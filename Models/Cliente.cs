@@ -19,8 +19,6 @@ namespace HealthWellbeing.Models
 		[RegularExpression(@"^9[1236]\d{7}$", ErrorMessage = "The number has to start with 91, 92, 93 or 96...")]
 		public string Phone { get; set; }
 
-		public string ClienteID { get; set; }
-
 		public bool? IsMember { get; set; }
 
 		public string IsMemberText => IsMember switch
