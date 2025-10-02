@@ -5,7 +5,7 @@ namespace HealthWellbeing.Models
     public class Patology
     {
         [Required(ErrorMessage = "ID is Required")]
-        public int Id { get; set; }
+        public int PatologyId { get; set; }
 
         [Required(ErrorMessage = "Name is Required")]
         public string Name { get; set; }
