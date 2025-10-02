@@ -2,7 +2,7 @@ namespace HealthWellbeing.Models;
 
 public class Consumiveis
 {
-    public int Id { get; set; }
+    public int ConsumiveisId { get; set; }
     public string Categoria { get; set; }
     public string Nome { get; set; }
     public string ZonaArmazenamento { get; set; }
