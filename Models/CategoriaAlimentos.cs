@@ -4,8 +4,8 @@
     {
         public int CategoriaID { get; set; }
 
-        public string name { get; set; }
+        public string Name { get; set; } = default!;
 
-        public string descricao { get; set; }
+        public string Description { get; set; }
     }
 }
