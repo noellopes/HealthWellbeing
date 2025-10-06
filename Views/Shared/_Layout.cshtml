@@ -22,6 +22,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="TipoMaterialDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">TipoMaterial</a>
+                            <ul class="dropdown-menu" aria-labelledby="TipoMaterialDropdown">
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="TipoMaterial" asp-action="Create"> Create TipoMaterial </a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="TipoMaterial" asp-action="Read"> See TipoMaterial </a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="TipoMaterial" asp-action="Update"> Update TipoMaterial </a></li>
+                                <li><a class="nav-link text-dark" asp-area="" asp-controller="TipoMaterial" asp-action="Delete"> Delete TipoMaterial </a></li>
+                            </ul>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
