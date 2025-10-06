@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Models
 {
-    public class TipoMaterial
+    public class TypeMaterial
     {
         public int TipoMaterialID {  get; set; }
         [Required(ErrorMessage = "O nome do TipoMaterial é obrigatorio.")]

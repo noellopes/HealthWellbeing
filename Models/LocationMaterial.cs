@@ -2,10 +2,10 @@
 
 namespace HealthWellbeing.Models
 {
-    public class LocalizacaoMaterial
+    public class LocationMaterial
     {
 
-        public int LocalizacaoMaterialID { get; set; }
+        public int LocationMaterialID { get; set; }
         
         public string Setor { get; set; }
         [Required(ErrorMessage = "O tipo de setor é obrigatório.")]
