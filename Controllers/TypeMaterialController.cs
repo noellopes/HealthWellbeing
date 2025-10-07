@@ -4,22 +4,22 @@ namespace HealthWellbeing.Controllers
 {
     public class TypeMaterialController : Controller
     {
-        public IActionResult CreateMaterial()
+        public IActionResult CreateTypeMaterial()
         {
             return View();
         }
 
-        public IActionResult ReadMaterial()
+        public IActionResult ReadTypeMaterial()
         {
             return View();
         }
 
-        public IActionResult UpdateMaterial()
+        public IActionResult UpdateTypeMaterial()
         {
             return View();
         }
 
-        public IActionResult DeleteMaterial()
+        public IActionResult DeleteTypeMaterial()
         {
             return View();
         }
