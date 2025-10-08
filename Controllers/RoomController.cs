@@ -34,12 +34,12 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View();
+                return View(room);//se o modelo nao for valido, retorna a view com os erros
             }
 
-            RepositoryRoom.AddRoom(room);
+            RepositoryRoom.AddRoom(room);//guarda a sala na "base de dados"
 
-            return View("Sala Criada com Sucesso!!!", room);
+            return View("CreateRoomComplete", room);
         }
 
     }

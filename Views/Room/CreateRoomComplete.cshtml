@@ -1,0 +1,32 @@
+﻿@model Room
+
+@{
+    ViewData["Title"] = "criação de Sala Completa";
+}
+
+<h1>Sala Criada com Sucesso!</h1>
+
+<div class="card">
+    <div class="card-body">
+
+        <h5 class="card-title text-success">Resumo da Sala Criada!</h5>
+
+        <hr />
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Tipo:</strong> @Model.TipoSala</li>
+                <li class="list-group-item"><strong>Especialidade:</strong> @Model.Especialidade</li>
+                <li class="list-group-item"><strong>Nome:</strong> @Model.Nome</li>
+                <li class="list-group-item"><strong>Localização:</strong> @Model.Localizacao</li>
+                <li class="list-group-item"><strong>Equipamentos:</strong> @string.Join(", ", Model.Equipamentos ?? new List<string>())</li>
+                <li class="list-group-item"><strong>Horário:</strong> @Model.HorarioFuncionamento</li>
+                <li class="list-group-item"><strong>Observações:</strong> @Model.Observacoes</li>
+            </ul>
+
+        <hr />
+
+        <a asp-controller="Home" asp-action="Index" class="card-link">Voltar ao inicio</a>
+
+        <a asp-action="" class="card-link">Ver a Sala</a>
+    </div>
+</div>

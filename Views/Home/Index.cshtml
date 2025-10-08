@@ -1,6 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Página Inicial";
 }
+
+<h1 class="card-title display-5 mb-5">
+    @ViewBag.Title
+</h1>
 
 <div style="margin: 10px;">
     <div class="card shadow-sm">
@@ -9,8 +13,25 @@
                 Bemvindo a <span class="text-primary fw-bold">HEALTH ROOMS!</span>
             </h1>
             <p class="card-text fs-5">A sua plataforma de gestão de Salas</p>
-            <a href="https://learn.microsoft.com/aspnet/core" class="btn btn-outline-primary mt-3">
-                Grupo 5
+            <hr />
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-3">
+                GRUPO 5
+            </a><br />
+            <hr />
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-3">
+                Nuno Clodic Carvalho Lima - 1011577
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-3">
+                Marcel da Moura Moreira -1708427
+            </a>
+            <a asp-controller="Home" asp-action="Index" " class="btn btn-outline-primary mt-3">
+                Luzayadio Pindi Vila - 1708199
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-3">
+                Evanilson Barros dos Santos - 1708452
+            </a>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary mt-3">
+                Leonel Fernandes - 1708094
             </a>
         </div>
     </div>
