@@ -1,6 +1,6 @@
 ﻿namespace HealthWellbeing.Models
 {
-    public class CategoriaAlimentos
+    public class CategoriaAlimento
     {
         public int CategoriaID { get; set; }
 
