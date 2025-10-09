@@ -3,5 +3,71 @@
     ViewData["Title"] = "CreateLocationMaterial";
 }
 
-<h1>CreateLocationMaterial</h1>
+<h1>Criar Localização Material</h1>
 
+@model HealthWellbeing.Models.LocationMaterial
+@{
+    ViewData["Title"] = "Criar Localização do Material";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+
+    <form asp-action="CreateLocationMaterial" method="post" class="border rounded shadow p-4 bg-light">
+
+        <div class="mb-3">
+            <label asp-for="Setor" class="form-label"></label>
+            <input asp-for="Setor" class="form-control" placeholder="Ex: Almoxarifado, Laboratório, Bloco Cirúrgico" />
+            <span asp-validation-for="Setor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Sala" class="form-label"></label>
+            <input asp-for="Sala" class="form-control" placeholder="Ex: Sala 101, Laboratório 2, Sala de Equipamentos" />
+            <span asp-validation-for="Sala" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Armario" class="form-label"></label>
+            <input asp-for="Armario" class="form-control" placeholder="Ex: Armário A, Armário Principal" />
+            <span asp-validation-for="Armario" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Gaveta" class="form-label"></label>
+            <input asp-for="Gaveta" class="form-control" placeholder="Ex: Gaveta 1, Gaveta Inferior" />
+            <span asp-validation-for="Gaveta" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Prateleira" class="form-label"></label>
+            <input asp-for="Prateleira" class="form-control" placeholder="Ex: Prateleira 2, Superior" />
+            <span asp-validation-for="Prateleira" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CodigoIdentificacao" class="form-label"></label>
+            <input asp-for="CodigoIdentificacao" class="form-control" placeholder="Ex: LM-001, COD-12345" />
+            <span asp-validation-for="CodigoIdentificacao" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Observacao" class="form-label"></label>
+            <textarea asp-for="Observacao" class="form-control" rows="3" placeholder="Observações adicionais sobre o local..."></textarea>
+            <span asp-validation-for="Observacao" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="ReadLocationMaterial" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Guardar
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
