@@ -20,5 +20,5 @@ public static class Repository
 
     public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
 
-    public static void AddResponse(Consumivel consumivel) => consumiveis.Add(consumivel);
+    public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
 }
