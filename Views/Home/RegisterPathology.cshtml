@@ -4,7 +4,7 @@
     ViewData["Title"] = "RegisterPathology";
 }
 
-<h1>@ViewBag.Title</h1>
+<h1>Register Pathology</h1>
 
 <form asp-action="Register" method="post">
    
@@ -22,21 +22,21 @@
     <div class="mb-3">
         <label asp-for="Severity" class="form-label"> Are you attending the party</label>
         <div class="form-check">
-            <input asp-for="Severity" class="form-check-input" type="radio" value="radio">
+            <input asp-for="Severity" class="form-check-input" type="radio" value="Mild">
             <label class="form-check-label">
-                Leve
+                Mild
             </label>
         </div>
         <div class="form-check">
-            <input asp-for="Severity" class="form-check-input" type="radio" >
+            <input asp-for="Severity" class="form-check-input" type="radio" value="Moderate">
             <label class="form-check-label">
-                Moderada
+                Moderate
             </label>
         </div>
         <div class="form-check">
-            <input asp-for="Severity" class="form-check-input" type="radio" >
+            <input asp-for="Severity" class="form-check-input" type="radio" value="Severe">
             <label class="form-check-label">
-                Grave
+                Severe
             </label>
         </div>
     </div>
