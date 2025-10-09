@@ -11,6 +11,6 @@
         public string Email { get; set; } = default!;          // Email como string
         public string Telefone { get; set; } = default!;      // String para preservar zeros iniciais e códigos
         public string Morada { get; set; } = default!;          // Endereço
-        public int MyProperty { get; set; } = default!;
+        public string Descrição { get; set; } = default; // Descrição para o Utente adicionar alguns dados extras
     }
 }
