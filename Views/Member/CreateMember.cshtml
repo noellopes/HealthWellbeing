@@ -1,0 +1,16 @@
+﻿@model Member
+@{
+    ViewData["Title"] = "CreateMember";
+}
+
+@* Titlle *@
+<h1>Become a Member!</h1>
+
+<form asp-action="CreateMember" method="post">
+    <div class="mb-3">
+        <label asp-for="ClientRecognizer" class="form-label"></label>
+        <input asp-for="ClientRecognizer" class="form-control" placeholder="Enter your client e-mail or phone number.">
+        <span asp-validation-for="ClientRecognizer" class="text-danger small"></span>
+    </div>
+</form>
+
