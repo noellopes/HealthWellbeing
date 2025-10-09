@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+//using NuGet.Protocol.Core.Types;
 
 namespace HealthWellbeing.Controllers
 {
@@ -9,5 +11,24 @@ namespace HealthWellbeing.Controllers
         {
             return View();
         }
-    }
+		// GET: /Client/Create
+		[HttpGet]
+		public IActionResult Create()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public IActionResult Create(Client client)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View();
+			}
+
+			Models.Repository.AddClient(client);
+
+			return View("CreateComplete", client);
+		}
+	}
 }

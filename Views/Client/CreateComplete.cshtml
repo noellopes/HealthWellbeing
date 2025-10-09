@@ -1,0 +1,36 @@
+﻿@model Client
+
+@{
+    ViewData["Title"] = "Create Completed!";
+}
+
+<h1>You are now a client of the Gym!!!</h1>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title text-success">@ViewBag.Title</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">
+            Thank you for creating an account!
+        </h6>
+
+        <hr />
+
+        <div class="form-floating mb-3">
+            <input asp-for="Name" readonly class="form-control-plaintext">
+            <label asp-for="Name"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Email" readonly class="form-control-plaintext">
+            <label asp-for="Email"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Phone" readonly class="form-control-plaintext">
+            <label asp-for="Phone"></label>
+        </div>
+        <hr />
+
+        <a asp-action="Index" class="card-link">Ok</a>
+    </div>
+</div>
