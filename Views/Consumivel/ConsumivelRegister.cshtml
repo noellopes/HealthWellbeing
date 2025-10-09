@@ -1,51 +1,48 @@
 ﻿@model HealthWellbeing.Models.Consumivel
 
 @{
-    ViewData["Title"] = "Registar Consumiveis";
+    ViewData["Title"] = "Registar Consumíveis";
 }
 
-<h1>Registo de Consumiveis</h1>
+<h1>@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post" class="mt-4">
+<form asp-action="ConsumivelRegister" method="post" class="mt-4">
     <div class="mb-3">
-        <label class="form-label">Nome</label>
-        <input type="text" class="form-control" name="Nome" />
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" placeholder="Insere o nome do consumível" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Categoria</label>
-        <input type="text" class="form-control" name="Categoria" />
+        <label asp-for="Categoria" class="form-label"></label>
+        <input asp-for="Categoria" class="form-control" placeholder="Ex: Luvas, Seringas, etc." />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Zona de Armazenamento</label>
-        <input type="text" class="form-control" name="ZonaArmazenamento" />
+        <label asp-for="ZonaArmazenamento" class="form-label"></label>
+        <input asp-for="ZonaArmazenamento" class="form-control" placeholder="Ex: Armazém A, Sala 3..." />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Fornecedores</label>
-        <input type="text" class="form-control" name="Fornecedores" placeholder="Separar por vírgula" />
+        <input type="text" name="FornecedoresTexto" class="form-control" placeholder="Separar fornecedores por vírgula" />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Stock</label>
-        <input type="number" class="form-control" name="Stock" />
+        <label asp-for="Stock" class="form-label"></label>
+        <input asp-for="Stock" type="number" class="form-control" min="0" />
     </div>
-    
-    <!--TODO: conectar com a database para ir buscar as salas quando as mesmas tiverem inseridas-->
-    <div class="form-floating">
-        <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-            <option selected>Open this select menu</option>
+
+    <!-- Dropdown de salas (por agora, valores de exemplo) -->
+    <div class="form-floating mb-4">
+        <select asp-for="SalaId" class="form-select" id="floatingSelect">
+            <option value="">-- Seleciona uma sala --</option>
             <option value="1">Exemplo sala 1</option>
             <option value="2">Exemplo sala 2</option>
             <option value="3">Exemplo sala 3</option>
         </select>
-        <label for="floatingSelect">Works with selects</label>
+        <label for="floatingSelect">Sala</label>
     </div>
-
-    <br />
 
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>
-
