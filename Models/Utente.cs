@@ -12,7 +12,7 @@ namespace HealthWellbeing.Models
 
         [StringLength(9, ErrorMessage = "O número de identificação civil deve ter 9 dígitos")]
         [RegularExpression(@"^\d{9}$", ErrorMessage = "O número de identificação civil deve conter apenas 9 dígitos")]
-        public string NumeroIdentificacaoCivil { get; set; } = string.Empty;
+        public string NumeroIdentificacaoCivil { get; set; } = string.Empty; 
 
         [StringLength(9, ErrorMessage = "O NIF deve ter 9 dígitos")]
         [RegularExpression(@"^\d{9}$", ErrorMessage = "O NIF deve conter apenas 9 dígitos")]
