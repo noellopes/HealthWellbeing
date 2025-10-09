@@ -1,6 +1,7 @@
-using System.Diagnostics;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Core.Types;
+using System.Diagnostics;
 
 namespace HealthWellbeing.Controllers
 {
@@ -22,7 +23,27 @@ namespace HealthWellbeing.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult TypeTreatmentRegister()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        public IActionResult TypeTreatmentRegister(TypeTreatment typeTreatment)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            RepositoryTypeTreatment.AddTypeTreatment(typeTreatment);
+
+            return View("TypeTreatmentRegisterComplete", typeTreatment);
+
+
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

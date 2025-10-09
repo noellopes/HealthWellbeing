@@ -1,1 +1,28 @@
-﻿
+﻿@model IEnumerable<TypeTreatment>
+
+
+@{
+    ViewData["Title"] = "TypeTreatmentList";
+}
+
+<h1>TypeTreatmentList</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">His priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (TypeTreatment g in Model)
+        {
+            <tr>
+                <td>@g.Name</td>
+                <td>@g.IsPriorityText</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button asp-action="Index" class="btn btn-primary"> Back </button>

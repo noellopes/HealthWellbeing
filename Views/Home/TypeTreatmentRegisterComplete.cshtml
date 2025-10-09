@@ -1,0 +1,44 @@
+﻿@model TypeTreatment
+
+@{
+    ViewData["Title"] = "TypeTreatmentRegisterComplete";
+}
+
+<div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">@ViewBag.Title</h4>
+    <p>Thank you for registering!</p>
+    <hr>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title text-success">@ViewBag.Title</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+
+        <hr />
+
+        <div class="form-floating mb-3">
+            <input asp-for="Name" readonly class="form-control-plaintext">
+            <label asp-for="Name"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Description" readonly class="form-control-plaintext">
+            <label asp-for="Description"></label>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="EstimatedDuration" readonly class="form-control-plaintext">
+            <label asp-for="EstimatedDuration"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input readonly class="form-control-plaintext" id="WillAttend" value="@Model.IsPriorityText">
+            <label for="WillAttend">Will attend the party</label>
+        </div>
+        <hr />
+
+        <a href="Index" class="card-link">OK</a>
+
+    </div>
+</div>
+
