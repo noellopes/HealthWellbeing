@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
 {
@@ -9,11 +9,9 @@ namespace HealthWellbeing.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-
-
-
-
-            PublicKey Dbset<AlimentoSubstituto> AlimentoSubstitutos { get; set; }
         }
+
+
+        public DbSet<AlimentoSubstituto> AlimentoSubstituto { get; set; }
     }
 }
