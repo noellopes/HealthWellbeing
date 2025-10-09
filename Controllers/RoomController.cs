@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
 using System.Diagnostics;
 
@@ -42,5 +43,20 @@ namespace HealthWellbeingRoom.Controllers
             return View("CreateRoomComplete", room);
         }
 
+
+        //public IActionResult VerSala()
+        //{
+
+        //    var rooms =;
+
+        //    if (rooms.)
+        //    {
+        //        return View(rooms);
+        //    }
+        //    else
+        //    {
+        //        return View("Naohasalas");
+        //    }
+        //}
     }
 }
