@@ -1,0 +1,51 @@
+﻿@model Pathology
+
+@{
+    ViewData["Title"] = "RegisterPathology";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<form asp-action="Register" method="post">
+   
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">   </label>
+        <input asp-for="Name" class="form-control" placeholder="Enter your Email">
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">   </label>
+        <input asp-for="Description" class="form-control" placeholder="Enter your Phone">
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Severity" class="form-label"> Are you attending the party</label>
+        <div class="form-check">
+            <input asp-for="Severity" class="form-check-input" type="radio" value="radio">
+            <label class="form-check-label">
+                Leve
+            </label>
+        </div>
+        <div class="form-check">
+            <input asp-for="Severity" class="form-check-input" type="radio" >
+            <label class="form-check-label">
+                Moderada
+            </label>
+        </div>
+        <div class="form-check">
+            <input asp-for="Severity" class="form-check-input" type="radio" >
+            <label class="form-check-label">
+                Grave
+            </label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary"> Submit </button>
+        <button asp-action="Index" class="btn btn-primary"> Cancel </button>
+    </div>
+
+</form>
+
+
