@@ -19,6 +19,4 @@ public static class Repository
     public static IEnumerable<Consumivel> Consumiveis => consumiveis;
 
     public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
-
-    public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
 }
