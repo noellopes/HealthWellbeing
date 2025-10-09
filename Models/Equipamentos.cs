@@ -25,8 +25,6 @@ namespace ProjetoSaude.Models
         [DataType(DataType.Date)]
         public DateTime? DataAquisicao { get; set; }
 
-        [Display(Name = "Número de Série")]
-        [StringLength(50)]
-        public string NumeroSerie { get; set; }
+        
     }
 }
