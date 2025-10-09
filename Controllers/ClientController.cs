@@ -1,6 +1,6 @@
-﻿using HealthWellbeing.Models;
+﻿using System.Diagnostics;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
-//using NuGet.Protocol.Core.Types;
 
 namespace HealthWellbeing.Controllers
 {
@@ -29,6 +29,12 @@ namespace HealthWellbeing.Controllers
 			Models.Repository.AddClient(client);
 
 			return View("CreateComplete", client);
+		}
+
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 	}
 }

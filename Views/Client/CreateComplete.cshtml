@@ -29,6 +29,10 @@
             <input asp-for="Phone" readonly class="form-control-plaintext">
             <label asp-for="Phone"></label>
         </div>
+        <div class="form-floating mb-3">
+            <input readonly class="form-control-plaintext" value="@Model.CreateMemberText">
+            <label asp-for="CreateMember">I am now a member of the Gym!</label>
+        </div>
         <hr />
 
         <a asp-action="Index" class="card-link">Ok</a>
