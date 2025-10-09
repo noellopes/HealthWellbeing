@@ -11,3 +11,14 @@ public class Consumivel
     public int SalaId { get; set; }
 
 }
+<<<<<<< Updated upstream
+=======
+public static class Repository
+{
+    private static List<Consumivel> consumiveis = new();
+
+    public static IEnumerable<Consumivel> Consumiveis => consumiveis;
+
+    public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
+}
+>>>>>>> Stashed changes
