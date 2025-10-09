@@ -23,7 +23,7 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        public IActionResult RegisterPatology()
+        public IActionResult RegisterPathology()
         {
             return View();
         }
