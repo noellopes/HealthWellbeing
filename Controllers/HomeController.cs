@@ -23,6 +23,8 @@ namespace HealthWellbeing.Controllers
         {
             return View();
         }
+
+        //------TypeTreatment------
         [HttpGet]
         public IActionResult TypeTreatmentRegister()
         {
@@ -44,11 +46,15 @@ namespace HealthWellbeing.Controllers
 
 
         }
+
+        //-----Pathologys-----
         public IActionResult RegisterPathology()
         {
             return View();
         }
 
+
+        //Outro
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
