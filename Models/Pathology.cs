@@ -8,6 +8,7 @@ namespace HealthWellbeing.Models
         public int PathologyId { get; set; }
 
         [Required(ErrorMessage = "Name is Required")]
+        [StringLength(200, MinimumLength = 3, ErrorMessage = "The name must have at least 3 chars and no more than 100 chars")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Description is Required")]
