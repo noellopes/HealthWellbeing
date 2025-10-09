@@ -1,16 +1,32 @@
-﻿namespace HealthWellbeing.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HealthWellbeing.Models
 {
-    public class AlergiaModel
+    public class Alergia
     {
-        public int Id { get; set; }
+        [Key]
+        public int AlergiaID { get; set; }
+
+        [Required(ErrorMessage = "O nome da alergia é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres.")]
+        [Display(Name = "Nome da Alergia")]
         public string Nome { get; set; }
+
+        [StringLength(500, ErrorMessage = "A descrição deve ter no máximo 500 caracteres.")]
+        [Display(Name = "Descrição")]
         public string Descricao { get; set; }
 
-        public string Gravidade { get; set; }
+        [Required(ErrorMessage = "A gravidade é obrigatória.")]
+        [StringLength(20, ErrorMessage = "A gravidade deve ter no máximo 20 caracteres.")]
+        [Display(Name = "Gravidade")]
+        public string Gravidade { get; set; } // -> quando implementar a classe alterar para ela, por enquanto mantem como string.
 
+        [Required(ErrorMessage = "Os sintomas são obrigatórios.")]
+        [StringLength(300, ErrorMessage = "Os sintomas devem ter no máximo 300 caracteres.")]
+        [Display(Name = "Sintomas")]
         public string Sintomas { get; set; }
 
-        //public ICollection<AlimentoModel> AlimentosRelacionados { get; set; } --> Quando implementar alimentos
+        //public ICollection<Alimentol> AlimentosRelacionados { get; set; } --> Quando implementar alimentos, adicionar as validações.
 
     }
 }
