@@ -1,0 +1,59 @@
+﻿@model TypeTreatment
+
+@{
+    ViewData["Title"] = "TypeTreatmentRegister";
+}
+
+<h1>TypeTreatmentRegister</h1>
+
+<form asp-action="TypeTreatmentRegister" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">   </label>
+        <input asp-for="Name" class="form-control" placeholder="Enter your Name">
+        <span class="text-danger small" asp-validation-for="Name"> </span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">   </label>
+        <input asp-for="Description" class="form-control" placeholder="Enter your Description">
+        <span class="text-danger small" asp-validation-for="Description"> </span>
+
+    </div>
+    <div class="mb-3">
+        <label asp-for="EstimatedDuration" class="form-label">   </label>
+        <input asp-for="EstimatedDuration" class="form-control" placeholder="Enter your EstimatedDuration">
+        <span class="text-danger small" asp-validation-for="EstimatedDuration"> </span>
+
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="Priority" class="form-label">       </label>
+
+        <div class="form-check">
+            <input asp-for="Priority" class="form-check-input" type="radio" value="checked">
+            <label class="form-check-label">
+                Routine
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="Priority" class="form-check-input" type="radio" value="true">
+            <label class="form-check-label">
+                Urgent
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="Priority" class="form-check-input" type="radio" value="false">
+            <label class="form-check-label">
+                Normal
+            </label>
+        </div>
+    </div>
+
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary"> Submit </button>
+        <button asp-action="Index" class="btn btn-primary"> Cancel </button>
+    </div>
+
+</form>
