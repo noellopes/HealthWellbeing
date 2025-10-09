@@ -21,9 +21,7 @@ namespace ProjetoSaude.Models
         [Display(Name = "Disponível?")]
         public bool Disponivel { get; set; } = true; // por defeito está disponível
 
-        [Display(Name = "Data de Aquisição")]
-        [DataType(DataType.Date)]
-        public DateTime? DataAquisicao { get; set; }
+        
 
         
     }
