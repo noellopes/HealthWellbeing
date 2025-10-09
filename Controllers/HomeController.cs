@@ -1,5 +1,6 @@
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NuGet.Protocol.Core.Types;
 using System.Diagnostics;
 
@@ -44,6 +45,11 @@ namespace HealthWellbeing.Controllers
 
 
         }
+        public IActionResult RegisterPathology()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
