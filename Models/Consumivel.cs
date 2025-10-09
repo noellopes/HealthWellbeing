@@ -11,3 +11,11 @@ public class Consumivel
     public int SalaId { get; set; }
 
 }
+public static class Repository
+{
+    private static List<Consumivel> consumiveis = new();
+
+    public static IEnumerable<Consumivel> Consumiveis => consumiveis;
+
+    public static void AddResponse(Consumivel consumivel) => consumiveis.Add(consumivel);
+}
