@@ -1,7 +1,49 @@
-﻿
+﻿@model HealthWellbeing.Models.TypeMaterial
 @{
-    ViewData["Title"] = "CreateTypeMaterial";
+    ViewData["Title"] = "Criar Tipo de Material";
 }
 
-<h1>Create</h1>
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+
+    <form asp-action="CreateTypeMaterial" method="post" class="border rounded shadow p-4 bg-light">
+        <div class="mb-3">
+            <label asp-for="TipoMaterialNome" class="form-label"></label>
+            <input asp-for="TipoMaterialNome" class="form-control" placeholder="Ex: Consumível, Equipamento, Dispositivo Médico" />
+            <span asp-validation-for="TipoMaterialNome" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Descricao" class="form-label"></label>
+            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descrição detalhada do tipo de material..."></textarea>
+            <span asp-validation-for="Descricao" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TipoMaterialCategoria" class="form-label"></label>
+            <input asp-for="TipoMaterialCategoria" class="form-control" placeholder="Ex: Descartável, Reutilizável, Eletromédico" />
+            <span asp-validation-for="TipoMaterialCategoria" class="text-danger"></span>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="Ativo" class="form-check-input" />
+            <label asp-for="Ativo" class="form-check-label"></label>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="ReadTypeMaterial" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Guardar
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
 
