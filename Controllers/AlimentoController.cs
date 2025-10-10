@@ -1,83 +1,62 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class AlimentoController : Controller
     {
-        // GET: AlimentoController
-        public ActionResult Index()
+        // Lista em memória — substitui a BD
+        private static List<Alimento> _alimentos = new()
         {
-            return View();
+            new Alimento { AlimentoId = 1, Name = "Maçã", KcalPor100g = 52 },
+            new Alimento { AlimentoId = 2, Name = "Arroz", KcalPor100g = 130 },
+        };
+
+        // LISTAR
+        public IActionResult Index()
+        {
+            return View(_alimentos);
         }
 
-        // GET: AlimentoController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        // CRIAR (GET)
+        public IActionResult Create() => View();
 
-        // GET: AlimentoController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AlimentoController/Create
+        // CRIAR (POST)
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Create(Alimento a)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            a.AlimentoId = _alimentos.Any() ? _alimentos.Max(x => x.AlimentoId) + 1 : 1;
+            _alimentos.Add(a);
+            return RedirectToAction("Index");
         }
 
-        // GET: AlimentoController/Edit/5
-        public ActionResult Edit(int id)
+        // EDITAR (GET)
+        public IActionResult Edit(int id)
         {
-            return View();
+            var a = _alimentos.FirstOrDefault(x => x.AlimentoId == id);
+            if (a == null) return NotFound();
+            return View(a);
         }
 
-        // POST: AlimentoController/Edit/5
+        // EDITAR (POST)
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult Edit(Alimento a)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var old = _alimentos.FirstOrDefault(x => x.AlimentoId == a.AlimentoId);
+            if (old == null) return NotFound();
+            old.Name = a.Name;
+            old.KcalPor100g = a.KcalPor100g;
+            return RedirectToAction("Index");
         }
 
-        // GET: AlimentoController/Delete/5
-        public ActionResult Delete(int id)
+        // ELIMINAR
+        public IActionResult Delete(int id)
         {
-            return View();
-        }
-
-        // POST: AlimentoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var a = _alimentos.FirstOrDefault(x => x.AlimentoId == id);
+            if (a != null) _alimentos.Remove(a);
+            return RedirectToAction("Index");
         }
     }
 }
