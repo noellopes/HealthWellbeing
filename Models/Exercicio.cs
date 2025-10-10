@@ -38,8 +38,8 @@ namespace HealthWellbeing.Models
         [Range(1, 50)]
         public int? Series { get; set; }
 
-        //preciso que o andre implemente o modelo de grupo muscular primeiro
-        //public int? GrupoMuscularId { get; set; }
-        //public GrupoMuscular? GrupoMuscular { get; set; }
+        public int? MusculoId { get; set; }
+        public GruposMusculares? GrupoMuscular { get; set; }
+
     }
 }
