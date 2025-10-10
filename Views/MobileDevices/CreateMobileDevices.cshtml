@@ -1,7 +1,67 @@
-﻿
+﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+@model MobileDevices;
+
 @{
-    ViewData["Title"] = "CreateMobileDevices";
+    ViewData["Title"] = "Registar novo Dispositivo Móvel";
 }
 
-<h1>CreateMobileDevices</h1>
+<h1>@ViewData["Title"]</h1>
 
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        
+        <form asp-action="CreateMobileDevices" method="post">
+            
+            @*(ModelOnly) -> mostra apenas o erro na validação*@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> 
+
+            <div class="mb-3">
+                <label asp-for="NomeDisp" class="form-label">Nome do Equipamento</label>
+                <input asp-for="NomeDisp" class="form-control" placeholder="Ex: Monitor de Paciente Portátil, Ecógrafo Móvel">
+                <span asp-validation-for="NomeDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="TipoDisp" class="form-label">Tipo de Dispositivo (Categoria)</label>
+                <input asp-for="TipoDisp" class="form-control" placeholder="Ex: Ultrassom, Monitores de UTI, Carrinho de Emergência">
+                <span asp-validation-for="TipoDisp" class="text-danger small"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="EspecificacaoDisp" class="form-label">Especificação Detalhada</label>
+                <input asp-for="EspecificacaoDisp" class="form-control" placeholder="Ex: Modelo Philips, Bateria 8h, Wi-Fi, Peso 5kg">
+                <span asp-validation-for="EspecificacaoDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="QuantidadeDisp" class="form-label">Quantidade a Adicionar</label>
+                <input asp-for="QuantidadeDisp" class="form-control" type="number" min="1" placeholder="1">
+                <span asp-validation-for="QuantidadeDisp" class="text-danger small"></span>
+            </div>
+
+            <input asp-for="DataRegisto" type="hidden" />
+            <input asp-for="DevicesID" type="hidden" />
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Submeter Registo
+                </button>
+                <a asp-action="Index" class="btn btn-secondary"> 
+                    <i class="bi bi-x-circle"></i> Cancelar e Ver Lista
+                </a>
+            </div>
+            
+        </form>
+        
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+       //As validações do C# apareçam imediatamente no navegador
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

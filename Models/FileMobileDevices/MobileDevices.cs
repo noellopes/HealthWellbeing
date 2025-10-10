@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HealthWellbeingRoom.Models
+namespace HealthWellbeingRoom.Models.FileMobileDevices
 {
     public class MobileDevices
     {

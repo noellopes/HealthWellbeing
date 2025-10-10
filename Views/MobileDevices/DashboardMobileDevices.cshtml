@@ -1,0 +1,41 @@
+﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+@model MobileDevices;
+
+@{
+    ViewData["Title"] = "Gestão de Dispositivos Móveis";
+}
+
+<div class="container text-center mt-5">
+    <h1>@ViewData["Title"]</h1>
+    <p class="lead">Selecione a ação desejada para gerir o inventário de equipamentos móveis hospitalares.</p>
+
+    <hr class="my-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Registar Novo Equipamento</h5>
+                    <p class="card-text">Adicione novos dispositivos ao inventário do hospital.</p>
+                    <a asp-action="CreateMobileDevices" class="btn btn-lg btn-success w-100">
+                        <i class="bi bi-plus-circle"></i> Novo Registo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Ver Lista de Dispositivos</h5>
+                    <p class="card-text">Consulte dispositivos existentes no inventário.</p>
+                    <a asp-action="Index" class="btn btn-lg btn-primary w-100">
+                        <i class="bi bi-list-ul"></i> Ver Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
