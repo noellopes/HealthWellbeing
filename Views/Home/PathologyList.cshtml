@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<Pathology>
+
 @{
     ViewData["Title"] = "PathologyList";
 }
@@ -15,12 +16,13 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var pathology in Model)
+        @foreach (var Pathology in Model)
         {
             <tr>
-                <td>@pathology.Name</td>
-                <td>@pathology.Description</td>
-                <td>@pathology.Severity</td>
+                <td>@Pathology.PathologyId</td>
+                <td>@Pathology.Name</td>
+                <td>@Pathology.Description</td>
+                <td>@Pathology.Severity</td>
             </tr>
         }
     </tbody>
