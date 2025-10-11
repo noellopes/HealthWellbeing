@@ -10,6 +10,11 @@
 
         public static void AddPathology(Pathology pathology)
         {
+            if (Pathologys.Any())
+                pathology.PathologyId = Pathologys.Max(p => p.PathologyId) + 1;
+            else
+                pathology.PathologyId = 1;
+
             Pathologys.Add(pathology);
         }
 
