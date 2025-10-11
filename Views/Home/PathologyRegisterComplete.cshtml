@@ -1,4 +1,5 @@
-﻿
+﻿@model Pathology
+
 @{
     ViewData["Title"] = "Pathology Register Complete";
 }
@@ -7,4 +8,37 @@
     <h4 class="alert-heading">@ViewBag.Title</h4>
     <p>Thank you for registering the pathology!</p>
     <hr>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title text-success">@ViewBag.Title</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+
+        <hr />
+
+        <div class="form-floating mb-3">
+            <input asp-for="PathologyId" readonly class="form-control-plaintext">
+            <label asp-for="PathologyId"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Name" readonly class="form-control-plaintext">
+            <label asp-for="Name"></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input asp-for="Description" readonly class="form-control-plaintext">
+            <label asp-for="Description"></label>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Severity" readonly class="form-control-plaintext">
+            <label asp-for="Severity"></label>
+        </div>
+
+        <hr />
+
+        <a href="Index" class="card-link">OK</a>
+
+    </div>
 </div>
