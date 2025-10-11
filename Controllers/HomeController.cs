@@ -49,6 +49,8 @@ namespace HealthWellbeing.Controllers
         }
 
         //-----Pathologys-----
+
+        [HttpGet]
         public IActionResult RegisterPathology()
         {
             return View();
@@ -58,12 +60,27 @@ namespace HealthWellbeing.Controllers
         {
             if (PathologyRepository.PathologyList.Any())
             {
-                return View(PathologyList);
+                return View(PathologyRepository.PathologyList);
             }
             else
             {
                 return View("NoPathologys");
             }
+        }
+
+        [HttpPost]
+        public IActionResult Register(Pathology pathology)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return View(pathology);
+            }
+
+            PathologyRepository.AddPathology(pathology);
+
+            //TODO: Store the Pathology response
+            return View("PathologyRegisterComplete", pathology);
         }
 
 
