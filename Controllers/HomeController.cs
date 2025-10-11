@@ -54,6 +54,18 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        public IActionResult PathologyList() 
+        {
+            if (PathologyRepository.PathologyList.Any())
+            {
+                return View(PathologyList);
+            }
+            else
+            {
+                return View("NoPathologys");
+            }
+        }
+
 
         //Outro
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
