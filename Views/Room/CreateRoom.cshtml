@@ -97,10 +97,19 @@
                 </div>
 
                 <!-- Botao enviar e cancelar-->
-                <div class="d-flex justify-content-between">
-                    <button type="button" asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Cancelar</button>
-                    <button type="submit" class="btn btn-primary flex-fill me-lg-2"> Criar </button>
+
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Cancelar</a>
+                                <button type="submit" class="btn btn-primary flex-fill me-lg-2"> Criar </button>
+                                <a asp-controller="Room" asp-action="ReadRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

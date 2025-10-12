@@ -8,6 +8,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th scope="col">Id da Sala</th>
             <th scope="col">Name da Sala</th>
             <th scope="col">Capacidade</th>
             <th scope="col">Especialidade</th>
@@ -20,14 +21,27 @@
         @foreach (Room room in Model)
         {
             <tr>
+                <td>@room.SalaId</td>
                 <td>@room.Nome</td>
                 <td>@room.Capacidade</td>
                 <td>@room.Especialidade</td>
                 <td>@room.Localizacao</td>
                 <td>@room.Observacoes</td>
                 <td>@room.Disponibilidade</td>
-
             </tr>
         }
     </tbody>
 </table>
+<form>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Voltar ao inicio</a>
+                    <a asp-controller="Room" asp-action="CreateRoom" class="btn btn-primary flex-fill me-lg-2">Adicionar nova Sala</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

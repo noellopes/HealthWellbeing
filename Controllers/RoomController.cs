@@ -9,54 +9,44 @@ namespace HealthWellbeingRoom.Controllers
 {
     public class RoomController : Controller
     {
+        [HttpGet]
         public IActionResult CreateRoom()
         {
             return View();
         }
+        [HttpGet]
         public IActionResult ReadRoom()
         {
-            return View();
+            var rooms = RepositoryRoom.Rooms;
+            return View(rooms);
         }
-
-
+        [HttpGet]
         public IActionResult UpdateRoom()
         {
             return View();
         }
-
+        [HttpGet]
         public IActionResult DeleteRoom()
         {
             return View();
         }
 
-        //Metodo POST para criar uma sala
         [HttpPost]
         public IActionResult CreateRoom(Room room)
         {
+
             if (!ModelState.IsValid)
             {
-                return View(room);//se o modelo nao for valido, retorna a view com os erros
+                return View(room); //se o modelo nao for valido, retorna a view com os erros
             }
-
-            RepositoryRoom.AddRoom(room);//guarda a sala na "base de dados"
-
+            room.SalaId = RepositoryRoom.Rooms.Count() + 1;
+            RepositoryRoom.AddRoom(room);
             return View("CreateRoomComplete", room);
         }
-
-
-        //public IActionResult VerSala()
-        //{
-
-        //    var rooms =;
-
-        //    if (rooms.)
-        //    {
-        //        return View(rooms);
-        //    }
-        //    else
-        //    {
-        //        return View("Naohasalas");
-        //    }
-        //}
+        [HttpGet]
+        public IActionResult CreateRoomComplete()
+        {
+            return View();
+        }
     }
 }
