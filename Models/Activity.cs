@@ -1,8 +1,8 @@
 ﻿namespace HealthWellbeing.Models {
-    public class Activity {
+    public class Activity_ {
 
-        public int ActivityId { get; set; }
-        public string ActivityName { get; set; }
-        public string ActivityDescription { get; set; }
+        public int Activity_Id { get; set; }
+        public string Activity_Name { get; set; }
+        public string Activity_Description { get; set; }
     }
 }
