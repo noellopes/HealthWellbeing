@@ -1,6 +1,6 @@
 namespace HealthWellbeing.Models;
 
-public class Consumiveis
+public class Consumivel
 {
     public int ConsumiveisId { get; set; }
     public string Categoria { get; set; }
