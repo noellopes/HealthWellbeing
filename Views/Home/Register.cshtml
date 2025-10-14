@@ -1,0 +1,40 @@
+﻿@model Register
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+<form asp-action="Register" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="registerId" class="form-label"></label>
+        <input asp-for="registerId" class="form-control" placeholder="Enter the register ID">
+    </div>
+    <div class="mb-3">
+        <label asp-for="pacientId" class="form-label"></label>
+        <input asp-for="pacientId" class="form-control" placeholder="Enter the pacient id">
+    </div>
+    <div class="mb-3">
+        <label asp-for="doctorId" class="form-label"></label>
+        <input asp-for="doctorId" class="form-control" placeholder="Enter your phone">
+    </div>
+    <div class="mb-3">
+        <label asp-for="date" class="form-label"></label>
+        <input asp-for="date" class="form-control" placeholder="Enter your phone">
+    </div>
+    <div class="mb-3">
+        <label asp-for="diagnostic" class="form-label"></label>
+        <input asp-for="diagnostic" class="form-control" placeholder="Enter your phone">
+    </div>
+    <div class="mb-3">
+        <label asp-for="observations" class="form-label"></label>
+        <input asp-for="observations" class="form-control" placeholder="Enter your phone">
+    </div
+
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button asp-action="Index" class="btn btn-secondary">Cancel</button>
+    </div>
+</form>
