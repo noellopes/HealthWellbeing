@@ -1,6 +1,6 @@
 ﻿namespace HealthWellbeing.Models
 {
-    public class ComponentesAlimentos
+    public class ComponentesAlimento
     {
         public int CompFoodID { get; set; } = default!;
 
