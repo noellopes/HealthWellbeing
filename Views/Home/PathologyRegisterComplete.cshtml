@@ -13,32 +13,32 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title text-success">@ViewBag.Title</h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+        <h6 class="card-subtitle mb-2 text-body-secondary">You registered the following pathology</h6>
 
         <hr />
 
-        <div class="form-floating mb-3">
+        <div class="mb-3">
+            <label asp-for="PathologyId" class="text-secondary"></label>
             <input asp-for="PathologyId" readonly class="form-control-plaintext">
-            <label asp-for="PathologyId"></label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div class="mb-3">
+            <label asp-for="Name" class="text-secondary"></label>
             <input asp-for="Name" readonly class="form-control-plaintext">
-            <label asp-for="Name"></label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div class="mb-3">
+            <label asp-for="Description" class="text-secondary"></label>
             <input asp-for="Description" readonly class="form-control-plaintext">
-            <label asp-for="Description"></label>
         </div>
-        <div class="form-floating mb-3">
+        <div class="mb-3">
+            <label asp-for="Severity" class="text-secondary"></label>
             <input asp-for="Severity" readonly class="form-control-plaintext">
-            <label asp-for="Severity"></label>
         </div>
 
         <hr />
 
-        <a href="Index" class="card-link">OK</a>
+        <a href="Index" class="btn btn-primary">OK</a>
 
     </div>
 </div>
