@@ -3,12 +3,22 @@
 }
 
 <div class="text-center">
+
     <h1 class="display-4">Welcome</h1>
-    <a asp-action="TypeTreatmentRegister"> Register here </a>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    
-    <a asp-action="RegisterPathology"> Register pathology here</a>
 
-    <a asp-action="PathologyList"> See pathologys </a>
+    <div class="border border-2 border-dark bg-light rounded-pill mt-3 mb-5 py-3 ">
+        <h3 class="fw-bold">Treatment types section</h3>
 
+        <a asp-action="TypeTreatmentRegister" class="btn btn-primary text-white text-decoration-none"> Register Type Treatment here </a>
+
+    </div>
+
+    <div class="border border-2 border-dark bg-light rounded-pill my-5 py-3">
+        <h3 class="fw-bold">Pathologys section</h3>
+
+        <a asp-action="RegisterPathology" class="btn btn-primary text-white text-decoration-none"> Register pathology here</a>
+
+        <a asp-action="PathologyList" class="btn btn-primary text-white text-decoration-none"> See pathologys </a>
+
+    </div>
 </div>
