@@ -74,7 +74,7 @@ namespace HealthWellbeing.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View(pathology);
+                return View("RegisterPathology", pathology);
             }
 
             PathologyRepository.AddPathology(pathology);
