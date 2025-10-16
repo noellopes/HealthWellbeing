@@ -1,7 +1,17 @@
-﻿
+﻿@model Room
 @{
     ViewData["Title"] = "Atualizar Sala";
 }
 
-<h1>Ola, Aqui a Pagina do Update Room</h1>
 
+
+@using (Html.BeginForm("Editar", "Salas", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.SalaId)
+    <div>
+        @Html.LabelFor(m => m.Nome)
+        @Html.TextBoxFor(m => m.Nome)
+    </div>
+    <!-- Adiciona os outros campos aqui -->
+    <button type="submit" class="btn btn-success">Salvar</button>
+}
