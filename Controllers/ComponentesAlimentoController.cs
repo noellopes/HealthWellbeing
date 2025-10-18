@@ -6,10 +6,17 @@ namespace HealthWellbeing.Controllers
 {
     public class ComponentesAlimentoController : Controller
     {
+        private static List<ComponentesAlimento> _Calimento = new()
+        {
+            new ComponentesAlimento { CompFoodID  = 1, Name = "Maçã", Description = "Water, Carbohydrates, Fibers, Vitamins, Minerals, Antioxidant, Maleic Acid"},
+            new ComponentesAlimento {  CompFoodID = 2, Name = "Arroz", Description = ""},
+        };
+
+
         // GET: ComponentesAlimentoController
         public ActionResult Index()
         {
-            return View();
+            return View(_Calimento);
         }
 
         // GET: ComponentesAlimentoController/Details/5
@@ -30,7 +37,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(ComponentesAlimentos));
+                return RedirectToAction(nameof(ComponentesAlimento));
             }
             catch
             {
@@ -51,7 +58,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(ComponentesAlimentos));
+                return RedirectToAction(nameof(ComponentesAlimento));
             }
             catch
             {
@@ -62,22 +69,9 @@ namespace HealthWellbeing.Controllers
         // GET: ComponentesAlimentoController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
-        }
-
-        // POST: ComponentesAlimentoController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(ComponentesAlimentos));
-            }
-            catch
-            {
-                return View();
-            }
+            var a = _Calimento.FirstOrDefault(x => x.CompFoodID == id);
+            if (a != null) _Calimento.Remove(a);
+            return RedirectToAction("Index");
         }
     }
 }
