@@ -9,65 +9,52 @@ namespace HealthWellbeing.Controllers
         private static List<ComponentesAlimento> _Calimento = new()
         {
             new ComponentesAlimento { CompFoodID  = 1, Name = "Maçã", Description = "Water, Carbohydrates, Fibers, Vitamins, Minerals, Antioxidant, Maleic Acid"},
-            new ComponentesAlimento {  CompFoodID = 2, Name = "Arroz", Description = ""},
+            new ComponentesAlimento { CompFoodID = 2, Name = "Arroz", Description = ""},
         };
 
 
         // GET: ComponentesAlimentoController
-        public ActionResult Index()
+        public IActionResult Index()
         {
             return View(_Calimento);
-        }
-
-        // GET: ComponentesAlimentoController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        }    
 
         // GET: ComponentesAlimentoController/Create
-        public ActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
 
         // POST: ComponentesAlimentoController/Create
         [HttpPost]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Create(ComponentesAlimento a)
         {
-            try
-            {
-                return RedirectToAction(nameof(ComponentesAlimento));
-            }
-            catch
-            {
-                return View();
-            }
+            a.CompFoodID = _Calimento.Any() ? _Calimento.Max(x => x.CompFoodID) + 1 : 1;
+            _Calimento.Add(a);
+            return RedirectToAction("Index");
         }
 
         // GET: ComponentesAlimentoController/Edit/5
-        public ActionResult Edit(int id)
+        public IActionResult Edit(int id)
         {
-            return View();
+            var a = _Calimento.FirstOrDefault(x => x.CompFoodID == id);
+            if (a == null) return NotFound();
+            return View(a);
         }
 
         // POST: ComponentesAlimentoController/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult Edit(ComponentesAlimento a)
         {
-            try
-            {
-                return RedirectToAction(nameof(ComponentesAlimento));
-            }
-            catch
-            {
-                return View();
-            }
+            var old = _Calimento.FirstOrDefault(x => x.CompFoodID == a.CompFoodID);
+            if (old == null) return NotFound();
+            old.Name = a.Name;
+            old.Description = a.Description;
+            return RedirectToAction("Index");
         }
 
         // GET: ComponentesAlimentoController/Delete/5
-        public ActionResult Delete(int id)
+        public IActionResult Delete(int id)
         {
             var a = _Calimento.FirstOrDefault(x => x.CompFoodID == id);
             if (a != null) _Calimento.Remove(a);

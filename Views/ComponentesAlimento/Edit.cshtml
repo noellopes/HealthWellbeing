@@ -13,8 +13,8 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Description</label>
-        <select asp-for="Description" class="form-select" asp-items="ViewBag.CompFoodID"></select>
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control"/>
     </div>
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Voltar</a>
