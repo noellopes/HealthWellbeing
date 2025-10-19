@@ -19,7 +19,6 @@
                 <li class="list-group-item"><strong>Especialidade:</strong> @Model.Especialidade</li>
                 <li class="list-group-item"><strong>Nome:</strong> @Model.Nome</li>
                 <li class="list-group-item"><strong>Localização:</strong> @Model.Localizacao</li>
-                <li class="list-group-item"><strong>Equipamentos:</strong> @string.Join(", ", Model.Equipamentos ?? new List<string>())</li>
                 <li class="list-group-item"><strong>Horário:</strong> @Model.HorarioFuncionamento</li>
                 <li class="list-group-item"><strong>Observações:</strong> @Model.Observacoes</li>
             </ul>
@@ -32,7 +31,7 @@
                     <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
                         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Voltar ao inicio</a>
                         <a asp-controller="Room" asp-action="CreateRoom" class="btn btn-primary flex-fill me-lg-2">Adicionar nova Sala</a>
-                        <a asp-controller="Room" asp-action="ReadRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
+                        <a asp-controller="Room" asp-action="IndexRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
                     </div>
                 </div>
             </div>

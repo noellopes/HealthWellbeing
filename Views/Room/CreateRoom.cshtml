@@ -70,18 +70,6 @@
                     <input asp-for="Localizacao" class="form-control" placeholder="Ex: Piso 2, Ala B">
                 </div>
 
-                <!-- Equipamentos -->
-                <div class="mb-3">
-                    <label asp-for="Equipamentos" class="form-label">Equipamentos</label>
-                    <input asp-for="Equipamentos" class="form-control" placeholder="Virão da base de dados">
-                </div>
-
-                <!-- Dispositivos Moveis -->
-                <div class="mb-3">
-                    <label asp-for="DispositivosMoveis" class="form-label">Dispositivos Moveis</label>
-                    <input asp-for="DispositivosMoveis" class="form-control" placeholder="Virão da base de dados">
-                </div>
-
                 <!-- HorarioFuncionamento -->
                 <div class="mb-3">
                     <label asp-for="HorarioFuncionamento" class="form-label">Horário de Funcionamento</label>
@@ -104,7 +92,7 @@
                             <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
                                 <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Cancelar</a>
                                 <button type="submit" class="btn btn-primary flex-fill me-lg-2"> Criar </button>
-                                <a asp-controller="Room" asp-action="ReadRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
+                                <a asp-controller="Room" asp-action="IndexRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
                             </div>
                         </div>
                     </div>

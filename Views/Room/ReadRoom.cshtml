@@ -1,50 +1,9 @@
-﻿@model IEnumerable<Room>
+﻿
 @{
-    ViewData["Title"] = "Ver Sala";
+    ViewData["Title"] = "ReadRoom";
 }
 
-<h1>Lista das Salas</h1>
+<h1>ReadRoom</h1>
+<hr />
+<p> Aqui vais ver os detalhes da sala</p>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Capacidade</th>
-            <th scope="col">Especialidade</th>
-            <th scope="col">Localização</th>
-            <th scope="col">Observações</th>
-            <th scope="col">Disponibilidade</th>
-            <th scope="col">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Room room in Model)
-        {
-            <tr>
-                <td>@room.SalaId</td>
-                <td>@room.Nome</td>
-                <td>@room.Capacidade</td>
-                <td>@room.Especialidade</td>
-                <td>@room.Localizacao</td>
-                <td>@room.Observacoes</td>
-                <td>@(room.Disponibilidade ? "disponível" : "indisponível")</td>
-                <td class="d-flex gap-2">
-                    <a href="@Url.Action("UpdateRoom", "Room", new { id = room.SalaId })" class="btn btn-warning flex-fill text-center">Editar</a>
-                    <a href="@Url.Action("DeleteRoom", "Room", new { id = room.SalaId })" class="btn btn-danger flex-fill text-center">Eliminar</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Voltar ao início</a>
-                <a asp-controller="Room" asp-action="CreateRoom" class="btn btn-primary flex-fill me-lg-2">Adicionar nova Sala</a>
-            </div>
-        </div>
-    </div>
-</div>

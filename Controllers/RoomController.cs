@@ -6,6 +6,13 @@ namespace HealthWellbeingRoom.Controllers
 {
     public class RoomController : Controller
     {
+        //Pagina principal de salas, listar salas.
+        [HttpGet]
+        public IActionResult IndexRoom()
+        {
+            var rooms = RepositoryRoom.Rooms;
+            return View(rooms);
+        }
         // GET: Criar nova sala
         [HttpGet]
         public IActionResult CreateRoom()
@@ -34,12 +41,16 @@ namespace HealthWellbeingRoom.Controllers
             return View();
         }
 
-        // GET: Listar salas
+        // GET: Ver uma Sala pelo Id
         [HttpGet]
-        public IActionResult ReadRoom()
+        public IActionResult ReadRoom(int id)
         {
-            var rooms = RepositoryRoom.Rooms;
-            return View(rooms);
+            var room = RepositoryRoom.GetRoomById(id);
+            if (room == null)
+            {
+                return NotFound();
+            }
+            return View(room);
         }
 
         // GET: Editar sala
@@ -62,9 +73,9 @@ namespace HealthWellbeingRoom.Controllers
             {
                 return View(room);
             }
-
             RepositoryRoom.UpdateRoom(room);
-            return RedirectToAction("ReadRoom");
+            TempData["Mensagem"] = "Sala atualizada com sucesso!";
+            return RedirectToAction("ReadRoom", "Room");
         }
 
         // GET: Eliminar sala
