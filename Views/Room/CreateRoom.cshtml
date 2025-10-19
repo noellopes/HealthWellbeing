@@ -1,6 +1,105 @@
-﻿
+﻿@model Room
+
 @{
     ViewData["Title"] = "Criar Sala";
 }
 
-<h1>Criar Sala em construção</h1>
+<h1>Criar Sala</h1>
+
+<!--mostrar erros de validacao-->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="CreateRoom" method="post">
+    <!-- Tipo de Sala -->
+
+    <div style="margin: 10px;">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <label asp-for="TipoSala" class="form-label">Tipo de Sala</label>
+                    <select asp-for="TipoSala" class="form-select" onchange="toggleCamposEspecificos()">
+                        <option value="">Selecione...</option>
+                        <option value="Consultas">Consultas</option>
+                        <option value="Tratamentos">Tratamentos</option>
+                    </select>
+                </div>
+
+                <!-- Especialidade -->
+                <div class="mb-3">
+                    <label asp-for="Especialidade" class="form-label">Especialidade</label>
+                    <select asp-for="Especialidade" class="form-select" onchange="toggleCamposEspecificos">
+                        <option value="">Selecione o tipo primeiro...</option>
+                        <option value="Cardiologia">Cardiologia</option>
+                        <option value="Dermatologia">Dermatologia</option>
+                        <option value="Pediatria">Pediatria</option>
+                        <option value="Ginecologia">Ginecologia</option>
+                        <option value="Urologia">Urologia</option>
+                        <option value="Neurologia">Neurologia</option>
+                        <option value="Psiquiatria">Psiquiatria</option>
+                        <option value="Oftalmologia">Oftalmologia</option>
+                        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+                        <option value="Endocrinologia">Endocrinologia</option>
+                        <option value="Reumatologia">Reumatologia</option>
+                        <option value="Gastroenterologia">Gastroenterologia</option>
+                        <option value="Pneumologia">Pneumologia</option>
+                        <option value="Nefrologia">Nefrologia</option>
+                        <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                    </select>
+                </div>
+
+
+                <!-- Nome da Sala -->
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label">Nome da Sala</label>
+                    <input asp-for="Nome" class="form-control" placeholder="Ex: Consulta-Cardio-01">
+                </div>
+
+                <!-- Localização -->
+                <div class="mb-3">
+                    <label asp-for="Localizacao" class="form-label">Localização</label>
+                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Piso 2, Ala B">
+                </div>
+
+                <!-- HorarioFuncionamento -->
+                <div class="mb-3">
+                    <label asp-for="HorarioFuncionamento" class="form-label">Horário de Funcionamento</label>
+                    <input asp-for="HorarioFuncionamento" class="form-control" placeholder="Ex: 08:00 - 18:00" />
+                    <span asp-validation-for="HorarioFuncionamento" class="text-danger small"></span>
+                </div>
+
+                <!-- Observações -->
+                <div class="mb-3">
+                    <label asp-for="Observacoes" class="form-label">Observações</label>
+                    <textarea asp-for="Observacoes" class="form-control" rows="4" placeholder="Notas adicionais sobre a sala..."></textarea>
+                    <span asp-validation-for="Observacoes" class="text-danger small"></span>
+                </div>
+
+                <!-- Botao enviar e cancelar-->
+
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary flex-fill me-lg-2">Cancelar</a>
+                                <button type="submit" class="btn btn-primary flex-fill me-lg-2"> Criar </button>
+                                <a asp-controller="Room" asp-action="IndexRoom" class="btn btn-primary flex-fill me-lg-2">Ver lista das Salas</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</form>
