@@ -1,7 +1,78 @@
-﻿
+﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+@model MobileDevices;
+
 @{
-    ViewData["Title"] = "UpdateMobileDevices";
+    ViewData["Title"] = $"Editar Dispositivo: {Model.NomeDisp}";
 }
 
-<h1>UpdateMobileDevices</h1>
+<h1>@ViewData["Title"]</h1>
+<p class="lead">Altere apenas os campos necessários.</p>
 
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+
+        <form asp-action="UpdateMobileDevices" method="post">
+
+            @*(ModelOnly) -> mostra apenas o erro na validação*@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="NomeDisp" class="form-label">Nome do Equipamento</label>
+                <input asp-for="NomeDisp" class="form-control">
+                <span asp-validation-for="NomeDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="TipoDisp" class="form-label">Tipo de Dispositivo (Categoria)</label>
+                <input asp-for="TipoDisp" class="form-control">
+                <span asp-validation-for="TipoDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EspecificacaoDisp" class="form-label">Especificação Detalhada</label>
+                <input asp-for="EspecificacaoDisp" class="form-control">
+                <span asp-validation-for="EspecificacaoDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="QuantidadeDisp" class="form-label">Quantidade</label>
+                <input asp-for="QuantidadeDisp" class="form-control" type="number" min="1">
+                <span asp-validation-for="QuantidadeDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="StatusDisp" class="form-label">Status do Dispositivo</label>
+                <input asp-for="StatusDisp" class="form-control">
+                <span asp-validation-for="StatusDisp" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ObservacoesDisp" class="form-label">Observações</label>
+                <input asp-for="ObservacoesDisp" class="form-control">
+                <span asp-validation-for="ObservacoesDisp" class="text-danger small"></span>
+            </div>
+
+            <input asp-for="DataRegisto" type="hidden" />
+            <input asp-for="DevicesID" type="hidden" />
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Salvar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancelar e Voltar
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        //As validações do C# apareçam imediatamente no navegador
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

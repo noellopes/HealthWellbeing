@@ -19,9 +19,13 @@ namespace HealthWellbeingRoom.Models.FileMobileDevices
         [StringLength(200, MinimumLength = 5, ErrorMessage = "Deve conter no min 5 letras e 200 no max.")]
         public string EspecificacaoDisp { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Quantidade é obrigatório.")]
         public int QuantidadeDisp { get; set; }
 
         public DateTime DataRegisto { get; set; }
+
+        public string StatusDisp { get; set; }
+
+        public string ObservacoesDisp { get; set; }
     }
 }
