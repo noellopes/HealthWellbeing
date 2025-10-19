@@ -1,0 +1,29 @@
+﻿@model HealthWellbeing.Models.User
+
+<h2>Login</h2>
+
+<form asp-action="Login" method="post">
+    <div>
+        <label asp-for="UserId"></label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Entrar</button>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <p class="text-danger">@ViewBag.ErrorMessage</p>
+    }
+</form>
+
+<p>Ainda não tem conta? <a asp-action="Register">Registe-se aqui</a>.</p>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
