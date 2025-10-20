@@ -51,12 +51,31 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction("Index");
         }
 
-        // ELIMINAR
+        // ELIMINAR (GET) — mostra a página de confirmação
         public IActionResult Delete(int id)
+        {
+            var a = _alimentos.FirstOrDefault(x => x.AlimentoId == id);
+            if (a == null) return NotFound();
+            return View(a);
+        }
+
+        // ELIMINAR (POST) — confirma e remove
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
         {
             var a = _alimentos.FirstOrDefault(x => x.AlimentoId == id);
             if (a != null) _alimentos.Remove(a);
             return RedirectToAction("Index");
         }
+
+
+        // DETALHES (GET)
+        public IActionResult Details(int id)
+        {
+            var a = _alimentos.FirstOrDefault(x => x.AlimentoId == id);
+            if (a == null) return NotFound();
+            return View(a);
+        }
+
     }
 }
