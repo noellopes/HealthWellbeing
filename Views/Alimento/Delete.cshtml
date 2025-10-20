@@ -1,17 +1,15 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model Alimento
-@{
-    ViewData["Title"] = "Apagar Alimento";
-}
-<h1>@ViewData["Title"]</h1>
+﻿@model HealthWellbeing.Models.Alimento
 
-<p>Queres mesmo apagar <strong>@Model.Name</strong>?</p>
+<h2>Eliminar Alimento</h2>
 
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="AlimentoId" />
-    <button type="submit" class="btn btn-danger">Apagar</button>
+<p>Tem a certeza que deseja eliminar este alimento?</p>
+
+<ul>
+    <li><b>Nome:</b> @Model.Name</li>
+    <li><b>Kcal:</b> @Model.KcalPor100g</li>
+</ul>
+
+<form method="post" asp-action="Delete" asp-route-id="@Model.AlimentoId">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>
-
