@@ -17,7 +17,15 @@ namespace HealthWellbeing.Controllers
         public IActionResult Index()
         {
             return View(_Calimento);
-        }    
+        }
+
+        // GET: ComponentesAlimentoController
+        public IActionResult Details(int id)
+        {
+            var a = _Calimento.FirstOrDefault(x => x.CompFoodID == id);
+            if (a == null) return NotFound();
+            return View(a);
+        }
 
         // GET: ComponentesAlimentoController/Create
         public IActionResult Create()
