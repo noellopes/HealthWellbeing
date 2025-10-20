@@ -1,8 +1,10 @@
-﻿namespace HealthWellbeing.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HealthWellbeing.Models
 {
     public class UtenteBalneario
     {
-
+        [Key]
         //Infos Utente
         public int UtenteBalnearioId { get; set; }
         public string Nome { get; set; }

@@ -1,7 +1,10 @@
-﻿namespace HealthWellbeing.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HealthWellbeing.Models
 {
     public class AgendamentoModel
     {
+        [Key]
         public int AgendamentoId { get; set; }
         public DateTime DataHoraInicio { get; set; }
         public DateTime DataHoraFim { get; set; }
@@ -9,11 +12,12 @@
 
         public int UtenteBalnearioId { get; set; }
         public UtenteBalneario UtenteBalneario { get; set; }
-        public int TerapeutaId {  get; set; }
+        public int TerapeutaId { get; set; }
         public TerapeutaModel Terapeuta { get; set; }
-        public int ServicoId { get; set; }  
-        public ServicoModel Servico { get; set; } 
+        public int ServicoId { get; set; }
+        public ServicoModel Servico { get; set; }  
 
 
     }
 }
+
