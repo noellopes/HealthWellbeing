@@ -24,18 +24,36 @@
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
-    <!-- Grupo Muscular -->
+    
+     Grupos Musculares (seleção múltipla)
     <div class="mb-3">
-        <label asp-for="MusculoId" class="form-label">Músculo Principal</label>
-        <select asp-for="MusculoId" class="form-select">
-            <option value="">-- Selecione um músculo --</option>
+        <label class="form-label">Grupos Musculares *</label>
+        <select asp-for="GruposMusculares" class="form-select" multiple
+                asp-items="ViewBag.GruposMusculares">
+        </select>
+        <span asp-validation-for="GruposMusculares" class="text-danger small"></span>
+        <small class="text-muted">Segure Ctrl (ou Cmd) para selecionar vários.</small>
+    </div>
+    
+
+    <!--Perguntar ao Professor-->
+    <!-- Grupos Musculares (lista com checkboxes)
+    <div class="mb-3">
+        <label class="form-label">Grupos Musculares *</label>
+        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
             @foreach (var item in ViewBag.GruposMusculares)
             {
-                <option value="@item.Value">@item.Text</option>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="musculosIds"
+                           value="@item.Value"
+                           id="musculo_@item.Value" />
+                    <label class="form-check-label" for="musculo_@item.Value">@item.Text</label>
+                </div>
             }
-        </select>
-        <span asp-validation-for="MusculoId" class="text-danger small"></span>
-    </div>
+        </div>
+    </div>-->
+
 
     <div class="row">
         <!-- Duração -->
@@ -63,26 +81,43 @@
     <div class="row">
         <!-- Equipamento -->
         <div class="col-md-6 mb-3">
-            <label asp-for="EquipamentoNecessario" class="form-label">Equipamento Necessário</label>
+            <label asp-for="EquipamentoNecessario" class="form-label">Equipamento Necessário *</label>
             <input asp-for="EquipamentoNecessario" class="form-control" placeholder="Ex: Halteres, Bola, Nenhum">
+            <span asp-validation-for="EquipamentoNecessario" class="text-danger small"></span>
         </div>
 
-        <!-- Repetições e Séries -->
+        <!-- Repetições -->
         <div class="col-md-3 mb-3">
-            <label asp-for="Repeticoes" class="form-label">Repetições</label>
+            <label asp-for="Repeticoes" class="form-label">Repetições *</label>
             <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
+            <span asp-validation-for="Repeticoes" class="text-danger small"></span>
         </div>
 
+        <!-- Séries -->
         <div class="col-md-3 mb-3">
-            <label asp-for="Series" class="form-label">Séries</label>
+            <label asp-for="Series" class="form-label">Séries *</label>
             <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
+            <span asp-validation-for="Series" class="text-danger small"></span>
         </div>
     </div>
 
     <!-- Instruções -->
     <div class="mb-3">
-        <label asp-for="Instrucoes" class="form-label">Instruções de Execução</label>
-        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo para realizar o exercício..."></textarea>
+        <label asp-for="Instrucoes" class="form-label">Instruções *</label>
+        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo..."></textarea>
+        <span asp-validation-for="Instrucoes" class="text-danger small"></span>
+    </div>
+
+    <!-- Género -->
+    <div class="mb-3">
+        <label asp-for="Genero" class="form-label">Género *</label>
+        <select asp-for="Genero" class="form-select">
+            <option value="">-- Selecione --</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Unissexo">Unissexo</option>
+        </select>
+        <span asp-validation-for="Genero" class="text-danger small"></span>
     </div>
 
     <!-- Botões -->
@@ -90,7 +125,7 @@
         <button type="submit" class="btn btn-success">
             <i class="fas fa-save"></i> Criar Exercício
         </button>
-        <a asp-action="VerExercicios" class="btn btn-secondary">
+        <a asp-action="Index" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Voltar à Lista
         </a>
     </div>

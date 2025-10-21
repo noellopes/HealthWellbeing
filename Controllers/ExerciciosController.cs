@@ -6,71 +6,66 @@ namespace HealthWellbeing.Controllers
 {
     public class ExercicioController : Controller
     {
-        public IActionResult VerExercicios()
+        // Lista de músculos em memória (simulando base de dados)
+        private static readonly List<GruposMusculares> todosMusculos = new List<GruposMusculares>
         {
-            // Para testar dados exemplo
-            var exercicios = new List<Exercicio>
-            {
-                new Exercicio 
-                { 
-                    ExercicioId = 1,
-                    ExercicioNome = "Flexões",
-                    Descricao = "Exercício para peitoral e tríceps",
-                    Duracao = 10,
-                    Intencidade = 7,
-                    CaloriasGastas = 100
-                },
-                new Exercicio 
-                { 
-                    ExercicioId = 2,
-                    ExercicioNome = "Agachamentos",
-                    Descricao = "Exercício para pernas e glúteos",
-                    Duracao = 15,
-                    Intencidade = 5,
-                    CaloriasGastas = 150
-                }
-            };
-            
+            new GruposMusculares { MusculoId = 1, MusculoNome = "Bíceps", GrupoMuscularPrimario="Braços", LadoMusculo="Bilateral", TamanhoMusculo=10 },
+            new GruposMusculares { MusculoId = 2, MusculoNome = "Tríceps", GrupoMuscularPrimario="Braços", LadoMusculo="Bilateral", TamanhoMusculo=12 },
+            new GruposMusculares { MusculoId = 3, MusculoNome = "Peitoral", GrupoMuscularPrimario="Tórax", LadoMusculo="Bilateral", TamanhoMusculo=20 },
+            new GruposMusculares { MusculoId = 4, MusculoNome = "Quadríceps", GrupoMuscularPrimario="Pernas", LadoMusculo="Bilateral", TamanhoMusculo=25 }
+        };
+
+        // Lista de exercícios em memória para testar
+        private static readonly List<Exercicio> exercicios = new List<Exercicio>();
+
+        // View para listar exercícios
+        public IActionResult Index()
+        {
             return View(exercicios);
         }
-    
 
+        // GET: Create
         [HttpGet]
-        public IActionResult CriarExercicio()
+        public IActionResult Create()
         {
-            // Carrega grupos musculares para o dropdown (dados exemplo)
-            ViewBag.GruposMusculares = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Bíceps (Braços) - Bilateral" },
-                new SelectListItem { Value = "2", Text = "Tríceps (Braços) - Bilateral" },
-                new SelectListItem { Value = "3", Text = "Peitoral (Tórax) - Bilateral" },
-                new SelectListItem { Value = "4", Text = "Quadríceps (Pernas) - Bilateral" }
-            };
-
+            // Passa músculos para a View
+            ViewBag.GruposMusculares = todosMusculos
+                .Select(g => new SelectListItem { Value = g.MusculoId.ToString(), Text = g.MusculoNome })
+                .ToList();
             return View();
         }
 
-
+        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CriarExercicio(Exercicio exercicio)
+        public IActionResult Create(Exercicio exercicio, [FromForm] List<int> musculosIds)
         {
             if (ModelState.IsValid)
             {
-                // Guatdar na base de dados
+                // Associar músculos selecionados ao exercício
+                if (musculosIds != null && musculosIds.Any())
+                {
+                    exercicio.GruposMusculares = todosMusculos
+                        .Where(g => musculosIds.Contains(g.MusculoId))
+                        .ToList();
+                }
+                else
+                {
+                    exercicio.GruposMusculares = new List<GruposMusculares>();
+                }
+
+                // Simula salvar em memória
+                exercicio.ExercicioId = exercicios.Count + 1;
+                exercicios.Add(exercicio);
 
                 TempData["SuccessMessage"] = $"Exercício '{exercicio.ExercicioNome}' criado com sucesso!";
-                return RedirectToAction("ExerciciosView");
+                return RedirectToAction("Index");
             }
 
-            // Se houver erros, recarrega os grupos musculares
-            ViewBag.GruposMusculares = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "1", Text = "Bíceps (Braços) - Bilateral" },
-                new SelectListItem { Value = "2", Text = "Tríceps (Braços) - Bilateral" },
-                new SelectListItem { Value = "3", Text = "Peitoral (Tórax) - Bilateral" },
-                new SelectListItem { Value = "4", Text = "Quadríceps (Pernas) - Bilateral" }
-            };
+            // Se houver erro, recarrega músculos
+            ViewBag.GruposMusculares = todosMusculos
+                .Select(g => new SelectListItem { Value = g.MusculoId.ToString(), Text = g.MusculoNome })
+                .ToList();
 
             return View(exercicio);
         }
