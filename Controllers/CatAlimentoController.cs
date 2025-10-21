@@ -4,7 +4,7 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class AlimentosCatController : Controller
+    public class CatAlimentoController : Controller
     {
         public ActionResult Index()
         {
@@ -27,7 +27,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimentos));
+                return RedirectToAction(nameof(CategoriaAlimento));
             }
             catch
             {
@@ -46,7 +46,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimentos));
+                return RedirectToAction(nameof(CategoriaAlimento));
             }
             catch
             {
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimentos));
+                return RedirectToAction(nameof(CategoriaAlimento));
             }
             catch
             {
