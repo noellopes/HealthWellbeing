@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021155614_Inicial")]
+    partial class Inicial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,14 +83,13 @@ namespace HealthWellbeing.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Preco")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TipoServicoId")
-                        .HasColumnType("int");
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServicoId");
-
-                    b.HasIndex("TipoServicoId");
 
                     b.ToTable("Servicos");
                 });
@@ -125,27 +127,6 @@ namespace HealthWellbeing.Data.Migrations
                     b.HasKey("TerapeutaId");
 
                     b.ToTable("Terapeutas");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
-                {
-                    b.Property<int>("TipoServicoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoServicoId"));
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("TipoServicoId");
-
-                    b.ToTable("TipoServicos");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>
@@ -439,17 +420,6 @@ namespace HealthWellbeing.Data.Migrations
                     b.Navigation("UtenteBalneario");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.ServicoModel", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.TipoServicoModel", "TipoServico")
-                        .WithMany("Servicos")
-                        .HasForeignKey("TipoServicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TipoServico");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -509,11 +479,6 @@ namespace HealthWellbeing.Data.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.TerapeutaModel", b =>
                 {
                     b.Navigation("Agendamentos");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
-                {
-                    b.Navigation("Servicos");
                 });
 #pragma warning restore 612, 618
         }

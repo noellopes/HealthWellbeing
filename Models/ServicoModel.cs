@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -6,14 +8,24 @@ namespace HealthWellbeing.Models
     {
         [Key]
         public int ServicoId { get; set; }
-        public string Nome { get; set; } // Ex: "Massagem Relaxante", "Banho de Ervas", etc.
+
+        [Required]
+        public string Nome { get; set; } 
         public string Descricao { get; set; }
-        public decimal Preco { get; set; }
+
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal Preco { get; set; } // Valor do serviço
+
+        [Range(1, 120)] // Duração entre 1 e 120 minutos (2h)
         public int DuracaoMinutos { get; set; } // Duração média do serviço
-        public string Tipo { get; set; } // Ex: "Massagem", "Banho", "Tratamento", "Fisioterapia", etc.
+
+        [Required]
+        public int TipoServicoId { get; set; }
+
+        [ForeignKey("TipoServicoId")]
+        public TipoServicoModel TipoServico { get; set; }
 
         // Relação: um serviço pode estar associado a vários agendamentos
         public ICollection<AgendamentoModel> Agendamentos { get; set; }
     }
 }
-

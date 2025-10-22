@@ -1,0 +1,42 @@
+﻿@model IEnumerable<HealthWellbeing.Models.TipoServicoModel>
+
+@{
+    ViewData["Title"] = "Tipo de Serviços";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Tipo de Serviços</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Criar Novo Tipo de Serviço</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nome)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Descricao)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.TipoServicoId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.TipoServicoId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.TipoServicoId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

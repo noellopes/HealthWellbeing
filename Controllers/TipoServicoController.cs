@@ -10,22 +10,22 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ServicoController : Controller
+    public class TipoServicoController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ServicoController(ApplicationDbContext context)
+        public TipoServicoController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Servico
+        // GET: TipoServico
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Servicos.ToListAsync());
+            return View(await _context.TipoServicos.ToListAsync());
         }
 
-        // GET: Servico/Details/5
+        // GET: TipoServico/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,41 +33,39 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos
-                .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servicoModel == null)
+            var tipoServicoModel = await _context.TipoServicos
+                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+            if (tipoServicoModel == null)
             {
                 return NotFound();
             }
 
-            return View(servicoModel);
+            return View(tipoServicoModel);
         }
 
-        // GET: Servico/Create
+        // GET: TipoServico/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Servico/Create
+        // POST: TipoServico/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] ServicoModel servicoModel)
+        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServicoModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(servicoModel);
+                _context.Add(tipoServicoModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["TipoServico"] = new SelectList(_context.Set<TipoServicoModel>(), "TipoServicoId", "Nome", servicoModel.TipoServicoId);
-            return View(servicoModel);
+            return View(tipoServicoModel);
         }
 
-        // GET: Servico/Edit/5
+        // GET: TipoServico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -75,22 +73,22 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos.FindAsync(id);
-            if (servicoModel == null)
+            var tipoServicoModel = await _context.TipoServicos.FindAsync(id);
+            if (tipoServicoModel == null)
             {
                 return NotFound();
             }
-            return View(servicoModel);
+            return View(tipoServicoModel);
         }
 
-        // POST: Servico/Edit/5
+        // POST: TipoServico/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] ServicoModel servicoModel)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServicoModel)
         {
-            if (id != servicoModel.ServicoId)
+            if (id != tipoServicoModel.TipoServicoId)
             {
                 return NotFound();
             }
@@ -99,12 +97,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(servicoModel);
+                    _context.Update(tipoServicoModel);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServicoModelExists(servicoModel.ServicoId))
+                    if (!TipoServicoModelExists(tipoServicoModel.TipoServicoId))
                     {
                         return NotFound();
                     }
@@ -115,10 +113,10 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(servicoModel);
+            return View(tipoServicoModel);
         }
 
-        // GET: Servico/Delete/5
+        // GET: TipoServico/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,34 +124,34 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos
-                .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servicoModel == null)
+            var tipoServicoModel = await _context.TipoServicos
+                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+            if (tipoServicoModel == null)
             {
                 return NotFound();
             }
 
-            return View(servicoModel);
+            return View(tipoServicoModel);
         }
 
-        // POST: Servico/Delete/5
+        // POST: TipoServico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var servicoModel = await _context.Servicos.FindAsync(id);
-            if (servicoModel != null)
+            var tipoServicoModel = await _context.TipoServicos.FindAsync(id);
+            if (tipoServicoModel != null)
             {
-                _context.Servicos.Remove(servicoModel);
+                _context.TipoServicos.Remove(tipoServicoModel);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ServicoModelExists(int id)
+        private bool TipoServicoModelExists(int id)
         {
-            return _context.Servicos.Any(e => e.ServicoId == id);
+            return _context.TipoServicos.Any(e => e.TipoServicoId == id);
         }
     }
 }
