@@ -43,26 +43,18 @@ namespace HealthWellbeing.Controllers
             return View(tipoServicoModel);
         }
 
-        // GET: TipoServico/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
         // POST: TipoServico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServicoModel)
+        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(tipoServicoModel);
+                    _context.Add(tipoServico);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipoServicoModel);
+            return View(tipoServico);
         }
 
         // GET: TipoServico/Edit/5
@@ -73,8 +65,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var tipoServicoModel = await _context.TipoServicos.FindAsync(id);
-            if (tipoServicoModel == null)
+            var tipoServico = await _context.TipoServicos.FindAsync(id);
+            if (tipoServico == null)
             {
                 return NotFound();
             }
@@ -86,9 +78,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServicoModel)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
         {
-            if (id != tipoServicoModel.TipoServicoId)
+            if (id != tipoServico.TipoServicoId)
             {
                 return NotFound();
             }
@@ -97,12 +89,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(tipoServicoModel);
+                    _context.Update(tipoServico);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoServicoModelExists(tipoServicoModel.TipoServicoId))
+                    if (!TipoServicoExists(tipoServico.TipoServicoId))
                     {
                         return NotFound();
                     }
@@ -113,7 +105,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipoServicoModel);
+            return View(tipoServico);
         }
 
         // GET: TipoServico/Delete/5
@@ -124,14 +116,14 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var tipoServicoModel = await _context.TipoServicos
+            var tipoServico = await _context.TipoServicos
                 .FirstOrDefaultAsync(m => m.TipoServicoId == id);
-            if (tipoServicoModel == null)
+            if (tipoServico == null)
             {
                 return NotFound();
             }
 
-            return View(tipoServicoModel);
+            return View(tipoServico);
         }
 
         // POST: TipoServico/Delete/5
@@ -139,17 +131,17 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tipoServicoModel = await _context.TipoServicos.FindAsync(id);
-            if (tipoServicoModel != null)
+            var tipoServico = await _context.TipoServicos.FindAsync(id);
+            if (tipoServico != null)
             {
-                _context.TipoServicos.Remove(tipoServicoModel);
+                _context.TipoServicos.Remove(tipoServico);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TipoServicoModelExists(int id)
+        private bool TipoServicoExists(int id)
         {
             return _context.TipoServicos.Any(e => e.TipoServicoId == id);
         }
