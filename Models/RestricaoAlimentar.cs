@@ -21,7 +21,7 @@ namespace HealthWellbeing.Models
         Grave
     }
 
-    public class RestricoesAlimentares
+    public class RestricaoAlimentar
     {
         public int Id { get; set; }
 

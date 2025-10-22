@@ -12,5 +12,6 @@ namespace HealthWellbeing.Data
         }
 
         public DbSet<Alergia> Alergias { get; set; }
+        public DbSet<ReceitaModel> Receita { get; set; }
     }
 }
