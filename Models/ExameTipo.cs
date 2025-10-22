@@ -1,17 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace HealthWellbeing.Models
+namespace HealthWellBeing.Models
 {
-    public class ExameTipo : Controller
+    public class ExameTipo
     {
-        public int Id { get; set; }
+       
+        public int ExameTipoId { get; set; }
+
         
-        [Required(ErrorMessage = "O nome do exame é obrigatório")]
-        [StringLength(100)]
+        [Required(ErrorMessage = "O nome do exame é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
         public string Nome { get; set; }
 
-        [StringLength(500)]
+        
+        [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
         public string Descricao { get; set; }
 
 
