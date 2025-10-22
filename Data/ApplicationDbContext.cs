@@ -11,8 +11,8 @@ namespace HealthWellbeing.Data
         {
         }
 
-
         public DbSet<AlimentoSubstituto> AlimentoSubstituto { get; set; }
+        public DbSet<Alergia> Alergias { get; set; }
         public DbSet<ReceitaModel> Receita { get; set; }
     }
 }
