@@ -1,0 +1,12 @@
+﻿@model HealthWellbeing.Models.Event
+
+@{
+    ViewData["Title"] = "Editar Evento";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="EventId" />
+    <partial name="Create" />
+</form>

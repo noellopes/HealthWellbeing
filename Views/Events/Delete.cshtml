@@ -1,0 +1,15 @@
+﻿@model HealthWellbeing.Models.Event
+
+@{
+    ViewData["Title"] = "Apagar Evento";
+}
+
+<h2>Apagar Evento</h2>
+
+<h4>Tens a certeza que queres apagar o evento <b>@Model.EventName</b>?</h4>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="EventId" />
+    <button type="submit" class="btn btn-danger">Apagar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
