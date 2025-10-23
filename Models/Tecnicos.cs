@@ -2,9 +2,9 @@
 
 namespace HealthWellbeing.Models
 {
-    public class ProfissionalExecutante
+    public class Tecnicos
     {
-        public int Id { get; set; } //Id do Profissional
+        public int TecnicoId { get; set; } //Id do Profissional
 
         [Required(ErrorMessage = "O nome do profissional é obrigatório")]
         [StringLength(100)]

@@ -4,7 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class Utente
     {
-        public int Id { get; set; } 
+        public int UtenteId { get; set; } 
 
         [Required(ErrorMessage = "O nome do utente é obrigatório")]
         [StringLength(150)]

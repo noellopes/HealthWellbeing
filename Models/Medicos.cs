@@ -4,7 +4,7 @@ namespace HealthWellbeing.Models
 {
 	public class Medicos
 	{
-		public int Id { get; set; }
+		public int MedicoId { get; set; }
 
 		[Required(ErrorMessage = "O nome do médico é obrigatório")]
 		[StringLength(100)]
