@@ -8,21 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Registo\**" />
-    <Content Remove="Views\Registo\**" />
-    <EmbeddedResource Remove="Views\Registo\**" />
-    <None Remove="Views\Registo\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\Registo\Create.cshtml" />
-    <None Include="Views\Registo\Delete.cshtml" />
-    <None Include="Views\Registo\Details.cshtml" />
-    <None Include="Views\Registo\Edit.cshtml" />
-    <None Include="Views\Registo\Index.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.20" />
