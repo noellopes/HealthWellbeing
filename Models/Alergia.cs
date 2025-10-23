@@ -12,7 +12,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Nome da Alergia")]
         public string Nome { get; set; }
 
-        [StringLength(500, ErrorMessage = "A descrição deve ter no máximo 500 caracteres.")]
         [Display(Name = "Descrição")]
         public string Descricao { get; set; }
 

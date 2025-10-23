@@ -1,27 +1,31 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class AlergiaController : Controller
+    public class AlergiasController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public AlergiaController(ApplicationDbContext context)
+        public AlergiasController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: AlergiaController
+        // GET: Alergias
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Alergias.ToListAsync());
+            return View(await _context.Alergia.ToListAsync());
         }
 
-        // GET: AlergiaController/Details/5
+        // GET: Alergias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -29,7 +33,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var alergia = await _context.Alergias.FindAsync(id);
+            var alergia = await _context.Alergia
+                .FirstOrDefaultAsync(m => m.AlergiaID == id);
             if (alergia == null)
             {
                 return NotFound();
@@ -38,13 +43,15 @@ namespace HealthWellbeing.Controllers
             return View(alergia);
         }
 
-        // GET: AlergiaController/Create
+        // GET: Alergias/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: AlergiaController/Create
+        // POST: Alergias/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas")] Alergia alergia)
@@ -58,7 +65,7 @@ namespace HealthWellbeing.Controllers
             return View(alergia);
         }
 
-        // GET: AlergiaController/Edit/5
+        // GET: Alergias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -66,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var alergia = await _context.Alergias.FindAsync(id);
+            var alergia = await _context.Alergia.FindAsync(id);
             if (alergia == null)
             {
                 return NotFound();
@@ -74,7 +81,9 @@ namespace HealthWellbeing.Controllers
             return View(alergia);
         }
 
-        // POST: AlergiaController/Edit/5
+        // POST: Alergias/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas")] Alergia alergia)
@@ -107,7 +116,7 @@ namespace HealthWellbeing.Controllers
             return View(alergia);
         }
 
-        // GET: AlergiaController/Delete/5
+        // GET: Alergias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -115,7 +124,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var alergia = await _context.Alergias.FindAsync(id);
+            var alergia = await _context.Alergia
+                .FirstOrDefaultAsync(m => m.AlergiaID == id);
             if (alergia == null)
             {
                 return NotFound();
@@ -124,23 +134,24 @@ namespace HealthWellbeing.Controllers
             return View(alergia);
         }
 
-        // POST: AlergiaController/Delete/5
+        // POST: Alergias/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var alergia = await _context.Alergias.FindAsync(id);
+            var alergia = await _context.Alergia.FindAsync(id);
             if (alergia != null)
             {
-                _context.Alergias.Remove(alergia);
-                await _context.SaveChangesAsync();
+                _context.Alergia.Remove(alergia);
             }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool AlergiaExists(int id)
         {
-            return _context.Alergias.Any(e => e.AlergiaID == id);
+            return _context.Alergia.Any(e => e.AlergiaID == id);
         }
     }
 }
