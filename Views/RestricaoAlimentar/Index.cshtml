@@ -1,0 +1,41 @@
+@model IEnumerable<HealthWellbeing.Models.RestricaoAlimentar>
+
+@{
+    ViewData["Title"] = "Restrições Alimentares";
+}
+
+<h1>Restrições Alimentares</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nova Restrição</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Nome)</th>
+            <th>@Html.DisplayNameFor(model => model.Tipo)</th>
+            <th>@Html.DisplayNameFor(model => model.Gravidade)</th>
+            <th>@Html.DisplayNameFor(model => model.Descricao)</th>
+            <th>@Html.DisplayNameFor(model => model.Alimento)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Nome</td>
+            <td>@item.Tipo</td>
+            <td>@item.Gravidade</td>
+            <td>@item.Descricao</td>
+            <td>@item.Alimento?.Name</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-warning">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-info">Detalhes</a> |
+                <a asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
