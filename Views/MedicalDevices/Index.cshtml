@@ -1,8 +1,8 @@
-﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
 @model IEnumerable<MedicalDevices> ;
 
 @{
-    ViewData["Title"] = "Lista de Equipamentos Móveis Registados";
+    ViewData["Title"] = "Lista de Dispositivos Médicos Registados";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -25,9 +25,9 @@
             <tr>
                 @*(DisplayNameFor) -> Titulo de cada coluna da lista*@
                 <td>@Html.DisplayFor(modelItem => dispositivo.DevicesID)</td>
-                <td>@Html.DisplayFor(modelItem => dispositivo.NomeDisp)</td>
-                <td>@Html.DisplayFor(modelItem => dispositivo.TipoDisp)</td>
-                <td>@Html.DisplayFor(modelItem => dispositivo.QuantidadeDisp)</td>
+                <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
+                <td>@Html.DisplayFor(modelItem => dispositivo.Type)</td>
+                <td>@Html.DisplayFor(modelItem => dispositivo.Quantity)</td>
                 <td>
                     @*gera um link, passa o id do dispositivo clicado e leva a view Read*@
                     <a asp-action="ReadMedicalDevices" asp-route-id="@dispositivo.DevicesID" class="btn btn-sm btn-info">

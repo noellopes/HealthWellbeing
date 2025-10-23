@@ -1,8 +1,8 @@
-﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
 @model MedicalDevices;
 
 @{
-    ViewData["Title"] = $"Editar Dispositivo: {Model.NomeDisp}";
+    ViewData["Title"] = $"Editar Dispositivo: {Model.Name}";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -19,42 +19,42 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="NomeDisp" class="form-label">Nome do Equipamento</label>
-                <input asp-for="NomeDisp" class="form-control">
-                <span asp-validation-for="NomeDisp" class="text-danger small"></span>
+                <label asp-for="Name" class="form-label">Nome do Equipamento</label>
+                <input asp-for="Name" class="form-control">
+                <span asp-validation-for="Name" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="TipoDisp" class="form-label">Tipo de Dispositivo (Categoria)</label>
-                <input asp-for="TipoDisp" class="form-control">
-                <span asp-validation-for="TipoDisp" class="text-danger small"></span>
+                <label asp-for="Type" class="form-label">Tipo de Dispositivo (Categoria)</label>
+                <input asp-for="Type" class="form-control">
+                <span asp-validation-for="Type" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="EspecificacaoDisp" class="form-label">Especificação Detalhada</label>
-                <input asp-for="EspecificacaoDisp" class="form-control">
-                <span asp-validation-for="EspecificacaoDisp" class="text-danger small"></span>
+                <label asp-for="Specification" class="form-label">Especificação Detalhada</label>
+                <input asp-for="Specification" class="form-control">
+                <span asp-validation-for="Specification" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="QuantidadeDisp" class="form-label">Quantidade</label>
-                <input asp-for="QuantidadeDisp" class="form-control" type="number" min="1">
-                <span asp-validation-for="QuantidadeDisp" class="text-danger small"></span>
+                <label asp-for="Quantity" class="form-label">Quantidade</label>
+                <input asp-for="Quantity" class="form-control" type="number" min="1">
+                <span asp-validation-for="Quantity" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="StatusDisp" class="form-label">Status do Dispositivo</label>
-                <input asp-for="StatusDisp" class="form-control">
-                <span asp-validation-for="StatusDisp" class="text-danger small"></span>
+                <label asp-for="Status" class="form-label">Status do Dispositivo</label>
+                <input asp-for="Status" class="form-control">
+                <span asp-validation-for="Status" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="ObservacoesDisp" class="form-label">Observações</label>
-                <input asp-for="ObservacoesDisp" class="form-control">
-                <span asp-validation-for="ObservacoesDisp" class="text-danger small"></span>
+                <label asp-for="Observation" class="form-label">Observações</label>
+                <input asp-for="Observation" class="form-control">
+                <span asp-validation-for="Observation" class="text-danger small"></span>
             </div>
 
-            <input asp-for="DataRegisto" type="hidden" />
+            <input asp-for="RegistrationDate" type="hidden" />
             <input asp-for="DevicesID" type="hidden" />
 
             <div class="mt-4">

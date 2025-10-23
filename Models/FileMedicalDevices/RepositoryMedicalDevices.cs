@@ -1,4 +1,4 @@
-﻿namespace HealthWellbeingRoom.Models.FileMobileDevices
+﻿namespace HealthWellbeingRoom.Models.FileMedicalDevices
 {
     public class RepositoryMedicalDevices
     {
