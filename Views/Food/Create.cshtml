@@ -1,0 +1,54 @@
+﻿@model HealthWellbeing.Models.Food
+@{
+    ViewData["Title"] = "Create Food";
+}
+<h1>Create Food</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label asp-for="KcalPer100g" class="form-label"></label>
+            <input asp-for="KcalPer100g" class="form-control" />
+            <span asp-validation-for="KcalPer100g" class="text-danger small"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="ProteinPer100g" class="form-label"></label>
+            <input asp-for="ProteinPer100g" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="CarbsPer100g" class="form-label"></label>
+            <input asp-for="CarbsPer100g" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="FatPer100g" class="form-label"></label>
+            <input asp-for="FatPer100g" class="form-control" />
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FoodCategoryId" class="form-label"></label>
+        <select asp-for="FoodCategoryId" asp-items="@(new SelectList((IEnumerable<HealthWellbeing.Models.FoodCategory>)ViewBag.Categories ?? new List<HealthWellbeing.Models.FoodCategory>(), "FoodCategoryId", "Name"))" class="form-select">
+            <option value="">(no category)</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
