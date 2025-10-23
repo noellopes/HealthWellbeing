@@ -4,11 +4,62 @@
     ViewData["Title"] = "Level";
 }
 
-<div>
-    <div>
-        <span>
+<div class ="level-container">
+    <div class="level-circle" style="border-color:@Model.LevelCategory">
+        <span class="level-number">
             @Model.Level
         </span>
     </div>
 </div>
 
+<div style="text-align:center; margin-top:20px;">
+    <a href="@Url.Action("Index", new { level = Model.Level - 1 })" class="btn">◀</a>
+    <a href="@Url.Action("Index", new { level = Model.Level + 1 })" class="btn">▶</a>
+</div>
+
+
+<style>
+    .level-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #f2f2f2;
+    }
+
+    .level-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 10px solid;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        transition: border-color 0.5s ease;
+    }
+
+    .level-number {
+        font-size: 48px;
+        font-weight: bold;
+        color: #333;
+    }
+
+   
+
+    .btn {
+        padding: 10px 20px;
+        margin: 0 10px;
+        background: #ddd;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+
+        .btn:hover {
+            background: #ccc;
+        }
+</style>
