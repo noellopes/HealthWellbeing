@@ -1,0 +1,39 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Alimento>
+@{
+    ViewData["Title"] = "Alimentos";
+}
+
+<h1>Alimentos</h1>
+
+<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Kcal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                <tr>
+                    <td>@a.Name</td>
+                    <td>@a.KcalPor100g</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@a.AlimentoId" class="btn btn-sm btn-secondary">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@a.AlimentoId" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@a.AlimentoId" class="btn btn-sm btn-danger">Apagar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Não há alimentos registados.</p>
+}
