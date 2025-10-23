@@ -1,7 +1,7 @@
-﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
 @model MedicalDevices; 
 @{
-    ViewData["Title"] = $"Detalhes: {Model.NomeDisp}"; //mostra o nome do dispositivo selecionado
+    ViewData["Title"] = $"Detalhes: {Model.Name}"; //mostra o nome do dispositivo selecionado
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -15,25 +15,25 @@
         <dd class="col-sm-8">@Html.DisplayFor(model => model.DevicesID)</dd>
 
         <dt class="col-sm-4">Nome do dispositivo:</dt>
-        <dd class="col-sm-8"><strong>@Html.DisplayFor(model => model.NomeDisp)</strong></dd>
+        <dd class="col-sm-8"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
         <dt class="col-sm-4">Tipo do dispositivo:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.TipoDisp)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Type)</dd>
 
         <dt class="col-sm-4">Especificação:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.EspecificacaoDisp)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Specification)</dd>
 
         <dt class="col-sm-4">Quantidade:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.QuantidadeDisp)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Quantity)</dd>
 
         <dt class="col-sm-4">Data do registo:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.DataRegisto)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
         <dt class="col-sm-4">Status:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.StatusDisp)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Status)</dd>
 
         <dt class="col-sm-4">Observação:</dt>
-        <dd class="col-sm-8">@Html.DisplayFor(model => model.ObservacoesDisp)</dd>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.Observation)</dd>
     </dl>
 </div>
 

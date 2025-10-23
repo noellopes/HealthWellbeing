@@ -1,4 +1,4 @@
-﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
 @model MedicalDevices;
 
 @{
@@ -15,13 +15,13 @@
         <dd class="col-sm-9">@Html.DisplayFor(model => model.DevicesID)</dd>
 
         <dt class="col-sm-3">Nome:</dt>
-        <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.NomeDisp)</strong></dd>
+        <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
         <dt class="col-sm-3">Tipo:</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoDisp)</dd>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Type)</dd>
 
         <dt class="col-sm-3">Data de Registo:</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.DataRegisto)</dd>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
     </dl>
 </div>
 

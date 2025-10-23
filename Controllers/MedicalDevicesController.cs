@@ -1,4 +1,4 @@
-﻿using HealthWellbeingRoom.Models.FileMobileDevices;
+﻿using HealthWellbeingRoom.Models.FileMedicalDevices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HealthWellbeingRoom.Controllers
@@ -59,12 +59,12 @@ namespace HealthWellbeingRoom.Controllers
                 dispositivo.DevicesID = listaAtual.Count() + 1;
 
                 //Regista data e hora da criação
-                dispositivo.DataRegisto = DateTime.Now;
+                dispositivo.RegistrationDate = DateTime.Now;
 
                 //Guarda dados
                 RepositoryMedicalDevices.AddMedicalDevices(dispositivo);
 
-                TempData["Mensagem de sucesso"] = $"Dispositivo '{dispositivo.NomeDisp}' Registado com sucesso!";
+                TempData["Mensagem de sucesso"] = $"Dispositivo '{dispositivo.Name}' Registado com sucesso!";
 
                 //Retorna a view CreateMedicalDevices com todos os campos vazios
                 return View(new MedicalDevices());
