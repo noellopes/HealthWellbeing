@@ -27,7 +27,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimento));
+                return RedirectToAction(nameof(CategoryFood));
             }
             catch
             {
@@ -46,7 +46,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimento));
+                return RedirectToAction(nameof(CategoryFood));
             }
             catch
             {
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(CategoriaAlimento));
+                return RedirectToAction(nameof(CategoryFood));
             }
             catch
             {

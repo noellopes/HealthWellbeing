@@ -13,7 +13,7 @@ namespace HealthWellbeing.Data
 
         //(CRUD de alimentos)
         public DbSet<Alimento> Alimentos { get; set; } = default!;
-        public DbSet<CategoriaAlimento> Categorias { get; set; } = default!;
+        public DbSet<CategoryFood> Categorias { get; set; } = default!;
 
         
         protected override void OnModelCreating(ModelBuilder builder)
@@ -22,7 +22,7 @@ namespace HealthWellbeing.Data
 
             //Nomes de tabelas personalizados
             builder.Entity<Alimento>().ToTable("Alimento");
-            builder.Entity<CategoriaAlimento>().ToTable("Categoria");
+            builder.Entity<CategoryFood>().ToTable("Categoria");
         }
     }
 }
