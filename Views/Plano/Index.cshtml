@@ -1,0 +1,33 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Plano>
+
+<h2>Planos disponíveis</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Preço (€)</th>
+            <th>Duração (dias)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var plano in Model)
+        {
+            <tr>
+                <td>@plano.Nome</td>
+                <td>@plano.Descricao</td>
+                <td>@plano.Preco</td>
+                <td>@plano.DuracaoDias</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@plano.PlanoId" class="btn btn-info btn-sm">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@plano.PlanoId" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@plano.PlanoId" class="btn btn-danger btn-sm">Apagar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Adicionar Novo Plano</a>
