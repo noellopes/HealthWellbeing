@@ -6,7 +6,15 @@
 
 <h1>@ViewData["Title"]</h1>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
 
     <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -24,36 +32,35 @@
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
-    
-     Grupos Musculares (seleção múltipla)
-    <div class="mb-3">
-        <label class="form-label">Grupos Musculares *</label>
-        <select asp-for="GruposMusculares" class="form-select" multiple
-                asp-items="ViewBag.GruposMusculares">
-        </select>
-        <span asp-validation-for="GruposMusculares" class="text-danger small"></span>
-        <small class="text-muted">Segure Ctrl (ou Cmd) para selecionar vários.</small>
-    </div>
-    
-
-    <!--Perguntar ao Professor-->
-    <!-- Grupos Musculares (lista com checkboxes)
+    <!-- Grupos Musculares (Checkboxes) -->
     <div class="mb-3">
         <label class="form-label">Grupos Musculares *</label>
         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-            @foreach (var item in ViewBag.GruposMusculares)
+            @if (ViewBag.GruposMusculares != null)
             {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox"
-                           name="musculosIds"
-                           value="@item.Value"
-                           id="musculo_@item.Value" />
-                    <label class="form-check-label" for="musculo_@item.Value">@item.Text</label>
-                </div>
+                foreach (var item in ViewBag.GruposMusculares)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               name="musculosIds"
+                               value="@item.Value"
+                               id="musculo_@item.Value" />
+                        <label class="form-check-label" for="musculo_@item.Value">
+                            @item.Text
+                        </label>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-warning">Nenhum grupo muscular disponível.</div>
             }
         </div>
-    </div>-->
-
+        @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
+        {
+            <span class="text-danger small">@ViewData.ModelState["musculosIds"].Errors.First().ErrorMessage</span>
+        }
+    </div>
 
     <div class="row">
         <!-- Duração -->
@@ -130,3 +137,4 @@
         </a>
     </div>
 </form>
+
