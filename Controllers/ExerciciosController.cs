@@ -6,65 +6,126 @@ namespace HealthWellbeing.Controllers
 {
     public class ExercicioController : Controller
     {
-        // Lista de músculos em memória (simulando base de dados)
-        private static readonly List<GruposMusculares> todosMusculos = new List<GruposMusculares>
+        // Lista de músculos em memória
+        private static readonly List<GrupoMuscular> todosMusculos = new List<GrupoMuscular>
         {
-            new GruposMusculares { MusculoId = 1, MusculoNome = "Bíceps", GrupoMuscularPrimario="Braços", LadoMusculo="Bilateral", TamanhoMusculo=10 },
-            new GruposMusculares { MusculoId = 2, MusculoNome = "Tríceps", GrupoMuscularPrimario="Braços", LadoMusculo="Bilateral", TamanhoMusculo=12 },
-            new GruposMusculares { MusculoId = 3, MusculoNome = "Peitoral", GrupoMuscularPrimario="Tórax", LadoMusculo="Bilateral", TamanhoMusculo=20 },
-            new GruposMusculares { MusculoId = 4, MusculoNome = "Quadríceps", GrupoMuscularPrimario="Pernas", LadoMusculo="Bilateral", TamanhoMusculo=25 }
+            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", Musculo="Braços", LocalizacaoCorporal="Bilateral"},
+            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", Musculo="Braços", LocalizacaoCorporal="Bilateral"},
+            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", Musculo="Tórax", LocalizacaoCorporal="Bilateral"},
+            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", Musculo="Pernas", LocalizacaoCorporal="Bilateral"}
         };
 
-        // Lista de exercícios em memória para testar
-        private static readonly List<Exercicio> exercicios = new List<Exercicio>();
+        private static readonly List<Exercicio> exercicios = new List<Exercicio>
+        {
+            new Exercicio
+            {
+                ExercicioId = 1,
+                ExercicioNome = "Flexões",
+                Descricao = "Exercício para fortalecer peitoral e tríceps",
+                Duracao = 10,
+                Intencidade = 7,
+                CaloriasGastas = 100,
+                Instrucoes = "1. Deitar no chão com as mãos à largura dos ombros\n2. Manter o corpo reto\n3. Baixar o corpo até o peito quase tocar no chão\n4. Empurrar de volta à posição inicial",
+                EquipamentoNecessario = "Nenhum",
+                Repeticoes = 15,
+                Series = 3,
+                Genero = "Unissexo",
+                GrupoMuscular = new List<GrupoMuscular> {
+                    todosMusculos[2], // Peitoral
+                    todosMusculos[1]  // Tríceps
+                }
+            },
+            new Exercicio
+            {
+                ExercicioId = 2,
+                ExercicioNome = "Agachamentos",
+                Descricao = "Exercício para fortalecer as pernas",
+                Duracao = 15,
+                Intencidade = 6,
+                CaloriasGastas = 120,
+                Instrucoes = "1. Ficar em pé com os pés à largura dos ombros\n2. Baixar como se fosse sentar numa cadeira\n3. Manter as costas retas\n4. Voltar à posição inicial",
+                EquipamentoNecessario = "Nenhum",
+                Repeticoes = 20,
+                Series = 4,
+                Genero = "Unissexo",
+                GrupoMuscular = new List<GrupoMuscular> {
+                    todosMusculos[3]  // Quadríceps
+                }
+            }
+        };
 
-        // View para listar exercícios
         public IActionResult Index()
         {
             return View(exercicios);
+        }
+
+        public IActionResult Detalhes(int id)
+        {
+            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            if (exercicio == null)
+            {
+                TempData["ErrorMessage"] = "Exercício não encontrado.";
+                return RedirectToAction("Index");
+            }
+            return View(exercicio);
         }
 
         // GET: Create
         [HttpGet]
         public IActionResult Create()
         {
-            // Passa músculos para a View
+            // Carrega os grupos musculares para a ViewBag
             ViewBag.GruposMusculares = todosMusculos
-                .Select(g => new SelectListItem { Value = g.MusculoId.ToString(), Text = g.MusculoNome })
+                .Select(g => new SelectListItem
+                {
+                    Value = g.GrupoMuscularId.ToString(),
+                    Text = g.GrupoMuscularNome
+                })
                 .ToList();
+
             return View();
         }
 
         // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Exercicio exercicio, [FromForm] List<int> musculosIds)
+        public IActionResult Create(Exercicio exercicio, List<int> musculosIds)
         {
-            if (ModelState.IsValid)
+            // Validação manual para os músculos
+            if (musculosIds == null || !musculosIds.Any())
             {
-                // Associar músculos selecionados ao exercício
-                if (musculosIds != null && musculosIds.Any())
-                {
-                    exercicio.GruposMusculares = todosMusculos
-                        .Where(g => musculosIds.Contains(g.MusculoId))
-                        .ToList();
-                }
-                else
-                {
-                    exercicio.GruposMusculares = new List<GruposMusculares>();
-                }
-
-                // Simula salvar em memória
-                exercicio.ExercicioId = exercicios.Count + 1;
-                exercicios.Add(exercicio);
-
-                TempData["SuccessMessage"] = $"Exercício '{exercicio.ExercicioNome}' criado com sucesso!";
-                return RedirectToAction("Index");
+                ModelState.AddModelError("musculosIds", "Selecione pelo menos um grupo muscular.");
             }
 
-            // Se houver erro, recarrega músculos
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // Associar músculos selecionados ao exercício
+                    exercicio.GrupoMuscular = todosMusculos
+                        .Where(g => musculosIds.Contains(g.GrupoMuscularId))
+                        .ToList();
+
+                    // Gerar novo ID e adicionar à lista
+                    exercicio.ExercicioId = exercicios.Any() ? exercicios.Max(e => e.ExercicioId) + 1 : 1;
+                    exercicios.Add(exercicio);
+
+                    TempData["SuccessMessage"] = $"Exercício '{exercicio.ExercicioNome}' criado com sucesso!";
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"Erro ao criar exercício: {ex.Message}";
+                }
+            }
+
+            // Se chegou aqui, houve erro - recarregar os dados
             ViewBag.GruposMusculares = todosMusculos
-                .Select(g => new SelectListItem { Value = g.MusculoId.ToString(), Text = g.MusculoNome })
+                .Select(g => new SelectListItem
+                {
+                    Value = g.GrupoMuscularId.ToString(),
+                    Text = g.GrupoMuscularNome
+                })
                 .ToList();
 
             return View(exercicio);

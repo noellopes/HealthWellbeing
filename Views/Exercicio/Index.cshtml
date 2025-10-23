@@ -11,7 +11,7 @@
 @if (Model?.Any() == true)
 {
     <div class="table-responsive">
-        <table class="table table-striped">
+        <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>Nome</th>
@@ -24,9 +24,9 @@
             <tbody>
                 @foreach (var exercicio in Model)
                 {
-                    <tr>
+                    <tr style="cursor: pointer;" onclick="window.location.href='@Url.Action("Detalhes", new { id = exercicio.ExercicioId })'">
                         <td>@exercicio.ExercicioNome</td>
-                        <td>@exercicio.Descricao</td>
+                        <td>@(exercicio.Descricao.Length > 50 ? exercicio.Descricao.Substring(0, 50) + "..." : exercicio.Descricao)</td>
                         <td>@exercicio.Duracao min</td>
                         <td>@exercicio.Intencidade/10</td>
                         <td>@exercicio.CaloriasGastas cal</td>
