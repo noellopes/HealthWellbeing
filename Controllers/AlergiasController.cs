@@ -22,7 +22,8 @@ namespace HealthWellbeing.Controllers
         // GET: Alergias
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Alergia.ToListAsync());
+            var healthWellbeingDbContext = _context.Alergia.Include(a => a.Alimento);
+            return View(await healthWellbeingDbContext.ToListAsync());
         }
 
         // GET: Alergias/Details/5
@@ -34,6 +35,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var alergia = await _context.Alergia
+                .Include(a => a.Alimento)
                 .FirstOrDefaultAsync(m => m.AlergiaID == id);
             if (alergia == null)
             {
@@ -46,6 +48,7 @@ namespace HealthWellbeing.Controllers
         // GET: Alergias/Create
         public IActionResult Create()
         {
+            ViewData["AlimentoId"] = new SelectList(_context.Set<Alimento>(), "AlimentoId", "AlimentoId");
             return View();
         }
 
@@ -54,7 +57,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas")] Alergia alergia)
+        public async Task<IActionResult> Create([Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +65,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Set<Alimento>(), "AlimentoId", "AlimentoId", alergia.AlimentoId);
             return View(alergia);
         }
 
@@ -78,6 +82,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Set<Alimento>(), "AlimentoId", "AlimentoId", alergia.AlimentoId);
             return View(alergia);
         }
 
@@ -86,7 +91,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas")] Alergia alergia)
+        public async Task<IActionResult> Edit(int id, [Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
         {
             if (id != alergia.AlergiaID)
             {
@@ -113,6 +118,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Set<Alimento>(), "AlimentoId", "AlimentoId", alergia.AlimentoId);
             return View(alergia);
         }
 
@@ -125,6 +131,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var alergia = await _context.Alergia
+                .Include(a => a.Alimento)
                 .FirstOrDefaultAsync(m => m.AlergiaID == id);
             if (alergia == null)
             {

@@ -4,6 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class Alimento
     {
+        [Key]
         public int AlimentoId { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; }
@@ -15,5 +16,6 @@ namespace HealthWellbeing.Models
         [Range(0, 100)] public decimal ProteinaGPor100g { get; set; }
         [Range(0, 100)] public decimal HidratosGPor100g { get; set; }
         [Range(0, 100)] public decimal GorduraGPor100g { get; set; }
+        public ICollection<Alergia> AlergiasRelacionadas { get; set; };
     }
 }
