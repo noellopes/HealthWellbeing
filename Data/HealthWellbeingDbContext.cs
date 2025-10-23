@@ -14,6 +14,9 @@ namespace HealthWellbeing.Data
         public DbSet<Alergia> Alergia { get; set; } = default!;
         public DbSet<Alimento> Alimentos { get; set; } = default!;
         public DbSet<AlimentoSubstituto> AlimentoSubstitutos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+
+        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,7 +36,7 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(a => a.AlimentoSubstitutoRefId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
+        
+
     }
 }
