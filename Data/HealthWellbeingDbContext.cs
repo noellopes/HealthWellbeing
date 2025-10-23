@@ -36,5 +36,6 @@ namespace HealthWellbeing.Data
                 .OnDelete(DeleteBehavior.Restrict);
         }
         
+        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
     }
 }
