@@ -4,20 +4,14 @@ namespace HealthWellbeing.Models
 {
     public class ProfissionalExecutante
     {
-        public int Id { get; set; } //Id do Profissional
+        [Key]
+        public int ProfissionalExecutanteId { get; set; } // Chave primária
 
-        [Required(ErrorMessage = "O nome do profissional é obrigatório")]
-        [StringLength(100)]
         public string Nome { get; set; }
+        public string Funcao { get; set; } // Futuramente poderá ser uma entidade (e.g. tabela Função)
 
-        [Required(ErrorMessage = "A função/cargo é obrigatória")]
-        [StringLength(100)]
-        public string Funcao { get; set; } //Funcao que o mesmo tem ex tipo "Técnico de Radiologia"
-
-        [Phone(ErrorMessage = "Número de telefone inválido")]
         public string Telefone { get; set; }
-
-        [EmailAddress(ErrorMessage = "Email inválido")]
         public string Email { get; set; }
+
     }
 }
