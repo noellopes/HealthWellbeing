@@ -13,5 +13,6 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<HealthWellbeing.Models.Pathology> Pathology { get; set; } = default!;
     }
 }
