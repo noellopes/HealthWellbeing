@@ -1,37 +1,32 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
-namespace HealthWellbeing.Models
+namespace HealthWellBeing.Models
 {
     public class Utente
     {
-        public int Id { get; set; } 
+        public int UtenteId { get; set; }
 
-        [Required(ErrorMessage = "O nome do utente é obrigatório")]
-        [StringLength(150)]
-        public string Nome { get; set; } = string.Empty;
+        [Required(ErrorMessage = "O nome é obrigatório.")]
+        [StringLength(100)]
+        public string NomeCompleto { get; set; }
 
-        [StringLength(9, ErrorMessage = "O número de identificação civil deve ter 9 dígitos")]
-        [RegularExpression(@"^\d{9}$", ErrorMessage = "O número de identificação civil deve conter apenas 9 dígitos")]
-        public string NumeroIdentificacaoCivil { get; set; } = string.Empty; 
+        [Required(ErrorMessage = "O número de utente de saúde é obrigatório.")]
+        [StringLength(20)]
+        public string NumeroUtente { get; set; }
 
-        [StringLength(9, ErrorMessage = "O NIF deve ter 9 dígitos")]
-        [RegularExpression(@"^\d{9}$", ErrorMessage = "O NIF deve conter apenas 9 dígitos")]
-        public string NIF { get; set; } = string.Empty; 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        [Required(ErrorMessage = "A data de nascimento é obrigatória.")]
+        public DateTime DataNascimento { get; set; }
 
-        [Phone(ErrorMessage = "Número de telefone inválido")]
-        public string Telefone { get; set; } = string.Empty;
+        [EmailAddress(ErrorMessage = "Endereço de e-mail inválido.")]
+        public string Email { get; set; }
 
-        [EmailAddress(ErrorMessage = "Email inválido")]
-        public string Email { get; set; } = string.Empty;
+        [Phone(ErrorMessage = "Número de telefone inválido.")]
+        public string Telefone { get; set; }
 
-        [StringLength(200)]
-        public string Morada { get; set; } = string.Empty;
-
-        [StringLength(10)]
-        public string CodigoPostal { get; set; } = string.Empty;
-
-        [StringLength(50)]
-        public string Localidade { get; set; } = string.Empty; 
-
+        // Propriedade de navegação
+        //public ICollection<Exame> Exames { get; set; }, base de dados ainda nao esta
     }
 }
