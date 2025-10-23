@@ -13,5 +13,6 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<HealthWellbeing.Models.Member> Member { get; set; } = default!;
     }
 }
