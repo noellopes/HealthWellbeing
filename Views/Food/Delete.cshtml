@@ -1,0 +1,19 @@
+﻿@model HealthWellbeing.Models.Food
+@{
+    ViewData["Title"] = "Delete Food";
+}
+<h1>Delete Food</h1>
+<p class="text-danger">Are you sure you want to delete this item?</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+    <dt class="col-sm-3">Category</dt>
+    <dd class="col-sm-9">@Model.Category?.Name</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="FoodId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
