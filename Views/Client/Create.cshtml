@@ -1,0 +1,49 @@
+﻿@model Client
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create Your Client Account!!!</h1>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" placeholder="Enter your First and Last Name.">
+        <span asp-validation-for="Name" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" placeholder="Enter your Gmail.">
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" placeholder="Enter your Phone Number.">
+        <span asp-validation-for="Phone" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CreateMember" class="form-label">
+            Would you like to be a member of the Gym?
+        </label>
+
+        <div class="form-check">
+            <input asp-for="CreateMember" id="create_member_yes" class="form-check-input" type="radio" value="true">
+            <label for="create_member_yes" class="form-check-label">
+                Yes
+            </label>
+        </div>
+
+        <div class="form-check">
+            <input asp-for="CreateMember" id="create_member_no" class="form-check-input" type="radio" value="false">
+            <label for="create_member_no" class="form-check-label">
+                No
+            </label>
+        </div>
+        <span asp-validation-for="CreateMember" class="text-danger small"></span>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button asp-action="Index" class="btn btn-secondary">Cancel</button>
+    </div>
+</form>
