@@ -16,7 +16,13 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100)]
         public string Especialidade { get; set; }
+        public int Id { get; set; }
+
+        
 
         
     }
+
+  
 }
+
