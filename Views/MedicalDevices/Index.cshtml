@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
-@model IEnumerable<MobileDevices> ;
+@model IEnumerable<MedicalDevices> ;
 
 @{
     ViewData["Title"] = "Lista de Equipamentos Móveis Registados";
@@ -30,7 +30,7 @@
                 <td>@Html.DisplayFor(modelItem => dispositivo.QuantidadeDisp)</td>
                 <td>
                     @*gera um link, passa o id do dispositivo clicado e leva a view Read*@
-                    <a asp-action="ReadMobileDevices" asp-route-id="@dispositivo.DevicesID" class="btn btn-sm btn-info">
+                    <a asp-action="ReadMedicalDevices" asp-route-id="@dispositivo.DevicesID" class="btn btn-sm btn-info">
                         Ver Detalhes
                     </a>
                 </td>
@@ -40,7 +40,7 @@
 </table>
 
 <div class="mt-4">
-    <a asp-action="Dashboard" class="btn btn-secondary">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
         <i class="bi bi-arrow-left-circle"></i> Voltar
     </a>
 </div>

@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
-@model MobileDevices; 
+@model MedicalDevices; 
 @{
     ViewData["Title"] = $"Detalhes: {Model.NomeDisp}"; //mostra o nome do dispositivo selecionado
 }
@@ -39,10 +39,10 @@
 
 
 <div class="mt-4">
-    <a asp-action="UpdateMobileDevices" asp-route-id="@Model.DevicesID" class="btn btn-warning">
+    <a asp-action="UpdateMedicalDevices" asp-route-id="@Model.DevicesID" class="btn btn-warning">
         <i class="bi bi-pencil-square"></i> Editar
     </a>
-    <a asp-action="DeleteMobileDevices" asp-route-id="@Model.DevicesID" class="btn btn-danger">
+    <a asp-action="DeleteMedicalDevices" asp-route-id="@Model.DevicesID" class="btn btn-danger">
         <i class="bi bi-trash"></i> Eliminar
     </a>
     <a asp-action="Index" class="btn btn-secondary">

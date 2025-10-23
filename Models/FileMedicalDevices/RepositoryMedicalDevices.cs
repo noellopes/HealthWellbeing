@@ -1,12 +1,12 @@
 ﻿namespace HealthWellbeingRoom.Models.FileMobileDevices
 {
-    public class RepositoryMobileDevices
+    public class RepositoryMedicalDevices
     {
-        private static List<MobileDevices> dispositivos = new List<MobileDevices>();
-        public static IEnumerable<MobileDevices> Index => dispositivos;
-        public static void AddMobileDevices(MobileDevices dispositivo) => dispositivos.Add(dispositivo);
+        private static List<MedicalDevices> dispositivos = new List<MedicalDevices>();
+        public static IEnumerable<MedicalDevices> Index => dispositivos;
+        public static void AddMedicalDevices(MedicalDevices dispositivo) => dispositivos.Add(dispositivo);
 
-        public static void UpdateMobileDevices(MobileDevices dispositivoAtualizado)
+        public static void UpdateMedicalDevices(MedicalDevices dispositivoAtualizado)
         {
             //Encontra o índice do dispositivo original na lista
             var indice = dispositivos.FindIndex(d => d.DevicesID == dispositivoAtualizado.DevicesID);
@@ -18,7 +18,7 @@
             }
         }
 
-        public static void DeleteMobileDevices(int id)
+        public static void DeleteMedicalDevices(int id)
         {
             //Encontra o dispositivo com o ID fornecido
             var dispositivo = dispositivos.FirstOrDefault(d => d.DevicesID == id);

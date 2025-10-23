@@ -2,7 +2,7 @@
 
 namespace HealthWellbeingRoom.Models.FileMobileDevices
 {
-    public class MobileDevices
+    public class MedicalDevices
     {
         //ID dos dispositivos móveis
         public int DevicesID { get; set; }
@@ -24,8 +24,8 @@ namespace HealthWellbeingRoom.Models.FileMobileDevices
 
         public DateTime DataRegisto { get; set; }
 
-        public string StatusDisp { get; set; }
+        public string? StatusDisp { get; set; }
 
-        public string ObservacoesDisp { get; set; }
+        public string? ObservacoesDisp { get; set; }
     }
 }

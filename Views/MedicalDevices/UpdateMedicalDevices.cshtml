@@ -1,63 +1,56 @@
 ﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
-@model MobileDevices;
+@model MedicalDevices;
 
 @{
-    ViewData["Title"] = "Registar novo Dispositivo Móvel";
+    ViewData["Title"] = $"Editar Dispositivo: {Model.NomeDisp}";
 }
 
 <h1>@ViewData["Title"]</h1>
+<p class="lead">Altere apenas os campos necessários.</p>
 
 <hr />
 
 <div class="row">
     <div class="col-md-6">
 
-        @if (TempData["Mensagem de sucesso"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                @TempData["Mensagem de sucesso"]
-                <button type="button" class="btn-close" data-bs-dismiss="alerta" aria-label="Close"></button>
-            </div>
-        }
-        
-        <form asp-action="CreateMobileDevices" method="post">
-            
+        <form asp-action="UpdateMedicalDevices" method="post">
+
             @*(ModelOnly) -> mostra apenas o erro na validação*@
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div> 
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
-                <label asp-for="NomeDisp" class="form-label">Nome do Dispositivo</label>
-                <input asp-for="NomeDisp" class="form-control" placeholder="Ex: Monitor de Paciente Portátil, Ecógrafo Móvel">
+                <label asp-for="NomeDisp" class="form-label">Nome do Equipamento</label>
+                <input asp-for="NomeDisp" class="form-control">
                 <span asp-validation-for="NomeDisp" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="TipoDisp" class="form-label">Tipo de Dispositivo (Categoria)</label>
-                <input asp-for="TipoDisp" class="form-control" placeholder="Ex: Monitores de UTI, Carrinho de Emergência">
+                <input asp-for="TipoDisp" class="form-control">
                 <span asp-validation-for="TipoDisp" class="text-danger small"></span>
             </div>
-            
+
             <div class="mb-3">
                 <label asp-for="EspecificacaoDisp" class="form-label">Especificação Detalhada</label>
-                <input asp-for="EspecificacaoDisp" class="form-control" placeholder="Ex: Modelo Philips, Bateria 8h, Wi-Fi, Peso 5kg">
+                <input asp-for="EspecificacaoDisp" class="form-control">
                 <span asp-validation-for="EspecificacaoDisp" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="QuantidadeDisp" class="form-label">Quantidade a Adicionar</label>
-                <input asp-for="QuantidadeDisp" class="form-control" type="number" min="1" placeholder="1">
+                <label asp-for="QuantidadeDisp" class="form-label">Quantidade</label>
+                <input asp-for="QuantidadeDisp" class="form-control" type="number" min="1">
                 <span asp-validation-for="QuantidadeDisp" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="StatusDisp" class="form-label">Status</label>
-                <input asp-for="StatusDisp" class="form-control" placeholder="Em uso, Disponível, Em manutenção">
+                <label asp-for="StatusDisp" class="form-label">Status do Dispositivo</label>
+                <input asp-for="StatusDisp" class="form-control">
                 <span asp-validation-for="StatusDisp" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="ObservacoesDisp" class="form-label">Observações</label>
-                <input asp-for="ObservacoesDisp" class="form-control" placeholder="observações gerais">
+                <input asp-for="ObservacoesDisp" class="form-control">
                 <span asp-validation-for="ObservacoesDisp" class="text-danger small"></span>
             </div>
 
@@ -66,22 +59,20 @@
 
             <div class="mt-4">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Submeter Registo
+                    <i class="bi bi-save"></i> Salvar Alterações
                 </button>
-                <a asp-action="Dashboard" class="btn btn-secondary"> 
+                <a asp-action="Index" class="btn btn-secondary">
                     <i class="bi bi-x-circle"></i> Cancelar e Voltar
                 </a>
             </div>
-            
         </form>
-        
+
     </div>
 </div>
 
-
 @section Scripts {
     @{
-       //As validações do C# apareçam imediatamente no navegador
+        //As validações do C# apareçam imediatamente no navegador
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
