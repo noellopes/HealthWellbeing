@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
-	public class Medicos : Controller
+	public class Medicos
 	{
 		public int Id { get; set; }
 
