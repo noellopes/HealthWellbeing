@@ -1,0 +1,54 @@
+﻿@model List<HealthWellbeing.Models.Exercicio>
+
+@{
+    ViewData["Title"] = "Exercícios";
+}
+
+<h1>Exercícios</h1>
+
+<p>Lista de exercícios disponíveis:</p>
+
+@if (Model?.Any() == true)
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Duração</th>
+                    <th>Intensidade</th>
+                    <th>Calorias</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var exercicio in Model)
+                {
+                    <tr>
+                        <td>@exercicio.ExercicioNome</td>
+                        <td>@exercicio.Descricao</td>
+                        <td>@exercicio.Duracao min</td>
+                        <td>@exercicio.Intencidade/10</td>
+                        <td>@exercicio.CaloriasGastas cal</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Nenhum exercício encontrado.
+    </div>
+}
+
+<!-- Botões -->
+<div class="mt-4 d-flex gap-3 align-items-center">
+    <a href="/" class="btn btn-secondary">
+        <i class="fas fa-home"></i> Voltar ao Início
+    </a>
+    <a asp-action="CriarExercicio" class="btn btn-success">
+        <i class="fas fa-plus"></i> Criar Exercício
+    </a>
+</div>
