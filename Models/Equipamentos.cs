@@ -4,7 +4,7 @@ namespace ProjetoSaude.Models
 {
     public class Equipamento
     {
-        public int Id { get; set; }
+        public int EquipamentoId { get; set; }
 
         [Required(ErrorMessage = "O nome do equipamento é obrigatório")]
         [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres")]
