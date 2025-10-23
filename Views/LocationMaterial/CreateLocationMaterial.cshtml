@@ -1,13 +1,12 @@
-﻿
-@{
-    ViewData["Title"] = "CreateLocationMaterial";
+﻿@{
+    ViewData["Title"] = "Create Material Location";
 }
 
-<h1>Criar Localização Material</h1>
+<h1>Create Material Location</h1>
 
 @model HealthWellbeing.Models.LocationMaterial
 @{
-    ViewData["Title"] = "Criar Localização do Material";
+    ViewData["Title"] = "Create Material Location";
 }
 
 <div class="container mt-4">
@@ -16,53 +15,53 @@
     <form asp-action="CreateLocationMaterial" method="post" class="border rounded shadow p-4 bg-light">
 
         <div class="mb-3">
-            <label asp-for="Setor" class="form-label"></label>
-            <input asp-for="Setor" class="form-control" placeholder="Ex: Almoxarifado, Laboratório, Bloco Cirúrgico" />
-            <span asp-validation-for="Setor" class="text-danger"></span>
+            <label asp-for="Sector" class="form-label"></label>
+            <input asp-for="Sector" class="form-control" placeholder="E.g., Warehouse, Laboratory, Surgical Block" />
+            <span asp-validation-for="Sector" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Sala" class="form-label"></label>
-            <input asp-for="Sala" class="form-control" placeholder="Ex: Sala 101, Laboratório 2, Sala de Equipamentos" />
-            <span asp-validation-for="Sala" class="text-danger"></span>
+            <label asp-for="Room" class="form-label"></label>
+            <input asp-for="Room" class="form-control" placeholder="E.g., Room 101, Laboratory 2, Equipment Room" />
+            <span asp-validation-for="Room" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Armario" class="form-label"></label>
-            <input asp-for="Armario" class="form-control" placeholder="Ex: Armário A, Armário Principal" />
-            <span asp-validation-for="Armario" class="text-danger"></span>
+            <label asp-for="Cabinet" class="form-label"></label>
+            <input asp-for="Cabinet" class="form-control" placeholder="E.g., Cabinet A, Main Cabinet" />
+            <span asp-validation-for="Cabinet" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Gaveta" class="form-label"></label>
-            <input asp-for="Gaveta" class="form-control" placeholder="Ex: Gaveta 1, Gaveta Inferior" />
-            <span asp-validation-for="Gaveta" class="text-danger"></span>
+            <label asp-for="Drawer" class="form-label"></label>
+            <input asp-for="Drawer" class="form-control" placeholder="E.g., Drawer 1, Bottom Drawer" />
+            <span asp-validation-for="Drawer" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Prateleira" class="form-label"></label>
-            <input asp-for="Prateleira" class="form-control" placeholder="Ex: Prateleira 2, Superior" />
-            <span asp-validation-for="Prateleira" class="text-danger"></span>
+            <label asp-for="Shelf" class="form-label"></label>
+            <input asp-for="Shelf" class="form-control" placeholder="E.g., Shelf 2, Upper Shelf" />
+            <span asp-validation-for="Shelf" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="CodigoIdentificacao" class="form-label"></label>
-            <input asp-for="CodigoIdentificacao" class="form-control" placeholder="Ex: LM-001, COD-12345" />
-            <span asp-validation-for="CodigoIdentificacao" class="text-danger"></span>
+            <label asp-for="IdentificationCode" class="form-label"></label>
+            <input asp-for="IdentificationCode" class="form-control" placeholder="E.g., ML-001, CODE-12345" />
+            <span asp-validation-for="IdentificationCode" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Observacao" class="form-label"></label>
-            <textarea asp-for="Observacao" class="form-control" rows="3" placeholder="Observações adicionais sobre o local..."></textarea>
-            <span asp-validation-for="Observacao" class="text-danger"></span>
+            <label asp-for="Observation" class="form-label"></label>
+            <textarea asp-for="Observation" class="form-control" rows="3" placeholder="Additional notes about the location..."></textarea>
+            <span asp-validation-for="Observation" class="text-danger"></span>
         </div>
 
         <div class="d-flex justify-content-between mt-4">
             <a asp-action="ReadLocationMaterial" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Cancelar
+                <i class="bi bi-arrow-left"></i> Cancel
             </a>
             <button type="submit" class="btn btn-success">
-                <i class="bi bi-save"></i> Guardar
+                <i class="bi bi-save"></i> Save
             </button>
         </div>
     </form>

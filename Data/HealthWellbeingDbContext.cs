@@ -14,6 +14,7 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<HealthWellbeing.Models.LocationMaterial> LocationMaterial { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.Equipment> Equipment { get; set; } = default!;
     }
 }
