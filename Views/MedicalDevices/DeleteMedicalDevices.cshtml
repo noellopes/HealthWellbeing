@@ -1,0 +1,39 @@
+﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+@model MedicalDevices;
+
+@{
+    ViewData["Title"] = "Confirmar Eliminação";
+}
+
+<h1 class="text-danger">@ViewData["Title"]</h1>
+<h3 class="lead">Tem a certeza que deseja eliminar o registo deste dispositivo? Esta ação é irreversível.</h3>
+<hr />
+
+<div class="card bg-light p-4 border-danger">
+    <dl class="row">
+        <dt class="col-sm-3">ID:</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.DevicesID)</dd>
+
+        <dt class="col-sm-3">Nome:</dt>
+        <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.NomeDisp)</strong></dd>
+
+        <dt class="col-sm-3">Tipo:</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.TipoDisp)</dd>
+
+        <dt class="col-sm-3">Data de Registo:</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.DataRegisto)</dd>
+    </dl>
+</div>
+
+<form asp-action="DeleteMedicalDevices" method="post" class="mt-4">
+
+    @Html.AntiForgeryToken() <input type="hidden" name="id" value="@Model.DevicesID" />
+
+    <button type="submit" class="btn btn-danger btn-lg">
+        <i class="bi bi-trash"></i> Sim, Eliminar Permanentemente
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary btn-lg">
+        <i class="bi bi-x-circle"></i> Cancelar e Voltar
+    </a>
+</form>

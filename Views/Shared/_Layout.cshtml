@@ -1,18 +1,18 @@
 ﻿<!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Health Romms</title>
+    <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top"> @* a barra de menu em preto e fixo com letras brancas *@
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand fw-bold fs-3" asp-area="" asp-controller="Home" asp-action="Index">HEALTH ROOMS</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HealthWellbeing</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -20,49 +20,57 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                       
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" id="roomDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Salas</a>
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="roomDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Salas e Materiais
+                            </a>
                             <ul class="dropdown-menu" aria-labelledby="roomDropdown">
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Room" asp-action="CreateRoom"> Criar Sala </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Room" asp-action="ReadRoom"> Ver Sala </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Room" asp-action="UpdateRoom"> Atualizar Sala </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Room" asp-action="DeleteRoom"> Eliminar Sala </a></li>
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Salas</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Room" asp-action="CreateRoom">Criar Salas</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Room" asp-action="IndexRoom">Lista das Salas</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Tipo de Materiais</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="TypeMaterial" asp-action="CreateTypeMaterial">Criar tipo de Materiais</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="TypeMaterial" asp-action="ReadTypeMaterial">Lista de tipos de Materiais</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Equipamentos</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Equipment" asp-action="CreateEquipment">Criar Equipamentos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Equipment" asp-action="ReadEquipment">Lista de Equipamentos</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Despositivos Médicos</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="CreateMedicalDevices">Criar dispositivos médicos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="Index">Lista de dispositivos médicos</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Localização dos  Materiais</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterial" asp-action="CreateLocationMaterial">Criar localização dos materiais</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterial" asp-action="ReadLocationMaterial">Lista das localizações de materiais</a></li>
+                                    </ul>
+                                </li>
+
                             </ul>
                         </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" id="TypeMaterialDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">TipoMaterial</a>
-                            <ul class="dropdown-menu" aria-labelledby="TypeMaterialDropdown">
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="TypeMaterial" asp-action="CreateTypeMaterial"> Criar TipoMaterial  </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="TypeMaterial" asp-action="ReadTypeMaterial"> Ver TipoMaterial </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="TypeMaterial" asp-action="UpdateTypeMaterial"> Atualizar TipoMaterial </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="TypeMaterial" asp-action="DeleteTypeMaterial"> Eliminar TipoMaterial </a></li>
-                            </ul>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" id="LocationMaterialDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">LocationMaterial</a>
-                            <ul class="dropdown-menu" aria-labelledby="LocationMaterialDropdown">
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="LocationMaterial" asp-action="CreateLocationMaterial"> Criar LocationMaterial  </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="LocationMaterial" asp-action="ReadLocationMaterial"> Ver LocationMaterial </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="LocationMaterial" asp-action="UpdateLocationMaterial"> Atualizar LocationMaterial </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="LocationMaterial" asp-action="DeleteLocationMaterial"> Eliminar LocationMaterial </a></li>
-                            </ul>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" id="MaterialDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Materiais</a>
-                            <ul class="dropdown-menu" aria-labelledby="MaterialDropdown">
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Equipment"> Equipamentos  </a></li>
-                                <li><a class="nav-link text-black" asp-area="" asp-controller="Equipment"> Dispositivos Médicos </a></li>
-                            </ul>
-                        </li>
-
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -70,25 +78,17 @@
             </div>
         </nav>
     </header>
-
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-  @*   Faz o corpo do site ocupar 100% de espaço de forma a empurar o rodope para baixo *@
-    <main class="flex-grow-1">
-        @RenderBody()
-    </main>
 
-
-    <footer class="bg-black text-white text-center py-3">
-
+    <footer class="border-top footer text-muted">
         <div class="container">
-            <p>© 2025 - Health Rooms - <a href="/Privacidade" class="text-white text-decoration-none fw-bold">Privacidade</a></p>
+            &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,0 +1,51 @@
+﻿@using HealthWellbeingRoom.Models.FileMobileDevices;
+@model MedicalDevices; 
+@{
+    ViewData["Title"] = $"Detalhes: {Model.NomeDisp}"; //mostra o nome do dispositivo selecionado
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>Informações completas do dispositivo selecionado.</p>
+<hr />
+
+<div class="card shadow-sm p-4">
+    <dl class="row">
+
+        <dt class="col-sm-4">ID:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.DevicesID)</dd>
+
+        <dt class="col-sm-4">Nome do dispositivo:</dt>
+        <dd class="col-sm-8"><strong>@Html.DisplayFor(model => model.NomeDisp)</strong></dd>
+
+        <dt class="col-sm-4">Tipo do dispositivo:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.TipoDisp)</dd>
+
+        <dt class="col-sm-4">Especificação:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.EspecificacaoDisp)</dd>
+
+        <dt class="col-sm-4">Quantidade:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.QuantidadeDisp)</dd>
+
+        <dt class="col-sm-4">Data do registo:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.DataRegisto)</dd>
+
+        <dt class="col-sm-4">Status:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.StatusDisp)</dd>
+
+        <dt class="col-sm-4">Observação:</dt>
+        <dd class="col-sm-8">@Html.DisplayFor(model => model.ObservacoesDisp)</dd>
+    </dl>
+</div>
+
+
+<div class="mt-4">
+    <a asp-action="UpdateMedicalDevices" asp-route-id="@Model.DevicesID" class="btn btn-warning">
+        <i class="bi bi-pencil-square"></i> Editar
+    </a>
+    <a asp-action="DeleteMedicalDevices" asp-route-id="@Model.DevicesID" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Eliminar
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle"></i> Voltar
+    </a>
+</div>

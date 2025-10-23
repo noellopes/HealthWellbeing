@@ -8,19 +8,20 @@ namespace HealthWellbeing.Models
         //ID da sala, chave primaria
         public int SalaId { get; set; }
 
-        //Nome da sala
-
-        [Required(ErrorMessage = "O nome da sala é obrigatorio.")]
-        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres")]
-        public string Nome { get; set; }
-
         //Tipo da sala (consultas ou tratamentos), (nao precisa de ser validado)
-        public enum TipoSala { Consultas, Tratamentos }
+        public enum Tipo { Consultas, Tratamentos }
+        [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
+        public Tipo TipoSala { get; set; }
 
         //Especialidade da sala (pediatria, cardiologia, etc)
         [Required(ErrorMessage = "A especialidade é obrigatoria.")]
         [StringLength(100, ErrorMessage = "A Especialidade não pode exceder 100 caracteres")]
         public string Especialidade { get; set; }
+
+        //Nome da sala
+        [Required(ErrorMessage = "O nome da sala é obrigatorio.")]
+        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres")]
+        public string Nome { get; set; }
 
         //Capacidade da sala (1 a 50),(nao precisa de ser validado)
         public int Capacidade { get; set; }
@@ -29,14 +30,8 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A localização é obrigatoria.")]
         public string Localizacao { get; set; }
 
-        //Equipamentos disponiveis na sala (lista de strings)
-        public List<String> Equipamentos { get; set; }
-
-        //Dispositivos moveis disponiveis na sala (lista de strings)
-        public List<String> DispositivosMoveis { get; set; }
-
         //Lista de agendamentos (datas e horas)
-        public List<string> Agendamentos { get; set; }
+        //public List<string> Agendamentos { get; set; }
 
         //Disponibilidade da sala (true ou false)
         public bool Disponibilidade { get; set; }
