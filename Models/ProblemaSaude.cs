@@ -2,9 +2,9 @@
 
 namespace HealthWellbeing.Models
 {
-    public class ProblemasdeSaude
+    public class ProblemaSaude
     {
-        public int ProblemaId { get; set; }
+        public int ProblemaSaudeId { get; set; }
 
         [Required(ErrorMessage = "A categoria do problema é obrigatória")]
         [StringLength(100)]
@@ -20,7 +20,7 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "Os profissionais de apoio são obrigatórios")]
         [StringLength(200)]
-        public string ProfissionaisDeApoio { get; set; }
+        public string ProfissionalDeApoio { get; set; }
 
         [Range(1, 10, ErrorMessage = "A gravidade deve estar entre 1 e 10")]
         public int Gravidade { get; set; }
