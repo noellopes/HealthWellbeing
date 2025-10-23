@@ -1,0 +1,43 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Event>
+
+@{
+    ViewData["Title"] = "Lista de Eventos";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Adicionar Novo Evento</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Duração</th>
+            <th>Intensidade</th>
+            <th>Calorias</th>
+            <th>Data</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.EventName</td>
+                <td>@item.EventType</td>
+                <td>@item.DurationMinutes min</td>
+                <td>@item.Intensity</td>
+                <td>@item.CaloriesBurned</td>
+                <td>@item.EventDate.ToShortDateString()</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-info btn-sm">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-primary btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-danger btn-sm">Apagar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

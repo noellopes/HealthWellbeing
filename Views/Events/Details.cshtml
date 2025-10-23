@@ -1,0 +1,16 @@
+﻿@model HealthWellbeing.Models.Event
+
+@{
+    ViewData["Title"] = "Detalhes do Evento";
+}
+
+<h2>@Model.EventName</h2>
+
+<p><strong>Descrição:</strong> @Model.EventDescription</p>
+<p><strong>Tipo:</strong> @Model.EventType</p>
+<p><strong>Duração:</strong> @Model.DurationMinutes minutos</p>
+<p><strong>Intensidade:</strong> @Model.Intensity</p>
+<p><strong>Calorias:</strong> @Model.CaloriesBurned</p>
+<p><strong>Data:</strong> @Model.EventDate.ToShortDateString()</p>
+
+<a asp-action="Index" class="btn btn-secondary">Voltar</a>
