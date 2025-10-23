@@ -4,7 +4,9 @@ namespace HealthWellbeing.Models
 {
     public class Client
     {
-		[Required(ErrorMessage = "First and last name are necessary.")]
+		public string ClientID { get; set; }
+
+        [Required(ErrorMessage = "First and last name are necessary.")]
 		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100")]
 		[RegularExpression(@"^[A-Za-zÀ-ÿ]+( [A-Za-zÀ-ÿ]+)+$", ErrorMessage = "Introduce at least a First and Last name!")]
 		public string Name { get; set; }
@@ -21,13 +23,13 @@ namespace HealthWellbeing.Models
 
 		public bool? CreateMember { get; set; }
 
-		public string ClientID { get; set; }
-
 		public string CreateMemberText => CreateMember switch
 		{
 			true => "Yes",
 			false => "No",
 			_ => "Pending Acceptation..",
 		};
-	}
+
+        public ICollection<Member>? Members { get; set; } = default;
+    }
 }
