@@ -1,28 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace HealthWellbeing.Models
+namespace HealthWellBeing.Models
 {
-    public class Exames
+    // Renomear para Exame (singular)
+    public class Exame
     {
-        public int Id { get; set; }
+        public int ExameId { get; set; } 
 
-        [Required(ErrorMessage = "A instância do exame é obrigatória")]
+        [Required(ErrorMessage = "A data e hora da marcação são obrigatórias.")]
+        public DateTime DataHoraMarcacao { get; set; }
+
+        
         [StringLength(100)]
-        public string Instancia { get; set; }
+        public string? Notas { get; set; } 
 
-        [StringLength(500)]
-        public string data { get; set; }
-        public string hora { get; set; }
-
-        public ExameTipo exameTipo { get; set; }
-
-       //public Medicos medicos { get; set; }
-
-
-
-
-
-
+        public ExameTipo? ExameTipo { get; set; } // Propriedade de navegação
+        public int ExameTipoId { get; set; } // Chave estrangeira
     }
 }
