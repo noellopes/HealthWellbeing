@@ -23,12 +23,6 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        [HttpGet("/eventtype")]
-        public ActionResult EventType() {
-            return View();
-        }
-
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

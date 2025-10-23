@@ -1,10 +1,12 @@
-﻿namespace HealthWellbeing.Models {
-    public class EventType {
+﻿
+using System.ComponentModel.DataAnnotations;
 
-        public int EventTypeId { get; set; }
-        public string EventTypeName { get; set; }
-        public string EventTypeDescription { get; set; }
-        public bool IsPublished { get; set; } = false;
+public class EventType {
+    public int EventTypeId { get; set; }
 
-    }
+    [Required, StringLength(200)]
+    public string EventTypeName { get; set; }
+
+    public string? EventTypeDescription { get; set; }
+
 }
