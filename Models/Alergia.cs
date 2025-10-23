@@ -25,7 +25,8 @@ namespace HealthWellbeing.Models
         [Display(Name = "Sintomas")]
         public string Sintomas { get; set; }
 
-        //public ICollection<Alimentol> AlimentosRelacionados { get; set; } --> Quando implementar alimentos, adicionar as validações.
-
+        [Display(Name = "Alimento Associado")]
+        public int AlimentoId { get; set; }
+        public Alimento? Alimento { get; set; }
     }
 }

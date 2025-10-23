@@ -30,6 +30,9 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlergiaID"));
 
+                    b.Property<int>("AlimentoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -50,6 +53,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(300)");
 
                     b.HasKey("AlergiaID");
+
+                    b.HasIndex("AlimentoId");
 
                     b.ToTable("Alergia");
                 });
@@ -151,6 +156,98 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("CategoriaAlimento");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
+                {
+                    b.Property<int>("ReceitaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
+
+                    b.Property<decimal>("CaloriasPorPorcao")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("Gorduras")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HidratosCarbono")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsLactoseFree")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVegan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVegetariana")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModoPreparo")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Porcoes")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Proteinas")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TempoPreparo")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReceitaId");
+
+                    b.ToTable("Receita");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.RestricaoAlimentar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Gravidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sintomas")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RestricaoAlimentar");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
+                        .WithMany("AlergiaRelacionadas")
+                        .HasForeignKey("AlimentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Alimento");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.CategoriaAlimento", "Categoria")
@@ -183,6 +280,8 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
+                    b.Navigation("AlergiaRelacionadas");
+
                     b.Navigation("SubstituidoPor");
 
                     b.Navigation("Substitutos");

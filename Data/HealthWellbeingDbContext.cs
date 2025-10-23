@@ -33,5 +33,7 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(a => a.AlimentoSubstitutoRefId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
     }
 }
