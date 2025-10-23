@@ -1,0 +1,44 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Registo>
+
+@{
+    ViewData["Title"] = "Food Intake Records";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Record</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>UserId</th>
+            <th>MealDateTime</th>
+            <th>MealType</th>
+            <th>FoodName</th>
+            <th>Quantity</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.UserId</td>
+                <td>@item.MealDateTime</td>
+                <td>@item.MealType</td>
+                <td>@item.FoodName</td>
+                <td>@item.Quantity</td>
+                <td>@item.Notes</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.RegistoID" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.RegistoID" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.RegistoID" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
