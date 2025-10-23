@@ -1,0 +1,34 @@
+﻿@model IEnumerable<EventType>
+
+@{
+	ViewData["Title"] = "Event Type List";
+}
+
+<h1>@ViewBag.Title</h1>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @foreach (EventType eventType in Model) {
+            <tr>
+                <td>@eventType.EventTypeName</td>
+                <td>@eventType.EventTypeDescription</td>
+                <td>
+                    <button type="button" class="btn btn-info">Details</button>
+                    <button type="button" class="btn btn-warning">Update</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                </td>
+            </tr>
+            
+        }
+        
+    </tbody>
+
+</table>
