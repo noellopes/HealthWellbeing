@@ -10,16 +10,21 @@
 <table class="table">
     <thead>
         <tr>
+            <th scope="col">#</th>
             <th scope="col">Name</th>
-            <th scope="col">His priority</th>
+            <th scope="col">Description</th>
+
+            <th scope="col">Priority</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (TypeTreatment g in Model)
+        @foreach (var TypeTreatment in Model)
         {
             <tr>
-                <td>@g.Name</td>
-                <td>@g.IsPriorityText</td>
+                <td>@TypeTreatment.TypeTreatmentId</td>
+                <td>@TypeTreatment.Name</td>
+                <td>@TypeTreatment.Description</td>
+                <td>@TypeTreatment.EstimatedDuration</td>
             </tr>
         }
     </tbody>

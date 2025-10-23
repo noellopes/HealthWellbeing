@@ -17,23 +17,23 @@
 
         <hr />
 
-        <div class="form-floating mb-3">
-            <input asp-for="Name" readonly class="form-control-plaintext">
+        <div mb-3">
             <label asp-for="Name"></label>
+            <input asp-for="Name" readonly class="form-control-plaintext">
         </div>
 
-        <div class="form-floating mb-3">
+        <div mb-3">
+            <label asp-for="Description" class="text-secondary"></label>
             <input asp-for="Description" readonly class="form-control-plaintext">
-            <label asp-for="Description"></label>
         </div>
-        <div class="form-floating mb-3">
+        <div mb-3">
+            <label asp-for="EstimatedDuration" class="text-secondary"></label>
             <input asp-for="EstimatedDuration" readonly class="form-control-plaintext">
-            <label asp-for="EstimatedDuration"></label>
         </div>
 
-        <div class="form-floating mb-3">
+        <div mb-3">
+            <label for="WillAttend" class="text-secondary">Will attend the Priority</label>
             <input readonly class="form-control-plaintext" id="WillAttend" value="@Model.IsPriorityText">
-            <label for="WillAttend">Will attend the party</label>
         </div>
         <hr />
 

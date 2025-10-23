@@ -17,15 +17,8 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "EstimatedDuration is Required!!")]
         public int EstimatedDuration { get; set; }
 
-        public bool? Priority { get; set; }         //Se é Urgente, Normal, Rotina
-
-        public string IsPriorityText => Priority switch
-        {
-            true => "Urgent",
-            false => "Normal",
-            _ => "Routine",
-        };    
-
+        [Required(ErrorMessage = "Priority is Required!!")]
+        public string? Priority { get; set; }         //Se é Urgente, Normal, Rotina
 
     }
 
