@@ -1,0 +1,196 @@
+﻿@model HealthWellbeing.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    /* Caixa centrada na página */
+    .login-wrap {
+        min-height: calc(100vh - 120px);
+        display: grid;
+        place-items: center;
+        background: #1f4f6a; /* azul mais escuro do fundo da imagem */
+        padding: 24px;
+    }
+    /* Cartão principal */
+    .login-card {
+        width: 720px;
+        max-width: 95vw;
+        background: #2d79a0; /* azul principal */
+        border-radius: 10px;
+        padding: 28px;
+        box-shadow: 0 0 0 4px #153b50 inset; /* moldura escura como no mock */
+    }
+    /* Área interna com 2 colunas */
+    .login-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 24px;
+    }
+    /* Painel do logo (esquerda) */
+    .logo-panel {
+        background: #e9f0f5; /* branco-azulado */
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+    }
+
+        .logo-panel img {
+            max-width: 100%;
+            height: auto;
+        }
+
+    /* Painel do formulário (direita) */
+    .form-panel {
+        background: #61a6c7; /* azul claro do mock */
+        border-radius: 10px;
+        padding: 28px 24px;
+        display: grid;
+        gap: 16px;
+    }
+
+    /* Campo com ícone */
+    .input-wrap {
+        position: relative;
+    }
+
+        .input-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            opacity: .9;
+            pointer-events: none;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            height: 42px;
+            padding: 8px 12px 8px 42px; /* espaço para o ícone */
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            background: #2d79a0; /* barra azul escura como no mock */
+            color: #fff;
+        }
+
+            .input-wrap input::placeholder {
+                color: #e1eef5;
+                opacity: .9;
+            }
+
+    /* Botão principal */
+    .btn-login {
+        display: block;
+        margin: 6px auto 0;
+        padding: 10px 28px;
+        border-radius: 20px;
+        border: none;
+        background: #3f8fb7;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: .5px;
+        cursor: pointer;
+    }
+
+        .btn-login:hover {
+            filter: brightness(1.05);
+        }
+
+    /* Link Register com linha fina */
+    .register-wrap {
+        text-align: center;
+        margin-top: 2px;
+    }
+
+        .register-wrap .line {
+            width: 70%;
+            height: 2px;
+            background: rgba(255,255,255,.5);
+            margin: 6px auto 8px;
+            border-radius: 1px;
+        }
+
+        .register-wrap a {
+            color: #0d2d3f;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .register-wrap a:hover {
+                text-decoration: underline;
+            }
+
+    /* Validações */
+    .text-danger {
+        color: #ffefef;
+    }
+
+    .validation-summary-errors ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    /* Responsivo */
+    @media (max-width: 720px) {
+        .login-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="login-wrap">
+    <div class="login-card">
+        <div class="login-grid">
+            <!-- Painel do LOGO -->
+            <div class="logo-panel">
+                <img src="~/images/jbma-logo.png" alt="JBMA Clínica Privada" />
+            </div>
+
+            <!-- Painel do FORM -->
+            <div class="form-panel">
+                <h2 style="color:#0d2d3f; margin:0 0 4px 0;">Login</h2>
+
+                <form asp-action="Login" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <!-- Email -->
+                    <div class="input-wrap">
+                        <!-- Ícone utilizador -->
+                        <svg viewBox="0 0 24 24" fill="#e9f0f5" aria-hidden="true">
+                            <path d="M12 12c2.761 0 5-2.686 5-6s-2.239-6-5-6-5 2.686-5 6 2.239 6 5 6zm0 2c-4.418 0-8 2.91-8 6.5 0 .828.895 1.5 2 1.5h12c1.105 0 2-.672 2-1.5 0-3.59-3.582-6.5-8-6.5z" />
+                        </svg>
+                        <input asp-for="Email" placeholder="Email" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+
+                    <!-- Password -->
+                    <div class="input-wrap">
+                        <!-- Ícone cadeado -->
+                        <svg viewBox="0 0 24 24" fill="#e9f0f5" aria-hidden="true">
+                            <path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 116 0v3H9z" />
+                        </svg>
+                        <input asp-for="Password" type="password" placeholder="Password" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+
+                    <button type="submit" class="btn-login">LOGIN</button>
+
+                    <div class="register-wrap">
+                        <div class="line"></div>
+                        <a asp-controller="UtentesSaude" asp-action="Create">Register</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
