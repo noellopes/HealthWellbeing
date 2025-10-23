@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.ComponentesAlimento>
+﻿@model IEnumerable<HealthWellbeing.Models.FoodComponent>
 @{
     ViewData["Titulo"] = "Componentes Alimentos";
 }
@@ -25,9 +25,9 @@
                     <td>@a.Name</td>
                     <td>@a.Description</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@a.CompFoodID" class="btn btn-sm btn-secondary">Ver</a>
-                        <a asp-action="Edit" asp-route-id="@a.CompFoodID" class="btn btn-sm btn-warning">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@a.CompFoodID" class="btn btn-sm btn-danger">Apagar</a>
+                        <a asp-action="Details" asp-route-id="@a.FoodComponentId" class="btn btn-sm btn-secondary">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@a.FoodComponentId" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@a.FoodComponentId" class="btn btn-sm btn-danger">Apagar</a>
                     </td>
                 </tr>
             }

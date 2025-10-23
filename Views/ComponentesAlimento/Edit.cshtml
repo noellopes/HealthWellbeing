@@ -1,11 +1,11 @@
-﻿@model ComponentesAlimento
+﻿@model FoodComponent
 @{
-    ViewData["Title"] = "Editar Food";
+    ViewData["Title"] = "Editar Alimento";
 }
 <h1>Editar Alimento</h1>
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="CompFoodID" />
+    <input type="hidden" asp-for="FoodComponentId" />
 
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>

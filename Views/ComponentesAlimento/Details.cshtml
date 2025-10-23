@@ -1,4 +1,4 @@
-﻿@model ComponentesAlimento
+﻿@model FoodComponent
 @{
     ViewData["Title"] = "Details";
 }
@@ -10,13 +10,13 @@
     <dd class="col-sm-9">@Model.Description</dd>
 </dl>
 <p>
-    <a asp-action="Edit" asp-route-id="@Model.CompFoodID" class="btn btn-warning">Editar</a>
+    <a asp-action="Edit" asp-route-id="@Model.FoodComponentId" class="btn btn-warning">Editar</a>
     <a asp-action="Index" class="btn btn-secondary">Voltar</a>
 
-    <form asp-action="Delete" asp-route-id="@Model.CompFoodID" method="post" class="d-inline">
+    <form asp-action="Delete" asp-route-id="@Model.FoodComponentId" method="post" class="d-inline">
         <button type="submit" class="btn btn-danger"
-                onclick="return confirm('Tem a certeza que quer eliminar?');">
-            Apagar
+                onclick="return confirm('Are you sure?');">
+            Delete
         </button>
     </form>
 </p>
