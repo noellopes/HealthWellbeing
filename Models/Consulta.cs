@@ -2,12 +2,13 @@
 {
     public class Consulta
     {
-        int idConsulta { get; set; }
-        DateTime dataMarcacao { get; set; }
-        DateTime dataConsulta { get; set; }
-        DateTime dataCancelamento { get; set; }
-        TimeOnly horaInicio { get; set; }
-        TimeOnly horaFim { get; set; }
+        public int idConsulta { get; set; }
+        public DateTime dataMarcacao { get; set; }
+        public DateTime dataConsulta { get; set; }
+        public DateTime dataCancelamento { get; set; }
+        public TimeOnly horaInicio { get; set; }
+        public TimeOnly horaFim { get; set; }
+        
         
     }
 }
