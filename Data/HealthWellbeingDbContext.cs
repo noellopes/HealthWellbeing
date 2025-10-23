@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
+using HealthWellbeingRoom.Models;
 
 namespace HealthWellbeing.Data
 {
@@ -13,5 +14,6 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<HealthWellbeingRoom.Models.Equipment> Equipment { get; set; } = default!;
     }
 }
