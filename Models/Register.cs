@@ -6,8 +6,8 @@ namespace HealthWellbeing.Models
     public class Register
     {
 
-        [Required(ErrorMessage = "Please enter the register id!")]
-        public int registerId { get; set; } = default!;
+        [Required(ErrorMessage = "Por favor introduza o id de registo")]
+        public int idRegisto { get; set; } = default!;
 
     }
 }
