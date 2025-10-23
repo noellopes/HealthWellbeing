@@ -1,20 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
     {
-        public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
+        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
         }
-        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
+
+        // Tabelas
+        public DbSet<Alergia> Alergia { get; set; } = default!;
+        public DbSet<Alimento> Alimentos { get; set; } = default!;
+        public DbSet<AlimentoSubstituto> AlimentoSubstitutos { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configuração da relação auto-referenciada Alimento ↔ AlimentoSubstituto
+
+            modelBuilder.Entity<AlimentoSubstituto>()
+                .HasOne(a => a.AlimentoOriginal)
+                .WithMany(a => a.Substitutos)
+                .HasForeignKey(a => a.AlimentoOriginalId)
+                .OnDelete(DeleteBehavior.Restrict); // evita exclusão em cascata
+
+            modelBuilder.Entity<AlimentoSubstituto>()
+                .HasOne(a => a.AlimentoSubstitutoRef)
+                .WithMany(a => a.SubstituidoPor)
+                .HasForeignKey(a => a.AlimentoSubstitutoRefId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
