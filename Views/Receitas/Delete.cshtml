@@ -1,0 +1,77 @@
+@model HealthWellbeing.Models.Receita
+
+@{
+    ViewData["Title"] = "Eliminar Receita";
+}
+
+<h1>Eliminar Receita</h1>
+
+<h3>Tem a certeza que deseja eliminar esta receita?</h3>
+<div>
+    <h4>@Model.Nome</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Descricao)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Descricao)
+        </dd>
+        
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.TempoPreparo)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.TempoPreparo) minutos
+        </dd>
+        
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Porcoes)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Porcoes)
+        </dd>
+        
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CaloriasPorPorcao)
+        </dt>
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CaloriasPorPorcao) kcal
+        </dd>
+        
+        <dt class="col-sm-3">
+            Restrições Alimentares
+        </dt>
+        <dd class="col-sm-9">
+            @if (Model.IsVegetariana)
+            {
+                <span class="badge bg-success">Vegetariana</span>
+            }
+            @if (Model.IsVegan)
+            {
+                <span class="badge bg-success">Vegana</span>
+            }
+            @if (Model.IsLactoseFree)
+            {
+                <span class="badge bg-info">Sem Lactose</span>
+            }
+            @if (!Model.IsVegetariana && !Model.IsVegan && !Model.IsLactoseFree)
+            {
+                <span class="text-muted">Nenhuma restrição</span>
+            }
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ReceitaId" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    </form>
+</div>
