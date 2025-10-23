@@ -18,19 +18,20 @@
         {
             if (level < 25)
             {
-                LevelCategory = "Beginner";
+                Description = "Beginner";
                 return "green";
             }
             else if (level < 50)
             {
-                LevelCategory = "Intermediate";
+                Description = "Intermediate";
                 return "blue";
             }
             else if (level < 75)
             {
-                LevelCategory = "Intermediate";
+                Description = "Expert";
                 return "yellow";
             }
+            Description = "Master";
             return "red";
         }
 
