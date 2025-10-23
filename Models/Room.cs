@@ -30,9 +30,6 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A localização é obrigatoria.")]
         public string Localizacao { get; set; }
 
-        //Lista de agendamentos (datas e horas)
-        //public List<string> Agendamentos { get; set; }
-
         //Disponibilidade da sala (true ou false)
         public bool Disponibilidade { get; set; }
 
