@@ -14,6 +14,10 @@
 
 <div style="text-align:center; margin-top:20px;">
     <a href="@Url.Action("Index", new { level = Model.Level - 1 })" class="btn">◀</a>
+    <form action="@Url.Action("Index")" method="get" class="level-form">
+        <input type="number" name="level" min="1" max="100" value="@Model.Level" />
+        <button type="submit" class="btn">Go</button>
+    </form>
     <a href="@Url.Action("Index", new { level = Model.Level + 1 })" class="btn">▶</a>
 </div>
 
@@ -23,7 +27,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
+        height: 500px;
         background: #f2f2f2;
     }
 
@@ -59,7 +63,38 @@
         transition: background 0.2s;
     }
 
-        .btn:hover {
-            background: #ccc;
-        }
+    .btn:hover {
+        background: #ccc;
+    }
+
+
+
+
+    .level-form {
+        display: inline-block;
+    }
+
+    .level-form input {
+        width: 70px;
+        padding: 8px;
+        text-align: center;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    .level-form button {
+        padding: 8px 12px;
+        margin-left: 5px;
+        background: dodgerblue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .level-form button:hover {
+        background: #555;
+    }
 </style>
