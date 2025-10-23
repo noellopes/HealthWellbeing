@@ -1,0 +1,33 @@
+﻿@model HealthWellbeing.Models.Objetivo
+
+@{
+    ViewData["Title"] = "Detalhes do Objetivo";
+}
+
+<h1 class="mb-3">@ViewData["Title"]</h1>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning">Objetivo não encontrado.</div>
+}
+else
+{
+    <dl class="row">
+        <dt class="col-sm-2">Id</dt>
+        <dd class="col-sm-10">@Model.ObjetivoId</dd>
+
+        <dt class="col-sm-2">Nome</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">Categoria</dt>
+        <dd class="col-sm-10">@Model.Category</dd>
+
+        <dt class="col-sm-2">Detalhes</dt>
+        <dd class="col-sm-10">@Model.Details</dd>
+    </dl>
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.ObjetivoId" class="btn btn-primary">Editar</a>
+        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+    </div>
+}
