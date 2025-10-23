@@ -13,6 +13,7 @@ namespace HealthWellbeing.Models
         [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
         public string Descricao { get; set; }
 
+<<<<<<< HEAD
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100)]
         public string Especialidade { get; set; }
@@ -21,6 +22,8 @@ namespace HealthWellbeing.Models
         
 
         
+=======
+>>>>>>> master
     }
 
   
