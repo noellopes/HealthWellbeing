@@ -1,8 +1,8 @@
-﻿using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
@@ -15,10 +15,18 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        private void LoadCategories(object? selected = null)
+            => ViewBag.FoodCategoryId = new SelectList(_context.FoodCategory.AsNoTracking().OrderBy(c => c.Name), "FoodCategoryId", "Name", selected);
+
         // GET: Food
         public async Task<IActionResult> Index()
         {
-            var foods = await _context.Food.Include(f => f.Category).ToListAsync();
+            var foods = await _context.Food
+                .Include(f => f.Category)
+                .AsNoTracking()
+                .OrderBy(f => f.Name)
+                .ToListAsync();
+
             return View(foods);
         }
 
@@ -29,32 +37,38 @@ namespace HealthWellbeing.Controllers
 
             var food = await _context.Food
                 .Include(f => f.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.FoodId == id);
-            if (food == null) return NotFound();
 
+            if (food == null) return NotFound();
             return View(food);
         }
 
         // GET: Food/Create
         public IActionResult Create()
         {
-            ViewData["FoodCategoryId"] = new SelectList(_context.FoodCategory, "FoodCategoryId", "Name");
-            return View();
+            LoadCategories();
+            return View(new Food());
         }
 
         // POST: Food/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FoodId,Name,Description,KcalPer100g,ProteinPer100g,CarbsPer100g,FatPer100g,FoodCategoryId")] Food food)
+        public async Task<IActionResult> Create(Food food)
         {
-            if (ModelState.IsValid)
+            // Uniqueness: Name within Category
+            if (await _context.Food.AnyAsync(f => f.Name == food.Name && f.FoodCategoryId == food.FoodCategoryId))
+                ModelState.AddModelError(nameof(Food.Name), "A food with this name already exists in the selected category.");
+
+            if (!ModelState.IsValid)
             {
-                _context.Add(food);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                LoadCategories(food.FoodCategoryId);
+                return View(food);
             }
-            ViewData["FoodCategoryId"] = new SelectList(_context.FoodCategory, "FoodCategoryId", "Name", food.FoodCategoryId);
-            return View(food);
+
+            _context.Add(food);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Food/Edit/5
@@ -65,35 +79,38 @@ namespace HealthWellbeing.Controllers
             var food = await _context.Food.FindAsync(id);
             if (food == null) return NotFound();
 
-            ViewData["FoodCategoryId"] = new SelectList(_context.FoodCategory, "FoodCategoryId", "Name", food.FoodCategoryId);
+            LoadCategories(food.FoodCategoryId);
             return View(food);
         }
 
         // POST: Food/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FoodId,Name,Description,KcalPer100g,ProteinPer100g,CarbsPer100g,FatPer100g,FoodCategoryId")] Food food)
+        public async Task<IActionResult> Edit(int id, Food food)
         {
             if (id != food.FoodId) return NotFound();
 
-            if (ModelState.IsValid)
+            if (await _context.Food.AnyAsync(f => f.FoodId != id && f.Name == food.Name && f.FoodCategoryId == food.FoodCategoryId))
+                ModelState.AddModelError(nameof(Food.Name), "A food with this name already exists in the selected category.");
+
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(food);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Food.Any(e => e.FoodId == food.FoodId))
-                        return NotFound();
-                    else
-                        throw;
-                }
-                return RedirectToAction(nameof(Index));
+                LoadCategories(food.FoodCategoryId);
+                return View(food);
             }
-            ViewData["FoodCategoryId"] = new SelectList(_context.FoodCategory, "FoodCategoryId", "Name", food.FoodCategoryId);
-            return View(food);
+
+            try
+            {
+                _context.Update(food);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Food.AnyAsync(e => e.FoodId == id)) return NotFound();
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Food/Delete/5
@@ -103,9 +120,10 @@ namespace HealthWellbeing.Controllers
 
             var food = await _context.Food
                 .Include(f => f.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.FoodId == id);
-            if (food == null) return NotFound();
 
+            if (food == null) return NotFound();
             return View(food);
         }
 
@@ -121,6 +139,18 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // ===== Remote Validation =====
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> CheckNameUnique(string name, int? foodCategoryId, int? foodId)
+        {
+            var exists = await _context.Food.AnyAsync(f =>
+                f.Name == name &&
+                f.FoodCategoryId == foodCategoryId &&
+                f.FoodId != (foodId ?? 0));
+
+            return Json(!exists); // true => valid
         }
     }
 }
