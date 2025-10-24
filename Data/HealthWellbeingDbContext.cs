@@ -13,5 +13,8 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
     }
 }
