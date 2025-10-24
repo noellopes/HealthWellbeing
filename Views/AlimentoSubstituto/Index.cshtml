@@ -1,0 +1,71 @@
+﻿@model IEnumerable<HealthWellbeing.Models.AlimentoSubstituto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Alimento Substituto</h1>
+
+<p>
+<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AlimentoOriginal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AlimentoSubstitutoRef)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Motivo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProporcaoEquivalente)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Observacoes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FatorSimilaridade)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AlimentoOriginal.AlimentoId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AlimentoSubstitutoRef.AlimentoId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Motivo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProporcaoEquivalente)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Observacoes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FatorSimilaridade)
+            </td>
+            <td>
+                    <div class="btn-group" role="group">
+
+                        <a asp-action="Details" asp-route-id="@item.AlimentoSubstitutoId"
+                            class="btn btn-sm btn-secondary ms-1">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@item.AlimentoSubstitutoId"
+                            class="btn btn-sm btn-warning ms-1 ">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.AlimentoSubstitutoId"
+                            class="btn btn-sm btn-danger ms-1">Apagar</a>
+                    </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
