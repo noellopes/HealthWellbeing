@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.FoodPortion
+@{
+    ViewData["Title"] = "Confirmar remoção";
+}
+<h2 class="mb-3">@ViewData["Title"]</h2>
+
+@if (Model != null)
+{
+    <div class="alert alert-danger">
+        <h4>⚠️ Atenção!</h4>
+        <p>Estás prestes a apagar o seguinte registo de porção:</p>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Comida</dt>
+        <dd class="col-sm-9"><strong>@Model.NomeComida</strong></dd>
+
+        <dt class="col-sm-3">Quantidade</dt>
+        <dd class="col-sm-9">@Model.Quantidade</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="UnidadeId" />
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-danger">
+                🗑️ Apagar definitivamente
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-warning">
+        <p>Registo não encontrado.</p>
+    </div>
+}

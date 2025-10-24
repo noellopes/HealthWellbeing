@@ -1,0 +1,19 @@
+﻿@model FoodPortion
+@{
+    ViewData["Title"] = "Details";
+}
+<h2>@ViewData["Title"]</h2>
+
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">@Model.UnitId</dd>
+    <dt class="col-sm-3">Food</dt>
+    <dd class="col-sm-9">@Model.FoodName</dd>
+    <dt class="col-sm-3">Amount</dt>
+    <dd class="col-sm-9">@Model.Amount</dd>
+</dl>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.UnitId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Return</a>
+</p>

@@ -1,0 +1,28 @@
+﻿@model FoodPortion
+@{
+    ViewData["Title"] = "New Portion";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FoodName" class="form-label"></label>
+        <input asp-for="FoodName" class="form-control" placeholder="ex.: Arroz cozido" />
+        <span asp-validation-for="FoodName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label"></label>
+        <input asp-for="Amount" class="form-control" placeholder="ex.: 250 g | 1 L | 2 un | 1 slice (30 g)" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Return</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
