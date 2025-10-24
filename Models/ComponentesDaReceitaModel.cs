@@ -13,7 +13,7 @@ namespace HealthWellbeing.Models
         public int ReceitaId { get; set; }
 
         [ForeignKey(nameof(ReceitaId))]
-        public ReceitaModel? Receita { get; set; }
+        public Receita? Receita { get; set; }
 
         [Required(ErrorMessage = "O nome do componente e obrigatorio.")]
         [StringLength(120, ErrorMessage = "O nome deve ter no maximo 120 caracteres.")]
