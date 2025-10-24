@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
+using HealthWellbeingRoom.Models.FileMedicalDevices;
 
 namespace HealthWellbeing.Data
 {
@@ -15,6 +16,11 @@ namespace HealthWellbeing.Data
         {
         }
         public DbSet<HealthWellbeing.Models.LocationMaterial> LocationMaterial { get; set; } = default!;
+
         public DbSet<HealthWellbeingRoom.Models.Equipment> Equipment { get; set; } = default!;
+
+        public DbSet<HealthWellbeingRoom.Models.FileMedicalDevices.MedicalDevices> MedicalDevices { get; set; } = default!;
+
+
     }
 }
