@@ -1,0 +1,35 @@
+﻿@model HealthWellbeing.Models.Objetivo
+
+@{
+    ViewData["Title"] = "Apagar Objetivo";
+}
+
+<h1 class="mb-3 text-danger">@ViewData["Title"]</h1>
+
+@if (Model == null)
+{
+    <div class="alert alert-warning">Objetivo não encontrado.</div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Tens a certeza que queres apagar o objetivo <strong>@Model.Name</strong>?
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-2">Id</dt>
+        <dd class="col-sm-10">@Model.ObjetivoId</dd>
+
+        <dt class="col-sm-2">Categoria</dt>
+        <dd class="col-sm-10">@Model.Category</dd>
+
+        <dt class="col-sm-2">Detalhes</dt>
+        <dd class="col-sm-10">@Model.Details</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post" onsubmit="return confirm('Confirmas a eliminação?');">
+        <input type="hidden" asp-for="ObjetivoId" />
+        <button type="submit" class="btn btn-danger">Apagar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+}
