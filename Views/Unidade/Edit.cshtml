@@ -1,0 +1,29 @@
+﻿@model Unidade
+@{
+    ViewData["Title"] = "Editar Porção";
+}
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="UnidadeId" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="NomeComida" class="form-label"></label>
+        <input asp-for="NomeComida" class="form-control" />
+        <span asp-validation-for="NomeComida" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantidade" class="form-label"></label>
+        <input asp-for="Quantidade" class="form-control" />
+        <span asp-validation-for="Quantidade" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Atualizar</button>
+    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
