@@ -1,0 +1,97 @@
+﻿@model HealthWellbeing.Models.Exercicio
+
+@{
+    ViewData["Title"] = "Criar Exercício";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- Nome do Exercício -->
+    <div class="mb-3">
+        <label asp-for="ExercicioNome" class="form-label">Nome do Exercício *</label>
+        <input asp-for="ExercicioNome" class="form-control" placeholder="Ex: Flexões, Corrida, Agachamentos">
+        <span asp-validation-for="ExercicioNome" class="text-danger small"></span>
+    </div>
+
+    <!-- Descrição -->
+    <div class="mb-3">
+        <label asp-for="Descricao" class="form-label">Descrição *</label>
+        <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o exercício..."></textarea>
+        <span asp-validation-for="Descricao" class="text-danger small"></span>
+    </div>
+
+    <!-- Grupo Muscular -->
+    <div class="mb-3">
+        <label asp-for="MusculoId" class="form-label">Músculo Principal</label>
+        <select asp-for="MusculoId" class="form-select">
+            <option value="">-- Selecione um músculo --</option>
+            @foreach (var item in ViewBag.GruposMusculares)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span asp-validation-for="MusculoId" class="text-danger small"></span>
+    </div>
+
+    <div class="row">
+        <!-- Duração -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="Duracao" class="form-label">Duração (minutos) *</label>
+            <input asp-for="Duracao" type="number" step="0.1" class="form-control" placeholder="Ex: 30.5">
+            <span asp-validation-for="Duracao" class="text-danger small"></span>
+        </div>
+
+        <!-- Intensidade -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
+            <input asp-for="Intencidade" type="number" class="form-control" placeholder="1 a 10">
+            <span asp-validation-for="Intencidade" class="text-danger small"></span>
+        </div>
+
+        <!-- Calorias Gastas -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="CaloriasGastas" class="form-label">Calorias Gastas *</label>
+            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control" placeholder="Ex: 250.5">
+            <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Equipamento -->
+        <div class="col-md-6 mb-3">
+            <label asp-for="EquipamentoNecessario" class="form-label">Equipamento Necessário</label>
+            <input asp-for="EquipamentoNecessario" class="form-control" placeholder="Ex: Halteres, Bola, Nenhum">
+        </div>
+
+        <!-- Repetições e Séries -->
+        <div class="col-md-3 mb-3">
+            <label asp-for="Repeticoes" class="form-label">Repetições</label>
+            <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label asp-for="Series" class="form-label">Séries</label>
+            <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
+        </div>
+    </div>
+
+    <!-- Instruções -->
+    <div class="mb-3">
+        <label asp-for="Instrucoes" class="form-label">Instruções de Execução</label>
+        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo para realizar o exercício..."></textarea>
+    </div>
+
+    <!-- Botões -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Criar Exercício
+        </button>
+        <a asp-action="VerExercicios" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+</form>
