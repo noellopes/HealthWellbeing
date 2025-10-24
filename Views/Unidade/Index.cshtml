@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Unidade>
+@{
+    ViewData["Title"] = "Porções";
+}
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Msg"] is string msg)
+{
+    <div class="alert alert-success">@msg</div>
+}
+
+<p><a asp-action="Create" class="btn btn-primary">Nova Porção</a></p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome da comida</th>
+            <th>Quilos/Litros/etc.</th>
+            <th style="width:230px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var x in Model)
+        {
+            <tr>
+                <td>@x.UnidadeId</td>
+                <td>@x.NomeComida</td>
+                <td>@x.Quantidade</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@x.UnidadeId" class="btn btn-sm btn-info">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@x.UnidadeId" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@x.UnidadeId" class="btn btn-sm btn-danger">Apagar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
