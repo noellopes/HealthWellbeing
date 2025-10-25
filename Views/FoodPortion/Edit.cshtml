@@ -1,11 +1,12 @@
-﻿@model FoodPortion
+﻿@model HealthWellbeing.Models.FoodPortion
 @{
-    ViewData["Title"] = "Edit Portioin";
+    ViewData["Title"] = "Edit Food Portion";
 }
-<h2>@ViewData["Title"]</h2>
+<h1 class="mb-3">Edit Food Portion</h1>
+<hr />
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="UnitId" />
+<form asp-action="Edit" method="post" novalidate>
+    <input type="hidden" asp-for="FoodPortionId" />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
@@ -20,8 +21,8 @@
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-warning">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Return</a>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
 
 @section Scripts {

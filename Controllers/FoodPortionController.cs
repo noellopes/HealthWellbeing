@@ -1,83 +1,134 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class FoodPortionController : Controller
     {
-        // “BD” temporária em memória
-        private static readonly List<FoodPortion> _data = new()
-        {
-            new FoodPortion { UnitId = 1, FoodName = "Bread",      Amount = "1 slice (30 g)" },
-            new FoodPortion { UnitId = 2, FoodName = "Milk",       Amount = "200 ml" },
-            new FoodPortion { UnitId = 3, FoodName = "Cooked Rice",Amount = "250 g" }
-        };
+        private readonly HealthWellbeingDbContext _context;
 
-        // GET: /Unidade
-        public IActionResult Index() => View(_data.OrderBy(x => x.UnitId).ToList());
-
-        // GET: /Unidade/Details/5
-        public IActionResult Details(int id)
+        public FoodPortionController(HealthWellbeingDbContext context)
         {
-            var item = _data.FirstOrDefault(x => x.UnitId == id);
+            _context = context;
+        }
+
+        // GET: /FoodPortion
+        public async Task<IActionResult> Index()
+        {
+            var list = await _context.FoodPortion
+                .AsNoTracking()
+                .OrderBy(x => x.FoodName)
+                .ThenBy(x => x.Amount)
+                .ToListAsync();
+
+            return View(list);
+        }
+
+        // GET: /FoodPortion/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var item = await _context.FoodPortion
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.FoodPortionId == id);
+
             if (item == null) return NotFound();
             return View(item);
         }
 
-        // GET: /Unidade/Create
-        public IActionResult Create() => View(new FoodPortion());
-
-        // POST: /Unidade/Create
-        [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Create(FoodPortion model)
+        // GET: /FoodPortion/Create
+        public IActionResult Create()
         {
+            return View(new FoodPortion());
+        }
+
+        // POST: /FoodPortion/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(FoodPortion model)
+        {
+            // Uniqueness defensive check (também garantido por índice único na BD)
+            if (await _context.FoodPortion.AnyAsync(p => p.FoodName == model.FoodName && p.Amount == model.Amount))
+                ModelState.AddModelError(nameof(FoodPortion.FoodName), "This portion already exists for the given food.");
+
             if (!ModelState.IsValid) return View(model);
-            model.UnitId = _data.Count == 0 ? 1 : _data.Max(x => x.UnitId) + 1;
-            _data.Add(model);
-            TempData["Msg"] = "Record Created.";
+
+            _context.Add(model);
+            await _context.SaveChangesAsync();
+            TempData["Msg"] = "Record created.";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Unidade/Edit/5
-        public IActionResult Edit(int id)
+        // GET: /FoodPortion/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            var item = _data.FirstOrDefault(x => x.UnitId == id);
+            if (id == null) return NotFound();
+
+            var item = await _context.FoodPortion.FindAsync(id);
             if (item == null) return NotFound();
+
             return View(item);
         }
 
-        // POST: /Unidade/Edit/5
-        [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, FoodPortion model)
+        // POST: /FoodPortion/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, FoodPortion model)
         {
+            if (id != model.FoodPortionId) return NotFound();
+
+            if (await _context.FoodPortion
+                .AnyAsync(p => p.FoodPortionId != id && p.FoodName == model.FoodName && p.Amount == model.Amount))
+                ModelState.AddModelError(nameof(FoodPortion.FoodName), "This portion already exists for the given food.");
+
             if (!ModelState.IsValid) return View(model);
-            var item = _data.FirstOrDefault(x => x.UnitId == id);
-            if (item == null) return NotFound();
 
-            item.FoodName = model.FoodName;
-            item.Amount = model.Amount;
+            try
+            {
+                _context.Update(model);
+                await _context.SaveChangesAsync();
+                TempData["Msg"] = "Record updated.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var exists = await _context.FoodPortion.AnyAsync(e => e.FoodPortionId == id);
+                if (!exists) return NotFound();
+                throw;
+            }
 
-            TempData["Msg"] = "Update Record.";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Unidade/Delete/5
-        public IActionResult Delete(int id)
+        // GET: /FoodPortion/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            var item = _data.FirstOrDefault(x => x.UnitId == id);
+            if (id == null) return NotFound();
+
+            var item = await _context.FoodPortion
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.FoodPortionId == id);
+
             if (item == null) return NotFound();
             return View(item);
         }
 
-        // POST: /Unidade/Delete/5
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        // POST: /FoodPortion/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = _data.FirstOrDefault(x => x.UnitId == id);
-            if (item != null) _data.Remove(item);
-            TempData["Msg"] = "Remove Record.";
+            var item = await _context.FoodPortion.FindAsync(id);
+            if (item != null)
+            {
+                _context.FoodPortion.Remove(item);
+                await _context.SaveChangesAsync();
+                TempData["Msg"] = "Record removed.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

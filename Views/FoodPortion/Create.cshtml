@@ -1,26 +1,27 @@
-﻿@model FoodPortion
+﻿@model HealthWellbeing.Models.FoodPortion
 @{
-    ViewData["Title"] = "New Portion";
+    ViewData["Title"] = "Create Food Portion";
 }
-<h2>@ViewData["Title"]</h2>
+<h1 class="mb-3">Create Food Portion</h1>
+<hr />
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" novalidate>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-3">
         <label asp-for="FoodName" class="form-label"></label>
-        <input asp-for="FoodName" class="form-control" placeholder="ex.: Arroz cozido" />
+        <input asp-for="FoodName" class="form-control" placeholder="e.g., Bread, Milk, Cooked Rice" />
         <span asp-validation-for="FoodName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Amount" class="form-label"></label>
-        <input asp-for="Amount" class="form-control" placeholder="ex.: 250 g | 1 L | 2 un | 1 slice (30 g)" />
+        <input asp-for="Amount" class="form-control" placeholder="e.g., 1 slice (30 g), 200 ml" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Return</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
 </form>
 
 @section Scripts {

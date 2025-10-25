@@ -1,36 +1,36 @@
-﻿@model IEnumerable<Unit>
+﻿@model IEnumerable<HealthWellbeing.Models.FoodPortion>
 @{
-    ViewData["Title"] = "Portions";
+    ViewData["Title"] = "Food Portions";
 }
-<h2>@ViewData["Title"]</h2>
+<h1 class="mb-3">Food Portions</h1>
 
-@if (TempData["Msg"] is string msg)
+@if (TempData["Msg"] != null)
 {
-    <div class="alert alert-success">@msg</div>
+    <div class="alert alert-success">@TempData["Msg"]</div>
 }
 
-<p><a asp-action="Create" class="btn btn-primary">New Portion</a></p>
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create new</a>
+</p>
 
-<table class="table table-striped">
+<table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Food Name</th>
-            <th>Kilos/Liters/etc.</th>
-            <th style="width:230px;"></th>
+            <th>@Html.DisplayNameFor(m => m.First().FoodName)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Amount)</th>
+            <th class="text-end">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var x in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@x.UnitId</td>
-                <td>@x.FoodName</td>
-                <td>@x.Amount</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@x.UnitId" class="btn btn-sm btn-info">Details</a>
-                    <a asp-action="Edit" asp-route-id="@x.UnitId" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@x.UnitId" class="btn btn-sm btn-danger">Delete</a>
+                <td>@item.FoodName</td>
+                <td>@item.Amount</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.FoodPortionId">Details</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.FoodPortionId">Edit</a>
+                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.FoodPortionId">Delete</a>
                 </td>
             </tr>
         }
