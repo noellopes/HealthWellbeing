@@ -1,85 +1,110 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using HealthWellbeing.Models;
-
+using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class UtenteSaudeController : Controller
     {
-        // GET: UtenteSaudeController
-        public ActionResult Index()
-        {
-            return View();
-        }
-        /*  // GET: UtenteSaudeController/Details/
-        public ActionResult Details(int id)
-        {
-            return View();
-        }*/
+        // “BD” em memória (apenas para esta fase, sem EF/SQL)
+        private static readonly List<UtenteSaude> _data = new();
+        private static int _nextId = 1;
 
-
-        // GET: UtenteSaudeController/Create
-        public ActionResult Create()
+        // LISTAR
+        public IActionResult Index()
         {
-            return View();
+            return View(_data);
         }
 
-        // POST: UtenteSaudeController/Create
+        // DETALHES
+        public IActionResult Details(int id)
+        {
+            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            if (u == null) return NotFound();
+            return View(u);
+        }
+
+        // CRIAR (GET)
+        public IActionResult Create()
+        {
+            return View(new UtenteSaude());
+        }
+
+        // CRIAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Create(UtenteSaude u)
         {
-            try
-            {
-                return RedirectToAction(nameof(UtenteSaude));
-            }
-            catch
-            {
-                return View();
-            }
+            // Validações de modelo (DataAnnotations)
+            if (!ModelState.IsValid) return View(u);
+
+            // Validações de unicidade (simuladas já que não há BD)
+            if (_data.Any(x => x.Nif == u.Nif))
+                ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
+            if (_data.Any(x => x.Nus == u.Nus))
+                ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
+            if (_data.Any(x => x.Niss == u.Niss))
+                ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
+
+            if (!ModelState.IsValid) return View(u);
+
+            u.UtenteSaudeId = _nextId++;
+            _data.Add(u);
+            TempData["Msg"] = "Utente criado com sucesso.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: UtenteSaudeController/Edit
-        public ActionResult Edit(int id)
+        // EDITAR (GET)
+        public IActionResult Edit(int id)
         {
-            return View();
+            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            if (u == null) return NotFound();
+            return View(u);
         }
 
-        // POST: UtenteSaudeController/Edit
+        // EDITAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public IActionResult Edit(int id, UtenteSaude u)
         {
-            try
-            {
-                return RedirectToAction(nameof(UtenteSaude));
-            }
-            catch
-            {
-                return View();
-            }
+            if (id != u.UtenteSaudeId) return NotFound();
+            if (!ModelState.IsValid) return View(u);
+
+            // Unicidade ignorando o próprio registo
+            if (_data.Any(x => x.UtenteSaudeId != id && x.Nif == u.Nif))
+                ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
+            if (_data.Any(x => x.UtenteSaudeId != id && x.Nus == u.Nus))
+                ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
+            if (_data.Any(x => x.UtenteSaudeId != id && x.Niss == u.Niss))
+                ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
+
+            if (!ModelState.IsValid) return View(u);
+
+            var idx = _data.FindIndex(x => x.UtenteSaudeId == id);
+            if (idx < 0) return NotFound();
+
+            _data[idx] = u;
+            TempData["Msg"] = "Utente atualizado com sucesso.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: UtenteSaudeController/Delete
-        public ActionResult Delete(int id)
+        // APAGAR (GET)
+        public IActionResult Delete(int id)
         {
-            return View();
+            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            if (u == null) return NotFound();
+            return View(u);
         }
 
-        // POST: UtenteSaudeController/Delete
-        [HttpPost]
+        // APAGAR (POST)
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteConfirmed(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(UtenteSaude));
-            }
-            catch
-            {
-                return View();
-            }
+            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            if (u != null) _data.Remove(u);
+            TempData["Msg"] = "Utente removido.";
+            return RedirectToAction(nameof(Index));
         }
     }
 }
