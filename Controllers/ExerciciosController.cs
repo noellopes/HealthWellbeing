@@ -1,18 +1,20 @@
 ﻿using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace HealthWellbeing.Controllers
 {
     public class ExercicioController : Controller
     {
-        // Lista de músculos em memória
-        private static readonly List<GrupoMuscular> todosMusculos = new List<GrupoMuscular>
+        private static readonly List<GrupoMuscular> todosMusculos = new()
         {
-            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", Musculo="Braços", LocalizacaoCorporal="Bilateral"},
-            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", Musculo="Braços", LocalizacaoCorporal="Bilateral"},
-            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", Musculo="Tórax", LocalizacaoCorporal="Bilateral"},
-            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", Musculo="Pernas", LocalizacaoCorporal="Bilateral"}
+            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", Musculo="Tórax", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", Musculo="Pernas", LocalizacaoCorporal="Inferior" }
         };
 
         private static readonly List<Exercicio> exercicios = new List<Exercicio>
@@ -63,72 +65,109 @@ namespace HealthWellbeing.Controllers
         {
             var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
             if (exercicio == null)
-            {
-                TempData["ErrorMessage"] = "Exercício não encontrado.";
-                return RedirectToAction("Index");
-            }
+                return NotFound();
+
             return View(exercicio);
         }
 
-        // GET: Create
         [HttpGet]
         public IActionResult Create()
         {
-            // Carrega os grupos musculares para a ViewBag
-            ViewBag.GruposMusculares = todosMusculos
-                .Select(g => new SelectListItem
-                {
-                    Value = g.GrupoMuscularId.ToString(),
-                    Text = g.GrupoMuscularNome
-                })
-                .ToList();
-
+            CarregarGruposMusculares();
             return View();
         }
 
-        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Exercicio exercicio, List<int> musculosIds)
+        public IActionResult Create(Exercicio model, List<int> musculosIds)
         {
-            // Validação manual para os músculos
             if (musculosIds == null || !musculosIds.Any())
-            {
                 ModelState.AddModelError("musculosIds", "Selecione pelo menos um grupo muscular.");
-            }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    // Associar músculos selecionados ao exercício
-                    exercicio.GrupoMuscular = todosMusculos
-                        .Where(g => musculosIds.Contains(g.GrupoMuscularId))
-                        .ToList();
-
-                    // Gerar novo ID e adicionar à lista
-                    exercicio.ExercicioId = exercicios.Any() ? exercicios.Max(e => e.ExercicioId) + 1 : 1;
-                    exercicios.Add(exercicio);
-
-                    TempData["SuccessMessage"] = $"Exercício '{exercicio.ExercicioNome}' criado com sucesso!";
-                    return RedirectToAction("Index");
-                }
-                catch (Exception ex)
-                {
-                    TempData["ErrorMessage"] = $"Erro ao criar exercício: {ex.Message}";
-                }
+                CarregarGruposMusculares();
+                return View(model);
             }
 
-            // Se chegou aqui, houve erro - recarregar os dados
-            ViewBag.GruposMusculares = todosMusculos
-                .Select(g => new SelectListItem
+            model.ExercicioId = exercicios.Any() ? exercicios.Max(e => e.ExercicioId) + 1 : 1;
+            model.GrupoMuscular = todosMusculos.Where(g => musculosIds.Contains(g.GrupoMuscularId)).ToList();
+            exercicios.Add(model);
+
+            TempData["SuccessMessage"] = "Exercício criado com sucesso!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            if (exercicio == null) return NotFound();
+
+            CarregarGruposMusculares(exercicio.GrupoMuscular.Select(m => m.GrupoMuscularId).ToList());
+            return View(exercicio);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Exercicio model, List<int> musculosIds)
+        {
+            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            if (exercicio == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                CarregarGruposMusculares(musculosIds);
+                return View(model);
+            }
+
+            exercicio.ExercicioNome = model.ExercicioNome;
+            exercicio.Descricao = model.Descricao;
+            exercicio.Duracao = model.Duracao;
+            exercicio.Intencidade = model.Intencidade;
+            exercicio.CaloriasGastas = model.CaloriasGastas;
+            exercicio.Instrucoes = model.Instrucoes;
+            exercicio.EquipamentoNecessario = model.EquipamentoNecessario;
+            exercicio.Genero = model.Genero;
+            exercicio.Series = model.Series;
+            exercicio.Repeticoes = model.Repeticoes;
+            exercicio.GrupoMuscular = todosMusculos.Where(g => musculosIds.Contains(g.GrupoMuscularId)).ToList();
+
+            TempData["SuccessMessage"] = "Exercício atualizado com sucesso!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            if (exercicio == null) return NotFound();
+            return View(exercicio);
+        }
+
+        [HttpPost]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            if (exercicio != null)
+            {
+                exercicios.Remove(exercicio);
+                TempData["SuccessMessage"] = "Exercício removido com sucesso!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        private void CarregarGruposMusculares(List<int>? preSelecionados = null)
+        {
+            ViewBag.GruposMusculares = todosMusculos.Select(g =>
+                new SelectListItem
                 {
                     Value = g.GrupoMuscularId.ToString(),
-                    Text = g.GrupoMuscularNome
-                })
-                .ToList();
-
-            return View(exercicio);
+                    Text = g.GrupoMuscularNome,
+                    Selected = preSelecionados != null && preSelecionados.Contains(g.GrupoMuscularId)
+                }).ToList();
         }
     }
 }

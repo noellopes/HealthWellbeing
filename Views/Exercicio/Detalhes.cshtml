@@ -7,9 +7,17 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Detalhes do Exercício</h1>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar à Lista
-        </a>
+        <div class="align-items-end">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.ExercicioId" class="btn btn-warning">
+                <i class="fas fa-arrow-left fa-edit"></i>Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.ExercicioId" class="btn btn-danger">
+                <i class="fas fa-arrow-left fa-trash-alt"></i>Apagar
+            </a>
+        </div>
     </div>
 
     <div class="card">

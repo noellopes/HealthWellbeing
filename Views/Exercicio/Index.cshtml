@@ -30,6 +30,17 @@
                         <td>@exercicio.Duracao min</td>
                         <td>@exercicio.Intencidade/10</td>
                         <td>@exercicio.CaloriasGastas cal</td>
+                        <td class="text-center">
+                            <a asp-action="Detalhes" asp-route-id="@exercicio.ExercicioId" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i>Detalhes
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@exercicio.ExercicioId" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@exercicio.ExercicioId" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i>Apagar
+                            </a>
+                        </td>
                     </tr>
                 }
             </tbody>

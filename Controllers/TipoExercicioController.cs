@@ -37,10 +37,6 @@ namespace HealthWellbeing.Controllers
             return View(_tiposExercicios);
         }
 
-
-
-
-
         // GET
         public IActionResult Create()
         {
@@ -63,10 +59,6 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-
-
-
-
         public IActionResult Details(int id)
         {
             var tipo = _tiposExercicios.FirstOrDefault(t => t.TipoExercicioId == id);
@@ -76,10 +68,6 @@ namespace HealthWellbeing.Controllers
             }
             return View(tipo);
         }
-
-
-
-
 
         // GET
         public IActionResult Delete(int id)
@@ -102,14 +90,6 @@ namespace HealthWellbeing.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
-
-
-
-
-
-
-
 
         // GET
         public IActionResult Edit(int id)
