@@ -10,13 +10,22 @@ namespace HealthWellbeing.Controllers
         private static readonly List<UtenteSaude> _data = new();
         private static int _nextId = 1;
 
+        // ================================
         // LISTAR
+        // URL: /UtenteSaude
+        // View: Views/UtenteSaude/Index.cshtml
+        // ================================
         public IActionResult Index()
         {
             return View(_data);
         }
 
+        // ================================
         // DETALHES
+        // URL: /UtenteSaude/Details/{id}
+        // Exemplo: /UtenteSaude/Details/3
+        // View: Views/UtenteSaude/Details.cshtml
+        // ================================
         public IActionResult Details(int id)
         {
             var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
@@ -24,13 +33,21 @@ namespace HealthWellbeing.Controllers
             return View(u);
         }
 
+        // ================================
         // CRIAR (GET)
+        // URL: /UtenteSaude/Create
+        // View: Views/UtenteSaude/Create.cshtml
+        // ================================
         public IActionResult Create()
         {
             return View(new UtenteSaude());
         }
 
+        // ================================
         // CRIAR (POST)
+        // URL: /UtenteSaude/Create
+        // (é chamada automaticamente quando se submete o formulário da View Create)
+        // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(UtenteSaude u)
@@ -51,10 +68,17 @@ namespace HealthWellbeing.Controllers
             u.UtenteSaudeId = _nextId++;
             _data.Add(u);
             TempData["Msg"] = "Utente criado com sucesso.";
+
+            // Redireciona para: /UtenteSaude (Index)
             return RedirectToAction(nameof(Index));
         }
 
+        // ================================
         // EDITAR (GET)
+        // URL: /UtenteSaude/Edit/{id}
+        // Exemplo: /UtenteSaude/Edit/2
+        // View: Views/UtenteSaude/Edit.cshtml
+        // ================================
         public IActionResult Edit(int id)
         {
             var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
@@ -62,7 +86,11 @@ namespace HealthWellbeing.Controllers
             return View(u);
         }
 
+        // ================================
         // EDITAR (POST)
+        // URL: /UtenteSaude/Edit/{id}
+        // (submetido via formulário da View Edit)
+        // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, UtenteSaude u)
@@ -85,10 +113,17 @@ namespace HealthWellbeing.Controllers
 
             _data[idx] = u;
             TempData["Msg"] = "Utente atualizado com sucesso.";
+
+            // Redireciona para: /UtenteSaude
             return RedirectToAction(nameof(Index));
         }
 
+        // ================================
         // APAGAR (GET)
+        // URL: /UtenteSaude/Delete/{id}
+        // Exemplo: /UtenteSaude/Delete/5
+        // View: Views/UtenteSaude/Delete.cshtml
+        // ================================
         public IActionResult Delete(int id)
         {
             var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
@@ -96,7 +131,11 @@ namespace HealthWellbeing.Controllers
             return View(u);
         }
 
+        // ================================
         // APAGAR (POST)
+        // URL: /UtenteSaude/Delete/{id}
+        // (submetido via formulário da View Delete)
+        // ================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -104,6 +143,8 @@ namespace HealthWellbeing.Controllers
             var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
             if (u != null) _data.Remove(u);
             TempData["Msg"] = "Utente removido.";
+
+            // Redireciona para: /UtenteSaude
             return RedirectToAction(nameof(Index));
         }
     }

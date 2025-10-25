@@ -26,7 +26,7 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A data de nascimento é obrigatória.")]
         [DataType(DataType.Date)]
         [DateNotInFuture(ErrorMessage = "A data de nascimento não pode ser no futuro.")]
-        [Range(typeof(DateTime), "1900-01-01", "2100-12-31", ErrorMessage = "Data fora do intervalo válido.")]
+        //[Range(typeof(DateTime), "01-01-1900", DateTime.Today, ErrorMessage = "Data fora do intervalo válido.")]
         [Display(Name = "Data de nascimento")]
         public DateTime DataNascimento { get; set; }
 
