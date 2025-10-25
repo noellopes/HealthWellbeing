@@ -1,81 +1,58 @@
-﻿@{
+﻿@model IEnumerable<HealthWellbeing.Models.UtenteSaude>
+@{
     ViewData["Title"] = "Área do Utente";
     var nome = ViewBag.Nome as string ?? "Utente";
 }
 
 <style>
-    /* Fundo da página */
-    .page-bg {
-        min-height: calc(100vh - 120px);
-        background: #1f4f6a; /* fundo escuro */
-        display: grid;
-        place-items: center;
+    /* Container principal */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
         padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
     }
 
-    /* Cartão principal */
-    .shell {
-        width: 980px;
-        max-width: 95vw;
-        background: #2d79a0;           /* azul do contorno */
+    .utente-card {
+        background: #2d79a0;
         border-radius: 12px;
         padding: 10px;
         box-shadow: 0 2px 16px rgba(0,0,0,.25);
     }
 
-    /* Painel interno (fundo azul-claro) */
-    .panel {
-        background: #a8d6ea;           /* azul claro (header e bordas) */
+    .utente-panel {
+        background: #a8d6ea;
         border-radius: 12px;
         padding: 10px;
     }
 
-    /* Cabeçalho com logo */
-    .header {
+    /* ---------- CABEÇALHO ---------- */
+    .utente-header {
         background: #a8d6ea;
         border-radius: 10px 10px 0 0;
         padding: 12px 16px;
-        position: relative;
     }
 
-    /* Linha separadora grossa (como no mock) */
-    .divider {
-        height: 8px;
-        background: #2d79a0;           /* linha azul média */
-        margin: 8px 8px 0 8px;
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
         border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
     }
 
-    /* Corpo de conteúdo claro */
-    .body {
-        background: #e6f3fb;           /* muito claro */
-        min-height: 360px;             /* ajusta conforme precisares */
-        margin: 8px;
-        border-radius: 8px;
-        padding: 18px;
-    }
-
-    /* Barra inferior */
-    .footer-bar {
-        height: 10px;
-        background: #61a6c7;           /* barra inferior */
-        margin: 0 8px 8px 8px;
-        border-radius: 0 0 8px 8px;
-    }
-
-    /* Utilidades */
-    .logo {
-        height: 28px;
-        display: block;
-    }
-    .top-right-actions {
-        position: absolute;
-        right: 16px;
-        top: 10px;
+    .utente-actions {
         display: flex;
         gap: 8px;
     }
-    .btn {
+
+    .utente-btn {
         padding: 8px 14px;
         border-radius: 18px;
         border: none;
@@ -84,44 +61,145 @@
         font-weight: 600;
         text-decoration: none;
     }
-    .btn.alt { background: #3f8fb7; }
-    .btn:hover { filter: brightness(1.05); }
-    media (max-width: 640px){
-        .body{ min-height: 240px; }
+
+        .utente-btn.alt {
+            background: #3f8fb7;
+        }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+
+
+    /* ---------- CORPO ---------- */
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
     }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /*media (max-width: 640px) {
+                .utente-header-content
+
+            {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .utente-body {
+                min-height: 240px;
+            }
+
+            }*/
 </style>
 
-<div class="page-bg">
-    <div class="shell">
-        <div class="panel">
-            <!-- Cabeçalho -->
-            <div class="header">
-                <img class="logo" src="~/images/jbma-mini.png" alt="JBMA" />
-                <div class="top-right-actions">
-                    <a asp-controller="Consultas" asp-action="Marcar" class="btn">Marcar Consulta</a>
-                    <a asp-controller="Auth" asp-action="Logout" class="btn alt">Sair</a>
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- ---------- CABEÇALHO ---------- -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <!-- LOGO À ESQUERDA -->
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <!-- BOTÕES À DIREITA -->
+                    <div class="utente-actions">
+                        <a asp-controller="Consultas" asp-action="Marcar" class="utente-btn">Marcar Consulta</a>
+
+                    </div>
                 </div>
             </div>
 
-            <!-- Linha grossa -->
-            <div class="divider"></div>
 
-            <!-- Corpo (coloca aqui o conteúdo da página) -->
-            <div class="body">
+            <!-- ---------- CORPO PRINCIPAL ---------- -->
+
+            <div class="utente-body">
                 <h2 style="margin-top:0;color:#1f4f6a;">Bem-vindo, @nome</h2>
                 <p style="margin-bottom:12px;color:#2b546c;">
                     Esta é a sua área pessoal. Use os atalhos para gerir as suas consultas e perfil.
                 </p>
 
-                <!-- Exemplos de blocos/atalhos (opcional) -->
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
-                    <a class="btn" asp-controller="Consultas" asp-action="Index">As minhas Consultas</a>
-                    <a class="btn alt" asp-controller="UtentesSaude" asp-action="Edit">Editar Perfil</a>
+                <!-- ---------- ATALHOS ---------- -->
+
+                <a class="utente-btn" asp-controller="Consultas" asp-action="Index" role="button">As minhas Consultas</a>
+
+
+
+
+                <!-- ---------- MENSAGEM DE SUCESSO ---------- -->
+                @if (TempData["Msg"] != null)
+                {
+                    <div class="alert alert-success mt-3">
+                        @TempData["Msg"]
+                    </div>
+                }
+
+
+                <!-- ---------- TABELA DE UTENTES ---------- -->
+                <div class="table-responsive mt-4">
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>NIF</th>
+                                <th>NUS</th>
+                                <th>Idade</th>
+                                <th style="width: 210px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var u in Model)
+                                {
+                                    <tr>
+                                        <td>@u.NomeCompleto</td>
+                                        <td>@u.Nif</td>
+                                        <td>@u.Nus</td>
+                                        <td>@u.Idade</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@u.UtenteSaudeId">Detalhes</a>
+                                            <a class="btn btn-sm btn-warning text-white" asp-action="Edit" asp-route-id="@u.UtenteSaudeId">Editar</a>
+                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@u.UtenteSaudeId">Apagar</a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        Ainda não existem utentes. Clique em <strong>Novo Utente</strong> para adicionar o primeiro.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ---------- BOTÃO NOVO UTENTE ---------- -->
+                <div class="mt-3">
+                    <a class="btn btn-success" asp-action="Create">Novo Utente</a>
                 </div>
             </div>
 
-            <!-- Barra inferior -->
-            <div class="footer-bar"></div>
+
         </div>
     </div>
 </div>
