@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Área do Utente";
+    var nome = ViewBag.Nome as string ?? "Utente";
+}
+
+<style>
+    /* Fundo da página */
+    .page-bg {
+        min-height: calc(100vh - 120px);
+        background: #1f4f6a; /* fundo escuro */
+        display: grid;
+        place-items: center;
+        padding: 24px;
+    }
+
+    /* Cartão principal */
+    .shell {
+        width: 980px;
+        max-width: 95vw;
+        background: #2d79a0;           /* azul do contorno */
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    /* Painel interno (fundo azul-claro) */
+    .panel {
+        background: #a8d6ea;           /* azul claro (header e bordas) */
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    /* Cabeçalho com logo */
+    .header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+        position: relative;
+    }
+
+    /* Linha separadora grossa (como no mock) */
+    .divider {
+        height: 8px;
+        background: #2d79a0;           /* linha azul média */
+        margin: 8px 8px 0 8px;
+        border-radius: 4px;
+    }
+
+    /* Corpo de conteúdo claro */
+    .body {
+        background: #e6f3fb;           /* muito claro */
+        min-height: 360px;             /* ajusta conforme precisares */
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    /* Barra inferior */
+    .footer-bar {
+        height: 10px;
+        background: #61a6c7;           /* barra inferior */
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Utilidades */
+    .logo {
+        height: 28px;
+        display: block;
+    }
+    .top-right-actions {
+        position: absolute;
+        right: 16px;
+        top: 10px;
+        display: flex;
+        gap: 8px;
+    }
+    .btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    .btn.alt { background: #3f8fb7; }
+    .btn:hover { filter: brightness(1.05); }
+    media (max-width: 640px){
+        .body{ min-height: 240px; }
+    }
+</style>
+
+<div class="page-bg">
+    <div class="shell">
+        <div class="panel">
+            <!-- Cabeçalho -->
+            <div class="header">
+                <img class="logo" src="~/images/jbma-mini.png" alt="JBMA" />
+                <div class="top-right-actions">
+                    <a asp-controller="Consultas" asp-action="Marcar" class="btn">Marcar Consulta</a>
+                    <a asp-controller="Auth" asp-action="Logout" class="btn alt">Sair</a>
+                </div>
+            </div>
+
+            <!-- Linha grossa -->
+            <div class="divider"></div>
+
+            <!-- Corpo (coloca aqui o conteúdo da página) -->
+            <div class="body">
+                <h2 style="margin-top:0;color:#1f4f6a;">Bem-vindo, @nome</h2>
+                <p style="margin-bottom:12px;color:#2b546c;">
+                    Esta é a sua área pessoal. Use os atalhos para gerir as suas consultas e perfil.
+                </p>
+
+                <!-- Exemplos de blocos/atalhos (opcional) -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+                    <a class="btn" asp-controller="Consultas" asp-action="Index">As minhas Consultas</a>
+                    <a class="btn alt" asp-controller="UtentesSaude" asp-action="Edit">Editar Perfil</a>
+                </div>
+            </div>
+
+            <!-- Barra inferior -->
+            <div class="footer-bar"></div>
+        </div>
+    </div>
+</div>
