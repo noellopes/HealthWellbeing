@@ -1,0 +1,13 @@
+﻿@model ComponentesAlimento
+@{
+    ViewData["Title"] = "Delete Description of Food";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Quer mesmo apagar <strong>@Model.Name</strong>?</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="CompFoodID" />
+    <button type="submit" class="btn btn-danger">Apagar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
