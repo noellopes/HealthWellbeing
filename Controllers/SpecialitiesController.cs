@@ -11,9 +11,9 @@ namespace HealthWellbeing.Controllers
             // Dados MOCK só para testar a página
             var especialidades = new List<Specialities>
             {
-                new() { EspecialidadeId = 1, Nome = "Cardiologia", Descricao = "Coração e sistema cardiovascular." },
-                new() { EspecialidadeId = 2, Nome = "Dermatologia", Descricao = "Pele, cabelo e unhas." },
-                new() { EspecialidadeId = 3, Nome = "Pediatria",   Descricao = "Saúde de crianças e adolescentes." }
+                new() { IdEspecialidade = 1, Nome = "Cardiologia", Descricao = "Coração e sistema cardiovascular." },
+                new() { IdEspecialidade = 2, Nome = "Dermatologia", Descricao = "Pele, cabelo e unhas." },
+                new() { IdEspecialidade = 3, Nome = "Pediatria",   Descricao = "Saúde de crianças e adolescentes." }
             };
 
             // Envia a lista para a View (Views/Specialities/Index.cshtml)
@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
         {
             var esp = new Specialities
             {
-                EspecialidadeId = id,
+                IdEspecialidade = id,
                 Nome = "Exemplo",
                 Descricao = "Descrição da especialidade…"
             };

@@ -3,11 +3,11 @@
     public class Disponibilidade
     {
 
-        public int idDisponibilidade { get; set; } = default!;
-        public int diaSemana { get; set; } = default!;
-        public DateOnly data { get; set; }
-        public int capacidade { get; set; } = default!;
-        public int ativo { get; set; } = default!;
+        public int IdDisponibilidade { get; set; } = default!;
+        public int DiaSemana { get; set; } = default!;
+        public DateTime Data { get; set; }
+        public int Capacidade { get; set; } = default!;
+        public int Ativo { get; set; } = default!;
 
     }
 }
