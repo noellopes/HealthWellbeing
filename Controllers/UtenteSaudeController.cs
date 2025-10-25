@@ -5,34 +5,34 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class UtentesSaudeController : Controller
+    public class UtenteSaudeController : Controller
     {
-        // GET: UtentesSaudeController
+        // GET: UtenteSaudeController
         public ActionResult Index()
         {
             return View();
         }
-
-        // GET: UtentesSaudeController/Details/5
+        /*  // GET: UtenteSaudeController/Details/
         public ActionResult Details(int id)
         {
             return View();
-        }
+        }*/
 
-        // GET: UtentesSaudeController/Create
+
+        // GET: UtenteSaudeController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: UtentesSaudeController/Create
+        // POST: UtenteSaudeController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(UtentesSaude));
+                return RedirectToAction(nameof(UtenteSaude));
             }
             catch
             {
@@ -40,20 +40,20 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        // GET: UtentesSaudeController/Edit/5
+        // GET: UtenteSaudeController/Edit
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: UtentesSaudeController/Edit/5
+        // POST: UtenteSaudeController/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(UtentesSaude));
+                return RedirectToAction(nameof(UtenteSaude));
             }
             catch
             {
@@ -61,20 +61,20 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        // GET: UtentesSaudeController/Delete/5
+        // GET: UtenteSaudeController/Delete
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: UtentesSaudeController/Delete/5
+        // POST: UtenteSaudeController/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(UtentesSaude));
+                return RedirectToAction(nameof(UtenteSaude));
             }
             catch
             {
