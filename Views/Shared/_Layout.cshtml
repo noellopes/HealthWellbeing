@@ -20,10 +20,31 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">📊 Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Clients" asp-action="Index">👥 Clients</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="TherapySessions" asp-action="Index">🗓️ Sessions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="MoodTracking" asp-action="Index">😊 Mood Tracking</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Goals" asp-action="Index">🎯 Goals</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="CrisisAlerts" asp-action="Index">🚨 Alerts</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                ⚙️ More
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-controller="MentalHealthProfessionals" asp-action="Index">Professionals</a></li>
+                                <li><a class="dropdown-item" asp-controller="SelfHelpResources" asp-action="Index">Resources</a></li>
+                            </ul>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />

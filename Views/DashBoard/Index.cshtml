@@ -1,0 +1,223 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Mental Health Dashboard</h1>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <h2 class="card-text">@Model.TotalClients</h2>
+                    <a asp-controller="Clients" asp-action="Index" class="text-white">View All →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Professionals</h5>
+                    <h2 class="card-text">@Model.TotalProfessionals</h2>
+                    <a asp-controller="MentalHealthProfessionals" asp-action="Index" class="text-white">View All →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Today's Sessions</h5>
+                    <h2 class="card-text">@Model.TodaysSessions.Count</h2>
+                    <a asp-controller="TherapySessions" asp-action="Index" class="text-white">View All →</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Active Alerts</h5>
+                    <h2 class="card-text">@Model.ActiveCrisisAlerts.Count</h2>
+                    <a asp-controller="CrisisAlerts" asp-action="Index" class="text-white">View All →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Sessions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Today's Sessions</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.TodaysSessions.Any())
+                    {
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Client</th>
+                                    <th>Professional</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var session in Model.TodaysSessions)
+                                {
+                                    <tr>
+                                        <td>@session.ScheduledDateTime.ToString("HH:mm")</td>
+                                        <td>@session.Client?.FirstName @session.Client?.LastName</td>
+                                        <td>@session.Professional?.FirstName @session.Professional?.LastName</td>
+                                        <td><span class="badge bg-info">@session.Type</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No sessions scheduled for today.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Crisis Alerts -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5>Active Crisis Alerts</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ActiveCrisisAlerts.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var alert in Model.ActiveCrisisAlerts.Take(5))
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">@alert.Client?.FirstName @alert.Client?.LastName</h6>
+                                        <small>@alert.AlertDateTime.ToString("MM/dd HH:mm")</small>
+                                    </div>
+                                    <p class="mb-1">@alert.Description</p>
+                                    <span class="badge
+                                                @(alert.Level == CrisisLevel.Critical ? "bg-danger" :
+                                                                                    alert.Level == CrisisLevel.High ? "bg-warning" :
+                                                                                    alert.Level == CrisisLevel.Medium ? "bg-info" : "bg-secondary")">
+                                @alert.Level
+                            </span>
+                        </div>
+                                                }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No active crisis alerts.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Sessions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Upcoming Sessions</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.UpcomingSessions.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Client</th>
+                                    <th>Professional</th>
+                                    <th>Type</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var session in Model.UpcomingSessions)
+                                {
+                                    <tr>
+                                        <td>@session.ScheduledDateTime.ToString("MMM dd, yyyy HH:mm")</td>
+                                        <td>@session.Client?.FirstName @session.Client?.LastName</td>
+                                        <td>@session.Professional?.FirstName @session.Professional?.LastName</td>
+                                        <td><span class="badge bg-primary">@session.Type</span></td>
+                                        <td>@session.DurationMinutes min</td>
+                                        <td>
+                                            <a asp-controller="TherapySessions" asp-action="Details" asp-route-id="@session.SessionId" class="btn btn-sm btn-info">View</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No upcoming sessions.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Mood Entries -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Recent Mood Entries</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentMoodEntries.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Client</th>
+                                    <th>Mood Score</th>
+                                    <th>Emotion</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var mood in Model.RecentMoodEntries)
+                                {
+                                    <tr>
+                                        <td>@mood.EntryDateTime.ToString("MMM dd, HH:mm")</td>
+                                        <td>@mood.Client?.FirstName @mood.Client?.LastName</td>
+                                        <td>
+                                            <span class="badge
+                                                        @(mood.MoodScore >= 8 ? "bg-success" :
+                                                                                                    mood.MoodScore >= 5 ? "bg-warning" : "bg-danger")">
+                                        @mood.MoodScore/10
+                                    </span>
+                                </td>
+                                <td>@mood.Emotion</td>
+                                <td>
+                                    <a asp-controller="MoodTracking" asp-action="Details" asp-route-id="@mood.MoodEntryId" class="btn btn-sm btn-info">View</a>
+                                </td>
+                            </tr>
+                                                        }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted">No recent mood entries.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
