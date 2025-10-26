@@ -1,23 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class UtenteSaudeController : Controller
     {
-        // “BD” em memória (apenas para esta fase, sem EF/SQL)
-        private static readonly List<UtenteSaude> _data = new();
-        private static int _nextId = 1;
+        private readonly HealthWellbeingDbContext _db;
+
+        public UtenteSaudeController(HealthWellbeingDbContext db)
+        {
+            _db = db;
+        }
 
         // ================================
         // LISTAR
         // URL: /UtenteSaude
         // View: Views/UtenteSaude/Index.cshtml
         // ================================
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_data);
+            var lista = await _db.UtenteSaude
+                                 .AsNoTracking()
+                                 .OrderBy(u => u.NomeCompleto)
+                                 .ToListAsync();
+            return View(lista);
         }
 
         // ================================
@@ -26,9 +34,11 @@ namespace HealthWellbeing.Controllers
         // Exemplo: /UtenteSaude/Details/3
         // View: Views/UtenteSaude/Details.cshtml
         // ================================
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            var u = await _db.UtenteSaude
+                             .AsNoTracking()
+                             .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
             if (u == null) return NotFound();
             return View(u);
         }
@@ -50,26 +60,24 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UtenteSaude u)
+        public async Task<IActionResult> Create(UtenteSaude u)
         {
-            // Validações de modelo (DataAnnotations)
             if (!ModelState.IsValid) return View(u);
 
-            // Validações de unicidade (simuladas já que não há BD)
-            if (_data.Any(x => x.Nif == u.Nif))
+            // Validações de unicidade
+            if (await _db.UtenteSaude.AnyAsync(x => x.Nif == u.Nif))
                 ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
-            if (_data.Any(x => x.Nus == u.Nus))
+            if (await _db.UtenteSaude.AnyAsync(x => x.Nus == u.Nus))
                 ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
-            if (_data.Any(x => x.Niss == u.Niss))
+            if (await _db.UtenteSaude.AnyAsync(x => x.Niss == u.Niss))
                 ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
 
             if (!ModelState.IsValid) return View(u);
 
-            u.UtenteSaudeId = _nextId++;
-            _data.Add(u);
-            TempData["Msg"] = "Utente criado com sucesso.";
+            _db.UtenteSaude.Add(u);
+            await _db.SaveChangesAsync();
 
-            // Redireciona para: /UtenteSaude (Index)
+            TempData["Msg"] = "Utente criado com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -79,9 +87,9 @@ namespace HealthWellbeing.Controllers
         // Exemplo: /UtenteSaude/Edit/2
         // View: Views/UtenteSaude/Edit.cshtml
         // ================================
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            var u = await _db.UtenteSaude.FindAsync(id);
             if (u == null) return NotFound();
             return View(u);
         }
@@ -93,28 +101,34 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, UtenteSaude u)
+        public async Task<IActionResult> Edit(int id, UtenteSaude u)
         {
             if (id != u.UtenteSaudeId) return NotFound();
             if (!ModelState.IsValid) return View(u);
 
-            // Unicidade ignorando o próprio registo
-            if (_data.Any(x => x.UtenteSaudeId != id && x.Nif == u.Nif))
+            // Unicidade (ignora o próprio registo)
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nif == u.Nif))
                 ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
-            if (_data.Any(x => x.UtenteSaudeId != id && x.Nus == u.Nus))
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nus == u.Nus))
                 ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
-            if (_data.Any(x => x.UtenteSaudeId != id && x.Niss == u.Niss))
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Niss == u.Niss))
                 ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
 
             if (!ModelState.IsValid) return View(u);
 
-            var idx = _data.FindIndex(x => x.UtenteSaudeId == id);
-            if (idx < 0) return NotFound();
+            try
+            {
+                _db.Update(u);
+                await _db.SaveChangesAsync();
+                TempData["Msg"] = "Utente atualizado com sucesso.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId == id))
+                    return NotFound();
+                throw;
+            }
 
-            _data[idx] = u;
-            TempData["Msg"] = "Utente atualizado com sucesso.";
-
-            // Redireciona para: /UtenteSaude
             return RedirectToAction(nameof(Index));
         }
 
@@ -124,9 +138,11 @@ namespace HealthWellbeing.Controllers
         // Exemplo: /UtenteSaude/Delete/5
         // View: Views/UtenteSaude/Delete.cshtml
         // ================================
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
+            var u = await _db.UtenteSaude
+                             .AsNoTracking()
+                             .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
             if (u == null) return NotFound();
             return View(u);
         }
@@ -138,13 +154,16 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var u = _data.FirstOrDefault(x => x.UtenteSaudeId == id);
-            if (u != null) _data.Remove(u);
-            TempData["Msg"] = "Utente removido.";
+            var u = await _db.UtenteSaude.FindAsync(id);
+            if (u != null)
+            {
+                _db.UtenteSaude.Remove(u);
+                await _db.SaveChangesAsync();
+                TempData["Msg"] = "Utente removido.";
+            }
 
-            // Redireciona para: /UtenteSaude
             return RedirectToAction(nameof(Index));
         }
     }

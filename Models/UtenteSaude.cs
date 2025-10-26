@@ -34,17 +34,20 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "O NIF é obrigatório.")]
         [Display(Name = "NIF")]
         [PortugueseNif(ErrorMessage = "NIF inválido.")]
+        [StringLength(9)]
         public string Nif { get; set; } = default!;
 
         // Número de Segurança Social (NISS) — 11 dígitos
         [Required(ErrorMessage = "O NISS é obrigatório.")]
         [Display(Name = "Número de Segurança Social")]
+        [StringLength(11)]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O NISS deve ter 11 dígitos.")]
         public string Niss { get; set; } = default!;
 
         // Número de Utente de Saúde (SNS/NUS) — 9 dígitos
         [Required(ErrorMessage = "O número de utente de saúde é obrigatório.")]
         [Display(Name = "Número de Utente de Saúde")]
+        [StringLength(9)]
         [RegularExpression(@"^\d{9}$", ErrorMessage = "O NUS deve ter 9 dígitos.")]
         public string Nus { get; set; } = default!;
 
