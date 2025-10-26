@@ -1,41 +1,74 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Specialities>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Especialidades";
+    var q = Context.Request.Query["q"].ToString();
 }
 
-<h1>Index</h1>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        + Nova Especialidade
+    </a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdEspecialidade">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdEspecialidade">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdEspecialidade">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="card shadow-sm">
+    <div class="card-header">
+        <form asp-action="Index" method="get" class="d-flex gap-2">
+            <input type="text"
+                   name="q"
+                   value="@q"
+                   class="form-control"
+                   placeholder="Procurar por nome ou descrição..." />
+            <button type="submit" class="btn btn-outline-secondary">Pesquisar</button>
+            @if (!string.IsNullOrWhiteSpace(q))
+            {
+                <a asp-action="Index" class="btn btn-outline-light border">Limpar</a>
+            }
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        @if (Model is null || !Model.Any())
+        {
+            <div class="p-4 text-center text-muted">
+                <div class="mb-2 fw-semibold">Sem especialidades para mostrar.</div>
+                <a asp-action="Create" class="btn btn-sm btn-primary">Criar a primeira</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 25%">@Html.DisplayNameFor(m => m.First().Nome)</th>
+                            <th>@Html.DisplayNameFor(m => m.First().Descricao)</th>
+                            <th class="text-end" style="width: 220px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.Nome</td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 640px;">
+                                        @item.Descricao
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-secondary">Detalhes</a>
+                                        <a asp-action="Edit" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-primary">Editar</a>
+                                        <a asp-action="Delete" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-danger">Apagar</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
