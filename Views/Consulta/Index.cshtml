@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Consulta>
+
+@{
+    ViewData["Title"] = "Products List";
+}
+
+<h1>@ViewBag.Title</h1>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Id consulta</th>
+            <th scope="col">Data marcacao</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Consulta consulta in Model)
+        {
+            <tr>
+                <td>@consulta.idConsulta</td>
+                <td>@consulta.dataMarcacao</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
