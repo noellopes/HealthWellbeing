@@ -18,5 +18,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UtenteSaude> UtenteSaude { get; set; } = default!;
 
+        public DbSet<HealthWellbeing.Models.Specialities> Specialities { get; set; } = default!;
+
     }
 }
