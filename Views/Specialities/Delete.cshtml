@@ -1,33 +1,37 @@
 ﻿@model HealthWellbeing.Models.Specialities
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Apagar Especialidade";
 }
 
-<h1>Delete</h1>
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0 text-danger">@ViewData["Title"]</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
+</div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Specialities</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="IdEspecialidade" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<div class="card border-danger shadow-sm">
+    <div class="card-header bg-danger text-white fw-semibold">
+        Confirmação de eliminação
+    </div>
+
+    <div class="card-body">
+        <p class="mb-4">Tens a certeza de que queres apagar esta especialidade?</p>
+
+        <dl class="row mb-0">
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Nome)</dt>
+            <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(m => m.Nome)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Descricao)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Descricao)</dd>
+        </dl>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end gap-2">
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdEspecialidade" />
+            <button type="submit" class="btn btn-danger">Apagar</button>
+        </form>
+        <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+    </div>
 </div>
