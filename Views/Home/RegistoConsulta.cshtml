@@ -1,0 +1,19 @@
+﻿@model RegistoConsulta
+@{
+    ViewData["Title"] = "RegistoConsulta";
+}
+
+<h1>Register</h1>
+
+<form asp-action="RegistoConsulta" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="RegisterId" class="form-label"></label>
+        <input asp-for="RegisterId" class="form-control" placeholder="Enter the register ID">
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button asp-action="Index" class="btn btn-secondary">Cancel</button>
+    </div>
+</form>
