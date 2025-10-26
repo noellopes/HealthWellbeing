@@ -1,0 +1,74 @@
+﻿@model HealthWellbeing.Models.Consulta
+
+@{
+    ViewData["Title"] = "Detalhes da Consulta";
+
+    // Estado calculado (usa isto mesmo que não tenhas a prop Estado no modelo)
+    var hoje = DateTime.Today;
+    var data = Model.DataConsulta.Date;
+    var estado = Model.DataCancelamento.HasValue
+        ? "Cancelada"
+        : (data < hoje) ? "Expirada"
+        : (data == hoje) ? "Hoje"
+        : "Agendada";
+
+    string Badge(string e) => e switch
+    {
+        "Cancelada" => "badge bg-danger",
+        "Expirada" => "badge bg-secondary",
+        "Hoje" => "badge bg-warning text-dark",
+        _ => "badge bg-success"
+    };
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+            <h2 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta</h2>
+            <span class="@Badge(estado) fs-6 px-3 py-2">@estado</span>
+        </div>
+
+        <div class="card-body bg-light px-5 py-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 fw-semibold text-secondary">Data de Marcação</dt>
+                <dd class="col-sm-8">@Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Data da Consulta</dt>
+                <dd class="col-sm-8">@Model.DataConsulta.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Início</dt>
+                <dd class="col-sm-8">@Model.HoraInicio.ToString("HH\\:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Fim</dt>
+                <dd class="col-sm-8">@Model.HoraFim.ToString("HH\\:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Data de Cancelamento</dt>
+                <dd class="col-sm-8">
+                    @(Model.DataCancelamento.HasValue
+                                        ? Model.DataCancelamento.Value.ToString("dd/MM/yyyy HH:mm")
+                                        : "—")
+                </dd>
+            </dl>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.IdConsulta" class="btn btn-warning px-4">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.IdConsulta" class="btn btn-danger px-4">
+                        <i class="bi bi-trash"></i> Apagar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- sem scripts obrigatórios aqui -->
+}
