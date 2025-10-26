@@ -1,0 +1,57 @@
+﻿@model HealthWellbeing.Models.MoodEntry
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>MoodEntry</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ClientId" class="control-label"></label>
+                <select asp-for="ClientId" class ="form-control" asp-items="ViewBag.ClientId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="EntryDateTime" class="control-label"></label>
+                <input asp-for="EntryDateTime" class="form-control" />
+                <span asp-validation-for="EntryDateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MoodScore" class="control-label"></label>
+                <input asp-for="MoodScore" class="form-control" />
+                <span asp-validation-for="MoodScore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Emotion" class="control-label"></label>
+                <input asp-for="Emotion" class="form-control" />
+                <span asp-validation-for="Emotion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label"></label>
+                <input asp-for="Notes" class="form-control" />
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Triggers" class="control-label"></label>
+                <input asp-for="Triggers" class="form-control" />
+                <span asp-validation-for="Triggers" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

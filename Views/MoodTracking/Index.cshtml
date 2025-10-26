@@ -1,0 +1,65 @@
+﻿@model IEnumerable<HealthWellbeing.Models.MoodEntry>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EntryDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MoodScore)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Emotion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Notes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Triggers)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Client)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EntryDateTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MoodScore)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Emotion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Notes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Triggers)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client.Email)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.MoodEntryId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.MoodEntryId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.MoodEntryId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
