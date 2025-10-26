@@ -48,7 +48,7 @@ namespace HealthWellbeing.Controllers
         // GET: RestricaoAlimentar/Create
         public IActionResult Create()
         {
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Nome");
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
             return View();
         }
 
@@ -63,7 +63,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Nome", restricaoAlimentar.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
@@ -80,7 +80,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Nome", restricaoAlimentar.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
@@ -114,7 +114,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Nome", restricaoAlimentar.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
