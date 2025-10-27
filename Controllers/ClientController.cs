@@ -35,9 +35,10 @@ namespace HealthWellbeing.Controllers
 
             var client = await _context.Client
                 .FirstOrDefaultAsync(m => m.ClientId == id);
+
             if (client == null)
             {
-                return NotFound();
+                return View("InvalidClient");
             }
 
             return View(client);
@@ -58,6 +59,8 @@ namespace HealthWellbeing.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				//client.Name = client.Name.Trim();
+
 				// Geração do ClientID aqui, ANTES de adicionar ao DBContext
 				client.ClientId = Guid.NewGuid().ToString("N");
 				client.RegistrationDate = DateTime.Now; // Defina a data de registo aqui também
@@ -90,7 +93,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ClientID,Name,Email,Phone,Address,BirthDate,Gender,RegistrationDate,CreateMember")] Client client)
+        public async Task<IActionResult> Edit(string id, [Bind("Name,Email,Phone,Address,BirthDate,Gender,CreateMember")] Client client)
         {
             if (id != client.ClientId)
             {
