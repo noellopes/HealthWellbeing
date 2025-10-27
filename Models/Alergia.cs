@@ -5,7 +5,7 @@ namespace HealthWellbeing.Models
     public class Alergia
     {
         [Key]
-        public int AlergiaID { get; set; }
+        public int AlergiaId { get; set; }
 
         [Required(ErrorMessage = "O nome da alergia é obrigatório.")]
         [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres.")]
