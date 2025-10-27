@@ -20,15 +20,16 @@
 }
 
 <form asp-action="CreateRoom" method="post">
-    <!-- Tipo de Sala -->
+    
 
     <div style="margin: 10px;">
         <div class="card shadow-sm">
             <div class="card-body text-center">
+                <!-- Tipo de Sala -->
                 <div class="mb-3">
-                    <label asp-for="TipoSala" class="form-label">Tipo de Sala</label>
-                    <select asp-for="TipoSala" class="form-select" onchange="toggleCamposEspecificos()">
-                        <option value="">Selecione...</option>
+                    <label asp-for="RoomsType" class="form-label">Tipo de Sala</label>
+                    <select asp-for="RoomsType" class="form-select" onchange="toggleCamposEspecificos()">
+                        <option value="">Selecione o tipo...</option>
                         <option value="Consultas">Consultas</option>
                         <option value="Tratamentos">Tratamentos</option>
                     </select>
@@ -36,8 +37,8 @@
 
                 <!-- Especialidade -->
                 <div class="mb-3">
-                    <label asp-for="Especialidade" class="form-label">Especialidade</label>
-                    <select asp-for="Especialidade" class="form-select" onchange="toggleCamposEspecificos">
+                    <label asp-for="Specialty" class="form-label">Especialidade</label>
+                    <select asp-for="Specialty" class="form-select" onchange="toggleCamposEspecificos">
                         <option value="">Selecione o tipo primeiro...</option>
                         <option value="Cardiologia">Cardiologia</option>
                         <option value="Dermatologia">Dermatologia</option>
@@ -60,28 +61,41 @@
 
                 <!-- Nome da Sala -->
                 <div class="mb-3">
-                    <label asp-for="Nome" class="form-label">Nome da Sala</label>
-                    <input asp-for="Nome" class="form-control" placeholder="Ex: Consulta-Cardio-01">
+                    <label asp-for="Name" class="form-label">Nome da Sala</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ex: Consulta-Cardio-01">
                 </div>
 
                 <!-- Localização -->
                 <div class="mb-3">
-                    <label asp-for="Localizacao" class="form-label">Localização</label>
-                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Piso 2, Ala B">
+                    <label asp-for="Location" class="form-label">Localização</label>
+                    <input asp-for="Location" class="form-control" placeholder="Ex: Piso 2, Ala B">
                 </div>
 
                 <!-- HorarioFuncionamento -->
                 <div class="mb-3">
-                    <label asp-for="HorarioFuncionamento" class="form-label">Horário de Funcionamento</label>
-                    <input asp-for="HorarioFuncionamento" class="form-control" placeholder="Ex: 08:00 - 18:00" />
-                    <span asp-validation-for="HorarioFuncionamento" class="text-danger small"></span>
+                    <label asp-for="OperatingHours" class="form-label">Horário de Funcionamento</label>
+                    <input asp-for="OperatingHours" class="form-control" placeholder="Ex: 08:00 - 18:00" />
+                    <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                </div>
+
+                <!-- Estado -->
+                <div class="mb-3">
+                    <label asp-for="Status" class="form-label">Estado</label>
+                    <select asp-for="Status" class="form-select" onchange="toggleCamposEspecificos()">
+                        <option value="">Selecioneo Estado...</option>
+                        <option value="Disponivel">Disponivel</option>
+                        <option value="Indisponivel">Indisponivel</option>
+                        <option value="Limpeza">Limpeza</option>
+                        <option value="Manutencao">Manutencao</option>
+                        <option value="ForaDeServico">ForaDeServico</option>
+                    </select>
                 </div>
 
                 <!-- Observações -->
                 <div class="mb-3">
-                    <label asp-for="Observacoes" class="form-label">Observações</label>
-                    <textarea asp-for="Observacoes" class="form-control" rows="4" placeholder="Notas adicionais sobre a sala..."></textarea>
-                    <span asp-validation-for="Observacoes" class="text-danger small"></span>
+                    <label asp-for="Notes" class="form-label">Observações</label>
+                    <textarea asp-for="Notes" class="form-control" rows="4" placeholder="Notas adicionais sobre a sala..."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
 
                 <!-- Botao enviar e cancelar-->

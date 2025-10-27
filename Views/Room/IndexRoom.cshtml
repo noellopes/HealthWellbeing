@@ -18,8 +18,8 @@
             <th scope="col">Capacidade</th>
             <th scope="col">Especialidade</th>
             <th scope="col">Localização</th>
-            <th scope="col">Observações</th>
-            <th scope="col">Disponibilidade</th>
+            <th scope="col">Observação</th>
+            <th scope="col">Estado</th>
             <th scope="col" class="text-center">Ações</th>
         </tr>
     </thead>
@@ -27,17 +27,17 @@
         @foreach (Room room in Model)
         {
             <tr>
-                <td>@room.SalaId</td>
-                <td>@room.Nome</td>
-                <td>@room.Capacidade</td>
-                <td>@room.Especialidade</td>
-                <td>@room.Localizacao</td>
-                <td>@room.Observacoes</td>
-                <td>@(room.Disponibilidade ? "disponível" : "indisponível")</td>
+                <td>@room.RoomId</td>
+                <td>@room.Name</td>
+                <td>@room.Capacity</td>
+                <td>@room.Specialty</td>
+                <td>@room.Location</td>
+                <td>@room.Notes</td>
+                <td>@room.Status</td>
                 <td class="d-flex gap-2">
-                    <a href="@Url.Action("ReadRoom", "Room", new { id = room.SalaId })" class="btn btn-success w-100 text-center">Ver</a>
-                    <a href="@Url.Action("UpdateRoom", "Room", new { id = room.SalaId })" class="btn btn-warning w-100 text-center">Editar</a>
-                    <a href="@Url.Action("DeleteRoom", "Room", new { id = room.SalaId })" class="btn btn-danger w-100 text-center">Eliminar</a>
+                    <a href="@Url.Action("ReadRoom", "Room", new { id = room.RoomId })" class="btn btn-success w-100 text-center">Ver</a>
+                    <a href="@Url.Action("UpdateRoom", "Room", new { id = room.RoomId })" class="btn btn-warning w-100 text-center">Editar</a>
+                    <a href="@Url.Action("DeleteRoom", "Room", new { id = room.RoomId })" class="btn btn-danger w-100 text-center">Eliminar</a>
                 </td>
             </tr>
         }

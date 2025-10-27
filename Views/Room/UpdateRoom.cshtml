@@ -7,36 +7,36 @@
 
 @using (Html.BeginForm("UpdateRoom", "Room", FormMethod.Post))
 {
-    @Html.HiddenFor(m => m.SalaId)
+    @Html.HiddenFor(m => m.RoomId)
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Nome, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Nome, new { @class = "form-control" })
+        @Html.LabelFor(m => m.Name, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
     </div>
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Capacidade, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Capacidade, new { @class = "form-control", type = "number", min = "0" })
+        @Html.LabelFor(m => m.Capacity, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Capacity, new { @class = "form-control", type = "number", min = "0" })
     </div>
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Especialidade, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Especialidade, new { @class = "form-control" })
+        @Html.LabelFor(m => m.Specialty, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Specialty, new { @class = "form-control" })
     </div>
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Localizacao, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Localizacao, new { @class = "form-control" })
+        @Html.LabelFor(m => m.Location, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
     </div>
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Observacoes, new { @class = "form-label" })
-        @Html.TextAreaFor(m => m.Observacoes, new { @class = "form-control", rows = 3 })
+        @Html.LabelFor(m => m.Notes, new { @class = "form-label" })
+        @Html.TextAreaFor(m => m.Notes, new { @class = "form-control", rows = 3 })
     </div>
 
     <div class="form-check mb-3">
-        @Html.CheckBoxFor(m => m.Disponibilidade, new { @class = "form-check-input" })
-        @Html.LabelFor(m => m.Disponibilidade, new { @class = "form-check-label" })
+        @Html.LabelFor(m => m.Status, new { @class = "form-check-input" })
+        @Html.TextBoxFor(m => m.Status, new { @class = "form-check-label" })
     </div>
 
     <div class="d-flex gap-2 mt-3">

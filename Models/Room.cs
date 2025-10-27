@@ -13,17 +13,6 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
         public RoomType RoomsType { get; set; }
 
-        // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
-        public enum RoomStatus
-        {
-            Disponivel,
-            Indisponivel,
-            Limpeza,
-            Manutencao,
-            ForaDeServico
-        }
-        public RoomStatus Status { get; set; }
-
         // Especialidade da sala (pediatria, cardiologia, etc)
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100, ErrorMessage = "A especialidade não pode exceder 100 caracteres.")]
@@ -44,6 +33,17 @@ namespace HealthWellbeing.Models
         // Horário de funcionamento da sala (ex: 08:00 - 18:00)
         [Required(ErrorMessage = "O horário de funcionamento é obrigatório.")]
         public string OperatingHours { get; set; }
+
+        // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
+        public enum RoomStatus
+        {
+            Disponivel,
+            Indisponivel,
+            Limpeza,
+            Manutencao,
+            ForaDeServico
+        }
+        public RoomStatus Status { get; set; }
 
         // Observações adicionais (máximo 500 caracteres)
         [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres.")]
