@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using HealthWellbeing.Models;
+﻿using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class ConsumivelController : Controller
     {
-        // Lista em memória — substitui a BD
+        // Lista em memória
         private static List<Consumivel> _consumiveis = new()
         {
             new Consumivel
@@ -30,37 +32,48 @@ namespace HealthWellbeing.Controllers
             }
         };
 
-        // GET: /Consumivel/ConsumivelRegister
-        public IActionResult ConsumivelRegister()
-        {
-            return View();
-        }
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        // LISTAR
-        // /Consumivel/AdministrarConsumiveis
+        // VIEW: Listar os consumíveis
         public IActionResult AdministrarConsumiveis()
         {
             return View(_consumiveis);
         }
 
-        // (GET)
-        public IActionResult Delete(int id)
+        // CRIAR (GET)
+        public IActionResult ConsumivelRegister() => View();
+
+        // CRIAR (POST)
+        [HttpPost]
+        public IActionResult ConsumivelRegister(Consumivel consumivel, string FornecedoresTexto)
         {
-            var a = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
-            if (a == null) return NotFound();
-            return View(a);
+            // Converte fornecedores de texto em lista
+            consumivel.Fornecedores = !string.IsNullOrEmpty(FornecedoresTexto)
+                ? FornecedoresTexto.Split(',').Select(f => f.Trim()).ToList()
+                : new List<string>();
+
+            // Atribui ID automático
+            consumivel.ConsumivelId = _consumiveis.Any() ? _consumiveis.Max(c => c.ConsumivelId) + 1 : 1;
+
+            // Adiciona à lista
+            _consumiveis.Add(consumivel);
+
+            // Redireciona para a lista
+            return RedirectToAction("AdministrarConsumiveis");
         }
 
-        // (POST)
+        // ELIMINAR (GET)
+        public IActionResult Delete(int id)
+        {
+            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
+            if (c == null) return NotFound();
+            return View(c);
+        }
+
+        // ELIMINAR (POST)
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
-            var a = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
-            if (a != null) _consumiveis.Remove(a);
+            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
+            if (c != null) _consumiveis.Remove(c);
             return RedirectToAction("AdministrarConsumiveis");
         }
     }
