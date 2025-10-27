@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251027101256_ObjectiveFoodFoodCategory")]
-    partial class ObjectiveFoodFoodCategory
+    [Migration("20251027103211_FoodFoodCategoryObjectiveFoodPortion")]
+    partial class FoodFoodCategoryObjectiveFoodPortion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,43 @@ namespace HealthWellbeing.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
+                {
+                    b.Property<int>("AlergiaID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlergiaID"));
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("FoodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Gravidade")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Sintomas")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("AlergiaID");
+
+                    b.HasIndex("FoodId");
+
+                    b.ToTable("Alergia");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
                 {
                     b.Property<int>("FoodId")
@@ -33,23 +70,20 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodId"));
 
                     b.Property<decimal>("CarbsPer100g")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("FatPer100g")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("FoodCategoryId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("KcalPer100g")
-                        .HasPrecision(6, 1)
-                        .HasColumnType("decimal(6,1)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -57,16 +91,11 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(120)");
 
                     b.Property<decimal>("ProteinPer100g")
-                        .HasPrecision(6, 2)
-                        .HasColumnType("decimal(6,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FoodId");
 
                     b.HasIndex("FoodCategoryId");
-
-                    b.HasIndex("Name", "FoodCategoryId")
-                        .IsUnique()
-                        .HasFilter("[FoodCategoryId] IS NOT NULL");
 
                     b.ToTable("Food");
                 });
@@ -113,9 +142,6 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("FoodPortionId");
 
-                    b.HasIndex("FoodName", "Amount")
-                        .IsUnique();
-
                     b.ToTable("FoodPortion");
                 });
 
@@ -143,18 +169,104 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("ObjectiveId");
 
-                    b.HasIndex("Name", "Category")
-                        .IsUnique();
-
                     b.ToTable("Objective");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
+                {
+                    b.Property<int>("ReceitaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
+
+                    b.Property<decimal>("CaloriasPorPorcao")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("Gorduras")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HidratosCarbono")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsLactoseFree")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVegan")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVegetariana")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ModoPreparo")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Porcoes")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Proteinas")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TempoPreparo")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReceitaId");
+
+                    b.ToTable("Receita");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.RestricaoAlimentar", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Gravidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sintomas")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RestricaoAlimentar");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Food", "Food")
+                        .WithMany()
+                        .HasForeignKey("FoodId");
+
+                    b.Navigation("Food");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.FoodCategory", "Category")
                         .WithMany("Foods")
-                        .HasForeignKey("FoodCategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("FoodCategoryId");
 
                     b.Navigation("Category");
                 });
