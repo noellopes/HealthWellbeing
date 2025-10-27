@@ -9,10 +9,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.App
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251026155920_Add_Consulta_Only")]
+    [Migration("20251027180047_Add_Consulta_Only")]
     partial class Add_Consulta_Only
     {
         /// <inheritdoc />
@@ -132,7 +132,7 @@ namespace HealthWellbeing.Migrations.App
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdConsulta"));
 
-                    b.Property<DateTime>("DataCancelamento")
+                    b.Property<DateTime?>("DataCancelamento")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DataConsulta")

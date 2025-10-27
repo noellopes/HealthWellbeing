@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.App
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
     public partial class Add_Consulta_Only : Migration
@@ -19,7 +19,7 @@ namespace HealthWellbeing.Migrations.App
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DataMarcacao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DataConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataCancelamento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DataCancelamento = table.Column<DateTime>(type: "datetime2", nullable: true),
                     HoraInicio = table.Column<TimeOnly>(type: "time", nullable: false),
                     HoraFim = table.Column<TimeOnly>(type: "time", nullable: false)
                 },
