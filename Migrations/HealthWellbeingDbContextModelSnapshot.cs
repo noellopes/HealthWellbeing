@@ -30,6 +30,9 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlergiaID"));
 
+                    b.Property<int>("AlimentoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -50,6 +53,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(300)");
 
                     b.HasKey("AlergiaID");
+
+                    b.HasIndex("AlimentoId");
 
                     b.ToTable("Alergia");
                 });

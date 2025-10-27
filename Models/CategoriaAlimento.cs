@@ -3,9 +3,9 @@
 namespace HealthWellbeing.Models
 {
     public class CategoriaAlimento
-    {
+        {
         [Key]
-        public int CategoriaID { get; set; }
+        public int CategoriaAlimentoId { get; set; }
 
         public string Name { get; set; } = default!;
 
