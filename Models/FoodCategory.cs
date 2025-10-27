@@ -10,7 +10,7 @@ namespace HealthWellbeing.Models
         public int FoodCategoryId { get; set; }
 
         [Required, StringLength(100)]
-        [Display(Name = "Category")]
+        [Display(Name = "Category name")]
         public string Name { get; set; } = default!;
 
         [StringLength(255)]

@@ -1,0 +1,41 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model FoodCategory
+@{
+    ViewData["Title"] = "Details";
+}
+<h1>Details</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+
+    <dt class="col-sm-3">ParentCategory</dt>
+    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
+
+    <dt class="col-sm-3">Subcategories</dt>
+    <dd class="col-sm-9">
+        @if (Model.SubCategories?.Any() == true)
+        {
+            <ul>
+                @foreach (var s in Model.SubCategories.OrderBy(x => x.Name))
+                {
+                    <li>@s.Name</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <span>(Uncategorized)</span>
+        }
+    </dd>
+</dl>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.FoodCategoryId" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</p>

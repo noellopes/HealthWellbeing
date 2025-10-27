@@ -1,0 +1,19 @@
+﻿@model HealthWellbeing.Models.FoodComponent
+
+@{
+    ViewData["Title"] = "Food Component Details";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-info">
+    <strong>ID:</strong> @Model.FoodComponentId
+    <br />
+    <strong>Name:</strong> @Model.Name
+    <br />
+    <strong>Description:</strong> @Model.Description
+</div>
+
+<a href="@Url.Action("Index")" class="btn btn-secondary">Back to List</a>
+<a href="@Url.Action("Edit", new { id = Model.FoodComponentId })" class="btn btn-warning">Edit</a>
+<a href="@Url.Action("Delete", new { id = Model.FoodComponentId })" class="btn btn-danger">Delete</a>
