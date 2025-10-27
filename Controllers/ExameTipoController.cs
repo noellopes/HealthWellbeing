@@ -10,11 +10,11 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ExameTipoesController : Controller
+    public class ExameTipoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public ExameTipoesController(HealthWellbeingDbContext context)
+        public ExameTipoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
