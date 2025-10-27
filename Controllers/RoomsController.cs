@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using static HealthWellbeing.Models.Room;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -52,7 +53,7 @@ namespace HealthWellbeingRoom.Controllers
         // Exibe o formulário para criar uma nova sala
         public IActionResult Create()
         {
-            return View();
+            ViewBag.RoomsTypeList = new SelectList(new List<string> { "Consulta", "Tratamentos" }); return View();
         }
 
         // POST: Rooms/Create
@@ -63,11 +64,14 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(room); // Adiciona a nova sala ao contexto
-                await _context.SaveChangesAsync(); // Salva na base de dados
-                return RedirectToAction(nameof(Index)); // Redireciona para a lista
+                _context.Add(room);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            return View(room); // Se houver erro, retorna à view com os dados preenchidos
+
+            // 🔧 Adiciona a lista novamente para o caso de erro
+            ViewBag.RoomsTypeList = new SelectList(Enum.GetValues(typeof(RoomType)));
+            return View(room);
         }
 
         // GET: Rooms/Edit/5
