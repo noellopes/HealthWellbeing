@@ -43,6 +43,8 @@ namespace HealthWellbeing.Models
 			false => "No",
 			_ => "Pending Acceptation..",
 		};
-	}
+
+        public ICollection<Member>? Members { get; set; } = default;
+    }
 }
 
