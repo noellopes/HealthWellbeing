@@ -1,0 +1,36 @@
+﻿@model IEnumerable<HealthWellbeing.Models.ClienteServico>
+
+@{
+    ViewData["Title"] = "Serviços dos Clientes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Tratamento</th>
+            <th>Terapeuta</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.NomeCliente</td>
+                <td>@s.DataServico.ToShortDateString()</td>
+                <td>@s.TipoTratamento</td>
+                <td>@s.Terapeuta</td>
+                <td>@s.Estado</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@s.ClienteServicoId" class="btn btn-info btn-sm">Ver Detalhes</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

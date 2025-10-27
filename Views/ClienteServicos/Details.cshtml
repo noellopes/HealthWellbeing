@@ -1,0 +1,39 @@
+﻿@model HealthWellbeing.Models.ClienteServico
+
+@{
+    ViewData["Title"] = "Detalhes do Serviço";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="card p-3 shadow">
+    <h4>@Model.NomeCliente</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Data do Serviço</dt>
+        <dd class="col-sm-9">@Model.DataServico.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Tipo de Tratamento</dt>
+        <dd class="col-sm-9">@Model.TipoTratamento</dd>
+
+        <dt class="col-sm-3">Duração</dt>
+        <dd class="col-sm-9">@Model.DuracaoMinutos minutos</dd>
+
+        <dt class="col-sm-3">Terapeuta</dt>
+        <dd class="col-sm-9">@Model.Terapeuta</dd>
+
+        <dt class="col-sm-3">Sala</dt>
+        <dd class="col-sm-9">@Model.Sala</dd>
+
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">@Model.Estado</dd>
+
+        @if (!string.IsNullOrEmpty(Model.Observacoes))
+        {
+            <dt class="col-sm-3">Observações</dt>
+            <dd class="col-sm-9">@Model.Observacoes</dd>
+        }
+    </dl>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Voltar</a>
