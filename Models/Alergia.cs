@@ -22,7 +22,6 @@ namespace HealthWellbeing.Models
         public string Descricao { get; set; }
 
         [Required(ErrorMessage = "A gravidade é obrigatória.")]
-        [StringLength(20, ErrorMessage = "A gravidade deve ter no máximo 20 caracteres.")]
         [Display(Name = "Gravidade")]
         public GravidadeAlergia Gravidade { get; set; }
 

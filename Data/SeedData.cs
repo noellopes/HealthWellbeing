@@ -28,41 +28,41 @@ internal class SeedData
             {
                 Nome = "Alergia ao Amendoim",
                 Descricao = "Reação alérgica grave a proteínas do amendoim.",
-                Gravidade = "Alta",
+                Gravidade = GravidadeAlergia.Grave,
                 Sintomas = "Urticária, dificuldade para respirar, inchaço na garganta.",
-                AlimentoId = 2 
+                AlimentoId = 1 
             },
             new Alergia
             {
                 Nome = "Alergia ao Leite",
                 Descricao = "Sensibilidade às proteínas do leite de vaca.",
-                Gravidade = "Média",
+                Gravidade = GravidadeAlergia.Moderada,
                 Sintomas = "Cólicas, diarreia, erupções cutâneas.",
-                AlimentoId = 2
+                AlimentoId = 1
             },
             new Alergia
             {
                 Nome = "Alergia ao Ovo",
                 Descricao = "Reação imunológica às proteínas da clara ou gema do ovo.",
-                Gravidade = "Baixa",
+                Gravidade = GravidadeAlergia.Leve,
                 Sintomas = "Coceira, vermelhidão, desconforto gastrointestinal.",
-                AlimentoId = 2
+                AlimentoId = 1
             },
             new Alergia
             {
                 Nome = "Alergia ao Trigo",
                 Descricao = "Reação às proteínas do trigo, incluindo o glúten.",
-                Gravidade = "Média",
+                Gravidade = GravidadeAlergia.Moderada,
                 Sintomas = "Inchaço abdominal, erupções cutâneas, fadiga.",
-                AlimentoId = 2
+                AlimentoId = 1
             },
             new Alergia
             {
                 Nome = "Alergia a Frutos do Mar",
                 Descricao = "Reação a crustáceos e moluscos.",
-                Gravidade = "Alta",
+                Gravidade = GravidadeAlergia.Moderada,
                 Sintomas = "Inchaço facial, vômitos, anafilaxia.",
-                AlimentoId = 2
+                AlimentoId = 1
             }
         );
 
