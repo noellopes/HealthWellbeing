@@ -11,4 +11,13 @@ namespace HealthWellbeing.Models
 
 		public static IEnumerable<Client> GetAllClients() => clients;
 	}
+
+		// Members
+
+        private static List<Member> members = new List<Member>();
+
+        public static IEnumerable<Member> MemberList => members;
+
+        public static void AddMember(Member member) => members.Add(member);
+    }
 }
