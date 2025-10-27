@@ -5,8 +5,7 @@ namespace HealthWellbeing.Models
 {
 	public class Client
 	{
-		[Key]
-		public string ClientID { get; set; } = string.Empty;
+		public string ClientId { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "First and last name are necessary.")]
 		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100.")]
@@ -44,7 +43,7 @@ namespace HealthWellbeing.Models
 			_ => "Pending Acceptation..",
 		};
 
-        public ICollection<Member>? Members { get; set; } = default;
+        public ICollection<Client>? Clients { get; set; } = default;
     }
 }
 
