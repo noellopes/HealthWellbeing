@@ -1,6 +1,4 @@
 ﻿
-using NuGet.DependencyResolver;
-
 namespace HealthWellbeingRoom.Models.FileMedicalDevices
 {
     public class RepositoryMedicalDevices
