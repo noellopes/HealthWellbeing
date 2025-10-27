@@ -1,0 +1,36 @@
+﻿@model HealthWellbeing.Models.ProfissionalExecutante
+
+@{
+    ViewData["Title"] = "Apagar Profissional Executante";
+}
+
+<h2 class="text-center mt-3 text-danger">Apagar Profissional</h2>
+<hr />
+
+<div class="alert alert-warning text-center">
+    <h5>Tens a certeza que pretendes apagar este profissional?</h5>
+</div>
+
+<div class="card shadow-sm p-4 mb-4">
+    <dl class="row">
+        <dt class="col-sm-3">Nome</dt>
+        <dd class="col-sm-9">@Model.Nome</dd>
+
+        <dt class="col-sm-3">Função</dt>
+        <dd class="col-sm-9">@Model.Funcao</dd>
+
+        <dt class="col-sm-3">Telefone</dt>
+        <dd class="col-sm-9">@Model.Telefone</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+    </dl>
+</div>
+
+<form asp-action="ApagarProfissional" method="post">
+    <input type="hidden" asp-for="ProfissionalExecutanteId" />
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="VerProfissionais" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-danger">Apagar</button>
+    </div>
+</form>

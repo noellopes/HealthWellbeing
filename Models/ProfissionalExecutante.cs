@@ -26,5 +26,7 @@ namespace HealthWellbeing.Models
         [StringLength(250)]
         public string Email { get; set; }
 
+        public ICollection<ProfissionalExecutante>? profissionalExecutantes { get; set; }   
+
     }
 }

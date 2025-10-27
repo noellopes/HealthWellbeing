@@ -1,0 +1,29 @@
+﻿@model HealthWellbeing.Models.ProfissionalExecutante
+
+@{
+    ViewData["Title"] = "Detalhes do Profissional";
+}
+
+<h2 class="text-center mt-3">Detalhes do Profissional</h2>
+<hr />
+
+<div class="card shadow-sm p-4 mb-4">
+    <dl class="row mb-0">
+        <dt class="col-sm-3">Nome</dt>
+        <dd class="col-sm-9">@Model.Nome</dd>
+
+        <dt class="col-sm-3">Função</dt>
+        <dd class="col-sm-9">@Model.Funcao</dd>
+
+        <dt class="col-sm-3">Telefone</dt>
+        <dd class="col-sm-9">@Model.Telefone</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+    </dl>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+    <a asp-action="VerProfissionais" class="btn btn-secondary">Voltar</a>
+    <a asp-action="EditarProfissional" asp-route-id="@Model.ProfissionalExecutanteId" class="btn btn-primary">Editar</a>
+</div>
