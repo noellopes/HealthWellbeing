@@ -51,16 +51,9 @@ namespace HealthWellbeing.Models
         [Display(Name = "Gorduras (g)")]
         public decimal Gorduras { get; set; }
 
-        [Display(Name = "Vegetariana")]
-        public bool IsVegetariana { get; set; }
+        public ICollection<ComponentesDaReceita>? Componentes { get; set; }
 
-        [Display(Name = "Vegana")]
-        public bool IsVegan { get; set; }
-
-        [Display(Name = "Sem Lactose")]
-        public bool IsLactoseFree { get; set; }
-
-        public ICollection<ComponentesDaReceita> Componentes { get; set; }
+        public ICollection<RestricaoAlimentar>? RestricoesAlimentares { get; set; }
 
         //public ICollection<Alergia> RestricaoAlergias { get; set; } --> Quando implementar restrições alimentares
 

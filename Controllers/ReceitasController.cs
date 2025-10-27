@@ -54,7 +54,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras")] Receita receita)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras")] Receita receita)
         {
             if (id != receita.ReceitaId)
             {
