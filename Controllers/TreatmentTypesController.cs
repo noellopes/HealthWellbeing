@@ -22,7 +22,9 @@ namespace HealthWellbeing.Controllers
         // GET: TreatmentTypes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.TreatmentType.ToListAsync());
+            ViewData["Title"] = "Tipos de tratamentos";
+            ViewBag.Properties = new List<string> { "Name", "Description", "EstimatedDuration", "Priority" };
+            return View("~/Views/Shared/Group1/_ListViewLayout.cshtml", await _context.TreatmentType.ToListAsync());
         }
 
         // GET: TreatmentTypes/Details/5
