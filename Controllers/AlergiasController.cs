@@ -36,7 +36,7 @@ namespace HealthWellbeing.Controllers
 
             var alergia = await _context.Alergia
                 .Include(a => a.Alimento)
-                .FirstOrDefaultAsync(m => m.AlergiaID == id);
+                .FirstOrDefaultAsync(m => m.AlergiaId== id);
             if (alergia == null)
             {
                 return NotFound();
@@ -57,7 +57,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
+        public async Task<IActionResult> Create([Bind("AlergiaId,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
         {
             if (ModelState.IsValid)
             {
@@ -91,9 +91,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AlergiaID,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
+        public async Task<IActionResult> Edit(int id, [Bind("AlergiaId,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
         {
-            if (id != alergia.AlergiaID)
+            if (id != alergia.AlergiaId)
             {
                 return NotFound();
             }
@@ -107,7 +107,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AlergiaExists(alergia.AlergiaID))
+                    if (!AlergiaExists(alergia.AlergiaId))
                     {
                         return NotFound();
                     }
@@ -132,7 +132,7 @@ namespace HealthWellbeing.Controllers
 
             var alergia = await _context.Alergia
                 .Include(a => a.Alimento)
-                .FirstOrDefaultAsync(m => m.AlergiaID == id);
+                .FirstOrDefaultAsync(m => m.AlergiaId== id);
             if (alergia == null)
             {
                 return NotFound();
@@ -158,7 +158,7 @@ namespace HealthWellbeing.Controllers
 
         private bool AlergiaExists(int id)
         {
-            return _context.Alergia.Any(e => e.AlergiaID == id);
+            return _context.Alergia.Any(e => e.AlergiaId== id);
         }
     }
 }
