@@ -1,4 +1,6 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeingRoom.Models.FileMedicalDevices;
+using HealthWellBeingRoom.Models.FileMedicalDevices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,31 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+// O Controller pedirá InterfaceRepositoryMDev e receberá RepositoryMedicalDevices
+builder.Services.AddScoped<InterfaceRepositoryMDev, EFRepository>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var context = services.GetRequiredService<HealthWellbeingDbContext>();
+
+        //Usei Migrate(): Garante que as migrações (tabelas) sejam aplicadas ANTES de consultar.
+        context.Database.Migrate();
+
+        //Chama o Populate
+        SeedData.Populate(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocorreu um erro durante a fase de Seed Data/Migração.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

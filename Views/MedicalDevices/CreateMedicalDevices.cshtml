@@ -61,6 +61,12 @@
                 <span asp-validation-for="Observation" class="text-danger small"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="SalaID" class="form-label">ID da Sala</label>
+                <input asp-for="SalaID" class="form-control" type="number" min="1" placeholder="1">
+                <span asp-validation-for="SalaID" class="text-danger small"></span>
+            </div>
+
             <input asp-for="RegistrationDate" type="hidden" />
             <input asp-for="DevicesID" type="hidden" />
 

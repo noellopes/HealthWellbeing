@@ -16,6 +16,7 @@
             <th scope="col">Nome do dispositivo</th> 
             <th scope="col">Tipo do dispositivo</th>
             <th scope="col">Quantidade do dispositivo</th>
+            <th scope="col">ID da Sala</th>
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,7 @@
                 <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
                 <td>@Html.DisplayFor(modelItem => dispositivo.Type)</td>
                 <td>@Html.DisplayFor(modelItem => dispositivo.Quantity)</td>
+                <td>@Html.DisplayFor(modelItem => dispositivo.SalaID)</td>
                 <td>
                     @*gera um link, passa o id do dispositivo clicado e leva a view Read*@
                     <a asp-action="ReadMedicalDevices" asp-route-id="@dispositivo.DevicesID" class="btn btn-sm btn-info">

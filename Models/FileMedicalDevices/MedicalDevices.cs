@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models.FileMedicalDevices
 {
+    [Table("MedicalDevices")]
     public class MedicalDevices
     {
         //ID dos dispositivos móveis
+        [Key]
         public int DevicesID { get; set; }
 
         [Required(ErrorMessage = "Nome é obrigatório.")]
@@ -27,5 +30,8 @@ namespace HealthWellbeingRoom.Models.FileMedicalDevices
         public string? Status { get; set; }
 
         public string? Observation { get; set; }
+
+        public int? SalaID { get; set; }
+
     }
 }
