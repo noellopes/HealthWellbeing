@@ -5,6 +5,31 @@ namespace HealthWellbeing.Controllers
 {
     public class ConsumivelController : Controller
     {
+        // Lista em memória — substitui a BD
+        private static List<Consumivel> _consumiveis = new()
+        {
+            new Consumivel
+            {
+                ConsumivelId = 1,
+                Categoria = "Limpeza",
+                Nome = "Álcool Gel",
+                ZonaArmazenamento = "Armário 1",
+                Fornecedores = new List<string> { "Higienix", "SafeHands" },
+                Stock = 25,
+                SalaId = 3
+            },
+            new Consumivel
+            {
+                ConsumivelId = 2,
+                Categoria = "Escritório",
+                Nome = "Canetas",
+                ZonaArmazenamento = "Armário 2",
+                Fornecedores = new List<string> { "OfficePlus", "Papelaria Central" },
+                Stock = 120,
+                SalaId = 5
+            }
+        };
+
         // GET: /Consumivel/ConsumivelRegister
         public IActionResult ConsumivelRegister()
         {
@@ -13,6 +38,30 @@ namespace HealthWellbeing.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        // LISTAR
+        // /Consumivel/AdministrarConsumiveis
+        public IActionResult AdministrarConsumiveis()
+        {
+            return View(_consumiveis);
+        }
+
+        // (GET)
+        public IActionResult Delete(int id)
+        {
+            var a = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
+            if (a == null) return NotFound();
+            return View(a);
+        }
+
+        // (POST)
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var a = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
+            if (a != null) _consumiveis.Remove(a);
+            return RedirectToAction("AdministrarConsumiveis");
         }
     }
 }

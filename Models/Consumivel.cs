@@ -9,7 +9,6 @@ public class Consumivel
     public List<string> Fornecedores { get; set; }
     public int Stock { get; set; }
     public int SalaId { get; set; }
-
 }
 
 public static class ConsumivelRepository

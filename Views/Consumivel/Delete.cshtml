@@ -1,0 +1,17 @@
+﻿@model HealthWellbeing.Models.Consumivel
+
+<h2>Eliminar Consumível</h2>
+
+<p>Tem a certeza que deseja eliminar este consumível?</p>
+
+<ul>
+    <li><b>Nome:</b> @Model.Nome</li>
+    <li><b>Categoria:</b> @Model.Categoria</li>
+    <li><b>Zona de Armazenamento:</b> @Model.ZonaArmazenamento</li>
+    <li><b>Stock:</b> @Model.Stock unidades</li>
+</ul>
+
+<form method="post" asp-action="Delete" asp-route-id="@Model.ConsumivelId">
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="AdministrarConsumiveis" class="btn btn-secondary">Cancelar</a>
+</form>
