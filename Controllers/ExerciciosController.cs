@@ -1,173 +1,158 @@
-﻿using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ExercicioController : Controller
+    public class ExerciciosController : Controller
     {
-        private static readonly List<GrupoMuscular> todosMusculos = new()
-        {
-            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", Musculo="Tórax", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", Musculo="Pernas", LocalizacaoCorporal="Inferior" }
-        };
+        
+        private readonly HealthWellbeingDbContext _context;
 
-        private static readonly List<Exercicio> exercicios = new List<Exercicio>
+        public ExerciciosController(HealthWellbeingDbContext context)
         {
-            new Exercicio
-            {
-                ExercicioId = 1,
-                ExercicioNome = "Flexões",
-                Descricao = "Exercício para fortalecer peitoral e tríceps",
-                Duracao = 10,
-                Intencidade = 7,
-                CaloriasGastas = 100,
-                Instrucoes = "1. Deitar no chão com as mãos à largura dos ombros\n2. Manter o corpo reto\n3. Baixar o corpo até o peito quase tocar no chão\n4. Empurrar de volta à posição inicial",
-                EquipamentoNecessario = "Nenhum",
-                Repeticoes = 15,
-                Series = 3,
-                Genero = "Unissexo",
-                GrupoMuscular = new List<GrupoMuscular> {
-                    todosMusculos[2], // Peitoral
-                    todosMusculos[1]  // Tríceps
-                }
-            },
-            new Exercicio
-            {
-                ExercicioId = 2,
-                ExercicioNome = "Agachamentos",
-                Descricao = "Exercício para fortalecer as pernas",
-                Duracao = 15,
-                Intencidade = 6,
-                CaloriasGastas = 120,
-                Instrucoes = "1. Ficar em pé com os pés à largura dos ombros\n2. Baixar como se fosse sentar numa cadeira\n3. Manter as costas retas\n4. Voltar à posição inicial",
-                EquipamentoNecessario = "Nenhum",
-                Repeticoes = 20,
-                Series = 4,
-                Genero = "Unissexo",
-                GrupoMuscular = new List<GrupoMuscular> {
-                    todosMusculos[3]  // Quadríceps
-                }
-            }
-        };
-
-        public IActionResult Index()
-        {
-            return View(exercicios);
+            _context = context;
         }
 
-        public IActionResult Detalhes(int id)
+        // GET: Exercicios
+        public async Task<IActionResult> Index()
         {
-            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
-            if (exercicio == null)
+            return View(await _context.Exercicio.ToListAsync());
+        }
+
+        // GET: Exercicios/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
                 return NotFound();
+            }
+
+            var exercicio = await _context.Exercicio
+                .FirstOrDefaultAsync(m => m.ExercicioId == id);
+            if (exercicio == null)
+            {
+                return NotFound();
+            }
 
             return View(exercicio);
         }
 
-        [HttpGet]
+        // GET: Exercicios/Create
         public IActionResult Create()
         {
-            CarregarGruposMusculares();
             return View();
         }
 
+        // POST: Exercicios/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Exercicio model, List<int> musculosIds)
+        public async Task<IActionResult> Create([Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series,Genero")] Exercicio exercicio)
         {
-            if (musculosIds == null || !musculosIds.Any())
-                ModelState.AddModelError("musculosIds", "Selecione pelo menos um grupo muscular.");
-
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                CarregarGruposMusculares();
-                return View(model);
+                _context.Add(exercicio);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            model.ExercicioId = exercicios.Any() ? exercicios.Max(e => e.ExercicioId) + 1 : 1;
-            model.GrupoMuscular = todosMusculos.Where(g => musculosIds.Contains(g.GrupoMuscularId)).ToList();
-            exercicios.Add(model);
-
-            TempData["SuccessMessage"] = "Exercício criado com sucesso!";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
-            if (exercicio == null) return NotFound();
-
-            CarregarGruposMusculares(exercicio.GrupoMuscular.Select(m => m.GrupoMuscularId).ToList());
             return View(exercicio);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Exercicio model, List<int> musculosIds)
+        // GET: Exercicios/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
-            if (exercicio == null) return NotFound();
-
-            if (!ModelState.IsValid)
+            if (id == null)
             {
-                CarregarGruposMusculares(musculosIds);
-                return View(model);
+                return NotFound();
             }
 
-            exercicio.ExercicioNome = model.ExercicioNome;
-            exercicio.Descricao = model.Descricao;
-            exercicio.Duracao = model.Duracao;
-            exercicio.Intencidade = model.Intencidade;
-            exercicio.CaloriasGastas = model.CaloriasGastas;
-            exercicio.Instrucoes = model.Instrucoes;
-            exercicio.EquipamentoNecessario = model.EquipamentoNecessario;
-            exercicio.Genero = model.Genero;
-            exercicio.Series = model.Series;
-            exercicio.Repeticoes = model.Repeticoes;
-            exercicio.GrupoMuscular = todosMusculos.Where(g => musculosIds.Contains(g.GrupoMuscularId)).ToList();
-
-            TempData["SuccessMessage"] = "Exercício atualizado com sucesso!";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public IActionResult Delete(int id)
-        {
-            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
-            if (exercicio == null) return NotFound();
+            var exercicio = await _context.Exercicio.FindAsync(id);
+            if (exercicio == null)
+            {
+                return NotFound();
+            }
             return View(exercicio);
         }
 
+        // POST: Exercicios/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series,Genero")] Exercicio exercicio)
+        {
+            if (id != exercicio.ExercicioId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(exercicio);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ExercicioExists(exercicio.ExercicioId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(exercicio);
+        }
+
+        // GET: Exercicios/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var exercicio = await _context.Exercicio
+                .FirstOrDefaultAsync(m => m.ExercicioId == id);
+            if (exercicio == null)
+            {
+                return NotFound();
+            }
+
+            return View(exercicio);
+        }
+
+        // POST: Exercicios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var exercicio = exercicios.FirstOrDefault(e => e.ExercicioId == id);
+            var exercicio = await _context.Exercicio.FindAsync(id);
             if (exercicio != null)
             {
-                exercicios.Remove(exercicio);
-                TempData["SuccessMessage"] = "Exercício removido com sucesso!";
+                _context.Exercicio.Remove(exercicio);
             }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private void CarregarGruposMusculares(List<int>? preSelecionados = null)
+        private bool ExercicioExists(int id)
         {
-            ViewBag.GruposMusculares = todosMusculos.Select(g =>
-                new SelectListItem
-                {
-                    Value = g.GrupoMuscularId.ToString(),
-                    Text = g.GrupoMuscularNome,
-                    Selected = preSelecionados != null && preSelecionados.Contains(g.GrupoMuscularId)
-                }).ToList();
+            return _context.Exercicio.Any(e => e.ExercicioId == id);
         }
     }
 }

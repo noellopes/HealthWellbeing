@@ -1,0 +1,145 @@
+﻿@model HealthWellbeing.Models.Exercicio
+
+@{
+    ViewData["Title"] = "Criar Exercício";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- Nome do Exercício -->
+    <div class="mb-3">
+        <label asp-for="ExercicioNome" class="form-label">Nome do Exercício *</label>
+        <input asp-for="ExercicioNome" class="form-control" placeholder="Ex: Flexões, Corrida, Agachamentos">
+        <span asp-validation-for="ExercicioNome" class="text-danger small"></span>
+    </div>
+
+    <!-- Descrição -->
+    <div class="mb-3">
+        <label asp-for="Descricao" class="form-label">Descrição *</label>
+        <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o exercício..."></textarea>
+        <span asp-validation-for="Descricao" class="text-danger small"></span>
+    </div>
+
+    <!-- Grupos Musculares (Checkboxes) -->
+    <div class="mb-3">
+        <label class="form-label">Grupos Musculares *</label>
+        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+            @if (ViewBag.GruposMusculares != null)
+            {
+                foreach (var item in ViewBag.GruposMusculares)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               name="musculosIds"
+                               value="@item.Value"
+                               id="musculo_@item.Value" />
+                        <label class="form-check-label" for="musculo_@item.Value">
+                            @item.Text
+                        </label>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-warning">Nenhum grupo muscular disponível.</div>
+            }
+        </div>
+        @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
+        {
+            <span class="text-danger small">@ViewData.ModelState["musculosIds"].Errors.First().ErrorMessage</span>
+        }
+    </div>
+
+    <div class="row">
+        <!-- Duração -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="Duracao" class="form-label">Duração (minutos) *</label>
+            <input asp-for="Duracao" type="number" step="0.1" class="form-control" placeholder="Ex: 30.5">
+            <span asp-validation-for="Duracao" class="text-danger small"></span>
+        </div>
+
+        <!-- Intensidade -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
+            <input asp-for="Intencidade" type="number" class="form-control" placeholder="1 a 10">
+            <span asp-validation-for="Intencidade" class="text-danger small"></span>
+        </div>
+
+        <!-- Calorias Gastas -->
+        <div class="col-md-4 mb-3">
+            <label asp-for="CaloriasGastas" class="form-label">Calorias Gastas *</label>
+            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control" placeholder="Ex: 250.5">
+            <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Equipamento -->
+        <div class="col-md-6 mb-3">
+            <label asp-for="EquipamentoNecessario" class="form-label">Equipamento Necessário *</label>
+            <input asp-for="EquipamentoNecessario" class="form-control" placeholder="Ex: Halteres, Bola, Nenhum">
+            <span asp-validation-for="EquipamentoNecessario" class="text-danger small"></span>
+        </div>
+
+        <!-- Repetições -->
+        <div class="col-md-3 mb-3">
+            <label asp-for="Repeticoes" class="form-label">Repetições *</label>
+            <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
+            <span asp-validation-for="Repeticoes" class="text-danger small"></span>
+        </div>
+
+        <!-- Séries -->
+        <div class="col-md-3 mb-3">
+            <label asp-for="Series" class="form-label">Séries *</label>
+            <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
+            <span asp-validation-for="Series" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <!-- Instruções -->
+    <div class="mb-3">
+        <label asp-for="Instrucoes" class="form-label">Instruções *</label>
+        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo..."></textarea>
+        <span asp-validation-for="Instrucoes" class="text-danger small"></span>
+    </div>
+
+    <!-- Género -->
+    <div class="mb-3">
+        <label asp-for="Genero" class="form-label">Género *</label>
+        <select asp-for="Genero" class="form-select">
+            <option value="">-- Selecione --</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Feminino">Feminino</option>
+            <option value="Unissexo">Unissexo</option>
+        </select>
+        <span asp-validation-for="Genero" class="text-danger small"></span>
+    </div>
+
+    <!-- Botões -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Criar Exercício
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

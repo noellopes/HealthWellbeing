@@ -1,0 +1,135 @@
+﻿@model HealthWellbeing.Models.Exercicio
+
+@{
+    ViewData["Title"] = "Editar Exercício";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-warning"><i class="fas fa-edit"></i> Editar Exercício</h2>
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ExercicioId" />
+
+        <div asp-validation-summary="All" class="text-danger small"></div>
+
+        <!-- Nome -->
+        <div class="mb-3">
+            <label asp-for="ExercicioNome" class="form-label">Nome *</label>
+            <input asp-for="ExercicioNome" class="form-control" />
+            <span asp-validation-for="ExercicioNome" class="text-danger small"></span>
+        </div>
+
+        <!-- Descrição -->
+        <div class="mb-3">
+            <label asp-for="Descricao" class="form-label">Descrição *</label>
+            <textarea asp-for="Descricao" rows="3" class="form-control"></textarea>
+            <span asp-validation-for="Descricao" class="text-danger small"></span>
+        </div>
+
+        <!-- Grupos Musculares -->
+        <div class="mb-3">
+            <label class="form-label">Grupos Musculares *</label>
+            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                @if (Model.GrupoMuscular?.Any() == true)
+                {
+                    @foreach (var item in ViewBag.GruposMusculares)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   name="musculosIds"
+                                   value="@item.Value"
+                                   id="musculo_@item.Value"
+                                   @(Model.GrupoMuscular.Any(g => g.GrupoMuscularId.ToString() == item.Value) ? "checked" : "") />
+
+                            <label class="form-check-label" for="musculo_@item.Value">@item.Text</label>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted">Nenhum músculo definido</span>
+                }
+            </div>
+            <span class="text-danger small">@ViewData.ModelState["musculosIds"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+        </div>
+
+        <!-- Linha com duração / intensidade / calorias -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Duracao" class="form-label">Duração (min) *</label>
+                <input asp-for="Duracao" type="number" class="form-control" min="1" />
+                <span asp-validation-for="Duracao" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
+                <input asp-for="Intencidade" type="number" class="form-control" min="1" max="10" />
+                <span asp-validation-for="Intencidade" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="CaloriasGastas" class="form-label">Calorias *</label>
+                <input asp-for="CaloriasGastas" type="number" class="form-control" min="0" />
+                <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Equipamento / Repetições / Séries -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="EquipamentoNecessario" class="form-label">Equipamento *</label>
+                <input asp-for="EquipamentoNecessario" class="form-control" />
+                <span asp-validation-for="EquipamentoNecessario" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="Repeticoes" class="form-label">Repetições *</label>
+                <input asp-for="Repeticoes" type="number" class="form-control" min="1" />
+                <span asp-validation-for="Repeticoes" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="Series" class="form-label">Séries *</label>
+                <input asp-for="Series" type="number" class="form-control" min="1" />
+                <span asp-validation-for="Series" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <!-- Instruções -->
+        <div class="mb-3">
+            <label asp-for="Instrucoes" class="form-label">Instruções *</label>
+            <textarea asp-for="Instrucoes" rows="3" class="form-control"></textarea>
+            <span asp-validation-for="Instrucoes" class="text-danger small"></span>
+        </div>
+
+        <!-- Género -->
+        <div class="mb-3">
+            <label asp-for="Genero" class="form-label">Género *</label>
+            <select asp-for="Genero" class="form-select">
+                <option value="">-- Selecione --</option>
+                <option>Masculino</option>
+                <option>Feminino</option>
+                <option>Unissexo</option>
+            </select>
+            <span asp-validation-for="Genero" class="text-danger small"></span>
+        </div>
+
+        <!-- Botões -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-save"></i> Guardar Alterações
+            </button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+        </div>
+
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
