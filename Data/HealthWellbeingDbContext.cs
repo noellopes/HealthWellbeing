@@ -21,7 +21,7 @@ namespace HealthWellbeing.Data
         public DbSet<ExameTipo> ExameTipos { get; set; } = default!;
         public DbSet<Medicos> Medicos { get; set; } = default!;
         public DbSet<SalaDeExames> SalaDeExame { get; set; } = default!;
-        public DbSet<ProfissionalExecutante> ProfissionaisExecutantes { get; set; } = default!;
+        public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
         public DbSet<MaterialEquipamentoAssociado> MaterialEquipamentoAssociado { get; set; } = default!;
     }
 }
