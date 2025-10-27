@@ -46,7 +46,7 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServico)
         {
             if (ModelState.IsValid)
             {
@@ -70,7 +70,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            return View(tipoServicoModel);
+            return View(tipoServico);
         }
 
         // POST: TipoServico/Edit/5
@@ -78,7 +78,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServico)
         {
             if (id != tipoServico.TipoServicoId)
             {
