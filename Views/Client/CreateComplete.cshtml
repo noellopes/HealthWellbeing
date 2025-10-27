@@ -6,35 +6,34 @@
 
 <h1>You are now a client of the Gym!!!</h1>
 
-<div class="card">
+<div class="card shadow-sm border-success mt-4">
     <div class="card-body">
-        <h5 class="card-title text-success">@ViewBag.Title</h5>
-        <h6 class="card-subtitle mb-2 text-body-secondary">
-            Thank you for creating an account!
-        </h6>
-
+        <h4 class="text-success">Create Completed!</h4>
+        <p class="text-muted">Thank you for creating an account!</p>
         <hr />
 
-        <div class="form-floating mb-3">
-            <input asp-for="Name" readonly class="form-control-plaintext">
-            <label asp-for="Name"></label>
-        </div>
+        <dl class="row">
+            <dt class="col-sm-3">Name</dt>
+            <dd class="col-sm-9">@Model.Name</dd>
 
-        <div class="form-floating mb-3">
-            <input asp-for="Email" readonly class="form-control-plaintext">
-            <label asp-for="Email"></label>
-        </div>
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
 
-        <div class="form-floating mb-3">
-            <input asp-for="Phone" readonly class="form-control-plaintext">
-            <label asp-for="Phone"></label>
-        </div>
-        <div class="form-floating mb-3">
-            <input readonly class="form-control-plaintext" value="@Model.CreateMemberText">
-            <label asp-for="CreateMember">I am now a member of the Gym!</label>
-        </div>
+            <dt class="col-sm-3">Phone</dt>
+            <dd class="col-sm-9">@Model.Phone</dd>
+
+            <dt class="col-sm-3">Membership</dt>
+            <dd class="col-sm-9">
+                @(Model.CreateMember switch
+                {
+                    true => "Yes — I am now a member of the Gym!",
+                    false => "No",
+                    _ => "Pending Acceptation..."
+                })
+            </dd>
+        </dl>
+
         <hr />
-
-        <a asp-action="Index" class="card-link">Ok</a>
+        <a asp-action="Index" class="btn btn-outline-success">Ok</a>
     </div>
 </div>

@@ -1,9 +1,35 @@
-﻿
+﻿@model IEnumerable<HealthWellbeing.Models.Client>
+
 @{
     ViewData["Title"] = "Client Page";
 }
 
-<h1>@ViewBag.Title</h1>
+<h2>Client List</h2>
 
-<a asp-action="Create">Create Your Client Account here!</a>
-
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Client ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Gender</th>
+            <th>Member</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var client in Model)
+        {
+            <tr>
+                <td>@client.ClientID</td>
+                <td>@client.Name</td>
+                <td>@client.Email</td>
+                <td>@client.Phone</td>
+                <td>@client.Address</td>
+                <td>@client.Gender</td>
+                <td>@client.CreateMemberText</td>
+            </tr>
+        }
+    </tbody>
+</table>
