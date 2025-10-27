@@ -30,8 +30,10 @@ namespace HealthWellbeing.Models
         [StringLength(200)]
         public string Morada { get; set; } = string.Empty;
 
+
+
         //DadosMedicos
-        public  DadosMedicos DadosMedicos { get; set; } = new DadosMedicos();
+        public DadosMedicos DadosMedicos { get; set; } = new DadosMedicos();
 
 
         //Dados administrativos
