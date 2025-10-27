@@ -43,8 +43,10 @@ namespace HealthWellBeing.Models
         public Medicos? MedicoSolicitante { get; set; }
 
         // 4. Sala de Exames
-        public int? SalaId { get; set; }
-        public Sala? Sala { get; set; }
+        
+        public int? SalaDeExameId { get; set; }
+        public SalaDeExames? SalaDeExame { get; set; }
+
 
         // 5. Profissional Executante
         public int? ProfissionalExecutanteId { get; set; }
