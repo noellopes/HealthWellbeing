@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.App
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
     public partial class Add_Doctor_Only : Migration

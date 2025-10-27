@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.App
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
     partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot

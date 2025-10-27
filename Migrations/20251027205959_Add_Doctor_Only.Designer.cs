@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.App
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251026161510_Add_Doctor_Only")]
+    [Migration("20251027205959_Add_Doctor_Only")]
     partial class Add_Doctor_Only
     {
         /// <inheritdoc />
