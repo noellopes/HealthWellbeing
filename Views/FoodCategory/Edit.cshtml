@@ -8,7 +8,7 @@
 <h1>Editar Alimento</h1>
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Category.FoodCategoryId" />
+    <input type="hidden" asp-for="FoodCategoryId" />
     <partial name="_CreateEdit" model="Model" />
     <button type="submit" class="btn btn-primary">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
