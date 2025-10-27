@@ -1,4 +1,5 @@
-﻿namespace HealthWellbeing.Models
+﻿
+namespace HealthWellbeing.Models
 {
 	public class Repository
 	{
@@ -7,6 +8,9 @@
 		public static IEnumerable<Client> ClientList => clients;
 
 		public static void AddClient(Client client) => clients.Add(client);
+
+		public static IEnumerable<Client> GetAllClients() => clients;
+	
 
 		// Members
 
