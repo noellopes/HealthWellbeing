@@ -1,0 +1,95 @@
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
+@model MedicalDevices;
+
+@{
+    // Título dinâmico, mostrando qual dispositivo está a ser editado
+    ViewData["Title"] = $"Editar Dispositivo: {Model.Name}";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Editar Dados
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <input type="hidden" asp-for="DevicesID" />
+
+            <input type="hidden" asp-for="RegistrationDate" />
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Equipamento</label>
+                        <input asp-for="Name" class="form-control">
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Type" class="form-label fw-bold">Tipo de Dispositivo (Categoria)</label>
+                        <input asp-for="Type" class="form-control">
+                        <span asp-validation-for="Type" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Specification" class="form-label fw-bold">Especificação Detalhada</label>
+                        <input asp-for="Specification" class="form-control">
+                        <span asp-validation-for="Specification" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Quantity" class="form-label fw-bold">Quantidade</label>
+                        <input asp-for="Quantity" class="form-control" type="number" min="1">
+                        <span asp-validation-for="Quantity" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Status" class="form-label fw-bold">Status do Dispositivo</label>
+                        <input asp-for="Status" class="form-control">
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SalaID" class="form-label fw-bold">ID da Sala</label>
+                        <input asp-for="SalaID" class="form-control">
+                        <span asp-validation-for="SalaID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observation" class="form-label fw-bold">Observações</label>
+                        <textarea asp-for="Observation" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Observation" class="text-danger small"></span>
+                    </div>
+                </div>
+
+            </div> <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-save me-1"></i> Salvar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

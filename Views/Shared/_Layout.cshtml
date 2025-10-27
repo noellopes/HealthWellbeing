@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
@@ -54,8 +55,8 @@
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Dispositivos Médicos</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="CreateMedicalDevices">Criar dispositivos médicos</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="Index">Lista de dispositivos médicos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevice" asp-action="Create">Criar dispositivos médicos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevice" asp-action="Index">Lista de dispositivos médicos</a></li>
                                     </ul>
                                 </li>
 
