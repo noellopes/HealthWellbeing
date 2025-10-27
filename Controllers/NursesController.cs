@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Migrations;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -22,7 +23,9 @@ namespace HealthWellbeing.Controllers
         // GET: Nurses
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Nurse.ToListAsync());
+            ViewData["Title"] = "Lista de Enfermeiros";
+            ViewBag.Properties = new List<string> { "Name", "NIF", "ProfessionalLicense", "BirthDate", "Email", "Phone", "Specialty" };
+            return View("~/Views/Shared/Group1/_ListViewLayout.cshtml", await _context.Nurse.ToListAsync());
         }
 
         // GET: Nurses/Details/5
