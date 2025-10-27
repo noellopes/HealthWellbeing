@@ -34,7 +34,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var client = await _context.Client
-                .FirstOrDefaultAsync(m => m.ClientID == id);
+                .FirstOrDefaultAsync(m => m.ClientId == id);
             if (client == null)
             {
                 return NotFound();
@@ -49,24 +49,28 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: Client/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientID,Name,Email,Phone,Address,BirthDate,Gender,RegistrationDate,CreateMember")] Client client)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(client);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(client);
-        }
+		// POST: Client/Create
+		// To protect from overposting attacks, enable the specific properties you want to bind to.
+		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender,CreateMember")] Client client)
+		{
+			if (ModelState.IsValid)
+			{
+				// Geração do ClientID aqui, ANTES de adicionar ao DBContext
+				client.ClientId = Guid.NewGuid().ToString("N");
+				client.RegistrationDate = DateTime.Now; // Defina a data de registo aqui também
 
-        // GET: Client/Edit/5
-        public async Task<IActionResult> Edit(string id)
+				_context.Add(client);
+				await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
+			}
+			return View(client);
+		}
+
+		// GET: Client/Edit/5
+		public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -88,7 +92,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("ClientID,Name,Email,Phone,Address,BirthDate,Gender,RegistrationDate,CreateMember")] Client client)
         {
-            if (id != client.ClientID)
+            if (id != client.ClientId)
             {
                 return NotFound();
             }
@@ -102,7 +106,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.ClientID))
+                    if (!ClientExists(client.ClientId))
                     {
                         return NotFound();
                     }
@@ -125,7 +129,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var client = await _context.Client
-                .FirstOrDefaultAsync(m => m.ClientID == id);
+                .FirstOrDefaultAsync(m => m.ClientId == id);
             if (client == null)
             {
                 return NotFound();
@@ -151,7 +155,7 @@ namespace HealthWellbeing.Controllers
 
         private bool ClientExists(string id)
         {
-            return _context.Client.Any(e => e.ClientID == id);
+            return _context.Client.Any(e => e.ClientId == id);
         }
     }
 }
