@@ -1,30 +1,36 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
     public class FoodComponentController : Controller
     {
-        private static List<FoodComponent> _CFood = new()
-        {
-            new FoodComponent { FoodComponentId  = 1, Name = "Apple", Description = "Water, Carbohydrates, Fibers, Vitamins, Minerals, Antioxidant, Maleic Acid"},
-            new FoodComponent { FoodComponentId = 2, Name = "Rice", Description = ""},
-        };
+        private readonly HealthWellbeingDbContext _context;
 
-
-        // GET: FoodComponentController
-        public IActionResult Index()
+        public FoodComponentController(HealthWellbeingDbContext context)
         {
-            return View(_CFood);
+            _context = context;
         }
 
         // GET: FoodComponentController
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Index()
         {
-            var a = _CFood.FirstOrDefault(x => x.FoodComponentId == id);
-            if (a == null) return NotFound();
-            return View(a);
+            var foodComponents = await _context.FoodComponent.ToListAsync();
+            return View(foodComponents);
+        }
+
+        // GET: FoodComponentController/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var foodComponent = await _context.FoodComponent
+                .FirstOrDefaultAsync(m => m.FoodComponentId == id);
+            if (foodComponent == null)
+            {
+                return NotFound();
+            }
+            return View(foodComponent);
         }
 
         // GET: FoodComponentController/Create
@@ -35,38 +41,108 @@ namespace HealthWellbeing.Controllers
 
         // POST: FoodComponentController/Create
         [HttpPost]
-        public IActionResult Create(FoodComponent a)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("FoodComponentId,Name,Description")] FoodComponent foodComponent)
         {
-            a.FoodComponentId = _CFood.Any() ? _CFood.Max(x => x.FoodComponentId) + 1 : 1;
-            _CFood.Add(a);
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Add(foodComponent);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Food Component created successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException)
+                {
+                    TempData["ErrorMessage"] = "Error creating Food Component. Please try again.";
+                    return View(foodComponent);
+                }
+            }
+            return View(foodComponent);
         }
 
         // GET: FoodComponentController/Edit/5
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var a = _CFood.FirstOrDefault(x => x.FoodComponentId == id);
-            if (a == null) return NotFound();
-            return View(a);
+            var foodComponent = await _context.FoodComponent.FindAsync(id);
+            if (foodComponent == null)
+            {
+                return NotFound();
+            }
+            return View(foodComponent);
         }
 
         // POST: FoodComponentController/Edit/5
         [HttpPost]
-        public IActionResult Edit(FoodComponent a)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("FoodComponentId,Name,Description")] FoodComponent foodComponent)
         {
-            var old = _CFood.FirstOrDefault(x => x.FoodComponentId == a.FoodComponentId);
-            if (old == null) return NotFound();
-            old.Name = a.Name;
-            old.Description = a.Description;
-            return RedirectToAction("Index");
+            if (id != foodComponent.FoodComponentId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(foodComponent);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Food Component updated successfully!";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FoodComponentExists(foodComponent.FoodComponentId))
+                    {
+                        TempData["ErrorMessage"] = "Food Component not found!";
+                        return NotFound();
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Error updating Food Component. Please try again.";
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(foodComponent);
         }
 
         // GET: FoodComponentController/Delete/5
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var a = _CFood.FirstOrDefault(x => x.FoodComponentId == id);
-            if (a != null) _CFood.Remove(a);
-            return RedirectToAction("Index");
+            var foodComponent = await _context.FoodComponent
+                .FirstOrDefaultAsync(m => m.FoodComponentId == id);
+            if (foodComponent == null)
+            {
+                return NotFound();
+            }
+            return View(foodComponent);
+        }
+
+        // POST: FoodComponentController/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var foodComponent = await _context.FoodComponent.FindAsync(id);
+            if (foodComponent != null)
+            {
+                _context.FoodComponent.Remove(foodComponent);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Food Component deleted successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Food Component not found!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool FoodComponentExists(int id)
+        {
+            return _context.FoodComponent.Any(e => e.FoodComponentId == id);
         }
     }
 }

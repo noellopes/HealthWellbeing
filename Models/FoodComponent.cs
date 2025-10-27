@@ -4,14 +4,15 @@ namespace HealthWellbeing.Models
 {
     public class FoodComponent
     {
-        public int FoodComponentId { get; set; } = default!;
+        [Key]
+        public int FoodComponentId { get; set; }
 
-        [Required(ErrorMessage = "The name of the Food is mandatory!")]
-        [StringLength(20)]
+        [Required(ErrorMessage = "The name of the food is mandatory!")]
+        [StringLength(50)]
         public string Name { get; set; } = default!;
 
-        [Required(ErrorMessage = "The Food has to have a mandatory description!")]
-        [StringLength(100)]
+        [Required(ErrorMessage = "The food must have a description!")]
+        [StringLength(200)]
         public string Description { get; set; } = default!;
     }
 }
