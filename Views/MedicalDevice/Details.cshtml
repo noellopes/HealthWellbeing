@@ -1,0 +1,72 @@
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
+@model MedicalDevices;
+
+@{
+    // Título dinâmico
+    ViewData["Title"] = $"Detalhes: {Model.Name}";
+
+    // Lógica para capturar e exibir mensagem de sucesso (do modelo do professor)
+    string? successMessage = Context.Request.Query["SuccessMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-black">
+        <h4 class="mb-0">
+            <i class="bi bi-gear me-2"></i> Informações do Dispositivo
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.DevicesID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.DevicesID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
+            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Type)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Type)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Specification)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specification)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Quantity)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Quantity)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Status)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SalaID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.SalaID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Observation)</dd>
+
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+    </a>
+</div>

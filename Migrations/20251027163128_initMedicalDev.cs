@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class iniMDevice : Migration
+    public partial class initMedicalDev : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
-namespace HealthWellBeingRoom.Models.FileMedicalDevices
+namespace HealthWellbeingRoom.Data
 {
 
-    internal class SeedData
+    internal class SeedDataMedicalDevices
     {
         internal static void Populate(HealthWellbeingDbContext? dbContext)
         {
@@ -98,10 +98,6 @@ namespace HealthWellBeingRoom.Models.FileMedicalDevices
                 new MedicalDevices {Name = "Foco Cirúrgico Móvel", Type = "Cirúrgico",
                     Specification = "Iluminação LED ajustável.", Quantity = 1, RegistrationDate = DateTime.Now,
                     Status = "Disponível", Observation = "Para procedimentos menores.", SalaID = 1 }, // Armazém
-            
-                new MedicalDevices {Name = "Estetoscópio Eletrónico", Type = "Diagnóstico",
-                    Specification = "Amplificação de som com redução de ruído.", Quantity = 3, RegistrationDate = DateTime.Now,
-                    Status = "Em Uso", Observation = null, SalaID = 4 } // Urgência
         });
 
             dbContext.SaveChanges();

@@ -1,6 +1,6 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeingRoom.Data;
 using HealthWellbeingRoom.Models.FileMedicalDevices;
-using HealthWellBeingRoom.Models.FileMedicalDevices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +36,7 @@ using (var scope = app.Services.CreateScope())
         context.Database.Migrate();
 
         //Chama o Populate
-        SeedData.Populate(context);
+        SeedDataMedicalDevices.Populate(context);
     }
     catch (Exception ex)
     {

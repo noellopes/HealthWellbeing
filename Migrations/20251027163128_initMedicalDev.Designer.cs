@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251024001307_iniMDevice")]
-    partial class iniMDevice
+    [Migration("20251027163128_initMedicalDev")]
+    partial class initMedicalDev
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
