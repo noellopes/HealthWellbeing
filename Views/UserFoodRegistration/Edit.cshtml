@@ -1,0 +1,56 @@
+﻿@model HealthWellbeing.Models.UserFoodRegistration
+
+@{
+    ViewData["Title"] = "Edit Food Record";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="UserId" class="form-label"></label>
+                <input asp-for="UserId" class="form-control" type="number" min="1" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="MealDateTime" class="form-label"></label>
+                <input asp-for="MealDateTime" class="form-control" type="datetime-local" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="MealType" class="form-label"></label>
+                <input asp-for="MealType" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FoodName" class="form-label"></label>
+                <input asp-for="FoodName" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Quantity" class="form-label"></label>
+                <input asp-for="Quantity" class="form-control" type="number" step="0.1" min="0.1" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Notes" class="form-label"></label>
+                <textarea asp-for="Notes" class="form-control"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+        </form>
+    </div>
+</div>
