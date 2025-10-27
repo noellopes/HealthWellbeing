@@ -7,7 +7,7 @@
 <h1>Restrições Alimentares</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Nova Restrição</a>
+<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
 </p>
 
 <table class="table table-striped">
@@ -31,9 +31,15 @@
             <td>@item.Descricao</td>
             <td>@item.Alimento?.Name</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-warning">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-info">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId" class="btn btn-sm btn-danger">Excluir</a>
+                    <div class="btn-group" role="group">
+
+                        <a asp-action="Details" asp-route-id="@item.RestricaoAlimentarId"
+                            class="btn btn-sm btn-secondary ms-1">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId"
+                            class="btn btn-sm btn-warning ms-1 ">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId"
+                            class="btn btn-sm btn-danger ms-1">Apagar</a>
+                    </div>
             </td>
         </tr>
     }

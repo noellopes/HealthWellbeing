@@ -59,12 +59,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="ComponentesReceitaId" class="control-label"></label>
-                <input asp-for="ComponentesReceitaId" class="form-control" />
+                <select asp-for="ComponentesReceitaId" class="form-control"
+                    asp-items="ViewBag.ComponentesReceita"></select>
                 <span asp-validation-for="ComponentesReceitaId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RestricoesAlimentarId" class="control-label"></label>
-                <input asp-for="RestricoesAlimentarId" class="form-control" />
+                <select asp-for="RestricoesAlimentarId" class="form-control"
+                    asp-items="ViewBag.RestricoesAlimentares"></select>
                 <span asp-validation-for="RestricoesAlimentarId" class="text-danger"></span>
             </div>
             <div class="form-group">

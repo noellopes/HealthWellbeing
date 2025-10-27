@@ -46,6 +46,9 @@ namespace HealthWellbeing.Controllers
         // GET: Receita/Create
         public IActionResult Create()
         {
+           
+            ViewData["ComponentesReceita"] = new SelectList(_context.ComponenteReceita, "ComponenteReceitaId", "ComponenteReceitaId");
+            ViewData["RestricoesAlimentares"] = new SelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "RestricaoAlimentarId");
             return View();
         }
 
@@ -78,6 +81,14 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+
+            if (_context.ComponenteReceita == null || _context.RestricaoAlimentar == null)
+            {
+                return Problem("Required data is missing in the database.");
+            }
+
+            ViewData["ComponentesReceita"] = new SelectList(_context.ComponenteReceita, "ComponenteReceitaId", "ComponenteReceitaId", receita.ComponentesReceitaId);
+            ViewData["RestricoesAlimentares"] = new SelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "RestricaoAlimentarId", receita.RestricoesAlimentarId);
             return View(receita);
         }
 

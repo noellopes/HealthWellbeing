@@ -17,6 +17,9 @@ namespace HealthWellbeing.Data
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<ComponenteReceita> ComponenteReceita { get; set; } = default!;
 
+        public DbSet<CategoriaAlimento> CategoriaAlimento { get; set; } = default!;
+
+
         public DbSet<Receita> Receita { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
