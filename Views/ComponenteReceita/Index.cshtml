@@ -1,0 +1,56 @@
+﻿@model IEnumerable<HealthWellbeing.Models.ComponenteReceita>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Componentes da Receita</h1>
+
+<p>
+<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Alimento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnidadeMedida)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantidade)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsOpcional)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Alimento.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UnidadeMedida)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantidade)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsOpcional)
+            </td>
+            <td>
+                    <a asp-action="Details" asp-route-id="@item.ComponenteReceitaId"
+                        class="btn btn-sm btn-secondary ms-1">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.ComponenteReceitaId"
+                        class="btn btn-sm btn-warning ms-1 ">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.ComponenteReceitaId"
+                        class="btn btn-sm btn-danger ms-1">Apagar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

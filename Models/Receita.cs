@@ -4,7 +4,6 @@ namespace HealthWellbeing.Models
 {
     public class Receita
     {
-        [Key]
         public int ReceitaId { get; set; }
 
         [Required(ErrorMessage = "O nome da receita é obrigatório.")]
@@ -21,43 +20,37 @@ namespace HealthWellbeing.Models
         [Display(Name = "Modo de Preparo")]
         public string ModoPreparo { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O tempo de preparo é obrigatório.")]
         [Range(1, 1440, ErrorMessage = "O tempo de preparo deve estar entre 1 e 1440 minutos.")]
         [Display(Name = "Tempo de Preparo (minutos)")]
         public int TempoPreparo { get; set; }
 
-        [Required(ErrorMessage = "O número de porções é obrigatório.")]
         [Range(1, 100, ErrorMessage = "O número de porções deve estar entre 1 e 100.")]
-        [Display(Name = "Número de Porções")]
+        [Display(Name = "Porções")]
         public int Porcoes { get; set; }
 
-        [Required(ErrorMessage = "As calorias por porção são obrigatórias.")]
-        [Range(0, 10000, ErrorMessage = "As calorias por porção devem estar entre 0 e 10000.")]
+        [Range(0, 10000)]
         [Display(Name = "Calorias por Porção")]
-        public decimal CaloriasPorPorcao { get; set; }
+        public decimal Calorias { get; set; }
 
-        [Required(ErrorMessage = "As proteínas são obrigatórias.")]
-        [Range(0, 1000, ErrorMessage = "As proteínas devem estar entre 0 e 1000g.")]
+        [Range(0, 1000)]
         [Display(Name = "Proteínas (g)")]
         public decimal Proteinas { get; set; }
 
-        [Required(ErrorMessage = "Os hidratos de carbono são obrigatórios.")]
-        [Range(0, 1000, ErrorMessage = "Os hidratos de carbono devem estar entre 0 e 1000g.")]
-        [Display(Name = "Hidratos de Carbono (g)")]
+        [Range(0, 1000)]
+        [Display(Name = "Carboidratos (g)")]
         public decimal HidratosCarbono { get; set; }
 
-        [Required(ErrorMessage = "As gorduras são obrigatórias.")]
-        [Range(0, 1000, ErrorMessage = "As gorduras devem estar entre 0 e 1000g.")]
+        [Range(0, 1000)]
         [Display(Name = "Gorduras (g)")]
         public decimal Gorduras { get; set; }
 
-        public ICollection<ComponentesDaReceita>? Componentes { get; set; }
+        public List<int> ComponentesReceitaId { get; set; } = new List<int>();
+        public List<int> RestricoesAlimentarId { get; set; } = new List<int>();
 
+        // Relação 1:N com componentes
+        public ICollection<ComponenteReceita> Componentes { get; set; } = new List<ComponenteReceita>();
+
+        // Relação N:N com restrições alimentares
         public ICollection<RestricaoAlimentar>? RestricoesAlimentares { get; set; }
-
-        //public ICollection<Alergia> RestricaoAlergias { get; set; } --> Quando implementar restrições alimentares
-
-        //public ICollection<CategoriaAlimento> CategoriasAlimentos { get; set; } --> Quando implementar categorias
-
     }
 }
