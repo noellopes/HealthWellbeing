@@ -48,7 +48,7 @@ namespace HealthWellbeing.Controllers
         // GET: Alergias/Create
         public IActionResult Create()
         {
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId");
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alergia.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
             return View(alergia);
         }
 
@@ -82,7 +82,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alergia.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
             return View(alergia);
         }
 
@@ -118,7 +118,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alergia.AlimentoId);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
             return View(alergia);
         }
 

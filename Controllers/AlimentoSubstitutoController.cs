@@ -49,8 +49,8 @@ namespace HealthWellbeing.Controllers
         // GET: AlimentoSubstituto/Create
         public IActionResult Create()
         {
-            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId");
-            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId");
+            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
+            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
             return View();
         }
 
@@ -67,8 +67,8 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoOriginalId);
-            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoSubstitutoRefId);
+            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
+            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
             return View(alimentoSubstituto);
         }
 
@@ -85,8 +85,8 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoOriginalId);
-            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoSubstitutoRefId);
+            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
+            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
             return View(alimentoSubstituto);
         }
 
@@ -122,8 +122,8 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoOriginalId);
-            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "AlimentoId", alimentoSubstituto.AlimentoSubstitutoRefId);
+            ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
+            ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
             return View(alimentoSubstituto);
         }
 
