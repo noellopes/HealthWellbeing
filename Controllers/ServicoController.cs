@@ -46,6 +46,7 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Create
         public IActionResult Create()
         {
+            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
             return View();
         }
 
@@ -56,6 +57,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] ServicoModel servicoModel)
         {
+
             if (ModelState.IsValid)
             {
                 _context.Add(servicoModel);

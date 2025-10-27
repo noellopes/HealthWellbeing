@@ -127,7 +127,7 @@ namespace HealthWellbeing.Data.Migrations
                     b.ToTable("Terapeutas");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServico", b =>
                 {
                     b.Property<int>("TipoServicoId")
                         .ValueGeneratedOnAdd()
@@ -441,7 +441,7 @@ namespace HealthWellbeing.Data.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.ServicoModel", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.TipoServicoModel", "TipoServico")
+                    b.HasOne("HealthWellbeing.Models.TipoServico", "TipoServico")
                         .WithMany("Servicos")
                         .HasForeignKey("TipoServicoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -511,7 +511,7 @@ namespace HealthWellbeing.Data.Migrations
                     b.Navigation("Agendamentos");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServico", b =>
                 {
                     b.Navigation("Servicos");
                 });
