@@ -12,25 +12,25 @@
     <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            
+
             <div class="form-group mb-3">
                 <label asp-for="Nome" class="control-label"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
-            
+
             <div class="form-group mb-3">
                 <label asp-for="Descricao" class="control-label"></label>
                 <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
-            
+
             <div class="form-group mb-3">
                 <label asp-for="ModoPreparo" class="control-label"></label>
                 <textarea asp-for="ModoPreparo" class="form-control" rows="8"></textarea>
                 <span asp-validation-for="ModoPreparo" class="text-danger"></span>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-3">
@@ -39,19 +39,20 @@
                         <span asp-validation-for="TempoPreparo" class="text-danger"></span>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="Porcoes" class="control-label"></label>
                         <input asp-for="Porcoes" class="form-control" type="number" />
                         <span asp-validation-for="Porcoes" class="text-danger"></span>
-                        <small class="form-text text-muted">Uma porção é a quantidade que uma pessoa normalmente consome numa refeição</small>
+                        <small class="form-text text-muted">Uma porção é a quantidade que uma pessoa normalmente consome
+                            numa refeição</small>
                     </div>
                 </div>
             </div>
-            
+
             <h5 class="mt-4 mb-3">Informação Nutricional (por porção)</h5>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-3">
@@ -60,7 +61,7 @@
                         <span asp-validation-for="CaloriasPorPorcao" class="text-danger"></span>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="Proteinas" class="control-label"></label>
@@ -69,7 +70,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-3">
@@ -78,7 +79,7 @@
                         <span asp-validation-for="HidratosCarbono" class="text-danger"></span>
                     </div>
                 </div>
-                
+
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="Gorduras" class="control-label"></label>
@@ -87,21 +88,7 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="form-group mb-3">
-                <label>Restrições Alimentares</label>
-                <select multiple name="selectedRestricaoIds" class="form-control">
-                    @if (ViewData["Restricoes"] is MultiSelectList restricoes)
-                    {
-                        foreach (var item in restricoes)
-                        {
-                            <option value="@item.Value">@item.Text</option>
-                        }
-                    }
-                </select>
-                <small class="form-text text-muted">Selecione as restrições alimentares aplicáveis à receita</small>
-            </div>
-            
+
             <div class="form-group mb-3">
                 <label>Componentes da Receita</label>
                 <select multiple name="selectedComponenteIds" class="form-control">
@@ -115,7 +102,21 @@
                 </select>
                 <small class="form-text text-muted">Selecione os componentes existentes para adicionar à receita</small>
             </div>
-            
+
+            <div class="form-group mb-3">
+                <label>Restrições Alimentares</label>
+                <select multiple name="selectedRestricaoIds" class="form-control">
+                    @if (ViewData["Restricoes"] is MultiSelectList restricoes)
+                    {
+                        foreach (var item in restricoes)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Selecione as restrições alimentares aplicáveis à receita</small>
+            </div>
+
             <div class="form-group mt-4">
                 <input type="submit" value="Criar" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
@@ -125,5 +126,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
