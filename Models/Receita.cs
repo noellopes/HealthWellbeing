@@ -60,7 +60,7 @@ namespace HealthWellbeing.Models
         [Display(Name = "Sem Lactose")]
         public bool IsLactoseFree { get; set; }
 
-        //public ICollection<ComponenteReceita> Componentes { get; set; } --> Quando implementar componentes da receita
+        public ICollection<ComponentesDaReceita> Componentes { get; set; }
 
         //public ICollection<Alergia> RestricaoAlergias { get; set; } --> Quando implementar restrições alimentares
 

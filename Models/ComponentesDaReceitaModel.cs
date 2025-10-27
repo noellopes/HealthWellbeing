@@ -8,11 +8,11 @@ namespace HealthWellbeing.Models
         [Key]
         public int ComponentesDaReceitaId { get; set; }
 
-        [Required(ErrorMessage = "O ID da receita e obrigatorio.")]
+        [Required]
+        [ForeignKey(nameof(Receita))]
         [Display(Name = "ID da Receita")]
         public int ReceitaId { get; set; }
 
-        [ForeignKey(nameof(ReceitaId))]
         public Receita? Receita { get; set; }
 
         [Required(ErrorMessage = "O nome do componente e obrigatorio.")]
@@ -30,7 +30,7 @@ namespace HealthWellbeing.Models
         public string UnidadeMedida { get; set; } = string.Empty;
 
         [Display(Name = "Quantidade")]
-        [Range(typeof(decimal), "0.0001", "9999999999", ErrorMessage = "A quantidade deve ser maior que zero.")]
+        [Range(typeof(decimal), "0", "9999999999", ErrorMessage = "A quantidade deve ser maior que zero.")]
         public decimal Quantidade { get; set; }
 
         [Display(Name = "Calorias")]
