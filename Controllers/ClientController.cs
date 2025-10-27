@@ -59,8 +59,6 @@ namespace HealthWellbeing.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				//client.Name = client.Name.Trim();
-
 				// Geração do ClientID aqui, ANTES de adicionar ao DBContext
 				client.ClientId = Guid.NewGuid().ToString("N");
 				client.RegistrationDate = DateTime.Now; // Defina a data de registo aqui também
