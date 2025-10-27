@@ -56,5 +56,8 @@ namespace HealthWellbeing.Data
             modelBuilder.Entity<FoodPortion>().Property(p => p.FoodName).HasMaxLength(60).IsRequired();
             modelBuilder.Entity<FoodPortion>().Property(p => p.Amount).HasMaxLength(30).IsRequired();
         }
+        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
     }
 }

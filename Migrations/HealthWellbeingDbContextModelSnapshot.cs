@@ -90,6 +90,32 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("FoodCategory");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.FoodPortion", b =>
+                {
+                    b.Property<int>("FoodPortionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodPortionId"));
+
+                    b.Property<string>("Amount")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("FoodName")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.HasKey("FoodPortionId");
+
+                    b.HasIndex("FoodName", "Amount")
+                        .IsUnique();
+
+                    b.ToTable("FoodPortion");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Objective", b =>
                 {
                     b.Property<int>("ObjectiveId")
@@ -113,6 +139,9 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(120)");
 
                     b.HasKey("ObjectiveId");
+
+                    b.HasIndex("Name", "Category")
+                        .IsUnique();
 
                     b.ToTable("Objective");
                 });
