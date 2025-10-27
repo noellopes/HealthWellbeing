@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
             return View(await _context.Doctor.ToListAsync());
         }
 
-        // GET: Doctors/Details/5
+        // GET: Doctors/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -50,22 +50,24 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Doctors/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdMedico,Nome,Telemovel,Email")] Doctor doctor)
         {
             if (ModelState.IsValid)
             {
+                
                 _context.Add(doctor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(doctor);
+
+
+           
         }
 
-        // GET: Doctors/Edit/5
+        // GET: Doctors/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,9 +83,7 @@ namespace HealthWellbeing.Controllers
             return View(doctor);
         }
 
-        // POST: Doctors/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Doctors/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdMedico,Nome,Telemovel,Email")] Doctor doctor)
@@ -116,7 +116,7 @@ namespace HealthWellbeing.Controllers
             return View(doctor);
         }
 
-        // GET: Doctors/Delete/5
+        // GET: 
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -134,7 +134,7 @@ namespace HealthWellbeing.Controllers
             return View(doctor);
         }
 
-        // POST: Doctors/Delete/5
+        // POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
