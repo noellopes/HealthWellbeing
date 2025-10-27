@@ -54,7 +54,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,Quantity,SalaId,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,CreatedDate")] Equipment equipment)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,Quantity,SalaId,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,CreatedDate")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
             {

@@ -6,50 +6,62 @@
 
 <h3>@ViewData["Title"]</h3>
 
-<br />
-
-<p class="d-flex justify-content-end">
-    <a class="btn btn-primary" asp-action="Create">Novo</a>
+<p class="text-end">
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Criar Novo</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SalaId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SalaId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.EquipmentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.EquipmentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EquipmentId">Delete</a>
-            </td>
-        </tr>
+
+@{
+    if(!Model.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">Nenhum Equipamento!</h4>
+            <p>Não existe nenhum equipamento cadastrado, para adicionar equipamentos crie novos.</p>
+        </div>
+    } else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Nome
+                    </th>
+                    <th>
+                        Quantidade
+                    </th>
+                    <th>
+                        Nº Série
+                    </th>
+                    <th>
+                        Data compra
+                    </th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SerialNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PurchaseDate)
+                    </td>
+                    <td class="text-end">
+                            <a class="btn btn-dark" asp-action="Edit" asp-route-id="@item.EquipmentId"><i class="bi bi-pencil-fill"></i> Editar</a>
+                            <a class="btn btn-info" asp-action="Details" asp-route-id="@item.EquipmentId"><i class="bi bi-eye"></i> Detalhes</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.EquipmentId"><i class="bi bi-trash"></i> Eliminar</a>
+                    </td>
+                </tr>
+        }
+            </tbody>
+        </table>
+    }
 }
-    </tbody>
-</table>
+
+
