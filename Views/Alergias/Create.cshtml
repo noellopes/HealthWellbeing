@@ -24,7 +24,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="Gravidade" class="control-label"></label>
-                <input asp-for="Gravidade" class="form-control" />
+                <select asp-for="Gravidade" class="form-control" asp-items="Html.GetEnumSelectList<GravidadeAlergia>()">
+                    <option value="">-- Selecione a Gravidade --</option>
+                </select>
                 <span asp-validation-for="Gravidade" class="text-danger"></span>
             </div>
             <div class="form-group">
