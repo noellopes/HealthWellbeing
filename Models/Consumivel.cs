@@ -12,7 +12,7 @@ public class Consumivel
 
 }
 
-public static class Repository
+public static class ConsumivelRepository
 {
     private static List<Consumivel> consumiveis = new();
 
