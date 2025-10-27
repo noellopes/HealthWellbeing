@@ -1,20 +1,17 @@
-﻿@model IEnumerable<HealthWellbeing.Models.ComponentesDaReceita>
+﻿@model IEnumerable<HealthWellbeing.Models.Receita>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Componentes da Receita</h1>
+<h1>Index</h1>
 
 <p>
-<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
+    <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Receita)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Nome)
             </th>
@@ -22,10 +19,13 @@
                 @Html.DisplayNameFor(model => model.Descricao)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnidadeMedida)
+                @Html.DisplayNameFor(model => model.ModoPreparo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantidade)
+                @Html.DisplayNameFor(model => model.TempoPreparo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Porcoes)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Calorias)
@@ -40,7 +40,10 @@
                 @Html.DisplayNameFor(model => model.Gorduras)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsOpcional)
+                @Html.DisplayNameFor(model => model.ComponentesReceitaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RestricoesAlimentarId)
             </th>
             <th></th>
         </tr>
@@ -49,19 +52,19 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Receita.ModoPreparo)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Nome)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Descricao)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UnidadeMedida)
+                @Html.DisplayFor(modelItem => item.ModoPreparo)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Quantidade)
+                @Html.DisplayFor(modelItem => item.TempoPreparo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Porcoes)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Calorias)
@@ -76,16 +79,15 @@
                 @Html.DisplayFor(modelItem => item.Gorduras)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsOpcional)
+                @Html.DisplayFor(modelItem => item.ComponentesReceitaId)
             </td>
             <td>
-
-                 <a asp-action="Details" asp-route-id="@item.ComponentesDaReceitaId"
-                            class="btn btn-sm btn-secondary ms-1">Ver</a>
-                        <a asp-action="Edit" asp-route-id="@item.ComponentesDaReceitaId"
-                            class="btn btn-sm btn-warning ms-1 ">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.ComponentesDaReceitaId"
-                            class="btn btn-sm btn-danger ms-1">Apagar</a>
+                @Html.DisplayFor(modelItem => item.RestricoesAlimentarId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ReceitaId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ReceitaId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ReceitaId">Delete</a>
             </td>
         </tr>
 }

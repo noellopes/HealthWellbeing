@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.ComponentesDaReceita
+﻿@model HealthWellbeing.Models.Receita
 
 @{
     ViewData["Title"] = "Delete";
@@ -8,15 +8,9 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>ComponentesDaReceita</h4>
+    <h4>Receita</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Receita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Receita.ModoPreparo)
-        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
@@ -30,16 +24,22 @@
             @Html.DisplayFor(model => model.Descricao)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UnidadeMedida)
+            @Html.DisplayNameFor(model => model.ModoPreparo)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UnidadeMedida)
+            @Html.DisplayFor(model => model.ModoPreparo)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantidade)
+            @Html.DisplayNameFor(model => model.TempoPreparo)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantidade)
+            @Html.DisplayFor(model => model.TempoPreparo)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Porcoes)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Porcoes)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Calorias)
@@ -66,15 +66,21 @@
             @Html.DisplayFor(model => model.Gorduras)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsOpcional)
+            @Html.DisplayNameFor(model => model.ComponentesReceitaId)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsOpcional)
+            @Html.DisplayFor(model => model.ComponentesReceitaId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RestricoesAlimentarId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RestricoesAlimentarId)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="ComponentesDaReceitaId" />
+        <input type="hidden" asp-for="ReceitaId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
