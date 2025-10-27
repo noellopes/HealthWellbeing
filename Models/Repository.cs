@@ -10,7 +10,7 @@ namespace HealthWellbeing.Models
 		public static void AddClient(Client client) => clients.Add(client);
 
 		public static IEnumerable<Client> GetAllClients() => clients;
-	}
+	
 
 		// Members
 
