@@ -2,11 +2,11 @@
 
 namespace HealthWellbeing.Models
 {
-    public class TipodeTratamento
+    public class TreatmentType
     {
 
         //Propriedades
-        public int TipoTratamentoId { get; set; }
+        public int TreatmentTypeId { get; set; }
 
         [Required(ErrorMessage = "Name is Required!!")]
         public string Name { get; set; }
@@ -18,8 +18,7 @@ namespace HealthWellbeing.Models
         public int EstimatedDuration { get; set; }
 
         [Required(ErrorMessage = "Priority is Required!!")]
-        public string Priority { get; set; }    //Se é Urgente, Normal, Rotina
-
+        public string? Priority { get; set; }         //Se é Urgente, Normal, Rotina
 
     }
 
