@@ -1,0 +1,54 @@
+﻿@model HealthWellbeing.Models.Consumivel
+
+@{
+    ViewData["Title"] = "Editar Consumível";
+}
+
+<h1>Editar Consumível</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ConsumivelId" />
+
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label"></label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Categoria" class="form-label"></label>
+        <input asp-for="Categoria" class="form-control" />
+        <span asp-validation-for="Categoria" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ZonaArmazenamento" class="form-label"></label>
+        <input asp-for="ZonaArmazenamento" class="form-control" />
+        <span asp-validation-for="ZonaArmazenamento" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Stock" class="form-label"></label>
+        <input asp-for="Stock" class="form-control" type="number" min="0" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SalaId" class="form-label"></label>
+        <select asp-for="SalaId" class="form-select" asp-items="ViewBag.SalaId"></select>
+        <span asp-validation-for="SalaId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Fornecedores" class="form-label">Fornecedores</label>
+        <input asp-for="Fornecedores" class="form-control" placeholder="Separar por vírgulas" />
+        <span asp-validation-for="Fornecedores" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
