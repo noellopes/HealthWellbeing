@@ -19,5 +19,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.UtenteSaude> UtenteSaude { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Consulta> Consulta { get; set; } = default!;
 
+        public DbSet<HealthWellbeing.Models.Doctor> Doctor{ get; set; } = default!;
     }
 }
