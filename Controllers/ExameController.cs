@@ -1,20 +1,21 @@
-﻿using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellBeing.Data;
-using HealthWellBeing.Models;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+
+// 1. CORRIGIDO: Usa o namespace correto para o DbContext
+using HealthWellbeing.Data;
+// 2. Onde estão os modelos
+using HealthWellBeing.Models;
 
 namespace HealthWellBeing.Controllers
 {
     public class ExamesController : Controller
     {
         // Injeção de Dependência do DbContext
-        private readonly HealthWellBeingContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public ExamesController(HealthWellBeingContext context)
+        public ExamesController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -41,7 +42,7 @@ namespace HealthWellBeing.Controllers
                 .Include(e => e.Utente)
                 .Include(e => e.ExameTipo)
                 .Include(e => e.MedicoSolicitante)
-                .Include(e => e.SalaDeExames)
+                .Include(e => e.SalaDeExame)
                 .Include(e => e.ProfissionalExecutante)
                 .Include(e => e.MaterialEquipamentoAssociado)
                 .FirstOrDefaultAsync(m => m.ExameId == id); // Usa ExameId para a chave
@@ -60,7 +61,7 @@ namespace HealthWellBeing.Controllers
             ViewData["MedicoId"] = new SelectList(_context.Medicos, "MedicoId", "Nome");
 
             // Outras relações que podem ser escolhidas no formulário
-            ViewData["SalaId"] = new SelectList(_context.SalasDeExames, "SalaId", "TipoDeSala");
+            ViewData["SalaId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoDeSala");
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionaisExecutantes, "ProfissionalExecutanteId", "Nome");
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "NomeEquipamento");
 
@@ -88,7 +89,7 @@ namespace HealthWellBeing.Controllers
             ViewData["UtenteId"] = new SelectList(_context.Utentes, "UtenteId", "NomeCompleto", exame.UtenteId);
             ViewData["ExameTipoId"] = new SelectList(_context.ExameTipos, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MedicoId"] = new SelectList(_context.Medicos, "MedicoId", "Nome", exame.MedicoId);
-            ViewData["SalaId"] = new SelectList(_context.SalasDeExames, "SalaId", "TipoDeSala", exame.SalaId);
+            ViewData["SalaId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoDeSala", exame.SalaDeExameId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionaisExecutantes, "ProfissionalExecutanteId", "Nome", exame.ProfissionalExecutanteId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "NomeEquipamento", exame.MaterialEquipamentoAssociadoId);
 
@@ -108,7 +109,7 @@ namespace HealthWellBeing.Controllers
             ViewData["UtenteId"] = new SelectList(_context.Utentes, "UtenteId", "NomeCompleto", exame.UtenteId);
             ViewData["ExameTipoId"] = new SelectList(_context.ExameTipos, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MedicoId"] = new SelectList(_context.Medicos, "MedicoId", "Nome", exame.MedicoId);
-            ViewData["SalaId"] = new SelectList(_context.SalasDeExames, "SalaId", "TipoDeSala", exame.SalaId);
+            ViewData["SalaId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoDeSala", exame.SalaDeExameId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionaisExecutantes, "ProfissionalExecutanteId", "Nome", exame.ProfissionalExecutanteId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "NomeEquipamento", exame.MaterialEquipamentoAssociadoId);
 
@@ -144,7 +145,7 @@ namespace HealthWellBeing.Controllers
             ViewData["UtenteId"] = new SelectList(_context.Utentes, "UtenteId", "NomeCompleto", exame.UtenteId);
             ViewData["ExameTipoId"] = new SelectList(_context.ExameTipos, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MedicoId"] = new SelectList(_context.Medicos, "MedicoId", "Nome", exame.MedicoId);
-            ViewData["SalaId"] = new SelectList(_context.SalasDeExames, "SalaId", "TipoDeSala", exame.SalaId);
+            ViewData["SalaId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoDeSala", exame.SalaDeExameId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionaisExecutantes, "ProfissionalExecutanteId", "Nome", exame.ProfissionalExecutanteId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "NomeEquipamento", exame.MaterialEquipamentoAssociadoId);
 

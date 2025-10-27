@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Models
 {
-    public class Sala
+    public class SalaDeExames
     {
         public int SalaId { get; set; }
 
