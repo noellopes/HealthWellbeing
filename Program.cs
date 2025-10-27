@@ -15,7 +15,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<IEventTypeRepository, EventTypeFakeRepository>();
+builder.Services.AddTransient<IEventTypeRepository, EventTypeEFRepository>();
 
 var app = builder.Build();
 
