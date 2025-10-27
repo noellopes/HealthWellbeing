@@ -1,0 +1,41 @@
+﻿@model IEnumerable<HealthWellbeing.Models.TipoTreino>
+
+@{
+    ViewData["Title"] = "Tipos de Treino";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Criar Novo Tipo de Treino</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Duração (min)</th>
+            <th>Intensidade</th>
+            <th>Ativo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nome</td>
+                <td>@item.Descricao</td>
+                <td>@item.DuracaoMinutos</td>
+                <td>@item.Intensidade</td>
+                <td>@(item.Ativo ? "Sim" : "Não")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.TipoTreinoId" class="btn btn-info btn-sm">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@item.TipoTreinoId" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.TipoTreinoId" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

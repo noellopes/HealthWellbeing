@@ -11,6 +11,7 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+        public DbSet<TipoTreino> TipoTreinos { get; set; }
     }
 }
 
