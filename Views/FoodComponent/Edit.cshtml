@@ -1,0 +1,21 @@
+﻿@model HealthWellbeing.Models.FoodComponent
+
+@{
+    ViewData["Title"] = "Delete Food Component";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this food component?
+    <br />
+    <strong>Name:</strong> @Model.Name
+    <br />
+    <strong>Description:</strong> @Model.Description
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.FoodComponentId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
+</form>

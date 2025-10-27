@@ -20,5 +20,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.FoodCategory> FoodCategory { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Objective> Objective { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodPortion> FoodPortion { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.FoodComponent> FoodComponent { get; set; } = default!;
     }
 }

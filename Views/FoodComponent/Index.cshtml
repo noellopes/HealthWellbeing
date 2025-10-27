@@ -1,0 +1,51 @@
+﻿@model IEnumerable<HealthWellbeing.Models.FoodComponent>
+
+@{
+    ViewData["Title"] = "Food Components List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<p>
+    <a href="@Url.Action("Create")" class="btn btn-primary">Create New Food Component</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.FoodComponentId</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>
+                    <a href="@Url.Action("Details", new { id = item.FoodComponentId })" class="btn btn-info">Details</a>
+                    <a href="@Url.Action("Edit", new { id = item.FoodComponentId })" class="btn btn-warning">Edit</a>
+                    <a href="@Url.Action("Delete", new { id = item.FoodComponentId })" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
