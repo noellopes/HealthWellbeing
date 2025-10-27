@@ -36,7 +36,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var treatmentType = await _context.TreatmentType
-                .FirstOrDefaultAsync(m => m.TreatmentTypeId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (treatmentType == null)
             {
                 return NotFound();
@@ -56,7 +56,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TreatmentTypeId,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
         {
             if (ModelState.IsValid)
             {
@@ -88,9 +88,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TreatmentTypeId,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
         {
-            if (id != treatmentType.TreatmentTypeId)
+            if (id != treatmentType.Id)
             {
                 return NotFound();
             }
@@ -104,7 +104,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TreatmentTypeExists(treatmentType.TreatmentTypeId))
+                    if (!TreatmentTypeExists(treatmentType.Id))
                     {
                         return NotFound();
                     }
@@ -127,7 +127,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var treatmentType = await _context.TreatmentType
-                .FirstOrDefaultAsync(m => m.TreatmentTypeId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (treatmentType == null)
             {
                 return NotFound();
@@ -153,7 +153,7 @@ namespace HealthWellbeing.Controllers
 
         private bool TreatmentTypeExists(int id)
         {
-            return _context.TreatmentType.Any(e => e.TreatmentTypeId == id);
+            return _context.TreatmentType.Any(e => e.Id == id);
         }
     }
 }

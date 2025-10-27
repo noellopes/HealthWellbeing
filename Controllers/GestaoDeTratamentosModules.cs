@@ -6,7 +6,7 @@ namespace HealthWellbeing.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return View("~/Views/Shared/Group1/Index.cshtml");
         }
     }
 }

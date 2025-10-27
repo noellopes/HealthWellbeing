@@ -6,16 +6,17 @@ namespace HealthWellbeing.Models
     {
 
         //Propriedades
-        public int TreatmentTypeId { get; set; }
+        [Key]
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is Required!!")]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [Required(ErrorMessage = "Description is Required!!")]
-        public string Description { get; set; }
+        public required string Description { get; set; }
 
         [Required(ErrorMessage = "EstimatedDuration is Required!!")]
-        public int EstimatedDuration { get; set; }
+        public required int EstimatedDuration { get; set; }
 
         [Required(ErrorMessage = "Priority is Required!!")]
         public string? Priority { get; set; }         //Se é Urgente, Normal, Rotina

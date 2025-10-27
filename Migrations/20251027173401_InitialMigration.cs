@@ -1,20 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class RenamePathologyId : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "PathologyId",
-                table: "Pathology",
-                newName: "Id");
-
             migrationBuilder.CreateTable(
                 name: "CategoriaAlimento",
                 columns: table => new
@@ -27,6 +23,40 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoriaAlimento", x => x.CategoriaID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Nurse",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProfessionalLicense = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Nurse", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pathology",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Severity = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pathology", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,6 +100,22 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TreatmentType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EstimatedDuration = table.Column<int>(type: "int", nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TreatmentType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alimento",
                 columns: table => new
                 {
@@ -92,6 +138,44 @@ namespace HealthWellbeing.Migrations
                         column: x => x.CategoriaAlimentoId,
                         principalTable: "CategoriaAlimento",
                         principalColumn: "CategoriaID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TreatmentRecord",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NurseId = table.Column<int>(type: "int", nullable: false),
+                    TreatmentId = table.Column<int>(type: "int", nullable: false),
+                    PathologyId = table.Column<int>(type: "int", nullable: true),
+                    TreatmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DurationMinutes = table.Column<int>(type: "int", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Result = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TreatmentRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_Nurse_NurseId",
+                        column: x => x.NurseId,
+                        principalTable: "Nurse",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_Pathology_PathologyId",
+                        column: x => x.PathologyId,
+                        principalTable: "Pathology",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_TreatmentType_TreatmentId",
+                        column: x => x.TreatmentId,
+                        principalTable: "TreatmentType",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -126,6 +210,21 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Alimento_CategoriaAlimentoId",
                 table: "Alimento",
                 column: "CategoriaAlimentoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_NurseId",
+                table: "TreatmentRecord",
+                column: "NurseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_PathologyId",
+                table: "TreatmentRecord",
+                column: "PathologyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_TreatmentId",
+                table: "TreatmentRecord",
+                column: "TreatmentId");
         }
 
         /// <inheritdoc />
@@ -141,15 +240,22 @@ namespace HealthWellbeing.Migrations
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
+                name: "TreatmentRecord");
+
+            migrationBuilder.DropTable(
                 name: "Alimento");
 
             migrationBuilder.DropTable(
-                name: "CategoriaAlimento");
+                name: "Nurse");
 
-            migrationBuilder.RenameColumn(
-                name: "Id",
-                table: "Pathology",
-                newName: "PathologyId");
+            migrationBuilder.DropTable(
+                name: "Pathology");
+
+            migrationBuilder.DropTable(
+                name: "TreatmentType");
+
+            migrationBuilder.DropTable(
+                name: "CategoriaAlimento");
         }
     }
 }

@@ -4,6 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class Nurse
     {
+        [Key]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
