@@ -4,6 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class SalaDeExames
     {
+        [Key]
         public int SalaId { get; set; }
 
         [Required(ErrorMessage = "O Tipo de sala é obrigatória")]
