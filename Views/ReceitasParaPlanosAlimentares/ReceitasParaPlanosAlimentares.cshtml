@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Receitas Para Planos Alimentares";
+}
+
+<h1 class="text-center mt-4">Gerenciar Receitas e Dados Relacionados</h1>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="row g-4 text-center">
+
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Alergias")" class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                        <h4>Alergias</h4>
+                        <p>Gerenciar registros de alergias alimentares</p>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "AlimentoSubstituto")" class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
+                        <h4>Alimentos Substitutos</h4>
+                        <p>Definir alimentos alternativos em planos</p>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "Receita")"
+                        class="btn btn-outline-warning w-100 p-4 shadow-sm rounded-3">
+                        <h4>Receitas</h4>
+                        <p>Cadastrar e editar receitas disponíveis</p>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "RestricaoAlimentar")" class="btn btn-outline-danger w-100 p-4 shadow-sm rounded-3">
+                        <h4>Restrições Alimentares</h4>
+                        <p>Gerenciar restrições de pacientes e planos</p>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@Url.Action("Index", "ComponenteReceita")"
+                        class="btn btn-outline-info w-100 p-4 shadow-sm rounded-3">
+                        <h4>Componentes da Receita</h4>
+                        <p>Gerenciar ingredientes e proporções das receitas</p>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

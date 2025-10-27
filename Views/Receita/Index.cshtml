@@ -1,0 +1,98 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Receita>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Receitas</h1>
+<p>
+<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descricao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModoPreparo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TempoPreparo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Porcoes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Calorias)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Proteinas)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HidratosCarbono)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gorduras)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ComponentesReceitaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RestricoesAlimentarId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descricao)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModoPreparo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TempoPreparo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Porcoes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Calorias)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Proteinas)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HidratosCarbono)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gorduras)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ComponentesReceitaId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RestricoesAlimentarId)
+                </td>
+                <td>
+
+                    <div class="btn-group" role="group">
+
+                        <a asp-action="Details" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-secondary ms-1">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-warning ms-1 ">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-danger ms-1">Apagar</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

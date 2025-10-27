@@ -22,7 +22,8 @@ namespace HealthWellbeing.Controllers
         // GET: RestricaoAlimentar
         public async Task<IActionResult> Index()
         {
-            return View(await _context.RestricaoAlimentar.ToListAsync());
+            var dbContext = _context.RestricaoAlimentar.Include(r => r.Alimento);
+            return View(await dbContext.ToListAsync());
         }
 
         // GET: RestricaoAlimentar/Details/5
@@ -34,7 +35,8 @@ namespace HealthWellbeing.Controllers
             }
 
             var restricaoAlimentar = await _context.RestricaoAlimentar
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(r => r.Alimento)
+                .FirstOrDefaultAsync(m => m.RestricaoAlimentarId == id);
             if (restricaoAlimentar == null)
             {
                 return NotFound();
@@ -46,13 +48,14 @@ namespace HealthWellbeing.Controllers
         // GET: RestricaoAlimentar/Create
         public IActionResult Create()
         {
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
             return View();
         }
 
         // POST: RestricaoAlimentar/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Tipo,Gravidade,Sintomas")] RestricaoAlimentar restricaoAlimentar)
+        public async Task<IActionResult> Create([Bind("RestricaoAlimentarId,Nome,Tipo,Gravidade,Descricao,AlimentoId")] RestricaoAlimentar restricaoAlimentar)
         {
             if (ModelState.IsValid)
             {
@@ -60,6 +63,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
@@ -76,15 +80,16 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
         // POST: RestricaoAlimentar/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Tipo,Gravidade,Sintomas")] RestricaoAlimentar restricaoAlimentar)
+        public async Task<IActionResult> Edit(int id, [Bind("RestricaoAlimentarId,Nome,Tipo,Gravidade,Descricao,AlimentoId")] RestricaoAlimentar restricaoAlimentar)
         {
-            if (id != restricaoAlimentar.Id)
+            if (id != restricaoAlimentar.RestricaoAlimentarId)
             {
                 return NotFound();
             }
@@ -98,7 +103,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RestricaoAlimentarExists(restricaoAlimentar.Id))
+                    if (!RestricaoAlimentarExists(restricaoAlimentar.RestricaoAlimentarId))
                     {
                         return NotFound();
                     }
@@ -109,6 +114,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", restricaoAlimentar.AlimentoId);
             return View(restricaoAlimentar);
         }
 
@@ -121,7 +127,8 @@ namespace HealthWellbeing.Controllers
             }
 
             var restricaoAlimentar = await _context.RestricaoAlimentar
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(r => r.Alimento)
+                .FirstOrDefaultAsync(m => m.RestricaoAlimentarId == id);
             if (restricaoAlimentar == null)
             {
                 return NotFound();
@@ -147,7 +154,7 @@ namespace HealthWellbeing.Controllers
 
         private bool RestricaoAlimentarExists(int id)
         {
-            return _context.RestricaoAlimentar.Any(e => e.Id == id);
+            return _context.RestricaoAlimentar.Any(e => e.RestricaoAlimentarId == id);
         }
     }
 }

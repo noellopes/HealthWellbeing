@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,22 +10,23 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ReceitasController : Controller
+    public class ComponenteReceitaController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public ReceitasController(HealthWellbeingDbContext context)
+        public ComponenteReceitaController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: Receitas
+        // GET: ComponenteReceita
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Receita.ToListAsync());
+            var healthWellbeingDbContext = _context.ComponenteReceita.Include(c => c.Alimento);
+            return View(await healthWellbeingDbContext.ToListAsync());
         }
 
-        // GET: Receitas/Details/5
+        // GET: ComponenteReceita/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +34,42 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var receita = await _context.Receita
-                .FirstOrDefaultAsync(m => m.ReceitaId == id);
-            if (receita == null)
+            var componenteReceita = await _context.ComponenteReceita
+                .Include(c => c.Alimento)
+                .FirstOrDefaultAsync(m => m.ComponenteReceitaId == id);
+            if (componenteReceita == null)
             {
                 return NotFound();
             }
 
-            return View(receita);
+            return View(componenteReceita);
         }
 
-        // GET: Receitas/Create
+        // GET: ComponenteReceita/Create
         public IActionResult Create()
         {
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
             return View();
         }
 
-        // POST: Receitas/Create
+        // POST: ComponenteReceita/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Create([Bind("ComponenteReceitaId,AlimentoId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(receita);
+                _context.Add(componenteReceita);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(receita);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            return View(componenteReceita);
         }
 
-        // GET: Receitas/Edit/5
+        // GET: ComponenteReceita/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +77,23 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var receita = await _context.Receita.FindAsync(id);
-            if (receita == null)
+            var componenteReceita = await _context.ComponenteReceita.FindAsync(id);
+            if (componenteReceita == null)
             {
                 return NotFound();
             }
-            return View(receita);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            return View(componenteReceita);
         }
 
-        // POST: Receitas/Edit/5
+        // POST: ComponenteReceita/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Edit(int id, [Bind("ComponenteReceitaId,AlimentoId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
         {
-            if (id != receita.ReceitaId)
+            if (id != componenteReceita.ComponenteReceitaId)
             {
                 return NotFound();
             }
@@ -97,12 +102,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(receita);
+                    _context.Update(componenteReceita);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReceitaExists(receita.ReceitaId))
+                    if (!ComponenteReceitaExists(componenteReceita.ComponenteReceitaId))
                     {
                         return NotFound();
                     }
@@ -113,10 +118,11 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(receita);
+            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            return View(componenteReceita);
         }
 
-        // GET: Receitas/Delete/5
+        // GET: ComponenteReceita/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +130,35 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var receita = await _context.Receita
-                .FirstOrDefaultAsync(m => m.ReceitaId == id);
-            if (receita == null)
+            var componenteReceita = await _context.ComponenteReceita
+                .Include(c => c.Alimento)
+                .FirstOrDefaultAsync(m => m.ComponenteReceitaId == id);
+            if (componenteReceita == null)
             {
                 return NotFound();
             }
 
-            return View(receita);
+            return View(componenteReceita);
         }
 
-        // POST: Receitas/Delete/5
+        // POST: ComponenteReceita/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var receita = await _context.Receita.FindAsync(id);
-            if (receita != null)
+            var componenteReceita = await _context.ComponenteReceita.FindAsync(id);
+            if (componenteReceita != null)
             {
-                _context.Receita.Remove(receita);
+                _context.ComponenteReceita.Remove(componenteReceita);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReceitaExists(int id)
+        private bool ComponenteReceitaExists(int id)
         {
-            return _context.Receita.Any(e => e.ReceitaId == id);
+            return _context.ComponenteReceita.Any(e => e.ComponenteReceitaId == id);
         }
     }
 }
