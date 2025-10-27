@@ -22,7 +22,9 @@ namespace HealthWellbeing.Controllers
         // GET: Pathologies
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Pathology.ToListAsync());
+            ViewData["Title"] = "Lista de patologias";
+            ViewBag.Properties = new List<string> { "Name", "Description", "Severity" };
+            return View("~/Views/Shared/Group1/_ListViewLayout.cshtml", await _context.Pathology.ToListAsync());
         }
 
         // GET: Pathologies/Details/5
@@ -34,7 +36,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var pathology = await _context.Pathology
-                .FirstOrDefaultAsync(m => m.PathologyId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (pathology == null)
             {
                 return NotFound();
@@ -86,9 +88,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PathologyId,Name,Description,Severity")] Pathology pathology)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Severity")] Pathology pathology)
         {
-            if (id != pathology.PathologyId)
+            if (id != pathology.Id)
             {
                 return NotFound();
             }
@@ -102,7 +104,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PathologyExists(pathology.PathologyId))
+                    if (!PathologyExists(pathology.Id))
                     {
                         return NotFound();
                     }
@@ -125,7 +127,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var pathology = await _context.Pathology
-                .FirstOrDefaultAsync(m => m.PathologyId == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (pathology == null)
             {
                 return NotFound();
@@ -151,7 +153,7 @@ namespace HealthWellbeing.Controllers
 
         private bool PathologyExists(int id)
         {
-            return _context.Pathology.Any(e => e.PathologyId == id);
+            return _context.Pathology.Any(e => e.Id == id);
         }
     }
 }
