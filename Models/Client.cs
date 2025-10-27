@@ -9,7 +9,7 @@ namespace HealthWellbeing.Models
 
 		[Required(ErrorMessage = "First and last name are necessary.")]
 		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100.")]
-		[RegularExpression(@"^\p{L}+(\s\p{L}+)+$", ErrorMessage = "Introduce at least a First and Last name!")]
+		[RegularExpression(@"^[A-Za-zÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç]+(?:\s[A-Za-zÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç]+)+$", ErrorMessage = "Please introduce at least a First and Last name!")]
 		public string Name { get; set; } = string.Empty;
 
 		[Required(ErrorMessage = "Email address is required.")]

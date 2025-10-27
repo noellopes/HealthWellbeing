@@ -7,11 +7,9 @@ internal class SeedData
 	{
 		if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-		// Ensure the database and tables are created.
-		// Note: This is an alternative to migrations (Update-Database).
-		// For production, using migrations is generally preferred.
 		dbContext.Database.EnsureCreated();
 
+		//ADICIONAR OS POPULATES AQUI
 		PopulateClients(dbContext);
 	}
 
