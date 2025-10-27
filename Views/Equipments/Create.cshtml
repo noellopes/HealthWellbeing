@@ -1,61 +1,64 @@
 ﻿@model HealthWellbeingRoom.Models.Equipment
 
 @{
-    ViewData["Title"] = "Criar equipamento";
+    ViewData["Title"] = "Equipamento";
 }
 
-<h4>@ViewData["Title"]</h4>
-<p>Preencha os dados do novo equipamento.</p>
-<hr />
+<h3>Criar</h3>
 <form asp-action="Create">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <div class="card">
+        <div class="card-header bg-primary text-white">@ViewData["Title"]</div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Quantity" class="control-label"></label>
+                        <input asp-for="Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="SalaId" class="control-label"></label>
+                        <input asp-for="SalaId" class="form-control" />
+                        <span asp-validation-for="SalaId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                @*Posteriormente tenho que tirar isso da view, a data será carregada automaticamente*@
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="CreatedDate" class="control-label"></label>
+                        <input asp-for="CreatedDate" class="form-control" />
+                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                    </div>
+                </div>
+                @*fim remoção*@
+
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label asp-for="Quantity" class="control-label"></label>
-                <input asp-for="Quantity" class="form-control" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Description" class="control-label"></label>
-        <textarea asp-for="Description" class="form-control" ></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label asp-for="SalaId" class="control-label"></label>
-                <input asp-for="SalaId" class="form-control" />
-                <span asp-validation-for="SalaId" class="text-danger"></span>
-            </div>
-        </div>
-
-        @*Posteriormente tenho que tirar isso da view, a data será carregada automaticamente*@
-        <div class="col-md-6">
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-             </div>
-        </div>
-        @*fim remoção*@
-
-    </div>
-    <div class="form-group d-flex justify-content-end">
-        <input type="submit" value="Guardar" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </div>
+	</div>
+	<div class="text-end mt-3">
+		<input type="submit" value="Guardar" class="btn btn-success" />
+		<a asp-action="Index" class="btn btn-secondary">Voltar a Lista</a>
+	</div>
 </form>
 
 @section Scripts {
