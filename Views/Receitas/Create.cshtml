@@ -88,6 +88,34 @@
                 </div>
             </div>
             
+            <div class="form-group mb-3">
+                <label>Restrições Alimentares</label>
+                <select multiple name="selectedRestricaoIds" class="form-control">
+                    @if (ViewData["Restricoes"] is MultiSelectList restricoes)
+                    {
+                        foreach (var item in restricoes)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Selecione as restrições alimentares aplicáveis à receita</small>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label>Componentes da Receita</label>
+                <select multiple name="selectedComponenteIds" class="form-control">
+                    @if (ViewData["Componentes"] is MultiSelectList componentes)
+                    {
+                        foreach (var item in componentes)
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    }
+                </select>
+                <small class="form-text text-muted">Selecione os componentes existentes para adicionar à receita</small>
+            </div>
+            
             <div class="form-group mt-4">
                 <input type="submit" value="Criar" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
