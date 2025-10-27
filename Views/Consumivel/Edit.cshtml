@@ -41,12 +41,12 @@
 
     <div class="mb-3">
         <label asp-for="Fornecedores" class="form-label">Fornecedores</label>
-        <input asp-for="Fornecedores" class="form-control" placeholder="Separar por vírgulas" />
+        <input asp-for="Fornecedores" class="form-control" />
         <span asp-validation-for="Fornecedores" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+    <a asp-action="AdministrarConsumiveis" class="btn btn-secondary">Cancelar</a>
 </form>
 
 @section Scripts {

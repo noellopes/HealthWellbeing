@@ -63,5 +63,30 @@ namespace HealthWellbeing.Controllers
             if (a != null) _consumiveis.Remove(a);
             return RedirectToAction("AdministrarConsumiveis");
         }
+       
+        // EDITAR (GET)
+        public IActionResult Edit(int id)
+        {
+            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
+            if (c == null) return NotFound();
+            return View(c);
+        }
+
+        // EDITAR (POST)
+        [HttpPost]
+        public IActionResult Edit(Consumivel c)
+        {
+            var old = _consumiveis.FirstOrDefault(x => x.ConsumivelId == c.ConsumivelId);
+            if (old == null) return NotFound();
+
+            old.Nome = c.Nome;
+            old.Categoria = c.Categoria;
+            old.ZonaArmazenamento = c.ZonaArmazenamento;
+            old.Stock = c.Stock;
+            old.SalaId = c.SalaId;
+            old.Fornecedores = c.Fornecedores;
+
+            return RedirectToAction("AdministrarConsumiveis");
+        }
     }
 }
