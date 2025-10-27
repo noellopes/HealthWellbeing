@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ClientController : Controller
-    {
+	public class ClientController : Controller
+	{
 		// GET: /Client/Index
 		public IActionResult Index()
-        {
-            return View();
-        }
+		{
+			var clients = Repository.GetAllClients(); // obter lista da "tabela"
+			return View(clients);
+		}
+
+
 		// GET: /Client/Create
 		[HttpGet]
 		public IActionResult Create()
@@ -18,6 +21,8 @@ namespace HealthWellbeing.Controllers
 			return View();
 		}
 
+
+		// POST: /Client/Create
 		[HttpPost]
 		public IActionResult Create(Client client)
 		{
@@ -26,10 +31,11 @@ namespace HealthWellbeing.Controllers
 				return View();
 			}
 
-			Models.Repository.AddClient(client);
+			Repository.AddClient(client);
 
 			return View("CreateComplete", client);
 		}
+
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 		public IActionResult Error()
@@ -38,3 +44,4 @@ namespace HealthWellbeing.Controllers
 		}
 	}
 }
+

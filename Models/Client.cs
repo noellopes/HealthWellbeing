@@ -1,27 +1,41 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
-    public class Client
-    {
+	public class Client
+	{
+		[Key]
+		public string ClientID { get; set; } = string.Empty;
+
 		[Required(ErrorMessage = "First and last name are necessary.")]
-		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100")]
-		[RegularExpression(@"^[A-Za-zÀ-ÿ]+( [A-Za-zÀ-ÿ]+)+$", ErrorMessage = "Introduce at least a First and Last name!")]
-		public string Name { get; set; }
+		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100.")]
+		[RegularExpression(@"^\p{L}+(\s\p{L}+)+$", ErrorMessage = "Introduce at least a First and Last name!")]
+		public string Name { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "A Google mail address is required (@gmail)")]
-		[EmailAddress(ErrorMessage = "Enter a valid gmail address")]
-		[RegularExpression(@"^[a-zA-Z0-9._-]+@gmail\.com$", ErrorMessage = "Email must contain @gmail.com")]
-		public string Email { get; set; }
+		[Required(ErrorMessage = "Email address is required.")]
+		[EmailAddress(ErrorMessage = "Enter a valid email address.")]
+		[StringLength(100)]
+		public string Email { get; set; } = string.Empty;
 
-		[Required(ErrorMessage = "A Portuguese Phone Number is required")]
-		[Phone(ErrorMessage = "Enter a valid Portuguese Phone Number")]
-		[RegularExpression(@"^9[1236]\d{7}$", ErrorMessage = "The number has to start with 91, 92, 93 or 96...")]
-		public string Phone { get; set; }
+		[Required(ErrorMessage = "A phone number is required.")]
+		[Phone(ErrorMessage = "Enter a valid phone number.")]
+		[StringLength(15)]
+		public string Phone { get; set; } = string.Empty;
+
+		[StringLength(200)]
+		public string Address { get; set; } = string.Empty;
+
+		[DataType(DataType.Date)]
+		public DateTime? BirthDate { get; set; }
+
+		[StringLength(10)]
+		public string Gender { get; set; } = string.Empty;
+
+		[DataType(DataType.Date)]
+		public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
 		public bool? CreateMember { get; set; }
-
-		public string ClientID { get; set; }
 
 		public string CreateMemberText => CreateMember switch
 		{
@@ -31,3 +45,4 @@ namespace HealthWellbeing.Models
 		};
 	}
 }
+
