@@ -2,10 +2,16 @@
 
 namespace HealthWellbeing.Models
 {
+    public enum GravidadeAlergia
+    {
+        Leve,
+        Moderada,
+        Grave
+    }
     public class Alergia
     {
         [Key]
-        public int AlergiaID { get; set; }
+        public int AlergiaId { get; set; }
 
         [Required(ErrorMessage = "O nome da alergia é obrigatório.")]
         [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres.")]
@@ -16,9 +22,8 @@ namespace HealthWellbeing.Models
         public string Descricao { get; set; }
 
         [Required(ErrorMessage = "A gravidade é obrigatória.")]
-        [StringLength(20, ErrorMessage = "A gravidade deve ter no máximo 20 caracteres.")]
         [Display(Name = "Gravidade")]
-        public string Gravidade { get; set; } // -> quando implementar a classe alterar para ela, por enquanto mantem como string.
+        public GravidadeAlergia Gravidade { get; set; }
 
         [Required(ErrorMessage = "Os sintomas são obrigatórios.")]
         [StringLength(300, ErrorMessage = "Os sintomas devem ter no máximo 300 caracteres.")]
