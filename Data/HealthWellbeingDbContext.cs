@@ -49,8 +49,5 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(c => c.ReceitaId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-
-
-
     }
 }
