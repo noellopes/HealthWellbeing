@@ -1,5 +1,5 @@
-﻿using HealthWellbeing.Models;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 internal class SeedData
 {
@@ -78,61 +78,52 @@ internal class SeedData
         {
             new FoodComponent
             {
-                FoodComponentId = 1,
                 Name = "Apple",
                 Description = "Contains water, carbohydrates, fibers, vitamins, minerals, and antioxidants."
             },
             new FoodComponent
             {
-                FoodComponentId = 2,
                 Name = "Rice",
                 Description = "Rich in carbohydrates and provides a quick source of energy."
             },
             new FoodComponent
             {
-                FoodComponentId = 3,
+
                 Name = "Salmon",
                 Description = "Contains omega-3 fatty acids, proteins, and essential minerals."
             },
             new FoodComponent
             {
-                FoodComponentId = 4,
                 Name = "Broccoli",
                 Description = "Contains fiber, vitamins C and K, iron, and potassium."
             },
             new FoodComponent
             {
-                FoodComponentId = 5,
                 Name = "Almonds",
                 Description = "Rich in healthy fats, proteins, and vitamin E."
             },
             new FoodComponent
             {
-                FoodComponentId = 6,
                 Name = "Eggs",
                 Description = "Excellent source of protein and essential amino acids."
             },
             new FoodComponent
             {
-                FoodComponentId = 7,
                 Name = "Oats",
                 Description = "Contain fiber, vitamins, and minerals that help reduce cholesterol."
             },
             new FoodComponent
             {
-                FoodComponentId = 8,
                 Name = "Tomato",
                 Description = "Contains lycopene, an antioxidant that helps prevent heart disease."
             },
             new FoodComponent
             {
-                FoodComponentId = 9,
                 Name = "Spinach",
                 Description = "Rich in iron, calcium, magnesium, and vitamin A."
             },
             new FoodComponent
             {
-                FoodComponentId = 10,
                 Name = "Banana",
                 Description = "Good source of potassium, vitamin B6, and natural sugars for energy."
             }
