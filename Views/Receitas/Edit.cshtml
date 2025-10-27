@@ -1,0 +1,119 @@
+@model HealthWellbeing.Models.Receita
+
+@{
+    ViewData["Title"] = "Editar Receita";
+}
+
+<h1>Editar Receita</h1>
+
+<h4>Receita</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ReceitaId" />
+            
+            <div class="form-group mb-3">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="Descricao" class="control-label"></label>
+                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label asp-for="ModoPreparo" class="control-label"></label>
+                <textarea asp-for="ModoPreparo" class="form-control" rows="8"></textarea>
+                <span asp-validation-for="ModoPreparo" class="text-danger"></span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TempoPreparo" class="control-label"></label>
+                        <input asp-for="TempoPreparo" class="form-control" type="number" />
+                        <span asp-validation-for="TempoPreparo" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Porcoes" class="control-label"></label>
+                        <input asp-for="Porcoes" class="form-control" type="number" />
+                        <span asp-validation-for="Porcoes" class="text-danger"></span>
+                        <small class="form-text text-muted">Uma porção é a quantidade que uma pessoa normalmente consome numa refeição</small>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="mt-4 mb-3">Informação Nutricional (por porção)</h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="CaloriasPorPorcao" class="control-label"></label>
+                        <input asp-for="CaloriasPorPorcao" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="CaloriasPorPorcao" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Proteinas" class="control-label"></label>
+                        <input asp-for="Proteinas" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Proteinas" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="HidratosCarbono" class="control-label"></label>
+                        <input asp-for="HidratosCarbono" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="HidratosCarbono" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="Gorduras" class="control-label"></label>
+                        <input asp-for="Gorduras" class="form-control" type="number" step="0.01" />
+                        <span asp-validation-for="Gorduras" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <h5 class="mt-4 mb-3">Restrições Alimentares</h5>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="IsVegetariana" />
+                <label class="form-check-label" asp-for="IsVegetariana"></label>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" asp-for="IsVegan" />
+                <label class="form-check-label" asp-for="IsVegan"></label>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input class="form-check-input" asp-for="IsLactoseFree" />
+                <label class="form-check-label" asp-for="IsLactoseFree"></label>
+            </div>
+            
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
