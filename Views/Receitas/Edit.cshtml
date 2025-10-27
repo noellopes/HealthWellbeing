@@ -89,21 +89,22 @@
                 </div>
             </div>
             
-            <h5 class="mt-4 mb-3">Restrições Alimentares</h5>
-            
-            <div class="form-check mb-2">
-                <input class="form-check-input" asp-for="IsVegetariana" />
-                <label class="form-check-label" asp-for="IsVegetariana"></label>
+            <div class="form-group mb-3">
+                <label>Componentes da Receita</label>
+                @if (ViewData["Componentes"] is MultiSelectList componentes)
+                {
+                    <select multiple asp-items="componentes" name="selectedComponenteIds" class="form-control"></select>
+                }
+                <small class="form-text text-muted">Selecione os componentes existentes para adicionar à receita</small>
             </div>
-            
-            <div class="form-check mb-2">
-                <input class="form-check-input" asp-for="IsVegan" />
-                <label class="form-check-label" asp-for="IsVegan"></label>
-            </div>
-            
-            <div class="form-check mb-3">
-                <input class="form-check-input" asp-for="IsLactoseFree" />
-                <label class="form-check-label" asp-for="IsLactoseFree"></label>
+
+            <div class="form-group mb-3">
+                <label>Restrições Alimentares</label>
+                @if (ViewData["Restricoes"] is MultiSelectList restricoes)
+                {
+                    <select multiple asp-items="restricoes" name="selectedRestricaoIds" class="form-control"></select>
+                }
+                <small class="form-text text-muted">Selecione as restrições alimentares aplicáveis à receita</small>
             </div>
             
             <div class="form-group mt-4">

@@ -62,17 +62,16 @@
                 @Html.DisplayFor(modelItem => item.Gorduras) g
             </td>
             <td>
-                @if (item.IsVegetariana)
+                @if (item.RestricoesAlimentares != null && item.RestricoesAlimentares.Any())
                 {
-                    <span class="badge bg-success">Vegetariana</span>
+                    foreach (var restricao in item.RestricoesAlimentares)
+                    {
+                        <span class="badge bg-secondary">@restricao.Nome</span>
+                    }
                 }
-                @if (item.IsVegan)
+                else
                 {
-                    <span class="badge bg-success">Vegana</span>
-                }
-                @if (item.IsLactoseFree)
-                {
-                    <span class="badge bg-info">Sem Lactose</span>
+                    <span class="text-muted">-</span>
                 }
             </td>
             <td>

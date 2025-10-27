@@ -46,6 +46,8 @@ namespace HealthWellbeing.Controllers
         // GET: Receitas/Create
         public IActionResult Create()
         {
+            ViewData["Restricoes"] = new MultiSelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "Nome");
+            ViewData["Componentes"] = new MultiSelectList(_context.ComponentesDaReceita, "ComponentesDaReceitaId", "Nome");
             return View();
         }
 
@@ -54,14 +56,46 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras")] Receita receita, int[] selectedRestricaoIds, int[] selectedComponenteIds)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(receita);
                 await _context.SaveChangesAsync();
+
+                // Assign selected restrictions
+                if (selectedRestricaoIds != null)
+                {
+                    foreach (var id in selectedRestricaoIds)
+                    {
+                        var restricao = await _context.RestricaoAlimentar.FindAsync(id);
+                        if (restricao != null)
+                        {
+                            receita.RestricoesAlimentares ??= new List<RestricaoAlimentar>();
+                            receita.RestricoesAlimentares.Add(restricao);
+                        }
+                    }
+                }
+
+                // Assign selected components
+                if (selectedComponenteIds != null)
+                {
+                    foreach (var id in selectedComponenteIds)
+                    {
+                        var componente = await _context.ComponentesDaReceita.FindAsync(id);
+                        if (componente != null)
+                        {
+                            componente.ReceitaId = receita.ReceitaId;
+                            _context.Update(componente);
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Restricoes"] = new MultiSelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "Nome");
+            ViewData["Componentes"] = new MultiSelectList(_context.ComponentesDaReceita, "ComponentesDaReceitaId", "Nome");
             return View(receita);
         }
 
@@ -73,11 +107,16 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var receita = await _context.Receita.FindAsync(id);
+            var receita = await _context.Receita
+                .Include(r => r.RestricoesAlimentares)
+                .Include(r => r.Componentes)
+                .FirstOrDefaultAsync(m => m.ReceitaId == id);
             if (receita == null)
             {
                 return NotFound();
             }
+            ViewData["Restricoes"] = new MultiSelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "Nome", receita.RestricoesAlimentares?.Select(r => r.RestricaoAlimentarId));
+            ViewData["Componentes"] = new MultiSelectList(_context.ComponentesDaReceita, "ComponentesDaReceitaId", "Nome", receita.Componentes?.Select(c => c.ComponentesDaReceitaId));
             return View(receita);
         }
 
@@ -86,7 +125,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras,IsVegetariana,IsVegan,IsLactoseFree")] Receita receita)
+        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,CaloriasPorPorcao,Proteinas,HidratosCarbono,Gorduras")] Receita receita, int[] selectedRestricaoIds, int[] selectedComponenteIds)
         {
             if (id != receita.ReceitaId)
             {
@@ -98,6 +137,47 @@ namespace HealthWellbeing.Controllers
                 try
                 {
                     _context.Update(receita);
+                    await _context.SaveChangesAsync();
+
+                    // Clear existing restrictions
+                    receita.RestricoesAlimentares?.Clear();
+
+                    // Assign selected restrictions
+                    if (selectedRestricaoIds != null)
+                    {
+                        foreach (var restricaoId in selectedRestricaoIds)
+                        {
+                            var restricao = await _context.RestricaoAlimentar.FindAsync(restricaoId);
+                            if (restricao != null)
+                            {
+                                receita.RestricoesAlimentares ??= new List<RestricaoAlimentar>();
+                                receita.RestricoesAlimentares.Add(restricao);
+                            }
+                        }
+                    }
+
+                    // Clear existing components
+                    var existingComponentes = _context.ComponentesDaReceita.Where(c => c.ReceitaId == receita.ReceitaId);
+                    foreach (var componente in existingComponentes)
+                    {
+                        componente.ReceitaId = 0;
+                        _context.Update(componente);
+                    }
+
+                    // Assign selected components
+                    if (selectedComponenteIds != null)
+                    {
+                        foreach (var componenteId in selectedComponenteIds)
+                        {
+                            var componente = await _context.ComponentesDaReceita.FindAsync(componenteId);
+                            if (componente != null)
+                            {
+                                componente.ReceitaId = receita.ReceitaId;
+                                _context.Update(componente);
+                            }
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -113,6 +193,8 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["Restricoes"] = new MultiSelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "Nome", receita.RestricoesAlimentares?.Select(r => r.RestricaoAlimentarId));
+            ViewData["Componentes"] = new MultiSelectList(_context.ComponentesDaReceita, "ComponentesDaReceitaId", "Nome", receita.Componentes?.Select(c => c.ComponentesDaReceitaId));
             return View(receita);
         }
 

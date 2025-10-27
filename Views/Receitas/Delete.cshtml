@@ -50,21 +50,35 @@
             Restrições Alimentares
         </dt>
         <dd class="col-sm-9">
-            @if (Model.IsVegetariana)
+            @if (Model.RestricoesAlimentares != null && Model.RestricoesAlimentares.Any())
             {
-                <span class="badge bg-success">Vegetariana</span>
+                foreach (var restricao in Model.RestricoesAlimentares)
+                {
+                    <span class="badge bg-secondary">@restricao.Nome</span>
+                }
             }
-            @if (Model.IsVegan)
-            {
-                <span class="badge bg-success">Vegana</span>
-            }
-            @if (Model.IsLactoseFree)
-            {
-                <span class="badge bg-info">Sem Lactose</span>
-            }
-            @if (!Model.IsVegetariana && !Model.IsVegan && !Model.IsLactoseFree)
+            else
             {
                 <span class="text-muted">Nenhuma restrição</span>
+            }
+        </dd>
+        
+        <dt class="col-sm-3">
+            Componentes
+        </dt>
+        <dd class="col-sm-9">
+            @if (Model.Componentes != null && Model.Componentes.Any())
+            {
+                <ul>
+                    @foreach (var componente in Model.Componentes)
+                    {
+                        <li>@componente.Nome - @componente.Quantidade @componente.UnidadeMedida</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Nenhum componente</span>
             }
         </dd>
     </dl>
