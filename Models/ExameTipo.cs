@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
@@ -17,11 +18,11 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100)]
         public string Especialidade { get; set; }
-        
 
-       
+        public ICollection<ExameTipo>? exametipo { get; set; }
+
     }
 
-  
+
 }
 
