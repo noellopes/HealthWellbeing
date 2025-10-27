@@ -26,5 +26,7 @@ namespace HealthWellbeing.Models
         [StringLength(200)]
         [Display(Name = "Observações")]
         public string Observacoes { get; set; }
+
+        public ICollection<Exame>? exames { get; set; }
     }
 }
