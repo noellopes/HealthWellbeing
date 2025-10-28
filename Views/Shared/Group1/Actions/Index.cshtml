@@ -1,0 +1,88 @@
+﻿@model IEnumerable<dynamic>
+@{
+    /*
+    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+    * DON'T MODIFY, Instead you can copy into your own folder
+    */
+
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+    var noData = Model == null || !Model.Any();
+    var _AlertPartial = "Group1/Partials/Alert";
+
+    var configAlertModel = Tuple.Create(
+        "danger",
+        "bi bi-exclamation-circle",
+        "Configuration error: Model type or properties list not provided."
+    );
+
+    var noDataAlertModel = Tuple.Create(
+        "warning",
+        "bi bi-exclamation-triangle",
+        "No records found."
+    );
+
+    if (TempData["Message"] != null)
+    {
+        var alertModel = Tuple.Create(
+            TempData["AlertType"]?.ToString() ?? "info",
+            TempData["IconClass"]?.ToString() ?? "",
+            TempData["Message"]?.ToString() ?? ""
+        );
+
+        <partial name="@_AlertPartial" model="alertModel" />
+    }
+}
+
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+
+@if (noConfig)
+{
+    <partial name="@_AlertPartial" model="configAlertModel" />
+}
+else
+{
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success rounded-2">
+            <i class="fas fa-plus"></i> Criar
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        @if (noData)
+        {
+            <partial name="@_AlertPartial" model="noDataAlertModel" />
+        }
+        else
+        {
+            <table class="table table-hover custom-table">
+                <thead>
+                    <tr>
+                        @foreach (var prop in properties)
+                        {
+                            <th>@HealthWellbeing.Views.Shared.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</th>
+                        }
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            @foreach (var prop in properties)
+                            {
+                                <td>@HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(item, prop)</td>
+                            }
+                            <td class="actions">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning rounded-2">Editar</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-2">Detalhes</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-2">Remover</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+}

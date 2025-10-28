@@ -23,7 +23,10 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             var healthWellbeingDbContext = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            ViewData["Title"] = "Marcação de tratamentos";
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
+            return View("~/Views/Shared/Group1/Actions/Index.cshtml", await healthWellbeingDbContext.ToListAsync());
         }
 
         // GET: TreatmentRecords/Details/5
@@ -67,6 +70,9 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(treatmentRecord);
                 await _context.SaveChangesAsync();
+                TempData["AlertType"] = "success";
+                TempData["IconClass"] = "bi bi-check-circle";
+                TempData["Message"] = "Treatment record created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Email", treatmentRecord.NurseId);

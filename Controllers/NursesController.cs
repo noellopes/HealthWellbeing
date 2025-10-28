@@ -23,8 +23,9 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             ViewData["Title"] = "Lista de Enfermeiros";
+            ViewBag.ModelType = typeof(Nurse);
             ViewBag.Properties = new List<string> { "Name", "NIF", "ProfessionalLicense", "BirthDate", "Email", "Phone", "Specialty" };
-            return View("~/Views/Shared/Group1/_ListViewLayout.cshtml", await _context.Nurse.ToListAsync());
+            return View("~/Views/Shared/Group1/Actions/Index.cshtml", await _context.Nurse.ToListAsync());
         }
 
         // GET: Nurses/Details/5
@@ -41,8 +42,10 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-
-            return View(nurse);
+            ViewData["Title"] = "Detalhes do Enfermeiro";
+            ViewBag.ModelType = typeof(Nurse);
+            ViewBag.Properties = new List<string> { "Name", "NIF", "ProfessionalLicense", "BirthDate", "Email", "Phone", "Specialty" };
+            return View("~/Views/Shared/Group1/Actions/Details.cshtml", nurse);
         }
 
         // GET: Nurses/Create
@@ -62,6 +65,9 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(nurse);
                 await _context.SaveChangesAsync();
+                TempData["AlertType"] = "success";
+                TempData["IconClass"] = "bi bi-check-circle";
+                TempData["Message"] = "Nurse created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(nurse);
