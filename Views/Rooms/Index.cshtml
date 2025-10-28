@@ -41,13 +41,13 @@
                     <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Capacity)</td>
+                    <td class="text-center">@Html.DisplayFor(modelItem => item.Capacity)</td>
                     <td>@Html.DisplayFor(modelItem => item.Location)</td>
                     <td>@Html.DisplayFor(modelItem => item.OperatingHours)</td>
                     <td>@Html.DisplayFor(modelItem => item.Status)</td>
                     <!-- Observações com truncamento visual -->
                     <td class="text-truncate" style="max-width: 150px;">
-                        @Html.DisplayFor(modelItem => item.Notes)
+                        "@item.Notes"
                     </td>
                     <td class="text-center">
                         <!-- Botão para editar a sala -->
