@@ -134,9 +134,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ClientId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<bool?>("CreateMember")
                         .HasColumnType("bit");
 
@@ -165,8 +162,6 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("ClientId");
 
-                    b.HasIndex("ClientId1");
-
                     b.ToTable("Client");
                 });
 
@@ -184,7 +179,8 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("MemberId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.ToTable("Member");
                 });
@@ -270,6 +266,39 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("RestricaoAlimentar");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TrainingType", b =>
+                {
+                    b.Property<int>("TrainingTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingTypeId"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Intensity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("TrainingTypeId");
+
+                    b.ToTable("TrainingType");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
@@ -290,18 +319,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Categoria");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Client", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("ClientId1");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
+                        .WithOne("Membership")
+                        .HasForeignKey("HealthWellbeing.Models.Member", "ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -315,7 +337,7 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
-                    b.Navigation("Clients");
+                    b.Navigation("Membership");
                 });
 #pragma warning restore 612, 618
         }
