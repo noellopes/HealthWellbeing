@@ -33,20 +33,20 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos
+            var servico = await _context.Servicos
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servicoModel == null)
+            if (servico == null)
             {
                 return NotFound();
             }
 
-            return View(servicoModel);
+            return View(servico);
         }
 
         // GET: Servico/Create
         public IActionResult Create()
         {
-            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
             return View();
         }
 
@@ -55,18 +55,19 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] ServicoModel servicoModel)
+        public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
+
         {
 
             if (ModelState.IsValid)
             {
-                _context.Add(servicoModel);
+                _context.Add(servico);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["TipoServico"] = new SelectList(_context.Set<TipoServicoModel>(), "TipoServicoId", "Nome", servicoModel.TipoServicoId);
-            return View(servicoModel);
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
+            return View(servico);
         }
 
         // GET: Servico/Edit/5
@@ -77,12 +78,12 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos.FindAsync(id);
-            if (servicoModel == null)
+            var servico = await _context.Servicos.FindAsync(id);
+            if (servico == null)
             {
                 return NotFound();
             }
-            return View(servicoModel);
+            return View(servico);
         }
 
         // POST: Servico/Edit/5
@@ -90,9 +91,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] ServicoModel servicoModel)
+        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] Servico servico)
         {
-            if (id != servicoModel.ServicoId)
+            if (id != servico.ServicoId)
             {
                 return NotFound();
             }
@@ -101,12 +102,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(servicoModel);
+                    _context.Update(servico);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServicoModelExists(servicoModel.ServicoId))
+                    if (!ServicoExists(servico.ServicoId))
                     {
                         return NotFound();
                     }
@@ -117,7 +118,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(servicoModel);
+            return View(servico);
         }
 
         // GET: Servico/Delete/5
@@ -128,14 +129,14 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var servicoModel = await _context.Servicos
+            var servico = await _context.Servicos
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servicoModel == null)
+            if (servico == null)
             {
                 return NotFound();
             }
 
-            return View(servicoModel);
+            return View(servico);
         }
 
         // POST: Servico/Delete/5
@@ -143,17 +144,17 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var servicoModel = await _context.Servicos.FindAsync(id);
-            if (servicoModel != null)
+            var servico = await _context.Servicos.FindAsync(id);
+            if (servico != null)
             {
-                _context.Servicos.Remove(servicoModel);
+                _context.Servicos.Remove(servico);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ServicoModelExists(int id)
+        private bool ServicoExists(int id)
         {
             return _context.Servicos.Any(e => e.ServicoId == id);
         }

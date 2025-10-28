@@ -15,7 +15,7 @@ namespace HealthWellbeing.Models
         public int TerapeutaId { get; set; }
         public TerapeutaModel Terapeuta { get; set; }
         public int ServicoId { get; set; }
-        public ServicoModel Servico { get; set; }  
+        public Servico Servico { get; set; }  
 
 
     }
