@@ -20,5 +20,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Client> Client { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TrainingType> TrainingType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Plan> Plan { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Trainer> Trainer { get; set; } = default!;
     }
 }
