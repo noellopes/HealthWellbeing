@@ -1,66 +1,117 @@
 ﻿@model HealthWellbeing.Models.Room
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Sala";
 }
 
-<h1>Edit</h1>
+<h1 class="mb-4 text-warning"><i class="bi bi-pencil-square"></i> Editar Sala</h1>
 
-<h4>Room</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="card shadow-sm">
+    <div class="card-body">
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <input type="hidden" asp-for="RoomId" />
-            <div class="form-group">
-                <label asp-for="RoomsType" class="control-label"></label>
-                <select asp-for="RoomsType" class="form-control"></select>
-                <span asp-validation-for="RoomsType" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="RoomsType" class="form-label">Tipo de Sala</label>
+                <select asp-for="RoomsType" class="form-select">
+                    <option value="">Selecione o tipo...</option>
+                    <option value="Consultas">Consultas</option>
+                    <option value="Tratamentos">Tratamentos</option>
+                </select>
+                <span asp-validation-for="RoomsType" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Specialty" class="control-label"></label>
-                <input asp-for="Specialty" class="form-control" />
-                <span asp-validation-for="Specialty" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Specialty" class="form-label">Especialidade</label>
+                <select asp-for="Specialty" class="form-select">
+                    <option value="">Selecione a especialidade...</option>
+                    <option value="Cardiologia">Cardiologia</option>
+                    <option value="Dermatologia">Dermatologia</option>
+                    <option value="Pediatria">Pediatria</option>
+                    <option value="Ginecologia">Ginecologia</option>
+                    <option value="Urologia">Urologia</option>
+                    <option value="Neurologia">Neurologia</option>
+                    <option value="Psiquiatria">Psiquiatria</option>
+                    <option value="Oftalmologia">Oftalmologia</option>
+                    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+                    <option value="Endocrinologia">Endocrinologia</option>
+                    <option value="Reumatologia">Reumatologia</option>
+                    <option value="Gastroenterologia">Gastroenterologia</option>
+                    <option value="Pneumologia">Pneumologia</option>
+                    <option value="Nefrologia">Nefrologia</option>
+                    <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                </select>
+                <span asp-validation-for="Specialty" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-bold">Nome</label>
                 <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <span asp-validation-for="Name" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Capacity" class="control-label"></label>
-                <input asp-for="Capacity" class="form-control" />
-                <span asp-validation-for="Capacity" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Capacity" class="form-label fw-bold">Capacidade</label>
+                <input asp-for="Capacity" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Capacity" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="Location" class="form-label fw-bold">Localização</label>
                 <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
+                <span asp-validation-for="Location" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="OperatingHours" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
                 <input asp-for="OperatingHours" class="form-control" />
-                <span asp-validation-for="OperatingHours" class="text-danger"></span>
+                <span asp-validation-for="OperatingHours" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Estado</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="Criado" />
+                    <label class="form-check-label">Criado</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="Disponivel" />
+                    <label class="form-check-label">Disponível</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="Indisponivel" />
+                    <label class="form-check-label">Indisponível</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="Limpeza" />
+                    <label class="form-check-label">Limpeza</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="Manutencao" />
+                    <label class="form-check-label">Manutenção</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Status" value="ForaDeServico" />
+                    <label class="form-check-label">Fora de Serviço</label>
+                </div>
+                <span asp-validation-for="Status" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label fw-bold">Observação</label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save-fill"></i> Guardar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left-circle"></i> Voltar à Lista
+                </a>
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
