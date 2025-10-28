@@ -1,47 +1,38 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Apagar Tipo de Exercício";
+    ViewData["Title"] = "Excluir Tipo de Exercício";
 }
 
-<h1>Apagar Tipo de Exercício</h1>
+<h1 class="mb-4">Excluir</h1>
 
-@if (Model != null)
-{
-    <div class="alert alert-danger">
-        Tem certeza que deseja apagar este tipo de exercício?
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <p class="text-danger fw-bold">Tem certeza que deseja excluir este tipo de exercício?</p>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Nome</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.NomeTipoExercicios)</dd>
+
+                    <dt class="col-sm-4">Descrição</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.DescricaoTipoExercicios)</dd>
+
+                    <dt class="col-sm-4">Nível de Dificuldade</dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
+                    </dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="TipoExercicioId" />
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                        <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <dl class="row">
-        <dt class="col-sm-3">Categoria</dt>
-        <dd class="col-sm-9">@Model.CategoriaTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Descrição</dt>
-        <dd class="col-sm-9">@Model.DescricaoTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Nível de Dificuldade</dt>
-        <dd class="col-sm-9">@Model.NivelDificuldadeTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Benefício</dt>
-        <dd class="col-sm-9">@Model.BeneficioTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Grupos Musculares</dt>
-        <dd class="col-sm-9">@Model.GruposMuscularesTrabalhadosTipoExercicios ?? "-"</dd>
-    </dl>
-
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="TipoExercicioId" />
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-trash-alt"></i> Apagar
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Cancelar
-        </a>
-    </form>
-}
-else
-{
-    <div class="alert alert-warning">
-        Tipo de exercício não encontrado.
-    </div>
-}
+</div>
