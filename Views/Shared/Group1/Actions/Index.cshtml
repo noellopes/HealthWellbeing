@@ -1,36 +1,22 @@
 ﻿@model IEnumerable<dynamic>
+
 @{
     /*
-    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
-    * DON'T MODIFY, Instead you can copy into your own folder
-    */
-
+     * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+     * DON'T MODIFY — Instead, copy into your own folder
+     */
     var modelType = ViewBag.ModelType as Type;
     var properties = ViewBag.Properties as List<string>;
     var noConfig = modelType == null || properties == null || properties.Count == 0;
     var noData = Model == null || !Model.Any();
     var _AlertPartial = "Group1/Partials/Alert";
 
-    var configAlertModel = Tuple.Create(
-        "danger",
-        "bi bi-exclamation-circle",
-        "Configuration error: Model type or properties list not provided."
-    );
-
-    var noDataAlertModel = Tuple.Create(
-        "warning",
-        "bi bi-exclamation-triangle",
-        "No records found."
-    );
+    var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
+    var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No records found.");
 
     if (TempData["Message"] != null)
     {
-        var alertModel = Tuple.Create(
-            TempData["AlertType"]?.ToString() ?? "info",
-            TempData["IconClass"]?.ToString() ?? "",
-            TempData["Message"]?.ToString() ?? ""
-        );
-
+        var alertModel = Tuple.Create(TempData["AlertType"]?.ToString() ?? "info", TempData["IconClass"]?.ToString() ?? "", TempData["Message"]?.ToString() ?? "");
         <partial name="@_AlertPartial" model="alertModel" />
     }
 }
@@ -44,9 +30,7 @@
 else
 {
     <div class="mb-3">
-        <a asp-action="Create" class="btn btn-success rounded-2">
-            <i class="fas fa-plus"></i> Criar
-        </a>
+        <a asp-action="Create" class="btn btn-success rounded-2"><i class="fas fa-plus"></i> Criar</a>
     </div>
 
     <div class="table-responsive">
