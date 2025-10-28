@@ -17,6 +17,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingDbContext")));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
