@@ -70,9 +70,16 @@ namespace HealthWellbeing.Models
 
     public enum TreatmentStatus
     {
+        [Display(Name = "Scheduled (Planned)")]
         Scheduled,
+
+        [Display(Name = "In Progress")]
         InProgress,
+
+        [Display(Name = "Completed Successfully")]
         Completed,
+
+        [Display(Name = "Canceled / Aborted")]
         Canceled
     }
 }
