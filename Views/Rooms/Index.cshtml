@@ -37,7 +37,7 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.RoomId</td> <!-- Exibe o ID da sala -->
+                    <td>@item.FormattedRoomId</td> <!-- Exibe o ID da sala com formatacao (000)-->
                     <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>

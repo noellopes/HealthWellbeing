@@ -7,6 +7,10 @@ namespace HealthWellbeing.Models
         // ID da sala, chave primária
         public int RoomId { get; set; }
 
+        // Propriedade formatada para exibição do ID com 3 dígitos (ex: 001, 012, 123)
+        public string FormattedRoomId => RoomId.ToString("D3");
+
+
         // Tipo da sala (consultas ou tratamentos), não precisa de ser validado
         public enum RoomType { Consultas, Tratamentos }
 
