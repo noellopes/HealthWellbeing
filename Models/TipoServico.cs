@@ -9,6 +9,7 @@ namespace HealthWellbeing.Models
         public int TipoServicoId { get; set; }
 
         [Required(ErrorMessage = "O nome do tipo de serviço é obrigatório.")]
+        [StringLength(20, ErrorMessage = "O nome do tipo de serviço não pode exceder 20 caracteres.")]
         public string Nome { get; set; }         // Ex.: "massagens", "banhos", "tratamentos", "fisioterapia", "Programas de bem-estar"
         public string? Descricao { get; set; }    // Detalhes do tipo de serviço
 
