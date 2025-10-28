@@ -20,12 +20,13 @@
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
             <tr>
+                <th>ID</th> <!-- Novo cabeçalho para o ID -->
                 <th>Tipo de Sala</th>
                 <th>Especialidade</th>
                 <th>Nome</th>
                 <th>Capacidade</th>
                 <th>Localização</th>
-                <th>Horário de Funcionamento</th>
+                <th>Horário F.</th>
                 <th>Estado</th>
                 <th>Observações</th>
                 <th class="text-center">Ações</th>
@@ -36,6 +37,7 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>@item.RoomId</td> <!-- Exibe o ID da sala -->
                     <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
@@ -43,7 +45,10 @@
                     <td>@Html.DisplayFor(modelItem => item.Location)</td>
                     <td>@Html.DisplayFor(modelItem => item.OperatingHours)</td>
                     <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                    <!-- Observações com truncamento visual -->
+                    <td class="text-truncate" style="max-width: 150px;">
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
                     <td class="text-center">
                         <!-- Botão para editar a sala -->
                         <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn btn-sm btn-warning me-1">
