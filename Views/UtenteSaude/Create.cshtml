@@ -1,0 +1,16 @@
+﻿@model HealthWellbeing.Models.UtenteSaude
+@{
+    ViewData["Title"] = "Criar Utente";
+}
+<h1>Criar Utente</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.Partial("_FormUtenteSaude", Model)
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

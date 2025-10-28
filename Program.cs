@@ -33,9 +33,8 @@ else
 
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetService<HealthWellbeingDbContext>();
+    SeedData.Populate(dbContext);
 }
 
 app.UseHttpsRedirection();
@@ -47,7 +46,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=UtenteSaude}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

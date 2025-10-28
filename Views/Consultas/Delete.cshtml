@@ -1,0 +1,62 @@
+﻿@model HealthWellbeing.Models.Consulta
+
+@{
+    ViewData["Title"] = "Eliminar Consulta";
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-danger text-white text-center rounded-top-4 py-3">
+            <h2 class="mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i> Eliminar Consulta
+            </h2>
+        </div>
+
+        <div class="card-body bg-light px-5 py-4">
+            <div class="alert alert-danger d-flex align-items-center rounded-3 shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-octagon-fill fs-3 me-3"></i>
+                <div>
+                    Tem a certeza de que pretende eliminar esta consulta?
+                    Esta ação é <strong>irreversível</strong>.
+                </div>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-4 fw-semibold text-secondary">Data de Marcação</dt>
+                <dd class="col-sm-8">@Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Data da Consulta</dt>
+                <dd class="col-sm-8">@Model.DataConsulta.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Data de Cancelamento</dt>
+                <dd class="col-sm-8">
+                    @(Model.DataCancelamento.HasValue
+                                        ? Model.DataCancelamento.Value.ToString("dd/MM/yyyy HH:mm")
+                                        : "—")
+                </dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Início</dt>
+                <dd class="col-sm-8">@Model.HoraInicio.ToString("HH\\:mm")</dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Fim</dt>
+                <dd class="col-sm-8">@Model.HoraFim.ToString("HH\\:mm")</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="IdConsulta" />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash"></i> Eliminar Consulta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
