@@ -185,6 +185,33 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Member");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
+                {
+                    b.Property<int>("PlanId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DurationDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("PlanId");
+
+                    b.ToTable("Plan");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
                 {
                     b.Property<int>("ReceitaId")

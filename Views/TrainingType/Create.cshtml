@@ -1,53 +1,69 @@
 ﻿@model HealthWellbeing.Models.TrainingType
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Training Type";
 }
 
-<h1>Create</h1>
+<h1 class="display-4 text-primary mb-4">Create New Training Type</h1>
 
-<h4>TrainingType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DurationMinutes" class="control-label"></label>
-                <input asp-for="DurationMinutes" class="form-control" />
-                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Intensity" class="control-label"></label>
-                <input asp-for="Intensity" class="form-control" />
-                <span asp-validation-for="Intensity" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<h4 class="mb-3">Enter Training Type Details</h4>
+<hr class="mb-4" />
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DurationMinutes" class="form-label fw-bold"></label>
+                    <input asp-for="DurationMinutes" class="form-control" type="number" min="10" max="300" />
+                    <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Intensity" class="form-label fw-bold"></label>
+                    <select asp-for="Intensity" class="form-select">
+                        <option value="">-- Select Intensity --</option>
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                    <span asp-validation-for="Intensity" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                    <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                    <span asp-validation-for="IsActive" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-between pt-2">
+                    <input type="submit" value="Create Training Type" class="btn btn-primary btn-lg shadow" />
+
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
