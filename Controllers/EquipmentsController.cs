@@ -30,14 +30,14 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var equipment = await _context.Equipment
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(equipment);
@@ -70,13 +70,13 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var equipment = await _context.Equipment.FindAsync(id);
             if (equipment == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
             return View(equipment);
         }
@@ -90,7 +90,7 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id != equipment.EquipmentId)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             if (ModelState.IsValid)
@@ -104,7 +104,7 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     if (!EquipmentExists(equipment.EquipmentId))
                     {
-                        return NotFound();
+                        return View("NotFound");
                     }
                     else
                     {
@@ -121,14 +121,14 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             var equipment = await _context.Equipment
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
 
             return View(equipment);
