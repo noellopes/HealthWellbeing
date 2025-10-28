@@ -9,6 +9,13 @@
     </div>
 }
 
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Erro"]
+    </div>
+}
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Adicionar Zona</a>
 </p>
