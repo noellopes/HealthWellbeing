@@ -1,0 +1,44 @@
+﻿@model IEnumerable<HealthWellbeing.Models.ZonaArmazenamento>
+
+<h2>Zonas de Armazenamento</h2>
+
+@if (TempData["Mensagem"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Mensagem"]
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Adicionar Zona</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Localização</th>
+            <th>Capacidade</th>
+            <th>Ativa</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var zona in Model)
+        {
+            <tr>
+                <td>@zona.Id</td>
+                <td>@zona.Nome</td>
+                <td>@zona.Localizacao</td>
+                <td>@zona.CapacidadeMaxima</td>
+                <td>@(zona.Ativa ? "Sim" : "Não")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@zona.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Details" asp-route-id="@zona.Id" class="btn btn-sm btn-info">Detalhes</a>
+                    <a asp-action="Delete" asp-route-id="@zona.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

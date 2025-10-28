@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class ZonasArmazenamentoController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public ZonasArmazenamentoController(ApplicationDbContext context)
+        // Lista simulada (em vez da base de dados)
+        private static List<ZonaArmazenamento> zonas = new List<ZonaArmazenamento>
         {
-            _context = context;
-        }
+            new ZonaArmazenamento { Id = 1, Nome = "Armazém Principal", Localizacao = "Bloco A", CapacidadeMaxima = 500 },
+            new ZonaArmazenamento { Id = 2, Nome = "Sala Fria", Localizacao = "Bloco B", CapacidadeMaxima = 200 }
+        };
 
         // GET: ZonasArmazenamento
         public IActionResult Index()
         {
-            var zonas = _context.ZonasArmazenamento.ToList();
             return View(zonas);
         }
 
@@ -33,8 +33,8 @@ namespace HealthWellbeing.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.ZonasArmazenamento.Add(zona);
-                _context.SaveChanges();
+                zona.Id = zonas.Any() ? zonas.Max(z => z.Id) + 1 : 1;
+                zonas.Add(zona);
                 return RedirectToAction(nameof(Index));
             }
             return View(zona);
@@ -43,11 +43,10 @@ namespace HealthWellbeing.Controllers
         // GET: ZonasArmazenamento/Edit/5
         public IActionResult Edit(int id)
         {
-            var zona = _context.ZonasArmazenamento.Find(id);
+            var zona = zonas.FirstOrDefault(z => z.Id == id);
             if (zona == null)
-            {
                 return NotFound();
-            }
+
             return View(zona);
         }
 
@@ -56,13 +55,18 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, ZonaArmazenamento zona)
         {
-            if (id != zona.Id)
+            var existente = zonas.FirstOrDefault(z => z.Id == id);
+            if (existente == null)
                 return NotFound();
 
             if (ModelState.IsValid)
             {
-                _context.ZonasArmazenamento.Update(zona);
-                _context.SaveChanges();
+                existente.Nome = zona.Nome;
+                existente.Localizacao = zona.Localizacao;
+                existente.Descricao = zona.Descricao;
+                existente.CapacidadeMaxima = zona.CapacidadeMaxima;
+                existente.Ativa = zona.Ativa;
+
                 return RedirectToAction(nameof(Index));
             }
             return View(zona);
@@ -71,11 +75,10 @@ namespace HealthWellbeing.Controllers
         // GET: ZonasArmazenamento/Delete/5
         public IActionResult Delete(int id)
         {
-            var zona = _context.ZonasArmazenamento.Find(id);
+            var zona = zonas.FirstOrDefault(z => z.Id == id);
             if (zona == null)
-            {
                 return NotFound();
-            }
+
             return View(zona);
         }
 
@@ -84,23 +87,20 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var zona = _context.ZonasArmazenamento.Find(id);
+            var zona = zonas.FirstOrDefault(z => z.Id == id);
             if (zona != null)
-            {
-                _context.ZonasArmazenamento.Remove(zona);
-                _context.SaveChanges();
-            }
+                zonas.Remove(zona);
+
             return RedirectToAction(nameof(Index));
         }
 
         // GET: ZonasArmazenamento/Details/5
         public IActionResult Details(int id)
         {
-            var zona = _context.ZonasArmazenamento.Find(id);
+            var zona = zonas.FirstOrDefault(z => z.Id == id);
             if (zona == null)
-            {
                 return NotFound();
-            }
+
             return View(zona);
         }
     }
