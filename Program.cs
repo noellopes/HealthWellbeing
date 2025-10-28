@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
-using HealthWellbeingRoom.Data;
+using HealthWellbeingRoom;
 using HealthWellbeingRoom.Models.FileMedicalDevices;
+using HealthWellBeingRoom.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,42 +20,27 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-// O Controller pedirá InterfaceRepositoryMDev e receberá RepositoryMedicalDevices
-builder.Services.AddScoped<InterfaceRepositoryMDev, EFRepository>();
-
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    try
-    {
-        var context = services.GetRequiredService<HealthWellbeingDbContext>();
-
-        //Usei Migrate(): Garante que as migrações (tabelas) sejam aplicadas ANTES de consultar.
-        context.Database.Migrate();
-
-        //Chama o Populate
-        SeedDataMedicalDevices.Populate(context);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro durante a fase de Seed Data/Migração.");
-    }
-}
-
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    using (var serviceScope = app.Services.CreateScope())
+    {
+        var dbcontext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
+
+        //Usei Migrate(): Garante que as migrações (tabelas) sejam aplicadas ANTES de consultar.
+        dbcontext.Database.Migrate();
+
+        //Chama o Populate
+        SeedDataMedicalDevices.Populate(dbcontext);
+    }
 }
 
 using (var scope = app.Services.CreateScope())

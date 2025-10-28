@@ -1,4 +1,5 @@
-﻿namespace HealthWellbeingRoom.Models.FileMedicalDevices
+﻿/*
+namespace HealthWellbeingRoom.Models.FileMedicalDevices
 {
     public interface InterfaceRepositoryMDev
     {
@@ -9,3 +10,4 @@
     }
 }
 
+*/

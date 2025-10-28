@@ -18,7 +18,7 @@
 
     <div class="card-body">
 
-        <p class="lead text-muted">Tem a certeza que deseja eliminar o registo do dispositivo <strong>""@Model.Name""</strong>? Esta ação é irreversível.</p>
+        <p class="lead text-muted">Tem a certeza que deseja eliminar o registo do dispositivo? Esta ação é irreversível.</p>
         
         <dl class="row mb-0 mt-4">
 
@@ -34,17 +34,11 @@
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Specification)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Specification)</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Quantity)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Quantity)</dd>
-
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Status)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SalaID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.SalaID)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Observation)</dd>
@@ -61,7 +55,7 @@
             <input type="hidden" name="id" value="@Model.DevicesID" />
 
             <button type="submit" class="btn btn-danger me-2">
-                <i class="bi bi-trash me-1"></i> Sim, Eliminar Permanentemente
+                <i class="bi bi-trash me-1"></i> Sim
             </button>
 
             <a asp-action="Index" class="btn btn-secondary">

@@ -1,4 +1,5 @@
-﻿using HealthWellbeing.Data;
+﻿/*
+using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeingRoom.Models.FileMedicalDevices
@@ -49,3 +50,4 @@ namespace HealthWellbeingRoom.Models.FileMedicalDevices
         }
     }
 }
+*/

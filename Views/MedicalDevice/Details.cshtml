@@ -3,7 +3,7 @@
 
 @{
     // Título dinâmico
-    ViewData["Title"] = $"Detalhes: {Model.Name}";
+    ViewData["Title"] = "Detalhes";
 
     // Lógica para capturar e exibir mensagem de sucesso (do modelo do professor)
     string? successMessage = Context.Request.Query["SuccessMessage"];
@@ -45,17 +45,11 @@
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Specification)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Specification)</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Quantity)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Quantity)</dd>
-
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Status)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SalaID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.SalaID)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Observation)</dd>
@@ -65,6 +59,14 @@
 </div>
 
 <div class="mt-4 d-flex justify-content-end gap-2">
+
+    <a asp-action="Edit" asp-route-id="@Model.DevicesID" class="btn btn-sm btn-warning me-1">
+        <i class="bi bi-pencil-square"></i> Editar
+    </a>
+
+    <a asp-action="Delete" asp-route-id="@Model.DevicesID" class="btn btn-sm btn-danger">
+        <i class="bi bi-trash"></i> Eliminar
+    </a>
 
     <a asp-action="Index" class="btn btn-secondary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista

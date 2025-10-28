@@ -22,16 +22,11 @@ namespace HealthWellbeingRoom.Models.FileMedicalDevices
         [StringLength(200, MinimumLength = 5, ErrorMessage = "Deve conter no min 5 letras e 200 no max.")]
         public string Specification { get; set; }
 
-        [Required(ErrorMessage = "Quantidade é obrigatório.")]
-        public int Quantity { get; set; }
-
         public DateTime RegistrationDate { get; set; }
 
         public string? Status { get; set; }
 
         public string? Observation { get; set; }
-
-        public int? SalaID { get; set; }
 
     }
 }

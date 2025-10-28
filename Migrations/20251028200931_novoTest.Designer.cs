@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251028085307_restore")]
-    partial class restore
+    [Migration("20251028200931_novoTest")]
+    partial class novoTest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -327,12 +327,17 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("EquipmentId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Equipment");
                 });
@@ -353,14 +358,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<string>("Observation")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("SalaID")
-                        .HasColumnType("int");
 
                     b.Property<string>("Specification")
                         .IsRequired()
@@ -398,6 +397,17 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>

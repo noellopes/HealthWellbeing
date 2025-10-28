@@ -3,7 +3,7 @@
 
 @{
     // Título dinâmico, mostrando qual dispositivo está a ser editado
-    ViewData["Title"] = $"Editar Dispositivo: {Model.Name}";
+    ViewData["Title"] = "Editar Dispositivo";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -47,11 +47,6 @@
                         <span asp-validation-for="Specification" class="text-danger small"></span>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Quantity" class="form-label fw-bold">Quantidade</label>
-                        <input asp-for="Quantity" class="form-control" type="number" min="1">
-                        <span asp-validation-for="Quantity" class="text-danger small"></span>
-                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -59,12 +54,6 @@
                         <label asp-for="Status" class="form-label fw-bold">Status do Dispositivo</label>
                         <input asp-for="Status" class="form-control">
                         <span asp-validation-for="Status" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="SalaID" class="form-label fw-bold">ID da Sala</label>
-                        <input asp-for="SalaID" class="form-control">
-                        <span asp-validation-for="SalaID" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">

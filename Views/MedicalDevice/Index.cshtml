@@ -35,20 +35,18 @@ else
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
+        <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">@Html.DisplayNameFor(model => model.DevicesID)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.Type)</th>
-                    <th class="text-end" scope="col">Ações</th>
+                    <th class="text-end" scope="col">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var dispositivo in Model)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => dispositivo.DevicesID)</td>
                         <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
                         <td>@Html.DisplayFor(modelItem => dispositivo.Type)</td>
 

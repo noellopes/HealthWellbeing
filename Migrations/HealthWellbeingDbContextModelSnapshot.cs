@@ -355,14 +355,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<string>("Observation")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("SalaID")
-                        .HasColumnType("int");
 
                     b.Property<string>("Specification")
                         .IsRequired()

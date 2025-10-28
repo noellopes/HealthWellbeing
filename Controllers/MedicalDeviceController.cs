@@ -1,5 +1,5 @@
 ﻿using HealthWellbeing.Data;
-using HealthWellbeingRoom.Models.FileMedicalDevices; 
+using HealthWellbeingRoom.Models.FileMedicalDevices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -57,7 +57,8 @@ namespace HealthWellbeingRoom.Controllers
         // POST: MedicalDevice/Create 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DevicesID,Name,Type,Specification,Quantity,RegistrationDate,Status,Observation,SalaID")] MedicalDevices medicalDevices)
+        // **[Bind] ATUALIZADO:** Quantity e SalaID removidos
+        public async Task<IActionResult> Create([Bind("DevicesID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevices medicalDevices)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +92,8 @@ namespace HealthWellbeingRoom.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DevicesID,Name,Type,Specification,Quantity,RegistrationDate,Status,Observation,SalaID")] MedicalDevices medicalDevices)
+        // **[Bind] ATUALIZADO:** Quantity e SalaID removidos
+        public async Task<IActionResult> Edit(int id, [Bind("DevicesID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevices medicalDevices)
         {
             if (id != medicalDevices.DevicesID)
             {
