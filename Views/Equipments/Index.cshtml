@@ -32,7 +32,7 @@
                         Nº Série
                     </th>
                     <th>
-                        Data compra
+                        Sala
                     </th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -50,7 +50,7 @@
                         @Html.DisplayFor(modelItem => item.SerialNumber)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.PurchaseDate)
+                        @Html.DisplayFor(modelItem => item.Room.Name)
                     </td>
                     <td class="text-end">
                             <a class="btn btn-dark" asp-action="Edit" asp-route-id="@item.EquipmentId"><i class="bi bi-pencil-fill"></i> Editar</a>

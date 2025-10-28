@@ -54,15 +54,7 @@
                         <span asp-validation-for="PurchaseDate" class="text-danger"></span>
                     </div>
                 </div>
-                @*
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="SalaId" class="control-label"></label>
-                        <input asp-for="SalaId" class="form-control" />
-                        <span asp-validation-for="SalaId" class="text-danger"></span>
-                    </div>
-                </div>
-                *@
+                
 
                 @*Posteriormente tenho que tirar isso da view, a data será carregada automaticamente*@
                 <div class="col-md-6">
@@ -76,6 +68,14 @@
 
 			</div>
 
+            
+            <div class="form-group">
+                <label asp-for="RoomId" class="control-label">Sala</label>
+                <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId"></select>
+                <span asp-validation-for="RoomId" class="text-danger"></span>
+            </div>
+                
+                
 			<div class="form-group mb-3">
 				<label asp-for="Description" class="control-label">Descrição</label>
 				<textarea asp-for="Description" class="form-control"></textarea>
