@@ -19,7 +19,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Estado" class="control-label"></label>
-                <select asp-for="Estado" class="form-control"></select>
+                <input asp-for="Estado" class="form-control" />
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -29,11 +29,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="UtenteId" class="control-label"></label>
-                <select asp-for="UtenteId" class ="form-control" asp-items="ViewBag.UtenteId"></select>
+                <select asp-for="UtenteId" class="form-control" asp-items="ViewBag.UtenteId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="ExameTipoId" class="control-label"></label>
-                <select asp-for="ExameTipoId" class ="form-control" asp-items="ViewBag.ExameTipoId"></select>
+                <select asp-for="ExameTipoId" class="form-control" asp-items="ViewBag.ExameTipoId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="MedicoId" class="control-label"></label>
@@ -41,16 +41,18 @@
                 <span asp-validation-for="MedicoId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SalaDeExameId" class="control-label"></label>
-                <select asp-for="SalaDeExameId" class ="form-control" asp-items="ViewBag.SalaDeExameId"></select>
+                <label asp-for="SalaDeExame" class="control-label"></label>
+                <input asp-for="SalaDeExame" class="form-control" />
+                <span asp-validation-for="SalaDeExame" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ProfissionalExecutanteId" class="control-label"></label>
-                <select asp-for="ProfissionalExecutanteId" class ="form-control" asp-items="ViewBag.ProfissionalExecutanteId"></select>
+                <select asp-for="ProfissionalExecutanteId" class="form-control" asp-items="ViewBag.ProfissionalExecutanteId"></select>
             </div>
             <div class="form-group">
-                <label asp-for="MaterialEquipamentoAssociadoId" class="control-label"></label>
-                <select asp-for="MaterialEquipamentoAssociadoId" class ="form-control" asp-items="ViewBag.MaterialEquipamentoAssociadoId"></select>
+                <label asp-for="MaterialEquipamentoAssociado" class="control-label"></label>
+                <input asp-for="MaterialEquipamentoAssociado" class="form-control" />
+                <span asp-validation-for="MaterialEquipamentoAssociado" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -64,5 +66,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
