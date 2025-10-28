@@ -12,7 +12,8 @@ internal class SeedData
         // Add seed data here
         PopulateClients(dbContext);
         PopulateTrainingType(dbContext);
-    }
+		PopulatePlan(dbContext);
+	}
 
     private static void PopulateClients(HealthWellbeingDbContext dbContext)
     {
@@ -112,4 +113,54 @@ internal class SeedData
 
         dbContext.SaveChanges();
     }
+
+	private static void PopulatePlan(HealthWellbeingDbContext dbContext)
+	{
+		// Check if the Plan table already contains data
+		if (dbContext.Plan.Any()) return;
+
+		dbContext.Plan.AddRange(new List<Plan>()
+	{
+		new Plan
+		{
+			Name = "Basic Wellness Plan",
+			Description = "A beginner-friendly plan including 3 workouts per week focused on flexibility and general health.",
+			Price = 29.99m,
+			DurationDays = 30
+		},
+		new Plan
+		{
+			Name = "Advanced Fitness Plan",
+			Description = "An intensive 6-week plan designed for strength, endurance, and fat loss.",
+			Price = 59.99m,
+			DurationDays = 45
+		},
+		new Plan
+		{
+			Name = "Mind & Body Balance",
+			Description = "A 2-month program combining yoga, meditation, and Pilates for mental and physical harmony.",
+			Price = 79.99m,
+			DurationDays = 60
+		},
+		new Plan
+		{
+			Name = "Ultimate Transformation Plan",
+			Description = "A 3-month premium plan featuring personal coaching, nutrition guidance, and high-intensity training.",
+			Price = 99.99m,
+			DurationDays = 90
+		},
+		new Plan
+		{
+			Name = "Corporate Health Boost",
+			Description = "A 1-month team-focused plan to improve workplace wellness, stress management, and physical activity.",
+			Price = 49.99m,
+			DurationDays = 30
+		}
+	});
+
+		dbContext.SaveChanges();
+	}
+    //POPULATE(ADD) MORE HERE!!!
+
+
 }
