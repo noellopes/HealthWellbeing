@@ -37,13 +37,14 @@ namespace HealthWellbeing.Models
         // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
         public enum RoomStatus
         {
+            Criado,
             Disponivel,
             Indisponivel,
             Limpeza,
             Manutencao,
-            ForaDeServico
+            ForaDeServico   
         }
-        public RoomStatus Status { get; set; }
+        public RoomStatus Status { get; set; } = RoomStatus.Criado;
 
         // Observações adicionais (máximo 500 caracteres)
         [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres.")]
