@@ -13,7 +13,7 @@ namespace HealthWellbeing.Models
         [StringLength(255, ErrorMessage = "A descrição não pode exceder 255 caracteres.")]
 
         public string Category { get; set; }
-        [StringLength(50, ErrorMessage = "A categoria não pode exceder 50 caracteres.")]
+           [StringLength(50, ErrorMessage = "A categoria não pode exceder 50 caracteres.")]
        
 
         public bool Active { get; set; } = true;

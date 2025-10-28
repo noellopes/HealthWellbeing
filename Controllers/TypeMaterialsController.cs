@@ -54,7 +54,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TypeMaterialID,Name,Description,Category,Active,DataCreate,DataAtualization")] TypeMaterial typeMaterial)
+        public async Task<IActionResult> Create([Bind("TypeMaterialID,Name,Description,Category,Active,DataCreate")] TypeMaterial typeMaterial)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description,Category,Active,DataCreate,DataAtualizacao")] TypeMaterial typeMaterial)
+        public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description,Category,Active,DataCreate")] TypeMaterial typeMaterial)
         {
             if (id != typeMaterial.TypeMaterialID)
             {
