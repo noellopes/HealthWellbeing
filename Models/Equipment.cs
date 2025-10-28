@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -23,8 +24,10 @@ namespace HealthWellbeingRoom.Models
         [StringLength(20, MinimumLength = 3, ErrorMessage = "Deve conter no min 3 letras e 20 no max.")]
         public required String SerialNumber { get; set; }
 
-        // public int SalaId { get; set; }
-        
+        public int RoomId { get; set; }
+
+        public Room? Room { get; set; }
+
         [Required(ErrorMessage = "Data de compra é obrigatório.")]
         public required DateTime PurchaseDate { get; set; }
 

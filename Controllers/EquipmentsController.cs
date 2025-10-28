@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeingRoom.Models;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -22,7 +23,8 @@ namespace HealthWellbeingRoom.Controllers
         // GET: Equipments
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Equipment.ToListAsync());
+            var myContext = _context.Equipment.Include(b => b.Room);
+            return View(await myContext.ToListAsync());
         }
 
         // GET: Equipments/Details/5
@@ -34,6 +36,7 @@ namespace HealthWellbeingRoom.Controllers
             }
 
             var equipment = await _context.Equipment
+                .Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
@@ -46,6 +49,7 @@ namespace HealthWellbeingRoom.Controllers
         // GET: Equipments/Create
         public IActionResult Create()
         {
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             return View();
         }
 
@@ -54,7 +58,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,RoomId,CreatedDate")] Equipment equipment)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +66,7 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
             return View(equipment);
         }
 
@@ -78,6 +83,7 @@ namespace HealthWellbeingRoom.Controllers
             {
                 return View("NotFound");
             }
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
             return View(equipment);
         }
 
@@ -86,7 +92,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,RoomId,CreatedDate")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
             {
@@ -113,6 +119,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
             return View(equipment);
         }
 
@@ -124,7 +131,7 @@ namespace HealthWellbeingRoom.Controllers
                 return View("NotFound");
             }
 
-            var equipment = await _context.Equipment
+            var equipment = await _context.Equipment.Include(b => b.Room)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
