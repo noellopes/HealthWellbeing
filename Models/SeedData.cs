@@ -13,6 +13,7 @@ internal class SeedData
         PopulateClients(dbContext);
         PopulateTrainingType(dbContext);
 		PopulatePlan(dbContext);
+        PopulateTrainer(dbContext);
 	}
 
     private static void PopulateClients(HealthWellbeingDbContext dbContext)
@@ -160,6 +161,55 @@ internal class SeedData
 
 		dbContext.SaveChanges();
 	}
+
+    private static void PopulateTrainer(HealthWellbeingDbContext dbContext)
+    {
+        // Check if Trainers already exist
+        if (dbContext.Trainer.Any()) return;
+
+        dbContext.Trainer.AddRange(new List<Trainer>()
+    {
+        new Trainer
+        {
+            Name = "John Smith",
+            Speciality = "HIIT (High Intensity Interval Training)",
+            Email = "john.smith@fitnesspro.com",
+            Phone = "555-1112233"
+        },
+        new Trainer
+        {
+            Name = "Emma Johnson",
+            Speciality = "Strength Training",
+            Email = "emma.johnson@strongfit.net",
+            Phone = "555-2223344"
+        },
+        new Trainer
+        {
+            Name = "Carlos Mendes",
+            Speciality = "Yoga Basics",
+            Email = "carlos.mendes@yogabalance.org",
+            Phone = "555-3334455"
+        },
+        new Trainer
+        {
+            Name = "Sophie Lee",
+            Speciality = "Pilates Core Strength",
+            Email = "sophie.lee@corewellness.com",
+            Phone = "555-4445566"
+        },
+        new Trainer
+        {
+            Name = "Maria Rodriguez",
+            Speciality = "Zumba Dance",
+            Email = "maria.rodriguez@zumbafit.com",
+            Phone = "555-5557788"
+        }
+    });
+
+        dbContext.SaveChanges();
+    }
+
+
     //POPULATE(ADD) MORE HERE!!!
 
 
