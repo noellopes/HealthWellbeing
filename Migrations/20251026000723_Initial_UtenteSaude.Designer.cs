@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-<<<<<<<< HEAD:Migrations/20251026000723_Initial_UtenteSaude.Designer.cs
     [Migration("20251026000723_Initial_UtenteSaude")]
-    partial class Initial_UtenteSaude
-========
-    [Migration("20251027213112_Add_Doctor_Only")]
-    partial class Add_Doctor_Only
->>>>>>>> Doctors:Migrations/20251027213112_Add_Doctor_Only.Designer.cs
+    partial class Initial_UtenteSaude 
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,263 +26,260 @@ namespace HealthWellbeing.Migrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
-                {
-                    b.Property<int>("AlergiaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("AlergiaID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlergiaID"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlergiaID"));
 
-                    b.Property<int?>("AlimentoId")
-                        .HasColumnType("int");
+                b.Property<int?>("AlimentoId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Descricao")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gravidade")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("Gravidade")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Nome")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Sintomas")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                b.Property<string>("Sintomas")
+                    .IsRequired()
+                    .HasMaxLength(300)
+                    .HasColumnType("nvarchar(300)");
 
-                    b.HasKey("AlergiaID");
+                b.HasKey("AlergiaID");
 
-                    b.HasIndex("AlimentoId");
+                b.HasIndex("AlimentoId");
 
-                    b.ToTable("Alergia");
-                });
+                b.ToTable("Alergia");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
-                {
-                    b.Property<int>("AlimentoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("AlimentoId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlimentoId"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AlimentoId"));
 
-                    b.Property<int>("Calories")
-                        .HasColumnType("int");
+                b.Property<int>("Calories")
+                    .HasColumnType("int");
 
-                    b.Property<int>("CategoriaAlimentoId")
-                        .HasColumnType("int");
+                b.Property<int>("CategoriaAlimentoId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("GorduraGPor100g")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("GorduraGPor100g")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("HidratosGPor100g")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("HidratosGPor100g")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("KcalPor100g")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("KcalPor100g")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("ProteinaGPor100g")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("ProteinaGPor100g")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("AlimentoId");
+                b.HasKey("AlimentoId");
 
-                    b.HasIndex("CategoriaAlimentoId");
+                b.HasIndex("CategoriaAlimentoId");
 
-                    b.ToTable("Alimento");
-                });
+                b.ToTable("Alimento");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.CategoriaAlimento", b =>
-                {
-                    b.Property<int>("CategoriaID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("CategoriaID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoriaID"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoriaID"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CategoriaID");
+                b.HasKey("CategoriaID");
 
-                    b.ToTable("CategoriaAlimento");
-                });
+                b.ToTable("CategoriaAlimento");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
-                {
-                    b.Property<int>("ReceitaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("ReceitaId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
 
-                    b.Property<decimal>("CaloriasPorPorcao")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("CaloriasPorPorcao")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Descricao")
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<decimal>("Gorduras")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("Gorduras")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("HidratosCarbono")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("HidratosCarbono")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("IsLactoseFree")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsLactoseFree")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsVegan")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsVegan")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsVegetariana")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsVegetariana")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("ModoPreparo")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                b.Property<string>("ModoPreparo")
+                    .IsRequired()
+                    .HasMaxLength(2000)
+                    .HasColumnType("nvarchar(2000)");
 
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Nome")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("Porcoes")
-                        .HasColumnType("int");
+                b.Property<int>("Porcoes")
+                    .HasColumnType("int");
 
-                    b.Property<decimal>("Proteinas")
-                        .HasColumnType("decimal(18,2)");
+                b.Property<decimal>("Proteinas")
+                    .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TempoPreparo")
-                        .HasColumnType("int");
+                b.Property<int>("TempoPreparo")
+                    .HasColumnType("int");
 
-                    b.HasKey("ReceitaId");
+                b.HasKey("ReceitaId");
 
-                    b.ToTable("Receita");
-                });
+                b.ToTable("Receita");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.RestricaoAlimentar", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Gravidade")
-                        .HasColumnType("int");
+                b.Property<int>("Gravidade")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Nome")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Sintomas")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Sintomas")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
+                b.Property<int>("Tipo")
+                    .HasColumnType("int");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("RestricaoAlimentar");
-                });
+                b.ToTable("RestricaoAlimentar");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
-                {
-                    b.Property<int>("UtenteSaudeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("UtenteSaudeId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtenteSaudeId"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtenteSaudeId"));
 
-                    b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("DataNascimento")
+                    .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
+                b.Property<string>("Email")
+                    .HasMaxLength(254)
+                    .HasColumnType("nvarchar(254)");
 
-                    b.Property<string>("Morada")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("Morada")
+                    .HasMaxLength(200)
+                    .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Nif")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("Nif")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Niss")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("Niss")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("NomeCompleto")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("NomeCompleto")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Nus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("Nus")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Telefone")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("Telefone")
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("UtenteSaudeId");
+                b.HasKey("UtenteSaudeId");
 
-                    b.HasIndex("Nif")
-                        .IsUnique();
+                b.HasIndex("Nif").IsUnique();
 
-                    b.HasIndex("Niss")
-                        .IsUnique();
+                b.HasIndex("Niss").IsUnique();
 
-                    b.HasIndex("Nus")
-                        .IsUnique();
+                b.HasIndex("Nus").IsUnique();
 
-                    b.ToTable("UtenteSaude");
-                });
+                b.ToTable("UtenteSaude");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
-                        .WithMany("AlergiasRelacionadas")
-                        .HasForeignKey("AlimentoId");
+            {
+                b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
+                    .WithMany("AlergiasRelacionadas")
+                    .HasForeignKey("AlimentoId");
 
-                    b.Navigation("Alimento");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.CategoriaAlimento", "Categoria")
-                        .WithMany()
-                        .HasForeignKey("CategoriaAlimentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Categoria");
-                });
+                b.Navigation("Alimento");
+            });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
-                {
-                    b.Navigation("AlergiasRelacionadas");
-                });
+            {
+                b.HasOne("HealthWellbeing.Models.CategoriaAlimento", "Categoria")
+                    .WithMany()
+                    .HasForeignKey("CategoriaAlimentoId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("Categoria");
+            });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
+            {
+                b.Navigation("AlergiasRelacionadas");
+            });
 #pragma warning restore 612, 618
         }
     }
