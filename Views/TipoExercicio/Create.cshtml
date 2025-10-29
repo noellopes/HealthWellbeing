@@ -1,62 +1,53 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Criar Tipo de Exercício";
+    ViewData["Title"] = "Create";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>Create</h1>
 
-<form asp-action="Create" method="post">
-
-    <div asp-validation-summary="All" class="text-danger"></div>
-
-    <!-- Categoria -->
-    <div class="mb-3">
-        <label asp-for="CategoriaTipoExercicios" class="form-label">Categoria *</label>
-        <input asp-for="CategoriaTipoExercicios" class="form-control" placeholder="Ex: Cardio, Força, Flexibilidade">
-        <span asp-validation-for="CategoriaTipoExercicios" class="text-danger small"></span>
+<h4>TipoExercicio</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CategoriaTipoExercicios" class="control-label"></label>
+                <input asp-for="CategoriaTipoExercicios" class="form-control" />
+                <span asp-validation-for="CategoriaTipoExercicios" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DescricaoTipoExercicios" class="control-label"></label>
+                <input asp-for="DescricaoTipoExercicios" class="form-control" />
+                <span asp-validation-for="DescricaoTipoExercicios" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NivelDificuldadeTipoExercicios" class="control-label"></label>
+                <input asp-for="NivelDificuldadeTipoExercicios" class="form-control" />
+                <span asp-validation-for="NivelDificuldadeTipoExercicios" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BeneficioTipoExercicios" class="control-label"></label>
+                <input asp-for="BeneficioTipoExercicios" class="form-control" />
+                <span asp-validation-for="BeneficioTipoExercicios" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GruposMuscularesTrabalhadosTipoExercicios" class="control-label"></label>
+                <input asp-for="GruposMuscularesTrabalhadosTipoExercicios" class="form-control" />
+                <span asp-validation-for="GruposMuscularesTrabalhadosTipoExercicios" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Descrição -->
-    <div class="mb-3">
-        <label asp-for="DescricaoTipoExercicios" class="form-label">Descrição *</label>
-        <textarea asp-for="DescricaoTipoExercicios" class="form-control" rows="3" placeholder="Descreva o tipo de exercício..."></textarea>
-        <span asp-validation-for="DescricaoTipoExercicios" class="text-danger small"></span>
-    </div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 
-    <!-- Nível de Dificuldade -->
-    <div class="mb-3">
-        <label asp-for="NivelDificuldadeTipoExercicios" class="form-label">Nível de Dificuldade *</label>
-        <select asp-for="NivelDificuldadeTipoExercicios" class="form-select">
-            <option value="">-- Selecione --</option>
-            <option value="Fácil">Fácil</option>
-            <option value="Intermediário">Intermediário</option>
-            <option value="Difícil">Difícil</option>
-        </select>
-        <span asp-validation-for="NivelDificuldadeTipoExercicios" class="text-danger small"></span>
-    </div>
-
-    <!-- Benefício -->
-    <div class="mb-3">
-        <label asp-for="BeneficioTipoExercicios" class="form-label">Benefício *</label>
-        <input asp-for="BeneficioTipoExercicios" class="form-control" placeholder="Ex: Melhora cardiovascular, Tonificação muscular">
-        <span asp-validation-for="BeneficioTipoExercicios" class="text-danger small"></span>
-    </div>
-
-    <!-- Grupos Musculares Trabalhados -->
-    <div class="mb-3">
-        <label asp-for="GruposMuscularesTrabalhadosTipoExercicios" class="form-label">Grupos Musculares Trabalhados *</label>
-        <input asp-for="GruposMuscularesTrabalhadosTipoExercicios" class="form-control" placeholder="Ex: Peito, Costas, Pernas">
-        <span asp-validation-for="GruposMuscularesTrabalhadosTipoExercicios" class="text-danger small"></span>
-    </div>
-
-    <!-- Botões -->
-    <div class="mt-4">
-        <button type="submit" class="btn btn-success">
-            <i class="fas fa-save"></i> Criar Tipo de Exercício
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar à Lista
-        </a>
-    </div>
-</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

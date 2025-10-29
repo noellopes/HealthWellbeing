@@ -1,47 +1,51 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Apagar Tipo de Exercício";
+    ViewData["Title"] = "Delete";
 }
 
-<h1>Apagar Tipo de Exercício</h1>
+<h1>Delete</h1>
 
-@if (Model != null)
-{
-    <div class="alert alert-danger">
-        Tem certeza que deseja apagar este tipo de exercício?
-    </div>
-
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TipoExercicio</h4>
+    <hr />
     <dl class="row">
-        <dt class="col-sm-3">Categoria</dt>
-        <dd class="col-sm-9">@Model.CategoriaTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Descrição</dt>
-        <dd class="col-sm-9">@Model.DescricaoTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Nível de Dificuldade</dt>
-        <dd class="col-sm-9">@Model.NivelDificuldadeTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Benefício</dt>
-        <dd class="col-sm-9">@Model.BeneficioTipoExercicios ?? "-"</dd>
-
-        <dt class="col-sm-3">Grupos Musculares</dt>
-        <dd class="col-sm-9">@Model.GruposMuscularesTrabalhadosTipoExercicios ?? "-"</dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CategoriaTipoExercicios)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CategoriaTipoExercicios)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DescricaoTipoExercicios)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NivelDificuldadeTipoExercicios)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NivelDificuldadeTipoExercicios)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BeneficioTipoExercicios)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BeneficioTipoExercicios)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.GruposMuscularesTrabalhadosTipoExercicios)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.GruposMuscularesTrabalhadosTipoExercicios)
+        </dd>
     </dl>
-
-    <form asp-action="Delete" method="post">
+    
+    <form asp-action="Delete">
         <input type="hidden" asp-for="TipoExercicioId" />
-        <button type="submit" class="btn btn-danger">
-            <i class="fas fa-trash-alt"></i> Apagar
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Cancelar
-        </a>
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
     </form>
-}
-else
-{
-    <div class="alert alert-warning">
-        Tipo de exercício não encontrado.
-    </div>
-}
+</div>

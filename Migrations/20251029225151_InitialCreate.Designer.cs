@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251027170749_InitialCreate")]
+    [Migration("20251029225151_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -284,6 +284,44 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RestricaoAlimentar");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
+                {
+                    b.Property<int>("TipoExercicioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoExercicioId"));
+
+                    b.Property<string>("BeneficioTipoExercicios")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("CategoriaTipoExercicios")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("DescricaoTipoExercicios")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("GruposMuscularesTrabalhadosTipoExercicios")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("NivelDificuldadeTipoExercicios")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TipoExercicioId");
+
+                    b.ToTable("TipoExercicio");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
