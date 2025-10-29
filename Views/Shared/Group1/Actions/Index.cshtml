@@ -4,7 +4,9 @@
     /*
      * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
      * DON'T MODIFY — Instead, copy into your own folder
+     * Pass Model, ViewBag.ModelType, and ViewBag.Properties (list of property names)
      */
+
     var modelType = ViewBag.ModelType as Type;
     var properties = ViewBag.Properties as List<string>;
     var noConfig = modelType == null || properties == null || properties.Count == 0;
@@ -59,9 +61,7 @@ else
                                 <td>@HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(item, prop)</td>
                             }
                             <td class="actions">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning rounded-2">Editar</a>
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-2">Detalhes</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger rounded-2">Remover</a>
                             </td>
                         </tr>
                     }

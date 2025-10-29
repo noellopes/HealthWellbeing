@@ -4,7 +4,9 @@
     /*
      * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
      * DON'T MODIFY — Instead, copy into your own folder
+     * Pass Model, ViewBag.ModelType, and ViewBag.Properties (list of property names)
      */
+
     var modelType = ViewBag.ModelType as Type;
     var properties = ViewBag.Properties as List<string>;
     var noConfig = modelType == null || properties == null || properties.Count == 0;

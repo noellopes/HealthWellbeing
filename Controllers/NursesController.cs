@@ -42,6 +42,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+
             ViewData["Title"] = "Detalhes do Enfermeiro";
             ViewBag.ModelType = typeof(Nurse);
             ViewBag.Properties = new List<string> { "Name", "NIF", "ProfessionalLicense", "BirthDate", "Email", "Phone", "Specialty" };

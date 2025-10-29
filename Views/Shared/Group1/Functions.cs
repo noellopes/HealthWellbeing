@@ -4,6 +4,8 @@
 * Don't Modify, any changes or additions. open a pull request to our branch (Group-1-MAIN)
 */
 
+using System.Dynamic;
+
 namespace HealthWellbeing.Views.Shared.Group1
 {
     public static class Functions
@@ -81,14 +83,42 @@ namespace HealthWellbeing.Views.Shared.Group1
                 return null;
 
             var currentObject = obj;
+
             foreach (var propName in propertyPath.Split('.'))
             {
                 if (currentObject == null) return null;
-                var propInfo = currentObject.GetType().GetProperty(propName);
-                if (propInfo == null) return null;
-                currentObject = propInfo.GetValue(currentObject);
+
+                // Handling for DynamicObject
+                if (currentObject is IDynamicMetaObjectProvider)
+                {
+                    var dictionary = currentObject as IDictionary<string, object>;
+                    if (dictionary != null && dictionary.ContainsKey(propName))
+                    {
+                        currentObject = dictionary[propName];
+                    }
+                    else
+                    {
+                        // fallback to DynamicObject's GetMember
+                        var dyn = currentObject as dynamic;
+                        try
+                        {
+                            currentObject = dyn.GetType().GetProperty(propName)?.GetValue(dyn);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+                }
+                else
+                {
+                    var propInfo = currentObject.GetType().GetProperty(propName);
+                    if (propInfo == null) return null;
+                    currentObject = propInfo.GetValue(currentObject);
+                }
             }
             return currentObject;
         }
+
     }
 }

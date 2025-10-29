@@ -23,7 +23,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             var healthWellbeingDbContext = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType);
-            ViewData["Title"] = "Marcação de tratamentos";
+            ViewData["Title"] = "Lista de tratamentos";
             ViewBag.ModelType = typeof(TreatmentRecord);
             ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
             return View("~/Views/Shared/Group1/Actions/Index.cshtml", await healthWellbeingDbContext.ToListAsync());
@@ -47,16 +47,22 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            return View(treatmentRecord);
+            ViewData["Title"] = "Detalhes do tratamento";
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
+            return View("~/Views/Shared/Group1/Actions/Details.cshtml", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Create
         public IActionResult Create()
         {
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name");
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name");
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View();
+            ViewData["Title"] = "Marcação de tratamento";
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
+            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
+            ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
+            return View("~/Views/Shared/Group1/Actions/Edit.cshtml");
         }
 
         // POST: TreatmentRecords/Create
@@ -64,8 +70,11 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate,DurationMinutes,Remarks,Result,Status,CreatedAt")] TreatmentRecord treatmentRecord)
+        public async Task<IActionResult> Create([Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate,DurationMinutes,Remarks,Result,Status")] TreatmentRecord treatmentRecord)
         {
+            ViewData["Title"] = "Marcação de tratamento";
+            treatmentRecord.CreatedAt = DateTime.Now;
+
             if (ModelState.IsValid)
             {
                 _context.Add(treatmentRecord);
@@ -75,10 +84,13 @@ namespace HealthWellbeing.Controllers
                 TempData["Message"] = "Treatment record created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Email", treatmentRecord.NurseId);
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Description", treatmentRecord.PathologyId);
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Description", treatmentRecord.TreatmentId);
-            return View(treatmentRecord);
+
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
+            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
+            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
+            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
+            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Edit/5
@@ -94,10 +106,14 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Email", treatmentRecord.NurseId);
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Description", treatmentRecord.PathologyId);
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Description", treatmentRecord.TreatmentId);
-            return View(treatmentRecord);
+
+            ViewData["Title"] = "Editar marcação de tratamento";
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
+            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
+            ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
+            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
         }
 
         // POST: TreatmentRecords/Edit/5
@@ -111,6 +127,8 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+
+            ViewData["Title"] = "Editar marcação de tratamento";
 
             if (ModelState.IsValid)
             {
@@ -130,12 +148,18 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
+                TempData["AlertType"] = "success";
+                TempData["IconClass"] = "bi bi-check-circle";
+                TempData["Message"] = "Treatment record edited successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Email", treatmentRecord.NurseId);
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Description", treatmentRecord.PathologyId);
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Description", treatmentRecord.TreatmentId);
-            return View(treatmentRecord);
+
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
+            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
+            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
+            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
+            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Delete/5

@@ -1,0 +1,129 @@
+﻿@model dynamic
+
+@{
+    /*
+    * SHARED DYNAMIC EDIT FORM - GROUP 1
+    * Use ViewBag.ModelType and ViewBag.Properties (list of property names)
+    * Pass populated SelectLists via ViewData for FK dropdowns
+    */
+
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+    var isNew = Model == null || (Model.Id == null || Model.Id == 0);
+    var formAction = isNew ? "Create" : "Edit";
+    var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
+    IDictionary<string, object> viewBagDict = ViewData as IDictionary<string, object>;
+}
+
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+
+@if (noConfig)
+{
+    <partial name="Group1/Partials/Alert" model="configAlertModel" />
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="@formAction" method="post">
+                @if (!isNew)
+                {
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                }
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                @foreach (var prop in properties)
+                {
+                    var baseProp = prop.Split('.')[0];
+                    var propInfo = modelType.GetProperty(baseProp);
+                    if (propInfo == null) continue;
+
+                    var displayName = HealthWellbeing.Views.Shared.Group1.Functions.GetDisplayName(modelType, baseProp);
+                    var propType = Nullable.GetUnderlyingType(propInfo.PropertyType) ?? propInfo.PropertyType;
+                    var value = HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(Model, prop);
+
+                    <div class="form-group">
+                        <label for="@prop">@displayName</label>
+                        @{
+                            switch (true)
+                            {
+                                // Foreign key dropdown
+                                case bool _ when prop.EndsWith("Id", StringComparison.OrdinalIgnoreCase) &&
+                            viewBagDict != null &&
+                            viewBagDict.ContainsKey(prop) &&
+                            viewBagDict[prop] is SelectList selectList:
+
+                                    <select name="@prop" id="@prop" class="form-control">
+                                        @foreach (var item in selectList)
+                                        {
+                                            <option value="@item.Value" selected="@(item.Value == (value?.ToString() ?? "") ? "selected" : null)">
+                                                @item.Text
+                                            </option>
+                                        }
+                                    </select>
+                            ;
+                                    break;
+
+                                // Enum dropdown with display name support
+                                case bool _ when propType.IsEnum:
+                                    var enumSelectList = Html.GetEnumSelectList(propType);
+                                    <select name="@prop" id="@prop" class="form-control" asp-items="enumSelectList"></select>
+                                    ;
+                                    break;
+
+                                // Date input formatted
+                                case bool _ when propType == typeof(DateTime):
+                                    <input type="date" name="@prop" id="@prop" class="form-control" value="@(value is DateTime dt ? dt.ToString("dd-MM-yyyy") : "")" />
+                                    ;
+                                    break;
+
+                                // Boolean dropdown
+                                case bool _ when propType == typeof(bool):
+                                    var isSelectedTrue = value?.Equals(true) == true ? "selected" : "";
+                                    var isSelectedFalse = value?.Equals(false) == true ? "selected" : "";
+                                    <select name="@prop" id="@prop" class="form-control">
+                                        <option value="true" selected="@isSelectedTrue">Yes</option>
+                                        <option value="false" selected="@isSelectedTrue">No</option>
+                                    </select>
+                                    ;
+                                    break;
+
+                                // Textarea for long text
+                                case bool _ when propInfo.PropertyType == typeof(string) &&
+                            (prop.ToLower().Contains("remarks") || prop.ToLower().Contains("description")):
+                                    <textarea name="@prop" id="@prop" rows="4" class="form-control">@value</textarea>
+                                    ;
+                                    break;
+
+                                // Default text input
+                                default:
+                                    <input type="text" name="@prop" id="@prop" class="form-control" value="@value" />
+                                    ;
+                                    break;
+                            }
+                        }
+                        <span class="text-danger" data-valmsg-for="@prop" data-valmsg-replace="true"></span>
+                    </div>
+                }
+                <div class="border-top mt-4 form-group text-right">
+                    <input type="submit" class="btn btn-sm btn-outline-primary mt-4 mr-2" value="Guardar" />
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-4">Cancelar</a>
+                </div>
+                @if (!isNew)
+                {
+                    <div class="d-flex justify-content-end border-top mt-4 form-group">
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-2 mt-4">Remover</a>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
