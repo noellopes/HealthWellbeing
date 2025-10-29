@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace HealthWellbeing.Models
 {
@@ -39,14 +41,21 @@ namespace HealthWellbeing.Models
         public string OperatingHours { get; set; }
 
         // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
+
         public enum RoomStatus
         {
+            [Display(Name = "Criado")]
             Criado,
+            [Display(Name = "Disponível")]
             Disponivel,
+            [Display(Name = "Indisponível")]
             Indisponivel,
+            [Display(Name = "Limpeza")]
             Limpeza,
+            [Display(Name = "Manutenção")]
             Manutencao,
-            ForaDeServico   
+            [Display(Name = "Fora de serviço")]
+            ForaDeServico
         }
         public RoomStatus Status { get; set; } = RoomStatus.Criado;
 

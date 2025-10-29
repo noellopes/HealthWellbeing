@@ -1,26 +1,34 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Room>
+@using HealthWellbeing.Models
+@using System.ComponentModel.DataAnnotations
+@using System.Reflection
 
 @{
-    // Define o título da página
     ViewData["Title"] = "Lista de Salas";
+
+    // Função local para extrair o nome amigável do enum usando o atributo [Display(Name = "...")]
+    string GetDisplayName(Enum value)
+    {
+        var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
+        var attr = member?.GetCustomAttribute<DisplayAttribute>();
+        return attr?.Name ?? value.ToString();
+    }
 }
 
-<!-- Título principal da página com ícone -->
-<h1 class="mb-4 text-primary"><i class="bi bi-houses-fill"></i> Lista de Salas</h1>
+<h1 class="mb-4 text-primary">
+    <i class="bi bi-houses-fill"></i> Lista de Salas
+</h1>
 
-<!-- Botão para criar uma nova sala -->
 <div class="mb-3">
     <a asp-action="Create" class="btn btn-success">
         <i class="bi bi-plus-circle-fill"></i> Criar Nova Sala
     </a>
 </div>
 
-<!-- Tabela responsiva para exibir a lista de salas -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
             <tr>
-                <th>ID</th> <!-- Novo cabeçalho para o ID -->
                 <th>Tipo de Sala</th>
                 <th>Especialidade</th>
                 <th>Nome</th>
@@ -28,37 +36,48 @@
                 <th>Localização</th>
                 <th>Horário F.</th>
                 <th>Estado</th>
-                <th>Observações</th>
                 <th class="text-center">Ações</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Loop para exibir cada sala da lista -->
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.FormattedRoomId</td> <!-- Exibe o ID da sala com formatacao (000)-->
                     <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
                     <td class="text-center">@Html.DisplayFor(modelItem => item.Capacity)</td>
                     <td>@Html.DisplayFor(modelItem => item.Location)</td>
                     <td>@Html.DisplayFor(modelItem => item.OperatingHours)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Status)</td>
-                    <!-- Observações com truncamento visual -->
-                    <td class="text-truncate" style="max-width: 150px;">
-                        "@item.Notes"
+                    <td>
+                        @{
+                            // Define a cor da bolinha com base no estado da sala
+                            var color = item.Status switch
+                            {
+                                Room.RoomStatus.Disponivel => "bg-success",
+                                Room.RoomStatus.Criado => "bg-secondary",
+                                Room.RoomStatus.Indisponivel => "bg-danger",
+                                Room.RoomStatus.Limpeza => "bg-warning",
+                                Room.RoomStatus.Manutencao => "bg-info",
+                                Room.RoomStatus.ForaDeServico => "bg-dark",
+                                _ => "bg-light"
+                            };
+
+                            // Extrai o nome amigável do enum usando DisplayAttribute
+                            var displayName = GetDisplayName(item.Status);
+                        }
+
+                        <!-- Bolinha colorida + nome amigável do estado -->
+                        <span class="rounded-circle d-inline-block me-2 @color" style="width:10px; height:10px;"></span>
+                        @displayName
                     </td>
                     <td class="text-center">
-                        <!-- Botão para editar a sala -->
                         <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square"></i> Editar
                         </a>
-                        <!-- Botão para visualizar detalhes da sala -->
                         <a asp-action="Details" asp-route-id="@item.RoomId" class="btn btn-sm btn-info me-1">
                             <i class="bi bi-info-circle-fill"></i> Detalhes
                         </a>
-                        <!-- Botão para eliminar a sala -->
                         <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn btn-sm btn-danger">
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </a>
