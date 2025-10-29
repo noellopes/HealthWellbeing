@@ -31,6 +31,13 @@ else
     app.UseHsts();
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
+    SeedDataTypeMaterial.Populate(dbContext);
+}
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

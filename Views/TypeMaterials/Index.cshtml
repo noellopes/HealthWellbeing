@@ -18,10 +18,6 @@
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th>@Html.DisplayNameFor(model => model.Description)</th>
-                <th>@Html.DisplayNameFor(model => model.Category)</th>
-                <th>@Html.DisplayNameFor(model => model.Active)</th>
-                <th>@Html.DisplayNameFor(model => model.DataCreate)</th>
-                <th>@Html.DisplayNameFor(model => model.DataAtualizacao)</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -31,19 +27,8 @@
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
                     <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                    <td>@Html.DisplayFor(modelItem => item.Category)</td>
-                    <td>
-                        @if (item.Active)
-                        {
-                            <span class="badge bg-success">Yes</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">No</span>
-                        }
-                    </td>
-                    <td>@item.DataCreate.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@(item.DataAtualizacao.HasValue? item.DataAtualizacao.Value.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                    
+                   
                     <td>
                         <a asp-action="Edit" asp-route-id="@item.TypeMaterialID" class="btn btn-sm btn-primary me-1">
                             <i class="bi bi-pencil-square"></i>

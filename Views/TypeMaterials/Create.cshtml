@@ -22,23 +22,6 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="Category" class="form-label"></label>
-            <input asp-for="Category" class="form-control" placeholder="e.g., Disposable, Reusable, Electromedical" />
-            <span asp-validation-for="Category" class="text-danger"></span>
-        </div>
-
-        <div class="form-check mb-3">
-            <input asp-for="Active" class="form-check-input" />
-            <label asp-for="Active" class="form-check-label"></label>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="DataCreate" class="form-label"></label>
-            <input asp-for="DataCreate" type="datetime-local" class="form-control" />
-            <span asp-validation-for="DataCreate" class="text-danger"></span>
-        </div>
-
 
         <div class="d-flex justify-content-between mt-4">
             <a asp-action="Index" class="btn btn-secondary">
