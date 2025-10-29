@@ -1,40 +1,60 @@
 ﻿@model HealthWellbeing.Models.TypeMaterial
 
 @{
-    ViewData["Title"] = "Material Type";
+    ViewData["Title"] = "Registar Tipo de Material";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">@ViewData["Title"]</h2>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-    <form asp-action="Create" method="post" class="border rounded shadow p-4 bg-light">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="card shadow-sm">
 
-        <div class="mb-3">
-            <label asp-for="Name" class="form-label"></label>
-            <input asp-for="Name" class="form-control" placeholder="e.g., Consumable, Equipment, Medical Device" />
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
+    
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-box-seam me-2"></i> Novo Tipo de Material
+        </h4>
+    </div>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label"></label>
-            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Detailed description of the material type..."></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+    <div class="card-body">
 
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
-        <div class="d-flex justify-content-between mt-4">
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
-            </a>
-            <button type="submit" class="btn btn-success">
-                <i class="bi bi-save"></i> Save
-            </button>
-        </div>
-    </form>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de Material</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Consumível, Equipamento, Dispositivo Médico">
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold">Descrição</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Ex: Materiais utilizados para esterilização ou uso único."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Submeter Registo
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                </a>
+            </div>
+        </form>
+
+    </div>
+    
 
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
