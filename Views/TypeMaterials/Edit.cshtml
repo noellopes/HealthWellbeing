@@ -1,39 +1,61 @@
-﻿@model HealthWellbeing.Models.TypeMaterial
+﻿@using HealthWellbeing.Models
+@model TypeMaterial
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Tipo de Material";
 }
 
-<h1>Edit</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h4>TypeMaterial</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="card shadow-sm">
+
+    
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Editar Dados do Tipo de Material
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
             <input type="hidden" asp-for="TypeMaterialID" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de Material</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Consumível, Equipamento, Dispositivo Médico" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold">Descrição</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Descrição detalhada do tipo de material..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-save me-1"></i> Guardar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+                </a>
             </div>
         </form>
     </div>
-</div>
+    
 
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
