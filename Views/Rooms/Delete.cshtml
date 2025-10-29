@@ -4,51 +4,71 @@
     ViewData["Title"] = "Eliminar Sala";
 }
 
-<h1 class="mb-4 text-danger"><i class="bi bi-trash-fill"></i> Eliminar Sala</h1>
+<h1 class="mb-4 text-danger">
+    <i class="bi bi-trash me-2"></i>
+    @ViewData["Title"]
+</h1>
 
-<div class="card border-danger shadow-sm">
+<div class="card shadow-sm">
+
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Atenção: Eliminação Irreversível
+        </h4>
+    </div>
+
     <div class="card-body">
-        <h5 class="mb-3">Tem certeza que deseja eliminar esta sala?</h5>
 
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold text-secondary">Id</dt>
+        <p class="lead text-muted">Tem a certeza que deseja eliminar esta sala? Esta ação é irreversível.</p>
+
+        <dl class="row mb-0 mt-4">
+
+            <dt class="col-sm-3 fw-bold text-muted">Id</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.FormattedRoomId)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Tipo de Sala</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Tipo de Sala</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RoomsType)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Especialidade</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Nome</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
+            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Capacidade</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Capacidade</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Capacity)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Localização</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Location)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Horário de Funcionamento</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Horário de Funcionamento</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.OperatingHours)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Estado</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Observações</dt>
-            <dd class="col-sm-9">"@Model.Notes"</dd>
-        </dl>
-    </div>
-</div>
+            <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
 
-<div class="mt-4 d-flex gap-2">
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="RoomId" />
-        <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash-fill"></i> Confirmar Eliminação
-        </button>
-    </form>
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left-circle"></i> Cancelar
-    </a>
+        </dl>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-end gap-2">
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RoomId" />
+
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash me-1"></i> Sim
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+            </a>
+        </form>
+
+    </div>
 </div>

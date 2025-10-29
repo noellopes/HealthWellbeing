@@ -1,49 +1,71 @@
 ﻿@model HealthWellbeing.Models.Room
 
 @{
-    ViewData["Title"] = "Detalhes da Sala";
+    ViewData["Title"] = "Detalhes da sala";
 }
 
-<h1 class="mb-4 text-info"><i class="bi bi-info-circle-fill"></i> Detalhes da Sala @Model.Name</h1>
+<h1 class="mb-4 text-info">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    @ViewData["Title"]
+</h1>
 
 <div class="card shadow-sm">
+
+    <div class="card-header bg-info text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-door-open me-2"></i>
+            Informações da Sala @Model.Name
+        </h4>
+    </div>
+
     <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold text-secondary">Id</dt>
+
+        <dl class="row mb-0 mt-4">
+
+            <dt class="col-sm-3 fw-bold text-muted">Id</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.FormattedRoomId)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Tipo de Sala</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Tipo de Sala</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RoomsType)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Especialidade</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Nome</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
+            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Capapacidade</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Capacidade</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Capacity)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Localização</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Location)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Horário de Funcionamento</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Horário de Funcionamento</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.OperatingHours)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Estado</dt>
+            <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
 
-            <dt class="col-sm-3 fw-bold text-secondary">Observações</dt>
-            <dd class="col-sm-9">"@Model.Notes"</dd>
-        </dl>
-    </div>
-</div>
+            <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
 
-<div class="mt-4 d-flex gap-2">
-    <a asp-action="Edit" asp-route-id="@Model?.RoomId" class="btn btn-warning">
-        <i class="bi bi-pencil-square"></i> Editar
-    </a>
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left-circle"></i> Voltar à Lista
-    </a>
+        </dl>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-end gap-2">
+
+        <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning me-2">
+            <i class="bi bi-pencil-square me-1"></i> Editar
+        </a>
+
+        <a asp-action="Delete" asp-route-id="@Model.RoomId" class="btn btn-danger me-2">
+            <i class="bi bi-trash me-1"></i> Eliminar
+        </a>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+        </a>
+
+    </div>
 </div>
