@@ -33,24 +33,32 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var tipoServicoModel = await _context.TipoServicos
+            var tipoServico = await _context.TipoServicos
                 .FirstOrDefaultAsync(m => m.TipoServicoId == id);
-            if (tipoServicoModel == null)
+            if (tipoServico == null)
             {
                 return NotFound();
             }
 
-            return View(tipoServicoModel);
+            return View(tipoServico);
+        }
+
+        // GET: TipoServico/Create
+        public IActionResult Create()
+        {
+            return View();
         }
 
         // POST: TipoServico/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicoModel tipoServico)
         {
             if (ModelState.IsValid)
             {
-                    _context.Add(tipoServico);
+                _context.Add(tipoServico);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
