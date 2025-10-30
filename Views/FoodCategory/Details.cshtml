@@ -1,41 +1,39 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model FoodCategory
+﻿@model HealthWellbeing.Models.FoodCategory
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Category Details";
 }
-<h1>Details</h1>
+
+<h1>@ViewData["Title"]</h1>
 
 <dl class="row">
-    <dt class="col-sm-3">Name</dt>
+    <dt class="col-sm-3">Category</dt>
     <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Parent</dt>
+    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
 
     <dt class="col-sm-3">Description</dt>
     <dd class="col-sm-9">@Model.Description</dd>
 
-    <dt class="col-sm-3">ParentCategory</dt>
-    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
-
     <dt class="col-sm-3">Subcategories</dt>
     <dd class="col-sm-9">
-        @if (Model.SubCategories?.Any() == true)
+        @if (Model.SubCategory != null && Model.SubCategory.Any())
         {
-            <ul>
-                @foreach (var s in Model.SubCategories.OrderBy(x => x.Name))
+            <ul class="mb-0">
+                @foreach (var sc in Model.SubCategory)
                 {
-                    <li>@s.Name</li>
+                    <li>@sc.Name</li>
                 }
             </ul>
         }
         else
         {
-            <span>(Uncategorized)</span>
+            <span class="text-muted">None</span>
         }
     </dd>
 </dl>
 
-<p>
-    <a asp-action="Edit" asp-route-id="@Model.FoodCategoryId" class="btn btn-warning">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-</p>
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.FoodCategoryId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</div>

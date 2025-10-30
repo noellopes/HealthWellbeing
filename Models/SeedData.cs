@@ -14,7 +14,7 @@ internal class SeedData
 
 		PopulateClients(dbContext);
         PopulateFoodCategory(dbContext);
-
+        PopulateFoodComponent(dbContext);
     }
 
 	private static void PopulateClients(HealthWellbeingDbContext dbContext)
