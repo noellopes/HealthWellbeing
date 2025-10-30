@@ -342,46 +342,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("RestricaoAlimentar");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.UserFoodRegistration", b =>
-                {
-                    b.Property<int>("UserFoodRegId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserFoodRegId"));
-
-                    b.Property<string>("ClientId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("FoodName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("MealDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MealType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<double>("Quantity")
-                        .HasColumnType("float");
-
-                    b.HasKey("UserFoodRegId");
-
-                    b.HasIndex("ClientId");
-
-                    b.ToTable("UserFoodRegistration");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Food", "Food")
@@ -408,17 +368,6 @@ namespace HealthWellbeing.Migrations
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.UserFoodRegistration", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
                         .WithMany()

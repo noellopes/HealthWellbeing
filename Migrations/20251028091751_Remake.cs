@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
     public partial class Remake : Migration
+========
+    public partial class Grupo3 : Migration
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -153,6 +157,7 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
                 name: "UserFoodRegistration",
                 columns: table => new
                 {
@@ -177,6 +182,8 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+========
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
                 name: "Food",
                 columns: table => new
                 {
@@ -241,11 +248,14 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Member_ClientId",
                 table: "Member",
                 column: "ClientId");
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserFoodRegistration_ClientId",
                 table: "UserFoodRegistration",
                 column: "ClientId");
+========
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
         }
 
         /// <inheritdoc />

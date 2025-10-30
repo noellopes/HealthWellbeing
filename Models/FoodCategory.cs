@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -12,10 +13,19 @@ namespace HealthWellbeing.Models
         [Display(Name = "Category name")]
         public string Name { get; set; } = default!;
 
-        [StringLength(250)]
-        [Display(Name = "Description")]
-        public string? Description { get; set; }
+        [StringLength(255)]
+        public string Description { get; set; }
 
-        public ICollection<Food>? Foods { get; set; }
+        // --- Hierarquia categoria pai/filho ---
+        public int? ParentCategoryId { get; set; }
+
+        [ForeignKey(nameof(ParentCategoryId))]
+        public FoodCategory? ParentCategory { get; set; }
+
+        // Filhos (subcategorias)
+        [InverseProperty(nameof(ParentCategory))]
+        public ICollection<FoodCategory> SubCategories { get; set; } = new List<FoodCategory>(); 
+
+        public ICollection<Food>? Foods { get; set; } = new List<Food>();
     }
 }
