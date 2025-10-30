@@ -52,17 +52,6 @@
                     <input asp-for="Gender" class="form-control" />
                     <span asp-validation-for="Gender" class="text-danger"></span>
                 </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="Membership" name="Membership" value="true" checked="@(Model.Membership == true ? "checked" : null)">
-                    <label class="form-check-label fw-bold" for="Membership">
-                        @Html.DisplayNameFor(model => model.Membership)
-                    </label>
-
-                    <input type="hidden" name="Membership" value="false" />
-
-                    <span asp-validation-for="Membership" class="text-danger d-block"></span>
-                </div>
-
                 <div class="mb-3 d-flex justify-content-between pt-2">
                     <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
 

@@ -31,8 +31,7 @@ internal class SeedData
                 Address = "10 Downing St, London",
                 BirthDate = new DateTime(1990, 5, 15),
                 Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-30),
-                Membership = true
+                RegistrationDate = DateTime.Now.AddDays(-30)
             },
             new Client
             {
@@ -44,7 +43,6 @@ internal class SeedData
                 BirthDate = new DateTime(1985, 10, 20),
                 Gender = "Male",
                 RegistrationDate = DateTime.Now.AddDays(-15),
-				Membership = false
             },
             new Client
             {
@@ -55,8 +53,7 @@ internal class SeedData
                 Address = "123 Comic Strip Ave",
                 BirthDate = new DateTime(2000, 1, 1),
                 Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-5),
-				Membership = false
+                RegistrationDate = DateTime.Now.AddDays(-5)
             }
         });
 

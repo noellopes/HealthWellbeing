@@ -64,11 +64,6 @@
             <dt class="col-sm-3 fw-bold">
                 @Html.DisplayNameFor(model => model.Membership)
             </dt>
-            <dd class="col-sm-9">
-                @{
-                    string badgeClass = Model.Membership == true ? "bg-success" : (Model.Membership == false ? "bg-danger" : "bg-warning text-dark");
-                }
-            </dd>
         </dl>
     </div>
 </div>

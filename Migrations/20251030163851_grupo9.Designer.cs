@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251028121559_grupo9")]
+    [Migration("20251030163851_grupo9")]
     partial class grupo9
     {
         /// <inheritdoc />
@@ -136,9 +136,6 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool?>("CreateMember")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -294,6 +291,39 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RestricaoAlimentar");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Trainer", b =>
+                {
+                    b.Property<int>("TrainerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainerId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Speciality")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TrainerId");
+
+                    b.ToTable("Trainer");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TrainingType", b =>

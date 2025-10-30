@@ -33,8 +33,7 @@ namespace HealthWellbeing.Models
 
 		[DataType(DataType.Date)]
 		public DateTime RegistrationDate { get; set; } = DateTime.Now;
-
-		public bool? Membership { get; set; }
+		public Member? Membership { get; set; }
 	}
 }
 
