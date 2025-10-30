@@ -3,13 +3,26 @@
     ViewData["Title"] = "Delete Category";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>@ViewData["Title"]</h1>
 
-<h4>Are you sure you want to delete this item? <strong>@Model.Name</strong>?</h4>
-<div class="text-muted">Parent Category: @Model.ParentCategory?.Name</div>
+<div class="alert alert-warning">
+    <strong>Are you sure you want to delete this category?</strong>
+    <div class="small text-muted">This action cannot be undone.</div>
+</div>
 
-<form asp-action="Delete" method="post">
+<dl class="row">
+    <dt class="col-sm-3">Category</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Parent</dt>
+    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+</dl>
+
+<form asp-action="Delete" method="post" onsubmit="return confirm('Confirm deletion?');">
     <input type="hidden" asp-for="FoodCategoryId" />
-    <button type="submit" class="btn btn-danger mt-3">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Cancel</a>
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

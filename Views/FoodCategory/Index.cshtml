@@ -1,25 +1,47 @@
-﻿@{
-    ViewData["Title"] = "Categoria de Alimentos";
+﻿@model IEnumerable<HealthWellbeing.Models.FoodCategory>
+@{
+    ViewData["Title"] = "Food Categories";
 }
 
+<h1>@ViewData["Title"]</h1>
 
-<div class="card text-center">
-    <div class="card-header">
-        <ul class="nav nav-tabs card-header-tabs">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="true" href="#">Active</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-            </li>
-        </ul>
-    </div>
-    <div class="card-body">
-        <h5 class="card-title">Special title treatment</h5>
-        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-</div>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">There are no categories yet.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Parent</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.ParentCategory?.Name</td>
+                    <td>@item.Description</td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-id="@item.FoodCategoryId" class="btn btn-sm btn-info">Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.FoodCategoryId" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.FoodCategoryId"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this category?');">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

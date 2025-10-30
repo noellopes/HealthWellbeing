@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251027193313_RebuildGrupo3")]
-    partial class RebuildGrupo3
+    [Migration("20251030101849_Grupo3")]
+    partial class Grupo3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,9 +75,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ClientId1")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<bool?>("CreateMember")
                         .HasColumnType("bit");
 
@@ -105,8 +102,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("ClientId");
-
-                    b.HasIndex("ClientId1");
 
                     b.ToTable("Client");
                 });
@@ -159,21 +154,15 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodCategoryId"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("FoodCategoryId");
-
-                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("FoodCategory");
                 });
@@ -238,7 +227,8 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("MemberId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.ToTable("Member");
                 });
@@ -360,13 +350,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Food");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Client", null)
-                        .WithMany("Clients")
-                        .HasForeignKey("ClientId1");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.FoodCategory", "Category")
@@ -376,20 +359,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.FoodCategory", "ParentCategory")
-                        .WithMany("SubCategories")
-                        .HasForeignKey("ParentCategoryId");
-
-                    b.Navigation("ParentCategory");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
+                        .WithOne("Membership")
+                        .HasForeignKey("HealthWellbeing.Models.Member", "ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -398,14 +372,12 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
-                    b.Navigation("Clients");
+                    b.Navigation("Membership");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
                 {
                     b.Navigation("Foods");
-
-                    b.Navigation("SubCategories");
                 });
 #pragma warning restore 612, 618
         }

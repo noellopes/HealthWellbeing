@@ -28,7 +28,7 @@ namespace HealthWellbeing.Models
 
         // Filhos (subcategorias)
         [InverseProperty(nameof(ParentCategory))]
-        public ICollection<FoodCategory> SubCategories { get; set; } = new List<FoodCategory>();
+        public ICollection<FoodCategory> SubCategory { get; set; } = new List<FoodCategory>();
 
         public ICollection<Food>? Foods { get; set; } = new List<Food>();
 
