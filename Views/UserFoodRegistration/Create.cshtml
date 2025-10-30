@@ -1,55 +1,60 @@
 ﻿@model HealthWellbeing.Models.UserFoodRegistration
 
 @{
-    ViewData["Title"] = "Add Food Record";
+    ViewData["Title"] = "Create Registration";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<hr />
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
-
-            <div class="form-group mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="UserId" class="form-label"></label>
-                <input asp-for="UserId" class="form-control" type="number" min="1" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MealDateTime" class="form-label"></label>
-                <input asp-for="MealDateTime" class="form-control" type="datetime-local" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MealType" class="form-label"></label>
-                <input asp-for="MealType" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="FoodName" class="form-label"></label>
-                <input asp-for="FoodName" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Quantity" class="form-label"></label>
-                <input asp-for="Quantity" class="form-control" type="number" step="0.1" min="0.1" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Notes" class="form-label"></label>
-                <textarea asp-for="Notes" class="form-control"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-success">Save</button>
-            <a asp-action="Index" class="btn btn-secondary">Back</a>
-        </form>
+<form asp-action="Create" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="Client"></label>
+        <select asp-for="ClientId" asp-items="ViewBag.Clients" class="form-control"></select>
+        <span asp-validation-for="ClientId" class="text-danger"></span>
     </div>
-</div>
+
+    <div class="form-group mb-3">
+        <label asp-for="MealDateTime"></label>
+        <input asp-for="MealDateTime" class="form-control" type="datetime-local"
+               value="@(Model != null && Model.MealDateTime != default ? Model.MealDateTime.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+        <span asp-validation-for="MealDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="MealType"></label>
+        <input asp-for="MealType" class="form-control" />
+        <span asp-validation-for="MealType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="FoodName"></label>
+        <input asp-for="FoodName" class="form-control" />
+        <span asp-validation-for="FoodName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Quantity"></label>
+        <input asp-for="Quantity" class="form-control" type="number" step="0.1" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Notes"></label>
+        <input asp-for="Notes" class="form-control" />
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
