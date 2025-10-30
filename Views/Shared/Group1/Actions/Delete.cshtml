@@ -1,0 +1,58 @@
+﻿@model dynamic
+
+@{
+    /*
+     * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+     * DON'T MODIFY — Instead, copy into your own folder
+     * Pass Model, ViewBag.ModelType, and ViewBag.Properties (list of property names)
+     */
+
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+    var _AlertPartial = "Group1/Partials/Alert";
+
+    var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
+    var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No data found.");
+
+    if (TempData["Message"] != null)
+    {
+        var alertModel = Tuple.Create(TempData["AlertType"]?.ToString() ?? "info", TempData["IconClass"]?.ToString() ?? "", TempData["Message"]?.ToString() ?? "");
+        <partial name="@_AlertPartial" model="alertModel" />
+    }
+}
+
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+
+@if (noConfig)
+{
+    <partial name="@_AlertPartial" model="configAlertModel" />
+}
+else
+{
+    <h4>Pretende remover o seguinte registo?</h4>
+    <div class="card shadow-sm mt-4">
+        @if (Model == null)
+        {
+            <partial name="@_AlertPartial" model="noDataAlertModel" />
+        }
+        else
+        {
+            <div class="card-body">
+                <dl class="row">
+                    @foreach (var prop in properties)
+                    {
+                        <dt>@HealthWellbeing.Views.Shared.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</dt>
+                        <dd>@HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(Model, prop)</dd>
+                    }
+                </dl>
+            </div>
+            <form asp-action="Delete" class="card-footer text-right">
+                <input type="hidden" value="@Model?.Id" />
+                <input type="submit" value="Delete" class="btn btn-sm btn-outline-danger mr-2" />
+                <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-secondary">Voltar</a>
+            </form>
+        }
+    </div>
+}
+

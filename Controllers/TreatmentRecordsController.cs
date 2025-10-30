@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
@@ -54,15 +55,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TreatmentRecords/Create
+        //[Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["Title"] = "Marcação de tratamento";
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("~/Views/Shared/Group1/Actions/Edit.cshtml");
+            return View("CreateOrEdit");
         }
 
         // POST: TreatmentRecords/Create
@@ -85,12 +85,10 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
             ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
             ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
             ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
-            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
+            return View("CreateOrEdit", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Edit/5
@@ -108,12 +106,10 @@ namespace HealthWellbeing.Controllers
             }
 
             ViewData["Title"] = "Editar marcação de tratamento";
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
+            return View("CreateOrEdit", treatmentRecord);
         }
 
         // POST: TreatmentRecords/Edit/5
@@ -154,12 +150,10 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "NurseId", "PathologyId", "TreatmentId", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status" };
             ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
             ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
             ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
-            return View("~/Views/Shared/Group1/Actions/Edit.cshtml", treatmentRecord);
+            return View("CreateOrEdit", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Delete/5
@@ -180,7 +174,10 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            return View(treatmentRecord);
+            ViewData["Title"] = "Remover tratamento";
+            ViewBag.ModelType = typeof(TreatmentRecord);
+            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
+            return View("~/Views/Shared/Group1/Actions/Delete.cshtml", treatmentRecord);
         }
 
         // POST: TreatmentRecords/Delete/5
