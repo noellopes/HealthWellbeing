@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251029225151_InitialCreate")]
+    [Migration("20251029235527_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -23,6 +23,21 @@ namespace HealthWellbeing.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BeneficioTipoExercicio", b =>
+                {
+                    b.Property<int>("BeneficiosBeneficioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TipoExercicioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BeneficiosBeneficioId", "TipoExercicioId");
+
+                    b.HasIndex("TipoExercicioId");
+
+                    b.ToTable("BeneficioTipoExercicio");
+                });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
@@ -100,6 +115,29 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("CategoriaAlimentoId");
 
                     b.ToTable("Alimento");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Beneficio", b =>
+                {
+                    b.Property<int>("BeneficioId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BeneficioId"));
+
+                    b.Property<string>("DescricaoBeneficio")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NomeBeneficio")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("BeneficioId");
+
+                    b.ToTable("Beneficio");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.CategoriaAlimento", b =>
@@ -294,27 +332,17 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoExercicioId"));
 
-                    b.Property<string>("BeneficioTipoExercicios")
+                    b.Property<string>("CaracteristicasTipoExercicios")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("CategoriaTipoExercicios")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("DescricaoTipoExercicios")
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("GruposMuscularesTrabalhadosTipoExercicios")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("NivelDificuldadeTipoExercicios")
+                    b.Property<string>("NomeTipoExercicios")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -322,6 +350,21 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("TipoExercicioId");
 
                     b.ToTable("TipoExercicio");
+                });
+
+            modelBuilder.Entity("BeneficioTipoExercicio", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Beneficio", null)
+                        .WithMany()
+                        .HasForeignKey("BeneficiosBeneficioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.TipoExercicio", null)
+                        .WithMany()
+                        .HasForeignKey("TipoExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>

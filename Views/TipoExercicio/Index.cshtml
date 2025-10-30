@@ -7,53 +7,60 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
 </p>
-<table class="table">
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoriaTipoExercicios)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NivelDificuldadeTipoExercicios)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BeneficioTipoExercicios)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GruposMuscularesTrabalhadosTipoExercicios)
-            </th>
-            <th></th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Benefícios</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoriaTipoExercicios)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DescricaoTipoExercicios)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NivelDificuldadeTipoExercicios)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BeneficioTipoExercicios)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GruposMuscularesTrabalhadosTipoExercicios)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.TipoExercicioId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TipoExercicioId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TipoExercicioId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NomeTipoExercicios)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DescricaoTipoExercicios)
+                </td>
+                <td>
+                    <!-- ✅ ADICIONADO: Lista de benefícios -->
+                    @if (item.Beneficios != null && item.Beneficios.Any())
+                    {
+                        <div class="beneficios-list">
+                            @foreach (var beneficio in item.Beneficios.Take(3))
+                            {
+                                <span class="badge bg-primary me-1 mb-1">
+                                    <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
+                                       class="text-white text-decoration-none"
+                                       target="_blank">
+                                        @beneficio.NomeBeneficio
+                                    </a>
+                                </span>
+                            }
+                            @if (item.Beneficios.Count > 3)
+                            {
+                                <span class="badge bg-secondary">+@(item.Beneficios.Count - 3) mais</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum benefício</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

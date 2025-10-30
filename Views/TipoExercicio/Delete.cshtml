@@ -11,38 +11,52 @@
     <h4>TipoExercicio</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoriaTipoExercicios)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NomeTipoExercicios)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoriaTipoExercicios)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NomeTipoExercicios)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DescricaoTipoExercicios)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NivelDificuldadeTipoExercicios)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CaracteristicasTipoExercicios)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NivelDificuldadeTipoExercicios)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BeneficioTipoExercicios)
+
+        <!-- ✅ ADICIONADO: Benefícios Associados -->
+        <dt class="col-sm-2">
+            Benefícios Associados
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BeneficioTipoExercicios)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GruposMuscularesTrabalhadosTipoExercicios)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GruposMuscularesTrabalhadosTipoExercicios)
+        <dd class="col-sm-10">
+            @if (Model.Beneficios != null && Model.Beneficios.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var beneficio in Model.Beneficios)
+                    {
+                        <li>
+                            <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
+                               target="_blank"
+                               class="text-decoration-none">
+                                📌 @beneficio.NomeBeneficio
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Nenhum benefício associado</span>
+            }
         </dd>
     </dl>
-    
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="TipoExercicioId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
