@@ -60,6 +60,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(exameTipo);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(exameTipo);
@@ -99,6 +100,7 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(exameTipo);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi atualizado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -143,6 +145,7 @@ namespace HealthWellbeing.Controllers
             if (exameTipo != null)
             {
                 _context.ExameTipo.Remove(exameTipo);
+                TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi apagado com sucesso!";
             }
 
             await _context.SaveChangesAsync();
