@@ -13,7 +13,8 @@ namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
     [Migration("20251028121758_InitialCreate")]
-    partial class InitialCreate
+    partial class InitialCreate20251028121758
+
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
