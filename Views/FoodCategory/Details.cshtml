@@ -15,19 +15,11 @@
     <dd class="col-sm-9">@Model.Description</dd>
 
     <dt class="col-sm-3">ParentCategory</dt>
-    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
+    
 
     <dt class="col-sm-3">Subcategories</dt>
     <dd class="col-sm-9">
-        @if (Model.SubCategories?.Any() == true)
-        {
-            <ul>
-                @foreach (var s in Model.SubCategories.OrderBy(x => x.Name))
-                {
-                    <li>@s.Name</li>
-                }
-            </ul>
-        }
+        
         else
         {
             <span>(Uncategorized)</span>
