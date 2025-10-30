@@ -10,22 +10,22 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ZonaArmazenamentoesController : Controller
+    public class ZonaArmazenamentoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public ZonaArmazenamentoesController(HealthWellbeingDbContext context)
+        public ZonaArmazenamentoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: ZonaArmazenamentoes
+        // GET: ZonaArmazenamento
         public async Task<IActionResult> Index()
         {
             return View(await _context.ZonaArmazenamento.ToListAsync());
         }
 
-        // GET: ZonaArmazenamentoes/Details/5
+        // GET: ZonaArmazenamento/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,13 +43,13 @@ namespace HealthWellbeing.Controllers
             return View(zonaArmazenamento);
         }
 
-        // GET: ZonaArmazenamentoes/Create
+        // GET: ZonaArmazenamento/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: ZonaArmazenamentoes/Create
+        // POST: ZonaArmazenamento/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
             return View(zonaArmazenamento);
         }
 
-        // GET: ZonaArmazenamentoes/Edit/5
+        // GET: ZonaArmazenamento/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,7 +81,7 @@ namespace HealthWellbeing.Controllers
             return View(zonaArmazenamento);
         }
 
-        // POST: ZonaArmazenamentoes/Edit/5
+        // POST: ZonaArmazenamento/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -116,7 +116,7 @@ namespace HealthWellbeing.Controllers
             return View(zonaArmazenamento);
         }
 
-        // GET: ZonaArmazenamentoes/Delete/5
+        // GET: ZonaArmazenamento/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -134,7 +134,7 @@ namespace HealthWellbeing.Controllers
             return View(zonaArmazenamento);
         }
 
-        // POST: ZonaArmazenamentoes/Delete/5
+        // POST: ZonaArmazenamento/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
