@@ -1,47 +1,54 @@
-﻿@model HealthWellbeing.Models.ProfissionalExecutante
+﻿@model HealthWellbeing.Models.ExameTipo
 
 @{
-    ViewData["Title"] = "Criar Profissional Executante";
+    ViewData["Title"] = "Criar Novo Tipo de Exame";
 }
 
-<h2 class="text-center mt-3">Criar Novo Profissional</h2>
-<hr />
+<div class="container mt-4">
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        @* CORREÇÃO AQUI: mudado asp-action="CriarProfissional" para asp-action="Create" *@
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <h1 class="display-5 mb-3">Criar Novo Tipo de Exame</h1>
 
-            <div class="form-group mb-3">
-                <label asp-for="Nome" class="form-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
+    <hr />
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg p-3">
+                <div class="card-body">
+                    <form asp-action="Create">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Nome" class="form-label"></label>
+                            <input asp-for="Nome" class="form-control" placeholder="Ex: Análise de Sangue" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descrição detalhada do exame."></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Especialidade" class="form-label"></label>
+                            <input asp-for="Especialidade" class="form-control" placeholder="Ex: Cardiologia, Hematologia" />
+                            <span asp-validation-for="Especialidade" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" value="Create" class="btn btn-success">
+                                <i class="bi bi-save"></i> Salvar
+                            </button>
+
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-short"></i> Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Funcao" class="form-label"></label>
-                <input asp-for="Funcao" class="form-control" />
-                <span asp-validation-for="Funcao" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Telefone" class="form-label"></label>
-                <input asp-for="Telefone" class="form-control" />
-                <span asp-validation-for="Telefone" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="d-flex justify-content-between mt-4">
-                <a asp-action="VerProfissionais" class="btn btn-secondary">Voltar</a>
-                <button type="submit" class="btn btn-success">Guardar</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
