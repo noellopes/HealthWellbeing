@@ -5,7 +5,7 @@
         public int LevelId { get; set; } // Primary Key
         public int Level { get; set; } // Level number 1-100
         public string LevelCategory { get; set; } // Level Category (If X level then Y category and Z circle color)
-        public string Description { get; set; }=default!;  // Description 
+        public string Description { get; set; }  // Description 
 
 
         public Levels(int level)
