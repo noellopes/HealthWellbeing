@@ -1,0 +1,23 @@
+﻿@model HealthWellbeing.Models.ZonaArmazenamento
+
+<h2>Eliminar Zona</h2>
+
+<h4>Tem a certeza que deseja eliminar esta zona?</h4>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Nome</dt>
+        <dd class="col-sm-10">@Model.Nome</dd>
+
+        <dt class="col-sm-2">Localização</dt>
+        <dd class="col-sm-10">@Model.Localizacao</dd>
+
+        <dt class="col-sm-2">Capacidade</dt>
+        <dd class="col-sm-10">@Model.CapacidadeMaxima</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -2,12 +2,20 @@ namespace HealthWellbeing.Models;
 
 public class Consumivel
 {
-    public int ConsumiveisId { get; set; }
+    public int ConsumivelId { get; set; }
     public string Categoria { get; set; }
     public string Nome { get; set; }
     public string ZonaArmazenamento { get; set; }
     public List<string> Fornecedores { get; set; }
     public int Stock { get; set; }
     public int SalaId { get; set; }
+}
 
+public static class ConsumivelRepository
+{
+    private static List<Consumivel> consumiveis = new();
+
+    public static IEnumerable<Consumivel> Consumiveis => consumiveis;
+
+    public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
 }
