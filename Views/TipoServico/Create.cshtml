@@ -5,10 +5,17 @@
 
 }
 
-<h2>Criar Novo Tipo de Serviço</h2>
-<hr />
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<form asp-action="Create">
+<div class="card shadow-sm">
+    <div class="card-header bg-sucess text-white">
+        <h4 class="mb-0">
+            <i class="bg bi-plus-circle me-2"></i>Novo Serviço
+        </h4>
+    </div>
+    <div class="card-body">
+   
+    <form asp-action="Create">
 
     <div class="form-group">
         <label asp-for="Nome" class="control-label"></label>
@@ -25,9 +32,14 @@
     <br />
 
     <button type="submit" class="btn btn-primary">Criar</button>
-    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar
+
+    </a>
 
 </form>
+    </div>
+</div>
+
 
 @section Scripts {
     @{
