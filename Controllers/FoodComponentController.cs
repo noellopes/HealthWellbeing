@@ -36,7 +36,7 @@ namespace HealthWellbeing.Controllers
         // GET: FoodComponentController/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new FoodComponent());
         }
 
         // POST: FoodComponentController/Create

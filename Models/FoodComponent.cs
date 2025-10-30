@@ -11,7 +11,6 @@ namespace HealthWellbeing.Models
         [StringLength(50)]
         public string Name { get; set; } = default!;
 
-        [Required(ErrorMessage = "The food must have a description!")]
         [StringLength(200)]
         public string Description { get; set; } = default!;
     }
