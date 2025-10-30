@@ -14,7 +14,7 @@ namespace HealthWellbeing.Models
         [StringLength(500)]
         public string Descricao { get; set; }
 
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         
 

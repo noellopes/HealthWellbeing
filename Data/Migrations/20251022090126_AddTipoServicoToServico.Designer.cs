@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251022090126_AddTipoServicoToServico")]
+    partial class AddTipoServicoToServico
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,7 +63,7 @@ namespace HealthWellbeing.Data.Migrations
                     b.ToTable("Agendamentos");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.ServicoModel", b =>
                 {
                     b.Property<int>("ServicoId")
                         .ValueGeneratedOnAdd()
@@ -80,9 +83,9 @@ namespace HealthWellbeing.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Preco")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("decimal(10,2)");
 
-                    b.Property<int?>("TipoServicoId")
+                    b.Property<int>("TipoServicoId")
                         .HasColumnType("int");
 
                     b.HasKey("ServicoId");
@@ -127,7 +130,7 @@ namespace HealthWellbeing.Data.Migrations
                     b.ToTable("Terapeutas");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.TipoServico", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
                 {
                     b.Property<int>("TipoServicoId")
                         .ValueGeneratedOnAdd()
@@ -136,6 +139,7 @@ namespace HealthWellbeing.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoServicoId"));
 
                     b.Property<string>("Descricao")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nome")
@@ -413,8 +417,8 @@ namespace HealthWellbeing.Data.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.AgendamentoModel", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.Servico", "Servico")
-                        .WithMany()
+                    b.HasOne("HealthWellbeing.Models.ServicoModel", "Servico")
+                        .WithMany("Agendamentos")
                         .HasForeignKey("ServicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -438,11 +442,13 @@ namespace HealthWellbeing.Data.Migrations
                     b.Navigation("UtenteBalneario");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.ServicoModel", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.TipoServico", "TipoServico")
-                        .WithMany()
-                        .HasForeignKey("TipoServicoId");
+                    b.HasOne("HealthWellbeing.Models.TipoServicoModel", "TipoServico")
+                        .WithMany("Servicos")
+                        .HasForeignKey("TipoServicoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TipoServico");
                 });
@@ -498,9 +504,19 @@ namespace HealthWellbeing.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ServicoModel", b =>
+                {
+                    b.Navigation("Agendamentos");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.TerapeutaModel", b =>
                 {
                     b.Navigation("Agendamentos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServicoModel", b =>
+                {
+                    b.Navigation("Servicos");
                 });
 #pragma warning restore 612, 618
         }

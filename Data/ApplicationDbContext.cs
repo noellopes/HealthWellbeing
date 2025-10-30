@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Data
@@ -9,5 +10,10 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
+        public DbSet<TerapeutaModel> Terapeutas { get; set; }
+        public DbSet<Servico> Servicos { get; set; }
+        public DbSet<AgendamentoModel> Agendamentos { get; set; }
+        public DbSet<TipoServico> TipoServicos{ get; set; }
     }
 }
