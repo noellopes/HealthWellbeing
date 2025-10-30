@@ -13,7 +13,9 @@ internal class SeedData
 		dbContext.Database.EnsureCreated();
 
 		PopulateClients(dbContext);
-	}
+        PopulateFoodCategory(dbContext);
+
+    }
 
 	private static void PopulateClients(HealthWellbeingDbContext dbContext)
 	{
@@ -63,7 +65,7 @@ internal class SeedData
 				CreateMember = false // Rejected/Denied
 			}
 		});
-        });
+        
         dbContext.SaveChanges();
     }
 
