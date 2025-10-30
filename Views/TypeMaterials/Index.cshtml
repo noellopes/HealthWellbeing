@@ -2,7 +2,7 @@
 @model IEnumerable<TypeMaterial>
 
 @{
-    ViewData["Title"] = "Tipos de Materiais Registados";
+    ViewData["Title"] = "Tipos de Materiais de Dispositivos Médicos Móveis";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -28,7 +28,7 @@
 else
 {
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Tipos de Materiais</h2>
+        <h2 class="h4">List</h2>
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle me-1"></i> Criar Novo
         </a>
@@ -69,3 +69,4 @@ else
         </table>
     </div>
 }
+ 

@@ -8,7 +8,7 @@ using HealthWellbeing.Models;
 namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
-    {
+     {
         public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
