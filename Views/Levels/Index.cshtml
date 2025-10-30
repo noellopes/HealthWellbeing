@@ -1,100 +1,47 @@
-﻿@model HealthWellbeing.Models.Levels
+﻿@model IEnumerable<HealthWellbeing.Models.Levels>
 
 @{
-    ViewData["Title"] = "Level";
+    ViewData["Title"] = "Levels";
 }
 
-<div class ="level-container">
-    <div class="level-circle" style="border-color:@Model.LevelCategory">
-        <span class="level-number">
-            @Model.Level
-        </span>
-    </div>
-</div>
+<h1>Viewbag.Title</h1>
 
-<div style="text-align:center; margin-top:20px;">
-    <a href="@Url.Action("Index", new { level = Model.Level - 1 })" class="btn">◀</a>
-    <form action="@Url.Action("Index")" method="get" class="level-form">
-        <input type="number" name="level" min="1" max="100" value="@Model.Level" />
-        <button type="submit" class="btn">Go</button>
-    </form>
-    <a href="@Url.Action("Index", new { level = Model.Level + 1 })" class="btn">▶</a>
-</div>
-
-
-<style>
-    .level-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 500px;
-        background: #f2f2f2;
-    }
-
-    .level-circle {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 10px solid;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: white;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        transition: border-color 0.5s ease;
-    }
-
-    .level-number {
-        font-size: 48px;
-        font-weight: bold;
-        color: #333;
-    }
-
-   
-
-    .btn {
-        padding: 10px 20px;
-        margin: 0 10px;
-        background: #ddd;
-        border-radius: 5px;
-        text-decoration: none;
-        color: #333;
-        font-weight: bold;
-        transition: background 0.2s;
-    }
-
-    .btn:hover {
-        background: #ccc;
-    }
-
-
-
-
-    .level-form {
-        display: inline-block;
-    }
-
-    .level-form input {
-        width: 70px;
-        padding: 8px;
-        text-align: center;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-    }
-
-    .level-form button {
-        padding: 8px 12px;
-        margin-left: 5px;
-        background: dodgerblue;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .level-form button:hover {
-        background: #555;
-    }
-</style>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Level)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LevelCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Level)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LevelCategory)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.LevelId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.LevelId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.LevelId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
