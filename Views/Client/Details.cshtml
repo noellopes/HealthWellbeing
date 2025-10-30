@@ -62,15 +62,12 @@
             </dd>
 
             <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.CreateMember)
+                @Html.DisplayNameFor(model => model.Membership)
             </dt>
             <dd class="col-sm-9">
                 @{
-                    string badgeClass = Model.CreateMember == true ? "bg-success" : (Model.CreateMember == false ? "bg-danger" : "bg-warning text-dark");
+                    string badgeClass = Model.Membership == true ? "bg-success" : (Model.Membership == false ? "bg-danger" : "bg-warning text-dark");
                 }
-                <span class="badge @badgeClass fs-6">
-                    @Model.CreateMemberText
-                </span>
             </dd>
         </dl>
     </div>

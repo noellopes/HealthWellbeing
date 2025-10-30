@@ -39,7 +39,7 @@
                     @Html.DisplayNameFor(model => model.RegistrationDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.CreateMember)
+                    @Html.DisplayNameFor(model => model.Membership)
                 </th>
                 <th>
                     Actions
@@ -71,13 +71,24 @@
                     <td class="d-none d-xl-table-cell">
                         @Html.DisplayFor(modelItem => item.RegistrationDate)
                     </td>
+                    <th class="text-center">
+                        Membership Status
+                    </th>
                     <td>
-                        @{
-                            string badgeClass = item.CreateMember == true ? "bg-success" : (item.CreateMember == false ? "bg-danger" : "bg-warning text-dark");
+                        @if (item.Membership != null)
+                        {
+                            // The client is a member, use a green badge
+                            <span class="badge bg-success">
+                                Active Member
+                            </span>
                         }
-                        <span class="badge @badgeClass">
-                            @item.CreateMemberText
-                        </span>
+                        else
+                        {
+                            // The client is not a member, use a gray badge or a button
+                            <a asp-controller="Member" asp-action="Create" asp-route-clientId="@item.ClientId" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-person-plus"></i> Make Member
+                            </a>
+                        }
                     </td>
                     <td class="text-nowrap">
                         <a asp-action="Edit" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-primary me-1">Edit</a>

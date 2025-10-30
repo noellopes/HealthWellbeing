@@ -34,17 +34,7 @@ namespace HealthWellbeing.Models
 		[DataType(DataType.Date)]
 		public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
-		public bool? CreateMember { get; set; }
-
-		public string CreateMemberText => CreateMember switch
-		{
-			true => "Yes",
-			false => "No",
-			_ => "Pending Acceptation..",
-		};
-
-		//public ICollection<Client>? Clients { get; set; } = default;
-		public Member? Membership { get; set; }
+		public bool? Membership { get; set; }
 	}
 }
 

@@ -32,7 +32,7 @@ internal class SeedData
                 BirthDate = new DateTime(1990, 5, 15),
                 Gender = "Female",
                 RegistrationDate = DateTime.Now.AddDays(-30),
-                CreateMember = true
+                Membership = true
             },
             new Client
             {
@@ -44,7 +44,7 @@ internal class SeedData
                 BirthDate = new DateTime(1985, 10, 20),
                 Gender = "Male",
                 RegistrationDate = DateTime.Now.AddDays(-15),
-                CreateMember = null
+				Membership = false
             },
             new Client
             {
@@ -56,7 +56,7 @@ internal class SeedData
                 BirthDate = new DateTime(2000, 1, 1),
                 Gender = "Male",
                 RegistrationDate = DateTime.Now.AddDays(-5),
-                CreateMember = false
+				Membership = false
             }
         });
 

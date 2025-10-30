@@ -22,8 +22,8 @@ namespace HealthWellbeing.Controllers
         // GET: Client
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Client.ToListAsync());
-        }
+			return View(await _context.Client.Include(c => c.Membership).ToListAsync());
+		}
 
         // GET: Client/Details/5
         public async Task<IActionResult> Details(string id)
@@ -55,7 +55,7 @@ namespace HealthWellbeing.Controllers
 		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender,CreateMember")] Client client)
+		public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender")] Client client)
 		{
 			if (ModelState.IsValid)
 			{
@@ -65,9 +65,16 @@ namespace HealthWellbeing.Controllers
 
 				_context.Add(client);
 				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(Index));
+				return RedirectToAction(nameof(ClientCreatedConfirmation), new { clientId = client.ClientId, clientName = client.Name });
 			}
 			return View(client);
+		}
+		public IActionResult ClientCreatedConfirmation(string clientId, string clientName)
+		{
+			// Passa o ID e Nome para a View
+			ViewBag.ClientId = clientId;
+			ViewBag.ClientName = clientName;
+			return View();
 		}
 
 		// GET: Client/Edit/5
@@ -91,7 +98,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Name,Email,Phone,Address,BirthDate,Gender,CreateMember")] Client client)
+        public async Task<IActionResult> Edit(string id, [Bind("Name,Email,Phone,Address,BirthDate,Gender,Membership")] Client client)
         {
             if (id != client.ClientId)
             {
