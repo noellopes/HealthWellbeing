@@ -1,0 +1,67 @@
+﻿@model IEnumerable<HealthWellbeingRoom.Models.Equipment>
+
+@{
+    ViewData["Title"] = "Lista de Equipamentos";
+}
+
+<h3>@ViewData["Title"]</h3>
+
+<p class="text-end">
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Criar Novo</a>
+</p>
+
+@{
+    if(!Model.Any())
+    {
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">Nenhum Equipamento!</h4>
+            <p>Não existe nenhum equipamento cadastrado, para adicionar equipamentos crie novos.</p>
+        </div>
+    } else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Nome
+                    </th>
+                    <th>
+                        Quantidade
+                    </th>
+                    <th>
+                        Nº Série
+                    </th>
+                    <th>
+                        Sala
+                    </th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SerialNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Room.Name)
+                    </td>
+                    <td class="text-end">
+                            <a class="btn btn-dark" asp-action="Edit" asp-route-id="@item.EquipmentId"><i class="bi bi-pencil-fill"></i> Editar</a>
+                            <a class="btn btn-info" asp-action="Details" asp-route-id="@item.EquipmentId"><i class="bi bi-eye"></i> Detalhes</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.EquipmentId"><i class="bi bi-trash"></i> Eliminar</a>
+                    </td>
+                </tr>
+        }
+            </tbody>
+        </table>
+    }
+}
+
+

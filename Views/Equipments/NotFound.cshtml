@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Equipamento";
+}
+
+
+<div class="text-end mb-3">
+	<a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-circle"></i> Criar Novo</a>
+	<a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Voltar a Lista</a>
+</div>
+<div class="alert alert-warning" role="alert">
+    <h4 class="alert-heading">@ViewBag.Title não encontrado!</h4>
+    <p>Não existe este @ViewBag.Title, adicione um novo ou consulte outro na lista.</p>
+</div>

@@ -1,0 +1,82 @@
+﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
+@model MedicalDevices;
+
+@{
+    // O nome da sua View (Registar novo Dispositivo Médico)
+    ViewData["Title"] = "Registar";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-clipboard-plus me-2"></i> Novo Dispositivo Médico
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Dispositivo</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Monitor Multiparamétrico">
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Type" class="form-label fw-bold">Tipo de Dispositivo (Categoria)</label>
+                        <input asp-for="Type" class="form-control" placeholder="Ex: Monitorização, Equipamento Cirúrgico">
+                        <span asp-validation-for="Type" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Specification" class="form-label fw-bold">Especificação Detalhada</label>
+                        <input asp-for="Specification" class="form-control" placeholder="Ex: Marca Philips, Modelo VM8, S/N 123456">
+                        <span asp-validation-for="Specification" class="text-danger small"></span>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Status" class="form-label fw-bold">Status</label>
+                        <input asp-for="Status" class="form-control" placeholder="Ex: Disponível, Em Uso, Em Manutenção.">
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observation" class="form-label fw-bold">Observações</label>
+                        <textarea asp-for="Observation" class="form-control" rows="4" placeholder="Ex: Adquirido em 2024. Calibração necessária em Dezembro."></textarea>
+                        <span asp-validation-for="Observation" class="text-danger small"></span>
+                    </div>
+
+                    <input asp-for="RegistrationDate" type="hidden" />
+                    <input asp-for="DevicesID" type="hidden" />
+                </div>
+
+            </div> <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Submeter Registo
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

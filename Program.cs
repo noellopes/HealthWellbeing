@@ -1,4 +1,7 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeingRoom;
+using HealthWellbeingRoom.Models.FileMedicalDevices;
+using HealthWellBeingRoom.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,15 +23,31 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else
+{
+    using (var serviceScope = app.Services.CreateScope())
+    {
+        var dbcontext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
+
+        //Usei Migrate(): Garante que as migrações (tabelas) sejam aplicadas ANTES de consultar.
+        //dbcontext.Database.Migrate();
+
+        //Chama o Populate
+        SeedDataMedicalDevices.Populate(dbcontext);
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
 }
 
 using (var scope = app.Services.CreateScope())

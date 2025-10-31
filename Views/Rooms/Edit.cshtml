@@ -1,0 +1,134 @@
+﻿@model HealthWellbeing.Models.Room
+
+@{
+    ViewData["Title"] = "Editar Sala";
+}
+
+<h1 class="mb-4 text-warning">
+    <i class="bi bi-pencil-square me-2"></i>
+    @ViewData["Title"]: @Model.Name
+</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-gear-fill me-2"></i>
+            Formulário de Edição
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RoomId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="RoomsType" class="form-label fw-bold">Tipo de Sala</label>
+                <select asp-for="RoomsType" class="form-select">
+                    <option value="">Selecione o tipo...</option>
+                    <option value="Consultas">Consultas</option>
+                    <option value="Tratamentos">Tratamentos</option>
+                </select>
+                <span asp-validation-for="RoomsType" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
+                <select asp-for="Specialty" class="form-select">
+                    <option value="">Selecione a especialidade...</option>
+                    <option value="Cardiologia">Cardiologia</option>
+                    <option value="Dermatologia">Dermatologia</option>
+                    <option value="Pediatria">Pediatria</option>
+                    <option value="Ginecologia">Ginecologia</option>
+                    <option value="Urologia">Urologia</option>
+                    <option value="Neurologia">Neurologia</option>
+                    <option value="Psiquiatria">Psiquiatria</option>
+                    <option value="Oftalmologia">Oftalmologia</option>
+                    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+                    <option value="Endocrinologia">Endocrinologia</option>
+                    <option value="Reumatologia">Reumatologia</option>
+                    <option value="Gastroenterologia">Gastroenterologia</option>
+                    <option value="Pneumologia">Pneumologia</option>
+                    <option value="Nefrologia">Nefrologia</option>
+                    <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                </select>
+                <span asp-validation-for="Specialty" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Capacity" class="form-label fw-bold">Capacidade</label>
+                <input asp-for="Capacity" class="form-control" type="number" min="1" />
+                <span asp-validation-for="Capacity" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Location" class="form-label fw-bold">Localização</label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
+                <input asp-for="OperatingHours" class="form-control" />
+                <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Estado</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="Criado" />
+                        <label class="form-check-label">Criado</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="Disponivel" />
+                        <label class="form-check-label">Disponível</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="Indisponivel" />
+                        <label class="form-check-label">Indisponível</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="Limpeza" />
+                        <label class="form-check-label">Limpeza</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="Manutencao" />
+                        <label class="form-check-label">Manutenção</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" asp-for="Status" value="ForaDeServico" />
+                        <label class="form-check-label">Fora de Serviço</label>
+                    </div>
+                </div>
+                <span asp-validation-for="Status" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label fw-bold">Observação</label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger small"></span>
+            </div>
+
+            <div class="card-footer d-flex justify-content-end gap-2 mt-4">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-save-fill me-1"></i> Guardar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>

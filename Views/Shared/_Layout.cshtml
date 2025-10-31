@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
@@ -30,8 +31,8 @@
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Salas</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Room" asp-action="CreateRoom">Criar Salas</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Room" asp-action="IndexRoom">Lista das Salas</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Create">Criar Salas</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Lista das Salas</a></li>
                                     </ul>
                                 </li>
 
@@ -46,24 +47,24 @@
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Equipamentos</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Equipment" asp-action="CreateEquipment">Criar Equipamentos</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Equipment" asp-action="ReadEquipment">Lista de Equipamentos</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Equipments" asp-action="Create">Criar Equipamentos</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Equipments" asp-action="Index">Lista de Equipamentos</a></li>
                                     </ul>
                                 </li>
 
                                 <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Despositivos Médicos</a>
+                                    <a class="dropdown-item dropdown-toggle" href="#">Dispositivos Médicos</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="CreateMedicalDevices">Criar dispositivos médicos</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevices" asp-action="Index">Lista de dispositivos médicos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevice" asp-action="Create">Criar dispositivos médicos</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="MedicalDevice" asp-action="Index">Lista de dispositivos médicos</a></li>
                                     </ul>
                                 </li>
 
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Localização dos  Materiais</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterial" asp-action="CreateLocationMaterial">Criar localização dos materiais</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterial" asp-action="ReadLocationMaterial">Lista das localizações de materiais</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterials" asp-action="Create">Criar localização dos materiais</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="LocationMaterials" asp-action="Read">Lista das localizações de materiais</a></li>
                                     </ul>
                                 </li>
 
@@ -71,6 +72,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Alimento" asp-action="Index">Alimento</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="ComponentesAlimento" asp-action="Index">ComponentesAlimento</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />

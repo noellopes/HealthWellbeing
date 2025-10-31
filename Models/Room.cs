@@ -1,47 +1,66 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace HealthWellbeing.Models
 {
     public class Room
     {
-        //ID da sala, chave primaria
-        public int SalaId { get; set; }
+        // ID da sala, chave primária
+        public int RoomId { get; set; }
 
-        //Tipo da sala (consultas ou tratamentos), (nao precisa de ser validado)
-        public enum Tipo { Consultas, Tratamentos }
+        // Propriedade formatada para exibição do ID com 3 dígitos (ex: 001, 012, 123)
+        public string FormattedRoomId => RoomId.ToString("D3");
+
+
+        // Tipo da sala (consultas ou tratamentos), não precisa de ser validado
+        public enum RoomType { Consultas, Tratamentos }
+
         [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
-        public Tipo TipoSala { get; set; }
+        public RoomType RoomsType { get; set; }
 
-        //Especialidade da sala (pediatria, cardiologia, etc)
-        [Required(ErrorMessage = "A especialidade é obrigatoria.")]
-        [StringLength(100, ErrorMessage = "A Especialidade não pode exceder 100 caracteres")]
-        public string Especialidade { get; set; }
+        // Especialidade da sala (pediatria, cardiologia, etc)
+        [Required(ErrorMessage = "A especialidade é obrigatória.")]
+        [StringLength(100, ErrorMessage = "A especialidade não pode exceder 100 caracteres.")]
+        public string Specialty { get; set; }
 
-        //Nome da sala
-        [Required(ErrorMessage = "O nome da sala é obrigatorio.")]
-        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres")]
-        public string Nome { get; set; }
+        // Nome da sala
+        [Required(ErrorMessage = "O nome da sala é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
+        public string Name { get; set; }
 
-        //Capacidade da sala (1 a 50),(nao precisa de ser validado)
-        public int Capacidade { get; set; }
+        // Capacidade da sala (1 a 50), não precisa de ser validado
+        public int Capacity { get; set; }
 
-        //Localização da sala (piso, ala, etc)
-        [Required(ErrorMessage = "A localização é obrigatoria.")]
-        public string Localizacao { get; set; }
+        // Localização da sala (piso, ala, etc)
+        [Required(ErrorMessage = "A localização é obrigatória.")]
+        public string Location { get; set; }
 
-        //Lista de agendamentos (datas e horas)
-        //public List<string> Agendamentos { get; set; }
+        // Horário de funcionamento da sala (ex: 08:00 - 18:00)
+        [Required(ErrorMessage = "O horário de funcionamento é obrigatório.")]
+        public string OperatingHours { get; set; }
 
-        //Disponibilidade da sala (true ou false)
-        public bool Disponibilidade { get; set; }
+        // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
 
-        //Horario de funcionamento da sala (ex: 08:00 - 18:00)
-        [Required(ErrorMessage = "O horário de funcionamento é obrigatorio.")]
-        public string HorarioFuncionamento { get; set; }
+        public enum RoomStatus
+        {
+            [Display(Name = "Criado")]
+            Criado,
+            [Display(Name = "Disponível")]
+            Disponivel,
+            [Display(Name = "Indisponível")]
+            Indisponivel,
+            [Display(Name = "Limpeza")]
+            Limpeza,
+            [Display(Name = "Manutenção")]
+            Manutencao,
+            [Display(Name = "Fora de serviço")]
+            ForaDeServico
+        }
+        public RoomStatus Status { get; set; } = RoomStatus.Criado;
 
-        //Observações adicionais (maximo 500 caracteres)
-        [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres")]
-        public string Observacoes { get; set; }
+        // Observações adicionais (máximo 500 caracteres)
+        [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres.")]
+        public string Notes { get; set; }
     }
 }
