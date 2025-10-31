@@ -22,6 +22,7 @@ namespace HealthWellbeingRoom.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterial", b =>
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.Property<int>("AlergiaID")
