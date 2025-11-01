@@ -1,34 +1,41 @@
-﻿@model IEnumerable<EventType>
+﻿@model IEnumerable<HealthWellbeing.Models.EventType>
 
 @{
-	ViewData["Title"] = "Event Type List";
+    ViewData["Title"] = "Index";
 }
 
-<h1>@ViewBag.Title</h1>
+<h1>Event Types</h1>
 
-
-<table class="table table-striped">
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
     <thead>
         <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Description</th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventTypeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventTypeDescription)
+            </th>
+            <th></th>
         </tr>
     </thead>
-    
     <tbody>
-        @foreach (EventType eventType in Model) {
-            <tr>
-                <td>@eventType.EventTypeName</td>
-                <td>@eventType.EventTypeDescription</td>
-                <td>
-                    <button type="button" class="btn btn-info">Details</button>
-                    <button type="button" class="btn btn-warning">Update</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
-                </td>
-            </tr>
-            
-        }
-        
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventTypeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventTypeDescription)
+            </td>
+            <td>
+                    <a asp-action="Details" asp-route-id="@item.EventTypeId" class="btn btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.EventTypeId" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.EventTypeId" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
-
 </table>

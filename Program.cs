@@ -15,20 +15,25 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<IEventTypeRepository, EventTypeEFRepository>();
+builder.Services.AddDbContext<EventTypeDbContext>(
+    options => options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+        )
+    );
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
+if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+else {
+    using (var serviceScope = app.Services.CreateScope()) {
+        var dbContext = serviceScope.ServiceProvider.GetService<EventTypeDbContext>();
+        EventTypeSeedData.Populate(dbContext);
+    }
 }
 
 app.UseHttpsRedirection();

@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.EventType
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1 class="mb-4">Edit Event Type</h1>
+
+<hr class="mb-4" />
+
+<div class="row">
+    <div class="col">
+        <form asp-action="Edit" class="p-3 border rounded shadow-sm bg-light">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <input type="hidden" asp-for="EventTypeId" />
+
+            <div class="mb-3">
+                <label asp-for="EventTypeName" class="form-label fw-semibold"></label>
+                <input asp-for="EventTypeName" class="form-control" placeholder="Enter event type name" />
+                <span asp-validation-for="EventTypeName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EventTypeDescription" class="form-label fw-semibold"></label>
+                <textarea asp-for="EventTypeDescription" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="EventTypeDescription" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                <input type="submit" value="Save" class="btn btn-primary px-4" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

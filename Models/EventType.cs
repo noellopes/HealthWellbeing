@@ -1,12 +1,14 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class EventType {
-    public int EventTypeId { get; set; }
+namespace HealthWellbeing.Models {
 
-    [Required, StringLength(200)]
-    public string EventTypeName { get; set; }
+    public class EventType {
+        public int EventTypeId { get; set; }
 
-    public string? EventTypeDescription { get; set; }
+        [Required, StringLength(200)]
+        public string EventTypeName { get; set; }
 
+        public string? EventTypeDescription { get; set; }
+
+    }
 }
