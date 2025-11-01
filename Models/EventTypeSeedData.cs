@@ -1,7 +1,9 @@
-﻿namespace HealthWellbeing.Models {
+﻿using HealthWellbeing.Data;
+
+namespace HealthWellbeing.Models {
     internal class EventTypeSeedData {
 
-        internal static void Populate(EventTypeDbContext? dbContext) {
+        internal static void Populate(HealthWellbeingDbContext? dbContext) {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             dbContext.Database.EnsureCreated();
@@ -9,10 +11,10 @@
             PopulateEventTypes(dbContext);
         }
 
-        private static void PopulateEventTypes(EventTypeDbContext dbContext) {
-            if (dbContext.EventTypes.Any()) return;
+        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
+            if (dbContext.EventType.Any()) return;
 
-            dbContext.EventTypes.AddRange(new List<EventType>() {
+            dbContext.EventType.AddRange(new List<EventType>() {
                 new EventType {
                 EventTypeName = "Treino de Cardio",
                 EventTypeDescription = "Sessão intensa de treino cardiovascular com música motivadora."

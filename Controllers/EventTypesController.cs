@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class EventTypesController : Controller
     {
-        private readonly EventTypeDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public EventTypesController(EventTypeDbContext context)
+        public EventTypesController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -21,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: EventTypes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.EventTypes.ToListAsync());
+            return View(await _context.EventType.ToListAsync());
         }
 
         // GET: EventTypes/Details/5
@@ -32,7 +33,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var eventType = await _context.EventTypes
+            var eventType = await _context.EventType
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
             if (eventType == null)
             {
@@ -72,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var eventType = await _context.EventTypes.FindAsync(id);
+            var eventType = await _context.EventType.FindAsync(id);
             if (eventType == null)
             {
                 return NotFound();
@@ -123,7 +124,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var eventType = await _context.EventTypes
+            var eventType = await _context.EventType
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
             if (eventType == null)
             {
@@ -138,10 +139,10 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var eventType = await _context.EventTypes.FindAsync(id);
+            var eventType = await _context.EventType.FindAsync(id);
             if (eventType != null)
             {
-                _context.EventTypes.Remove(eventType);
+                _context.EventType.Remove(eventType);
             }
 
             await _context.SaveChangesAsync();
@@ -150,7 +151,7 @@ namespace HealthWellbeing.Controllers
 
         private bool EventTypeExists(int id)
         {
-            return _context.EventTypes.Any(e => e.EventTypeId == id);
+            return _context.EventType.Any(e => e.EventTypeId == id);
         }
     }
 }
