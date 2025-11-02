@@ -6,7 +6,7 @@ namespace HealthWellbeing.Models
     {
         [Key]
         public int LevelId { get; set; } // Primary Key
-        [Required]
+        [Range(1, 100, ErrorMessage = "Level must be 1-100")]
         public int Level { get; set; } // Level number 1-100
         [ValidateNever]
         public string LevelCategory { get; set; } // Level Category (If X level then Y category and Z circle color)
