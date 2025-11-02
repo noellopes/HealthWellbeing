@@ -12,9 +12,9 @@ namespace HealthWellbeing.Controllers
 {
     public class LevelsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public LevelsController(AppDbContext context)
+        public LevelsController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
