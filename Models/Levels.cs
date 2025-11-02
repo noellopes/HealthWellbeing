@@ -1,16 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace HealthWellbeing.Models
 {
     public class Levels
     {
         [Key]
         public int LevelId { get; set; } // Primary Key
+        [Required]
         public int Level { get; set; } // Level number 1-100
+        [ValidateNever]
         public string LevelCategory { get; set; } // Level Category (If X level then Y category and Z circle color)
+        [ValidateNever]
         public string Description { get; set; }  // Description 
 
 
-        public ICollection<Levels>? levels { get; set; }
+        public Levels() { }
 
         public Levels(int level)
         {

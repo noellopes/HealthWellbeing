@@ -54,11 +54,12 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,Level,LevelCategory,Description")] Levels levels)
+        public async Task<IActionResult> Create([Bind("Level")] Levels levels)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(levels);
+                var newLevel = new Levels(levels.Level);
+                _context.Add(newLevel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
