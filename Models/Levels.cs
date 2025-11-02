@@ -22,7 +22,7 @@ namespace HealthWellbeing.Models
             LevelCategory = GetCircleColor(level);
         }
 
-        private string GetCircleColor(int level)
+        public string GetCircleColor(int level)
         {
             if (level < 25)
             {
