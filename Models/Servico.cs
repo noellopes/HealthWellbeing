@@ -6,8 +6,6 @@ namespace HealthWellbeing.Models
 {
     public class Servico
     {
-        // CORREÇÃO: ADICIONAR CONSTRUTOR VAZIO AQUI
-        public Servico() { }
 
         [Key]
         public int ServicoId { get; set; }
@@ -26,7 +24,6 @@ namespace HealthWellbeing.Models
 
         
         public int? TipoServicoId { get; set; }
-
         [ForeignKey("TipoServicoId")]
         public TipoServico TipoServico { get; set; }
 
