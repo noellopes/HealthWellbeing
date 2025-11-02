@@ -1,7 +1,7 @@
 ﻿@model HealthWellbeing.Models.TipoServico
 
 @{
-    ViewData["Title"] = "Editar Tipo de Serviço";
+    ViewData["Title"] = "Edit";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -31,11 +31,18 @@
         <span asp-validation-for="Descricao" class="text-danger"></span>
     </div>
 
-     <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            <div class="d-flex justify-content-start gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i>Guardar
+            </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="=bi bi-arrow-left-circle me-1"></i>Cancelar
+            </a>
     </div>
 </form>
+    </div>
+</div>
+
 
 @section Scripts {
     @{

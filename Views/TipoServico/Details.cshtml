@@ -5,27 +5,42 @@
 
 }
 
-<h1>Details</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<div>
-    <h4>Tipo de Serviço</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-book me-2"></i>Detalhes do Tipo de Serviço
+        </h4>
+    </div>
+    <div class="card-body">
+
+        <dl class="row mb-0">
+            
+        <dt class="col-sm-3 fw-bold text-muted">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Nome)
         </dd>
-        <dt class="col-sm-2">
+            <dt class="col-sm-3 fw-bold text-muted">
             @Html.DisplayNameFor(model => model.Descricao)
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-9">
             @Html.DisplayFor(model => model.Descricao)
         </dd>
     </dl>
+
+    <div class="mt-4 d-flex justify-content-start gap-2">
+    <a asp-action="Edit" asp-route-id="@Model.TipoServicoId" class="btn btn-primary">
+        <i class="bi bi-pencil-square me-1"></i>Editar
+        </a> 
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i>Cancelar
+        </a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.TipoServicoId" class="btn btn-primary">Edit</a> |
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+ </div>
+
 </div>
+
