@@ -162,7 +162,7 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index),
                  new
                  {
-                     id = tipoServico.TipoServicoId,
+                     
                      successMessage = "Tipo de Serviço eliminado com sucesso!"
                  }
             );

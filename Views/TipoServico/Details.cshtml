@@ -2,6 +2,17 @@
 
 @{
     ViewData["Title"] = "Details";
+    string? successMessage = Context.Request.Query["successMessage"];
+
+}
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 
 }
 
