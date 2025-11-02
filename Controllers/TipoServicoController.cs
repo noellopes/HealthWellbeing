@@ -163,9 +163,9 @@ namespace HealthWellbeing.Controllers
                  new
                  {
                      id = tipoServico.TipoServicoId,
-                     successMessage = "Tipo de Serviço apagado com sucesso!"
+                     successMessage = "Tipo de Serviço eliminado com sucesso!"
                  }
-                );
+            );
         
         }
 
