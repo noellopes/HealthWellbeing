@@ -1,11 +1,22 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Client>
-
 @{
-    // Using ViewData["Title"] instead of Viewbag.Title for ASP.NET Core consistency
     ViewData["Title"] = "Client Management";
 }
 
 <h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
+
+@{
+    var message = TempData["Message"] as string;
+    var messageType = TempData["MessageType"] as string ?? "info"; // Default to info
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-@messageType alert-dismissible fade show" role="alert">
+        @Html.Raw(message)
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <p>
     <a asp-action="Create" class="btn btn-primary shadow-sm">
@@ -20,28 +31,10 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th class="d-none d-md-table-cell">
-                    @Html.DisplayNameFor(model => model.Email)
+                <th class="text-center" style="width: 100px;">
+                    Member
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Phone)
-                </th>
-                <th class="d-none d-lg-table-cell">
-                    @Html.DisplayNameFor(model => model.Address)
-                </th>
-                <th class="d-none d-sm-table-cell">
-                    @Html.DisplayNameFor(model => model.BirthDate)
-                </th>
-                <th class="d-none d-lg-table-cell">
-                    @Html.DisplayNameFor(model => model.Gender)
-                </th>
-                <th class="d-none d-xl-table-cell">
-                    @Html.DisplayNameFor(model => model.RegistrationDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Membership)
-                </th>
-                <th>
+                <th class="text-end">
                     Actions
                 </th>
             </tr>
@@ -49,48 +42,35 @@
         <tbody>
             @foreach (var item in Model)
             {
+                // Determine membership status
+                var isMember = item.Membership != null;
+
                 <tr>
                     <td class="fw-bold">
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-                    <td class="d-none d-md-table-cell">
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Phone)
-                    </td>
-                    <td class="d-none d-lg-table-cell text-truncate" style="max-width: 150px;">
-                        @Html.DisplayFor(modelItem => item.Address)
-                    </td>
-                    <td class="d-none d-sm-table-cell">
-                        @Html.DisplayFor(modelItem => item.BirthDate)
-                    </td>
-                    <td class="d-none d-lg-table-cell">
-                        @Html.DisplayFor(modelItem => item.Gender)
-                    </td>
-                    <td class="d-none d-xl-table-cell">
-                        @Html.DisplayFor(modelItem => item.RegistrationDate)
-                    </td>
-                    <th class="text-center">
-                        Membership Status
-                    </th>
-                    <td>
-                        @if (item.Membership != null)
+                    <td class="text-center">
+                        @if (isMember)
                         {
-                            // The client is a member, use a green badge
-                            <span class="badge bg-success">
-                                Active Member
+                            <span class="badge bg-success py-2 px-3 d-inline-block">
+                                Yes
                             </span>
                         }
                         else
                         {
-                            // The client is not a member, use a gray badge or a button
-                            <a asp-controller="Member" asp-action="Create" asp-route-clientId="@item.ClientId" class="btn btn-sm btn-outline-info">
+                            <span class="badge bg-danger py-2 px-3 d-inline-block">
+                                No
+                            </span>
+                        }
+                    </td>
+                    <td class="text-nowrap text-end">
+                        @if (!isMember)
+                        {
+                            <a asp-controller="Member" asp-action="Create" asp-route-clientId="@item.ClientId" class="btn btn-sm btn-info me-1" title="Make Member">
                                 <i class="bi bi-person-plus"></i> Make Member
                             </a>
                         }
-                    </td>
-                    <td class="text-nowrap">
+
                         <a asp-action="Edit" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-primary me-1">Edit</a>
                         <a asp-action="Details" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-info me-1">Details</a>
                         <a asp-action="Delete" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-danger">Delete</a>

@@ -9,58 +9,108 @@ internal class SeedData
 
         dbContext.Database.EnsureCreated();
 
-        // Add seed data here
-        PopulateClients(dbContext);
-        PopulateTrainingType(dbContext);
+		// Add seed data here
+		var clients = PopulateClients(dbContext);
+		PopulateMember(dbContext, clients);
+		PopulateTrainingType(dbContext);
 		PopulatePlan(dbContext);
         PopulateTrainer(dbContext);
 	}
 
-    private static void PopulateClients(HealthWellbeingDbContext dbContext)
-    {
-        if (dbContext.Client.Any()) return;
+	private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
+	{
+		if (dbContext.Client.Any())
+		{
+			return dbContext.Client.ToList();
+		}
 
-        dbContext.Client.AddRange(new List<Client>()
-        {
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Alice Wonderland",
-                Email = "alice.w@example.com",
-                Phone = "555-1234567",
-                Address = "10 Downing St, London",
-                BirthDate = new DateTime(1990, 5, 15),
-                Gender = "Female",
-                RegistrationDate = DateTime.Now.AddDays(-30)
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Bob The Builder",
-                Email = "bob.builder@work.net",
-                Phone = "555-9876543",
-                Address = "Construction Site 5A",
-                BirthDate = new DateTime(1985, 10, 20),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-15),
-            },
-            new Client
-            {
-                ClientId = Guid.NewGuid().ToString("N"),
-                Name = "Charlie Brown",
-                Email = "charlie.b@peanuts.com",
-                Phone = "555-4567890",
-                Address = "123 Comic Strip Ave",
-                BirthDate = new DateTime(2000, 1, 1),
-                Gender = "Male",
-                RegistrationDate = DateTime.Now.AddDays(-5)
-            }
-        });
+		var clients = new List<Client>()
+		{
+			new Client
+			{
+				ClientId = Guid.NewGuid().ToString("N"),
+				Name = "Alice Wonderland",
+				Email = "alice.w@example.com",
+				Phone = "555-1234567",
+				Address = "10 Downing St, London",
+				BirthDate = new DateTime(1990, 5, 15),
+				Gender = "Female",
+				RegistrationDate = DateTime.Now.AddDays(-30)
+			},
+			new Client
+			{
+				ClientId = Guid.NewGuid().ToString("N"),
+				Name = "Bob The Builder",
+				Email = "bob.builder@work.net",
+				Phone = "555-9876543",
+				Address = "Construction Site 5A",
+				BirthDate = new DateTime(1985, 10, 20),
+				Gender = "Male",
+				RegistrationDate = DateTime.Now.AddDays(-15),
+			},
+			new Client
+			{
+				ClientId = Guid.NewGuid().ToString("N"),
+				Name = "Charlie Brown",
+				Email = "charlie.b@peanuts.com",
+				Phone = "555-4567890",
+				Address = "123 Comic Strip Ave",
+				BirthDate = new DateTime(2000, 1, 1),
+				Gender = "Male",
+				RegistrationDate = DateTime.Now.AddDays(-5)
+			},
+			new Client
+			{
+				ClientId = Guid.NewGuid().ToString("N"),
+				Name = "David Copperfield",
+				Email = "david.c@magic.com",
+				Phone = "555-9001002",
+				Address = "Las Vegas Strip",
+				BirthDate = new DateTime(1960, 9, 16),
+				Gender = "Male",
+				RegistrationDate = DateTime.Now.AddDays(-25)
+			},
+			new Client
+			{
+				ClientId = Guid.NewGuid().ToString("N"),
+				Name = "Eve Harrington",
+				Email = "eve.h@stage.net",
+				Phone = "555-3330009",
+				Address = "Broadway St",
+				BirthDate = new DateTime(1995, 2, 28),
+				Gender = "Female",
+				RegistrationDate = DateTime.Now.AddDays(-10)
+			}
+		};
 
-        dbContext.SaveChanges();
-    }
+		dbContext.Client.AddRange(clients);
+		dbContext.SaveChanges();
 
-    private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)
+		return clients;
+	}
+
+	private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
+	{
+		if (dbContext.Member.Any()) return;
+
+		var clientNamesToMakeMembers = new List<string> { "Alice Wonderland", "Charlie Brown", "David Copperfield" };
+
+		var members = clients
+			.Where(c => clientNamesToMakeMembers.Contains(c.Name))
+			.Select(c => new Member
+			{
+				ClientId = c.ClientId,
+			})
+			.ToList();
+
+		if (members.Any())
+		{
+			dbContext.Member.AddRange(members);
+			dbContext.SaveChanges();
+		}
+	}
+
+	private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)
     {
         // Check if the TrainingType table already contains data
         if (dbContext.TrainingType.Any()) return;
