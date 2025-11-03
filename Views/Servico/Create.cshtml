@@ -33,7 +33,6 @@
                 <input asp-for="DuracaoMinutos" class="form-control" />
                 <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
             </div>
-
             <div class="form-group">
                 <label asp-for="TipoServicoId" class="control-label">Tipo de Serviço</label>
                 <select asp-for="TipoServicoId" class="form-control" asp-items="ViewBag.TipoServicoId">
@@ -46,8 +45,6 @@
 
             <button type="submit" class="btn btn-primary">Criar</button>
             <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-
-        </form>
 
 @section Scripts {
     @{
