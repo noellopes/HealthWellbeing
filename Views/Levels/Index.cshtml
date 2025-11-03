@@ -4,44 +4,86 @@
     ViewData["Title"] = "Levels";
 }
 
-<h1>Viewbag.Title</h1>
+<h1>Levels</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Level)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LevelCategory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Level)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LevelCategory)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Level)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LevelCategory)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.LevelId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.LevelId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.LevelId">Delete</a>
-            </td>
-        </tr>
+    <tr>
+        <td>
+            <div class="level-circle" style="border-color:@item.LevelCategory">
+                <span class="level-number">@item.Level</span>
+            </div>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Level)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LevelCategory)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-info">Details</a>
+            <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-warning">Edit</a>
+            <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-danger">Delete</a>
+        </td>
+    </tr>
 }
     </tbody>
 </table>
+
+            
+<style>
+    .level-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 5px solid;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease;
+        margin: 0 auto;
+    }
+
+    .level-circle:hover {
+        transform: scale(1.1);
+    }
+
+    .level-number {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .table td {
+        vertical-align: middle !important;
+        text-align: center;
+    }
+
+    .table th{
+        text-align: center;
+    }
+</style>

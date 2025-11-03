@@ -12,9 +12,9 @@ namespace HealthWellbeing.Controllers
 {
     public class LevelsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public LevelsController(AppDbContext context)
+        public LevelsController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -54,11 +54,12 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,Level,LevelCategory,Description")] Levels levels)
+        public async Task<IActionResult> Create([Bind("Level")] Levels levels)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(levels);
+                var newLevel = new Levels(levels.Level);
+                _context.Add(newLevel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -86,7 +87,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,Level,LevelCategory,Description")] Levels levels)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,Level")] Levels levels)
         {
             if (id != levels.LevelId)
             {
@@ -97,6 +98,7 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
+                    levels.LevelCategory = levels.GetCircleColor(levels.Level);
                     _context.Update(levels);
                     await _context.SaveChangesAsync();
                 }
