@@ -4,6 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class TypeMaterial
     {
+        [Key]
         public int TipoMaterialID {  get; set; }
         [Required(ErrorMessage = "O nome do TipoMaterial é obrigatorio.")]
         [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres")]

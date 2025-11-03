@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
-using System.Collections.Generic; // Adicionado para usar List<MedicalDevices>
+using System.Collections.Generic; 
 
 namespace HealthWellBeingRoom.Data
 {
-    internal class SeedDataMedicalDevices
+    internal class SeedData
     {
         internal static void Populate(HealthWellbeingDbContext? dbContext)
         {
