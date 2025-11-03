@@ -1,13 +1,17 @@
 ﻿using HealthWellbeing.Models;
-using Humanizer.Localisation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+// ... outras usings ...
 
 namespace HealthWellBeing.Models
 {
-    // O Enum EstadoExame deve estar no mesmo namespace ou num ficheiro separado (ex: Enums/EstadoExame.cs)
-    public enum EstadoExame { Marcado, Realizado, Cancelado, PendenteResultado }
+    // Enum atualizado para refletir as opções pretendidas
+    public enum EstadoExame
+    {
+        Pendente,
+        Realizado,
+        ARealizar, // Usamos 'ARealizar' para 'a realizar'
+        Cancelado
+    }
 
     public class Exame
     {
@@ -19,7 +23,7 @@ namespace HealthWellBeing.Models
         public DateTime DataHoraMarcacao { get; set; }
 
         // Estado do Exame (propriedade do Controller)
-        public EstadoExame Estado { get; set; } = EstadoExame.Marcado;
+        public EstadoExame Estado { get; set; } = EstadoExame.Pendente; // Valor por defeito
 
         // Notas ou Observações
         [StringLength(500)]
@@ -43,7 +47,7 @@ namespace HealthWellBeing.Models
         public Medicos? MedicoSolicitante { get; set; }
 
         // 4. Sala de Exames
-        
+
         public int? SalaDeExameId { get; set; }
         public SalaDeExames? SalaDeExame { get; set; }
 
@@ -56,6 +60,6 @@ namespace HealthWellBeing.Models
         public int? MaterialEquipamentoAssociadoId { get; set; }
         public MaterialEquipamentoAssociado? MaterialEquipamentoAssociado { get; set; }
 
-        
+
     }
 }
