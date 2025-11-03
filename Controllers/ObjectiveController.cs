@@ -43,17 +43,17 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             LoadCategories();
-            return View(new Objective());
+            return View(new Goal());
         }
 
         // POST: /Objective/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Objective obj)
+        public async Task<IActionResult> Create(Goal obj)
         {
             // Server-side uniqueness check (defensive - Remote handles client side)
             if (await _context.Objective.AnyAsync(o => o.Name == obj.Name && o.Category == obj.Category))
-                ModelState.AddModelError(nameof(Objective.Name), "An objective with this name already exists in the selected category.");
+                ModelState.AddModelError(nameof(Goal.Name), "An objective with this name already exists in the selected category.");
 
             if (!ModelState.IsValid)
             {
@@ -79,13 +79,13 @@ namespace HealthWellbeing.Controllers
         // POST: /Objective/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Objective obj)
+        public async Task<IActionResult> Edit(int id, Goal obj)
         {
             if (id != obj.ObjectiveId) return NotFound();
 
             // Server-side uniqueness (ignore the same row)
             if (await _context.Objective.AnyAsync(o => o.ObjectiveId != id && o.Name == obj.Name && o.Category == obj.Category))
-                ModelState.AddModelError(nameof(Objective.Name), "An objective with this name already exists in the selected category.");
+                ModelState.AddModelError(nameof(Goal.Name), "An objective with this name already exists in the selected category.");
 
             if (!ModelState.IsValid)
             {
