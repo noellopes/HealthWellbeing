@@ -60,9 +60,9 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(tipoServico);
                 await _context.SaveChangesAsync();
-<<<<<<< HEAD
+
                 return RedirectToAction(nameof(Index));
-=======
+
                 return RedirectToAction(nameof(Details),
                     new
                     {
@@ -70,7 +70,7 @@ namespace HealthWellbeing.Controllers
                         successMessage = "Tipo de Serviço criado com sucesso!"
                     }
                 );
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
+
             }
             return View(tipoServico);
         }
@@ -121,9 +121,9 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-<<<<<<< HEAD
+
                 return RedirectToAction(nameof(Index));
-=======
+
                 return RedirectToAction(nameof(Details),
                      new
                      {
@@ -132,7 +132,7 @@ namespace HealthWellbeing.Controllers
                      }
                 );
             
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
+
             }
             return View(tipoServico);
         }
@@ -167,9 +167,9 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
-<<<<<<< HEAD
+
             return RedirectToAction(nameof(Index));
-=======
+
             return RedirectToAction(nameof(Index),
                  new
                  {
@@ -178,7 +178,7 @@ namespace HealthWellbeing.Controllers
                  }
             );
         
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
+
         }
 
         private bool TipoServicoExists(int id)
