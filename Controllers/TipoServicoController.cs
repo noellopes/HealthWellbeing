@@ -20,13 +20,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TipoServico
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? successMessage = null)
         {
+            ViewBag.SuccessMessage = successMessage;
             return View(await _context.TipoServicos.ToListAsync());
         }
 
         // GET: TipoServico/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string? successMessage = null)
         {
             if (id == null)
             {
@@ -35,11 +36,13 @@ namespace HealthWellbeing.Controllers
 
             var tipoServico = await _context.TipoServicos
                 .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+
             if (tipoServico == null)
             {
                 return NotFound();
             }
 
+            ViewBag.SuccessMessage = successMessage;
             return View(tipoServico);
         }
 
@@ -50,8 +53,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: TipoServico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
@@ -61,8 +62,6 @@ namespace HealthWellbeing.Controllers
                 _context.Add(tipoServico);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
-
                 return RedirectToAction(nameof(Details),
                     new
                     {
@@ -70,7 +69,6 @@ namespace HealthWellbeing.Controllers
                         successMessage = "Tipo de Serviço criado com sucesso!"
                     }
                 );
-
             }
             return View(tipoServico);
         }
@@ -92,8 +90,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: TipoServico/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
@@ -122,17 +118,13 @@ namespace HealthWellbeing.Controllers
                     }
                 }
 
-                return RedirectToAction(nameof(Index));
-
                 return RedirectToAction(nameof(Details),
-                     new
-                     {
-                         id = tipoServico.TipoServicoId,
-                         successMessage = "Tipo de Serviço aletrado com sucesso!"
-                     }
+                    new
+                    {
+                        id = tipoServico.TipoServicoId,
+                        successMessage = "Tipo de Serviço alterado com sucesso!"
+                    }
                 );
-            
-
             }
             return View(tipoServico);
         }
@@ -164,21 +156,15 @@ namespace HealthWellbeing.Controllers
             if (tipoServico != null)
             {
                 _context.TipoServicos.Remove(tipoServico);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-
             return RedirectToAction(nameof(Index),
-                 new
-                 {
-                     
-                     successMessage = "Tipo de Serviço eliminado com sucesso!"
-                 }
+                new
+                {
+                    successMessage = "Tipo de Serviço eliminado com sucesso!"
+                }
             );
-        
-
         }
 
         private bool TipoServicoExists(int id)
