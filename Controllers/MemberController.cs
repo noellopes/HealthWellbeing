@@ -47,51 +47,33 @@ namespace HealthWellbeing.Controllers
 			return View(member);
 		}
 
-		// --- NEW/MODIFIED CREATE ACTIONS FOR "MAKE MEMBER" ---
+        // --- NEW/MODIFIED CREATE ACTIONS FOR "MAKE MEMBER" ---
 
-		// GET: Member/Create?clientId={clientId}
-		// This action receives the ClientId from the Client Index page
-		public IActionResult Create(string clientId)
-		{
-			if (string.IsNullOrEmpty(clientId))
-			{
-				// If the link was manually entered without a ClientId
-				TempData["Message"] = "Client ID is required to create a membership.";
-				return RedirectToAction("Index", "Client");
-			}
+        // GET: Member/Create?clientId={clientId}
+        // This action receives the ClientId from the Client Index page
+        public async Task<IActionResult> Create(string clientId)
+        {
+            // 1. Cria a nova entidade Member (FK para Client)
+            var member = new Member
+            {
+                ClientId = clientId,
+                // Outras propriedades Member, se houver
+            };
 
-			// 1. Find the Client
-			var client = _context.Client.Find(clientId);
-			if (client == null)
-			{
-				TempData["Message"] = $"Client ID '{clientId}' not found.";
-				return RedirectToAction("Index", "Client");
-			}
+            _context.Add(member);
+            await _context.SaveChangesAsync();
 
-			// 2. Check if the client is ALREADY a member
-			if (_context.Member.Any(m => m.ClientId == clientId))
-			{
-				// Redirect back to client list or details with a warning
-				TempData["Message"] = $"Client **{client.Name}** is already an active member.";
-				TempData["MessageType"] = "warning"; // Use TempData to signal a warning type
-				return RedirectToAction("Index", "Client");
-			}
+            // 2. Redireciona para o MemberPlanController para escolher o plano
+            // O MemberId é gerado após salvar no SaveChanges()
+            return RedirectToAction("Create", "MemberPlan", new { memberId = member.MemberId });
+        }
 
+        // POST: Member/Create
+        // To protect from overposting attacks, we only bind the ClientId
+        // [HttpPost]
+		// [ValidateAntiForgeryToken]
 
-			// Initialize the Member object with the foreign key (ClientId)
-			var member = new Member { ClientId = clientId };
-
-			// Pass the Client name/details to the view using ViewBag for display
-			ViewBag.ClientName = client.Name;
-
-			return View(member);
-		}
-
-		// POST: Member/Create
-		// To protect from overposting attacks, we only bind the ClientId
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("ClientId")] Member member)
+		/* public async Task<IActionResult> Create([Bind("ClientId")] Member member)
 		{
 			// We rely on the ClientId being present from the hidden field in the form
 			if (string.IsNullOrEmpty(member.ClientId))
@@ -123,6 +105,7 @@ namespace HealthWellbeing.Controllers
 
 			return View(member);
 		}
+		*/
 
 		// --- EXISTING ACTIONS (Edit, Delete, Exists) ---
 

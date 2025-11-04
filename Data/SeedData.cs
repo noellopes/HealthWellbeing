@@ -15,7 +15,8 @@ internal class SeedData
 		PopulateTrainingType(dbContext);
 		PopulatePlan(dbContext);
         PopulateTrainer(dbContext);
-	}
+        PopulateMemberPlan(dbContext);
+    }
 
 	private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
 	{
@@ -256,6 +257,54 @@ internal class SeedData
         dbContext.SaveChanges();
     }
 
+    private static void PopulateMemberPlan(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.MemberPlan.Any()) return;
+
+        var members = dbContext.Member.ToList();
+        var plans = dbContext.Plan.ToList();
+
+        if (!members.Any() || !plans.Any()) return;
+
+        // Mapping assignments:
+        // Alice Wonderland → Basic Wellness Plan (30d)
+        // Charlie Brown → Advanced Fitness Plan (45d)
+        // David Copperfield → Mind & Body Balance (60d)
+
+        var memberPlans = new List<MemberPlan>();
+
+        var mapping = new List<(string clientName, string planName)>
+    {
+        ("Alice Wonderland", "Basic Wellness Plan"),
+        ("Charlie Brown", "Advanced Fitness Plan"),
+        ("David Copperfield", "Mind & Body Balance")
+    };
+
+        foreach (var (clientName, planName) in mapping)
+        {
+            var member = members.FirstOrDefault(m =>
+                dbContext.Client.Any(c => c.ClientId == m.ClientId && c.Name == clientName));
+
+            var plan = plans.FirstOrDefault(p => p.Name == planName);
+
+            if (member != null && plan != null)
+            {
+                var startDate = DateTime.Now.AddDays(-5); // recently started example
+
+                memberPlans.Add(new MemberPlan
+                {
+                    MemberId = member.MemberId,
+                    PlanId = plan.PlanId,
+                    StartDate = startDate,
+                    EndDate = startDate.AddDays(plan.DurationDays),
+                    Status = "Active"
+                });
+            }
+        }
+
+        dbContext.MemberPlan.AddRange(memberPlans);
+        dbContext.SaveChanges();
+    }
 
     //POPULATE(ADD) MORE HERE!!!
 

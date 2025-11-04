@@ -21,5 +21,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.TrainingType> TrainingType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Plan> Plan { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Trainer> Trainer { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.MemberPlan> MemberPlan { get; set; } = default!;
     }
 }
