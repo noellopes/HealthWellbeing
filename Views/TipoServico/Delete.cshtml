@@ -5,30 +5,46 @@
    
 }
 
-<h1>Delete</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h3>Tem certeza de que deseja apagar isto?</h3>
-<div>
-    <h4>Tipo de Serviço</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
+<h3>Tem certeza de que deseja eleiminar isto?</h3>
+
+<hr />
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-trash3-fill me-2"></i>Eliminar Tipo de Serviço
+        </h4>
+        </div>
+        <div class="card-body">
+    <dl class="row mb-0">
+        <dt class="col-sm-3 fw-bold text-muted">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.Nome)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-3 fw-bold text-muted">
             @Html.DisplayNameFor(model => model.Descricao)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class = "col-sm-9">
             @Html.DisplayFor(model => model.Descricao)
         </dd>
     </dl>
     
     <form asp-action="Delete" method="post" class="mt-3">
         <input type="hidden" asp-for="TipoServicoId" />
-        <button type="submit" value="Delete" class="btn btn-danger" >Delete</Button> |
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+        <div class="mt-4 d-flex justify-content-around-start gap-2">
+        <button type="submit" value="Delete" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i> Eliminar
+        </Button> 
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i>Cancel
+            </a>
+            </div>
     </form>
 </div>
+</div>
+

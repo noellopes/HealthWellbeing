@@ -22,6 +22,9 @@ namespace HealthWellbeing.Controllers
         // GET: Servico
         public async Task<IActionResult> Index()
         {
+            var servicosContext = await _context.Servicos
+                .Include(s => s.TipoServico)
+                .ToListAsync();
             return View(await _context.Servicos.ToListAsync());
         }
 
@@ -34,10 +37,11 @@ namespace HealthWellbeing.Controllers
             }
 
             var servico = await _context.Servicos
+                .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
             if (servico == null)
             {
-                return NotFound();
+                return View("InvalidServico");
             }
 
             return View(servico);
@@ -58,12 +62,18 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
 
         {
-
+            ModelState.Remove("TipoServico");
             if (ModelState.IsValid)
             {
                 _context.Add(servico);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index),
+                    new
+                    {
+                        id = servico.ServicoId,
+                        SuccessMessage = "Serviço criado com sucesso!"
+                    }
+                    );
             }
 
             ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);

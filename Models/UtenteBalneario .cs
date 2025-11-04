@@ -1,12 +1,11 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
     public class UtenteBalneario
     {
-        //Informações Utente
         [Key]
+        //Infos Utente
         public int UtenteBalnearioId { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório")]

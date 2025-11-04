@@ -20,7 +20,7 @@
             <th>@Html.DisplayNameFor(model => model.Descricao)</th>
             <th>@Html.DisplayNameFor(model => model.Preco)</th>
             <th>@Html.DisplayNameFor(model => model.DuracaoMinutos)</th>
-            <th>@Html.DisplayNameFor(model => model.TipoServico)</th>
+            <th>@Html.DisplayNameFor(model => model.TipoServicoId)</th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -32,7 +32,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
                 <td>@Html.DisplayFor(modelItem => item.Preco)</td>
                 <td>@Html.DisplayFor(modelItem => item.DuracaoMinutos)</td>
-                <td>@Html.DisplayFor(modelItem => item.TipoServico)</td>
+                <td>@Html.DisplayFor(modelItem => item.TipoServico.Nome)</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.ServicoId" class="btn btn-sm btn-warning">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.ServicoId" class="btn btn-sm btn-info">Detals</a>

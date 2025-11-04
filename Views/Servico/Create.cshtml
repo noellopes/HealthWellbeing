@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    
 }
 
-<h1>Criar Novo Serviço</h1>
+<h1>Create</h1>
 
-
+<h4>Servico</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -36,21 +36,24 @@
 
             <div class="form-group">
                 <label asp-for="TipoServicoId" class="control-label">Tipo de Serviço</label>
-                <select asp-for="TipoServicoId" class="form-control" asp-items="ViewBag.TipoServicoId">
+                <select asp-for="TipoServicoId" class="form-control"
+                        asp-items="ViewBag.TipoServicoId">
                     <option value="">-- Selecione o Tipo de Serviço --</option>
                 </select>
+
                 <span asp-validation-for="TipoServicoId" class="text-danger"></span>
             </div>
-
-            <br />
-
-            <button type="submit" class="btn btn-primary">Criar</button>
-            <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
         </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
