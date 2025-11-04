@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 namespace HealthWellbeing.Models
 {
-    public class Levels
+    public class Level
     {
         [Key]
         public int LevelId { get; set; } // Primary Key
         [Range(1, 100, ErrorMessage = "Level must be 1-100")]
-        public int Level { get; set; } // Level number 1-100
+        public int LevelNumber { get; set; } // Level number 1-100
         //[ValidateNever]
         //public string LevelPoints { get; set; } // Total points of the level
         [ValidateNever]
@@ -16,11 +16,11 @@ namespace HealthWellbeing.Models
         public string Description { get; set; }  // Description 
 
 
-        public Levels() { }
+        public Level() { }
 
-        public Levels(int level)
+        public Level(int level)
         {
-            Level = level;
+            LevelNumber = level;
             LevelCategory = GetCircleColor(level);
         }
 

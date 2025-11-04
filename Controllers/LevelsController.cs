@@ -54,11 +54,11 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Level")] Levels levels)
+        public async Task<IActionResult> Create([Bind("LevelNumber")] Level levels)
         {
             if (ModelState.IsValid)
             {
-                var newLevel = new Levels(levels.Level);
+                var newLevel = new Level(levels.LevelNumber);
                 _context.Add(newLevel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -87,7 +87,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,Level")] Levels levels)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber")] Level levels)
         {
             if (id != levels.LevelId)
             {
@@ -98,7 +98,7 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    levels.LevelCategory = levels.GetCircleColor(levels.Level);
+                    levels.LevelCategory = levels.GetCircleColor(levels.LevelNumber);
                     _context.Update(levels);
                     await _context.SaveChangesAsync();
                 }

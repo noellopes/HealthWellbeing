@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Levels>
+﻿@model IEnumerable<HealthWellbeing.Models.Level>
 
 @{
     ViewData["Title"] = "Levels";
@@ -14,7 +14,7 @@
     <tr>
         <th></th>
         <th>
-            @Html.DisplayNameFor(model => model.Level)
+            @Html.DisplayNameFor(model => model.LevelNumber)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.LevelCategory)
@@ -30,11 +30,11 @@
     <tr>
         <td>
             <div class="level-circle" style="border-color:@item.LevelCategory">
-                <span class="level-number">@item.Level</span>
+                <span class="level-number">@item.LevelNumber</span>
             </div>
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Level)
+            @Html.DisplayFor(modelItem => item.LevelNumber)
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.LevelCategory)

@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.Levels
+﻿@model HealthWellbeing.Models.Level
 
 @{
     ViewData["Title"] = "Create";
@@ -14,9 +14,9 @@
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Level" class="control-label"></label>
-                <input asp-for="Level" class="form-control"/>
-                <span asp-validation-for="Level" class="text-danger"></span>
+                <label asp-for="LevelNumber" class="control-label"></label>
+                <input asp-for="LevelNumber" class="form-control"/>
+                <span asp-validation-for="LevelNumber" class="text-danger"></span>
             </div>
             <br/>
             <div class="form-group">
