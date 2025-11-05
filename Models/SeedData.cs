@@ -14,6 +14,7 @@ internal class SeedData
 
 		PopulateClients(dbContext);
 		PopulateFoodComponent(dbContext);
+        PopulateFoodPortion(dbContext);
 	}
 
     private static void PopulateClients(HealthWellbeingDbContext dbContext)
@@ -126,6 +127,67 @@ internal class SeedData
             {
                 Name = "Banana",
                 Description = "Good source of potassium, vitamin B6, and natural sugars for energy."
+            }
+        });
+
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateFoodPortion(HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext.FoodPortion.Any()) return;
+
+        dbContext.FoodPortion.AddRange(new List<FoodPortion>()
+        {
+            new FoodPortion
+            {
+                FoodName = "Apple",
+                Amount = "1 medium (182 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Rice (cooked)",
+                Amount = "1 cup (200 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Salmon (grilled)",
+                Amount = "1 fillet (150 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Broccoli (steamed)",
+                Amount = "1 cup (90 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Almonds",
+                Amount = "10 units (15 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Egg (boiled)",
+                Amount = "1 large (50 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Oats",
+                Amount = "½ cup (40 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Tomato",
+                Amount = "1 medium (120 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Spinach (raw)",
+                Amount = "1 cup (30 g)"
+            },
+            new FoodPortion
+            {
+                FoodName = "Banana",
+                Amount = "1 medium (118 g)"
             }
         });
 
