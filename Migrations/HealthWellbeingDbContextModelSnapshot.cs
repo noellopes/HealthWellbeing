@@ -339,13 +339,13 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("Equipment");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.FileMedicalDevices.MedicalDevices", b =>
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
                 {
-                    b.Property<int>("DevicesID")
+                    b.Property<int>("MedicalDeviceID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DevicesID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicalDeviceID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -360,18 +360,13 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.Property<string>("Specification")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("DevicesID");
+                    b.HasKey("MedicalDeviceID");
 
                     b.ToTable("MedicalDevices");
                 });

@@ -1,6 +1,5 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeingRoom;
-using HealthWellbeingRoom.Models.FileMedicalDevices;
 using HealthWellBeingRoom.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
