@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
+    public partial class Remake : Migration
+========
     public partial class Grupo3 : Migration
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -153,6 +157,33 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
+                name: "UserFoodRegistration",
+                columns: table => new
+                {
+                    UserFoodRegId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    MealDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MealType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    FoodName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Quantity = table.Column<double>(type: "float", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFoodRegistration", x => x.UserFoodRegId);
+                    table.ForeignKey(
+                        name: "FK_UserFoodRegistration_Client_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Client",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+========
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
                 name: "Food",
                 columns: table => new
                 {
@@ -217,6 +248,14 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Member_ClientId",
                 table: "Member",
                 column: "ClientId");
+<<<<<<<< HEAD:Migrations/20251028091751_Remake.cs
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserFoodRegistration_ClientId",
+                table: "UserFoodRegistration",
+                column: "ClientId");
+========
+>>>>>>>> 73280250ab6c367087efed31e28bb9cd588ff03b:Migrations/20251027185632_Grupo3.cs
         }
 
         /// <inheritdoc />
@@ -242,6 +281,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
+
+            migrationBuilder.DropTable(
+                name: "UserFoodRegistration");
 
             migrationBuilder.DropTable(
                 name: "Food");

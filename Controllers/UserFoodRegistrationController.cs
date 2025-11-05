@@ -1,105 +1,177 @@
-﻿using HealthWellbeing.Models;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
     public class UserFoodRegistrationController : Controller
     {
-        private readonly ILogger<UserFoodRegistrationController> _logger;
+        private readonly HealthWellbeingDbContext _context;
 
-        public UserFoodRegistrationController(ILogger<UserFoodRegistrationController> logger)
+        public UserFoodRegistrationController(HealthWellbeingDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        // In-memory database simulation
-        private static List<UserFoodRegistration> _registrations = new();
-        private static int _nextId = 1;
-
-        // READ - List all
-        public IActionResult Index()
+        // LIST
+        public async Task<IActionResult> Index()
         {
-            return View(_registrations);
+            var registrations = await _context.UserFoodRegistration
+                .Include(u => u.Client)
+                .ToListAsync();
+            return View(registrations);
         }
 
-        // READ - Details
-        public IActionResult Details(int id)
+        // DETAILS
+        public async Task<IActionResult> Details(int id)
         {
-            var registration = _registrations.FirstOrDefault(r => r.Id == id);
-            if (registration == null) return NotFound();
+            var registration = await _context.UserFoodRegistration
+                .Include(u => u.Client)
+                .FirstOrDefaultAsync(u => u.UserFoodRegId == id);
+
+            if (registration == null)
+            {
+                TempData["ErrorMessage"] = "Registration not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(registration);
         }
 
-        // CREATE - Form
+        // CREATE GET
         public IActionResult Create()
         {
+            ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
             return View();
         }
 
-        // CREATE - Save
+        // CREATE POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(UserFoodRegistration registration)
+        public async Task<IActionResult> Create(UserFoodRegistration registration)
         {
             if (!ModelState.IsValid)
+            {
+                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
+                TempData["ErrorMessage"] = "Please fix the errors and try again.";
                 return View(registration);
+            }
 
-            registration.Id = _nextId++;
-            _registrations.Add(registration);
-
-            TempData["SuccessMessage"] = "The food record was successfully added!";
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.Add(registration);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Registration saved successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
+                TempData["ErrorMessage"] = "Error saving registration.";
+                return View(registration);
+            }
         }
 
-        // UPDATE - Form
-        public IActionResult Edit(int id)
+        // EDIT GET
+        public async Task<IActionResult> Edit(int id)
         {
-            var registration = _registrations.FirstOrDefault(r => r.Id == id);
-            if (registration == null) return NotFound();
+            var registration = await _context.UserFoodRegistration.FindAsync(id);
+            if (registration == null)
+            {
+                TempData["ErrorMessage"] = "Registration not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
             return View(registration);
         }
 
-        // UPDATE - Save
+        // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(UserFoodRegistration registration)
+        public async Task<IActionResult> Edit(int id, UserFoodRegistration registration)
         {
+            if (id != registration.UserFoodRegId)
+            {
+                TempData["ErrorMessage"] = "Invalid registration.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (!ModelState.IsValid)
+            {
+                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
+                TempData["ErrorMessage"] = "Please fix the errors and try again.";
                 return View(registration);
+            }
 
-            var existing = _registrations.FirstOrDefault(r => r.Id == registration.Id);
-            if (existing == null) return NotFound();
+            try
+            {
+                var regInDb = await _context.UserFoodRegistration.FindAsync(id);
+                if (regInDb == null)
+                {
+                    TempData["ErrorMessage"] = "Registration not found.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-            existing.Name = registration.Name;
-            existing.UserId = registration.UserId;
-            existing.MealDateTime = registration.MealDateTime;
-            existing.MealType = registration.MealType;
-            existing.FoodName = registration.FoodName;
-            existing.Quantity = registration.Quantity;
-            existing.Notes = registration.Notes;
+                // Atualizar campos
+                regInDb.ClientId = registration.ClientId;
+                regInDb.MealDateTime = registration.MealDateTime;
+                regInDb.MealType = registration.MealType;
+                regInDb.FoodName = registration.FoodName;
+                regInDb.Quantity = registration.Quantity;
+                regInDb.Notes = registration.Notes;
 
-            TempData["SuccessMessage"] = "The food record was successfully updated!";
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Registration updated successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
+                TempData["ErrorMessage"] = "Error updating registration.";
+                return View(registration);
+            }
         }
 
-        // DELETE - Confirm
-        public IActionResult Delete(int id)
+        // DELETE GET
+        public async Task<IActionResult> Delete(int id)
         {
-            var registration = _registrations.FirstOrDefault(r => r.Id == id);
-            if (registration == null) return NotFound();
+            var registration = await _context.UserFoodRegistration
+                .Include(u => u.Client)
+                .FirstOrDefaultAsync(u => u.UserFoodRegId == id);
+
+            if (registration == null)
+            {
+                TempData["ErrorMessage"] = "Registration not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(registration);
         }
 
-        // DELETE - Execute
+        // DELETE POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var registration = _registrations.FirstOrDefault(r => r.Id == id);
+            var registration = await _context.UserFoodRegistration.FindAsync(id);
             if (registration != null)
-                _registrations.Remove(registration);
+            {
+                try
+                {
+                    _context.UserFoodRegistration.Remove(registration);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Registration deleted successfully!";
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Error deleting registration.";
+                }
+            }
 
-            TempData["SuccessMessage"] = "The food record was successfully deleted!";
             return RedirectToAction(nameof(Index));
         }
     }

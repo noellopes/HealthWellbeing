@@ -1,42 +1,49 @@
 ﻿@model HealthWellbeing.Models.UserFoodRegistration
 
 @{
-    ViewData["Title"] = "Delete Record";
+    ViewData["Title"] = "Delete Registration";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>Delete Registration</h2>
 
-<hr />
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
 
-<h4>Are you sure you want to delete this record?</h4>
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">Name</dt>
-        <dd class="col-sm-9">@Model.Name</dd>
-
-        <dt class="col-sm-3">User ID</dt>
-        <dd class="col-sm-9">@Model.UserId</dd>
-
-        <dt class="col-sm-3">Meal Date and Time</dt>
-        <dd class="col-sm-9">@Model.MealDateTime</dd>
-
-        <dt class="col-sm-3">Meal Type</dt>
-        <dd class="col-sm-9">@Model.MealType</dd>
-
-        <dt class="col-sm-3">Food Name</dt>
-        <dd class="col-sm-9">@Model.FoodName</dd>
-
-        <dt class="col-sm-3">Quantity</dt>
-        <dd class="col-sm-9">@Model.Quantity</dd>
-
-        <dt class="col-sm-3">Notes</dt>
-        <dd class="col-sm-9">@Model.Notes</dd>
-    </dl>
+<div class="alert alert-warning">
+    Are you sure you want to delete this registration?
 </div>
 
+<table class="table table-bordered">
+    <tr>
+        <th>Client</th>
+        <td>@Model.Client?.Name</td>
+    </tr>
+    <tr>
+        <th>Meal Date</th>
+        <td>@Model.MealDateTime.ToString("g")</td>
+    </tr>
+    <tr>
+        <th>Meal Type</th>
+        <td>@Model.MealType</td>
+    </tr>
+    <tr>
+        <th>Food Name</th>
+        <td>@Model.FoodName</td>
+    </tr>
+    <tr>
+        <th>Quantity</th>
+        <td>@Model.Quantity</td>
+    </tr>
+    <tr>
+        <th>Notes</th>
+        <td>@Model.Notes</td>
+    </tr>
+</table>
+
 <form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="UserFoodRegId" />
     <button type="submit" class="btn btn-danger">Delete</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
