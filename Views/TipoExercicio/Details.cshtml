@@ -1,50 +1,66 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "DetalhesTiopExercicio";
+    ViewData["Title"] = "Details";
 }
 
-<h1>Detalhes do Tipo de Exercício</h1>
+<h1>Details</h1>
 
-@if (Model != null)
-{
-    <div class="card mb-4">
-        <div class="card-header">
-            <strong>@Model.CategoriaTipoExercicios</strong>
-        </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">Descrição</dt>
-                <dd class="col-sm-9">@Model.DescricaoTipoExercicios</dd>
+<div>
+    <h4>TipoExercicio</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.NomeTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.NomeTipoExercicios)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DescricaoTipoExercicios)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CaracteristicasTipoExercicios)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
+        </dd>
 
-                <dt class="col-sm-3">Nível de Dificuldade</dt>
-                <dd class="col-sm-9">@Model.NivelDificuldadeTipoExercicios</dd>
-
-                <dt class="col-sm-3">Benefício</dt>
-                <dd class="col-sm-9">@Model.BeneficioTipoExercicios</dd>
-
-                <dt class="col-sm-3">Grupos Musculares Trabalhados</dt>
-                <dd class="col-sm-9">@Model.GruposMuscularesTrabalhadosTipoExercicios</dd>
-            </dl>
-        </div>
-    </div>
-
-    <!-- Botões -->
-    <div class="mt-3 d-flex gap-3">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar à Lista
-        </a>
-        <a asp-action="Edit" asp-route-id="@Model.TipoExercicioId" class="btn btn-primary">
-            <i class="fas fa-edit"></i> Editar
-        </a>
-        <a asp-action="Delete" asp-route-id="@Model.TipoExercicioId" class="btn btn-danger">
-            <i class="fas fa-trash-alt"></i> Apagar
-        </a>
-    </div>
-}
-else
-{
-    <div class="alert alert-warning">
-        Tipo de exercício não encontrado.
-    </div>
-}
+        <!-- ✅ ADICIONADO: Benefícios Associados -->
+        <dt class="col-sm-2">
+            Benefícios Associados
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Beneficios != null && Model.Beneficios.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var beneficio in Model.Beneficios)
+                    {
+                        <li>
+                            <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
+                               target="_blank"
+                               class="text-decoration-none">
+                                📌 @beneficio.NomeBeneficio
+                            </a>
+                            @if (!string.IsNullOrEmpty(beneficio.DescricaoBeneficio))
+                            {
+                                <small class="text-muted d-block ms-3">@beneficio.DescricaoBeneficio</small>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Nenhum benefício associado</span>
+            }
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.TipoExercicioId" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
