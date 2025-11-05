@@ -1,62 +1,71 @@
 ﻿@model HealthWellbeing.Models.UserFoodRegistration
-
 @{
-    ViewData["Title"] = "Edit Registration";
+    ViewData["Title"] = "Edit Food Record";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>@ViewData["Title"]</h1>
 
-@if (TempData["ErrorMessage"] != null)
+@if (success != null)
 {
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    <div class="alert alert-success">@success</div>
+}
+@if (error != null)
+{
+    <div class="alert alert-danger">@error</div>
 }
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="UserFoodRegId" />
+    <input type="hidden" asp-for="UserFoodRegistrationId" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
 
-    <div class="form-group mb-3">
-        <label asp-for="ClientId"></label>
-        <select asp-for="ClientId" asp-items="ViewBag.Clients" class="form-control"></select>
+    <div class="mb-3">
+        <label asp-for="ClientId" class="form-label"></label>
+        <select asp-for="ClientId" asp-items="ViewBag.ClientId" class="form-select"></select>
         <span asp-validation-for="ClientId" class="text-danger"></span>
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="MealDateTime"></label>
-        <input asp-for="MealDateTime" class="form-control" type="datetime-local"
-               value="@(Model.MealDateTime.ToString("yyyy-MM-ddTHH:mm"))" />
+    <div class="mb-3">
+        <label asp-for="FoodId" class="form-label"></label>
+        <select asp-for="FoodId" asp-items="ViewBag.FoodId" class="form-select"></select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FoodPortionId" class="form-label"></label>
+        <select asp-for="FoodPortionId" asp-items="ViewBag.FoodPortionId" class="form-select"></select>
+        <span asp-validation-for="FoodPortionId" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col">
+            <label asp-for="PortionsCount" class="form-label"></label>
+            <input asp-for="PortionsCount" class="form-control" />
+            <span asp-validation-for="PortionsCount" class="text-danger"></span>
+        </div>
+        <div class="col">
+            <label asp-for="MealType" class="form-label"></label>
+            <input asp-for="MealType" class="form-control" />
+            <span asp-validation-for="MealType" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3 mt-2">
+        <label asp-for="MealDateTime" class="form-label"></label>
+        <input asp-for="MealDateTime" type="datetime-local" class="form-control" />
         <span asp-validation-for="MealDateTime" class="text-danger"></span>
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="MealType"></label>
-        <input asp-for="MealType" class="form-control" />
-        <span asp-validation-for="MealType" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="FoodName"></label>
-        <input asp-for="FoodName" class="form-control" />
-        <span asp-validation-for="FoodName" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Quantity"></label>
-        <input asp-for="Quantity" class="form-control" type="number" step="0.1" />
-        <span asp-validation-for="Quantity" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Notes"></label>
-        <input asp-for="Notes" class="form-control" />
-        <span asp-validation-for="Notes" class="text-danger"></span>
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

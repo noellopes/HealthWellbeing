@@ -21,13 +21,10 @@
 <table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Patient</th>
             <th>Goal</th>
             <th>Food</th>
             <th>Quantity</th>
             <th>Nutritionist</th>
-            <th>Description</th>
             <th style="width:190px;"></th>
         </tr>
     </thead>
@@ -35,13 +32,10 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.FoodPlanId</td>
-                <td>@item.ClientId</td>
                 <td>@item.Goal?.GoalType</td>
                 <td>@item.Food?.Name</td>
                 <td>@item.Quantity</td>
                 <td>@item.Nutritionist?.Name</td>
-                <td>@item.Description</td>
                 <td class="text-end">
                     <a asp-action="Details" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-secondary">Details</a>
                     <a asp-action="Edit" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-primary">Edit</a>

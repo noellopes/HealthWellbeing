@@ -13,12 +13,12 @@ internal static class SeedData
         db.Database.EnsureCreated();
 
         PopulateClients(db);
+        PopulateNutritionists(db);
         PopulateFoodCategories(db);
         PopulateFoods(db);
         PopulateNutrientComponents(db);
         PopulateFoodNutrients(db);
         PopulateFoodPortions(db);
-        PopulateNutritionists(db);
         PopulateGoals(db);
         PopulateFoodPlans(db);
         PopulateUserFoodRegistrations(db);
@@ -31,14 +31,27 @@ internal static class SeedData
     {
         if (db.Client.Any()) return;
 
-        var clients = new List<Client>
-        {
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Alice Wonder", Email = "alice@example.com", BirthDate = new DateTime(1992,5,14), Gender="Female" },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Bob Strong", Email = "bob@example.com", BirthDate = new DateTime(1987,2,8), Gender="Male" },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Charlie Fit", Email = "charlie@example.com", BirthDate = new DateTime(1998,10,20), Gender="Male" }
-        };
+        db.Client.AddRange(
+            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Alice Wonder", Email = "alice@example.com", BirthDate = new DateTime(1992, 5, 14), Gender = "Female" },
+            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Bob Strong", Email = "bob@example.com", BirthDate = new DateTime(1987, 2, 8), Gender = "Male" },
+            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Charlie Fit", Email = "charlie@example.com", BirthDate = new DateTime(1998, 10, 20), Gender = "Male" }
+        );
 
-        db.Client.AddRange(clients);
+        db.SaveChanges();
+    }
+
+    // ================================================================
+    // NUTRITIONISTS
+    // ================================================================
+    private static void PopulateNutritionists(HealthWellbeingDbContext db)
+    {
+        if (db.Nutritionist.Any()) return;
+
+        db.Nutritionist.AddRange(
+            new Nutritionist { Name = "Dr. Sara Healthy" },
+            new Nutritionist { Name = "Dr. Miguel Fit" }
+        );
+
         db.SaveChanges();
     }
 
@@ -66,20 +79,21 @@ internal static class SeedData
     {
         if (db.Food.Any()) return;
 
-        var fruits = db.FoodCategory.FirstOrDefault(c => c.Name == "Fruits");
-        var grains = db.FoodCategory.FirstOrDefault(c => c.Name == "Grains");
-        var proteins = db.FoodCategory.FirstOrDefault(c => c.Name == "Proteins");
-        var vegetables = db.FoodCategory.FirstOrDefault(c => c.Name == "Vegetables");
-        var dairy = db.FoodCategory.FirstOrDefault(c => c.Name == "Dairy");
+        var fruits = db.FoodCategory.First(c => c.Name == "Fruits");
+        var grains = db.FoodCategory.First(c => c.Name == "Grains");
+        var proteins = db.FoodCategory.First(c => c.Name == "Proteins");
+        var vegetables = db.FoodCategory.First(c => c.Name == "Vegetables");
+        var dairy = db.FoodCategory.First(c => c.Name == "Dairy");
 
         db.Food.AddRange(
             new Food { Name = "Apple", Description = "Fresh apple", FoodCategory = fruits },
             new Food { Name = "Banana", Description = "Yellow banana", FoodCategory = fruits },
             new Food { Name = "Rice (white, cooked)", Description = "Cooked white rice", FoodCategory = grains },
-            new Food { Name = "Salmon (raw)", Description = "Fresh salmon fish", FoodCategory = proteins },
+            new Food { Name = "Salmon", Description = "Fresh salmon fish", FoodCategory = proteins },
             new Food { Name = "Broccoli", Description = "Green broccoli florets", FoodCategory = vegetables },
             new Food { Name = "Milk (whole)", Description = "Whole cow milk", FoodCategory = dairy }
         );
+
         db.SaveChanges();
     }
 
@@ -93,11 +107,12 @@ internal static class SeedData
         db.NutrientComponent.AddRange(
             new NutrientComponent { Name = "Energy", DefaultUnit = "kcal", Description = "Energy content" },
             new NutrientComponent { Name = "Protein", DefaultUnit = "g", Description = "Protein amount" },
-            new NutrientComponent { Name = "Carbs", DefaultUnit = "g", Description = "Carbohydrates" },
+            new NutrientComponent { Name = "Carbohydrates", DefaultUnit = "g", Description = "Carbohydrates" },
             new NutrientComponent { Name = "Fat", DefaultUnit = "g", Description = "Fat content" },
             new NutrientComponent { Name = "Fiber", DefaultUnit = "g", Description = "Dietary fiber" },
             new NutrientComponent { Name = "Sugar", DefaultUnit = "g", Description = "Total sugars" }
         );
+
         db.SaveChanges();
     }
 
@@ -108,24 +123,25 @@ internal static class SeedData
     {
         if (db.FoodNutrient.Any()) return;
 
-        var comp = db.NutrientComponent.ToDictionary(c => c.Name, c => c.NutrientComponentId);
-        int Get(string name) => comp[name];
+        var comps = db.NutrientComponent.ToDictionary(c => c.Name, c => c.NutrientComponentId);
+        int Get(string name) => comps[name];
 
         var apple = db.Food.First(f => f.Name == "Apple");
         var rice = db.Food.First(f => f.Name == "Rice (white, cooked)");
-        var salmon = db.Food.First(f => f.Name == "Salmon (raw)");
+        var salmon = db.Food.First(f => f.Name == "Salmon");
         var milk = db.Food.First(f => f.Name == "Milk (whole)");
 
         db.FoodNutrient.AddRange(
             new FoodNutrient { Food = apple, NutrientComponentId = Get("Energy"), Value = 52m, Unit = "kcal", Basis = "per100g" },
-            new FoodNutrient { Food = apple, NutrientComponentId = Get("Carbs"), Value = 14m, Unit = "g", Basis = "per100g" },
+            new FoodNutrient { Food = apple, NutrientComponentId = Get("Carbohydrates"), Value = 14m, Unit = "g", Basis = "per100g" },
             new FoodNutrient { Food = rice, NutrientComponentId = Get("Energy"), Value = 130m, Unit = "kcal", Basis = "per100g" },
-            new FoodNutrient { Food = rice, NutrientComponentId = Get("Carbs"), Value = 28m, Unit = "g", Basis = "per100g" },
+            new FoodNutrient { Food = rice, NutrientComponentId = Get("Carbohydrates"), Value = 28m, Unit = "g", Basis = "per100g" },
             new FoodNutrient { Food = salmon, NutrientComponentId = Get("Energy"), Value = 208m, Unit = "kcal", Basis = "per100g" },
             new FoodNutrient { Food = salmon, NutrientComponentId = Get("Protein"), Value = 20.4m, Unit = "g", Basis = "per100g" },
             new FoodNutrient { Food = milk, NutrientComponentId = Get("Energy"), Value = 60m, Unit = "kcal", Basis = "per100ml" },
             new FoodNutrient { Food = milk, NutrientComponentId = Get("Protein"), Value = 3.2m, Unit = "g", Basis = "per100ml" }
         );
+
         db.SaveChanges();
     }
 
@@ -141,26 +157,11 @@ internal static class SeedData
         var milk = db.Food.First(f => f.Name == "Milk (whole)");
 
         db.FoodPortion.AddRange(
-            new FoodPortion { Food = apple, Label = "1 small (100 g)", AmountGramsMl = 100 },
             new FoodPortion { Food = apple, Label = "1 medium (150 g)", AmountGramsMl = 150 },
             new FoodPortion { Food = rice, Label = "1 cup cooked (150 g)", AmountGramsMl = 150 },
-            new FoodPortion { Food = rice, Label = "1/2 cup cooked (75 g)", AmountGramsMl = 75 },
             new FoodPortion { Food = milk, Label = "1 glass (200 ml)", AmountGramsMl = 200 }
         );
-        db.SaveChanges();
-    }
 
-    // ================================================================
-    // NUTRITIONISTS
-    // ================================================================
-    private static void PopulateNutritionists(HealthWellbeingDbContext db)
-    {
-        if (db.Nutritionist.Any()) return;
-
-        db.Nutritionist.AddRange(
-            new Nutritionist { Name = "Dr. Sara Healthy" },
-            new Nutritionist { Name = "Dr. Miguel Fit" }
-        );
         db.SaveChanges();
     }
 
@@ -194,6 +195,7 @@ internal static class SeedData
                 DailyFat = 70
             }
         );
+
         db.SaveChanges();
     }
 
@@ -204,19 +206,34 @@ internal static class SeedData
     {
         if (db.FoodPlan.Any()) return;
 
-        var goal = db.Goal.First();
+        var goal1 = db.Goal.First(g => g.GoalType == "Lose Weight");
+        var goal2 = db.Goal.First(g => g.GoalType == "Muscle Gain");
+        var alice = db.Client.First(c => c.Name == "Alice Wonder");
+        var bob = db.Client.First(c => c.Name == "Bob Strong");
+        var rice = db.Food.First(f => f.Name == "Rice (white, cooked)");
+        var salmon = db.Food.First(f => f.Name == "Salmon");
         var nutri = db.Nutritionist.First();
-        var food = db.Food.First(f => f.Name == "Rice (white, cooked)");
 
-        db.FoodPlan.Add(new FoodPlan
-        {
-            GoalId = goal.GoalId,
-            ClientId = goal.ClientId,
-            FoodId = food.FoodId,
-            Description = "Lunch rice portion",
-            Quantity = 150,
-            NutritionistId = nutri.NutritionistId
-        });
+        db.FoodPlan.AddRange(
+            new FoodPlan
+            {
+                ClientId = alice.ClientId,
+                GoalId = goal1.GoalId,
+                FoodId = rice.FoodId,
+                Quantity = 150,
+                Description = "Lunch portion of rice",
+                NutritionistId = nutri.NutritionistId
+            },
+            new FoodPlan
+            {
+                ClientId = bob.ClientId,
+                GoalId = goal2.GoalId,
+                FoodId = salmon.FoodId,
+                Quantity = 200,
+                Description = "Dinner portion of salmon",
+                NutritionistId = nutri.NutritionistId
+            }
+        );
 
         db.SaveChanges();
     }

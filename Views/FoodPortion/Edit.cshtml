@@ -1,28 +1,45 @@
 ﻿@model HealthWellbeing.Models.FoodPortion
 @{
     ViewData["Title"] = "Edit Food Portion";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
-<h1 class="mb-3">Edit Food Portion</h1>
-<hr />
 
-<form asp-action="Edit" method="post" novalidate>
+<h1>@ViewData["Title"]</h1>
+
+@if (success != null)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (error != null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form asp-action="Edit" method="post">
     <input type="hidden" asp-for="FoodPortionId" />
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
 
     <div class="mb-3">
-        <label asp-for="FoodName" class="form-label"></label>
-        <input asp-for="FoodName" class="form-control" />
-        <span asp-validation-for="FoodName" class="text-danger"></span>
+        <label asp-for="FoodId" class="form-label"></label>
+        <select asp-for="FoodId" asp-items="ViewBag.FoodId" class="form-select"></select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Amount" class="form-label"></label>
-        <input asp-for="Amount" class="form-control" />
-        <span asp-validation-for="Amount" class="text-danger"></span>
+        <label asp-for="Label" class="form-label"></label>
+        <input asp-for="Label" class="form-control" />
+        <span asp-validation-for="Label" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <div class="mb-3">
+        <label asp-for="AmountGramsMl" class="form-label"></label>
+        <input asp-for="AmountGramsMl" class="form-control" />
+        <span asp-validation-for="AmountGramsMl" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
 </form>
 
 @section Scripts {

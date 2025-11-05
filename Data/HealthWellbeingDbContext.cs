@@ -27,6 +27,18 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Nutritionist> Nutritionist { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodPlan> FoodPlan { get; set; } = default!;
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            foreach (var fk in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(e => e.GetForeignKeys())
+                     .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade))
+            {
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
+            }
+        }
 
     }
+    
+
 }

@@ -22,7 +22,6 @@
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(m => m.First().Name)</th>
-            <th>@Html.DisplayNameFor(m => m.First().Description)</th>
             <th>Parent</th>
             <th style="width:180px;"></th>
         </tr>
@@ -32,7 +31,6 @@
         {
             <tr>
                 <td>@item.Name</td>
-                <td>@item.Description</td>
                 <td>@item.ParentCategory?.Name</td>
                 <td class="text-end">
                     <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.FoodCategoryId">Details</a>

@@ -1,178 +1,202 @@
-﻿using HealthWellbeing.Data;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
     public class UserFoodRegistrationController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
-
         public UserFoodRegistrationController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // LIST
         public async Task<IActionResult> Index()
         {
-            var registrations = await _context.UserFoodRegistration
-                .Include(u => u.Client)
+            var list = await _context.UserFoodRegistration
+                .Include(r => r.Client)
+                .Include(r => r.Food)
+                .Include(r => r.FoodPortion)
+                .AsNoTracking()
+                .OrderByDescending(r => r.MealDateTime)
                 .ToListAsync();
-            return View(registrations);
+
+            return View(list);
         }
 
-        // DETAILS
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Details(int? id)
         {
-            var registration = await _context.UserFoodRegistration
-                .Include(u => u.Client)
-                .FirstOrDefaultAsync(u => u.UserFoodRegId == id);
+            if (id == null) return NotFound();
 
-            if (registration == null)
-            {
-                TempData["ErrorMessage"] = "Registration not found.";
-                return RedirectToAction(nameof(Index));
-            }
+            var model = await _context.UserFoodRegistration
+                .Include(r => r.Client)
+                .Include(r => r.Food)
+                .Include(r => r.FoodPortion)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.UserFoodRegistrationId == id);
 
-            return View(registration);
+            if (model == null) return NotFound();
+            return View(model);
         }
 
-        // CREATE GET
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
+            await LoadDropDownsAsync();
             return View();
         }
 
-        // CREATE POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserFoodRegistration registration)
+        public async Task<IActionResult> Create([Bind("ClientId,FoodId,FoodPortionId,PortionsCount,MealType,MealDateTime,Notes")] UserFoodRegistration model)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
-                TempData["ErrorMessage"] = "Please fix the errors and try again.";
-                return View(registration);
+                await LoadDropDownsAsync(model.ClientId, model.FoodId, model.FoodPortionId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
             }
 
             try
             {
-                _context.Add(registration);
+                // calcular energia estimada
+                model.EstimatedEnergyKcal = await CalculateEnergyAsync(model.FoodId, model.FoodPortionId, model.PortionsCount);
+
+                _context.Add(model);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Registration saved successfully!";
+                TempData["Success"] = "Food record created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name");
-                TempData["ErrorMessage"] = "Error saving registration.";
-                return View(registration);
+                TempData["Error"] = $"Could not create record: {ex.GetBaseException().Message}";
+                await LoadDropDownsAsync(model.ClientId, model.FoodId, model.FoodPortionId);
+                return View(model);
             }
         }
 
-        // EDIT GET
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            var registration = await _context.UserFoodRegistration.FindAsync(id);
-            if (registration == null)
-            {
-                TempData["ErrorMessage"] = "Registration not found.";
-                return RedirectToAction(nameof(Index));
-            }
+            if (id == null) return NotFound();
 
-            ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
-            return View(registration);
+            var model = await _context.UserFoodRegistration.FindAsync(id);
+            if (model == null) return NotFound();
+
+            await LoadDropDownsAsync(model.ClientId, model.FoodId, model.FoodPortionId);
+            return View(model);
         }
 
-        // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UserFoodRegistration registration)
+        public async Task<IActionResult> Edit(int id, [Bind("UserFoodRegistrationId,ClientId,FoodId,FoodPortionId,PortionsCount,MealType,MealDateTime,Notes")] UserFoodRegistration model)
         {
-            if (id != registration.UserFoodRegId)
-            {
-                TempData["ErrorMessage"] = "Invalid registration.";
-                return RedirectToAction(nameof(Index));
-            }
+            if (id != model.UserFoodRegistrationId) return NotFound();
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
-                TempData["ErrorMessage"] = "Please fix the errors and try again.";
-                return View(registration);
+                await LoadDropDownsAsync(model.ClientId, model.FoodId, model.FoodPortionId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
             }
 
             try
             {
-                var regInDb = await _context.UserFoodRegistration.FindAsync(id);
-                if (regInDb == null)
-                {
-                    TempData["ErrorMessage"] = "Registration not found.";
-                    return RedirectToAction(nameof(Index));
-                }
+                var entity = await _context.UserFoodRegistration.FirstOrDefaultAsync(r => r.UserFoodRegistrationId == id);
+                if (entity == null) return NotFound();
 
-                // Atualizar campos
-                regInDb.ClientId = registration.ClientId;
-                regInDb.MealDateTime = registration.MealDateTime;
-                regInDb.MealType = registration.MealType;
-                regInDb.FoodName = registration.FoodName;
-                regInDb.Quantity = registration.Quantity;
-                regInDb.Notes = registration.Notes;
+                entity.ClientId = model.ClientId;
+                entity.FoodId = model.FoodId;
+                entity.FoodPortionId = model.FoodPortionId;
+                entity.PortionsCount = model.PortionsCount;
+                entity.MealType = model.MealType.Trim();
+                entity.MealDateTime = model.MealDateTime;
+                entity.Notes = model.Notes?.Trim();
+                entity.EstimatedEnergyKcal = await CalculateEnergyAsync(model.FoodId, model.FoodPortionId, model.PortionsCount);
 
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Registration updated successfully!";
+                TempData["Success"] = "Record updated successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (DbUpdateException ex)
             {
-                ViewBag.Clients = new SelectList(_context.Client.ToList(), "ClientId", "Name", registration.ClientId);
-                TempData["ErrorMessage"] = "Error updating registration.";
-                return View(registration);
+                TempData["Error"] = $"Could not save changes: {ex.GetBaseException().Message}";
+                await LoadDropDownsAsync(model.ClientId, model.FoodId, model.FoodPortionId);
+                return View(model);
             }
         }
 
-        // DELETE GET
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            var registration = await _context.UserFoodRegistration
-                .Include(u => u.Client)
-                .FirstOrDefaultAsync(u => u.UserFoodRegId == id);
+            if (id == null) return NotFound();
 
-            if (registration == null)
-            {
-                TempData["ErrorMessage"] = "Registration not found.";
-                return RedirectToAction(nameof(Index));
-            }
+            var model = await _context.UserFoodRegistration
+                .Include(r => r.Client)
+                .Include(r => r.Food)
+                .Include(r => r.FoodPortion)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.UserFoodRegistrationId == id);
 
-            return View(registration);
+            if (model == null) return NotFound();
+            return View(model);
         }
 
-        // DELETE POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var registration = await _context.UserFoodRegistration.FindAsync(id);
-            if (registration != null)
+            var entity = await _context.UserFoodRegistration.FirstOrDefaultAsync(r => r.UserFoodRegistrationId == id);
+            if (entity == null) return NotFound();
+
+            try
             {
-                try
-                {
-                    _context.UserFoodRegistration.Remove(registration);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Registration deleted successfully!";
-                }
-                catch
-                {
-                    TempData["ErrorMessage"] = "Error deleting registration.";
-                }
+                _context.UserFoodRegistration.Remove(entity);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Record deleted successfully.";
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not delete record: {ex.GetBaseException().Message}";
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadDropDownsAsync(string? clientId = null, int? foodId = null, int? portionId = null)
+        {
+            ViewBag.ClientId = new SelectList(
+                await _context.Client.AsNoTracking().OrderBy(c => c.Name).ToListAsync(),
+                "ClientId", "Name", clientId);
+
+            ViewBag.FoodId = new SelectList(
+                await _context.Food.AsNoTracking().OrderBy(f => f.Name).ToListAsync(),
+                "FoodId", "Name", foodId);
+
+            ViewBag.FoodPortionId = new SelectList(
+                await _context.FoodPortion
+                    .Include(p => p.Food)
+                    .AsNoTracking()
+                    .OrderBy(p => p.Label)
+                    .ToListAsync(),
+                "FoodPortionId", "Label", portionId);
+        }
+
+        private async Task<decimal?> CalculateEnergyAsync(int foodId, int portionId, decimal portionsCount)
+        {
+            var portion = await _context.FoodPortion.AsNoTracking().FirstOrDefaultAsync(p => p.FoodPortionId == portionId);
+            var nutrient = await _context.FoodNutrient
+                .Include(fn => fn.NutrientComponent)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(fn => fn.FoodId == foodId && fn.NutrientComponent!.Name == "Energy");
+
+            if (portion == null || nutrient == null) return null;
+
+            // energia = valor * (pesoPorção / 100) * nº porções
+            return Math.Round(((nutrient.Value / 100m) * portion.AmountGramsMl * portionsCount), 2);
         }
     }
 }
