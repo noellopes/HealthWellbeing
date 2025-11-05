@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
+using HealthWellBeing.Models;
 
 namespace HealthWellbeing.Data
 {
