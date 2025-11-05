@@ -264,6 +264,29 @@ namespace HealthWellbeing.Migrations
             });
 
             // ===== UtenteSaude (só no 1º código) =====
+            modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
+                {
+                    b.Property<int>("IdEspecialidade")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdEspecialidade"));
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("IdEspecialidade");
+
+                    b.ToTable("Specialities");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
             {
                 b.Property<int>("UtenteSaudeId")
