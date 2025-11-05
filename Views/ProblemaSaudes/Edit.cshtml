@@ -1,54 +1,92 @@
 ﻿@model HealthWellbeing.Models.ProblemaSaude
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Problema de Saúde";
 }
 
-<h1>Edit</h1>
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
+            <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>@ViewData["Title"]</h2>
+        </div>
 
-<h4>ProblemaSaude</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ProblemaSaudeId" />
-            <div class="form-group">
-                <label asp-for="ProblemaCategoria" class="control-label"></label>
-                <input asp-for="ProblemaCategoria" class="form-control" />
-                <span asp-validation-for="ProblemaCategoria" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProblemaNome" class="control-label"></label>
-                <input asp-for="ProblemaNome" class="form-control" />
-                <span asp-validation-for="ProblemaNome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ZonaAtingida" class="control-label"></label>
-                <input asp-for="ZonaAtingida" class="form-control" />
-                <span asp-validation-for="ZonaAtingida" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProfissionalDeApoio" class="control-label"></label>
-                <input asp-for="ProfissionalDeApoio" class="form-control" />
-                <span asp-validation-for="ProfissionalDeApoio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Gravidade" class="control-label"></label>
-                <input asp-for="Gravidade" class="form-control" />
-                <span asp-validation-for="Gravidade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        <div class="card-body px-5 py-4">
+            <form asp-action="Edit" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="ProblemaSaudeId" />
+
+                <div class="mb-3">
+                    <label asp-for="ProblemaCategoria" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ProblemaCategoria" class="form-control rounded-3 shadow-sm" placeholder="Ex: Doença Respiratória" />
+                    <span asp-validation-for="ProblemaCategoria" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProblemaNome" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ProblemaNome" class="form-control rounded-3 shadow-sm" placeholder="Ex: Asma" />
+                    <span asp-validation-for="ProblemaNome" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ZonaAtingida" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ZonaAtingida" class="form-control rounded-3 shadow-sm" placeholder="Ex: Pulmões" />
+                    <span asp-validation-for="ZonaAtingida" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProfissionalDeApoio" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="ProfissionalDeApoio" class="form-control rounded-3 shadow-sm" placeholder="Ex: Pneumologista" />
+                    <span asp-validation-for="ProfissionalDeApoio" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Gravidade" class="form-label fw-semibold text-secondary"></label>
+                    <input asp-for="Gravidade" type="number" min="1" max="10" class="form-control rounded-3 shadow-sm" />
+                    <span asp-validation-for="Gravidade" class="text-danger small"></span>
+                    <small class="text-muted">Indique a gravidade entre 1 e 10.</small>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success px-4 me-2 shadow-sm">
+                        <i class="bi bi-save2"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        <i class="bi bi-arrow-left-circle"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    label {
+        font-weight: 600;
+    }
+
+    input.form-control {
+        border: 1px solid #ddd;
+        transition: all 0.2s ease;
+    }
+
+        input.form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+        }
+</style>
+

@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -21,9 +25,21 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercicios
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Exercicio.ToListAsync());
+            var exerciciosContext = _context.Exercicio;
+
+            int numberExercicios = await exerciciosContext.CountAsync();
+
+            var exerciciosInfo = new PaginationInfoExercicios<Exercicio>(page, numberExercicios);
+
+            exerciciosInfo.Items = await exerciciosContext
+                .OrderBy(e => e.ExercicioNome)
+                .Skip(exerciciosInfo.ItemsToSkip)
+                .Take(exerciciosInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(exerciciosInfo);
         }
 
         // GET: Exercicios/Details/5
