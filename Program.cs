@@ -42,6 +42,7 @@ using (var scope = app.Services.CreateScope())
     healthContext.Database.Migrate();
     SeedDataExercicio.Populate(healthContext);
     SeedDataTipoExercicio.Populate(healthContext);
+    SeedDataProblemaSaude.Populate(healthContext);
 }
 
 app.UseHttpsRedirection();
