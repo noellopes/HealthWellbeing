@@ -1,0 +1,35 @@
+﻿@model HealthWellbeing.Models.FoodPlan
+@{
+    ViewData["Title"] = "Delete Food Plan";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-danger">
+    Are you sure you want to delete this food plan?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Patient</dt>
+    <dd class="col-sm-9">@Model.PatientId</dd>
+    <dt class="col-sm-3">Goal</dt>
+    <dd class="col-sm-9">@Model.Goal?.GoalType</dd>
+    <dt class="col-sm-3">Food</dt>
+    <dd class="col-sm-9">@Model.Food?.Name</dd>
+</dl>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="FoodPlanId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

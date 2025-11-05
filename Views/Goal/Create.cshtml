@@ -1,0 +1,76 @@
+﻿@model HealthWellbeing.Models.Goal
+@{
+    ViewData["Title"] = "Create Goal";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+
+    <div class="mb-3">
+        <label asp-for="PatientId" class="form-label">Patient</label>
+        <select asp-for="PatientId" class="form-select" asp-items="ViewBag.PatientId" as SelectList"></select>
+        <span asp-validation-for="PatientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="GoalType" class="form-label"></label>
+        <input asp-for="GoalType" class="form-control" />
+        <span asp-validation-for="GoalType" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label asp-for="DailyCalories" class="form-label"></label>
+            <input asp-for="DailyCalories" class="form-control" />
+            <span asp-validation-for="DailyCalories" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="DailyProtein" class="form-label"></label>
+            <input asp-for="DailyProtein" class="form-control" />
+            <span asp-validation-for="DailyProtein" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="DailyCarbs" class="form-label"></label>
+            <input asp-for="DailyCarbs" class="form-control" />
+            <span asp-validation-for="DailyCarbs" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-md-4">
+            <label asp-for="DailyFats" class="form-label"></label>
+            <input asp-for="DailyFats" class="form-control" />
+            <span asp-validation-for="DailyFats" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="DailyFibers" class="form-label"></label>
+            <input asp-for="DailyFibers" class="form-control" />
+            <span asp-validation-for="DailyFibers" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="DailyMinerals" class="form-label"></label>
+            <input asp-for="DailyMinerals" class="form-control" />
+            <span asp-validation-for="DailyMinerals" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-primary" type="submit">Create</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

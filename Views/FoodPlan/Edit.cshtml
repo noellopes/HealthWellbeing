@@ -1,0 +1,65 @@
+﻿@model HealthWellbeing.Models.FoodPlan
+@{
+    ViewData["Title"] = "Edit Food Plan";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+    <input type="hidden" asp-for="FoodPlanId" />
+
+    <div class="mb-3">
+        <label asp-for="PatientId" class="form-label">Patient</label>
+        <select asp-for="PatientId" class="form-select" asp-items="ViewBag.PatientId" as SelectList"></select>
+        <span asp-validation-for="PatientId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="GoalId" class="form-label">Goal</label>
+        <select asp-for="GoalId" class="form-select" asp-items="ViewBag.GoalId" as SelectList"></select>
+        <span asp-validation-for="GoalId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FoodId" class="form-label">Food</label>
+        <select asp-for="FoodId" class="form-select" asp-items="ViewBag.FoodId" as SelectList"></select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label asp-for="Description" class="form-label"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Quantity" class="form-label"></label>
+            <input asp-for="Quantity" class="form-control" />
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3 mt-2">
+        <label asp-for="NutritionistId" class="form-label">Nutritionist</label>
+        <select asp-for="NutritionistId" class="form-select" asp-items="ViewBag.NutritionistId" as SelectList"></select>
+        <span asp-validation-for="NutritionistId" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
