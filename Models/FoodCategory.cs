@@ -8,7 +8,7 @@ namespace HealthWellbeing.Models
     {
         public int FoodCategoryId { get; set; }
 
-<<<<<<< Updated upstream
+
         [Required(ErrorMessage = "Category name is required.")]
         [StringLength(100, MinimumLength = 2,
             ErrorMessage = "Category name must be between 2 and 100 characters.")]
@@ -70,19 +70,5 @@ namespace HealthWellbeing.Models
                     new[] { nameof(Description) });
             }
         }
-=======
-        [Required, StringLength(60)]
-        public string Name { get; set; } = string.Empty;
-
-        [StringLength(200)]
-        public string? Description { get; set; }
-
-        public int? ParentCategoryId { get; set; }
-        public FoodCategory? ParentCategory { get; set; }
-
-        public ICollection<FoodCategory> SubCategory { get; set; } = new List<FoodCategory>();
-
-        public ICollection<Food>? Food { get; set; }
->>>>>>> Stashed changes
     }
 }
