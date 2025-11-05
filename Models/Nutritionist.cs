@@ -12,7 +12,6 @@ namespace HealthWellbeing.Models
         [Required, StringLength(120)]
         public string Name { get; set; } = string.Empty;
 
-        // Navigation
-        public ICollection<Plan>? Plans { get; set; }
+        public ICollection<FoodPlan>? FoodPlan { get; set; }
     }
 }
