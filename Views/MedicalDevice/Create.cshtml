@@ -1,5 +1,5 @@
-﻿@using HealthWellbeingRoom.Models.FileMedicalDevices;
-@model MedicalDevices;
+﻿@using HealthWellbeingRoom.Models
+@model MedicalDevice;
 
 @{
     // O nome da sua View (Registar novo Dispositivo Médico)
@@ -36,19 +36,14 @@
                         <span asp-validation-for="Type" class="text-danger small"></span>
                     </div>
 
+                </div>
+
+                <div class="col-md-6">
+
                     <div class="mb-3">
                         <label asp-for="Specification" class="form-label fw-bold">Especificação Detalhada</label>
                         <input asp-for="Specification" class="form-control" placeholder="Ex: Marca Philips, Modelo VM8, S/N 123456">
                         <span asp-validation-for="Specification" class="text-danger small"></span>
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Status" class="form-label fw-bold">Status</label>
-                        <input asp-for="Status" class="form-control" placeholder="Ex: Disponível, Em Uso, Em Manutenção.">
-                        <span asp-validation-for="Status" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
@@ -58,7 +53,7 @@
                     </div>
 
                     <input asp-for="RegistrationDate" type="hidden" />
-                    <input asp-for="DevicesID" type="hidden" />
+                    <input asp-for="MedicalDeviceID" type="hidden" />
                 </div>
 
             </div> <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">

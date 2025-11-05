@@ -340,13 +340,13 @@
 //                    b.ToTable("Equipment");
 //                });
 
-//            modelBuilder.Entity("HealthWellbeingRoom.Models.FileMedicalDevices.MedicalDevices", b =>
-//                {
-//                    b.Property<int>("DevicesID")
-//                        .ValueGeneratedOnAdd()
-//                        .HasColumnType("int");
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
+                {
+                    b.Property<int>("MedicalDeviceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-//                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DevicesID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicalDeviceID"));
 
 //                    b.Property<string>("Name")
 //                        .IsRequired()
@@ -359,20 +359,15 @@
 //                    b.Property<DateTime>("RegistrationDate")
 //                        .HasColumnType("datetime2");
 
-//                    b.Property<string>("Specification")
-//                        .IsRequired()
-//                        .HasMaxLength(200)
-//                        .HasColumnType("nvarchar(200)");
+                    b.Property<string>("Specification")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-//                    b.Property<string>("Status")
-//                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-//                    b.Property<string>("Type")
-//                        .IsRequired()
-//                        .HasMaxLength(50)
-//                        .HasColumnType("nvarchar(50)");
-
-//                    b.HasKey("DevicesID");
+                    b.HasKey("MedicalDeviceID");
 
 //                    b.ToTable("MedicalDevices");
 //                });
