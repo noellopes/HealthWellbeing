@@ -27,7 +27,9 @@
 <table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Name</th>
+            <th>Description</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -35,7 +37,9 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>@item.FoodComponentId</td>
                 <td>@item.Name</td>
+                <td>@item.Description</td>
                 <td>
                     <a href="@Url.Action("Details", new { id = item.FoodComponentId })" class="btn btn-info">Details</a>
                     <a href="@Url.Action("Edit", new { id = item.FoodComponentId })" class="btn btn-warning">Edit</a>
