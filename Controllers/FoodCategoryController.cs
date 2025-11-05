@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
-    public class FoodCategoriesController : Controller
+    public class FoodCategoryController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public FoodCategoriesController(HealthWellbeingDbContext context)
+        public FoodCategoryController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -29,14 +29,14 @@ namespace HealthWellbeing.Controllers
             return View(categories);
         }
 
-        // GET: /FoodCategories/Details/5
+        // GET: /FoodCategory/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var category = await _context.FoodCategory
                 .Include(c => c.ParentCategory)
-                .Include(c => c.SubCategories)
+                .Include(c => c.SubCategory)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.FoodCategoryId == id);
 
@@ -199,13 +199,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.FoodCategory
-                .Include(c => c.SubCategories)
+                .Include(c => c.SubCategory)
                 .Include(c => c.Foods!)
                 .FirstOrDefaultAsync(c => c.FoodCategoryId == id);
 
             if (category == null) return NotFound();
 
-            if (category.SubCategories.Any())
+            if (category.SubCategory.Any())
             {
                 TempData["Error"] = "Cannot delete a category that has subcategories. Reassign or remove them first.";
                 return RedirectToAction(nameof(Index));
