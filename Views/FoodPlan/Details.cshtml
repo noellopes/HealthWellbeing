@@ -1,36 +1,26 @@
 ﻿@model HealthWellbeing.Models.FoodPlan
 @{
     ViewData["Title"] = "Food Plan Details";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
 }
-<h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
+<h1>Food Plan Details</h1>
 
 <dl class="row">
-    <dt class="col-sm-3">Patient</dt>
-    <dd class="col-sm-9">@Model.PatientId</dd>
+    <dt class="col-sm-3">Patient ID</dt>
+    <dd class="col-sm-9">@Model.ClientId</dd>
     <dt class="col-sm-3">Goal</dt>
     <dd class="col-sm-9">@Model.Goal?.GoalType</dd>
     <dt class="col-sm-3">Food</dt>
     <dd class="col-sm-9">@Model.Food?.Name</dd>
     <dt class="col-sm-3">Quantity</dt>
     <dd class="col-sm-9">@Model.Quantity</dd>
-    <dt class="col-sm-3">Nutritionist</dt>
-    <dd class="col-sm-9">@Model.Nutritionist?.Name</dd>
     <dt class="col-sm-3">Description</dt>
     <dd class="col-sm-9">@Model.Description</dd>
+    <dt class="col-sm-3">Nutritionist</dt>
+    <dd class="col-sm-9">@Model.Nutritionist?.Name</dd>
 </dl>
 
-<div class="mt-3">
-    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.FoodPlanId">Edit</a>
-    <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
-</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.FoodPlanId" class="btn btn-outline-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</p>

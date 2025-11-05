@@ -22,5 +22,11 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.FoodPortion> FoodPortion { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodComponent> FoodComponent { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UserFoodRegistration> UserFoodRegistration { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.NutrientComponent> NutrientComponent { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.FoodNutrient> FoodNutrient { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Nutritionist> Nutritionist { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.FoodPlan> FoodPlan { get; set; } = default!;
+
+
     }
 }

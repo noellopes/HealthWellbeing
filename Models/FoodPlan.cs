@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -8,23 +9,32 @@ namespace HealthWellbeing.Models
         public int FoodPlanId { get; set; }
 
         [Required]
+        [Display(Name = "Client")]
+        public string ClientId { get; set; } = string.Empty;
+        public Client? Client { get; set; }
+
+        [Required]
+        [Display(Name = "Goal")]
         public int GoalId { get; set; }
         public Goal? Goal { get; set; }
 
         [Required]
-        public int PatientId { get; set; }  // FK to UtenteSaude
-
-        [Required]
+        [Display(Name = "Food")]
         public int FoodId { get; set; }
         public Food? Food { get; set; }
 
-        [StringLength(300)]
+
+        [Range(0.01, 999999.99, ErrorMessage = "Please enter a valid quantity.")]
+        [Column(TypeName = "decimal(9,2)")]
+        [Display(Name = "Quantity (g/ml)")]
+        public decimal Quantity { get; set; }
+
+        [StringLength(200)]
+        [Display(Name = "Description / Notes")]
         public string? Description { get; set; }
 
-        public int Quantity { get; set; }
-
+        [Display(Name = "Nutritionist")]
         public int? NutritionistId { get; set; }
-        public Nutritionist? Nutritionist { get; set; }    
-
+        public Nutritionist? Nutritionist { get; set; }
     }
 }

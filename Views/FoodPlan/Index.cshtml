@@ -1,57 +1,53 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.FoodPlan>
 @{
     ViewData["Title"] = "Food Plans";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
 }
-<h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrWhiteSpace(success))
+<h1 class="mb-3">Food Plans</h1>
+
+@if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@success</div>
+    <div class="alert alert-success">@TempData["Success"]</div>
 }
-@if (!string.IsNullOrWhiteSpace(error))
+@if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@error</div>
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Plan</a>
 </p>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">There are no food plans yet.</div>
-}
-else
-{
-    <table class="table table-striped align-middle">
-        <thead>
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Goal</th>
+            <th>Food</th>
+            <th>Quantity</th>
+            <th>Nutritionist</th>
+            <th>Description</th>
+            <th style="width:190px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
             <tr>
-                <th>Patient</th>
-                <th>Goal</th>
-                <th>Food</th>
-                <th>Quantity</th>
-                <th>Nutritionist</th>
-                <th class="text-end">Actions</th>
+                <td>@item.FoodPlanId</td>
+                <td>@item.ClientId</td>
+                <td>@item.Goal?.GoalType</td>
+                <td>@item.Food?.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Nutritionist?.Name</td>
+                <td>@item.Description</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-secondary">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-danger">Delete</a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model)
-            {
-                <tr>
-                    <td>@p.PatientId</td>
-                    <td>@p.Goal?.GoalType</td>
-                    <td>@p.Food?.Name</td>
-                    <td>@p.Quantity</td>
-                    <td>@p.Nutritionist?.Name</td>
-                    <td class="text-end">
-                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@p.FoodPlanId">Details</a>
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@p.FoodPlanId">Edit</a>
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.FoodPlanId">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        }
+    </tbody>
+</table>

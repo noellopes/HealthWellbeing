@@ -11,142 +11,221 @@ namespace HealthWellbeing.Controllers
     public class FoodPlanController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
-        public FoodPlanController(HealthWellbeingDbContext context) => _context = context;
 
-        // GET: /FoodPlan
-        public async Task<IActionResult> Index(int? patientId, int? goalId)
+        public FoodPlanController(HealthWellbeingDbContext context)
         {
-            var q = _context.FoodPlan
+            _context = context;
+        }
+
+        private async Task LoadDropDownsAsync(string? clientId = null, int? goalId = null, int? foodId = null, int? nutritionistId = null)
+        {
+            ViewBag.ClientId = new SelectList(
+                await _context.Client.AsNoTracking().OrderBy(c => c.Name).ToListAsync(),
+                "ClientId", "Name", clientId
+            );
+
+            // Goals (filtra pelo cliente se existir)
+            var goalsQuery = _context.Goal.AsNoTracking().OrderBy(g => g.GoalType).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(clientId))
+                goalsQuery = goalsQuery.Where(g => g.ClientId == clientId);
+
+            ViewBag.GoalId = new SelectList(
+                await goalsQuery.ToListAsync(),
+                "GoalId", "GoalType", goalId
+            );
+
+            ViewBag.FoodId = new SelectList(
+                await _context.Food.AsNoTracking().OrderBy(f => f.Name).ToListAsync(),
+                "FoodId", "Name", foodId
+            );
+
+            ViewBag.NutritionistId = new SelectList(
+                await _context.Nutritionist.AsNoTracking().OrderBy(n => n.Name).ToListAsync(),
+                "NutritionistId", "Name", nutritionistId
+            );
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var list = await _context.FoodPlan
+                .Include(p => p.Client)
                 .Include(p => p.Goal)
                 .Include(p => p.Food)
                 .Include(p => p.Nutritionist)
                 .AsNoTracking()
-                .AsQueryable();
+                .OrderByDescending(p => p.FoodPlanId)
+                .ToListAsync();
 
-            if (patientId.HasValue) q = q.Where(p => p.PatientId == patientId.Value);
-            if (goalId.HasValue) q = q.Where(p => p.GoalId == goalId.Value);
-
-            ViewBag.PatientId = patientId;
-            ViewBag.GoalId = goalId;
-            return View(await q.OrderByDescending(p => p.FoodPlanId).ToListAsync());
+            return View(list);
         }
 
-        // GET: /FoodPlan/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var plan = await _context.FoodPlan
+
+            var model = await _context.FoodPlan
+                .Include(p => p.Client)
                 .Include(p => p.Goal)
                 .Include(p => p.Food)
                 .Include(p => p.Nutritionist)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.FoodPlanId == id);
-            if (plan == null) return NotFound();
-            return View(plan);
+                .FirstOrDefaultAsync(p => p.FoodPlanId == id);
+
+            if (model == null) return NotFound();
+            return View(model);
         }
 
-        // GET: /FoodPlan/Create
-        public async Task<IActionResult> Create(int? patientId, int? goalId)
+        public async Task<IActionResult> Create(string? clientId = null)
         {
-            ViewData["GoalId"] = new SelectList(await _context.Goal
-                .Where(g => !patientId.HasValue || g.PatientId == patientId)
-                .OrderBy(g => g.GoalType).ToListAsync(), "GoalId", "GoalType", goalId);
-
-            ViewData["PatientId"] = new SelectList(new[]
-            { new { Id = patientId ?? 0, Name = patientId.HasValue ? $"Patient #{patientId}" : "Select a patient" } }, "Id", "Name", patientId);
-
-            ViewData["FoodId"] = new SelectList(await _context.Food.OrderBy(f => f.Name).ToListAsync(), "FoodId", "Name");
-            ViewData["NutritionistId"] = new SelectList(await _context.Nutritionist.OrderBy(n => n.Name).ToListAsync(), "NutritionistId", "Name");
-            return View(new FoodPlan { Quantity = 1 });
+            await LoadDropDownsAsync(clientId, null, null, null);
+            return View();
         }
 
-        // POST: /FoodPlan/Create
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GoalId,PatientId,FoodId,Description,Quantity,NutritionistId")] FoodPlan plan)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("ClientId,GoalId,FoodId,Quantity,Description,NutritionistId")] FoodPlan model)
         {
-            if (!ModelState.IsValid)
+            if (!string.IsNullOrWhiteSpace(model.ClientId))
             {
-                ViewData["GoalId"] = new SelectList(await _context.Goal.OrderBy(g => g.GoalType).ToListAsync(), "GoalId", "GoalType", plan.GoalId);
-                ViewData["PatientId"] = new SelectList(new[] { new { Id = plan.PatientId, Name = $"Patient #{plan.PatientId}" } }, "Id", "Name", plan.PatientId);
-                ViewData["FoodId"] = new SelectList(await _context.Food.OrderBy(f => f.Name).ToListAsync(), "FoodId", "Name", plan.FoodId);
-                ViewData["NutritionistId"] = new SelectList(await _context.Nutritionist.OrderBy(n => n.Name).ToListAsync(), "NutritionistId", "Name", plan.NutritionistId);
-                return View(plan);
+                bool goalMatchesClient = await _context.Goal.AnyAsync(g => g.GoalId == model.GoalId && g.ClientId == model.ClientId);
+                if (!goalMatchesClient)
+                    ModelState.AddModelError(nameof(FoodPlan.GoalId), "Selected goal does not belong to this client.");
             }
 
-            _context.Add(plan);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Plan created successfully.";
-            return RedirectToAction(nameof(Index), new { patientId = plan.PatientId, goalId = plan.GoalId });
-        }
-
-        // GET: /FoodPlan/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-            var plan = await _context.FoodPlan.FindAsync(id);
-            if (plan == null) return NotFound();
-
-            ViewData["GoalId"] = new SelectList(await _context.Goal.Where(g => g.PatientId == plan.PatientId).OrderBy(g => g.GoalType).ToListAsync(), "GoalId", "GoalType", plan.GoalId);
-            ViewData["PatientId"] = new SelectList(new[] { new { Id = plan.PatientId, Name = $"Patient #{plan.PatientId}" } }, "Id", "Name", plan.PatientId);
-            ViewData["FoodId"] = new SelectList(await _context.Food.OrderBy(f => f.Name).ToListAsync(), "FoodId", "Name", plan.FoodId);
-            ViewData["NutritionistId"] = new SelectList(await _context.Nutritionist.OrderBy(n => n.Name).ToListAsync(), "NutritionistId", "Name", plan.NutritionistId);
-            return View(plan);
-        }
-
-        // POST: /FoodPlan/Edit/5
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FoodPlanId,GoalId,PatientId,FoodId,Description,Quantity,NutritionistId")] FoodPlan plan)
-        {
-            if (id != plan.FoodPlanId) return NotFound();
-
             if (!ModelState.IsValid)
             {
-                ViewData["GoalId"] = new SelectList(await _context.Goal.Where(g => g.PatientId == plan.PatientId).OrderBy(g => g.GoalType).ToListAsync(), "GoalId", "GoalType", plan.GoalId);
-                ViewData["PatientId"] = new SelectList(new[] { new { Id = plan.PatientId, Name = $"Patient #{plan.PatientId}" } }, "Id", "Name", plan.PatientId);
-                ViewData["FoodId"] = new SelectList(await _context.Food.OrderBy(f => f.Name).ToListAsync(), "FoodId", "Name", plan.FoodId);
-                ViewData["NutritionistId"] = new SelectList(await _context.Nutritionist.OrderBy(n => n.Name).ToListAsync(), "NutritionistId", "Name", plan.NutritionistId);
-                return View(plan);
+                await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
             }
 
             try
             {
-                _context.Update(plan);
+                model.Description = model.Description?.Trim();
+                _context.Add(model);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Plan updated successfully.";
-                return RedirectToAction(nameof(Index), new { patientId = plan.PatientId, goalId = plan.GoalId });
+                TempData["Success"] = "Food plan created successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Error creating record: {ex.GetBaseException().Message}";
+                await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+                return View(model);
+            }
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+            var model = await _context.FoodPlan.FindAsync(id);
+            if (model == null) return NotFound();
+
+            await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("FoodPlanId,ClientId,GoalId,FoodId,Quantity,Description,NutritionistId")] FoodPlan model)
+        {
+            if (id != model.FoodPlanId) return NotFound();
+
+            if (!string.IsNullOrWhiteSpace(model.ClientId))
+            {
+                bool goalMatchesClient = await _context.Goal.AnyAsync(g => g.GoalId == model.GoalId && g.ClientId == model.ClientId);
+                if (!goalMatchesClient)
+                    ModelState.AddModelError(nameof(FoodPlan.GoalId), "Selected goal does not belong to this client.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
+            }
+
+            try
+            {
+                var entity = await _context.FoodPlan.FirstOrDefaultAsync(p => p.FoodPlanId == id);
+                if (entity == null) return NotFound();
+
+                entity.ClientId = model.ClientId;
+                entity.GoalId = model.GoalId;
+                entity.FoodId = model.FoodId;
+                entity.Quantity = model.Quantity;
+                entity.Description = model.Description?.Trim();
+                entity.NutritionistId = model.NutritionistId;
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Food plan updated successfully.";
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _context.FoodPlan.AnyAsync(e => e.FoodPlanId == id)) return NotFound();
-                TempData["Error"] = "The record was modified by another user. Please reload and try again.";
-                return View(plan);
+                if (!await _context.FoodPlan.AnyAsync(p => p.FoodPlanId == id))
+                    return NotFound();
+
+                TempData["Error"] = "Concurrency conflict. Please reload and try again.";
+                await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+                return View(model);
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not save: {ex.GetBaseException().Message}";
+                await LoadDropDownsAsync(model.ClientId, model.GoalId, model.FoodId, model.NutritionistId);
+                return View(model);
             }
         }
 
-        // GET: /FoodPlan/Delete/5
+      
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-            var plan = await _context.FoodPlan
-                .Include(p => p.Goal).Include(p => p.Food).Include(p => p.Nutritionist)
+
+            var model = await _context.FoodPlan
+                .Include(p => p.Client)
+                .Include(p => p.Goal)
+                .Include(p => p.Food)
+                .Include(p => p.Nutritionist)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.FoodPlanId == id);
-            if (plan == null) return NotFound();
-            return View(plan);
+                .FirstOrDefaultAsync(p => p.FoodPlanId == id);
+
+            if (model == null) return NotFound();
+            return View(model);
         }
 
-        // POST: /FoodPlan/Delete/5
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var plan = await _context.FoodPlan.FindAsync(id);
-            if (plan == null) return NotFound();
-            int pat = plan.PatientId; int gol = plan.GoalId;
+            var entity = await _context.FoodPlan.FirstOrDefaultAsync(p => p.FoodPlanId == id);
+            if (entity == null) return NotFound();
 
-            _context.FoodPlan.Remove(plan);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Plan deleted successfully.";
-            return RedirectToAction(nameof(Index), new { patientId = pat, goalId = gol });
+            try
+            {
+                _context.FoodPlan.Remove(entity);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Food plan deleted successfully.";
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not delete: {ex.GetBaseException().Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GoalsByClient(string clientId)
+        {
+            var data = await _context.Goal
+                .Where(g => g.ClientId == clientId)
+                .OrderBy(g => g.GoalType)
+                .Select(g => new { g.GoalId, g.GoalType })
+                .ToListAsync();
+
+            return Json(data);
         }
     }
 }

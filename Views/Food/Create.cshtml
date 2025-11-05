@@ -3,64 +3,33 @@
     ViewData["Title"] = "Create Food";
 }
 
-<h1 class="mb-3">Create Food</h1>
-<hr />
+<h1>Create Food</h1>
 
 <form asp-action="Create" method="post" novalidate>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <!-- Food Name -->
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" placeholder="Enter food name" />
+        <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <!-- Category dropdown -->
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
     <div class="mb-3">
         <label asp-for="FoodCategoryId" class="form-label"></label>
-        <select asp-for="FoodCategoryId" class="form-select" asp-items="ViewBag.FoodCategoryId">
-            <option value="">-- Select a category --</option>
+        <select asp-for="FoodCategoryId" asp-items="ViewBag.FoodCategoryId" class="form-select">
+            <option value="">-- Select Category --</option>
         </select>
         <span asp-validation-for="FoodCategoryId" class="text-danger"></span>
     </div>
 
-    <!-- Description -->
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Optional description..."></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <!-- Nutritional information -->
-    <h5 class="mt-4 mb-2">Nutritional Information (per 100g)</h5>
-    <div class="row g-3">
-        <div class="col-md-3">
-            <label asp-for="KcalPer100g" class="form-label"></label>
-            <input asp-for="KcalPer100g" class="form-control" />
-            <span asp-validation-for="KcalPer100g" class="text-danger"></span>
-        </div>
-        <div class="col-md-3">
-            <label asp-for="ProteinPer100g" class="form-label"></label>
-            <input asp-for="ProteinPer100g" class="form-control" />
-            <span asp-validation-for="ProteinPer100g" class="text-danger"></span>
-        </div>
-        <div class="col-md-3">
-            <label asp-for="CarbsPer100g" class="form-label"></label>
-            <input asp-for="CarbsPer100g" class="form-control" />
-            <span asp-validation-for="CarbsPer100g" class="text-danger"></span>
-        </div>
-        <div class="col-md-3">
-            <label asp-for="FatPer100g" class="form-label"></label>
-            <input asp-for="FatPer100g" class="form-control" />
-            <span asp-validation-for="FatPer100g" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
-    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {

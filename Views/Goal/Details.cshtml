@@ -5,6 +5,7 @@
     var error = TempData["Error"] as string;
 }
 <h1>@ViewData["Title"]</h1>
+
 @if (!string.IsNullOrWhiteSpace(success))
 {
     <div class="alert alert-success">@success</div>
@@ -15,23 +16,32 @@
 }
 
 <dl class="row">
-    <dt class="col-sm-3">Patient</dt>
-    <dd class="col-sm-9">@Model.PatientId</dd>
+    <dt class="col-sm-3">Client</dt>
+    <dd class="col-sm-9">@Model.Client?.Name</dd>
 
     <dt class="col-sm-3">Goal Type</dt>
     <dd class="col-sm-9">@Model.GoalType</dd>
 
-    <dt class="col-sm-3">Daily Calories</dt>
+    <dt class="col-sm-3">Calories</dt>
     <dd class="col-sm-9">@Model.DailyCalories</dd>
 
-    <dt class="col-sm-3">Daily Protein</dt>
+    <dt class="col-sm-3">Protein</dt>
     <dd class="col-sm-9">@Model.DailyProtein</dd>
 
-    <dt class="col-sm-3">Daily Carbs</dt>
+    <dt class="col-sm-3">Carbs</dt>
     <dd class="col-sm-9">@Model.DailyCarbs</dd>
 
-    <dt class="col-sm-3">Daily Fats</dt>
-    <dd class="col-sm-9">@Model.DailyFats</dd>
+    <dt class="col-sm-3">Fat</dt>
+    <dd class="col-sm-9">@Model.DailyFat</dd>
+
+    <dt class="col-sm-3">Fiber</dt>
+    <dd class="col-sm-9">@Model.DailyFiber</dd>
+
+    <dt class="col-sm-3">Vitamins</dt>
+    <dd class="col-sm-9">@Model.DailyVitamins</dd>
+
+    <dt class="col-sm-3">Minerals</dt>
+    <dd class="col-sm-9">@Model.DailyMinerals</dd>
 </dl>
 
 <div class="mt-3">

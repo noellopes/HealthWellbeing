@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Numerics;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
@@ -9,9 +7,14 @@ namespace HealthWellbeing.Models
         [Key]
         public int NutritionistId { get; set; }
 
-        [Required, StringLength(120)]
+        [Required, StringLength(80)]
         public string Name { get; set; } = string.Empty;
 
-        public ICollection<FoodPlan>? FoodPlan { get; set; }
+        
+        [EmailAddress, StringLength(120)]
+        public string? Email { get; set; }
+
+        [Phone, StringLength(30)]
+        public string? Phone { get; set; }
     }
 }

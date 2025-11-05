@@ -2,29 +2,21 @@
 @{
     ViewData["Title"] = "Food Details";
 }
-<h1>@Model.Name</h1>
+
+<h1>Food Details</h1>
 
 <dl class="row">
-    <dt class="col-sm-3">Category</dt>
-    <dd class="col-sm-9">@Model.Category?.Name</dd>
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
 
     <dt class="col-sm-3">Description</dt>
     <dd class="col-sm-9">@Model.Description</dd>
 
-    <dt class="col-sm-3">Kcal / 100g</dt>
-    <dd class="col-sm-9">@Model.KcalPer100g</dd>
-
-    <dt class="col-sm-3">Protein / 100g</dt>
-    <dd class="col-sm-9">@Model.ProteinPer100g g</dd>
-
-    <dt class="col-sm-3">Carbs / 100g</dt>
-    <dd class="col-sm-9">@Model.CarbsPer100g g</dd>
-
-    <dt class="col-sm-3">Fat / 100g</dt>
-    <dd class="col-sm-9">@Model.FatPer100g g</dd>
+    <dt class="col-sm-3">Category</dt>
+    <dd class="col-sm-9">@Model.FoodCategory?.Name</dd>
 </dl>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.FoodId" class="btn btn-primary">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.FoodId" class="btn btn-outline-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</p>

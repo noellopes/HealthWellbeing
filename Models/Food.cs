@@ -20,6 +20,6 @@ namespace HealthWellbeing.Models
         public FoodCategory? FoodCategory { get; set; }
 
         public ICollection<FoodNutrient>? FoodNutrients { get; set; }
-        public ICollection<Plan>? Plans { get; set; }
+        public ICollection<FoodPlan>? FoodPlans { get; set; }
     }
 }

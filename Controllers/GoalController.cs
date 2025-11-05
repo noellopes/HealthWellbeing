@@ -11,114 +11,180 @@ namespace HealthWellbeing.Controllers
     public class GoalController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
-        public GoalController(HealthWellbeingDbContext context) => _context = context;
-
-        // GET: /Goal
-        public async Task<IActionResult> Index(int? patientId)
+        public GoalController(HealthWellbeingDbContext context)
         {
-            var q = _context.Goal.AsNoTracking().AsQueryable();
-            if (patientId.HasValue) q = q.Where(g => g.PatientId == patientId.Value);
-            ViewBag.PatientId = patientId;
-            return View(await q.OrderByDescending(g => g.GoalId).ToListAsync());
+            _context = context;
         }
 
-        // GET: /Goal/Details/5
+        public async Task<IActionResult> Index(string? clientId)
+        {
+            var query = _context.Goal
+                .Include(g => g.Client)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(clientId))
+                query = query.Where(g => g.ClientId == clientId);
+
+            ViewBag.ClientId = clientId;
+            return View(await query.OrderBy(g => g.GoalType).ToListAsync());
+        }
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-            var g = await _context.Goal
-                .Include(x => x.Plan)
+
+            var goal = await _context.Goal
+                .Include(g => g.Client)
+                .Include(g => g.FoodPlans)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.GoalId == id);
-            if (g == null) return NotFound();
-            return View(g);
+                .FirstOrDefaultAsync(g => g.GoalId == id);
+
+            if (goal == null) return NotFound();
+            return View(goal);
         }
 
-        // GET: /Goal/Create
-        public IActionResult Create(int? patientId)
+        public async Task<IActionResult> Create(string? clientId)
         {
-            // Troca isto por UtenteSaude quando tiveres a entidade real:
-            ViewData["PatientId"] = new SelectList(new[]
-            {
-                new { Id = patientId ?? 0, Name = patientId.HasValue ? $"Patient #{patientId}" : "Select a patient" }
-            }, "Id", "Name", patientId);
+            await LoadClientsAsync(clientId);
             return View();
         }
 
-        // POST: /Goal/Create
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PatientId,GoalType,DailyCalories,DailyProtein,DailyFats,DailyCarbs,DailyVitamins,DailyMinerals,DailyFibers")] Goal goal)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("ClientId,GoalType,DailyCalories,DailyProtein,DailyFat,DailyCarbs,DailyFiber,DailyVitamins,DailyMinerals")] Goal goal)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["PatientId"] = new SelectList(new[] { new { Id = goal.PatientId, Name = $"Patient #{goal.PatientId}" } }, "Id", "Name", goal.PatientId);
-                return View(goal);
-            }
-
-            _context.Add(goal);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Goal created successfully.";
-            return RedirectToAction(nameof(Index), new { patientId = goal.PatientId });
-        }
-
-        // GET: /Goal/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-            var g = await _context.Goal.FindAsync(id);
-            if (g == null) return NotFound();
-
-            ViewData["PatientId"] = new SelectList(new[] { new { Id = g.PatientId, Name = $"Patient #{g.PatientId}" } }, "Id", "Name", g.PatientId);
-            return View(g);
-        }
-
-        // POST: /Goal/Edit/5
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GoalId,PatientId,GoalType,DailyCalories,DailyProtein,DailyFats,DailyCarbs,DailyVitamins,DailyMinerals,DailyFibers")] Goal goal)
-        {
-            if (id != goal.GoalId) return NotFound();
-            if (!ModelState.IsValid)
-            {
-                ViewData["PatientId"] = new SelectList(new[] { new { Id = goal.PatientId, Name = $"Patient #{goal.PatientId}" } }, "Id", "Name", goal.PatientId);
+                await LoadClientsAsync(goal.ClientId);
+                TempData["Error"] = "Please correct the errors below.";
                 return View(goal);
             }
 
             try
             {
-                _context.Update(goal);
+                goal.GoalType = goal.GoalType.Trim();
+                _context.Add(goal);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Goal updated successfully.";
-                return RedirectToAction(nameof(Index), new { patientId = goal.PatientId });
+                TempData["Success"] = "Goal created successfully.";
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateException ex)
             {
-                if (!await _context.Goal.AnyAsync(e => e.GoalId == id)) return NotFound();
-                TempData["Error"] = "The record was modified by another user. Please reload and try again.";
+                TempData["Error"] = $"Error creating record: {ex.GetBaseException().Message}";
+                await LoadClientsAsync(goal.ClientId);
                 return View(goal);
             }
         }
 
-        // GET: /Goal/Delete/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var goal = await _context.Goal.FindAsync(id);
+            if (goal == null) return NotFound();
+
+            await LoadClientsAsync(goal.ClientId);
+            return View(goal);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,GoalType,DailyCalories,DailyProtein,DailyFat,DailyCarbs,DailyFiber,DailyVitamins,DailyMinerals")] Goal goal)
+        {
+            if (id != goal.GoalId) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                await LoadClientsAsync(goal.ClientId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(goal);
+            }
+
+            try
+            {
+                var entity = await _context.Goal.FirstOrDefaultAsync(g => g.GoalId == id);
+                if (entity == null) return NotFound();
+
+                entity.ClientId = goal.ClientId;
+                entity.GoalType = goal.GoalType.Trim();
+                entity.DailyCalories = goal.DailyCalories;
+                entity.DailyProtein = goal.DailyProtein;
+                entity.DailyFat = goal.DailyFat;
+                entity.DailyCarbs = goal.DailyCarbs;
+                entity.DailyFiber = goal.DailyFiber;
+                entity.DailyVitamins = goal.DailyVitamins;
+                entity.DailyMinerals = goal.DailyMinerals;
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Goal updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Goal.AnyAsync(g => g.GoalId == id))
+                    return NotFound();
+
+                TempData["Error"] = "This record was changed by another user. Please reload.";
+                await LoadClientsAsync(goal.ClientId);
+                return View(goal);
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not save changes: {ex.GetBaseException().Message}";
+                await LoadClientsAsync(goal.ClientId);
+                return View(goal);
+            }
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-            var g = await _context.Goal.AsNoTracking().FirstOrDefaultAsync(x => x.GoalId == id);
-            if (g == null) return NotFound();
-            return View(g);
+
+            var goal = await _context.Goal
+                .Include(g => g.Client)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(g => g.GoalId == id);
+
+            if (goal == null) return NotFound();
+            return View(goal);
         }
 
-        // POST: /Goal/Delete/5
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var g = await _context.Goal.FindAsync(id);
-            if (g == null) return NotFound();
-            int patientId = g.PatientId;
+            var goal = await _context.Goal
+                .Include(g => g.FoodPlans)
+                .FirstOrDefaultAsync(g => g.GoalId == id);
 
-            _context.Goal.Remove(g);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Goal deleted successfully.";
-            return RedirectToAction(nameof(Index), new { patientId });
+            if (goal == null) return NotFound();
+
+            if (goal.FoodPlans != null && goal.FoodPlans.Any())
+            {
+                TempData["Error"] = "Cannot delete a goal that has associated food plans.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Goal.Remove(goal);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Goal deleted successfully.";
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not delete: {ex.GetBaseException().Message}";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadClientsAsync(string? selectedClientId = null)
+        {
+            ViewBag.ClientId = new SelectList(
+                await _context.Client.AsNoTracking().OrderBy(c => c.Name).ToListAsync(),
+                "ClientId", "Name", selectedClientId);
         }
     }
 }
