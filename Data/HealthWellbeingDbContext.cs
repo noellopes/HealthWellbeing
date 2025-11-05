@@ -18,7 +18,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Client> Client { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Food> Food { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodCategory> FoodCategory { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Goal> Objective { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Goal> Goal { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodPortion> FoodPortion { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodComponent> FoodComponent { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UserFoodRegistration> UserFoodRegistration { get; set; } = default!;
