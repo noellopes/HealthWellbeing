@@ -32,7 +32,7 @@ namespace HealthWellbeing.Models
         [Range(0.1, 1000, ErrorMessage = "Quantity must be greater than 0")]
         public double Quantity { get; set; }
 
-        [StringLength(250, ErrorMessage = "Notes must be at most 250 characters long")]
+        
         public string? Notes { get; set; }
     }
 }
