@@ -1,59 +1,122 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.ProblemaSaude>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Problemas de Saúde";
+
+    // --- Lógica simples de paginação ---
+    int pageSize = 10; // nº de itens por página
+    int totalItems = Model.Count();
+    int currentPage = Convert.ToInt32(Context.Request.Query["page"].FirstOrDefault() ?? "1");
+    int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+    var items = Model.Skip((currentPage - 1) * pageSize).Take(pageSize);
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <h1 class="text-center text-primary fw-bold mb-4">
+        <i class="bi bi-heart-pulse-fill"></i> @ViewData["Title"]
+    </h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProblemaCategoria)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProblemaNome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ZonaAtingida)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProfissionalDeApoio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gravidade)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProblemaCategoria)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProblemaNome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ZonaAtingida)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProfissionalDeApoio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gravidade)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProblemaSaudeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProblemaSaudeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProblemaSaudeId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <a class="btn btn-success shadow-sm" asp-action="Create">
+            <i class="bi bi-plus-circle"></i> Adicionar Novo Problema
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded-3">
+        <table id="problemasTable" class="table table-hover table-bordered align-middle mb-0">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>Categoria</th>
+                    <th>Nome</th>
+                    <th>Zona Atingida</th>
+                    <th>Profissional de Apoio</th>
+                    <th>Gravidade</th>
+                    <th style="width:180px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in items)
+                {
+                    <tr>
+                        <td>@item.ProblemaCategoria</td>
+                        <td>@item.ProblemaNome</td>
+                        <td>@item.ZonaAtingida</td>
+                        <td>@item.ProfissionalDeApoio</td>
+                        <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <div class="progress w-50" style="height: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated
+                                            @(item.Gravidade >= 8 ? "bg-danger" :
+                                                                                   item.Gravidade >= 5 ? "bg-warning" : "bg-success")"
+                                     role="progressbar"
+                                     style="width: @(item.Gravidade * 10)%;">
+                                </div>
+                            </div>
+                            <span class="fw-bold">@item.Gravidade/10</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.ProblemaSaudeId" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.ProblemaSaudeId" title="Detalhes">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.ProblemaSaudeId" title="Apagar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação simples -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Paginação de problemas de saúde">
+            <ul class="pagination mb-0">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<style>
+    .pagination {
+        list-style: none;
+        display: flex;
+        gap: 6px;
+        padding: 0;
+    }
+
+    .page-item a {
+        display: block;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #0d6efd;
+        border: 1px solid #0d6efd;
+        transition: 0.2s;
+    }
+
+    .page-item.active a {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .page-item a:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+</style>
+
+
+
