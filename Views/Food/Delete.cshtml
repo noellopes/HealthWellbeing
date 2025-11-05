@@ -1,19 +1,31 @@
 ﻿@model HealthWellbeing.Models.Food
 @{
     ViewData["Title"] = "Delete Food";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
-<h1>Delete Food</h1>
-<p class="text-danger">Are you sure you want to delete this item?</p>
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-danger">Are you sure you want to delete <strong>@Model.Name</strong>?</div>
 
 <dl class="row">
-    <dt class="col-sm-3">Name</dt>
-    <dd class="col-sm-9">@Model.Name</dd>
     <dt class="col-sm-3">Category</dt>
-    <dd class="col-sm-9">@Model.Category?.Name</dd>
+    <dd class="col-sm-9">@Model.FoodCategory?.Name</dd>
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
 </dl>
 
-<form asp-action="Delete" method="post">
+<form asp-action="Delete">
     <input type="hidden" asp-for="FoodId" />
     <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

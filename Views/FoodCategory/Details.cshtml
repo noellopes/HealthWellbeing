@@ -1,12 +1,22 @@
 ﻿@model HealthWellbeing.Models.FoodCategory
 @{
     ViewData["Title"] = "Category Details";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
-
 <h1>@ViewData["Title"]</h1>
 
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
 <dl class="row">
-    <dt class="col-sm-3">Category</dt>
+    <dt class="col-sm-3">Name</dt>
     <dd class="col-sm-9">@Model.Name</dd>
 
     <dt class="col-sm-3">Parent</dt>
@@ -14,26 +24,9 @@
 
     <dt class="col-sm-3">Description</dt>
     <dd class="col-sm-9">@Model.Description</dd>
-
-    <dt class="col-sm-3">Subcategories</dt>
-    <dd class="col-sm-9">
-        @if (Model.SubCategory != null && Model.SubCategory.Any())
-        {
-            <ul class="mb-0">
-                @foreach (var sc in Model.SubCategory)
-                {
-                    <li>@sc.Name</li>
-                }
-            </ul>
-        }
-        else
-        {
-            <span class="text-muted">None</span>
-        }
-    </dd>
 </dl>
 
 <div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.FoodCategoryId" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.FoodCategoryId">Edit</a>
+    <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
 </div>
