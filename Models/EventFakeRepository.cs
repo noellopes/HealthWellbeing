@@ -12,7 +12,7 @@
                 EventType = "Cardio",
                 DurationMinutes = 45,
                 Intensity = "Média",
-                CaloriesBurned = 300,
+                
                 EventDate = new DateTime(2025, 10, 10)
             },
             new Event
@@ -23,7 +23,7 @@
                 EventType = "Pilates",
                 DurationMinutes = 60,
                 Intensity = "Baixa",
-                CaloriesBurned = 200,
+                
                 EventDate = new DateTime(2025, 10, 8)
             },
             new Event
@@ -34,7 +34,7 @@
                 EventType = "Funcional",
                 DurationMinutes = 50,
                 Intensity = "Alta",
-                CaloriesBurned = 400,
+                
                 EventDate = new DateTime(2025, 10, 5)
             }
         };
