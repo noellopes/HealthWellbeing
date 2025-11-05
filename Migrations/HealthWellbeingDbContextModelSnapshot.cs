@@ -156,15 +156,21 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodCategoryId"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
+
                     b.HasKey("FoodCategoryId");
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("FoodCategory");
                 });
@@ -385,7 +391,34 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
                 {
+                    b.HasOne("HealthWellbeing.Models.FoodCategory", "ParentCategory")
+                        .WithMany("SubCategories")
+                        .HasForeignKey("ParentCategoryId");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
+                {
+                    b.Navigation("Clients");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
+                {
                     b.Navigation("Foods");
+
+                    b.Navigation("SubCategories");
                 });
 #pragma warning restore 612, 618
         }
