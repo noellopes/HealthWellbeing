@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251103182537_FreshStart")]
+    partial class FreshStart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,29 +119,17 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodId"));
 
-                    b.Property<decimal>("CarbsPer100g")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
-                    b.Property<decimal>("FatPer100g")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("FoodCategoryId")
+                    b.Property<int>("FoodCategoryId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("KcalPer100g")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
-
-                    b.Property<decimal>("ProteinPer100g")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FoodId");
 
@@ -156,15 +147,20 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodCategoryId"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
 
                     b.HasKey("FoodCategoryId");
+
+                    b.HasIndex("ParentCategoryId");
 
                     b.ToTable("FoodCategory");
                 });
@@ -192,6 +188,78 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("FoodComponent");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.FoodNutrient", b =>
+                {
+                    b.Property<int>("FoodNutrientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodNutrientId"));
+
+                    b.Property<string>("Basis")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<int>("FoodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NutrientComponentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(9,3)");
+
+                    b.HasKey("FoodNutrientId");
+
+                    b.HasIndex("FoodId");
+
+                    b.HasIndex("NutrientComponentId");
+
+                    b.ToTable("FoodNutrient");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodPlan", b =>
+                {
+                    b.Property<int>("FoodPlanId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodPlanId"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("FoodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GoalId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NutritionistId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("FoodPlanId");
+
+                    b.HasIndex("FoodId");
+
+                    b.HasIndex("GoalId");
+
+                    b.HasIndex("NutritionistId");
+
+                    b.ToTable("FoodPlan");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.FoodPortion", b =>
                 {
                     b.Property<int>("FoodPortionId")
@@ -215,6 +283,48 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("FoodPortion");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Goal", b =>
+                {
+                    b.Property<int>("GoalId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GoalId"));
+
+                    b.Property<int?>("DailyCalories")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyCarbs")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyFats")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyFibers")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyMinerals")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyProtein")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DailyVitamins")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GoalType")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GoalId");
+
+                    b.ToTable("Goal");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
                 {
                     b.Property<int>("MemberId")
@@ -234,31 +344,55 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Member");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Objective", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.NutrientComponent", b =>
                 {
-                    b.Property<int>("ObjectiveId")
+                    b.Property<int>("NutrientComponentId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ObjectiveId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutrientComponentId"));
 
-                    b.Property<string>("Category")
+                    b.Property<string>("Code")
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<string>("DefaultUnit")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsMacro")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
 
-                    b.Property<string>("Details")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.HasKey("NutrientComponentId");
+
+                    b.ToTable("NutrientComponent");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Nutritionist", b =>
+                {
+                    b.Property<int>("NutritionistId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NutritionistId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
-                    b.HasKey("ObjectiveId");
+                    b.HasKey("NutritionistId");
 
-                    b.ToTable("Objective");
+                    b.ToTable("Nutritionist");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
@@ -342,6 +476,46 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("RestricaoAlimentar");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.UserFoodRegistration", b =>
+                {
+                    b.Property<int>("UserFoodRegId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserFoodRegId"));
+
+                    b.Property<string>("ClientId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FoodName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("MealDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MealType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<double>("Quantity")
+                        .HasColumnType("float");
+
+                    b.HasKey("UserFoodRegId");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("UserFoodRegistration");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Food", "Food")
@@ -360,14 +534,80 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.FoodCategory", "Category")
-                        .WithMany("Foods")
-                        .HasForeignKey("FoodCategoryId");
+                    b.HasOne("HealthWellbeing.Models.FoodCategory", "FoodCategory")
+                        .WithMany("Food")
+                        .HasForeignKey("FoodCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("FoodCategory");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.FoodCategory", "ParentCategory")
+                        .WithMany("SubCategory")
+                        .HasForeignKey("ParentCategoryId");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodNutrient", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Food", "Food")
+                        .WithMany("FoodNutrients")
+                        .HasForeignKey("FoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.NutrientComponent", "NutrientComponent")
+                        .WithMany("FoodNutrient")
+                        .HasForeignKey("NutrientComponentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Food");
+
+                    b.Navigation("NutrientComponent");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodPlan", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Food", "Food")
+                        .WithMany("Plans")
+                        .HasForeignKey("FoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Goal", "Goal")
+                        .WithMany("Plan")
+                        .HasForeignKey("GoalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Nutritionist", "Nutritionist")
+                        .WithMany("FoodPlan")
+                        .HasForeignKey("NutritionistId");
+
+                    b.Navigation("Food");
+
+                    b.Navigation("Goal");
+
+                    b.Navigation("Nutritionist");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.UserFoodRegistration", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
                         .WithMany()
@@ -383,9 +623,33 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Clients");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
+                {
+                    b.Navigation("FoodNutrients");
+
+                    b.Navigation("Plans");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
                 {
-                    b.Navigation("Foods");
+                    b.Navigation("Food");
+
+                    b.Navigation("SubCategory");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Goal", b =>
+                {
+                    b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.NutrientComponent", b =>
+                {
+                    b.Navigation("FoodNutrient");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Nutritionist", b =>
+                {
+                    b.Navigation("FoodPlan");
                 });
 #pragma warning restore 612, 618
         }
