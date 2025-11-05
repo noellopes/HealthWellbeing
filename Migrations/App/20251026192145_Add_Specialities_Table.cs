@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations
+namespace HealthWellbeing.Migrations.App
 {
     /// <inheritdoc />
-    public partial class Add_Spetialities_Only : Migration
+    public partial class Add_Specialities_Table : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
