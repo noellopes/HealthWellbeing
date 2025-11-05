@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.FoodCategory>
 @{
     ViewData["Title"] = "Food Categories";
+<<<<<<< Updated upstream
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -9,6 +10,26 @@
     <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
 
+=======
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
+</p>
+
+>>>>>>> Stashed changes
 @if (!Model.Any())
 {
     <div class="alert alert-info">There are no categories yet.</div>
@@ -18,13 +39,18 @@ else
     <table class="table table-striped align-middle">
         <thead>
             <tr>
+<<<<<<< Updated upstream
                 <th>Category</th>
+=======
+                <th>Name</th>
+>>>>>>> Stashed changes
                 <th>Parent</th>
                 <th>Description</th>
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
         <tbody>
+<<<<<<< Updated upstream
             @foreach (var item in Model)
             {
                 <tr>
@@ -39,6 +65,18 @@ else
                            onclick="return confirm('Are you sure you want to delete this category?');">
                             Delete
                         </a>
+=======
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.Name</td>
+                    <td>@c.ParentCategory?.Name</td>
+                    <td>@c.Description</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@c.FoodCategoryId">Details</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@c.FoodCategoryId">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@c.FoodCategoryId">Delete</a>
+>>>>>>> Stashed changes
                     </td>
                 </tr>
             }

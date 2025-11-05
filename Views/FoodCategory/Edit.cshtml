@@ -1,12 +1,29 @@
 ﻿@model HealthWellbeing.Models.FoodCategory
 @{
     ViewData["Title"] = "Edit Category";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
-
 <h1>@ViewData["Title"]</h1>
 
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+<<<<<<< Updated upstream
+
+<h1>@ViewData["Title"]</h1>
+=======
+>>>>>>> Stashed changes
+
 <form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
     <input type="hidden" asp-for="FoodCategoryId" />
+<<<<<<< Updated upstream
     <partial name="_Form" model="Model" />
     <div class="mt-3">
         <button type="submit" class="btn btn-warning"
@@ -15,6 +32,31 @@
         </button>
         <a asp-action="Index" class="btn btn-secondary">Back</a>
     </div>
+=======
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" asp-for="ParentCategoryId">Parent Category</label>
+        <select asp-for="ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategoryId">
+            <option value="">-- None --</option>
+        </select>
+        <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+>>>>>>> Stashed changes
 </form>
 
 @section Scripts {
