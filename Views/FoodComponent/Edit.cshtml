@@ -1,35 +1,21 @@
 ﻿@model HealthWellbeing.Models.FoodComponent
 
 @{
-    ViewData["Title"] = "Edit Food";
+    ViewData["Title"] = "Delete Food Component";
 }
 
-<h1>Edit Food</h1>
+<h2>@ViewData["Title"]</h2>
 
-<form asp-action="Edit" method="post">
-    <!-- Hidden field to store the ID -->
-    <input type="hidden" asp-for="FoodComponentId" />
+<div class="alert alert-warning">
+    Are you sure you want to delete this food component?
+    <br />
+    <strong>Name:</strong> @Model.Name
+    <br />
+    <strong>Description:</strong> @Model.Description
+</div>
 
-    <!-- Display any validation errors -->
-    <div asp-validation-summary="All" class="text-danger"></div>
-
-    <div class="form-group">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description" class="control-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.FoodComponentId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-

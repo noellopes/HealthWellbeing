@@ -1,0 +1,35 @@
+﻿@model HealthWellbeing.Models.NutrientComponent
+@{
+    ViewData["Title"] = "Nutrient Details";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Default Unit</dt>
+    <dd class="col-sm-9">@Model.DefaultUnit</dd>
+
+    <dt class="col-sm-3">Is Macro</dt>
+    <dd class="col-sm-9">@(Model.IsMacro ? "Yes" : "No")</dd>
+
+    <dt class="col-sm-3">Description</dt>
+    <dd class="col-sm-9">@Model.Description</dd>
+</dl>
+
+<div class="mt-3">
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.NutrientComponentId">Edit</a>
+    <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
+</div>
