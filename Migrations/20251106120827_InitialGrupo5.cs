@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialGrupo5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -164,18 +164,14 @@ namespace HealthWellbeingRoom.Migrations
                 name: "TypeMaterial",
                 columns: table => new
                 {
-                    TipoMaterialID = table.Column<int>(type: "int", nullable: false)
+                    TypeMaterialID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TipoMaterialNome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TipoMaterialCategoria = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Ativo = table.Column<bool>(type: "bit", maxLength: 50, nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TypeMaterial", x => x.TipoMaterialID);
+                    table.PrimaryKey("PK_TypeMaterial", x => x.TypeMaterialID);
                 });
 
             migrationBuilder.CreateTable(

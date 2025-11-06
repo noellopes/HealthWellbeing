@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.11" />
     <Content Remove="Views\ExerciciosView.cshtml" />
+    <Content Remove="Views\TypeMaterial\Index.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

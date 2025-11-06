@@ -1,0 +1,48 @@
+﻿@model HealthWellbeing.Models.TypeMaterial
+
+@{
+    ViewData["Title"] = "Eliminar Tipo de Material";
+}
+
+<h1 class="mb-4 text-danger">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm border-danger">
+
+  
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i> Confirmação de Eliminação
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <p class="lead">
+            Tem a certeza que deseja eliminar o seguinte <strong>Tipo de Material</strong>?
+        </p>
+
+        <hr />
+
+        <dl class="row">
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Description)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Description)</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post" class="mt-4 border-top pt-3">
+            <input type="hidden" asp-for="TypeMaterialID" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash3 me-1"></i> Eliminar Definitivamente
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+    
+
+</div>

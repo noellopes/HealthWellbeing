@@ -14,7 +14,9 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
         public DbSet<HealthWellbeing.Models.TypeMaterial> TypeMaterial { get; set; } = default!;
+
         public DbSet<HealthWellbeing.Models.LocationMaterial> LocationMaterial { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentType> EquipmentType { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentStatus> EquipmentStatus { get; set; } = default!;
@@ -25,5 +27,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
+
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251106002048_Initial")]
-    partial class Initial
+    [Migration("20251106120827_InitialGrupo5")]
+    partial class InitialGrupo5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -299,37 +299,23 @@ namespace HealthWellbeingRoom.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.TypeMaterial", b =>
                 {
-                    b.Property<int>("TipoMaterialID")
+                    b.Property<int>("TypeMaterialID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoMaterialID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeMaterialID"));
 
-                    b.Property<bool>("Ativo")
-                        .HasMaxLength(50)
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DataAtualizacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TipoMaterialCategoria")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("TipoMaterialNome")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("TipoMaterialID");
+                    b.HasKey("TypeMaterialID");
 
                     b.ToTable("TypeMaterial");
                 });
