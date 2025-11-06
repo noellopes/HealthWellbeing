@@ -14,15 +14,59 @@ namespace HealthWellBeingRoom.Data
         internal static void Populate(HealthWellbeingDbContext? dbContext)
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
-
+            PopulateRooms(dbContext);
             PopulateTypeMaterial(dbContext);
             PopulateMedicalDevices(dbContext);
-
             PopulateManufacturer(dbContext);
             PolutateEquipmentTypes(dbContext);
             PolutateEquipmentStatus(dbContext);
             PolutateEquipment(dbContext);
         }
+
+        private static void PopulateRooms(HealthWellbeingDbContext dbContext)
+        {
+            if (!dbContext.Room.Any())
+            {
+                var rooms = new List<Room>
+                {
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Pediatria", Name = "Sala 01", Capacity = 5, Location = "Piso 1, Ala A", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "Atendimento infantil." },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Cardiologia", Name = "Sala 02", Capacity = 4, Location = "Piso 1, Ala B", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "Atendimento cardiológico." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Fisioterapia", Name = "Sala 03", Capacity = 3, Location = "Piso 2, Ala C", OperatingHours = "09:00 - 19:00", Status = Room.RoomStatus.Disponivel, Notes = "Sala equipada." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Oncologia", Name = "Sala 04", Capacity = 2, Location = "Piso 2, Ala D", OperatingHours = "08:00 - 17:00", Status = Room.RoomStatus.Limpeza, Notes = "Limpeza agendada." },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Ortopedia", Name = "Sala 05", Capacity = 6, Location = "Piso 1, Ala E", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "Especialista em ossos." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Dermatologia", Name = "Sala 06", Capacity = 4, Location = "Piso 2, Ala F", OperatingHours = "10:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Psicologia", Name = "Sala 07", Capacity = 2, Location = "Piso 1, Ala G", OperatingHours = "09:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Ginecologia", Name = "Sala 08", Capacity = 3, Location = "Piso 2, Ala H", OperatingHours = "08:00 - 16:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Oftalmologia", Name = "Sala 09", Capacity = 2, Location = "Piso 1, Ala I", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "Material óptico disponível." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Nutrição", Name = "Sala 10", Capacity = 2, Location = "Piso 2, Ala J", OperatingHours = "09:30 - 16:30", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Pneumologia", Name = "Sala 11", Capacity = 4, Location = "Piso 1, Ala K", OperatingHours = "08:30 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Neurologia", Name = "Sala 12", Capacity = 2, Location = "Piso 2, Ala L", OperatingHours = "10:00 - 18:00", Status = Room.RoomStatus.Manutencao, Notes = "Equipamento em revisão." },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Endocrinologia", Name = "Sala 13", Capacity = 3, Location = "Piso 1, Ala M", OperatingHours = "08:00 - 15:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Reumatologia", Name = "Sala 14", Capacity = 3, Location = "Piso 2, Ala N", OperatingHours = "09:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Otorrinolaringologia", Name = "Sala 15", Capacity = 2, Location = "Piso 1, Ala O", OperatingHours = "10:00 - 17:00", Status = Room.RoomStatus.ForaDeServico, Notes = "Sem uso temporário." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Urologia", Name = "Sala 16", Capacity = 3, Location = "Piso 2, Ala P", OperatingHours = "08:00 - 16:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Gastroenterologia", Name = "Sala 17", Capacity = 4, Location = "Piso 1, Ala Q", OperatingHours = "08:00 - 16:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Hematologia", Name = "Sala 18", Capacity = 2, Location = "Piso 2, Ala R", OperatingHours = "09:00 - 17:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Nefrologia", Name = "Sala 19", Capacity = 2, Location = "Piso 1, Ala S", OperatingHours = "10:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Oncologia Pediátrica", Name = "Sala 20", Capacity = 2, Location = "Piso 2, Ala T", OperatingHours = "08:00 - 13:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Imunologia", Name = "Sala 21", Capacity = 3, Location = "Piso 1, Ala U", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Psiquiatria", Name = "Sala 22", Capacity = 2, Location = "Piso 2, Ala V", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Maternidade", Name = "Sala 23", Capacity = 6, Location = "Piso 1, Ala W", OperatingHours = "08:00 - 20:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Transplante", Name = "Sala 24", Capacity = 2, Location = "Piso 2, Ala X", OperatingHours = "08:00 - 17:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Odontologia", Name = "Sala 25", Capacity = 3, Location = "Piso 1, Ala Y", OperatingHours = "10:00 - 17:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Cirurgia Geral", Name = "Sala 26", Capacity = 2, Location = "Piso 2, Ala Z", OperatingHours = "09:00 - 17:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Otorrinolaringologia", Name = "Sala 27", Capacity = 2, Location = "Piso 1, Ala AA", OperatingHours = "08:00 - 16:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Anestesiologia", Name = "Sala 28", Capacity = 2, Location = "Piso 2, Ala BB", OperatingHours = "08:00 - 14:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Radiologia", Name = "Sala 29", Capacity = 3, Location = "Piso 1, Ala CC", OperatingHours = "08:00 - 18:00", Status = Room.RoomStatus.Manutencao, Notes = "Equipamento em manutenção." },
+                    new Room { RoomsType = Room.RoomType.Tratamentos, Specialty = "Reabilitação Cardíaca", Name = "Sala 30", Capacity = 2, Location = "Piso 2, Ala DD", OperatingHours = "08:30 - 16:30", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                    new Room { RoomsType = Room.RoomType.Consultas, Specialty = "Vascular", Name = "Sala 31", Capacity = 3, Location = "Piso 1, Ala EE", OperatingHours = "09:00 - 17:00", Status = Room.RoomStatus.Disponivel, Notes = "" },
+                };
+
+                dbContext.Room.AddRange(rooms);
+                dbContext.SaveChanges();
+            }
+        }
+
 
         private static void PopulateManufacturer(HealthWellbeingDbContext dbContext)
         {
