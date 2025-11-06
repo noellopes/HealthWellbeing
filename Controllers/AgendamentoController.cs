@@ -34,25 +34,25 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamentoModel = await _context.Agendamentos
+            var agendamentoBalneario = await _context.Agendamentos
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.UtenteBalneario)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
-            if (agendamentoModel == null)
+            if (agendamentoBalneario == null)
             {
                 return NotFound();
             }
 
-            return View(agendamentoModel);
+            return View(agendamentoBalneario);
         }
 
         // GET: Agendamento/Create
         public IActionResult Create()
         {
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId");
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "TerapeutaId");
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId");
+            ViewData["ServicoId"] = new SelectList(_context.Servicos.OrderBy(s => s.Nome), "ServicoId", "Nome");
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas.OrderBy(t => t.Nome), "TerapeutaId", "Nome");
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>().OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "Nome");
             return View();
         }
 
@@ -172,5 +172,8 @@ namespace HealthWellbeing.Controllers
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);
         }
+
+    
+
     }
 }
