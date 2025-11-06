@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeingRoom.Models;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -21,14 +22,22 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var myContext = _context.Equipment
                 .Include(r => r.Room)
                 .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus);
-            return View(await myContext.ToListAsync());
+
+            var equipmentInfo = new RPaginationInfo<Equipment>(page, await myContext.CountAsync());
+            equipmentInfo.Items = await myContext
+                .OrderBy(e => e.Name)
+                .Skip(equipmentInfo.ItemsToSkip)
+                .Take(equipmentInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(equipmentInfo);
         }
 
         // GET: Equipments/Details/5
