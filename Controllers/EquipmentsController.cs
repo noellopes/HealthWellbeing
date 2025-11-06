@@ -149,8 +149,14 @@ namespace HealthWellbeingRoom.Controllers
                     }
                 }
 
-                TempData["SuccessMessage"] = "Equipamento editado com sucesso.";
-                return RedirectToAction(nameof(Index));
+                // Redirecionar para a página de detalhes com mensagem de sucesso
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = equipment.EquipmentId,
+                        SuccessMessage = "Equipamento editado com sucesso."
+                    }
+                );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");

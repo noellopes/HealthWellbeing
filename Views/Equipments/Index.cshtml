@@ -84,8 +84,10 @@
             </tbody>
         </table>
 
-        <nav aria-label="Equipment page">
-            <ul class="pagination">
+        <nav aria-label="Equipment page" class="d-flex justify-content-between align-items-center">
+            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+
+            <ul class="pagination mb-0">
                 @if (Model.CurrentPage == 1)
                 {
                     <li class="page-item disabled"><a class="page-link">Primeira</a></li>
