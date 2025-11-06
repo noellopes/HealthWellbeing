@@ -52,7 +52,7 @@ namespace HealthWellbeing.Controllers
         {
             ViewData["ServicoId"] = new SelectList(_context.Servicos.OrderBy(s => s.Nome), "ServicoId", "Nome");
             ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas.OrderBy(t => t.Nome), "TerapeutaId", "Nome");
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>().OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "Nome");
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>().OrderBy(u => u.NomeCompleto), "UtenteBalnearioId", "NomeCompleto");
             return View();
         }
 
