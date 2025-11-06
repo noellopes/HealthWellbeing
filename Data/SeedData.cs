@@ -1,10 +1,11 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeingRoom.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using HealthWellbeingRoom.Models;
+using System.Linq;
 
 namespace HealthWellBeingRoom.Data
 {
@@ -14,7 +15,171 @@ namespace HealthWellBeingRoom.Data
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
+
             PopulateMedicalDevices(dbContext);
+
+            PopulateManufacturer(dbContext);
+            PolutateEquipmentTypes(dbContext);
+            PolutateEquipmentStatus(dbContext);
+            PolutateEquipment(dbContext);
+        }
+
+        private static void PopulateManufacturer(HealthWellbeingDbContext dbContext)
+        {
+            // Verificar se os dados de Manufacturer já existem no banco
+            if (!dbContext.Manufacturer.Any())
+            {
+                // Adicionando Manufacturers
+                var manufacturers = new List<Manufacturer>
+                {
+                    new Manufacturer { Name = "Dell" },
+                    new Manufacturer { Name = "HP" },
+                    new Manufacturer { Name = "Apple" },
+                    new Manufacturer { Name = "Lenovo" },
+                    new Manufacturer { Name = "Samsung" },
+                    new Manufacturer { Name = "Sony" },
+                    new Manufacturer { Name = "Microsoft" },
+                    new Manufacturer { Name = "Acer" },
+                    new Manufacturer { Name = "Asus" },
+                    new Manufacturer { Name = "LG" },
+                    new Manufacturer { Name = "Canon" },
+                    new Manufacturer { Name = "Epson" },
+                    new Manufacturer { Name = "Xerox" },
+                    new Manufacturer { Name = "Panasonic" },
+                    new Manufacturer { Name = "Sharp" },
+                    new Manufacturer { Name = "Toshiba" },
+                    new Manufacturer { Name = "Fujitsu" },
+                    new Manufacturer { Name = "Razer" },
+                    new Manufacturer { Name = "Corsair" },
+                    new Manufacturer { Name = "Logitech" },
+                    new Manufacturer { Name = "Seagate" },
+                    new Manufacturer { Name = "Western Digital" },
+                    new Manufacturer { Name = "Kingston" },
+                    new Manufacturer { Name = "Sandisk" },
+                    new Manufacturer { Name = "Intel" },
+                    new Manufacturer { Name = "NVIDIA" },
+                    new Manufacturer { Name = "Huawei" },
+                    new Manufacturer { Name = "Xiaomi" }
+                };
+
+                dbContext.Manufacturer.AddRange(manufacturers);
+                dbContext.SaveChanges();
+            }
+        }
+
+        private static void PolutateEquipmentTypes(HealthWellbeingDbContext dbContext)
+        {
+            if (!dbContext.EquipmentType.Any())
+            {
+                var equipmentTypes = new List<EquipmentType>
+                {
+                    new EquipmentType { Name = "Computador" },
+                    new EquipmentType { Name = "Impressora" },
+                    new EquipmentType { Name = "Projetor" },
+                    new EquipmentType { Name = "Monitor" },
+                    new EquipmentType { Name = "Teclado" },
+                    new EquipmentType { Name = "Mouse" },
+                    new EquipmentType { Name = "Roteador" },
+                    new EquipmentType { Name = "Scanner" },
+                    new EquipmentType { Name = "Tablet" },
+                    new EquipmentType { Name = "Smartphone" },
+                    new EquipmentType { Name = "Câmera Digital" },
+                    new EquipmentType { Name = "Videoconferência" },
+                    new EquipmentType { Name = "Ar Condicionado" },
+                    new EquipmentType { Name = "Microfone" },
+                    new EquipmentType { Name = "Fone de ouvido" },
+                    new EquipmentType { Name = "Multímetro" },
+                    new EquipmentType { Name = "Câmera de Segurança" },
+                    new EquipmentType { Name = "Projetor 3D" },
+                    new EquipmentType { Name = "Sistemas de Iluminação" },
+                    new EquipmentType { Name = "Câmera 360" },
+                    new EquipmentType { Name = "Leitor de código de barras" },
+                    new EquipmentType { Name = "Impressora 3D" },
+                    new EquipmentType { Name = "Impressora térmica" },
+                    new EquipmentType { Name = "Controle de Acesso" },
+                    new EquipmentType { Name = "Smartwatch" },
+                    new EquipmentType { Name = "Sistema de Som" },
+                    new EquipmentType { Name = "Exaustor" },
+                    new EquipmentType { Name = "Máquina de Cartão" },
+                    new EquipmentType { Name = "Caixa Registradora" }
+                };
+
+                dbContext.EquipmentType.AddRange(equipmentTypes);
+                dbContext.SaveChanges();
+            }
+        }
+
+        private static void PolutateEquipmentStatus(HealthWellbeingDbContext dbContext)
+        {
+            // Verificar se já existem estados de equipamentos
+            if (!dbContext.EquipmentStatus.Any())
+            {
+                var equipmentStatuses = new List<EquipmentStatus>
+                {
+                    new EquipmentStatus { Name = "Ativo" },
+                    new EquipmentStatus { Name = "Em Manutenção" },
+                    new EquipmentStatus { Name = "Inativo" }
+                };
+
+                dbContext.EquipmentStatus.AddRange(equipmentStatuses);
+                dbContext.SaveChanges();
+            }
+        }
+
+        private static void PolutateEquipment(HealthWellbeingDbContext dbContext)
+        {
+            // Verificar se já existem salas
+            if (!dbContext.Room.Any())
+            {
+                var roomTypes = Enum.GetValues(typeof(Room.RoomType)).Cast<Room.RoomType>().ToList();
+                var roomStatuses = Enum.GetValues(typeof(Room.RoomStatus)).Cast<Room.RoomStatus>().ToList();
+
+                var rooms = new List<Room>();
+
+                for (int i = 1; i <= 30; i++)
+                {
+                    var room = new Room
+                    {
+                        Name = $"Sala {i:000}",  // Nome da sala, ex: Sala 001, Sala 002
+                        RoomsType = roomTypes[i % roomTypes.Count],  // Alterna entre Consultas e Tratamentos
+                        Specialty = (i % 2 == 0) ? "Cardiologia" : "Pediatria",  // Alterna entre especialidades
+                        Capacity = new Random().Next(1, 51),  // Capacidade aleatória entre 1 e 50
+                        Location = $"Bloco {((i - 1) / 5) + 1}",  // Ex: Bloco 1, Bloco 2, ...
+                        OperatingHours = $"08:00 - 18:00",  // Horário fixo de funcionamento
+                        Status = roomStatuses[i % roomStatuses.Count],  // Alterna entre os estados possíveis
+                        Notes = i % 2 == 0 ? "Sala renovada." : "Necessita de manutenção."  // Observações aleatórias
+                    };
+
+                    rooms.Add(room);
+                }
+
+                dbContext.Room.AddRange(rooms);
+                dbContext.SaveChanges();
+            }
+
+            // verificar se já existem equipamentos
+            if (!dbContext.Equipment.Any() && dbContext.Room.Any())
+            {
+                var equipment = new List<Equipment>();
+
+                for (int i = 1; i <= 30; i++)
+                {
+                    equipment.Add(new Equipment
+                    {
+                        Name = $"Equipamento {i}",
+                        Description = $"Descrição do Equipamento {i}",
+                        SerialNumber = $"SN-{i:000}",
+                        PurchaseDate = DateTime.Now.AddMonths(-i),
+                        ManufacturerId = Random.Shared.Next(1, dbContext.Manufacturer.Count()),
+                        EquipmentTypeId = Random.Shared.Next(1, dbContext.EquipmentType.Count()),
+                        EquipmentStatusId = Random.Shared.Next(1, dbContext.EquipmentStatus.Count()),
+                        RoomId = Random.Shared.Next(1, dbContext.Room.Count())
+                    });
+                }
+
+                dbContext.Equipment.AddRange(equipment);
+                dbContext.SaveChanges();
+            }
         }
 
         private static void PopulateMedicalDevices(HealthWellbeingDbContext dbContext)
