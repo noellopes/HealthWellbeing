@@ -321,6 +321,43 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("Room");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterial", b =>
+                {
+                    b.Property<int>("TipoMaterialID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TipoMaterialID"));
+
+                    b.Property<bool>("Ativo")
+                        .HasMaxLength(50)
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DataAtualizacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DataCriacao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TipoMaterialCategoria")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TipoMaterialNome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("TipoMaterialID");
+
+                    b.ToTable("TypeMaterial");
+                });
+
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
                 {
                     b.Property<int>("EquipmentId")
@@ -329,16 +366,17 @@ namespace HealthWellbeingRoom.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentId"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Manufacturer")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EquipmentStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EquipmentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ManufacturerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -348,31 +386,84 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EquipmentId");
+
+                    b.HasIndex("EquipmentStatusId");
+
+                    b.HasIndex("EquipmentTypeId");
+
+                    b.HasIndex("ManufacturerId");
 
                     b.HasIndex("RoomId");
 
                     b.ToTable("Equipment");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.FileMedicalDevices.MedicalDevices", b =>
+            modelBuilder.Entity("HealthWellbeingRoom.Models.EquipmentStatus", b =>
                 {
-                    b.Property<int>("DevicesID")
+                    b.Property<int>("EquipmentStatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DevicesID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentStatusId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EquipmentStatusId");
+
+                    b.ToTable("EquipmentStatus");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.EquipmentType", b =>
+                {
+                    b.Property<int>("EquipmentTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EquipmentTypeId");
+
+                    b.ToTable("EquipmentType");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.Manufacturer", b =>
+                {
+                    b.Property<int>("ManufacturerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ManufacturerId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ManufacturerId");
+
+                    b.ToTable("Manufacturer");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
+                {
+                    b.Property<int>("MedicalDeviceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicalDeviceID"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -387,18 +478,13 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.Property<string>("Specification")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("DevicesID");
+                    b.HasKey("MedicalDeviceID");
 
                     b.ToTable("MedicalDevices");
                 });
@@ -425,11 +511,35 @@ namespace HealthWellbeingRoom.Migrations
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
                 {
+                    b.HasOne("HealthWellbeingRoom.Models.EquipmentStatus", "EquipmentStatus")
+                        .WithMany()
+                        .HasForeignKey("EquipmentStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeingRoom.Models.EquipmentType", "EquipmentType")
+                        .WithMany()
+                        .HasForeignKey("EquipmentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeingRoom.Models.Manufacturer", "Manufacturer")
+                        .WithMany()
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HealthWellbeing.Models.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("EquipmentStatus");
+
+                    b.Navigation("EquipmentType");
+
+                    b.Navigation("Manufacturer");
 
                     b.Navigation("Room");
                 });

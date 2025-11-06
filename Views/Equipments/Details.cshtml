@@ -1,68 +1,101 @@
 ﻿@model HealthWellbeingRoom.Models.Equipment
 
 @{
-    ViewData["Title"] = "Equipamento";
+    ViewData["Title"] = "Detalhes";
+    string? successMessage = Context.Request.Query["SuccessMessage"];
 }
 
-<h3>Detalhes @ViewBag.Title</h3>
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
-<div class="card">
-    <div class="card-header bg-info"><i class="bi bi-pc-display"></i> @ViewBag.Title</div>
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-black">
+        <h4 class="mb-0">
+            <i class="bi bi-gear me-2"></i> Informações do Equipamento
+        </h4>
+    </div>
+
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-2">
+            <dt class="col-sm-3 fw-bold text-muted">
                 Nome
             </dt>
-            <dd class="col-sm-10">
+            <dd class="col-sm-9">
                 @Html.DisplayFor(model => model.Name)
             </dd>
-            <dt class="col-sm-2">
+
+            <dt class="col-sm-3 fw-bold text-muted">
                 Sala
             </dt>
-            <dd class="col-sm-10">
+            <dd class="col-sm-9">
                 @Html.DisplayFor(model => model.Room.Name)
             </dd>
-            <dt class="col-sm-2">
-                Descrição
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                Tipo de Equipamento
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EquipmentType.Name)
             </dd>
-            <dt class="col-sm-2">
-                Quantidade
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                Estado
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Quantity)
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EquipmentStatus.Name)
             </dd>
-            <dt class="col-sm-2">
+
+            <dt class="col-sm-3 fw-bold text-muted">
                 Fabricante
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Manufacturer)
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Manufacturer.Name)
             </dd>
-            <dt class="col-sm-2">
-                Nº Série
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                Nº de Série
             </dt>
-            <dd class="col-sm-10">
+            <dd class="col-sm-9">
                 @Html.DisplayFor(model => model.SerialNumber)
             </dd>
-            <dt class="col-sm-2">
+
+            <dt class="col-sm-3 fw-bold text-muted">
                 Data compra
             </dt>
-            <dd class="col-sm-10">
+            <dd class="col-sm-9">
                 @Html.DisplayFor(model => model.PurchaseDate)
             </dd>
-            <dt class="col-sm-2">
-                Data criação
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                Descrição
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CreatedDate)
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Description)
             </dd>
         </dl>
     </div>
-    
 </div>
-<div class="mt-3 text-end">
-    <a class="btn btn-success" asp-action="Edit" asp-route-id="@Model?.EquipmentId"><i class="bi bi-floppy"></i> Editar</a>
-    <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-arrow-left-circle"></i> Voltar a Lista</a>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+    <a class="btn btn-warning me-1" asp-action="Edit" asp-route-id="@Model?.EquipmentId">
+        <i class="bi bi-pencil-square"></i> Editar
+    </a>
+
+    <a asp-action="Delete" asp-route-id="@Model?.EquipmentId" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Eliminar
+    </a>
+
+    <a class="btn btn-secondary" asp-action="Index">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar a Lista
+    </a>
 </div>

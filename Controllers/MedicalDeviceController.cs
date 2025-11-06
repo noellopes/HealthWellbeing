@@ -1,5 +1,5 @@
 ﻿using HealthWellbeing.Data;
-using HealthWellbeingRoom.Models.FileMedicalDevices;
+using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -37,7 +37,7 @@ namespace HealthWellbeingRoom.Controllers
 
             // Usa o FirstOrDefaultAsync do EF Core 
             var dispositivo = await _context.MedicalDevices
-                .FirstOrDefaultAsync(m => m.DevicesID == id);
+                .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (dispositivo == null)
             {
@@ -51,14 +51,14 @@ namespace HealthWellbeingRoom.Controllers
         // 3. CRIAR (Create)
         public IActionResult Create()
         {
-            return View(new MedicalDevices());
+            return View(new MedicalDevice());
         }
 
         // POST: MedicalDevice/Create 
         [HttpPost]
         [ValidateAntiForgeryToken]
         // **[Bind] ATUALIZADO:** Quantity e SalaID removidos
-        public async Task<IActionResult> Create([Bind("DevicesID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevices medicalDevices)
+        public async Task<IActionResult> Create([Bind("MedicalDeviceID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevice medicalDevices)
         {
             if (ModelState.IsValid)
             {
@@ -93,9 +93,9 @@ namespace HealthWellbeingRoom.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         // **[Bind] ATUALIZADO:** Quantity e SalaID removidos
-        public async Task<IActionResult> Edit(int id, [Bind("DevicesID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevices medicalDevices)
+        public async Task<IActionResult> Edit(int id, [Bind("MedicalDeviceID,Name,Type,Specification,RegistrationDate,Status,Observation")] MedicalDevice medicalDevices)
         {
-            if (id != medicalDevices.DevicesID)
+            if (id != medicalDevices.MedicalDeviceID)
             {
                 return NotFound();
             }
@@ -109,7 +109,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MedicalDevicesExists(medicalDevices.DevicesID))
+                    if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID))
                     {
                         return NotFound();
                     }
@@ -132,7 +132,7 @@ namespace HealthWellbeingRoom.Controllers
             }
 
             var medicalDevices = await _context.MedicalDevices
-                .FirstOrDefaultAsync(m => m.DevicesID == id);
+                .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (medicalDevices == null)
             {
@@ -167,7 +167,7 @@ namespace HealthWellbeingRoom.Controllers
 
         private bool MedicalDevicesExists(int id)
         {
-            return _context.MedicalDevices.Any(e => e.DevicesID == id);
+            return _context.MedicalDevices.Any(e => e.MedicalDeviceID == id);
         }
     }
 }

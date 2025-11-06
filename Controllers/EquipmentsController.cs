@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeingRoom.Models;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -21,10 +22,22 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var myContext = _context.Equipment.Include(b => b.Room);
-            return View(await myContext.ToListAsync());
+            var myContext = _context.Equipment
+                .Include(r => r.Room)
+                .Include(m => m.Manufacturer)
+                .Include(et => et.EquipmentType)
+                .Include(es => es.EquipmentStatus);
+
+            var equipmentInfo = new RPaginationInfo<Equipment>(page, await myContext.CountAsync());
+            equipmentInfo.Items = await myContext
+                .OrderBy(e => e.Name)
+                .Skip(equipmentInfo.ItemsToSkip)
+                .Take(equipmentInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(equipmentInfo);
         }
 
         // GET: Equipments/Details/5
@@ -32,14 +45,19 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
             var equipment = await _context.Equipment
-                .Include(b => b.Room)
+                .Include(r => r.Room)
+                .Include(m => m.Manufacturer)
+                .Include(et => et.EquipmentType)
+                .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
@@ -50,6 +68,9 @@ namespace HealthWellbeingRoom.Controllers
         public IActionResult Create()
         {
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
+            ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View();
         }
 
@@ -58,7 +79,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,RoomId,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (ModelState.IsValid)
             {
@@ -66,7 +87,10 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
+            ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -75,15 +99,20 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
             var equipment = await _context.Equipment.FindAsync(id);
             if (equipment == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
-            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
+            ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -92,10 +121,11 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,Quantity,Manufacturer,SerialNumber,PurchaseDate,RoomId,CreatedDate")] Equipment equipment)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
@@ -110,6 +140,7 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     if (!EquipmentExists(equipment.EquipmentId))
                     {
+                        /* Retornar para minha page do not found */
                         return View("NotFound");
                     }
                     else
@@ -117,9 +148,20 @@ namespace HealthWellbeingRoom.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                // Redirecionar para a página de detalhes com mensagem de sucesso
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = equipment.EquipmentId,
+                        SuccessMessage = "Equipamento editado com sucesso."
+                    }
+                );
             }
-            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
+            ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
+            ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -128,13 +170,19 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
-            var equipment = await _context.Equipment.Include(b => b.Room)
+            var equipment = await _context.Equipment
+                .Include(r => r.Room)
+                .Include(m => m.Manufacturer)
+                .Include(et => et.EquipmentType)
+                .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
+                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
@@ -150,9 +198,10 @@ namespace HealthWellbeingRoom.Controllers
             if (equipment != null)
             {
                 _context.Equipment.Remove(equipment);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Equipamento eliminado com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,95 +1,103 @@
 ﻿@model HealthWellbeingRoom.Models.Equipment
 
 @{
-    ViewData["Title"] = "Equipamento";
+    ViewData["Title"] = "Registar";
 }
 
-<h3>Criar @ViewData["Title"]</h3>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
 <form asp-action="Create">
-    <div class="card mb-7">
-        <div class="card-header bg-primary text-white"><i class="bi bi-pc-display"></i> @ViewData["Title"]</div>
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="Name" class="control-label">Nome</label>
-                        <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Quantity" class="control-label">Quantidade</label>
-                        <input asp-for="Quantity" class="form-control" />
-                        <span asp-validation-for="Quantity" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="Manufacturer" class="control-label">Fabricante</label>
-                        <input asp-for="Manufacturer" class="form-control" />
-                        <span asp-validation-for="Manufacturer" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="SerialNumber" class="control-label">Nº Série</label>
-                        <input asp-for="SerialNumber" class="form-control" />
-                        <span asp-validation-for="SerialNumber" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="PurchaseDate" class="control-label">Data Compra</label>
-                        <input asp-for="PurchaseDate" class="form-control" />
-                        <span asp-validation-for="PurchaseDate" class="text-danger"></span>
-                    </div>
-                </div>
-                
-
-                @*Posteriormente tenho que tirar isso da view, a data será carregada automaticamente*@
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label asp-for="CreatedDate" class="control-label"></label>
-                        <input asp-for="CreatedDate" class="form-control" />
-                        <span asp-validation-for="CreatedDate" class="text-danger"></span>
-                    </div>
-                </div>
-                @*fim remoção*@
-
-			</div>
-
-            
-            <div class="form-group mb-3">
-                <label asp-for="RoomId" class="control-label">Sala</label>
-                <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId"></select>
-                <span asp-validation-for="RoomId" class="text-danger"></span>
-            </div>
-                
-                
-			<div class="form-group mb-3">
-				<label asp-for="Description" class="control-label">Descrição</label>
-				<textarea asp-for="Description" class="form-control"></textarea>
-				<span asp-validation-for="Description" class="text-danger"></span>
-			</div>
-
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-clipboard-plus me-2"></i> Novo Equipamento
+            </h4>
         </div>
-	</div>
-    
-	<div class="text-end mt-3">
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-floppy"></i> Guardar
-        </button>
-        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Voltar a Lista</a>
+
+		<div class="card-body">
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Laptop Dell Latitude" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="RoomId" class="form-label fw-bold">Sala</label>
+                        <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId"></select>
+                        <span asp-validation-for="RoomId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EquipmentTypeId" class="form-label fw-bold">Tipo de Equipamento</label>
+                        <select asp-for="EquipmentTypeId" class="form-select" asp-items="ViewBag.EquipmentTypeId"></select>
+                        <span asp-validation-for="EquipmentTypeId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EquipmentStatusId" class="form-label fw-bold">Estado</label>
+                        <select asp-for="EquipmentStatusId" class="form-select" asp-items="ViewBag.EquipmentStatusId"></select>
+                        <span asp-validation-for="EquipmentStatusId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="ManufacturerId" class="form-label fw-bold">Fabricante</label>
+                        <select asp-for="ManufacturerId" class="form-select" asp-items="ViewBag.ManufacturerId"></select>
+                        <span asp-validation-for="ManufacturerId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="SerialNumber" class="form-label fw-bold">Nº de Série</label>
+                        <input asp-for="SerialNumber" class="form-control" placeholder="Ex: SXR-04937" />
+                        <span asp-validation-for="SerialNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PurchaseDate" class="form-label fw-bold">Data Compra</label>
+                        <input asp-for="PurchaseDate" class="form-control" />
+                        <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Description" class="form-label fw-bold">Descrição</label>
+                        <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+			</div>
+
+            <div class="text-end mt-4 gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Submeter
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                </a>
+            </div>
+        </div>
 	</div>
 </form>
 

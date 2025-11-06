@@ -1,6 +1,5 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeingRoom;
-using HealthWellbeingRoom.Models.FileMedicalDevices;
 using HealthWellBeingRoom.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,11 +34,8 @@ else
     {
         var dbcontext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
 
-        //Usei Migrate(): Garante que as migrações (tabelas) sejam aplicadas ANTES de consultar.
-        //dbcontext.Database.Migrate();
-
         //Chama o Populate
-        SeedDataMedicalDevices.Populate(dbcontext);
+        SeedData.Populate(dbcontext);
     }
 }
 

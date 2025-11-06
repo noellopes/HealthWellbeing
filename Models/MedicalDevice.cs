@@ -1,31 +1,34 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HealthWellbeingRoom.Models.FileMedicalDevices
+namespace HealthWellbeingRoom.Models
 {
     [Table("MedicalDevices")]
-    public class MedicalDevices
+    public class MedicalDevice
     {
         //ID dos dispositivos móveis
+        [Display(Name = "ID do dispositivo")]
         [Key]
-        public int DevicesID { get; set; }
+        public int MedicalDeviceID { get; set; }
 
+        [Display(Name = "Nome")]
         [Required(ErrorMessage = "Nome é obrigatório.")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Deve conter no min 2 letras e 100 no max.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Deve conter no min 3 letras e 100 no max.")]
         public string Name { get; set; }
 
+        [Display(Name = "Tipo")]
+        //Posteriormente vou mudar o nome do tipo de dispositivos
         [Required(ErrorMessage = "Tipo de Dispositivo é Obrigatório.")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Deve conter no min 2 letras e 50 no max.")]
         public string Type { get; set; }
 
+        [Display(Name = "Especificação")]
         [Required(ErrorMessage = "Especificação é obrigatório.")]
-        [StringLength(200, MinimumLength = 5, ErrorMessage = "Deve conter no min 5 letras e 200 no max.")]
         public string Specification { get; set; }
 
+        [Display(Name = "Data de Registo")]
         public DateTime RegistrationDate { get; set; }
 
-        public string? Status { get; set; }
-
+        [Display(Name = "Observação")]
         public string? Observation { get; set; }
 
     }
