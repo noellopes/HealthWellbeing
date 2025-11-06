@@ -61,18 +61,18 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoModel agendamentoModel)
+        public async Task<IActionResult> Create([Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoBalneario agendamentoBalneario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(agendamentoModel);
+                _context.Add(agendamentoBalneario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentoModel.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "TerapeutaId", agendamentoModel.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentoModel.UtenteBalnearioId);
-            return View(agendamentoModel);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "TerapeutaId", agendamentoBalneario.TerapeutaId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentoBalneario.UtenteBalnearioId);
+            return View(agendamentoBalneario);
         }
 
         // GET: Agendamento/Edit/5
@@ -99,9 +99,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoModel agendamentoModel)
+        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoBalneario agendamentoBalneario)
         {
-            if (id != agendamentoModel.AgendamentoId)
+            if (id != agendamentoBalneario.AgendamentoId)
             {
                 return NotFound();
             }
@@ -110,12 +110,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(agendamentoModel);
+                    _context.Update(agendamentoBalneario);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AgendamentoModelExists(agendamentoModel.AgendamentoId))
+                    if (!AgendamentoModelExists(agendamentoBalneario.AgendamentoId))
                     {
                         return NotFound();
                     }
@@ -126,10 +126,10 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentoModel.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "TerapeutaId", agendamentoModel.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentoModel.UtenteBalnearioId);
-            return View(agendamentoModel);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeutas, "TerapeutaId", "TerapeutaId", agendamentoBalneario.TerapeutaId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentoBalneario.UtenteBalnearioId);
+            return View(agendamentoBalneario);
         }
 
         // GET: Agendamento/Delete/5

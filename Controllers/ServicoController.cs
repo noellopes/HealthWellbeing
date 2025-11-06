@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
             var servicosContext = await _context.Servicos
                 .Include(s => s.TipoServico)
                 .ToListAsync();
-            return View(await _context.Servicos.ToListAsync());
+            return View(servicosContext);
         }
 
         // GET: Servico/Details/5
@@ -37,11 +37,11 @@ namespace HealthWellbeing.Controllers
             }
 
             var servico = await _context.Servicos
-                .Include(s => s.TipoServico)
+               .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
             if (servico == null)
             {
-                return View("InvalidServico");
+                return NotFound();
             }
 
             return View(servico);
@@ -70,7 +70,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index),
                     new
                     {
-                        id = servico.ServicoId,
+                        //id = servico.ServicoId,
                         SuccessMessage = "Serviço criado com sucesso!"
                     }
                     );

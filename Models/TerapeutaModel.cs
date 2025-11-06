@@ -14,7 +14,7 @@ namespace HealthWellbeing.Models
         public bool Ativo { get; set; }
 
         // Relação: um terapeuta pode ter vários agendamentos
-        public ICollection<AgendamentoModel> Agendamentos { get; set; }
+        public ICollection<AgendamentoBalneario> Agendamentos { get; set; }
     }
 }
 

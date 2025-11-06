@@ -1,8 +1,8 @@
-﻿@model HealthWellbeing.Models.AgendamentoModel
+﻿@model HealthWellbeing.Models.AgendamentoBalneario
 
 @{
     ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
 
 <h1>Create</h1>
@@ -52,5 +52,8 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
+}
+
+
