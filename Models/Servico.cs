@@ -7,6 +7,8 @@ namespace HealthWellbeing.Models
 {
     public class Servico
     {
+        // Construtor vazio necessário para Entity Framework
+        public Servico() { }
 
         [Key]
         public int ServicoId { get; set; }
@@ -20,21 +22,19 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "O preço é obrigatório.")]
         [Column(TypeName = "decimal(18,2)")]
-        [DisplayName("Preço(€)")]
+        [DisplayName("Preço (€)")]
         [DisplayFormat(DataFormatString = "{0:F2}", ApplyFormatInEditMode = true)]
         public decimal Preco { get; set; }
 
         [Required(ErrorMessage = "A duração em minutos é obrigatória.")]
-        [DisplayName("Duração(minutos)")]
+        [DisplayName("Duração (minutos)")]
         public int DuracaoMinutos { get; set; }
 
-
-       [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
+        [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
         [DisplayName("Tipo de Serviço")]
         public int TipoServicoId { get; set; }
+
         [ForeignKey("TipoServicoId")]
         public TipoServico TipoServico { get; set; }
-
-        
     }
 }
