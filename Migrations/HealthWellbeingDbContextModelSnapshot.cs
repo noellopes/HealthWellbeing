@@ -435,15 +435,20 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Specification")
+                    b.Property<string>("SerialNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TypeMaterialID")
+                        .HasColumnType("int");
 
                     b.HasKey("MedicalDeviceID");
+
+                    b.HasIndex("SerialNumber")
+                        .IsUnique();
+
+                    b.HasIndex("TypeMaterialID");
 
                     b.ToTable("MedicalDevices");
                 });
@@ -501,6 +506,17 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Manufacturer");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.TypeMaterial", "TypeMaterial")
+                        .WithMany()
+                        .HasForeignKey("TypeMaterialID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeMaterial");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>

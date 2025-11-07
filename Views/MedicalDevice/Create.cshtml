@@ -2,8 +2,7 @@
 @model MedicalDevice;
 
 @{
-    // O nome da sua View (Registar novo Dispositivo Médico)
-    ViewData["Title"] = "Registar";
+    ViewData["Title"] = "Registar Novo Dispositivo Médico";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -24,16 +23,17 @@
 
             <div class="row">
                 <div class="col-md-6">
+
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-bold">Nome do Dispositivo</label>
+                        <label asp-for="Name" class="form-label fw-bold"></label>
                         <input asp-for="Name" class="form-control" placeholder="Ex: Monitor Multiparamétrico">
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Type" class="form-label fw-bold">Tipo de Dispositivo (Categoria)</label>
-                        <input asp-for="Type" class="form-control" placeholder="Ex: Monitorização, Equipamento Cirúrgico">
-                        <span asp-validation-for="Type" class="text-danger small"></span>
+                        <label asp-for="SerialNumber" class="form-label fw-bold"></label>
+                        <input asp-for="SerialNumber" class="form-control" placeholder="Ex: A1B2C3D4">
+                        <span asp-validation-for="SerialNumber" class="text-danger small"></span>
                     </div>
 
                 </div>
@@ -41,14 +41,16 @@
                 <div class="col-md-6">
 
                     <div class="mb-3">
-                        <label asp-for="Specification" class="form-label fw-bold">Especificação Detalhada</label>
-                        <input asp-for="Specification" class="form-control" placeholder="Ex: Marca Philips, Modelo VM8, S/N 123456">
-                        <span asp-validation-for="Specification" class="text-danger small"></span>
+                        <label asp-for="TypeMaterialID" class="form-label fw-bold"></label>
+                        <select asp-for="TypeMaterialID" class="form-control" asp-items="ViewBag.TypeMaterialID">
+                            <option value="">-- Selecione o Tipo --</option>
+                        </select>
+                        <span asp-validation-for="TypeMaterialID" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Observation" class="form-label fw-bold">Observações</label>
-                        <textarea asp-for="Observation" class="form-control" rows="4" placeholder="Ex: Adquirido em 2024. Calibração necessária em Dezembro."></textarea>
+                        <label asp-for="Observation" class="form-label fw-bold"></label>
+                        <textarea asp-for="Observation" class="form-control" rows="3" placeholder="Ex: Adquirido em 2024. Calibração necessária em Dezembro."></textarea>
                         <span asp-validation-for="Observation" class="text-danger small"></span>
                     </div>
 
@@ -56,7 +58,9 @@
                     <input asp-for="MedicalDeviceID" type="hidden" />
                 </div>
 
-            </div> <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success">
                     <i class="bi bi-check-circle me-1"></i> Submeter Registo
                 </button>

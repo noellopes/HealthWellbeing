@@ -1,13 +1,26 @@
 ﻿@using HealthWellbeingRoom.Models
-@model IEnumerable<MedicalDevice> 
+@model HealthWellbeing.ViewModels.RPaginationInfo<MedicalDevice> 
 
 @{
     ViewData["Title"] = "Dispositivos Médicos Registados";
 }
 
+@* --- Secção de Mensagem de Sucesso --- *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-@if (!Model.Any())
+@* Usamos Model.Items para verificar se há dados na página atual *@
+@if (Model == null || !Model.Items.Any())
 {
     <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
@@ -35,31 +48,36 @@ else
     </div>
 
     <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
+        <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">@Html.DisplayNameFor(model => model.Name)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.Type)</th>
-                    <th class="text-end" scope="col">Action</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.Items.First().Name)</th>
+                    <th scope="col">Tipo de Dispositivo</th>
+                    <th scope="col">Localização</th>
+                    <th class="text-end" scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var dispositivo in Model)
+                @* Percorremos Model.Items (a lista de dispositivos na página atual) *@
+                @foreach (var dispositivo in Model.Items)
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
-                        <td>@Html.DisplayFor(modelItem => dispositivo.Type)</td>
+
+                        <td>@(dispositivo.TypeMaterial?.Name ?? "N/A")</td>
+
+                        <td>
+                            @* AQUI: Usar dispositivo.Location.Name ou algo do tipo quando o Marcel terminar *@
+                            <span class="text-muted small">Aguardando localização...</span>
+                        </td>
 
                         <td class="text-end">
-
-                            <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-
                             <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
-
+                            <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
                             <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
                                 <i class="bi bi-trash"></i> Eliminar
                             </a>
@@ -68,5 +86,42 @@ else
                 }
             </tbody>
         </table>
+
+        @* --- Secção de Paginação --- *@
+        <nav aria-label="Medical Device page" class="d-flex justify-content-between align-items-center">
+            @* Model.Items.Count() mostra quantos itens estão na página atual *@
+            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+
+            <ul class="pagination mb-0">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                    }
+                }
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                }
+            </ul>
+        </nav>
     </div>
 }

@@ -2,19 +2,16 @@
 @model MedicalDevice;
 
 @{
-    // Título dinâmico
-    ViewData["Title"] = "Detalhes";
-
-    // Lógica para capturar e exibir mensagem de sucesso (do modelo do professor)
-    string? successMessage = Context.Request.Query["SuccessMessage"];
+    ViewData["Title"] = "Detalhes do Dispositivo";
 }
 
-@if (successMessage != null)
+@* --- Secção de Mensagem de Sucesso (Usando TempData) --- *@
+@if (TempData["SuccessMessage"] != null)
 {
     <div class="container py-4">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
-            @successMessage
+            @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
@@ -23,7 +20,7 @@
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="card shadow-sm">
-    <div class="card-header bg-info text-black">
+    <div class="card-header bg-info text-dark">
         <h4 class="mb-0">
             <i class="bi bi-gear me-2"></i> Informações do Dispositivo
         </h4>
@@ -33,23 +30,39 @@
 
         <dl class="row mb-0">
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.MedicalDeviceID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
+            <dt class="col-sm-3 fw-bold text-muted small">ID do Dispositivo</dt>
+            <dd class="col-sm-9 small">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
             <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Type)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Type)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SerialNumber)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.SerialNumber)</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Specification)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specification)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">Tipo de Material</dt> 
+            <dd class="col-sm-9">
+                @(Model.TypeMaterial?.Name ?? Model.TypeMaterialID.ToString())
+            </dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
+            @* Informação do Estado (Se você decidir usar a propriedade IsUnderMaintenance) *@
+            @* Se a propriedade IsUnderMaintenance existir, descomente: *@
+            @* <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsUnderMaintenance)
+                {
+                    <span class="badge bg-danger">Em Manutenção</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Disponível</span>
+                }
+            </dd> *@
+
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Observation)</dd>
+            <dd class="col-sm-9 text-wrap">@Html.DisplayFor(model => model.Observation)</dd> 
 
         </dl>
     </div>

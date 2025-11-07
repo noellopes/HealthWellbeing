@@ -2,7 +2,6 @@
 @model MedicalDevice;
 
 @{
-    // Título dinâmico, mostrando qual dispositivo está a ser editado
     ViewData["Title"] = "Editar Dispositivo";
 }
 
@@ -23,45 +22,69 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
             <input type="hidden" asp-for="MedicalDeviceID" />
-
             <input type="hidden" asp-for="RegistrationDate" />
+
 
             <div class="row">
 
                 <div class="col-md-6">
+
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-bold">Nome do Equipamento</label>
+                        <label asp-for="Name" class="form-label fw-bold"></label>
                         <input asp-for="Name" class="form-control">
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
+                    @*o meu serialNumber aqui vai ser não editável -> (readonly)*@
                     <div class="mb-3">
-                        <label asp-for="Type" class="form-label fw-bold">Tipo de Dispositivo (Categoria)</label>
-                        <input asp-for="Type" class="form-control">
-                        <span asp-validation-for="Type" class="text-danger small"></span>
+                        <label asp-for="SerialNumber" class="form-label fw-bold"></label>
+                        <input asp-for="SerialNumber" class="form-control" readonly> 
+                        <span asp-validation-for="SerialNumber" class="text-danger small"></span>
+                        <div class="small text-muted">O Número de Série não deve ser alterado após o registo inicial.</div>
                     </div>
 
                 </div>
 
                 <div class="col-md-6">
-                    
+
                     <div class="mb-3">
-                        <label asp-for="Specification" class="form-label fw-bold">Especificação Detalhada</label>
-                        <input asp-for="Specification" class="form-control">
-                        <span asp-validation-for="Specification" class="text-danger small"></span>
+                        <label asp-for="TypeMaterialID" class="form-label fw-bold"></label>
+                        <select asp-for="TypeMaterialID" class="form-control" asp-items="ViewBag.TypeMaterialID">
+                            <option value="">-- Selecione o Tipo --</option>
+                        </select>
+                        <span asp-validation-for="TypeMaterialID" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Observation" class="form-label fw-bold">Observações</label>
-                        <textarea asp-for="Observation" class="form-control" rows="4"></textarea>
+                        <label asp-for="Observation" class="form-label fw-bold"></label>
+                        <textarea asp-for="Observation" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="Observation" class="text-danger small"></span>
                     </div>
-                </div>
 
-            </div> <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-warning">
+                </div>
+            </div>
+
+            @*
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-check mt-3 mb-4">
+                        {{ LÓGICA DE ESTADO: Em Manutenção }}
+                        <input class="form-check-input" type="checkbox" asp-for="IsUnderMaintenance">
+                        <label class="form-check-label fw-bold text-danger" asp-for="IsUnderMaintenance">
+                            Ativar Modo **Em Manutenção**
+                        </label>
+                        <p class="small text-muted">Se ativado, o dispositivo será marcado como indisponível para uso.</p>
+                    </div>
+                </div>
+            </div>
+            *@
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+
+                <button type="submit" class="btn btn-success">
                     <i class="bi bi-save me-1"></i> Salvar Alterações
                 </button>
+
                 <a asp-action="Index" class="btn btn-secondary">
                     <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
                 </a>

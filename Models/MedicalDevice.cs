@@ -1,8 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
+    [Index(nameof(SerialNumber), IsUnique = true)]//O serial number vai ser único
     [Table("MedicalDevices")]
     public class MedicalDevice
     {
@@ -10,26 +13,65 @@ namespace HealthWellbeingRoom.Models
         [Display(Name = "ID do dispositivo")]
         [Key]
         public int MedicalDeviceID { get; set; }
+        
 
         [Display(Name = "Nome")]
         [Required(ErrorMessage = "Nome é obrigatório.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Deve conter no min 3 letras e 100 no max.")]
         public string Name { get; set; }
 
-        [Display(Name = "Tipo")]
-        //Posteriormente vou mudar o nome do tipo de dispositivos
-        [Required(ErrorMessage = "Tipo de Dispositivo é Obrigatório.")]
-        public string Type { get; set; }
 
-        [Display(Name = "Especificação")]
-        [Required(ErrorMessage = "Especificação é obrigatório.")]
-        public string Specification { get; set; }
+        [Display(Name = "Número de Série")]
+        [Required(ErrorMessage = "O Número de Série é obrigatório.")]
+        [StringLength(50, ErrorMessage = "O Número de Série não deve exceder 50 caracteres.")]
+        public string SerialNumber { get; set; }
 
         [Display(Name = "Data de Registo")]
         public DateTime RegistrationDate { get; set; }
 
+
         [Display(Name = "Observação")]
         public string? Observation { get; set; }
 
+
+        //FK da tabela tipo de dispositivo
+        [Display(Name = "Tipo de Dispositivo")]
+        [Required(ErrorMessage = "O Tipo de Dispositivo é Obrigatório.")]
+        public int TypeMaterialID { get; set; }
+        public TypeMaterial? TypeMaterial { get; set; }
+        
+
+        /*
+        public ICollection<LocationMedDevice> LocationMedDevices { get; set; }
+
+
+        //Status: Em manutenção (Propriedade de controlo)
+        public bool IsUnderMaintenance { get; set; } = false;
+
+
+        //Calcular o estado
+        [Display(Name = "Estado Atual")]
+        public string CurrentStatus
+        {
+            get
+            {
+                // 1. Prioridade Máxima: Manutenção
+                if (IsUnderMaintenance)
+                {
+                    return "Em Manutenção";
+                }
+
+                // 2. Segunda Prioridade: Alocação (Indisponível)
+                // Verifica a tabela de ligação (DeviceLocation)
+                if (LocationMedDevice.Any())
+                {
+                    return "Indisponível (Alocado)";
+                }
+
+                // 3. Última Prioridade: Disponível
+                return "Disponível";
+            }
+        }
+        */
     }
 }

@@ -184,85 +184,152 @@ namespace HealthWellBeingRoom.Data
 
         private static void PopulateMedicalDevices(HealthWellbeingDbContext dbContext)
         {
+
             if (dbContext.MedicalDevices.Any()) return;
 
             dbContext.MedicalDevices.AddRange(new List<MedicalDevice>()
             {
-                new MedicalDevice {Name = "Monitor MP-500", Type = "Monitorização",
-                    Specification = "ECG, SPO2, PNI. S/N: MP500-A01", RegistrationDate = DateTime.Now.AddDays(-60),
-                    Observation = "Excelente condição." },
+                new MedicalDevice {
+                    Name = "Monitor de Paciente Vital X5",
+                    SerialNumber = "MT-VITAL-X5-001",
+                    RegistrationDate = DateTime.Now.AddDays(-150),
+                    Observation = "Monitor de cabeceira fixo.",
+                    TypeMaterialID = 1
+                },
+                new MedicalDevice {
+                    Name = "Monitor de Paciente Vital X5", 
+                    SerialNumber = "MT-VITAL-X5-002",
+                    RegistrationDate = DateTime.Now.AddDays(-140),
+                    Observation = "Aguardando nova bateria.",
+                    TypeMaterialID = 1
+                },
+                new MedicalDevice {
+                    Name = "Oxímetro de Pulso Portátil",
+                    SerialNumber = "MT-OXI-HAND-01",
+                    RegistrationDate = DateTime.Now.AddDays(-130),
+                    Observation = "Usado na triagem.",
+                    TypeMaterialID = 1
+                },
+                new MedicalDevice {
+                    Name = "Eletrocardiógrafo ECG-1200",
+                    SerialNumber = "MT-ECG-1200",
+                    RegistrationDate = DateTime.Now.AddDays(-120),
+                    Observation = "Para consultas externas. Necessita de consumíveis (papel).",
+                    TypeMaterialID = 1
+                },
+                new MedicalDevice {
+                    Name = "Ventilador de Cuidados Intensivos Alpha",
+                    SerialNumber = "AV-VCI-A01",
+                    RegistrationDate = DateTime.Now.AddDays(-100),
+                    Observation = "Localizado na UCI 1.",
+                    TypeMaterialID = 1
+                },
+                new MedicalDevice {
+                    Name = "Ventilador de Cuidados Intensivos Alpha",
+                    SerialNumber = "AV-VCI-A02",
+                    RegistrationDate = DateTime.Now.AddDays(-90),
+                    Observation = "Localizado na UCI 2.",
+                    TypeMaterialID = 2
+                },
+                new MedicalDevice {
+                    Name = "Desfibrilhador DEA Auto",
+                    SerialNumber = "BC-DEA-001",
+                    RegistrationDate = DateTime.Now.AddDays(-80),
+                    Observation = "Localizado no carrinho de emergência principal.",
+                    TypeMaterialID = 2
+                },
+                new MedicalDevice {
+                    Name = "Sistema de Aspiração Central",
+                    SerialNumber = "BC-ASC-005",
+                    RegistrationDate = DateTime.Now.AddDays(-70),
+                    Observation = "Unidade fixa, manutenção trimestral.",
+                    TypeMaterialID = 2
+                },
+                new MedicalDevice {
+                    Name = "Ecógrafo Móvel 3D",
+                    SerialNumber = "AD-ECHO-M3D",
+                    RegistrationDate = DateTime.Now.AddDays(-60),
+                    Observation = "Transdutores convexos e lineares.",
+                    TypeMaterialID = 2
+                },
+                new MedicalDevice {
+                    Name = "Sistema de Raio-X Portátil",
+                    SerialNumber = "AD-RX-PORT-A",
+                    RegistrationDate = DateTime.Now.AddDays(-50),
+                    Observation = "Para radiografias de cabeceira.",
+                    TypeMaterialID = 2
+                },
 
-                new MedicalDevice {Name = "Monitor MP-501", Type = "Monitorização",
-                    Specification = "ECG, SPO2, PNI. S/N: MP500-A02", RegistrationDate = DateTime.Now.AddDays(-60),
-                    Observation = "Em espera para Sala 4." },
-
-                new MedicalDevice {Name = "Bomba Infusora Gemini", Type = "Infusão",
-                    Specification = "Duplo Canal, Bateria 4h.", RegistrationDate = DateTime.Now.AddDays(-30),
-                    Observation = "Uso exclusivo em pediatria." },
-
-                new MedicalDevice {Name = "Ventilador Portátil V5", Type = "Suporte Vital",
-                    Specification = "Modos de ventilação avançados.", RegistrationDate = DateTime.Now.AddDays(-15),
-                    Observation = "Sensor de pressão defeituoso." },
-
-                new MedicalDevice {Name = "Máquina de Anestesia PAX", Type = "Anestesia",
-                    Specification = "Sistema modular de controlo de gás.", RegistrationDate = DateTime.Now.AddDays(-10),
-                    Observation = "Necessita de filtro novo." },
-
-                new MedicalDevice {Name = "Oxímetro de Pulso OP-6", Type = "Diagnóstico",
-                    Specification = "Display OLED de alta precisão.", RegistrationDate = DateTime.Now.AddDays(-7),
-                    Observation = null },
-
-                new MedicalDevice {Name = "Oxímetro de Pulso OP-7", Type = "Diagnóstico",
-                    Specification = "Display OLED de alta precisão.", RegistrationDate = DateTime.Now.AddDays(-7),
-                    Observation = null },
-
-                new MedicalDevice {Name = "Ecógrafo Móvel GE", Type = "Diagnóstico",
-                    Specification = "Transdutor linear e convexo.", RegistrationDate = DateTime.Now.AddDays(-4),
-                    Observation = "Calibração concluída." },
-
-                new MedicalDevice {Name = "Unidade de Fototerapia", Type = "Tratamento",
-                    Specification = "Luz azul de alta intensidade.", RegistrationDate = DateTime.Now.AddDays(-2),
-                    Observation = null },
-
-                new MedicalDevice {Name = "Balança de Cama Digital", Type = "Monitorização",
-                    Specification = "Capacidade de 300kg. Portátil.", RegistrationDate = DateTime.Now.AddDays(-1),
-                    Observation = "Para uso em leitos." },
-
-                new MedicalDevice {Name = "Bomba de Aspiração Cirúrgica", Type = "Cirúrgico",
-                    Specification = "Fluxo ajustável, recipiente de 2L.", RegistrationDate = DateTime.Now,
-                    Observation = null },
-
-                new MedicalDevice {Name = "Monofone de Comunicação", Type = "Comunicação",
-                    Specification = "Comunicação interna wireless.", RegistrationDate = DateTime.Now,
-                    Observation = null },
-
-                new MedicalDevice {Name = "Ventilador Portátil V6", Type = "Suporte Vital",
-                    Specification = "Modelo avançado para transporte.", RegistrationDate = DateTime.Now,
-                    Observation = null },
-
-                new MedicalDevice {Name = "Electrocardiógrafo ECG-1", Type = "Diagnóstico",
-                    Specification = "12 canais, portátil com bateria.", RegistrationDate = DateTime.Now,
-                    Observation = "Para consultas externas." },
-
-                new MedicalDevice {Name = "Esfigmomanómetro Digital", Type = "Diagnóstico",
-                    Specification = "Automático, memória para 50 medições.", RegistrationDate = DateTime.Now,
-                    Observation = null },
-
-                new MedicalDevice {Name = "Termómetro Infravermelho", Type = "Diagnóstico",
-                    Specification = "Medição sem contato.", RegistrationDate = DateTime.Now,
-                    Observation = "Uso geral em todos os gabinetes." },
-
-                new MedicalDevice {Name = "Analisador de Gás Sanguíneo", Type = "Laboratorial",
-                    Specification = "Portátil, resultados em 1 minuto.", RegistrationDate = DateTime.Now,
-                    Observation = "Requer reagentes." },
-
-                new MedicalDevice {Name = "Desfibrilhador DEA", Type = "Emergência",
-                    Specification = "Automático, com guia por voz.", RegistrationDate = DateTime.Now,
-                    Observation = "Localizado no carrinho de emergência." },
-
-                new MedicalDevice {Name = "Foco Cirúrgico Móvel", Type = "Cirúrgico",
-                    Specification = "Iluminação LED ajustável.", RegistrationDate = DateTime.Now,
-                    Observation = "Para procedimentos menores." },
+                new MedicalDevice {
+                    Name = "Unidade de Eletrocirurgia Portátil",
+                    SerialNumber = "SG-ELECSURG-01",
+                    RegistrationDate = DateTime.Now.AddDays(-40),
+                    Observation = "Modelo de alta frequência. Uso em Bloco 1.",
+                    TypeMaterialID = 3
+                },
+                new MedicalDevice {
+                    Name = "Caixa de Instrumental Básico (Grande)",
+                    SerialNumber = "SG-INST-BGC01",
+                    RegistrationDate = DateTime.Now.AddDays(-30),
+                    Observation = "Requer reesterilização.",
+                    TypeMaterialID = 3
+                },
+                new MedicalDevice {
+                    Name = "Foco Cirúrgico Móvel LED",
+                    SerialNumber = "BC-FOCUS-LED01",
+                    RegistrationDate = DateTime.Now.AddDays(-25),
+                    Observation = "Para procedimentos menores.",
+                    TypeMaterialID = 3
+                },
+                new MedicalDevice {
+                    Name = "Caixa de Instrumental Básico (Pequena)",
+                    SerialNumber = "SG-INST-BSC02",
+                    RegistrationDate = DateTime.Now.AddDays(-20),
+                    Observation = "Kit de sutura e pinças.",
+                    TypeMaterialID = 3
+                },
+                new MedicalDevice {
+                    Name = "Pinça Hemostática (Individual)",
+                    SerialNumber = "SG-PINZA-HEM01",
+                    RegistrationDate = DateTime.Now.AddDays(-15),
+                    Observation = "Pronta a usar.",
+                    TypeMaterialID = 3
+                },
+                new MedicalDevice {
+                    Name = "Analisador de Gás Sanguíneo Portátil",
+                    SerialNumber = "AD-AGS-P01",
+                    RegistrationDate = DateTime.Now.AddDays(-10),
+                    Observation = "Localizado no Laboratório de Urgência.",
+                    TypeMaterialID = 4
+                },
+                new MedicalDevice {
+                    Name = "Analisador de Gás Sanguíneo Portátil",
+                    SerialNumber = "AD-AGS-P02",
+                    RegistrationDate = DateTime.Now.AddDays(-9),
+                    Observation = "Requer substituição de cartuchos.",
+                    TypeMaterialID = 4
+                },
+                new MedicalDevice {
+                    Name = "Estetoscópio Digital",
+                    SerialNumber = "AD-EST-DIGI-1",
+                    RegistrationDate = DateTime.Now.AddDays(-8),
+                    Observation = "Para o chefe de serviço.",
+                    TypeMaterialID = 4
+                },
+                new MedicalDevice {
+                    Name = "Bomba de Infusão de Nutrição",
+                    SerialNumber = "AV-NUTRI-INF-01",
+                    RegistrationDate = DateTime.Now.AddDays(-7),
+                    Observation = "Uso exclusivo para nutrição parenteral.",
+                    TypeMaterialID = 4
+                },
+                new MedicalDevice {
+                    Name = "Oxímetro de Pulso Portátil",
+                    SerialNumber = "MT-OXI-HAND-02", 
+                    RegistrationDate = DateTime.Now.AddDays(-6),
+                    Observation = "Unidade nova, em caixa.",
+                    TypeMaterialID = 4
+                }
             });
 
             dbContext.SaveChanges();

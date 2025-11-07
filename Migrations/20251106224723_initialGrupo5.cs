@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialGrupo5 : Migration
+    public partial class initialGrupo5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -81,23 +81,6 @@ namespace HealthWellbeingRoom.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Manufacturer", x => x.ManufacturerId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MedicalDevices",
-                columns: table => new
-                {
-                    MedicalDeviceID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Specification = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Observation = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MedicalDevices", x => x.MedicalDeviceID);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,6 +228,29 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MedicalDevices",
+                columns: table => new
+                {
+                    MedicalDeviceID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Observation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TypeMaterialID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicalDevices", x => x.MedicalDeviceID);
+                    table.ForeignKey(
+                        name: "FK_MedicalDevices_TypeMaterial_TypeMaterialID",
+                        column: x => x.TypeMaterialID,
+                        principalTable: "TypeMaterial",
+                        principalColumn: "TypeMaterialID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alergia",
                 columns: table => new
                 {
@@ -295,6 +301,17 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_Equipment_RoomId",
                 table: "Equipment",
                 column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalDevices_SerialNumber",
+                table: "MedicalDevices",
+                column: "SerialNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalDevices_TypeMaterialID",
+                table: "MedicalDevices",
+                column: "TypeMaterialID");
         }
 
         /// <inheritdoc />
@@ -319,9 +336,6 @@ namespace HealthWellbeingRoom.Migrations
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
-                name: "TypeMaterial");
-
-            migrationBuilder.DropTable(
                 name: "Alimento");
 
             migrationBuilder.DropTable(
@@ -335,6 +349,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Room");
+
+            migrationBuilder.DropTable(
+                name: "TypeMaterial");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");

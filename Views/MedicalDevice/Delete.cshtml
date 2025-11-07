@@ -18,27 +18,45 @@
 
     <div class="card-body">
 
-        <p class="lead text-muted">Tem a certeza que deseja eliminar o registo do dispositivo? Esta ação é irreversível.</p>
-        
+        <p class="lead text-muted">
+            Tem a certeza que deseja eliminar o registo do dispositivo? Esta ação é irreversível.
+        </p>
+
         <dl class="row mb-0 mt-4">
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.MedicalDeviceID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
+            <dt class="col-sm-3 fw-bold text-muted small">ID do Dispositivo</dt>
+            <dd class="col-sm-9 small">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
             <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Type)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Type)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SerialNumber)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.SerialNumber)</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Specification)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specification)</dd>
+            <dt class="col-sm-3 fw-bold text-muted">Tipo de Material</dt>
+            <dd class="col-sm-9">
+                @(Model.TypeMaterial?.Name ?? Model.TypeMaterialID.ToString())
+            </dd>
 
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
+            @* Informação do Estado (Se você decidir usar a propriedade IsUnderMaintenance) *@
+            @* Se a propriedade IsUnderMaintenance existir, descomente: *@
+            @* <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
+            <dd class="col-sm-9">
+                @if (Model.IsUnderMaintenance)
+                {
+                    <span class="badge bg-danger">Em Manutenção</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">Disponível</span>
+                }
+            </dd> *@
+
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Observation)</dd>
+            <dd class="col-sm-9 text-wrap">@Html.DisplayFor(model => model.Observation)</dd>
 
         </dl>
 
@@ -51,7 +69,7 @@
             <input type="hidden" name="id" value="@Model.MedicalDeviceID" />
 
             <button type="submit" class="btn btn-danger me-2">
-                <i class="bi bi-trash me-1"></i> Sim
+                <i class="bi bi-trash me-1"></i> Sim, Eliminar
             </button>
 
             <a asp-action="Index" class="btn btn-secondary">
