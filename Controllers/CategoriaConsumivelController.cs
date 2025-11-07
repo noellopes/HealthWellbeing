@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellBeing.Models;
+using HealthWellbeing.Models;
 using HealthWellbeing.Data;
 
 namespace HealthWellbeing.Controllers
