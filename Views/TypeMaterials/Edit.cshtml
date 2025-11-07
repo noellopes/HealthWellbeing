@@ -5,6 +5,15 @@
     ViewData["Title"] = "Editar Tipo de Material";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="card shadow-sm">
@@ -41,7 +50,7 @@
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-warning">
+                <button type="submit" class="btn btn-success">
                     <i class="bi bi-save me-1"></i> Guardar Alterações
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">

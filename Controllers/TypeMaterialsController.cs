@@ -60,8 +60,14 @@ namespace HealthWellbeingRoom.Controllers
             {
                 _context.Add(typeMaterial);
                 await _context.SaveChangesAsync();
+
+                //Mensagem de sucesso
+                TempData["SuccessMessage"] = "Tipo de material criado com sucesso!";
+
+                //Volta para o Index (lista)
                 return RedirectToAction(nameof(Index));
             }
+
             return View(typeMaterial);
         }
 
@@ -89,9 +95,7 @@ namespace HealthWellbeingRoom.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
             if (id != typeMaterial.TypeMaterialID)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -99,22 +103,25 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     _context.Update(typeMaterial);
                     await _context.SaveChangesAsync();
+
+                    //  Mensagem de sucesso
+                    TempData["SuccessMessage"] = "Tipo de material atualizado com sucesso!";
+
+                    //  Redireciona para os detalhes do mesmo registo
+                    return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!TypeMaterialExists(typeMaterial.TypeMaterialID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
-                return RedirectToAction(nameof(Index));
             }
+
             return View(typeMaterial);
         }
+
 
         // GET: TypeMaterials/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -143,9 +150,12 @@ namespace HealthWellbeingRoom.Controllers
             if (typeMaterial != null)
             {
                 _context.TypeMaterial.Remove(typeMaterial);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            // Mensagem de sucesso (igual ao padrão do prof)
+            TempData["SuccessMessage"] = "Tipo de material eliminado com sucesso!";
+
             return RedirectToAction(nameof(Index));
         }
 

@@ -348,29 +348,105 @@ namespace HealthWellBeingRoom.Data
             {
                 new TypeMaterial
                 {
-                    Name = "Consumível",
-                    Description = "Materiais de uso único ou limitada duração, como gazes, seringas e luvas."
+                    Name = "Monitorização",
+                    Description = "Acompanha sinais vitais e parâmetros fisiológicos."
                 },
                 new TypeMaterial
                 {
-                    Name = "Equipamento",
-                    Description = "Aparelhos fixos utilizados nas salas de consulta e tratamento."
+                    Name = "Infusão",
+                    Description = "Administra líquidos e medicamentos."
                 },
                 new TypeMaterial
                 {
-                    Name = "Dispositivo Médico",
-                    Description = "Instrumentos e aparelhos móveis usados para apoio ao diagnóstico e tratamento."
+                    Name = "Ventilação",
+                    Description = "Auxilia a respiração do paciente."
                 },
                 new TypeMaterial
                 {
-                    Name = "Instrumento Cirúrgico",
-                    Description = "Ferramentas utilizadas em procedimentos invasivos e pequenas cirurgias."
+                    Name = "Aspiração",
+                    Description = "Remove secreções e fluidos corporais."
                 },
                 new TypeMaterial
                 {
-                    Name = "Material de Esterilização",
-                    Description = "Produtos e utensílios destinados à limpeza e esterilização de instrumentos."
+                    Name = "Diagnóstico",
+                    Description = "Permite identificar doenças e condições clínicas."
+                },
+                new TypeMaterial
+                {
+                    Name = "Imagem Médica",
+                    Description = "Captura imagens internas do corpo humano."
+                },
+                new TypeMaterial
+                {
+                    Name = "Terapia",
+                    Description = "Utilizado em tratamentos e reabilitação."
+                },
+                new TypeMaterial
+                {
+                    Name = "Anestesia",
+                    Description = "Administra e controla agentes anestésicos."
+                },
+                new TypeMaterial
+                {
+                    Name = "Suporte Vital",
+                    Description = "Mantém funções vitais de pacientes críticos."
+                },
+                new TypeMaterial
+                {
+                    Name = "Comunicação Médica",
+                    Description = "Transmite dados clínicos e alertas."
+                },
+                new TypeMaterial
+                {
+                    Name = "Laboratorial",
+                    Description = "Usado em análises e testes clínicos."
+                },
+                new TypeMaterial
+                {
+                    Name = "Reabilitação",
+                    Description = "Apoia a recuperação funcional e motora."
+                },
+                new TypeMaterial
+                {
+                    Name = "Esterilização",
+                    Description = "Garante a assepsia de instrumentos e materiais."
+                },
+                new TypeMaterial
+                {
+                    Name = "Cirúrgico",
+                    Description = "Empregado em procedimentos invasivos."
+                },
+                new TypeMaterial
+                {
+                    Name = "Emergência",
+                    Description = "Usado em situações críticas e urgentes."
+                },
+                new TypeMaterial
+                {
+                    Name = "Óptico",
+                    Description = "Amplia e ilumina áreas de observação médica."
+                },
+                new TypeMaterial
+                {
+                    Name = "Audiológico",
+                    Description = "Destinado a exames e terapias auditivas."
+                },
+                new TypeMaterial
+                {
+                    Name = "Mobilidade",
+                    Description = "Facilita o transporte e posicionamento de pacientes."
+                },
+                new TypeMaterial
+                {
+                    Name = "Desinfeção",
+                    Description = "Usado na limpeza e descontaminação."
+                },
+                new TypeMaterial
+                {
+                    Name = "Medição Clínica",
+                    Description = "Realiza medições fisiológicas e biomédicas."
                 }
+
             };
 
 
