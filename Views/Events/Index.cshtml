@@ -1,43 +1,65 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Event>
 
 @{
-    ViewData["Title"] = "Lista de Eventos";
+    ViewData["Title"] = "Index";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>Index</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-success">Adicionar Novo Evento</a>
+    <a asp-action="Create">Create New</a>
 </p>
-
-<table class="table table-striped">
+<table class="table">
     <thead>
         <tr>
-            <th>Nome</th>
-            <th>Tipo</th>
-            <th>Duração</th>
-            <th>Intensidade</th>
-            <th>Calorias</th>
-            <th>Data</th>
-            <th>Ações</th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DurationMinutes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Intensity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventDate)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.EventName</td>
-                <td>@item.EventType</td>
-                <td>@item.DurationMinutes min</td>
-                <td>@item.Intensity</td>
-                <td>@item.CaloriesBurned</td>
-                <td>@item.EventDate.ToShortDateString()</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-info btn-sm">Detalhes</a>
-                    <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-primary btn-sm">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-danger btn-sm">Apagar</a>
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationMinutes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Intensity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventDate)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.EventId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.EventId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.EventId">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
 </table>

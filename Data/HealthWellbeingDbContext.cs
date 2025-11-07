@@ -15,5 +15,7 @@ namespace HealthWellbeing.Data
         }
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Levels { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Event> Events { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Activity_> Activity { get; set; } = default!;
     }
 }

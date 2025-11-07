@@ -1,16 +1,54 @@
 ﻿@model HealthWellbeing.Models.Event
 
 @{
-    ViewData["Title"] = "Detalhes do Evento";
+    ViewData["Title"] = "Details";
 }
 
-<h2>@Model.EventName</h2>
+<h1>Details</h1>
 
-<p><strong>Descrição:</strong> @Model.EventDescription</p>
-<p><strong>Tipo:</strong> @Model.EventType</p>
-<p><strong>Duração:</strong> @Model.DurationMinutes minutos</p>
-<p><strong>Intensidade:</strong> @Model.Intensity</p>
-<p><strong>Calorias:</strong> @Model.CaloriesBurned</p>
-<p><strong>Data:</strong> @Model.EventDate.ToShortDateString()</p>
-
-<a asp-action="Index" class="btn btn-secondary">Voltar</a>
+<div>
+    <h4>Event</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EventName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EventName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EventDescription)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EventDescription)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EventType)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EventType)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DurationMinutes)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DurationMinutes)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Intensity)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Intensity)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.EventDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.EventDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.EventId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

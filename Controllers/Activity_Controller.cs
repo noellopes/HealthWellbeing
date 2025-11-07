@@ -10,22 +10,22 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class EventsController : Controller
+    public class Activity_Controller : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public EventsController(HealthWellbeingDbContext context)
+        public Activity_Controller(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: Events
+        // GET: Activity_
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Events.ToListAsync());
+            return View(await _context.Activity.ToListAsync());
         }
 
-        // GET: Events/Details/5
+        // GET: Activity_/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,39 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events
-                .FirstOrDefaultAsync(m => m.EventId == id);
-            if (@event == null)
+            var activity_ = await _context.Activity
+                .FirstOrDefaultAsync(m => m.Activity_Id == id);
+            if (activity_ == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
+            return View(activity_);
         }
 
-        // GET: Events/Create
+        // GET: Activity_/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Events/Create
+        // POST: Activity_/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,CaloriesBurned,EventDate")] Event @event)
+        public async Task<IActionResult> Create([Bind("Activity_Id,Activity_Name,Activity_Description,Activity_Type,NumberSets,NumberReps,Weigth")] Activity_ activity_)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(@event);
+                _context.Add(activity_);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(@event);
+            return View(activity_);
         }
 
-        // GET: Events/Edit/5
+        // GET: Activity_/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +73,22 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
+            var activity_ = await _context.Activity.FindAsync(id);
+            if (activity_ == null)
             {
                 return NotFound();
             }
-            return View(@event);
+            return View(activity_);
         }
 
-        // POST: Events/Edit/5
+        // POST: Activity_/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,CaloriesBurned,EventDate")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("Activity_Id,Activity_Name,Activity_Description,Activity_Type,NumberSets,NumberReps,Weigth")] Activity_ activity_)
         {
-            if (id != @event.EventId)
+            if (id != activity_.Activity_Id)
             {
                 return NotFound();
             }
@@ -97,12 +97,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(@event);
+                    _context.Update(activity_);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EventExists(@event.EventId))
+                    if (!Activity_Exists(activity_.Activity_Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +113,10 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(@event);
+            return View(activity_);
         }
 
-        // GET: Events/Delete/5
+        // GET: Activity_/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +124,34 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var @event = await _context.Events
-                .FirstOrDefaultAsync(m => m.EventId == id);
-            if (@event == null)
+            var activity_ = await _context.Activity
+                .FirstOrDefaultAsync(m => m.Activity_Id == id);
+            if (activity_ == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
+            return View(activity_);
         }
 
-        // POST: Events/Delete/5
+        // POST: Activity_/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event != null)
+            var activity_ = await _context.Activity.FindAsync(id);
+            if (activity_ != null)
             {
-                _context.Events.Remove(@event);
+                _context.Activity.Remove(activity_);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EventExists(int id)
+        private bool Activity_Exists(int id)
         {
-            return _context.Events.Any(e => e.EventId == id);
+            return _context.Activity.Any(e => e.Activity_Id == id);
         }
     }
 }

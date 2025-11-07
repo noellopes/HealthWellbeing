@@ -1,12 +1,59 @@
 ﻿@model HealthWellbeing.Models.Event
 
 @{
-    ViewData["Title"] = "Editar Evento";
+    ViewData["Title"] = "Edit";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>Edit</h1>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="EventId" />
-    <partial name="Create" />
-</form>
+<h4>Event</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="EventId" />
+            <div class="form-group">
+                <label asp-for="EventName" class="control-label"></label>
+                <input asp-for="EventName" class="form-control" />
+                <span asp-validation-for="EventName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventDescription" class="control-label"></label>
+                <input asp-for="EventDescription" class="form-control" />
+                <span asp-validation-for="EventDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventType" class="control-label"></label>
+                <input asp-for="EventType" class="form-control" />
+                <span asp-validation-for="EventType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DurationMinutes" class="control-label"></label>
+                <input asp-for="DurationMinutes" class="form-control" />
+                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Intensity" class="control-label"></label>
+                <input asp-for="Intensity" class="form-control" />
+                <span asp-validation-for="Intensity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventDate" class="control-label"></label>
+                <input asp-for="EventDate" class="form-control" />
+                <span asp-validation-for="EventDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
