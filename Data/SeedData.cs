@@ -16,12 +16,14 @@ namespace HealthWellBeingRoom.Data
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             PopulateTypeMaterial(dbContext);
-            PopulateMedicalDevices(dbContext);
 
             PopulateManufacturer(dbContext);
             PolutateEquipmentTypes(dbContext);
             PolutateEquipmentStatus(dbContext);
             PolutateEquipment(dbContext);
+
+            PopulateMedicalDevices(dbContext);
+            PopulateLocalizacaoDispMovel_temporario(dbContext);
         }
 
         private static void PopulateManufacturer(HealthWellbeingDbContext dbContext)
@@ -180,6 +182,33 @@ namespace HealthWellBeingRoom.Data
                 dbContext.Equipment.AddRange(equipment);
                 dbContext.SaveChanges();
             }
+        }
+
+        private static void PopulateLocalizacaoDispMovel_temporario(HealthWellbeingDbContext dbContext)
+        {
+
+            if (dbContext.LocalizacaoDispMovel_temporario.Any()) return;
+
+            dbContext.LocalizacaoDispMovel_temporario.AddRange(new List<LocalizacaoDispMovel_temporario>()
+            {
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 1, RoomId = 1, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 2, RoomId = 2, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 3, RoomId = 3, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 4, RoomId = 4, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 5, RoomId = 5, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 6, RoomId = 6, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 7, RoomId = 7, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 8, RoomId = 8, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 9, RoomId = 9, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 10, RoomId = 10, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 11, RoomId = 11, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 12, RoomId = 12, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 13, RoomId = 13, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 14, RoomId = 14, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 15, RoomId = 15, IsCurrent = true}
+            });
+
+            dbContext.SaveChanges();
         }
 
         private static void PopulateMedicalDevices(HealthWellbeingDbContext dbContext)

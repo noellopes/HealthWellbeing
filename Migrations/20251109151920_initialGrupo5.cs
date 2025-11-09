@@ -237,7 +237,8 @@ namespace HealthWellbeingRoom.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Observation = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TypeMaterialID = table.Column<int>(type: "int", nullable: false)
+                    TypeMaterialID = table.Column<int>(type: "int", nullable: false),
+                    IsUnderMaintenance = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -272,6 +273,33 @@ namespace HealthWellbeingRoom.Migrations
                         principalColumn: "AlimentoId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "LocalizacaoDispMovel_temporario",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MedicalDeviceID = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    IsCurrent = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocalizacaoDispMovel_temporario", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LocalizacaoDispMovel_temporario_MedicalDevices_MedicalDeviceID",
+                        column: x => x.MedicalDeviceID,
+                        principalTable: "MedicalDevices",
+                        principalColumn: "MedicalDeviceID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LocalizacaoDispMovel_temporario_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Alergia_AlimentoId",
                 table: "Alergia",
@@ -303,6 +331,16 @@ namespace HealthWellbeingRoom.Migrations
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LocalizacaoDispMovel_temporario_MedicalDeviceID",
+                table: "LocalizacaoDispMovel_temporario",
+                column: "MedicalDeviceID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocalizacaoDispMovel_temporario_RoomId",
+                table: "LocalizacaoDispMovel_temporario",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicalDevices_SerialNumber",
                 table: "MedicalDevices",
                 column: "SerialNumber",
@@ -324,10 +362,10 @@ namespace HealthWellbeingRoom.Migrations
                 name: "Equipment");
 
             migrationBuilder.DropTable(
-                name: "LocationMaterial");
+                name: "LocalizacaoDispMovel_temporario");
 
             migrationBuilder.DropTable(
-                name: "MedicalDevices");
+                name: "LocationMaterial");
 
             migrationBuilder.DropTable(
                 name: "Receita");
@@ -348,13 +386,16 @@ namespace HealthWellbeingRoom.Migrations
                 name: "Manufacturer");
 
             migrationBuilder.DropTable(
+                name: "MedicalDevices");
+
+            migrationBuilder.DropTable(
                 name: "Room");
 
             migrationBuilder.DropTable(
-                name: "TypeMaterial");
+                name: "CategoriaAlimento");
 
             migrationBuilder.DropTable(
-                name: "CategoriaAlimento");
+                name: "TypeMaterial");
         }
     }
 }

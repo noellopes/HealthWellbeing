@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251107100620_teste")]
-    partial class teste
+    [Migration("20251109151920_initialGrupo5")]
+    partial class initialGrupo5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -402,6 +402,32 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("EquipmentType");
                 });
 
+            modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MedicalDeviceID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicalDeviceID");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("LocalizacaoDispMovel_temporario");
+                });
+
             modelBuilder.Entity("HealthWellbeingRoom.Models.Manufacturer", b =>
                 {
                     b.Property<int>("ManufacturerId")
@@ -427,6 +453,9 @@ namespace HealthWellbeingRoom.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MedicalDeviceID"));
 
+                    b.Property<bool>("IsUnderMaintenance")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -438,15 +467,20 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Specification")
+                    b.Property<string>("SerialNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TypeMaterialID")
+                        .HasColumnType("int");
 
                     b.HasKey("MedicalDeviceID");
+
+                    b.HasIndex("SerialNumber")
+                        .IsUnique();
+
+                    b.HasIndex("TypeMaterialID");
 
                     b.ToTable("MedicalDevices");
                 });
@@ -506,9 +540,49 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
+                {
+                    b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
+                        .WithMany("LocalizacaoDispMedicoMovel")
+                        .HasForeignKey("MedicalDeviceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany("LocalizacaoDispMedicoMovel")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalDevice");
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.TypeMaterial", "TypeMaterial")
+                        .WithMany()
+                        .HasForeignKey("TypeMaterialID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeMaterial");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
                     b.Navigation("AlergiasRelacionadas");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Room", b =>
+                {
+                    b.Navigation("LocalizacaoDispMedicoMovel");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
+                {
+                    b.Navigation("LocalizacaoDispMedicoMovel");
                 });
 #pragma warning restore 612, 618
         }

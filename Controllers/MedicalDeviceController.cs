@@ -31,6 +31,11 @@ namespace HealthWellBeingRoom.Controllers
 
             var listaDeDispositivos = await _context.MedicalDevices
                 .Include(m => m.TypeMaterial)
+                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
+                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
+                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
+                )
+                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
                 .Skip(paginationInfo.ItemsToSkip)
                 .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
@@ -51,7 +56,12 @@ namespace HealthWellBeingRoom.Controllers
             }
 
             var dispositivo = await _context.MedicalDevices
-                .Include(m => m.TypeMaterial) 
+                .Include(m => m.TypeMaterial)
+                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
+                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
+                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
+                )
+                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
                 .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (dispositivo == null)
@@ -175,7 +185,12 @@ namespace HealthWellBeingRoom.Controllers
             }
 
             var medicalDevices = await _context.MedicalDevices
-                .Include(m => m.TypeMaterial) 
+                .Include(m => m.TypeMaterial)
+                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
+                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
+                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
+                )
+                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
                 .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (medicalDevices == null)

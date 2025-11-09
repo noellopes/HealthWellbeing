@@ -61,14 +61,49 @@ else
                 @* Percorremos Model.Items (a lista de dispositivos na página atual) *@
                 @foreach (var dispositivo in Model.Items)
                 {
+
+                    @* Extrair a localização do dispositivo *@
+                    // Pega a primeira (e única, se IsCurrent for usado corretamente) localização ativa.
+                    // O Controller garante que este campo está carregado (Eager Loading).
+                    var localizacao = dispositivo.LocalizacaoDispMedicoMovel.FirstOrDefault();
+                    string status = dispositivo.CurrentStatus;
+                    
                     <tr>
                         <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
 
                         <td>@(dispositivo.TypeMaterial?.Name ?? "N/A")</td>
 
-                        <td>
-                            @* AQUI: Usar dispositivo.Location.Name ou algo do tipo quando o Marcel terminar *@
-                            <span class="text-muted small">Aguardando localização...</span>
+                        <td class="text-nowrap">
+                            @* Exibir Status *@
+                            @if (status == "Disponível")
+                            {
+                                <span class="badge bg-success">@status</span>
+                            }
+                            else if (status == "Em Manutenção")
+                            {
+                                <span class="badge bg-warning text-dark">@status</span>
+                            }
+                            else /* Indisponível (Alocado) */
+                            {
+                                <span class="badge bg-danger">@status</span>
+                            }
+
+                            @* Exibir a localização(sala) *@
+                            @if (localizacao != null && localizacao.Room != null)
+                            {
+                                // Tem atribuição, mostra o nome da sala
+                                <span class="fw-bold ms-2">na @localizacao.Room.Name</span>
+                            }
+                            else if (status == "Disponível")
+                            {
+                                // Não tem atribuição (e não está em manutenção), está à espera
+                                <span class="text-muted small ms-2">Aguardando atribuição...</span>
+                            }
+                            else if (status == "Em Manutenção")
+                            {
+                                // Se estiver em manutenção, não precisa de mostrar a localização da sala
+                                <span class="text-muted small ms-2">Consultar observações</span>
+                            }
                         </td>
 
                         <td class="text-end">

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeingRoom.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -62,5 +63,8 @@ namespace HealthWellbeing.Models
         // Observações adicionais (máximo 500 caracteres)
         [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres.")]
         public string Notes { get; set; }
+
+        //Coleção para a tabela intermediária
+        public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
     }
 }

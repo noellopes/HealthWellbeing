@@ -16,13 +16,13 @@ namespace HealthWellbeing.Data
         }
 
         public DbSet<HealthWellbeing.Models.TypeMaterial> TypeMaterial { get; set; } = default!;
-
         public DbSet<HealthWellbeing.Models.LocationMaterial> LocationMaterial { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentType> EquipmentType { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentStatus> EquipmentStatus { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.Manufacturer> Manufacturer { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.Equipment> Equipment { get; set; } = default!;
         public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
+        public DbSet<LocalizacaoDispMovel_temporario> LocalizacaoDispMovel_temporario { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Room> Room { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;

@@ -39,17 +39,14 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "O Tipo de Dispositivo é Obrigatório.")]
         public int TypeMaterialID { get; set; }
         public TypeMaterial? TypeMaterial { get; set; }
-        
 
-        /*
-        public ICollection<LocationMedDevice> LocationMedDevices { get; set; }
+        //Coleção para a tabela intermediária
+        public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
 
-
-        //Status: Em manutenção (Propriedade de controlo)
+        // Status: Em manutenção (Propriedade de controlo)
         public bool IsUnderMaintenance { get; set; } = false;
 
-
-        //Calcular o estado
+        // Calcular o estado 
         [Display(Name = "Estado Atual")]
         public string CurrentStatus
         {
@@ -62,8 +59,7 @@ namespace HealthWellbeingRoom.Models
                 }
 
                 // 2. Segunda Prioridade: Alocação (Indisponível)
-                // Verifica a tabela de ligação (DeviceLocation)
-                if (LocationMedDevice.Any())
+                if (LocalizacaoDispMedicoMovel.Any())
                 {
                     return "Indisponível (Alocado)";
                 }
@@ -72,6 +68,6 @@ namespace HealthWellbeingRoom.Models
                 return "Disponível";
             }
         }
-        */
     }
 }
+
