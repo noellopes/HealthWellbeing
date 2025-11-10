@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations; // <--- Não se esqueça disto!
 
-namespace HealthWellBeing.Models
+namespace HealthWellbeing.Models
 {
     public class CategoriaConsumivel
     {

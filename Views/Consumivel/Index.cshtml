@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.CategoriaConsumivel>
+﻿@model IEnumerable<HealthWellbeing.Models.Consumivel>
 
 @{
     ViewData["Title"] = "Index";
@@ -18,6 +18,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Descricao)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CategoriaConsumivel)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -31,9 +34,12 @@
                 @Html.DisplayFor(modelItem => item.Descricao)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoriaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CategoriaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoriaId">Delete</a>
+                @Html.DisplayFor(modelItem => item.CategoriaConsumivel.CategoriaId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ConsumivelId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ConsumivelId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ConsumivelId">Delete</a>
             </td>
         </tr>
 }

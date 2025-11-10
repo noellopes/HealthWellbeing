@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
-using HealthWellBeing.Models;
 
 namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
     {
-        public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
+        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
         }
@@ -18,5 +17,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ConsumivelFornecedor> ConsumivelFornecedor { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Consumivel> Consumivel { get; set; } = default!;
     }
 }
