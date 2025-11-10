@@ -20,6 +20,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Beneficio> Beneficio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ProblemaSaude> ProblemaSaude { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         
     }
 }
