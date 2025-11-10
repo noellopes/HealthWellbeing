@@ -11,6 +11,8 @@ namespace HealthWellbeing.Models
         ColherDeSopa,
         ColherDeCha,
         Xicara,
+
+        Fatia,
     }
 
     public class ComponenteReceita
