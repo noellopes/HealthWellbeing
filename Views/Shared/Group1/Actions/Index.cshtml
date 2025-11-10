@@ -13,8 +13,18 @@
     var noConfig = modelType == null || properties == null || properties.Count == 0;
     var noData = Model == null || !Model.Any();
 
-    var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.", false);
-    var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No records found.", true);
+    var configAlertModel = new AlertItem {
+        AlertType = "danger",
+        IconClass = "bi bi-exclamation-circle",
+        Message = "Configuration error: Model type or properties list not provided.",
+        Dismissible = false
+    };
+    var noDataAlertModel = new AlertItem {
+        AlertType = "warning",
+        IconClass = "bi bi-exclamation-triangle",
+        Message = "No records found.",
+        Dismissible = false
+    };
 
     if (TempData["Alert"] != null)
     {
