@@ -157,10 +157,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Nome</th>
-                                <th>NIF</th>
-                                <th>NUS</th>
                                 <th>Idade</th>
-                                <th style="width: 210px;">Ações</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,8 +168,6 @@
                                 {
                                     <tr>
                                         <td>@u.NomeCompleto</td>
-                                        <td>@u.Nif</td>
-                                        <td>@u.Nus</td>
                                         <td>@u.Idade</td>
                                         <td>
                                             <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@u.UtenteSaudeId">Detalhes</a>
