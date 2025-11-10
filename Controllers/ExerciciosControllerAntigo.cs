@@ -11,10 +11,10 @@ namespace HealthWellbeing.Controllers
     {
         private static readonly List<GrupoMuscular> todosMusculos = new()
         {
-            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", Musculo="Braços", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", Musculo="Tórax", LocalizacaoCorporal="Superior" },
-            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", Musculo="Pernas", LocalizacaoCorporal="Inferior" }
+            new GrupoMuscular { GrupoMuscularId = 1, GrupoMuscularNome = "Bíceps", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 2, GrupoMuscularNome = "Tríceps", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 3, GrupoMuscularNome = "Peitoral", LocalizacaoCorporal="Superior" },
+            new GrupoMuscular { GrupoMuscularId = 4, GrupoMuscularNome = "Quadríceps", LocalizacaoCorporal="Inferior" }
         };
 
         private static readonly List<Exercicio> exercicios = new List<Exercicio>
