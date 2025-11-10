@@ -13,6 +13,8 @@ namespace HealthWellbeing.Data
 
             PopulateTreatmentType(HealthWellbeingDbContext);
             //PopulatePathology
+            PopulateNurses(HealthWellbeingDbContext);
+            //PupulateNurses
         }
         private static void PopulateTreatmentType(HealthWellbeingDbContext HealthWellbeingDbContext)
         {
@@ -44,6 +46,37 @@ namespace HealthWellbeing.Data
             };
 
             HealthWellbeingDbContext.TreatmentType.AddRange(tipoTratamentos);
+            HealthWellbeingDbContext.SaveChanges();
+        }
+        private static void PopulateNurses(HealthWellbeingDbContext HealthWellbeingDbContext)
+        {
+            if (HealthWellbeingDbContext.Nurse.Any()) return;
+
+            var enfermeiros = new[]
+            {
+                new Nurse { Name = "Carla Martins", NIF = "234567890", ProfessionalLicense = "ENF12345", BirthDate = new DateTime(1988, 3, 12), Email = "carla.martins@hospital.pt", Phone = "912345678", Specialty = "Cuidados Intensivos" },
+                new Nurse { Name = "Rui Fernandes", NIF = "198765432", ProfessionalLicense = "ENF67890", BirthDate = new DateTime(1990, 7, 5), Email = "rui.fernandes@hospital.pt", Phone = "913456789", Specialty = "Pediatria" },
+                new Nurse { Name = "Ana Costa", NIF = "245678901", ProfessionalLicense = "ENF11223", BirthDate = new DateTime(1985, 11, 21), Email = "ana.costa@hospital.pt", Phone = "914567890", Specialty = "Saúde Materna" },
+                new Nurse { Name = "Miguel Rocha", NIF = "223344556", ProfessionalLicense = "ENF33445", BirthDate = new DateTime(1993, 4, 2), Email = "miguel.rocha@hospital.pt", Phone = "915678901", Specialty = "Emergência" },
+                new Nurse { Name = "Sofia Almeida", NIF = "267890123", ProfessionalLicense = "ENF55667", BirthDate = new DateTime(1987, 1, 30), Email = "sofia.almeida@hospital.pt", Phone = "916789012", Specialty = "Psiquiatria" },
+                new Nurse { Name = "João Pires", NIF = "278901234", ProfessionalLicense = "ENF77889", BirthDate = new DateTime(1991, 6, 14), Email = "joao.pires@hospital.pt", Phone = "917890123", Specialty = "Oncologia" },
+                new Nurse { Name = "Mariana Lopes", NIF = "289012345", ProfessionalLicense = "ENF99001", BirthDate = new DateTime(1989, 9, 19), Email = "mariana.lopes@hospital.pt", Phone = "918901234", Specialty = "Cuidados Paliativos" },
+                new Nurse { Name = "Bruno Carvalho", NIF = "290123456", ProfessionalLicense = "ENF11224", BirthDate = new DateTime(1992, 12, 10), Email = "bruno.carvalho@hospital.pt", Phone = "919012345", Specialty = "Urgência" },
+                new Nurse { Name = "Catarina Silva", NIF = "301234567", ProfessionalLicense = "ENF22335", BirthDate = new DateTime(1986, 2, 8), Email = "catarina.silva@hospital.pt", Phone = "910123456", Specialty = "Cardiologia" },
+                new Nurse { Name = "Pedro Nogueira", NIF = "312345678", ProfessionalLicense = "ENF33446", BirthDate = new DateTime(1995, 10, 22), Email = "pedro.nogueira@hospital.pt", Phone = "911234567", Specialty = "Ortopedia" },
+                new Nurse { Name = "Filipa Moreira", NIF = "323456789", ProfessionalLicense = "ENF44557", BirthDate = new DateTime(1994, 8, 17), Email = "filipa.moreira@hospital.pt", Phone = "912345679", Specialty = "Geriatria" },
+                new Nurse { Name = "Ricardo Teixeira", NIF = "334567890", ProfessionalLicense = "ENF55668", BirthDate = new DateTime(1983, 5, 11), Email = "ricardo.teixeira@hospital.pt", Phone = "913456780", Specialty = "Medicina Interna" },
+                new Nurse { Name = "Tânia Correia", NIF = "345678901", ProfessionalLicense = "ENF66779", BirthDate = new DateTime(1989, 3, 3), Email = "tania.correia@hospital.pt", Phone = "914567891", Specialty = "Cirurgia Geral" },
+                new Nurse { Name = "André Sousa", NIF = "356789012", ProfessionalLicense = "ENF77880", BirthDate = new DateTime(1996, 4, 20), Email = "andre.sousa@hospital.pt", Phone = "915678902", Specialty = "Pneumologia" },
+                new Nurse { Name = "Laura Mendes", NIF = "367890123", ProfessionalLicense = "ENF88991", BirthDate = new DateTime(1984, 11, 25), Email = "laura.mendes@hospital.pt", Phone = "916789013", Specialty = "Reabilitação" },
+                new Nurse { Name = "Diogo Azevedo", NIF = "378901234", ProfessionalLicense = "ENF99002", BirthDate = new DateTime(1992, 6, 1), Email = "diogo.azevedo@hospital.pt", Phone = "917890134", Specialty = "Urgência" },
+                new Nurse { Name = "Patrícia Faria", NIF = "389012345", ProfessionalLicense = "ENF10113", BirthDate = new DateTime(1990, 9, 15), Email = "patricia.faria@hospital.pt", Phone = "918901245", Specialty = "Cuidados Domiciliários" },
+                new Nurse { Name = "Nelson Ribeiro", NIF = "390123456", ProfessionalLicense = "ENF11224", BirthDate = new DateTime(1988, 1, 9), Email = "nelson.ribeiro@hospital.pt", Phone = "919012356", Specialty = "Urgência" },
+                new Nurse { Name = "Vera Coelho", NIF = "401234567", ProfessionalLicense = "ENF22335", BirthDate = new DateTime(1993, 2, 12), Email = "vera.coelho@hospital.pt", Phone = "910123467", Specialty = "Cuidados Intensivos" },
+                new Nurse { Name = "Gonçalo Lima", NIF = "412345678", ProfessionalLicense = "ENF33446", BirthDate = new DateTime(1991, 12, 3), Email = "goncalo.lima@hospital.pt", Phone = "911234578", Specialty = "Pediatria" }
+            };
+
+            HealthWellbeingDbContext.Nurse.AddRange(enfermeiros);
             HealthWellbeingDbContext.SaveChanges();
         }
     }
