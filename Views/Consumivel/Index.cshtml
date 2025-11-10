@@ -9,6 +9,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
@@ -34,7 +35,7 @@
                 @Html.DisplayFor(modelItem => item.Descricao)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoriaConsumivel.CategoriaId)
+                @Html.DisplayFor(modelItem => item.CategoriaConsumivel.Nome)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ConsumivelId">Edit</a> |
