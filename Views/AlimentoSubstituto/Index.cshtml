@@ -4,6 +4,14 @@
     ViewData["Title"] = "Index";
 }
 
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <h1>Alimento Substituto</h1>
 
 <p>
@@ -13,19 +21,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.AlimentoOriginal)
+                Alimento Original
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AlimentoSubstitutoRef)
+                Alimento Substituto
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Motivo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProporcaoEquivalente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Observacoes)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.FatorSimilaridade)
@@ -45,14 +47,8 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Motivo)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProporcaoEquivalente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Observacoes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FatorSimilaridade)
+                <td>
+                    @String.Format("{0:P0}", item.FatorSimilaridade)
             </td>
             <td>
                     <div class="btn-group" role="group">

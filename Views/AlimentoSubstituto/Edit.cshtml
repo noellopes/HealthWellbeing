@@ -4,6 +4,14 @@
     ViewData["Title"] = "Edit";
 }
 
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <h1>Edit</h1>
 
 <h4>AlimentoSubstituto</h4>
@@ -40,7 +48,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="FatorSimilaridade" class="control-label"></label>
-                <input asp-for="FatorSimilaridade" class="form-control" />
+                <input asp-for="FatorSimilaridade" class="form-control" type="number" step="0.01" min="0" max="1" />
                 <span asp-validation-for="FatorSimilaridade" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -56,4 +64,21 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Ajusta jQuery Validate para aceitar vírgula como separador decimal e converte para ponto antes da validação
+        (function () {
+            if (window.jQuery && jQuery.validator) {
+                jQuery.validator.methods.number = function (value, element) {
+                    if (this.optional(element)) return true;
+                    var val = String(value).replace(',', '.');
+                    return /^-?(?:\d+)(?:\.\d+)?$/.test(val);
+                };
+                jQuery.validator.methods.range = function (value, element, param) {
+                    if (this.optional(element)) return true;
+                    var val = parseFloat(String(value).replace(',', '.'));
+                    return val >= param[0] && val <= param[1];
+                };
+            }
+        })();
+    </script>
 }
