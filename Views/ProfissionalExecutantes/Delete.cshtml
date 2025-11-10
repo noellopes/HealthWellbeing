@@ -4,33 +4,41 @@
     ViewData["Title"] = "Apagar Profissional Executante";
 }
 
-<h2 class="text-center mt-3 text-danger">Apagar Profissional</h2>
-<hr />
+<div class="container mt-4">
 
-<div class="alert alert-warning text-center">
-    <h5>Tens a certeza que pretendes apagar este profissional?</h5>
-</div>
+    <h2 class="text-center mb-4"><i class="bi bi-person-x-fill text-danger me-2"></i> @ViewData["Title"]</h2>
 
-<div class="card shadow-sm p-4 mb-4">
-    <dl class="row">
-        <dt class="col-sm-3">Nome</dt>
-        <dd class="col-sm-9">@Model.Nome</dd>
-
-        <dt class="col-sm-3">Função</dt>
-        <dd class="col-sm-9">@Model.Funcao</dd>
-
-        <dt class="col-sm-3">Telefone</dt>
-        <dd class="col-sm-9">@Model.Telefone</dd>
-
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9">@Model.Email</dd>
-    </dl>
-</div>
-
-<form asp-action="ApagarProfissional" method="post">
-    <input type="hidden" asp-for="ProfissionalExecutanteId" />
-    <div class="d-flex justify-content-between mt-4">
-        <a asp-action="VerProfissionais" class="btn btn-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-danger">Apagar</button>
+    <div class="alert alert-danger text-center shadow">
+        <h5 class="mb-0">Tens a certeza que pretendes apagar este profissional? Esta ação não pode ser desfeita.</h5>
     </div>
-</form>
+
+    <div class="card shadow-sm p-4 mb-4">
+        <dl class="row">
+            <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
+            <dd class="col-sm-9">@Model.Nome</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Função</dt>
+            <dd class="col-sm-9">@Model.Funcao</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Telefone</dt>
+            <dd class="col-sm-9">@Model.Telefone</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Email</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+        </dl>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="ProfissionalExecutanteId" />
+        <div class="d-flex justify-content-between mt-4">
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle-fill me-1"></i> Cancelar
+            </a>
+
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill me-1"></i> Apagar
+            </button>
+        </div>
+    </form>
+</div>
