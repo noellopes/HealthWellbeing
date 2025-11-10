@@ -3,6 +3,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110170042_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,21 +37,6 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("TipoExercicioId");
 
                     b.ToTable("BeneficioTipoExercicio");
-                });
-
-            modelBuilder.Entity("ExercicioGenero", b =>
-                {
-                    b.Property<int>("ExercicioId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("GeneroId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ExercicioId", "GeneroId");
-
-                    b.HasIndex("GeneroId");
-
-                    b.ToTable("ExercicioGenero");
                 });
 
             modelBuilder.Entity("ExercicioGrupoMuscular", b =>
@@ -237,28 +225,49 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Exercicio");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
+                    b.Property<int>("GrupoMuscularId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GrupoMuscularId"));
 
+                    b.Property<string>("GrupoMuscularNome")
                         .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("LocalizacaoCorporal")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
+                    b.HasKey("GrupoMuscularId");
+
+                    b.ToTable("GrupoMuscular");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Musculo", b =>
                 {
+                    b.Property<int>("MusculoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MusculoId"));
 
+                    b.Property<int>("GrupoMuscularId")
+                        .HasColumnType("int");
 
+                    b.Property<string>("Nome_Musculo")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.HasKey("MusculoId");
 
+                    b.HasIndex("GrupoMuscularId");
 
+                    b.ToTable("Musculo");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ProblemaSaude", b =>
@@ -417,21 +426,6 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.TipoExercicio", null)
                         .WithMany()
                         .HasForeignKey("TipoExercicioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ExercicioGenero", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Exercicio", null)
-                        .WithMany()
-                        .HasForeignKey("ExercicioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.Genero", null)
-                        .WithMany()
-                        .HasForeignKey("GeneroId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
