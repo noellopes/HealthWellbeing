@@ -21,12 +21,39 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(UtenteBalneario utente)
         {
-            if (!ModelState.IsValid) return View(utente);
+            Console.WriteLine("Entrou no POST Create"); // confirmar que o POST chegou
+
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("ModelState inválido. Erros:");
+                foreach (var kv in ModelState)
+                {
+                    var key = kv.Key;
+                    foreach (var err in kv.Value.Errors)
+                    {
+                        Console.WriteLine($"- Campo: {key} | Erro: {err.ErrorMessage} | Ex: {err.Exception?.Message}");
+                    }
+                }
+
+                utente.DataInscricao = DateTime.Now; // 👈 define automaticamente
+                utente.DadosMedicos ??= new DadosMedicos();
+                utente.SeguroSaude ??= new SeguroSaude();
+                utente.SeguroSaude.NomeSeguradora = "N/A"; // evita erro do [Required]
+                UtenteService.Add(utente);
+
+                return View(utente);
+            }
+
             UtenteService.Add(utente);
+            Console.WriteLine($"Adicionado: {utente.NomeCompleto}");
             return RedirectToAction(nameof(Index));
+
+
         }
+
 
         public IActionResult Edit(int id)
         {

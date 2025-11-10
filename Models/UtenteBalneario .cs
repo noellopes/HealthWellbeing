@@ -10,7 +10,7 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "O nome é obrigatório")]
         [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
-        public string NomeCompleto { get; set; } = string.Empty;
+        public string? NomeCompleto { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "A data de nascimento é obrigatória")]
         [DataType(DataType.Date)]
@@ -20,14 +20,14 @@ namespace HealthWellbeing.Models
         public  Sexo Sexo { get; set; }
 
         [StringLength(9, ErrorMessage = "O NIF deve ter 9 caracteres.")]
-        public string NIF { get; set; } = string.Empty;
+        public string? NIF { get; set; } = string.Empty;
 
         [Phone]
         [StringLength(15)]
-        public string Contacto { get; set; } = string.Empty;
+        public string? Contacto { get; set; } = string.Empty;
 
         [StringLength(200)]
-        public string Morada { get; set; } = string.Empty;
+        public string? Morada { get; set; } = string.Empty;
 
 
 

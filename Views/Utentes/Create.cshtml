@@ -5,8 +5,10 @@
 }
 
 <h2>@ViewData["Title"]</h2>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
     <div class="form-group">
         <label asp-for="NomeCompleto"></label>
         <input asp-for="NomeCompleto" class="form-control" />
@@ -17,6 +19,13 @@
         <label asp-for="DataNascimento"></label>
         <input asp-for="DataNascimento" type="date" class="form-control" />
     </div>
+
+    <div class="form-group">
+        <label asp-for="DataInscricao"></label>
+        <input asp-for="DataInscricao" type="date" class="form-control" />
+        <span asp-validation-for="DataInscricao" class="text-danger"></span>
+    </div>
+
 
     <div class="form-group">
         <label asp-for="Sexo"></label>
