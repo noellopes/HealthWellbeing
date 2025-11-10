@@ -40,15 +40,67 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
+            // Carregar componentes relacionados com detalhes do alimento
+            var componentesDetalhados = new List<dynamic>();
+            if (receita.ComponentesReceitaId != null && receita.ComponentesReceitaId.Any())
+            {
+                componentesDetalhados = await _context.ComponenteReceita
+                    .Include(c => c.Alimento)
+                    .Where(c => receita.ComponentesReceitaId.Contains(c.ComponenteReceitaId))
+                    .Select(c => new {
+                        c.ComponenteReceitaId,
+                        AlimentoNome = c.Alimento!.Name,
+                        c.Quantidade,
+                        Unidade = c.UnidadeMedida.ToString(),
+                        c.IsOpcional
+                    })
+                    .ToListAsync<dynamic>();
+            }
+            ViewBag.ComponentesDetalhados = componentesDetalhados;
+
+            // Carregar restrições relacionadas
+            var restricoesDetalhadas = new List<dynamic>();
+            if (receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
+            {
+                restricoesDetalhadas = await _context.RestricaoAlimentar
+                    .Where(r => receita.RestricoesAlimentarId.Contains(r.RestricaoAlimentarId))
+                    .Select(r => new {
+                        r.RestricaoAlimentarId,
+                        r.Nome,
+                        Tipo = r.Tipo.ToString(),
+                        Gravidade = r.Gravidade.ToString(),
+                        r.Descricao
+                    })
+                    .ToListAsync<dynamic>();
+            }
+            ViewBag.RestricoesDetalhadas = restricoesDetalhadas;
+
             return View(receita);
         }
 
         // GET: Receita/Create
         public IActionResult Create()
         {
+            // Carregar componentes com informações do alimento
+            var componentes = _context.ComponenteReceita
+                .Include(c => c.Alimento)
+                .Select(c => new {
+                    c.ComponenteReceitaId,
+                    Display = $"{c.Alimento!.Name} - {c.Quantidade} {c.UnidadeMedida}" + 
+                              (c.IsOpcional ? " (Opcional)" : "")
+                })
+                .ToList();
+            
+            // Carregar restrições com tipo e gravidade
+            var restricoes = _context.RestricaoAlimentar
+                .Select(r => new {
+                    r.RestricaoAlimentarId,
+                    Display = $"{r.Nome} - {r.Tipo} ({r.Gravidade})"
+                })
+                .ToList();
            
-            ViewData["ComponentesReceita"] = new SelectList(_context.ComponenteReceita, "ComponenteReceitaId", "ComponenteReceitaId");
-            ViewData["RestricoesAlimentares"] = new SelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "RestricaoAlimentarId");
+            ViewData["ComponentesReceita"] = new MultiSelectList(componentes, "ComponenteReceitaId", "Display");
+            ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display");
             return View();
         }
 
@@ -87,8 +139,26 @@ namespace HealthWellbeing.Controllers
                 return Problem("Required data is missing in the database.");
             }
 
-            ViewData["ComponentesReceita"] = new SelectList(_context.ComponenteReceita, "ComponenteReceitaId", "ComponenteReceitaId", receita.ComponentesReceitaId);
-            ViewData["RestricoesAlimentares"] = new SelectList(_context.RestricaoAlimentar, "RestricaoAlimentarId", "RestricaoAlimentarId", receita.RestricoesAlimentarId);
+            // Carregar componentes com informações do alimento
+            var componentes = _context.ComponenteReceita
+                .Include(c => c.Alimento)
+                .Select(c => new {
+                    c.ComponenteReceitaId,
+                    Display = $"{c.Alimento!.Name} - {c.Quantidade} {c.UnidadeMedida}" + 
+                              (c.IsOpcional ? " (Opcional)" : "")
+                })
+                .ToList();
+            
+            // Carregar restrições com tipo e gravidade
+            var restricoes = _context.RestricaoAlimentar
+                .Select(r => new {
+                    r.RestricaoAlimentarId,
+                    Display = $"{r.Nome} - {r.Tipo} ({r.Gravidade})"
+                })
+                .ToList();
+
+            ViewData["ComponentesReceita"] = new MultiSelectList(componentes, "ComponenteReceitaId", "Display", receita.ComponentesReceitaId);
+            ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display", receita.RestricoesAlimentarId);
             return View(receita);
         }
 

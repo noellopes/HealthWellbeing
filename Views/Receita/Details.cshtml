@@ -1,84 +1,224 @@
 ﻿@model HealthWellbeing.Models.Receita
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Receita";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="bi bi-eye"></i> @Model.Nome
+            </h2>
+            <hr />
+        </div>
+    </div>
 
-<div>
-    <h4>Receita</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ModoPreparo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ModoPreparo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TempoPreparo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TempoPreparo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Porcoes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Porcoes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Calorias)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Calorias)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Proteinas)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Proteinas)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HidratosCarbono)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HidratosCarbono)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Gorduras)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Gorduras)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ComponentesReceitaId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ComponentesReceitaId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RestricoesAlimentarId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RestricoesAlimentarId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ReceitaId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <!-- Coluna Esquerda - Informações Básicas -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações da Receita</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Descricao))
+                    {
+                        <div class="mb-3">
+                            <h6 class="text-muted">Descrição:</h6>
+                            <p>@Model.Descricao</p>
+                        </div>
+                    }
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">
+                                <i class="bi bi-clock"></i> Tempo de Preparo:
+                            </h6>
+                            <p class="fs-5"><strong>@Model.TempoPreparo minutos</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">
+                                <i class="bi bi-people"></i> Porções:
+                            </h6>
+                            <p class="fs-5"><strong>@Model.Porcoes porções</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted">
+                            <i class="bi bi-list-ol"></i> Modo de Preparo:
+                        </h6>
+                        <div class="border rounded p-3 bg-light">
+                            <p style="white-space: pre-line;">@Model.ModoPreparo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Componentes -->
+            @if (ViewBag.ComponentesDetalhados != null && ((List<dynamic>)ViewBag.ComponentesDetalhados).Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0"><i class="bi bi-basket"></i> Ingredientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var comp in (List<dynamic>)ViewBag.ComponentesDetalhados)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold">
+                                            <i class="bi bi-dot"></i> @comp.AlimentoNome
+                                        </div>
+                                        <small class="text-muted">
+                                            Quantidade: @comp.Quantidade @comp.Unidade
+                                        </small>
+                                    </div>
+                                    @if (comp.IsOpcional)
+                                    {
+                                        <span class="badge bg-info rounded-pill">Opcional</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success rounded-pill">Obrigatório</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+            else if (Model.ComponentesReceitaId != null && Model.ComponentesReceitaId.Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0"><i class="bi bi-basket"></i> Ingredientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Componentes (IDs): @string.Join(", ", Model.ComponentesReceitaId)</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Restrições -->
+            @if (ViewBag.RestricoesDetalhadas != null && ((List<dynamic>)ViewBag.RestricoesDetalhadas).Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var rest in (List<dynamic>)ViewBag.RestricoesDetalhadas)
+                        {
+                            var badgeClass = rest.Gravidade == "Grave" ? "bg-danger" : 
+                                           rest.Gravidade == "Moderada" ? "bg-warning" : "bg-info";
+                            
+                            <div class="alert alert-warning mb-3" role="alert">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="alert-heading">
+                                            <i class="bi bi-shield-exclamation"></i> @rest.Nome
+                                        </h6>
+                                        @if (!string.IsNullOrEmpty(rest.Descricao))
+                                        {
+                                            <p class="mb-2"><small>@rest.Descricao</small></p>
+                                        }
+                                        <div class="mb-0">
+                                            <span class="badge bg-secondary">@rest.Tipo</span>
+                                            <span class="badge @badgeClass">@rest.Gravidade</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.RestricoesAlimentarId != null && Model.RestricoesAlimentarId.Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Restrições (IDs): @string.Join(", ", Model.RestricoesAlimentarId)</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Coluna Direita - Informações Nutricionais -->
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-heart-pulse"></i> Informação Nutricional</h5>
+                    <small>Por porção</small>
+                </div>
+                <div class="card-body">
+                    <div class="nutrition-info">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                            <div>
+                                <h6 class="text-muted mb-0">Calorias</h6>
+                            </div>
+                            <div class="text-end">
+                                <h4 class="mb-0 text-primary">@Model.Calorias</h4>
+                                <small class="text-muted">kcal</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Proteínas</span>
+                                <strong>@Model.Proteinas g</strong>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: @((Model.Proteinas / 100) * 100)%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Carboidratos</span>
+                                <strong>@Model.HidratosCarbono g</strong>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: @((Model.HidratosCarbono / 100) * 100)%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Gorduras</span>
+                                <strong>@Model.Gorduras g</strong>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: @((Model.Gorduras / 100) * 100)%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar para Lista
+                </a>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.ReceitaId" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.ReceitaId" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Excluir
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
