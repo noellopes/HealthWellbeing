@@ -16,5 +16,7 @@ namespace HealthWellbeing.Models
 
         [StringLength(150)]
         public string LocalizacaoCorporal { get; set; } // 📍 Localização anatómica do grupo muscular Exemplo: "Parte superior do tronco", "Membros inferiores"
+
+        public ICollection<Exercicio>? Exercicio { get; set; }
     }
 }

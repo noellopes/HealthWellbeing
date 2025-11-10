@@ -28,30 +28,42 @@
         </div>
 
         <!-- Grupos Musculares -->
-        <div class="mb-3">
-            <label class="form-label">Grupos Musculares *</label>
-            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-                @if (Model.GrupoMuscular?.Any() == true)
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold">Grupos Musculares Associados</label>
+            <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.GruposMusculares != null && ViewBag.GruposMusculares.Count > 0)
                 {
-                    @foreach (var item in ViewBag.GruposMusculares)
-                    {
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                   name="musculosIds"
-                                   value="@item.Value"
-                                   id="musculo_@item.Value"
-                                   @(Model.GrupoMuscular.Any(g => g.GrupoMuscularId.ToString() == item.Value) ? "checked" : "") />
-
-                            <label class="form-check-label" for="musculo_@item.Value">@item.Text</label>
-                        </div>
-                    }
+                    <div class="row">
+                        @foreach (var grupo in ViewBag.GruposMusculares)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="gruposMuscularesIds"
+                                           value="@grupo.GrupoMuscularId"
+                                           id="grupo_@grupo.GrupoMuscularId"
+                                           @(ViewBag.GruposSelecionados != null && ViewBag.GruposSelecionados.Contains(grupo.GrupoMuscularId) ? "checked" : "") />
+                                    <label class="form-check-label" for="grupo_@grupo.GrupoMuscularId">
+                                        <strong>@grupo.GrupoMuscularNome</strong> - @grupo.Musculo
+                                        <br>
+                                        <small class="text-muted">📍 @grupo.LocalizacaoCorporal</small>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
                 }
                 else
                 {
-                    <span class="text-muted">Nenhum músculo definido</span>
+                    <div class="alert alert-warning">
+                        <p class="mb-1">Nenhum grupo muscular encontrado no sistema.</p>
+                        <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">
+                            Criar Grupo Muscular
+                        </a>
+                    </div>
                 }
             </div>
-            <span class="text-danger small">@ViewData.ModelState["musculosIds"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
         </div>
 
         <!-- Linha com duração / intensidade / calorias -->
@@ -103,16 +115,41 @@
             <span asp-validation-for="Instrucoes" class="text-danger small"></span>
         </div>
 
-        <!-- Género -->
-        <div class="mb-3">
-            <label asp-for="Genero" class="form-label">Género *</label>
-            <select asp-for="Genero" class="form-select">
-                <option value="">-- Selecione --</option>
-                <option>Masculino</option>
-                <option>Feminino</option>
-                <option>Unissexo</option>
-            </select>
-            <span asp-validation-for="Genero" class="text-danger small"></span>
+        <!-- Géneros -->
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold">Géneros Associados</label>
+            <small class="form-text text-muted d-block">Selecione os géneros associados a este exercício</small>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.Generos != null && ViewBag.Generos.Count > 0)
+                {
+                    <div class="row">
+                        @foreach (var genero in ViewBag.Generos)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="generosIds"
+                                           value="@genero.GeneroId"
+                                           id="genero_@genero.GeneroId"
+                                           @(ViewBag.GenerosSelecionados != null && ViewBag.GenerosSelecionados.Contains(genero.GeneroId) ? "checked" : "") />
+                                    <label class="form-check-label" for="genero_@genero.GeneroId">
+                                        @genero.NomeGenero
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <p class="mb-1">Nenhum género encontrado no sistema.</p>
+                        <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
+                            Criar Género
+                        </a>
+                    </div>
+                }
+            </div>
         </div>
 
         <!-- Botões -->
@@ -124,7 +161,6 @@
                 <i class="fas fa-arrow-left"></i> Cancelar
             </a>
         </div>
-
     </form>
 </div>
 

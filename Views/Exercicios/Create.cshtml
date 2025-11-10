@@ -32,28 +32,43 @@
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
-    <!-- Grupos Musculares (Checkboxes) -->
-    <div class="mb-3">
-        <label class="form-label">Grupos Musculares *</label>
-        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-            @if (ViewBag.GruposMusculares != null)
+    <!-- Grupos Musculares Associados -->
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold">Grupos Musculares Associados</label>
+        <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
+        <div class="border p-3 rounded mt-2">
+            @if (ViewBag.GruposMusculares != null && ViewBag.GruposMusculares.Any())
             {
-                foreach (var item in ViewBag.GruposMusculares)
-                {
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox"
-                               name="musculosIds"
-                               value="@item.Value"
-                               id="musculo_@item.Value" />
-                        <label class="form-check-label" for="musculo_@item.Value">
-                            @item.Text
-                        </label>
-                    </div>
-                }
+                <div class="row">
+                    @foreach (var grupoMuscular in ViewBag.GruposMusculares)
+                    {
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="musculosIds"
+                                       value="@grupoMuscular.Value"
+                                       id="musculo_@grupoMuscular.Value" />
+                                <label class="form-check-label" for="musculo_@grupoMuscular.Value">
+                                    <a href="@Url.Action("Details", "GrupoMuscular", new { id = grupoMuscular.Value })"
+                                       target="_blank"
+                                       class="text-decoration-none"
+                                       title="Ver detalhes do grupo muscular">
+                                        @grupoMuscular.Text
+                                    </a>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
             else
             {
-                <div class="text-warning">Nenhum grupo muscular disponível.</div>
+                <div class="alert alert-warning">
+                    <p class="mb-1">Nenhum grupo muscular encontrado no sistema.</p>
+                    <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">
+                        Criar Grupo Muscular
+                    </a>
+                </div>
             }
         </div>
         @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
@@ -115,16 +130,49 @@
         <span asp-validation-for="Instrucoes" class="text-danger small"></span>
     </div>
 
-    <!-- Género -->
-    <div class="mb-3">
-        <label asp-for="Genero" class="form-label">Género *</label>
-        <select asp-for="Genero" class="form-select">
-            <option value="">-- Selecione --</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Feminino">Feminino</option>
-            <option value="Unissexo">Unissexo</option>
-        </select>
-        <span asp-validation-for="Genero" class="text-danger small"></span>
+    <!-- Gêneros Associados -->
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold">Gêneros Associados</label>
+        <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
+        <div class="border p-3 rounded mt-2">
+            @if (ViewBag.Generos != null && ((IEnumerable<SelectListItem>)ViewBag.Generos).Any())
+            {
+                <div class="row">
+                    @foreach (var genero in ViewBag.Generos as IEnumerable<SelectListItem>)
+                    {
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="generosIds"
+                                       value="@genero.Value"
+                                       id="genero_@genero.Value" />
+                                <label class="form-check-label" for="genero_@genero.Value">
+                                    <a href="@Url.Action("Details", "Genero", new { id = genero.Value })"
+                                       target="_blank"
+                                       class="text-decoration-none"
+                                       title="Ver detalhes do gênero">
+                                        @genero.Text
+                                    </a>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <p class="mb-1">Nenhum gênero encontrado no sistema.</p>
+                    <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
+                        Criar Gênero
+                    </a>
+                </div>
+            }
+        </div>
+        @if (ViewData.ModelState["generosIds"] != null && ViewData.ModelState["generosIds"].Errors.Any())
+        {
+            <span class="text-danger small">@ViewData.ModelState["generosIds"].Errors.First().ErrorMessage</span>
+        }
     </div>
 
     <!-- Botões -->

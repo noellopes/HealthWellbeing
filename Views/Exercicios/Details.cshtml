@@ -53,8 +53,22 @@
                             <td>@Model.EquipamentoNecessario</td>
                         </tr>
                         <tr>
-                            <th class="text-secondary">Género:</th>
-                            <td>@Model.Genero</td>
+                            <th class="text-secondary">Géneros:</th>
+                            <td>
+                                @if (Model.Genero?.Any() == true)
+                                {
+                                    foreach (var genero in Model.Genero)
+                                    {
+                                        <span class="badge bg-success me-1">
+                                            @genero.NomeGenero
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Nenhum gênero definido</span>
+                                }
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -98,7 +112,14 @@
             <div class="mt-4">
                 <h5 class="fw-bold">Instruções</h5>
                 <div class="border rounded p-3 bg-light">
-                    @Model.Instrucoes
+                    @if (!string.IsNullOrEmpty(Model.Instrucoes))
+                    {
+                        @Model.Instrucoes
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhuma instrução definida</span>
+                    }
                 </div>
             </div>
 

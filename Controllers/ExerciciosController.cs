@@ -7,16 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
     public class ExerciciosController : Controller
     {
-        
         private readonly HealthWellbeingDbContext _context;
 
         public ExerciciosController(HealthWellbeingDbContext context)
@@ -27,7 +23,7 @@ namespace HealthWellbeing.Controllers
         // GET: Exercicios
         public async Task<IActionResult> Index(int page = 1)
         {
-            var exerciciosContext = _context.Exercicio;
+            var exerciciosContext = _context.Exercicio.Include(e => e.Genero);
 
             int numberExercicios = await exerciciosContext.CountAsync();
 
@@ -51,7 +47,10 @@ namespace HealthWellbeing.Controllers
             }
 
             var exercicio = await _context.Exercicio
+                .Include(e => e.Genero)
+                .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
+
             if (exercicio == null)
             {
                 return NotFound();
@@ -63,22 +62,40 @@ namespace HealthWellbeing.Controllers
         // GET: Exercicios/Create
         public IActionResult Create()
         {
+            // Carrega os gêneros para a ViewBag
+            ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
             return View();
         }
 
         // POST: Exercicios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series,Genero")] Exercicio exercicio)
+        public async Task<IActionResult> Create([Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")] Exercicio exercicio, int[] generosIds)
         {
             if (ModelState.IsValid)
             {
+                // Adiciona os gêneros selecionados
+                if (generosIds != null && generosIds.Length > 0)
+                {
+                    exercicio.Genero = new List<Genero>();
+
+                    foreach (var generoId in generosIds)
+                    {
+                        var genero = await _context.Genero.FindAsync(generoId);
+                        if (genero != null)
+                        {
+                            exercicio.Genero.Add(genero);
+                        }
+                    }
+                }
+
                 _context.Add(exercicio);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Recarrega os gêneros se houver erro
+            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
             return View(exercicio);
         }
 
@@ -90,20 +107,29 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exercicio = await _context.Exercicio.FindAsync(id);
+            var exercicio = await _context.Exercicio
+                .Include(e => e.Genero)
+                .FirstOrDefaultAsync(e => e.ExercicioId == id);
+
             if (exercicio == null)
             {
                 return NotFound();
             }
+
+            // Carrega os gêneros para a ViewBag
+            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+
+            // Prepara lista de gêneros já selecionados para marcar os checkboxes
+            var generosSelecionados = exercicio.Genero?.Select(g => g.GeneroId).ToList();
+            ViewBag.GenerosSelecionados = generosSelecionados ?? new List<int>();
+
             return View(exercicio);
         }
 
         // POST: Exercicios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series,Genero")] Exercicio exercicio)
+        public async Task<IActionResult> Edit(int id, [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")] Exercicio exercicio, int[] generosIds)
         {
             if (id != exercicio.ExercicioId)
             {
@@ -114,7 +140,36 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(exercicio);
+                    // Carrega o exercício existente com seus gêneros
+                    var exercicioExistente = await _context.Exercicio
+                        .Include(e => e.Genero)
+                        .FirstOrDefaultAsync(e => e.ExercicioId == id);
+
+                    if (exercicioExistente == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Atualiza propriedades básicas
+                    _context.Entry(exercicioExistente).CurrentValues.SetValues(exercicio);
+
+                    // Limpa gêneros existentes
+                    exercicioExistente. Genero?.Clear();
+
+                    // Adiciona novos gêneros selecionados
+                    if (generosIds != null && generosIds.Length > 0)
+                    {
+                        var generosParaAdicionar = await _context.Genero
+                            .Where(g => generosIds.Contains(g.GeneroId))
+                            .ToListAsync();
+
+                        exercicioExistente.Genero = generosParaAdicionar;
+                    }
+                    else
+                    {
+                        exercicioExistente.Genero = new List<Genero>();
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -130,6 +185,9 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // Recarrega os gêneros se houver erro
+            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
             return View(exercicio);
         }
 
@@ -142,7 +200,9 @@ namespace HealthWellbeing.Controllers
             }
 
             var exercicio = await _context.Exercicio
+                .Include(e => e.Genero)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
+
             if (exercicio == null)
             {
                 return NotFound();
@@ -156,9 +216,15 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var exercicio = await _context.Exercicio.FindAsync(id);
+            var exercicio = await _context.Exercicio
+                .Include(e => e.Genero)
+                .FirstOrDefaultAsync(e => e.ExercicioId == id);
+
             if (exercicio != null)
             {
+                // Remove as relações muitos-para-muitos primeiro
+                exercicio.Genero?.Clear();
+
                 _context.Exercicio.Remove(exercicio);
             }
 

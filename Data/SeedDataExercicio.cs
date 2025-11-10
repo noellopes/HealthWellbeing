@@ -33,7 +33,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -46,7 +46,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 4,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -59,7 +59,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -72,7 +72,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Halteres",
                     Repeticoes = 12,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -85,7 +85,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 1,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -98,7 +98,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -111,7 +111,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Halteres",
                     Repeticoes = 12,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -124,7 +124,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 10,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -137,7 +137,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 2,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 },
                 new Exercicio
                 {
@@ -150,7 +150,7 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 3,
-                    Genero = "Unisexo"
+                    //Genero = "Unisexo"
                 }
             };
 

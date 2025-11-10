@@ -40,10 +40,10 @@ namespace HealthWellbeing.Models
         [Range(1, 100, ErrorMessage = "As séries devem ser entre 1 e 100.")]
         public int Series { get; set; }
 
-        [Required(ErrorMessage = "O género é obrigatório.")]
-        public string Genero { get; set; }
+        // Lista de grupos Generos
+        public ICollection<Genero>? Genero { get; set; }
 
         // Lista de grupos musculares
-        public List<GrupoMuscular> GrupoMuscular { get; set; } = new List<GrupoMuscular>();
+        public ICollection<GrupoMuscular>? GrupoMuscular { get; set; }
     }
 }
