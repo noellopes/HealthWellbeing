@@ -1,0 +1,59 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Stock>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ConsumivelID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ZonaID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantidadeAtual)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantidadeMinima)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataUltimaAtualizacao)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ConsumivelID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ZonaID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantidadeAtual)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantidadeMinima)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataUltimaAtualizacao)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.StockId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.StockId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.StockId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
