@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -20,25 +19,39 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchName, string searchType)
         {
-            return View(await _context.Events.ToListAsync());
+            // Guarda os filtros na ViewBag para manter o texto nas caixas de pesquisa
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchType = searchType;
+
+            var events = from e in _context.Events select e;
+
+            // Filtra por nome
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                events = events.Where(e => e.EventName.Contains(searchName));
+            }
+
+            // Filtra por tipo
+            if (!string.IsNullOrEmpty(searchType))
+            {
+                events = events.Where(e => e.EventType.Contains(searchType));
+            }
+
+            var eventList = await events.ToListAsync();
+            return View(eventList);
         }
 
         // GET: Events/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
-            var @event = await _context.Events
-                .FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Events.FirstOrDefaultAsync(m => m.EventId == id);
             if (@event == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
             return View(@event);
         }
@@ -50,16 +63,15 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Events/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,CaloriesBurned,EventDate")] Event @event)
+        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,EventDate")] Event @event)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(@event);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Event created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(@event);
@@ -69,29 +81,22 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
             var @event = await _context.Events.FindAsync(id);
             if (@event == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
+
             return View(@event);
         }
 
         // POST: Events/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,CaloriesBurned,EventDate")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventType,DurationMinutes,Intensity,EventDate")] Event @event)
         {
             if (id != @event.EventId)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
             if (ModelState.IsValid)
             {
@@ -99,17 +104,14 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(@event);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Event updated successfully!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!EventExists(@event.EventId))
-                    {
-                        return NotFound();
-                    }
+                        return View("InvalidEvent");
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -120,16 +122,11 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
-            var @event = await _context.Events
-                .FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Events.FirstOrDefaultAsync(m => m.EventId == id);
             if (@event == null)
-            {
-                return NotFound();
-            }
+                return View("InvalidEvent");
 
             return View(@event);
         }
@@ -140,12 +137,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var @event = await _context.Events.FindAsync(id);
-            if (@event != null)
-            {
-                _context.Events.Remove(@event);
-            }
+            if (@event == null)
+                return View("InvalidEvent");
 
+            _context.Events.Remove(@event);
             await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Event deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
 
