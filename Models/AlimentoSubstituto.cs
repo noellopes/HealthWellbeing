@@ -9,7 +9,7 @@ namespace HealthWellbeing.Models
         public int AlimentoSubstitutoId { get; set; }
 
         // Alimento original
-        [Required]
+        [Required(ErrorMessage = "O alimento original é obrigatório.")]
         [ForeignKey(nameof(AlimentoOriginal))]
         [Display(Name = "Alimento Original")]
         public int AlimentoOriginalId { get; set; }
@@ -17,7 +17,7 @@ namespace HealthWellbeing.Models
         public Alimento? AlimentoOriginal { get; set; }
 
         // Alimento substituto
-        [Required]
+        [Required(ErrorMessage = "O alimento substituto é obrigatório.")]
         [ForeignKey(nameof(AlimentoSubstitutoRef))]
         [Display(Name = "Alimento Substituto")]
         public int AlimentoSubstitutoRefId { get; set; }
