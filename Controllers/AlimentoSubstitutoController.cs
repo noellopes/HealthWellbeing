@@ -65,6 +65,8 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(alimentoSubstituto);
                 await _context.SaveChangesAsync();
+                TempData["AlertMessage"] = "Registro criado com sucesso.";
+                TempData["AlertType"] = "success";
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
@@ -108,6 +110,8 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(alimentoSubstituto);
                     await _context.SaveChangesAsync();
+                    TempData["AlertMessage"] = "Registro atualizado com sucesso.";
+                    TempData["AlertType"] = "success";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -159,6 +163,8 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
+            TempData["AlertMessage"] = "Registro apagado com sucesso.";
+            TempData["AlertType"] = "success";
             return RedirectToAction(nameof(Index));
         }
 

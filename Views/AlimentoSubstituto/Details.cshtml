@@ -4,6 +4,14 @@
     ViewData["Title"] = "Details";
 }
 
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <h1>Details</h1>
 
 <div>
