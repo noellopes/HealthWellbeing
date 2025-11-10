@@ -34,34 +34,26 @@ namespace HealthWellBeingRoom.Data
                 // Adicionando Manufacturers
                 var manufacturers = new List<Manufacturer>
                 {
-                    new Manufacturer { Name = "Dell" },
-                    new Manufacturer { Name = "HP" },
-                    new Manufacturer { Name = "Apple" },
-                    new Manufacturer { Name = "Lenovo" },
-                    new Manufacturer { Name = "Samsung" },
-                    new Manufacturer { Name = "Sony" },
-                    new Manufacturer { Name = "Microsoft" },
-                    new Manufacturer { Name = "Acer" },
-                    new Manufacturer { Name = "Asus" },
-                    new Manufacturer { Name = "LG" },
-                    new Manufacturer { Name = "Canon" },
-                    new Manufacturer { Name = "Epson" },
-                    new Manufacturer { Name = "Xerox" },
-                    new Manufacturer { Name = "Panasonic" },
-                    new Manufacturer { Name = "Sharp" },
-                    new Manufacturer { Name = "Toshiba" },
-                    new Manufacturer { Name = "Fujitsu" },
-                    new Manufacturer { Name = "Razer" },
-                    new Manufacturer { Name = "Corsair" },
-                    new Manufacturer { Name = "Logitech" },
-                    new Manufacturer { Name = "Seagate" },
-                    new Manufacturer { Name = "Western Digital" },
-                    new Manufacturer { Name = "Kingston" },
-                    new Manufacturer { Name = "Sandisk" },
-                    new Manufacturer { Name = "Intel" },
-                    new Manufacturer { Name = "NVIDIA" },
-                    new Manufacturer { Name = "Huawei" },
-                    new Manufacturer { Name = "Xiaomi" }
+                    new Manufacturer { Name = "GE Healthcare" },
+                    new Manufacturer { Name = "Siemens Healthineers" },
+                    new Manufacturer { Name = "Philips Healthcare" },
+                    new Manufacturer { Name = "Mindray" },
+                    new Manufacturer { Name = "Dräger" },
+                    new Manufacturer { Name = "Medtronic" },
+                    new Manufacturer { Name = "Samsung Medison" },
+                    new Manufacturer { Name = "Canon Medical Systems" },
+                    new Manufacturer { Name = "Fujifilm Healthcare" },
+                    new Manufacturer { Name = "Agfa Healthcare" },
+                    new Manufacturer { Name = "Boston Scientific" },
+                    new Manufacturer { Name = "Baxter" },
+                    new Manufacturer { Name = "B. Braun" },
+                    new Manufacturer { Name = "Abbott" },
+                    new Manufacturer { Name = "Zimmer Biomet" },
+                    new Manufacturer { Name = "Stryker" },
+                    new Manufacturer { Name = "Roche" },
+                    new Manufacturer { Name = "Edan Instruments" },
+                    new Manufacturer { Name = "Hospira" },
+                    new Manufacturer { Name = "Nihon Kohden" }
                 };
 
                 dbContext.Manufacturer.AddRange(manufacturers);
@@ -75,35 +67,36 @@ namespace HealthWellBeingRoom.Data
             {
                 var equipmentTypes = new List<EquipmentType>
                 {
-                    new EquipmentType { Name = "Computador" },
-                    new EquipmentType { Name = "Impressora" },
-                    new EquipmentType { Name = "Projetor" },
-                    new EquipmentType { Name = "Monitor" },
-                    new EquipmentType { Name = "Teclado" },
-                    new EquipmentType { Name = "Mouse" },
-                    new EquipmentType { Name = "Roteador" },
-                    new EquipmentType { Name = "Scanner" },
-                    new EquipmentType { Name = "Tablet" },
-                    new EquipmentType { Name = "Smartphone" },
-                    new EquipmentType { Name = "Câmera Digital" },
-                    new EquipmentType { Name = "Videoconferência" },
-                    new EquipmentType { Name = "Ar Condicionado" },
-                    new EquipmentType { Name = "Microfone" },
-                    new EquipmentType { Name = "Fone de ouvido" },
-                    new EquipmentType { Name = "Multímetro" },
-                    new EquipmentType { Name = "Câmera de Segurança" },
-                    new EquipmentType { Name = "Projetor 3D" },
-                    new EquipmentType { Name = "Sistemas de Iluminação" },
-                    new EquipmentType { Name = "Câmera 360" },
-                    new EquipmentType { Name = "Leitor de código de barras" },
-                    new EquipmentType { Name = "Impressora 3D" },
-                    new EquipmentType { Name = "Impressora térmica" },
-                    new EquipmentType { Name = "Controle de Acesso" },
-                    new EquipmentType { Name = "Smartwatch" },
-                    new EquipmentType { Name = "Sistema de Som" },
-                    new EquipmentType { Name = "Exaustor" },
-                    new EquipmentType { Name = "Máquina de Cartão" },
-                    new EquipmentType { Name = "Caixa Registradora" }
+                    new EquipmentType { Name = "Monitor de Sinais Vitais" },
+                    new EquipmentType { Name = "Eletrocardiógrafo (ECG)" },
+                    new EquipmentType { Name = "Ventilador Mecânico" },
+                    new EquipmentType { Name = "Bomba de Infusão" },
+                    new EquipmentType { Name = "Desfibrilador" },
+                    new EquipmentType { Name = "Ultrassom" },
+                    new EquipmentType { Name = "Raio-X Digital" },
+                    new EquipmentType { Name = "Tomógrafo" },
+                    new EquipmentType { Name = "Resonância Magnética" },
+                    new EquipmentType { Name = "Oxímetro de Pulso" },
+                    new EquipmentType { Name = "Equipamento de Anestesia" },
+                    new EquipmentType { Name = "Autoclave" },
+                    new EquipmentType { Name = "Centrífuga" },
+                    new EquipmentType { Name = "Microscópio" },
+                    new EquipmentType { Name = "Balança Hospitalar" },
+                    new EquipmentType { Name = "Lâmpada Cirúrgica" },
+                    new EquipmentType { Name = "Mesa Cirúrgica" },
+                    new EquipmentType { Name = "Cadeira de Rodas" },
+                    new EquipmentType { Name = "Esterilizador" },
+                    new EquipmentType { Name = "Incubadora Neonatal" },
+                    new EquipmentType { Name = "Aspirador Cirúrgico" },
+                    new EquipmentType { Name = "Monitor Fetal" },
+                    new EquipmentType { Name = "Equipamento de Hemodiálise" },
+                    new EquipmentType { Name = "Colposcópio" },
+                    new EquipmentType { Name = "Bisturi Elétrico" },
+                    new EquipmentType { Name = "Laringoscópio" },
+                    new EquipmentType { Name = "Câmera Endoscópica" },
+                    new EquipmentType { Name = "Mesa de Exames" },
+                    new EquipmentType { Name = "Negatoscópio" },
+                    new EquipmentType { Name = "Carrinho de Emergência" }
                 };
 
                 dbContext.EquipmentType.AddRange(equipmentTypes);
@@ -118,9 +111,10 @@ namespace HealthWellBeingRoom.Data
             {
                 var equipmentStatuses = new List<EquipmentStatus>
                 {
-                    new EquipmentStatus { Name = "Ativo" },
+                    new EquipmentStatus { Name = "Operacional" },
                     new EquipmentStatus { Name = "Em Manutenção" },
-                    new EquipmentStatus { Name = "Inativo" }
+                    new EquipmentStatus { Name = "Fora de Uso" },
+                    new EquipmentStatus { Name = "Reservado" }
                 };
 
                 dbContext.EquipmentStatus.AddRange(equipmentStatuses);
@@ -136,24 +130,18 @@ namespace HealthWellBeingRoom.Data
                 var roomTypes = Enum.GetValues(typeof(Room.RoomType)).Cast<Room.RoomType>().ToList();
                 var roomStatuses = Enum.GetValues(typeof(Room.RoomStatus)).Cast<Room.RoomStatus>().ToList();
 
-                var rooms = new List<Room>();
-
-                for (int i = 1; i <= 30; i++)
+                var rooms = new List<Room>
                 {
-                    var room = new Room
-                    {
-                        Name = $"Sala {i:000}",  // Nome da sala, ex: Sala 001, Sala 002
-                        RoomsType = roomTypes[i % roomTypes.Count],  // Alterna entre Consultas e Tratamentos
-                        Specialty = (i % 2 == 0) ? "Cardiologia" : "Pediatria",  // Alterna entre especialidades
-                        Capacity = new Random().Next(1, 51),  // Capacidade aleatória entre 1 e 50
-                        Location = $"Bloco {((i - 1) / 5) + 1}",  // Ex: Bloco 1, Bloco 2, ...
-                        OperatingHours = $"08:00 - 18:00",  // Horário fixo de funcionamento
-                        Status = roomStatuses[i % roomStatuses.Count],  // Alterna entre os estados possíveis
-                        Notes = i % 2 == 0 ? "Sala renovada." : "Necessita de manutenção."  // Observações aleatórias
-                    };
-
-                    rooms.Add(room);
-                }
+                    new Room { Name = "UTI 1", RoomsType = roomTypes[0], Specialty = "Cuidados Intensivos", Capacity = 2, Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos críticos." },
+                    new Room { Name = "UTI 2", RoomsType = roomTypes[0], Specialty = "Cuidados Intensivos", Capacity = 2, Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos de suporte vital." },
+                    new Room { Name = "Centro Cirúrgico 1", RoomsType = roomTypes[1], Specialty = "Cirurgia Geral", Capacity = 1, Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[1], Notes = "Cirurgias de média complexidade." },
+                    new Room { Name = "Centro Cirúrgico 2", RoomsType = roomTypes[1], Specialty = "Ortopedia", Capacity = 1, Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Cirurgias ortopédicas." },
+                    new Room { Name = "Sala de Exames 1", RoomsType = roomTypes[1], Specialty = "Radiologia", Capacity = 1, Location = "Bloco C", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Equipamentos de imagem." },
+                    new Room { Name = "Consultório 1", RoomsType = roomTypes[0], Specialty = "Pediatria", Capacity = 1, Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas ambulatoriais." },
+                    new Room { Name = "Consultório 2", RoomsType = roomTypes[0], Specialty = "Cardiologia", Capacity = 1, Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas especializadas." },
+                    new Room { Name = "Laboratório", RoomsType = roomTypes[1], Specialty = "Análises Clínicas", Capacity = 3, Location = "Bloco E", OperatingHours = "07:00 - 19:00", Status = roomStatuses[0], Notes = "Coleta e exames laboratoriais." },
+                    new Room { Name = "Farmácia", RoomsType = roomTypes[1], Specialty = "Controle de Medicamentos", Capacity = 2, Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Armazenamento e dispensação de medicamentos." }
+                };
 
                 dbContext.Room.AddRange(rooms);
                 dbContext.SaveChanges();
@@ -162,22 +150,44 @@ namespace HealthWellBeingRoom.Data
             // verificar se já existem equipamentos
             if (!dbContext.Equipment.Any() && dbContext.Room.Any())
             {
-                var equipment = new List<Equipment>();
-
-                for (int i = 1; i <= 30; i++)
+                var equipment = new List<Equipment>
                 {
-                    equipment.Add(new Equipment
-                    {
-                        Name = $"Equipamento {i}",
-                        Description = $"Descrição do Equipamento {i}",
-                        SerialNumber = $"SN-{i:000}",
-                        PurchaseDate = DateTime.Now.AddMonths(-i),
-                        ManufacturerId = Random.Shared.Next(1, dbContext.Manufacturer.Count()),
-                        EquipmentTypeId = Random.Shared.Next(1, dbContext.EquipmentType.Count()),
-                        EquipmentStatusId = Random.Shared.Next(1, dbContext.EquipmentStatus.Count()),
-                        RoomId = Random.Shared.Next(1, dbContext.Room.Count())
-                    });
-                }
+                    // --- UTI ---
+                    new Equipment { Name = "Monitor Cardíaco GE Dash 4000", Description = "Monitor multiparamétrico para UTI", SerialNumber = "GE4000-UTI01", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 1, EquipmentTypeId = 1, EquipmentStatusId = 1, RoomId = 1 },
+                    new Equipment { Name = "Ventilador Mecânico Dräger Evita XL", Description = "Ventilador pulmonar para suporte respiratório", SerialNumber = "DRG-EVXL-01", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 5, EquipmentTypeId = 3, EquipmentStatusId = 1, RoomId = 1 },
+                    new Equipment { Name = "Bomba de Infusão B. Braun Infusomat Space", Description = "Controle preciso de infusões intravenosas", SerialNumber = "BBR-INF-002", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 13, EquipmentTypeId = 4, EquipmentStatusId = 1, RoomId = 1 },
+                    new Equipment { Name = "Oxímetro de Pulso Mindray PM-60", Description = "Medição de saturação de oxigênio", SerialNumber = "MND-PM60-03", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 4, EquipmentTypeId = 10, EquipmentStatusId = 1, RoomId = 1 },
+                    new Equipment { Name = "Desfibrilador Philips HeartStart XL", Description = "Desfibrilador com monitor ECG integrado", SerialNumber = "PHL-DFB-003", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 3, EquipmentTypeId = 5, EquipmentStatusId = 2, RoomId = 2 },
+
+                    // --- Centro Cirúrgico ---
+                    new Equipment { Name = "Mesa Cirúrgica Stryker 1080", Description = "Mesa ajustável para procedimentos cirúrgicos", SerialNumber = "STR-1080-06", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 16, EquipmentTypeId = 17, EquipmentStatusId = 1, RoomId = 3 },
+                    new Equipment { Name = "Lâmpada Cirúrgica Dräger Polaris 100", Description = "Iluminação cirúrgica com controle de intensidade", SerialNumber = "DRG-PLS100-07", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 5, EquipmentTypeId = 16, EquipmentStatusId = 1, RoomId = 3 },
+                    new Equipment { Name = "Equipamento de Anestesia GE Aespire View", Description = "Sistema completo de anestesia inalatória", SerialNumber = "GE-ASP-08", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 1, EquipmentTypeId = 11, EquipmentStatusId = 1, RoomId = 3 },
+                    new Equipment { Name = "Bisturi Elétrico Valleylab Force FX", Description = "Corte e coagulação durante cirurgias", SerialNumber = "VLY-FX-09", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 15, EquipmentTypeId = 25, EquipmentStatusId = 1, RoomId = 4 },
+                    new Equipment { Name = "Aspirador Cirúrgico Schuco S330A", Description = "Aspiração de fluidos durante procedimentos", SerialNumber = "SCH-S330A-10", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 14, EquipmentTypeId = 21, EquipmentStatusId = 1, RoomId = 4 },
+
+                    // --- Sala de Exames ---
+                    new Equipment { Name = "Ultrassom Mindray DC-70", Description = "Equipamento para exames de imagem", SerialNumber = "MND-DC70-004", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 4, EquipmentTypeId = 6, EquipmentStatusId = 1, RoomId = 5 },
+                    new Equipment { Name = "Raio-X Siemens Multix Fusion", Description = "Sistema de radiografia digital", SerialNumber = "SMN-MULTIX-11", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 2, EquipmentTypeId = 7, EquipmentStatusId = 1, RoomId = 5 },
+                    new Equipment { Name = "Tomógrafo Philips Brilliance 64", Description = "Tomografia computadorizada de alta resolução", SerialNumber = "PHL-BR64-12", PurchaseDate = DateTime.Now.AddYears(-6), ManufacturerId = 3, EquipmentTypeId = 8, EquipmentStatusId = 2, RoomId = 5 },
+                    new Equipment { Name = "Monitor Fetal Edan F3", Description = "Monitorização de batimentos fetais", SerialNumber = "EDN-F3-13", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 18, EquipmentTypeId = 22, EquipmentStatusId = 1, RoomId = 5 },
+
+                    // --- Consultórios ---
+                    new Equipment { Name = "Eletrocardiógrafo Nihon Kohden ECG-1250", Description = "Registro de atividade elétrica cardíaca", SerialNumber = "NHK-ECG1250-14", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 20, EquipmentTypeId = 2, EquipmentStatusId = 1, RoomId = 7 },
+                    new Equipment { Name = "Balança Digital Filizola BP", Description = "Balança hospitalar com estadiômetro", SerialNumber = "FLZ-BP-15", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 10, EquipmentTypeId = 15, EquipmentStatusId = 1, RoomId = 6 },
+                    new Equipment { Name = "Mesa de Exames Arjo Alpha", Description = "Mesa ajustável para consultas clínicas", SerialNumber = "ARJ-ALPHA-16", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 15, EquipmentTypeId = 28, EquipmentStatusId = 1, RoomId = 6 },
+                    new Equipment { Name = "Estetoscópio Littmann Classic III", Description = "Auscultação cardíaca e pulmonar", SerialNumber = "LTT-CL3-17", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 14, EquipmentTypeId = 1, EquipmentStatusId = 1, RoomId = 7 },
+
+                    // --- Laboratório ---
+                    new Equipment { Name = "Centrífuga Fanem 206BL", Description = "Centrifugação de amostras biológicas", SerialNumber = "FNM-206-006", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 9, EquipmentTypeId = 13, EquipmentStatusId = 1, RoomId = 8 },
+                    new Equipment { Name = "Microscópio Olympus CX23", Description = "Análise microscópica de lâminas", SerialNumber = "OLY-CX23-007", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 8, EquipmentTypeId = 14, EquipmentStatusId = 1, RoomId = 8 },
+                    new Equipment { Name = "Autoclave Phoenix 200L", Description = "Esterilização de materiais hospitalares", SerialNumber = "PHX-200-005", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 10, EquipmentTypeId = 12, EquipmentStatusId = 1, RoomId = 8 },
+                    new Equipment { Name = "Esterilizador Cristófoli Vitale 12L", Description = "Esterilização rápida de instrumentos", SerialNumber = "CST-V12-19", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 14, EquipmentTypeId = 19, EquipmentStatusId = 1, RoomId = 8 },
+
+                    // --- Farmácia ---
+                    new Equipment { Name = "Refrigerador Científico Consul BioCool", Description = "Armazenamento de vacinas e reagentes", SerialNumber = "CNS-BCOOL-20", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 12, EquipmentTypeId = 27, EquipmentStatusId = 1, RoomId = 9 },
+                    new Equipment { Name = "Sistema de Controle de Temperatura Elitech RCW-800", Description = "Monitoramento contínuo de temperatura", SerialNumber = "ELT-RCW800-21", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 19, EquipmentTypeId = 29, EquipmentStatusId = 1, RoomId = 9 }
+                };
 
                 dbContext.Equipment.AddRange(equipment);
                 dbContext.SaveChanges();
@@ -200,12 +210,12 @@ namespace HealthWellBeingRoom.Data
                 new LocalizacaoDispMovel_temporario {MedicalDeviceID = 7, RoomId = 7, IsCurrent = true},
                 new LocalizacaoDispMovel_temporario {MedicalDeviceID = 8, RoomId = 8, IsCurrent = true},
                 new LocalizacaoDispMovel_temporario {MedicalDeviceID = 9, RoomId = 9, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 10, RoomId = 10, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 11, RoomId = 11, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 12, RoomId = 12, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 13, RoomId = 13, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 14, RoomId = 14, IsCurrent = true},
-                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 15, RoomId = 15, IsCurrent = true}
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 10, RoomId = 4, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 11, RoomId = 5, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 12, RoomId = 6, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 13, RoomId = 1, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 14, RoomId = 2, IsCurrent = true},
+                new LocalizacaoDispMovel_temporario {MedicalDeviceID = 15, RoomId = 3, IsCurrent = true}
             });
 
             dbContext.SaveChanges();
