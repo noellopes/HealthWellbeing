@@ -50,8 +50,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: TipoServico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
@@ -60,9 +58,8 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(tipoServico);
                 await _context.SaveChangesAsync();
-<<<<<<< HEAD
-                return RedirectToAction(nameof(Index));
-=======
+
+                // Redireciona para os detalhes com mensagem de sucesso
                 return RedirectToAction(nameof(Details),
                     new
                     {
@@ -70,7 +67,6 @@ namespace HealthWellbeing.Controllers
                         successMessage = "Tipo de Serviço criado com sucesso!"
                     }
                 );
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
             }
             return View(tipoServico);
         }
@@ -92,8 +88,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: TipoServico/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
@@ -121,18 +115,15 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-<<<<<<< HEAD
-                return RedirectToAction(nameof(Index));
-=======
+
+                // Redireciona para os detalhes com mensagem de sucesso
                 return RedirectToAction(nameof(Details),
                      new
                      {
                          id = tipoServico.TipoServicoId,
-                         successMessage = "Tipo de Serviço aletrado com sucesso!"
+                         successMessage = "Tipo de Serviço alterado com sucesso!"
                      }
                 );
-            
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
             }
             return View(tipoServico);
         }
@@ -167,18 +158,14 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
-<<<<<<< HEAD
-            return RedirectToAction(nameof(Index));
-=======
+
+            // Redireciona para o Index com mensagem de sucesso
             return RedirectToAction(nameof(Index),
                  new
                  {
-                     
                      successMessage = "Tipo de Serviço eliminado com sucesso!"
                  }
             );
-        
->>>>>>> d18072c14a75f06e8de0b1dcbc41f0e0f1c2fc2c
         }
 
         private bool TipoServicoExists(int id)
