@@ -1,0 +1,55 @@
+﻿@using HealthWellbeing.Models
+@model LocationMedDevice
+
+@{
+    ViewData["Title"] = "Confirmar Eliminação";
+}
+
+<h1 class="mb-4 text-danger">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Atenção: Eliminação Irreversível
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <p class="lead text-muted">
+            Tem a certeza que deseja eliminar o registo da localização deste dispositivo médico?
+            Esta ação é <strong>irreversível</strong>.
+        </p>
+
+        <dl class="row mb-0 mt-4">
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.LocationMedDeviceID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.LocationMedDeviceID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.MedicalDeviceID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RoomID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.RoomID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.InitialDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.InitialDate)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.EndDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndDate)</dd>
+        </dl>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end gap-2">
+        <form asp-action="Delete" method="post">
+            <input type="hidden" name="id" value="@Model.LocationMedDeviceID" />
+
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash me-1"></i> Sim, eliminar
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+            </a>
+        </form>
+    </div>
+</div>

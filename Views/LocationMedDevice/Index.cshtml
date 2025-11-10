@@ -1,0 +1,84 @@
+﻿@using HealthWellbeing.Models
+@model IEnumerable<LocationMedDevice>
+
+@{
+    ViewData["Title"] = "Localizações de Dispositivos Médicos";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Nenhuma Localização Encontrada</h4>
+            <p>Não há localizações de dispositivos médicos registadas na base de dados.</p>
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Registar Nova Localização
+    </a>
+
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
+    </a>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4">Lista de Localizações</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Registar Nova
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">@Html.DisplayNameFor(model => model.MedicalDeviceID)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.RoomID)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.InitialDate)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.EndDate)</th>
+                    <th class="text-end" scope="col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var loc in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => loc.MedicalDeviceID)</td>
+                        <td>@Html.DisplayFor(modelItem => loc.RoomID)</td>
+                        <td>@loc.InitialDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (loc.EndDate.HasValue)
+                            {
+                                @loc.EndDate?.ToString("dd/MM/yyyy")
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@loc.LocationMedDeviceID" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+
+                            <a asp-action="Details" asp-route-id="@loc.LocationMedDeviceID" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Detalhes
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@loc.LocationMedDeviceID" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

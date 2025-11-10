@@ -267,5 +267,175 @@ namespace HealthWellBeingRoom.Data
 
             dbContext.SaveChanges();
         }
+        private static void PopulateLocationMedDevices(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.LocationMedDevice.Any()) return;
+
+            dbContext.LocationMedDevice.AddRange(new List<LocationMedDevice>()
+            {
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 1,
+                    RoomID = 101,
+                    InitialDate = DateTime.Now.AddMonths(-3),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 2,
+                    RoomID = 104,
+                    InitialDate = DateTime.Now.AddMonths(-2),
+                    EndDate = DateTime.Now.AddDays(-10)
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 3,
+                    RoomID = 203,
+                    InitialDate = DateTime.Now.AddMonths(-1),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 4,
+                    RoomID = 205,
+                    InitialDate = DateTime.Now.AddDays(-45),
+                    EndDate = DateTime.Now.AddDays(-5)
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 5,
+                    RoomID = 210,
+                    InitialDate = DateTime.Now.AddDays(-30),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 6,
+                    RoomID = 110,
+                    InitialDate = DateTime.Now.AddDays(-20),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 7,
+                    RoomID = 111,
+                    InitialDate = DateTime.Now.AddDays(-15),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 8,
+                    RoomID = 220,
+                    InitialDate = DateTime.Now.AddDays(-10),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 9,
+                    RoomID = 301,
+                    InitialDate = DateTime.Now.AddDays(-8),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 10,
+                    RoomID = 302,
+                    InitialDate = DateTime.Now.AddDays(-6),
+                    EndDate = DateTime.Now.AddDays(-1)
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 11,
+                    RoomID = 105,
+                    InitialDate = DateTime.Now.AddDays(-4),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 12,
+                    RoomID = 106,
+                    InitialDate = DateTime.Now.AddDays(-3),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 13,
+                    RoomID = 115,
+                    InitialDate = DateTime.Now.AddDays(-2),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 14,
+                    RoomID = 120,
+                    InitialDate = DateTime.Now.AddDays(-1),
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 15,
+                    RoomID = 305,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 16,
+                    RoomID = 307,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 17,
+                    RoomID = 310,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 18,
+                    RoomID = 401,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 19,
+                    RoomID = 405,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 20,
+                    RoomID = 410,
+                    InitialDate = DateTime.Now,
+                    EndDate = null
+                }
+                });
+
+                dbContext.SaveChanges();
+        }
+
     }
 }

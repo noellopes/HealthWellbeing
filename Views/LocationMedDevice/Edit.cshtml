@@ -1,0 +1,75 @@
+﻿@using HealthWellbeing.Models
+@model LocationMedDevice
+
+@{
+    // Título dinâmico, mostrando qual localização está a ser editada
+    ViewData["Title"] = "Editar Localização do Dispositivo Médico";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Editar Dados da Localização
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <input type="hidden" asp-for="LocationMedDeviceID" />
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="MedicalDeviceID" class="form-label fw-bold">ID do Dispositivo Médico</label>
+                        <input asp-for="MedicalDeviceID" class="form-control">
+                        <span asp-validation-for="MedicalDeviceID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="RoomID" class="form-label fw-bold">ID da Sala</label>
+                        <input asp-for="RoomID" class="form-control">
+                        <span asp-validation-for="RoomID" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="InitialDate" class="form-label fw-bold">Data de Início</label>
+                        <input asp-for="InitialDate" type="date" class="form-control">
+                        <span asp-validation-for="InitialDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EndDate" class="form-label fw-bold">Data de Fim</label>
+                        <input asp-for="EndDate" type="date" class="form-control">
+                        <span asp-validation-for="EndDate" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-save me-1"></i> Salvar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

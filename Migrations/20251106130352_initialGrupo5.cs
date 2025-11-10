@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initialGrupo5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -52,22 +52,19 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LocationMaterial",
+                name: "LocationMedDevice",
                 columns: table => new
                 {
-                    LocationMaterialID = table.Column<int>(type: "int", nullable: false)
+                    LocationMedDeviceID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Sector = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Room = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Cabinet = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Drawer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Shelf = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IdentificationCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Observation = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    MedicalDeviceID = table.Column<int>(type: "int", nullable: false),
+                    RoomID = table.Column<int>(type: "int", nullable: false),
+                    InitialDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LocationMaterial", x => x.LocationMaterialID);
+                    table.PrimaryKey("PK_LocationMedDevice", x => x.LocationMedDeviceID);
                 });
 
             migrationBuilder.CreateTable(
@@ -311,7 +308,7 @@ namespace HealthWellbeingRoom.Migrations
                 name: "Equipment");
 
             migrationBuilder.DropTable(
-                name: "LocationMaterial");
+                name: "LocationMedDevice");
 
             migrationBuilder.DropTable(
                 name: "MedicalDevices");

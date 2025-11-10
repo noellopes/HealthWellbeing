@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251106002048_Initial")]
-    partial class Initial
+    [Migration("20251110112239_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,51 +124,29 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("CategoriaAlimento");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.LocationMaterial", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
                 {
-                    b.Property<int>("LocationMaterialID")
+                    b.Property<int>("LocationMedDeviceID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationMaterialID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationMedDeviceID"));
 
-                    b.Property<string>("Cabinet")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Drawer")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime>("InitialDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("IdentificationCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("MedicalDeviceID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Observation")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("RoomID")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Room")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.HasKey("LocationMedDeviceID");
 
-                    b.Property<string>("Sector")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Shelf")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("LocationMaterialID");
-
-                    b.ToTable("LocationMaterial");
+                    b.ToTable("LocationMedDevice");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
