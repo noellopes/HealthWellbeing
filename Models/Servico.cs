@@ -30,9 +30,6 @@ namespace HealthWellbeing.Models
         [DisplayName("Duração(minutos)")]
         public int DuracaoMinutos { get; set; }
 
-        
-        public int? TipoServicoId { get; set; }
-
        [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
         [DisplayName("Tipo de Serviço")]
         public int TipoServicoId { get; set; }
