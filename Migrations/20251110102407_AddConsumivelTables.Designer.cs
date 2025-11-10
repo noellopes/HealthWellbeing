@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251030181028_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251110102407_AddConsumivelTables")]
+    partial class AddConsumivelTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -145,6 +145,43 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("CategoriaAlimento");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ConsumivelFornecedor", b =>
+                {
+                    b.Property<int>("FornecedorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FornecedorId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Morada")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NIF")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("NomeEmpresa")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
+                    b.HasKey("FornecedorId");
+
+                    b.ToTable("ConsumivelFornecedor");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
                 {
                     b.Property<int>("ReceitaId")
@@ -224,6 +261,39 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RestricaoAlimentar");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.ZonaArmazenamento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("CapacidadeMaxima")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Localizacao")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ZonaArmazenamento");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>

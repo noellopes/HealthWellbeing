@@ -5,7 +5,7 @@
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddConsumivelTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,6 +22,20 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CategoriaAlimento", x => x.CategoriaID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoriaConsumivel",
+                columns: table => new
+                {
+                    CategoriaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoriaConsumivel", x => x.CategoriaId);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,6 +93,23 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RestricaoAlimentar", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ZonaArmazenamento",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Localizacao = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    CapacidadeMaxima = table.Column<double>(type: "float", nullable: false),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ZonaArmazenamento", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,6 +178,9 @@ namespace HealthWellbeing.Migrations
                 name: "Alergia");
 
             migrationBuilder.DropTable(
+                name: "CategoriaConsumivel");
+
+            migrationBuilder.DropTable(
                 name: "ConsumivelFornecedor");
 
             migrationBuilder.DropTable(
@@ -154,6 +188,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
+
+            migrationBuilder.DropTable(
+                name: "ZonaArmazenamento");
 
             migrationBuilder.DropTable(
                 name: "Alimento");

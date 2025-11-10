@@ -18,5 +18,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
+        public DbSet<CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
+        public DbSet<ConsumivelFornecedor> ConsumivelFornecedor { get; set; } = default!;
+
     }
 }
