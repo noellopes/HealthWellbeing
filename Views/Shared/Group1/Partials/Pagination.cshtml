@@ -1,0 +1,37 @@
+﻿@using HealthWellbeing.Utils.Group1.Models
+@model PaginationProps
+
+@{
+    /*
+    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+    * DON'T MODIFY, Instead you can copy into your own folder
+    */
+
+    var prevDisabled = @Model.PrevDisabled ? "disabled" : "";
+    var nextDisabled = @Model.NextDisabled ? "disabled" : "";
+}
+
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item @prevDisabled">
+            <a class="page-link" asp-action="Index"
+               asp-route-sortOrder="@ViewBag.CurrentSort"
+               asp-route-searchBy="@ViewBag.CurrentSearchBy"
+               asp-route-searchString="@ViewBag.CurrentSearchString"
+               asp-route-pageNumber="@(@Model.PageIndex - 1)"
+               aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item @nextDisabled">
+            <a class="page-link" asp-action="Index"
+               asp-route-sortOrder="@ViewBag.CurrentSort"
+               asp-route-searchBy="@ViewBag.CurrentSearchBy"
+               asp-route-searchString="@ViewBag.CurrentSearchString"
+               asp-route-pageNumber="@(@Model.PageIndex + 1)"
+               aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

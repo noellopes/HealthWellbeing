@@ -41,8 +41,8 @@ else
                 <dl class="row">
                     @foreach (var prop in properties)
                     {
-                        <dt>@HealthWellbeing.Views.Shared.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</dt>
-                        <dd>@HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(Model, prop)</dd>
+                        <dt>@HealthWellbeing.Utils.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</dt>
+                        <dd>@HealthWellbeing.Utils.Group1.Functions.GetNestedPropertyValue(Model, prop)</dd>
                     }
                 </dl>
             </div>

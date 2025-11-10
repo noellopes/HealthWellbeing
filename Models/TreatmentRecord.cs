@@ -22,6 +22,7 @@ namespace HealthWellbeing.Models
         public int NurseId { get; set; }
 
         [ForeignKey(nameof(NurseId))]
+        [Display(Name = "Responsible Nurse")]
         public Nurse? Nurse { get; set; }
 
         // Treatment Type
@@ -30,6 +31,7 @@ namespace HealthWellbeing.Models
         public int TreatmentId { get; set; }
 
         [ForeignKey(nameof(TreatmentId))]
+        [Display(Name = "Treatment Type")]
         public TreatmentType? TreatmentType { get; set; }
 
         // Associated pathology (optional)
@@ -64,7 +66,7 @@ namespace HealthWellbeing.Models
         public TreatmentStatus Status { get; set; } = TreatmentStatus.Scheduled;
 
         // Record creation date
-        [Display(Name = "Record Date")]
+        [Display(Name = "Submission Date")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
@@ -82,4 +84,5 @@ namespace HealthWellbeing.Models
         [Display(Name = "Canceled / Aborted")]
         Canceled
     }
+
 }

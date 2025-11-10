@@ -6,7 +6,7 @@
     * DON'T MODIFY, Instead you can copy into your own folder
     */
 
-    var alertType = HealthWellbeing.Views.Shared.Group1.Functions.ValidateAlertType(Model?.Item1?.ToLower() ?? "info");
+    var alertType = HealthWellbeing.Utils.Group1.Functions.ValidateAlertType(Model?.Item1?.ToLower() ?? "info");
     var iconClass = Model?.Item2 ?? "";
     var message = Model?.Item3 ?? "";
 }

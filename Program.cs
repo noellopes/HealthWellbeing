@@ -1,4 +1,7 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +19,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// GROUP 1 - Filtering Service (Sort/Search)
+builder.Services.AddScoped<IRecordFilterService<TreatmentRecord>, TreatmentRecordFilterService>();
 
 var app = builder.Build();
 
@@ -37,7 +43,6 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<HealthWellbeingDbContext>();
     context.Database.Migrate();
     SeedData.Populate(context);
-
 }
 
 app.UseHttpsRedirection();

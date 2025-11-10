@@ -1,4 +1,5 @@
-﻿@model IEnumerable<dynamic>
+﻿@using HealthWellbeing.Utils.Group1.Models
+@model PaginatedList<TreatmentRecord>
 
 @{
     /*
@@ -11,7 +12,6 @@
     var properties = ViewBag.Properties as List<string>;
     var noConfig = modelType == null || properties == null || properties.Count == 0;
     var noData = Model == null || !Model.Any();
-    var _AlertPartial = "Group1/Partials/Alert";
 
     var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
     var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No records found.");
@@ -19,26 +19,27 @@
     if (TempData["Message"] != null)
     {
         var alertModel = Tuple.Create(TempData["AlertType"]?.ToString() ?? "info", TempData["IconClass"]?.ToString() ?? "", TempData["Message"]?.ToString() ?? "");
-        <partial name="@_AlertPartial" model="alertModel" />
+        <partial name="Group1/Partials/Alert" model="alertModel" />
     }
+
 }
 
 <h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
 
 @if (noConfig)
 {
-    <partial name="@_AlertPartial" model="configAlertModel" />
+    <partial name="Group1/Partials/Alert" model="configAlertModel" />
 }
 else
 {
     <div class="mb-3">
         <a asp-action="Create" class="btn btn-success rounded-2"><i class="fas fa-plus"></i> Criar</a>
     </div>
-
+    <partial name="Group1/Partials/Search" />
     <div class="table-responsive">
         @if (noData)
         {
-            <partial name="@_AlertPartial" model="noDataAlertModel" />
+            <partial name="Group1/Partials/Alert" model="noDataAlertModel" />
         }
         else
         {
@@ -47,7 +48,46 @@ else
                     <tr>
                         @foreach (var prop in properties)
                         {
-                            <th>@HealthWellbeing.Views.Shared.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</th>
+                            var currentSort = ViewData["CurrentSort"]?.ToString() ?? "";
+                            string sortOrder;
+
+                            if (currentSort == prop)
+                            {
+                                sortOrder = prop + "_desc";
+                            }
+                            else if (currentSort == prop + "_desc")
+                            {
+                                sortOrder = "";
+                            }
+                            else
+                            {
+                                sortOrder = prop;
+                            }
+
+                            var isActiveSort = (currentSort == prop || currentSort == prop + "_desc");
+                            var isDescending = currentSort.EndsWith("_desc");
+
+                            <th>
+                                <a asp-action="Index"
+                                   asp-route-sortOrder="@sortOrder"
+                                   asp-route-searchBy="@ViewData["CurrentSearchBy"]"
+                                   asp-route-searchString="@ViewData["CurrentSearchString"]"
+                                   asp-route-pageNumber="@ViewData["CurrentPage"]"
+                                   style="@(!isActiveSort ? "color: black !important" : "color: blue !important")">
+                                    @HealthWellbeing.Utils.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])
+                                    @if (isActiveSort)
+                                    {
+                                        if (isDescending)
+                                        {
+                                            <span class="ml-1">&#x25BC;</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="ml-1">&#x25B2;</span>
+                                        }
+                                    }
+                                </a>
+                            </th>
                         }
                         <th>Actions</th>
                     </tr>
@@ -58,7 +98,7 @@ else
                         <tr>
                             @foreach (var prop in properties)
                             {
-                                <td>@HealthWellbeing.Views.Shared.Group1.Functions.GetNestedPropertyValue(item, prop)</td>
+                                <td>@HealthWellbeing.Utils.Group1.Functions.GetNestedPropertyValue(item, prop)</td>
                             }
                             <td class="actions">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-2">Detalhes</a>
@@ -69,4 +109,12 @@ else
             </table>
         }
     </div>
+    @if (Model.TotalPages > 1)
+    {
+        <partial name="Group1/Partials/Pagination" model="new PaginationProps {
+            PageIndex = Model?.PageIndex ?? 1,
+            PrevDisabled = !Model.HasPreviousPage,
+            NextDisabled = !Model.HasNextPage,
+        }" />
+    }
 }

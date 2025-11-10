@@ -1,0 +1,28 @@
+﻿@{
+    /*
+    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+    * DON'T MODIFY, Instead you can copy into your own folder
+    */
+
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.SearchProperties as List<string>;
+}
+
+<form class="form-inline my-2 my-lg-2" method="get" asp-action="Index">
+    <div class="input-group">
+        <select class="form-select" name="SearchBy" aria-label="Search by" required>
+            <option value="" disabled>Search by...</option>
+            @foreach (var option in properties)
+            {
+                var selected = (ViewBag.CurrentSearchBy as string) == option ? true : false;
+                <option value="@option" selected="@selected">@HealthWellbeing.Utils.Group1.Functions.GetDisplayName(modelType, option.Split('.')[0])</option>
+            }
+        </select>
+        <input class="form-control" type="search" placeholder="Search" name="SearchString" value="@ViewBag.CurrentSearchString" aria-label="Search" required />
+        <div class="input-group-append">
+            <button class="btn btn-outline-primary" type="submit">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
