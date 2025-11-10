@@ -41,42 +41,23 @@ namespace HealthWellbeing.Data {
             dbContext.SaveChanges();
         }
 
-        private static void PopulateEvents(HealthWellbeingDbContext dbContext) {
+        private static void PopulateEvents(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.Event.Any()) return;
 
             dbContext.Event.AddRange(new List<Event>() {
-                new Event
-                {
-                    EventName = "Treino de Cardio Matinal",
-                    EventDescription = "Sessão de corrida leve e alongamentos para começar o dia com energia.",
-                    EventType = "Cardio",
-                    DurationMinutes = 45,
-                    Intensity = "Média",
-
-                    EventDate = new DateTime(2025, 10, 10)
-                },
-                new Event
-                {
-                    EventName = "Aula de Pilates",
-                    EventDescription = "Treino focado em postura e flexibilidade.",
-                    EventType = "Pilates",
-                    DurationMinutes = 60,
-                    Intensity = "Baixa",
-
-                    EventDate = new DateTime(2025, 10, 8)
-                },
-                new Event
-                {
-                    EventName = "Treino Funcional",
-                    EventDescription = "Exercícios para força e coordenação geral.",
-                    EventType = "Funcional",
-                    DurationMinutes = 50,
-                    Intensity = "Alta",
-
-                    EventDate = new DateTime(2025, 10, 5)
-                }
+                new Event { EventName = "Treino de Cardio Matinal", EventDescription = "Sessão de corrida leve e alongamentos para começar o dia com energia.", EventType = "Cardio", DurationMinutes = 45, Intensity = "Média", EventDate = new DateTime(2025, 10, 10) },
+                new Event { EventName = "Aula de Pilates", EventDescription = "Treino focado em postura e flexibilidade.", EventType = "Pilates", DurationMinutes = 60, Intensity = "Baixa", EventDate = new DateTime(2025, 10, 8) },
+                new Event { EventName = "Treino Funcional", EventDescription = "Exercícios para força e coordenação geral.", EventType = "Funcional", DurationMinutes = 50, Intensity = "Alta", EventDate = new DateTime(2025, 10, 5) },
+                new Event { EventName = "Aula de Spinning", EventDescription = "Pedaladas intensas para melhorar resistência e queimar calorias.", EventType = "Spinning", DurationMinutes = 55, Intensity = "Alta", EventDate = new DateTime(2025, 10, 12) },
+                new Event { EventName = "Treino Vespertino", EventDescription = "Sessão rápida para manter a forma depois do trabalho.", EventType = "Cardio", DurationMinutes = 30, Intensity = "Média", EventDate = new DateTime(2025, 10, 11) },
+                new Event { EventName = "Zumba Energética", EventDescription = "Aula animada de dança para liberar endorfinas e tonificar o corpo.", EventType = "Zumba", DurationMinutes = 50, Intensity = "Alta", EventDate = new DateTime(2025, 10, 13) },
+                new Event { EventName = "Pilates Core", EventDescription = "Foco no fortalecimento do core e melhoria da postura.", EventType = "Pilates", DurationMinutes = 45, Intensity = "Média", EventDate = new DateTime(2025, 10, 14) },
+                new Event { EventName = "Treino Funcional Matinal", EventDescription = "Atividades funcionais para começar o dia com energia.", EventType = "Funcional", DurationMinutes = 40, Intensity = "Média", EventDate = new DateTime(2025, 10, 15) },
+                new Event { EventName = "Spinning Intenso", EventDescription = "Pedaladas de alta intensidade para desafiar o corpo.", EventType = "Spinning", DurationMinutes = 60, Intensity = "Alta", EventDate = new DateTime(2025, 10, 16) },
+                new Event { EventName = "Cardio Mix", EventDescription = "Combinação de exercícios cardiovasculares variados.", EventType = "Cardio", DurationMinutes = 50, Intensity = "Média", EventDate = new DateTime(2025, 10, 17) }
             });
-        
+
             dbContext.SaveChanges();
         }
     }
