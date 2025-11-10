@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251103110802_InitialEvents")]
-    partial class InitialEvents
+    [Migration("20251110182518_UpdateMigration")]
+    partial class UpdateMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,39 @@ namespace HealthWellbeing.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("HealthWellbeing.Models.Activity_", b =>
+                {
+                    b.Property<int>("Activity_Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Activity_Id"));
+
+                    b.Property<string>("Activity_Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Activity_Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Activity_Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("NumberReps")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NumberSets")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Weigth")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Activity_Id");
+
+                    b.ToTable("Activity");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
                     b.Property<int>("EventId")
@@ -32,9 +65,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
-
-                    b.Property<int>("CaloriesBurned")
-                        .HasColumnType("int");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("int");
@@ -44,23 +74,27 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("EventDescription")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("EventName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("EventType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Intensity")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("EventId");
 
-                    b.ToTable("Events");
+                    b.ToTable("Event");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
@@ -84,7 +118,7 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("EventType");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Levels", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Level", b =>
                 {
                     b.Property<int>("LevelId")
                         .ValueGeneratedOnAdd()
@@ -96,33 +130,16 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Level")
-                        .HasColumnType("int");
-
                     b.Property<string>("LevelCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("LevelsLevelId")
+                    b.Property<int>("LevelNumber")
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");
 
-                    b.HasIndex("LevelsLevelId");
-
                     b.ToTable("Levels");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Levels", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Levels", null)
-                        .WithMany("levels")
-                        .HasForeignKey("LevelsLevelId");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Levels", b =>
-                {
-                    b.Navigation("levels");
                 });
 #pragma warning restore 612, 618
         }

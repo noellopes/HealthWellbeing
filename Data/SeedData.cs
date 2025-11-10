@@ -1,7 +1,7 @@
-﻿using HealthWellbeing.Data;
+﻿using HealthWellbeing.Models;
 
-namespace HealthWellbeing.Models {
-    internal class EventTypeSeedData {
+namespace HealthWellbeing.Data {
+    internal class SeedData {
 
         internal static void Populate(HealthWellbeingDbContext? dbContext) {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
@@ -9,6 +9,7 @@ namespace HealthWellbeing.Models {
             dbContext.Database.EnsureCreated();
 
             PopulateEventTypes(dbContext);
+            PopulateEvents(dbContext);
         }
 
         private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
@@ -37,6 +38,45 @@ namespace HealthWellbeing.Models {
                 }
             });
 
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateEvents(HealthWellbeingDbContext dbContext) {
+            if (dbContext.Event.Any()) return;
+
+            dbContext.Event.AddRange(new List<Event>() {
+                new Event
+                {
+                    EventName = "Treino de Cardio Matinal",
+                    EventDescription = "Sessão de corrida leve e alongamentos para começar o dia com energia.",
+                    EventType = "Cardio",
+                    DurationMinutes = 45,
+                    Intensity = "Média",
+
+                    EventDate = new DateTime(2025, 10, 10)
+                },
+                new Event
+                {
+                    EventName = "Aula de Pilates",
+                    EventDescription = "Treino focado em postura e flexibilidade.",
+                    EventType = "Pilates",
+                    DurationMinutes = 60,
+                    Intensity = "Baixa",
+
+                    EventDate = new DateTime(2025, 10, 8)
+                },
+                new Event
+                {
+                    EventName = "Treino Funcional",
+                    EventDescription = "Exercícios para força e coordenação geral.",
+                    EventType = "Funcional",
+                    DurationMinutes = 50,
+                    Intensity = "Alta",
+
+                    EventDate = new DateTime(2025, 10, 5)
+                }
+            });
+        
             dbContext.SaveChanges();
         }
     }

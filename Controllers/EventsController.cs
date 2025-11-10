@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
 
-            var events = from e in _context.Events select e;
+            var events = from e in _context.Event select e;
 
             // Filtra por nome
             if (!string.IsNullOrEmpty(searchName))
@@ -49,7 +49,7 @@ namespace HealthWellbeing.Controllers
             if (id == null)
                 return View("InvalidEvent");
 
-            var @event = await _context.Events.FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Event.FirstOrDefaultAsync(m => m.EventId == id);
             if (@event == null)
                 return View("InvalidEvent");
 
@@ -83,7 +83,7 @@ namespace HealthWellbeing.Controllers
             if (id == null)
                 return View("InvalidEvent");
 
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await _context.Event.FindAsync(id);
             if (@event == null)
                 return View("InvalidEvent");
 
@@ -124,7 +124,7 @@ namespace HealthWellbeing.Controllers
             if (id == null)
                 return View("InvalidEvent");
 
-            var @event = await _context.Events.FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Event.FirstOrDefaultAsync(m => m.EventId == id);
             if (@event == null)
                 return View("InvalidEvent");
 
@@ -136,11 +136,11 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var @event = await _context.Event.FindAsync(id);
             if (@event == null)
                 return View("InvalidEvent");
 
-            _context.Events.Remove(@event);
+            _context.Event.Remove(@event);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Event deleted successfully!";
             return RedirectToAction(nameof(Index));
@@ -148,7 +148,7 @@ namespace HealthWellbeing.Controllers
 
         private bool EventExists(int id)
         {
-            return _context.Events.Any(e => e.EventId == id);
+            return _context.Event.Any(e => e.EventId == id);
         }
     }
 }

@@ -1,5 +1,4 @@
 using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +31,7 @@ if (!app.Environment.IsDevelopment()) {
 else {
     using (var serviceScope = app.Services.CreateScope()) {
         var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        EventTypeSeedData.Populate(dbContext);
+        SeedData.Populate(dbContext);
     }
 }
 
