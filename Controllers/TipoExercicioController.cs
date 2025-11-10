@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,11 +21,50 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TipoExercicio
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    int page = 1,
+    string searchNome = "",
+    string searchDescricao = "",
+    string searchBeneficio = "")
         {
-            return View(await _context.TipoExercicio
-                .Include(t => t.Beneficios) // ✅ ADICIONADO: Carrega benefícios para a listagem
-                .ToListAsync());
+            var query = _context.TipoExercicio
+                .Include(t => t.Beneficios)
+                .AsQueryable();
+
+            // 🔍 Filtragem por Nome
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                query = query.Where(t => t.NomeTipoExercicios.Contains(searchNome));
+            }
+
+            // 🔍 Filtragem por Descrição
+            if (!string.IsNullOrEmpty(searchDescricao))
+            {
+                query = query.Where(t => t.DescricaoTipoExercicios.Contains(searchDescricao));
+            }
+
+            // 🔍 Filtragem por Benefício
+            if (!string.IsNullOrEmpty(searchBeneficio))
+            {
+                query = query.Where(t => t.Beneficios.Any(b => b.NomeBeneficio.Contains(searchBeneficio)));
+            }
+
+            // Guardar os valores de pesquisa para a view
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchDescricao = searchDescricao;
+            ViewBag.SearchBeneficio = searchBeneficio;
+
+            // Paginação
+            int total = await query.CountAsync();
+            var pagination = new PaginationInfoExercicios<TipoExercicio>(page, total);
+
+            pagination.Items = await query
+                .OrderBy(t => t.NomeTipoExercicios)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            return View(pagination);
         }
 
         // GET: TipoExercicio/Details/5
