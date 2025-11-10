@@ -1,7 +1,7 @@
 ﻿@model HealthWellbeing.Models.AlimentoSubstituto
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes";
 }
 
 @if (TempData["AlertMessage"] != null)
@@ -12,51 +12,64 @@
     </div>
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>AlimentoSubstituto</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AlimentoOriginal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AlimentoOriginal.AlimentoId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AlimentoSubstitutoRef)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AlimentoSubstitutoRef.AlimentoId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Motivo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Motivo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProporcaoEquivalente)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProporcaoEquivalente)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacoes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacoes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FatorSimilaridade)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FatorSimilaridade)
-        </dd>
-    </dl>
+<!-- Cabeçalho padronizado -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Detalhes do Alimento Substituto</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AlimentoSubstitutoId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Informações</h5>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Alimento Original</dt>
+                    <dd class="col-sm-8">
+                        @(Model?.AlimentoOriginal?.Name ?? "-")
+                    </dd>
+
+                    <dt class="col-sm-4">Alimento Substituto</dt>
+                    <dd class="col-sm-8">
+                        @(Model?.AlimentoSubstitutoRef?.Name ?? "-")
+                    </dd>
+
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Motivo)</dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Motivo)
+                    </dd>
+
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ProporcaoEquivalente)</dt>
+                    <dd class="col-sm-8">
+                        @(Model?.ProporcaoEquivalente.HasValue == true
+                                                ? Model.ProporcaoEquivalente.Value.ToString("0.##")
+                                                : "-")
+                    </dd>
+
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Observacoes)</dt>
+                    <dd class="col-sm-8">
+                        @Html.DisplayFor(model => model.Observacoes)
+                    </dd>
+
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.FatorSimilaridade)</dt>
+                    <dd class="col-sm-8">
+                        @(Model?.FatorSimilaridade.HasValue == true
+                                                ? string.Format("{0:P0}", Model.FatorSimilaridade)
+                                                : "-")
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-end">
+                    <a asp-action="Edit" asp-route-id="@Model?.AlimentoSubstitutoId"
+                        class="btn btn-warning me-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@Model?.AlimentoSubstitutoId"
+                        class="btn btn-danger me-2">Apagar</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -1,7 +1,7 @@
 ﻿@model HealthWellbeing.Models.AlimentoSubstituto
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar";
 }
 
 @if (TempData["AlertMessage"] != null)
@@ -12,54 +12,76 @@
     </div>
 }
 
-<h1>Edit</h1>
-
-<h4>AlimentoSubstituto</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AlimentoSubstitutoId" />
-            <div class="form-group">
-                <label asp-for="AlimentoOriginalId" class="control-label"></label>
-                <select asp-for="AlimentoOriginalId" class="form-control" asp-items="ViewBag.AlimentoOriginalId"></select>
-                <span asp-validation-for="AlimentoOriginalId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AlimentoSubstitutoRefId" class="control-label"></label>
-                <select asp-for="AlimentoSubstitutoRefId" class="form-control" asp-items="ViewBag.AlimentoSubstitutoRefId"></select>
-                <span asp-validation-for="AlimentoSubstitutoRefId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Motivo" class="control-label"></label>
-                <input asp-for="Motivo" class="form-control" />
-                <span asp-validation-for="Motivo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProporcaoEquivalente" class="control-label"></label>
-                <input asp-for="ProporcaoEquivalente" class="form-control" />
-                <span asp-validation-for="ProporcaoEquivalente" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observacoes" class="control-label"></label>
-                <input asp-for="Observacoes" class="form-control" />
-                <span asp-validation-for="Observacoes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FatorSimilaridade" class="control-label"></label>
-                <input asp-for="FatorSimilaridade" class="form-control" type="number" step="0.01" min="0" max="1" />
-                <span asp-validation-for="FatorSimilaridade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Editar Alimento Substituto</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="AlimentoSubstitutoId" />
+
+                    <div class="mb-3">
+                        <label asp-for="AlimentoOriginalId" class="form-label"></label>
+                        <select asp-for="AlimentoOriginalId" class="form-select"
+                            asp-items="ViewBag.AlimentoOriginalId"></select>
+                        <span asp-validation-for="AlimentoOriginalId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AlimentoSubstitutoRefId" class="form-label"></label>
+                        <select asp-for="AlimentoSubstitutoRefId" class="form-select"
+                            asp-items="ViewBag.AlimentoSubstitutoRefId"></select>
+                        <span asp-validation-for="AlimentoSubstitutoRefId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Motivo" class="form-label"></label>
+                        <input asp-for="Motivo" class="form-control" />
+                        <span asp-validation-for="Motivo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProporcaoEquivalente" class="form-label"></label>
+                        <div>
+                            <input asp-for="ProporcaoEquivalente" class="form-control" type="number" step="0.01" min="0"
+                                max="10" />
+                        </div>
+                        <span class="text-muted small">Valor absoluto (não é porcentagem). Ex.: 1 = mesma porção</span>
+                        <span asp-validation-for="ProporcaoEquivalente" class="text-danger d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observacoes" class="form-label"></label>
+                        <input asp-for="Observacoes" class="form-control" />
+                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FatorSimilaridade" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="FatorSimilaridade" class="form-control" type="number" step="0.01" min="0"
+                                max="1" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span class="text-muted small">Valor entre 0 e 1 (ex.: 0.75 = 75%)</span>
+                        @* <span asp-validation-for="FatorSimilaridade" class="text-danger"></span> *@
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <input type="submit" value="Salvar" class="btn btn-warning me-2" />
+                        <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
