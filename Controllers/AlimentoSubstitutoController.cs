@@ -20,10 +20,67 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: AlimentoSubstituto
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string originalName, string substitutoName, string factorOp, decimal? factorValue, int? page)
         {
-            var healthWellbeingDbContext = _context.AlimentoSubstitutos.Include(a => a.AlimentoOriginal).Include(a => a.AlimentoSubstitutoRef);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            int pageSize = 10;
+            int pageNumber = page ?? 1;
+
+            // Query ordered so paging is deterministic
+            var query = _context.AlimentoSubstitutos
+                .Include(a => a.AlimentoOriginal)
+                .Include(a => a.AlimentoSubstitutoRef)
+                .OrderBy(a => a.AlimentoSubstitutoId)
+                .AsQueryable();
+
+            // Aplicar filtros de busca (antes da paginação)
+            if (!string.IsNullOrWhiteSpace(originalName))
+            {
+                query = query.Where(a => a.AlimentoOriginal != null && a.AlimentoOriginal.Name.Contains(originalName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(substitutoName))
+            {
+                query = query.Where(a => a.AlimentoSubstitutoRef != null && a.AlimentoSubstitutoRef.Name.Contains(substitutoName));
+            }
+
+            if (factorValue.HasValue)
+            {
+                // factorOp: "gt" (maior que), "eq" (igual), "lt" (menor que)
+                switch (factorOp)
+                {
+                    case "gt":
+                        query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value > (double)factorValue.Value);
+                        break;
+                    case "eq":
+                        // igualdade com tolerância fina
+                        query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value == (double)factorValue.Value);
+                        break;
+                    case "lt":
+                        query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value < (double)factorValue.Value);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            int totalCount = await query.CountAsync();
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+
+            // Preservar valores de busca na View
+            ViewBag.SearchOriginalName = originalName;
+            ViewBag.SearchSubstitutoName = substitutoName;
+            ViewBag.SearchFactorOp = factorOp;
+            ViewBag.SearchFactorValue = factorValue;
+
+            return View(items);
         }
 
         // GET: AlimentoSubstituto/Details/5
