@@ -22,16 +22,43 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchType = "", string searchStatus = "", string searchRoom = "")
         {
-            var myContext = _context.Equipment
+            var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
                 .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
-                .Include(es => es.EquipmentStatus);
+                .Include(es => es.EquipmentStatus)
+                .AsQueryable();
 
-            var equipmentInfo = new RPaginationInfo<Equipment>(page, await myContext.CountAsync());
-            equipmentInfo.Items = await myContext
+
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchType))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.EquipmentType.Name.Contains(searchType));
+            }
+
+            if (!string.IsNullOrEmpty(searchStatus))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.EquipmentStatus.Name.Contains(searchStatus));
+            }
+
+            if (!string.IsNullOrEmpty(searchRoom))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.Room.Name.Contains(searchRoom));
+            }
+
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchType = searchType;
+            ViewBag.SearchStatus = searchStatus;
+            ViewBag.SearchRoom = searchRoom;
+
+            var equipmentInfo = new RPaginationInfo<Equipment>(page, await equipmentQuery.CountAsync());
+            equipmentInfo.Items = await equipmentQuery
                 .OrderBy(e => e.Name)
                 .Skip(equipmentInfo.ItemsToSkip)
                 .Take(equipmentInfo.ItemsPerPage)

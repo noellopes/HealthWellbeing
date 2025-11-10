@@ -41,9 +41,46 @@
 {
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4">Lista de Equipamentos</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Registar Novo
-        </a>
+        <div>
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+                <i class="bi bi-search me-1"></i> Pesquisar
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+            </a>
+        </div>
+    </div>
+
+    <div class="collapse mt-2 mb-2" id="postSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label for="searchName" class="form-label">Nome</label>
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchType" class="form-label">Tipo</label>
+                    <input id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-control" placeholder="Pesquisar pelo tipo" type="search" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchStatus" class="form-label">Estado</label>
+                    <input id="searchStatus" name="searchStatus" value="@ViewBag.SearchStatus" class="form-control" placeholder="Pesquisar pelo estado" type="search" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchRoom" class="form-label">Sala</label>
+                    <input id="searchRoom" name="searchRoom" value="@ViewBag.SearchRoom" class="form-control" placeholder="Pesquisar pela sala" type="search" />
+                </div>
+
+                <div class="col-12 mt-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Pesquisar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="table-responsive">
