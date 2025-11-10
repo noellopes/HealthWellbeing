@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeingRoom.Models;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -22,8 +23,9 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchType = "", string searchStatus = "", string searchRoom = "")
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
+            // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
                 .Include(m => m.Manufacturer)
@@ -31,36 +33,56 @@ namespace HealthWellbeingRoom.Controllers
                 .Include(es => es.EquipmentStatus)
                 .AsQueryable();
 
-
+            // Validar se os parâmetros de pesquisa não estão vazios e aplicar os filtros correspondentes
             if (!string.IsNullOrEmpty(searchName))
             {
                 equipmentQuery = equipmentQuery.Where(e => e.Name.Contains(searchName));
             }
 
-            if (!string.IsNullOrEmpty(searchType))
+            if (searchType > 0)
             {
-                equipmentQuery = equipmentQuery.Where(e => e.EquipmentType.Name.Contains(searchType));
+                equipmentQuery = equipmentQuery.Where(e => e.EquipmentTypeId == searchType);
             }
 
-            if (!string.IsNullOrEmpty(searchStatus))
+            if (searchStatus > 0)
             {
-                equipmentQuery = equipmentQuery.Where(e => e.EquipmentStatus.Name.Contains(searchStatus));
+                equipmentQuery = equipmentQuery.Where(e => e.EquipmentStatusId == searchStatus);
             }
 
-            if (!string.IsNullOrEmpty(searchRoom))
+            if (searchRoom > 0)
             {
-                equipmentQuery = equipmentQuery.Where(e => e.Room.Name.Contains(searchRoom));
+                equipmentQuery = equipmentQuery.Where(e => e.RoomId == searchRoom);
             }
 
+            // Manter os valores de pesquisa na ViewBag para uso na View
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
             ViewBag.SearchStatus = searchStatus;
             ViewBag.SearchRoom = searchRoom;
 
+            // Buscar dados para os filtros ordenados alfabeticamente
+            var rooms = await _context.Set<Room>().OrderBy(e => e.Name).ToListAsync();
+            var types = await _context.Set<EquipmentType>().OrderBy(e => e.Name).ToListAsync();
+            var status = await _context.Set<EquipmentStatus>().OrderBy(e => e.Name).ToListAsync();
+
+            // Atribuir 1ª opção "Todos" aos filtros
+            rooms.Insert(0, new Room { RoomId = -1, Name = "Todas" });
+            types.Insert(0, new EquipmentType { EquipmentTypeId = -1, Name = "Todos" });
+            status.Insert(0, new EquipmentStatus { EquipmentStatusId = -1, Name = "Todos" });
+
+
+            // Salvar os filtros na ViewBag
+            ViewBag.Rooms = new SelectList(rooms, "RoomId", "Name", searchRoom);
+            ViewBag.Types = new SelectList(types, "EquipmentTypeId", "Name", searchType);
+            ViewBag.Status = new SelectList(status, "EquipmentStatusId", "Name", searchStatus);
+
+
+            // Implementar paginação
             var equipmentInfo = new RPaginationInfo<Equipment>(page, await equipmentQuery.CountAsync());
             equipmentInfo.Items = await equipmentQuery
                 .OrderBy(e => e.Name)
-                .Skip(equipmentInfo.ItemsToSkip)
+                //.Skip(equipmentInfo.ItemsToSkip)
+                .Skip((page - 1) * equipmentInfo.ItemsPerPage)
                 .Take(equipmentInfo.ItemsPerPage)
                 .ToListAsync();
 
