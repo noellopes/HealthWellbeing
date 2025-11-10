@@ -45,6 +45,9 @@ namespace HealthWellbeing.Utils.Group1.Services
                 "Pathology.Name" => descending ? query.OrderByDescending(t => t.Pathology.Name) : query.OrderBy(t => t.Pathology.Name),
                 "TreatmentDate" => descending ? query.OrderByDescending(t => t.TreatmentDate) : query.OrderBy(t => t.TreatmentDate),
                 "DurationMinutes" => descending ? query.OrderByDescending(t => t.DurationMinutes) : query.OrderBy(t => t.DurationMinutes),
+                "Remarks" => descending ? query.OrderByDescending(t => t.Remarks) : query.OrderBy(t => t.Remarks),
+                "Result" => descending ? query.OrderByDescending(t => t.Result) : query.OrderBy(t => t.Result),
+                "Status" => descending ? query.OrderByDescending(t => t.Status) : query.OrderBy(t => t.Status),
                 "CreatedAt" => descending ? query.OrderByDescending(t => t.CreatedAt) : query.OrderBy(t => t.CreatedAt),
                 _ => descending ? query.OrderByDescending(t => t.Id) : query.OrderBy(t => t.Id),
             };

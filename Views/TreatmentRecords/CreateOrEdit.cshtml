@@ -53,13 +53,15 @@
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="border-top mt-4 form-group text-right">
-                <input type="submit" class="btn btn-sm btn-outline-primary mt-4 mr-2" value="Guardar" />
-                <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-4">Cancelar</a>
+                <button type="submit" class="btn btn-sm btn-outline-primary mt-4 mr-2">
+                    <i class="bi bi-check-circle me-1"></i> Guardar
+                </button>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-4"><i class="bi bi-arrow-left-circle me-1"></i> Cancelar</a>
             </div>
             @if (!isNew)
             {
                 <div class="d-flex justify-content-end border-top mt-4 form-group">
-                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-2 mt-4">Remover</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-2 mt-4"><i class="bi bi-trash"></i> Remover</a>
                 </div>
             }
         </form>

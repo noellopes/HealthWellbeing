@@ -14,12 +14,6 @@
 
     var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
     var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No data found.");
-
-    if (TempData["Message"] != null)
-    {
-        var alertModel = Tuple.Create(TempData["AlertType"]?.ToString() ?? "info", TempData["IconClass"]?.ToString() ?? "", TempData["Message"]?.ToString() ?? "");
-        <partial name="@_AlertPartial" model="alertModel" />
-    }
 }
 
 <h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
@@ -49,8 +43,10 @@ else
             </div>
             <form asp-action="Delete" class="card-footer text-right">
                 <input type="hidden" value="@Model?.Id" />
-                <input type="submit" value="Delete" class="btn btn-sm btn-outline-danger mr-2" />
-                <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-secondary">Voltar</a>
+                <button type="submit" class="btn btn-sm btn-outline-danger mr-2">
+                    <i class="bi bi-trash-fill"></i> Remover
+                </button>
+                <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle me-1"></i> Voltar</a>
             </form>
         }
     </div>

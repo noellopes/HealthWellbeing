@@ -1,4 +1,4 @@
-﻿@model Tuple<string, string, string> // Item1: alert type, Item2: icon class, Item3: message
+﻿@model HealthWellbeing.Utils.Group1.Models.AlertItem
 
 @{
     /*
@@ -6,18 +6,20 @@
     * DON'T MODIFY, Instead you can copy into your own folder
     */
 
-    var alertType = HealthWellbeing.Utils.Group1.Functions.ValidateAlertType(Model?.Item1?.ToLower() ?? "info");
-    var iconClass = Model?.Item2 ?? "";
-    var message = Model?.Item3 ?? "";
+    var dismissible = (Model.Dismissible == true) ? "alert-dismissible" : "";
 }
 
-<div class="alert alert-@alertType d-flex flex-column flex-sm-row align-items-center justify-content-center text-center fs-5 py-3" role="alert" style="min-height: 80px; gap: 0.5rem;">
-    @if (!string.IsNullOrWhiteSpace(iconClass))
+<div class="alert alert-@Model.AlertType @dismissible d-flex flex-column flex-sm-row align-items-center justify-content-center text-center fs-5 py-3" role="alert" style="min-height: 80px; gap: 0.5rem;">
+    @if (!string.IsNullOrWhiteSpace(Model.IconClass))
     {
         <span class="d-inline-block" style="font-size: 1.8rem; line-height: 1;">
-            <i class="@iconClass" aria-hidden="true"></i>
+            <i class="@Model.IconClass" aria-hidden="true"></i>
             <span class="visually-hidden">Icon</span>
         </span>
     }
-    <span class="flex-fill">@message</span>
+    <span class="flex-fill">@Model.Message</span>
+    @if (dismissible != "")
+    {
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    }
 </div>
