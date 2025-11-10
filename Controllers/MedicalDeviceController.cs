@@ -21,26 +21,61 @@ namespace HealthWellBeingRoom.Controllers
         }
 
         // --- 1. LISTA (Index) ---
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchName = "",
+            string searchType = "",
+            string searchRoom = "")
         {
-            //Contar todos os itens (para o ViewModel)
-            var totalItems = await _context.MedicalDevices.CountAsync();
+            //Inicializa a query base com os Includes necessários (Eager Loading)
+            var devicesQuery = _context.MedicalDevices
+                .Include(m => m.TypeMaterial)
+                // Incluir a coleção da Localização, filtrando só o registo ativo (IsCurrent = true)
+                .Include(md => md.LocalizacaoDispMedicoMovel
+                    .Where(loc => loc.IsCurrent == true)
+                )
+                .ThenInclude(loc => loc.Room)
+                .AsQueryable(); 
 
-            //Criar a instância do ViewModel
+            //Aplicação dos Filtros de Pesquisa
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                //Pesquisa pelo Nome do Dispositivo
+                devicesQuery = devicesQuery.Where(d => d.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchType))
+            {
+                //Pesquisa pelo Nome do Tipo de Material
+                devicesQuery = devicesQuery.Where(d => d.TypeMaterial.Name.Contains(searchType));
+            }
+
+            if (!string.IsNullOrEmpty(searchRoom))
+            {
+                //Pesquisa pelo Nome da Sala na Localização Atual (IsCurrent == true)
+                devicesQuery = devicesQuery.Where(d => d.LocalizacaoDispMedicoMovel
+                    .Any(loc => loc.IsCurrent == true && loc.Room.Name.Contains(searchRoom)));
+            }
+
+            // Armazena os valores de pesquisa no ViewBag para persistir na View (mantendo o texto na caixa de busca)
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchType = searchType;
+            ViewBag.SearchRoom = searchRoom;
+
+            //Conta o total de itens após o filtro
+            int totalItems = await devicesQuery.CountAsync();
+
+            //Cria a instância do ViewModel de Paginação (RPaginationInfo)
             var paginationInfo = new RPaginationInfo<MedicalDevice>(page, totalItems, itemsPerPage: 10); // 10 por página
 
-            var listaDeDispositivos = await _context.MedicalDevices
-                .Include(m => m.TypeMaterial)
-                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
-                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
-                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
-                )
-                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
-                .Skip(paginationInfo.ItemsToSkip)
-                .Take(paginationInfo.ItemsPerPage)
+            // Executa a Consulta com Ordenação e Paginação
+            var listaDeDispositivos = await devicesQuery
+                .OrderBy(d => d.Name) // Ordenação para garantir consistência entre páginas
+                .Skip(paginationInfo.ItemsToSkip) // Lógica de Skip do ViewModel
+                .Take(paginationInfo.ItemsPerPage) // Lógica de Take do ViewModel
                 .ToListAsync();
 
-            //Atribuir os itens à propriedade Items do ViewModel
+            //Atribui os itens ao ViewModel
             paginationInfo.Items = listaDeDispositivos;
 
             return View(paginationInfo);
