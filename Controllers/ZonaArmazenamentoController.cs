@@ -59,16 +59,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var zonaArmazenamento = await _context.ZonaArmazenamento
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (zonaArmazenamento == null)
-            {
                 return NotFound();
-            }
 
             return View(zonaArmazenamento);
         }
@@ -88,8 +85,11 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(zonaArmazenamento);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "✅ Zona criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
+
+            TempData["ErrorMessage"] = "❌ Erro ao criar a zona. Verifique os campos e tente novamente.";
             return View(zonaArmazenamento);
         }
 
@@ -97,15 +97,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var zonaArmazenamento = await _context.ZonaArmazenamento.FindAsync(id);
             if (zonaArmazenamento == null)
-            {
                 return NotFound();
-            }
+
             return View(zonaArmazenamento);
         }
 
@@ -115,9 +112,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Localizacao,CapacidadeMaxima,Ativa")] ZonaArmazenamento zonaArmazenamento)
         {
             if (id != zonaArmazenamento.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -125,20 +120,19 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(zonaArmazenamento);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "💾 Alterações guardadas com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ZonaArmazenamentoExists(zonaArmazenamento.Id))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            TempData["ErrorMessage"] = "❌ Erro ao editar a zona. Verifique os campos e tente novamente.";
             return View(zonaArmazenamento);
         }
 
@@ -146,16 +140,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var zonaArmazenamento = await _context.ZonaArmazenamento
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (zonaArmazenamento == null)
-            {
                 return NotFound();
-            }
 
             return View(zonaArmazenamento);
         }
@@ -169,9 +160,14 @@ namespace HealthWellbeing.Controllers
             if (zonaArmazenamento != null)
             {
                 _context.ZonaArmazenamento.Remove(zonaArmazenamento);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "🗑️ Zona eliminada com sucesso!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "❌ Erro ao eliminar a zona. Ela pode já ter sido removida.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
