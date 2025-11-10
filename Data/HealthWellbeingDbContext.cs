@@ -19,5 +19,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ConsumivelFornecedor> ConsumivelFornecedor { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Consumivel> Consumivel { get; set; } = default!;
     }
 }

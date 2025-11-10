@@ -1,21 +1,26 @@
-namespace HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Consumivel
+namespace HealthWellbeing.Models
 {
-    public int ConsumivelId { get; set; }
-    public string Categoria { get; set; }
-    public string Nome { get; set; }
-    public string ZonaArmazenamento { get; set; }
-    public List<string> Fornecedores { get; set; }
-    public int Stock { get; set; }
-    public int SalaId { get; set; }
-}
+    public class Consumivel
+    {
+        [Key]
+        public int ConsumivelId { get; set; }
 
-public static class ConsumivelRepository
-{
-    private static List<Consumivel> consumiveis = new();
+        [Required(ErrorMessage = "O nome é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
+        public string Nome { get; set; }
 
-    public static IEnumerable<Consumivel> Consumiveis => consumiveis;
+        [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
+        public string? Descricao { get; set; }
 
-    public static void AddConsumivel(Consumivel consumivel) => consumiveis.Add(consumivel);
+        // Chave estrangeira
+        [ForeignKey("CategoriaConsumivel")]
+        [Display(Name = "Categoria")]
+        public int CategoriaId { get; set; }
+
+        // Propriedade de navegação (importante para o EF)
+        public CategoriaConsumivel? CategoriaConsumivel { get; set; }
+    }
 }

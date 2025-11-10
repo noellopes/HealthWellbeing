@@ -1,105 +1,164 @@
-﻿using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class ConsumivelController : Controller
     {
-        // Lista em memória
-        private static List<Consumivel> _consumiveis = new()
+        private readonly HealthWellbeingDbContext _context;
+
+        public ConsumivelController(HealthWellbeingDbContext context)
         {
-            new Consumivel
+            _context = context;
+        }
+
+        // GET: Consumivel
+        public async Task<IActionResult> Index()
+        {
+            var healthWellbeingDbContext = _context.Consumivel.Include(c => c.CategoriaConsumivel);
+            return View(await healthWellbeingDbContext.ToListAsync());
+        }
+
+        // GET: Consumivel/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
             {
-                ConsumivelId = 1,
-                Categoria = "Limpeza",
-                Nome = "Álcool Gel",
-                ZonaArmazenamento = "Armário 1",
-                Fornecedores = new List<string> { "Higienix", "SafeHands" },
-                Stock = 25,
-                SalaId = 3
-            },
-            new Consumivel
-            {
-                ConsumivelId = 2,
-                Categoria = "Escritório",
-                Nome = "Canetas",
-                ZonaArmazenamento = "Armário 2",
-                Fornecedores = new List<string> { "OfficePlus", "Papelaria Central" },
-                Stock = 120,
-                SalaId = 5
+                return NotFound();
             }
-        };
 
-        // VIEW: Listar os consumíveis
-        public IActionResult AdministrarConsumiveis()
-        {
-            return View(_consumiveis);
+            var consumivel = await _context.Consumivel
+                .Include(c => c.CategoriaConsumivel)
+                .FirstOrDefaultAsync(m => m.ConsumivelId == id);
+            if (consumivel == null)
+            {
+                return NotFound();
+            }
+
+            return View(consumivel);
         }
 
-        // CRIAR (GET)
-        public IActionResult ConsumivelRegister() => View();
+        // GET: Consumivel/Create
+        public IActionResult Create()
+        {
+            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome");
+            return View();
+        }
 
-        // CRIAR (POST)
+        // POST: Consumivel/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public IActionResult ConsumivelRegister(Consumivel consumivel, string FornecedoresTexto)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("ConsumivelId,Nome,Descricao,CategoriaId")] Consumivel consumivel)
         {
-            // Converte fornecedores de texto em lista
-            consumivel.Fornecedores = !string.IsNullOrEmpty(FornecedoresTexto)
-                ? FornecedoresTexto.Split(',').Select(f => f.Trim()).ToList()
-                : new List<string>();
-
-            // Atribui ID automático
-            consumivel.ConsumivelId = _consumiveis.Any() ? _consumiveis.Max(c => c.ConsumivelId) + 1 : 1;
-
-            // Adiciona à lista
-            _consumiveis.Add(consumivel);
-
-            // Redireciona para a lista
-            return RedirectToAction("AdministrarConsumiveis");
+            if (ModelState.IsValid)
+            {
+                _context.Add(consumivel);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
+            return View(consumivel);
         }
 
-        // ELIMINAR (GET)
-        public IActionResult Delete(int id)
+        // GET: Consumivel/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
-            if (c == null) return NotFound();
-            return View(c);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var consumivel = await _context.Consumivel.FindAsync(id);
+            if (consumivel == null)
+            {
+                return NotFound();
+            }
+            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
+            return View(consumivel);
         }
 
-        // ELIMINAR (POST)
+        // POST: Consumivel/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("ConsumivelId,Nome,Descricao,CategoriaId")] Consumivel consumivel)
+        {
+            if (id != consumivel.ConsumivelId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(consumivel);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ConsumivelExists(consumivel.ConsumivelId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
+            return View(consumivel);
+        }
+
+        // GET: Consumivel/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var consumivel = await _context.Consumivel
+                .Include(c => c.CategoriaConsumivel)
+                .FirstOrDefaultAsync(m => m.ConsumivelId == id);
+            if (consumivel == null)
+            {
+                return NotFound();
+            }
+
+            return View(consumivel);
+        }
+
+        // POST: Consumivel/Delete/5
         [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
-            if (c != null) _consumiveis.Remove(c);
-            return RedirectToAction("AdministrarConsumiveis");
-        }
-       
-        // EDITAR (GET)
-        public IActionResult Edit(int id)
-        {
-            var c = _consumiveis.FirstOrDefault(x => x.ConsumivelId == id);
-            if (c == null) return NotFound();
-            return View(c);
+            var consumivel = await _context.Consumivel.FindAsync(id);
+            if (consumivel != null)
+            {
+                _context.Consumivel.Remove(consumivel);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // EDITAR (POST)
-        [HttpPost]
-        public IActionResult Edit(Consumivel c)
+        private bool ConsumivelExists(int id)
         {
-            var old = _consumiveis.FirstOrDefault(x => x.ConsumivelId == c.ConsumivelId);
-            if (old == null) return NotFound();
-
-            old.Nome = c.Nome;
-            old.Categoria = c.Categoria;
-            old.ZonaArmazenamento = c.ZonaArmazenamento;
-            old.Stock = c.Stock;
-            old.SalaId = c.SalaId;
-            old.Fornecedores = c.Fornecedores;
-
-            return RedirectToAction("AdministrarConsumiveis");
+            return _context.Consumivel.Any(e => e.ConsumivelId == id);
         }
     }
 }
