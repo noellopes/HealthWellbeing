@@ -37,15 +37,15 @@
         <label class="control-label fw-bold">Grupos Musculares Associados</label>
         <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
         <div class="border p-3 rounded mt-2">
-            @if (ViewBag.GruposMusculares != null && ViewBag.GruposMusculares.Any())
+            @if (ViewBag.GruposMusculares != null && ((IEnumerable<SelectListItem>)ViewBag.GruposMusculares).Any())
             {
                 <div class="row">
-                    @foreach (var grupoMuscular in ViewBag.GruposMusculares)
+                    @foreach (var grupoMuscular in (IEnumerable<SelectListItem>)ViewBag.GruposMusculares)
                     {
                         <div class="col-md-6 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
-                                       name="musculosIds"
+                                       name="GrupoMuscularIds"
                                        value="@grupoMuscular.Value"
                                        id="musculo_@grupoMuscular.Value" />
                                 <label class="form-check-label" for="musculo_@grupoMuscular.Value">
@@ -70,6 +70,7 @@
                     </a>
                 </div>
             }
+
         </div>
         @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
         {

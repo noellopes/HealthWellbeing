@@ -4,60 +4,95 @@
     ViewData["Title"] = "Eliminar Exercício";
 }
 
-<h1 class="text-danger">@ViewData["Title"]</h1>
+<div class="container mt-4">
+    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
-<p class="lead">Tem a certeza que deseja eliminar este exercício?</p>
+    <p class="lead">Tem a certeza que deseja eliminar o seguinte exercício? Esta ação não pode ser desfeita.</p>
 
-<div class="card mb-4 shadow-sm">
-    <div class="card-header bg-danger text-white fw-bold">
-        Dados do Exercício
+    <div class="card mb-4 shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+            Dados do Exercício
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+
+                <dt class="col-sm-3">Nome do Exercício</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ExercicioNome)</dd>
+
+                <dt class="col-sm-3">Descrição</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
+
+                <dt class="col-sm-3">Duração (min)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Duracao)</dd>
+
+                <dt class="col-sm-3">Intensidade</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Intencidade)</dd>
+
+                <dt class="col-sm-3">Calorias Gastas</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.CaloriasGastas)</dd>
+
+                <dt class="col-sm-3">Equipamento Necessário</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.EquipamentoNecessario)</dd>
+
+                <dt class="col-sm-3">Repetições</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Repeticoes)</dd>
+
+                <dt class="col-sm-3">Séries</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Series)</dd>
+
+                <dt class="col-sm-3">Instruções</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Instrucoes)</dd>
+
+                <dt class="col-sm-3">Gêneros Associados</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Genero != null && Model.Genero.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var genero in Model.Genero)
+                            {
+                                <li>@genero.NomeGenero</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum gênero associado.</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Grupos Musculares Associados</dt>
+                <dd class="col-sm-9">
+                    @if (Model.GrupoMuscular != null && Model.GrupoMuscular.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var grupo in Model.GrupoMuscular)
+                            {
+                                <li>@grupo.GrupoMuscularNome</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum grupo muscular associado.</span>
+                    }
+                </dd>
+
+            </dl>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row">
 
-            <dt class="col-sm-3">Nome do Exercício</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.ExercicioNome)</dd>
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ExercicioId" />
 
-            <dt class="col-sm-3">Descrição</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
+        <div class="d-flex">
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
 
-            <dt class="col-sm-3">Duração (min)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Duracao)</dd>
-
-            <dt class="col-sm-3">Intensidade</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Intencidade)</dd>
-
-            <dt class="col-sm-3">Calorias Gastas</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.CaloriasGastas)</dd>
-
-            <dt class="col-sm-3">Instruções</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Instrucoes)</dd>
-
-            <dt class="col-sm-3">Equipamento Necessário</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.EquipamentoNecessario)</dd>
-
-            <dt class="col-sm-3">Repetições</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Repeticoes)</dd>
-
-            <dt class="col-sm-3">Séries</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Series)</dd>
-
-            <dt class="col-sm-3">Género</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Genero)</dd>
-
-        </dl>
-    </div>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </form>
 </div>
-
-<form asp-action="Delete" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="ExercicioId" />
-
-    <button type="submit" class="btn btn-danger me-2">
-        <i class="fas fa-trash-alt"></i> Eliminar
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Voltar à Lista
-    </a>
-</form>

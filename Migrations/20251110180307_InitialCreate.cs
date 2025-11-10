@@ -52,12 +52,24 @@ namespace HealthWellbeing.Migrations
                     Instrucoes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EquipamentoNecessario = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Repeticoes = table.Column<int>(type: "int", nullable: false),
-                    Series = table.Column<int>(type: "int", nullable: false),
-                    Genero = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Series = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Exercicio", x => x.ExercicioId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Genero",
+                columns: table => new
+                {
+                    GeneroId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeGenero = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Genero", x => x.GeneroId);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,6 +185,30 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExercicioGenero",
+                columns: table => new
+                {
+                    ExercicioId = table.Column<int>(type: "int", nullable: false),
+                    GeneroId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExercicioGenero", x => new { x.ExercicioId, x.GeneroId });
+                    table.ForeignKey(
+                        name: "FK_ExercicioGenero_Exercicio_ExercicioId",
+                        column: x => x.ExercicioId,
+                        principalTable: "Exercicio",
+                        principalColumn: "ExercicioId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExercicioGenero_Genero_GeneroId",
+                        column: x => x.GeneroId,
+                        principalTable: "Genero",
+                        principalColumn: "GeneroId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ExercicioGrupoMuscular",
                 columns: table => new
                 {
@@ -278,6 +314,11 @@ namespace HealthWellbeing.Migrations
                 column: "TipoExercicioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExercicioGenero_GeneroId",
+                table: "ExercicioGenero",
+                column: "GeneroId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExercicioGrupoMuscular_GrupoMuscularId",
                 table: "ExercicioGrupoMuscular",
                 column: "GrupoMuscularId");
@@ -296,6 +337,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "BeneficioTipoExercicio");
+
+            migrationBuilder.DropTable(
+                name: "ExercicioGenero");
 
             migrationBuilder.DropTable(
                 name: "ExercicioGrupoMuscular");
@@ -320,6 +364,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "TipoExercicio");
+
+            migrationBuilder.DropTable(
+                name: "Genero");
 
             migrationBuilder.DropTable(
                 name: "Exercicio");

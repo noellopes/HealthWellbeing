@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251110170042_InitialCreate")]
+    [Migration("20251110180307_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -37,6 +37,21 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("TipoExercicioId");
 
                     b.ToTable("BeneficioTipoExercicio");
+                });
+
+            modelBuilder.Entity("ExercicioGenero", b =>
+                {
+                    b.Property<int>("ExercicioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GeneroId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExercicioId", "GeneroId");
+
+                    b.HasIndex("GeneroId");
+
+                    b.ToTable("ExercicioGenero");
                 });
 
             modelBuilder.Entity("ExercicioGrupoMuscular", b =>
@@ -203,10 +218,6 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Genero")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Instrucoes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -223,6 +234,24 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("ExercicioId");
 
                     b.ToTable("Exercicio");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Genero", b =>
+                {
+                    b.Property<int>("GeneroId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GeneroId"));
+
+                    b.Property<string>("NomeGenero")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("GeneroId");
+
+                    b.ToTable("Genero");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
@@ -426,6 +455,21 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.TipoExercicio", null)
                         .WithMany()
                         .HasForeignKey("TipoExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ExercicioGenero", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Exercicio", null)
+                        .WithMany()
+                        .HasForeignKey("ExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Genero", null)
+                        .WithMany()
+                        .HasForeignKey("GeneroId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

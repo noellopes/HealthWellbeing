@@ -215,10 +215,6 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Genero")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Instrucoes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -237,28 +233,67 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Exercicio");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Genero", b =>
                 {
+                    b.Property<int>("GeneroId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GeneroId"));
 
+                    b.Property<string>("NomeGenero")
                         .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
+                    b.HasKey("GeneroId");
 
+                    b.ToTable("Genero");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
+                    b.Property<int>("GrupoMuscularId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GrupoMuscularId"));
 
+                    b.Property<string>("GrupoMuscularNome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("LocalizacaoCorporal")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("GrupoMuscularId");
+
+                    b.ToTable("GrupoMuscular");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Musculo", b =>
+                {
+                    b.Property<int>("MusculoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MusculoId"));
+
+                    b.Property<int>("GrupoMuscularId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome_Musculo")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.HasKey("MusculoId");
 
+                    b.HasIndex("GrupoMuscularId");
 
+                    b.ToTable("Musculo");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ProblemaSaude", b =>

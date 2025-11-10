@@ -32,10 +32,10 @@
             <label class="control-label fw-bold">Grupos Musculares Associados</label>
             <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
             <div class="border p-3 rounded mt-2">
-                @if (ViewBag.GruposMusculares != null && ViewBag.GruposMusculares.Count > 0)
+                @if (ViewBag.GruposMusculares != null && ((IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares).Any())
                 {
                     <div class="row">
-                        @foreach (var grupo in ViewBag.GruposMusculares)
+                        @foreach (var grupo in (IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares)
                         {
                             <div class="col-md-6 mb-2">
                                 <div class="form-check">
@@ -43,11 +43,9 @@
                                            name="gruposMuscularesIds"
                                            value="@grupo.GrupoMuscularId"
                                            id="grupo_@grupo.GrupoMuscularId"
-                                           @(ViewBag.GruposSelecionados != null && ViewBag.GruposSelecionados.Contains(grupo.GrupoMuscularId) ? "checked" : "") />
+                                           @(ViewBag.GruposSelecionados != null && ((List<int>)ViewBag.GruposSelecionados).Contains(grupo.GrupoMuscularId) ? "checked" : "") />
                                     <label class="form-check-label" for="grupo_@grupo.GrupoMuscularId">
-                                        <strong>@grupo.GrupoMuscularNome</strong> - @grupo.Musculo
-                                        <br>
-                                        <small class="text-muted">📍 @grupo.LocalizacaoCorporal</small>
+                                        @grupo.GrupoMuscularNome
                                     </label>
                                 </div>
                             </div>
@@ -115,15 +113,15 @@
             <span asp-validation-for="Instrucoes" class="text-danger small"></span>
         </div>
 
-        <!-- Géneros -->
+        <!-- Gêneros -->
         <div class="form-group mb-4">
-            <label class="control-label fw-bold">Géneros Associados</label>
-            <small class="form-text text-muted d-block">Selecione os géneros associados a este exercício</small>
+            <label class="control-label fw-bold">Gêneros Associados</label>
+            <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
             <div class="border p-3 rounded mt-2">
-                @if (ViewBag.Generos != null && ViewBag.Generos.Count > 0)
+                @if (ViewBag.Generos != null && ((IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos).Any())
                 {
                     <div class="row">
-                        @foreach (var genero in ViewBag.Generos)
+                        @foreach (var genero in (IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos)
                         {
                             <div class="col-md-6 mb-2">
                                 <div class="form-check">
@@ -131,7 +129,7 @@
                                            name="generosIds"
                                            value="@genero.GeneroId"
                                            id="genero_@genero.GeneroId"
-                                           @(ViewBag.GenerosSelecionados != null && ViewBag.GenerosSelecionados.Contains(genero.GeneroId) ? "checked" : "") />
+                                           @(ViewBag.GenerosSelecionados != null && ((List<int>)ViewBag.GenerosSelecionados).Contains(genero.GeneroId) ? "checked" : "") />
                                     <label class="form-check-label" for="genero_@genero.GeneroId">
                                         @genero.NomeGenero
                                     </label>
@@ -143,9 +141,9 @@
                 else
                 {
                     <div class="alert alert-warning">
-                        <p class="mb-1">Nenhum género encontrado no sistema.</p>
+                        <p class="mb-1">Nenhum gênero encontrado no sistema.</p>
                         <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
-                            Criar Género
+                            Criar Gênero
                         </a>
                     </div>
                 }

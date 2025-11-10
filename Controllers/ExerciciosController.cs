@@ -38,7 +38,7 @@ namespace HealthWellbeing.Controllers
             return View(exerciciosInfo);
         }
 
-        // GET: Exercicios/Details/5
+        // GET: Exercicios/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -64,17 +64,22 @@ namespace HealthWellbeing.Controllers
         {
             // Carrega os gêneros para a ViewBag
             ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+            ViewBag.GruposMusculares = new SelectList(_context.GrupoMuscular, "GrupoMuscularId", "GrupoMuscularNome");
             return View();
         }
 
         // POST: Exercicios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")] Exercicio exercicio, int[] generosIds)
+        public async Task<IActionResult> Create(
+            [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")]
+            Exercicio exercicio,
+            int[] generosIds,
+            int[] GrupoMuscularIds)
         {
             if (ModelState.IsValid)
             {
-                // Adiciona os gêneros selecionados
+                // --- Adiciona os gêneros selecionados ---
                 if (generosIds != null && generosIds.Length > 0)
                 {
                     exercicio.Genero = new List<Genero>();
@@ -89,17 +94,36 @@ namespace HealthWellbeing.Controllers
                     }
                 }
 
+                // --- Adiciona os grupos musculares selecionados ---
+                if (GrupoMuscularIds != null && GrupoMuscularIds.Length > 0)
+                {
+                    exercicio.GrupoMuscular = new List<GrupoMuscular>();
+
+                    foreach (var grupoMuscularId in GrupoMuscularIds)
+                    {
+                        var grupo = await _context.GrupoMuscular.FindAsync(grupoMuscularId);
+                        if (grupo != null)
+                        {
+                            exercicio.GrupoMuscular.Add(grupo);
+                        }
+                    }
+                }
+
+                // --- Salva o exercício ---
                 _context.Add(exercicio);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarrega os gêneros se houver erro
-            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+            // --- Se houver erro, recarrega selects e retorna view ---
+            ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+            ViewBag.GruposMusculares = new SelectList(_context.GrupoMuscular, "GrupoMuscularId", "GrupoMuscularNome");
+
             return View(exercicio);
         }
 
-        // GET: Exercicios/Edit/5
+
+        // GET: Exercicios/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -109,6 +133,7 @@ namespace HealthWellbeing.Controllers
 
             var exercicio = await _context.Exercicio
                 .Include(e => e.Genero)
+                .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(e => e.ExercicioId == id);
 
             if (exercicio == null)
@@ -116,20 +141,27 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Carrega os gêneros para a ViewBag
-            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+            // Carrega todos os gêneros e grupos musculares
+            ViewBag.Generos = _context.Genero.ToList();
+            ViewBag.GruposMusculares = _context.GrupoMuscular.ToList();
 
-            // Prepara lista de gêneros já selecionados para marcar os checkboxes
-            var generosSelecionados = exercicio.Genero?.Select(g => g.GeneroId).ToList();
-            ViewBag.GenerosSelecionados = generosSelecionados ?? new List<int>();
+            // Prepara listas de selecionados
+            ViewBag.GenerosSelecionados = exercicio.Genero?.Select(g => g.GeneroId).ToList() ?? new List<int>();
+            ViewBag.GruposSelecionados = exercicio.GrupoMuscular?.Select(g => g.GrupoMuscularId).ToList() ?? new List<int>();
 
             return View(exercicio);
         }
 
-        // POST: Exercicios/Edit/5
+
+        // POST: Exercicios/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")] Exercicio exercicio, int[] generosIds)
+        public async Task<IActionResult> Edit(
+        int id,
+        [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")]
+        Exercicio exercicio,
+        int[] generosIds,
+        int[] gruposMuscularesIds)
         {
             if (id != exercicio.ExercicioId)
             {
@@ -138,60 +170,52 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var exercicioExistente = await _context.Exercicio
+                    .Include(e => e.Genero)
+                    .Include(e => e.GrupoMuscular)
+                    .FirstOrDefaultAsync(e => e.ExercicioId == id);
+
+                if (exercicioExistente == null)
                 {
-                    // Carrega o exercício existente com seus gêneros
-                    var exercicioExistente = await _context.Exercicio
-                        .Include(e => e.Genero)
-                        .FirstOrDefaultAsync(e => e.ExercicioId == id);
-
-                    if (exercicioExistente == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Atualiza propriedades básicas
-                    _context.Entry(exercicioExistente).CurrentValues.SetValues(exercicio);
-
-                    // Limpa gêneros existentes
-                    exercicioExistente. Genero?.Clear();
-
-                    // Adiciona novos gêneros selecionados
-                    if (generosIds != null && generosIds.Length > 0)
-                    {
-                        var generosParaAdicionar = await _context.Genero
-                            .Where(g => generosIds.Contains(g.GeneroId))
-                            .ToListAsync();
-
-                        exercicioExistente.Genero = generosParaAdicionar;
-                    }
-                    else
-                    {
-                        exercicioExistente.Genero = new List<Genero>();
-                    }
-
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+
+                // Atualiza dados básicos
+                _context.Entry(exercicioExistente).CurrentValues.SetValues(exercicio);
+
+                // Atualiza gêneros
+                exercicioExistente.Genero.Clear();
+                if (generosIds != null && generosIds.Length > 0)
                 {
-                    if (!ExercicioExists(exercicio.ExercicioId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    var generos = await _context.Genero
+                        .Where(g => generosIds.Contains(g.GeneroId))
+                        .ToListAsync();
+                    exercicioExistente.Genero = generos;
                 }
+
+                // Atualiza grupos musculares
+                exercicioExistente.GrupoMuscular.Clear();
+                if (gruposMuscularesIds != null && gruposMuscularesIds.Length > 0)
+                {
+                    var grupos = await _context.GrupoMuscular
+                        .Where(g => gruposMuscularesIds.Contains(g.GrupoMuscularId))
+                        .ToListAsync();
+                    exercicioExistente.GrupoMuscular = grupos;
+                }
+
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarrega os gêneros se houver erro
-            ViewBag.Genero = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
+            // Se der erro, recarrega listas
+            ViewBag.Generos = _context.Genero.ToList();
+            ViewBag.GruposMusculares = _context.GrupoMuscular.ToList();
+
             return View(exercicio);
         }
 
-        // GET: Exercicios/Delete/5
+
+        // GET: Exercicios/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -201,6 +225,7 @@ namespace HealthWellbeing.Controllers
 
             var exercicio = await _context.Exercicio
                 .Include(e => e.Genero)
+                .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
 
             if (exercicio == null)
@@ -211,7 +236,8 @@ namespace HealthWellbeing.Controllers
             return View(exercicio);
         }
 
-        // POST: Exercicios/Delete/5
+
+        // POST: Exercicios/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
