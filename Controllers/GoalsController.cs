@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: Goals
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Goals.Include(g => g.Client);
+            var applicationDbContext = _context.Goals.Include(g => g.Patient);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var goal = await _context.Goals
-                .Include(g => g.Client)
+                .Include(g => g.Patient)
                 .FirstOrDefaultAsync(m => m.GoalId == id);
             if (goal == null)
             {
@@ -48,7 +48,7 @@ namespace HealthWellbeing.Controllers
         // GET: Goals/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email");
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
             return View();
         }
 
@@ -57,7 +57,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GoalId,ClientId,Title,Description,StartDate,TargetDate,Status,ProgressPercentage")] Goal goal)
+        public async Task<IActionResult> Create([Bind("GoalId,PatientId,Title,Description,StartDate,TargetDate,Status,ProgressPercentage")] Goal goal)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", goal.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", goal.PatientId);
             return View(goal);
         }
 
@@ -82,7 +82,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", goal.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", goal.PatientId);
             return View(goal);
         }
 
@@ -91,7 +91,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,Title,Description,StartDate,TargetDate,Status,ProgressPercentage")] Goal goal)
+        public async Task<IActionResult> Edit(int id, [Bind("GoalId,PatientId,Title,Description,StartDate,TargetDate,Status,ProgressPercentage")] Goal goal)
         {
             if (id != goal.GoalId)
             {
@@ -118,7 +118,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", goal.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", goal.PatientId);
             return View(goal);
         }
 
@@ -131,7 +131,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var goal = await _context.Goals
-                .Include(g => g.Client)
+                .Include(g => g.Patient)
                 .FirstOrDefaultAsync(m => m.GoalId == id);
             if (goal == null)
             {

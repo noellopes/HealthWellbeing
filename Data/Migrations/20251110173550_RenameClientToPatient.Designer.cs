@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251026213937_InitialMentalHealthModels")]
-    partial class InitialMentalHealthModels
+    [Migration("20251110173550_RenameClientToPatient")]
+    partial class RenameClientToPatient
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,55 +24,6 @@ namespace HealthWellbeing.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("HealthWellbeing.Models.Patient", b =>
-                {
-                    b.Property<int>("ClientId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"));
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EmergencyContact")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("EmergencyPhone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ClientId");
-
-                    b.ToTable("Clients");
-                });
 
             modelBuilder.Entity("HealthWellbeing.Models.CrisisAlert", b =>
                 {
@@ -85,9 +36,6 @@ namespace HealthWellbeing.Data.Migrations
                     b.Property<DateTime>("AlertDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -99,6 +47,9 @@ namespace HealthWellbeing.Data.Migrations
                     b.Property<int>("Level")
                         .HasColumnType("int");
 
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Resolution")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
@@ -108,7 +59,7 @@ namespace HealthWellbeing.Data.Migrations
 
                     b.HasKey("AlertId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("PatientId");
 
                     b.ToTable("CrisisAlerts");
                 });
@@ -121,12 +72,12 @@ namespace HealthWellbeing.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GoalId"));
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProgressPercentage")
                         .HasColumnType("int");
@@ -147,7 +98,7 @@ namespace HealthWellbeing.Data.Migrations
 
                     b.HasKey("GoalId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("PatientId");
 
                     b.ToTable("Goals");
                 });
@@ -207,9 +158,6 @@ namespace HealthWellbeing.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MoodEntryId"));
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Emotion")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -224,15 +172,70 @@ namespace HealthWellbeing.Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Triggers")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.HasKey("MoodEntryId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("PatientId");
 
                     b.ToTable("MoodEntries");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Patient", b =>
+                {
+                    b.Property<int>("PatientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PatientId"));
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("EmergencyContact")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("EmergencyPhone")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PatientId");
+
+                    b.ToTable("Patients");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ProgressReport", b =>
@@ -314,9 +317,6 @@ namespace HealthWellbeing.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SessionId"));
 
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("CompletedDateTime")
                         .HasColumnType("datetime2");
 
@@ -326,6 +326,9 @@ namespace HealthWellbeing.Data.Migrations
                     b.Property<string>("Notes")
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProfessionalId")
                         .HasColumnType("int");
@@ -341,7 +344,7 @@ namespace HealthWellbeing.Data.Migrations
 
                     b.HasKey("SessionId");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("PatientId");
 
                     b.HasIndex("ProfessionalId");
 
@@ -554,7 +557,7 @@ namespace HealthWellbeing.Data.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Patient", "Patient")
                         .WithMany("CrisisAlerts")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -565,7 +568,7 @@ namespace HealthWellbeing.Data.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Patient", "Patient")
                         .WithMany("Goals")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -576,7 +579,7 @@ namespace HealthWellbeing.Data.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Patient", "Patient")
                         .WithMany("MoodEntries")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -598,7 +601,7 @@ namespace HealthWellbeing.Data.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Patient", "Patient")
                         .WithMany("TherapySessions")
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -664,6 +667,16 @@ namespace HealthWellbeing.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Goal", b =>
+                {
+                    b.Navigation("ProgressReports");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.MentalHealthProfessional", b =>
+                {
+                    b.Navigation("TherapySessions");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Patient", b =>
                 {
                     b.Navigation("CrisisAlerts");
@@ -672,16 +685,6 @@ namespace HealthWellbeing.Data.Migrations
 
                     b.Navigation("MoodEntries");
 
-                    b.Navigation("TherapySessions");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Goal", b =>
-                {
-                    b.Navigation("ProgressReports");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.MentalHealthProfessional", b =>
-                {
                     b.Navigation("TherapySessions");
                 });
 #pragma warning restore 612, 618

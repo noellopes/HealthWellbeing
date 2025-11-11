@@ -9,17 +9,20 @@ namespace HealthWellbeing.Models
 
         public string? UserId { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string FirstName { get; set; }
+        [Required(ErrorMessage = "First name is required.")]
+        [MaxLength(100, ErrorMessage = "First name cannot exceed 100 characters.")]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; } = null!;
 
-        [Required]
-        [MaxLength(100)]
-        public string LastName { get; set; }
+        [Required(ErrorMessage = "Last name is required.")]
+        [MaxLength(100, ErrorMessage = "Last name cannot exceed 100 characters.")]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; } = null!;
 
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required(ErrorMessage = "Email address is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [Display(Name = "Email Address")]
+        public string Email { get; set; } = null!;
 
         [Phone]
         public string? Phone { get; set; }

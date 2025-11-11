@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: TherapySessions
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.TherapySessions.Include(t => t.Client).Include(t => t.Professional);
+            var applicationDbContext = _context.TherapySessions.Include(t => t.Patient).Include(t => t.Professional);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var therapySession = await _context.TherapySessions
-                .Include(t => t.Client)
+                .Include(t => t.Patient)
                 .Include(t => t.Professional)
                 .FirstOrDefaultAsync(m => m.SessionId == id);
             if (therapySession == null)
@@ -49,7 +49,7 @@ namespace HealthWellbeing.Controllers
         // GET: TherapySessions/Create
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email");
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
             ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email");
             return View();
         }
@@ -59,7 +59,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SessionId,ClientId,ProfessionalId,ScheduledDateTime,DurationMinutes,Status,Type,Notes,CompletedDateTime")] TherapySession therapySession)
+        public async Task<IActionResult> Create([Bind("SessionId,PatientId,ProfessionalId,ScheduledDateTime,DurationMinutes,Status,Type,Notes,CompletedDateTime")] TherapySession therapySession)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +67,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", therapySession.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
             ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
             return View(therapySession);
         }
@@ -85,7 +85,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", therapySession.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
             ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
             return View(therapySession);
         }
@@ -95,7 +95,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SessionId,ClientId,ProfessionalId,ScheduledDateTime,DurationMinutes,Status,Type,Notes,CompletedDateTime")] TherapySession therapySession)
+        public async Task<IActionResult> Edit(int id, [Bind("SessionId,PatientId,ProfessionalId,ScheduledDateTime,DurationMinutes,Status,Type,Notes,CompletedDateTime")] TherapySession therapySession)
         {
             if (id != therapySession.SessionId)
             {
@@ -122,7 +122,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Clients, "ClientId", "Email", therapySession.ClientId);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
             ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
             return View(therapySession);
         }
@@ -136,7 +136,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var therapySession = await _context.TherapySessions
-                .Include(t => t.Client)
+                .Include(t => t.Patient)
                 .Include(t => t.Professional)
                 .FirstOrDefaultAsync(m => m.SessionId == id);
             if (therapySession == null)
@@ -165,18 +165,6 @@ namespace HealthWellbeing.Controllers
         private bool TherapySessionExists(int id)
         {
             return _context.TherapySessions.Any(e => e.SessionId == id);
-        }
-
-        // Add this method to TherapySessionsController
-        public async Task<IActionResult> Calendar()
-        {
-            var sessions = await _context.TherapySessions
-                .Include(t => t.Client)
-                .Include(t => t.Professional)
-                .Where(s => s.Status == SessionStatus.Scheduled)
-                .ToListAsync();
-
-            return View(sessions);
         }
     }
 }

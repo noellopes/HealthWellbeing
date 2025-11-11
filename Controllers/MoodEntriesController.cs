@@ -10,22 +10,23 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ClientsController : Controller
+    public class MoodEntriesController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ClientsController(ApplicationDbContext context)
+        public MoodEntriesController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Clients
+        // GET: MoodEntries
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clients.ToListAsync());
+            var applicationDbContext = _context.MoodEntries.Include(m => m.Patient);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Clients/Details/5
+        // GET: MoodEntries/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +34,42 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.ClientId == id);
-            if (client == null)
+            var moodEntry = await _context.MoodEntries
+                .Include(m => m.Patient)
+                .FirstOrDefaultAsync(m => m.MoodEntryId == id);
+            if (moodEntry == null)
             {
                 return NotFound();
             }
 
-            return View(client);
+            return View(moodEntry);
         }
 
-        // GET: Clients/Create
+        // GET: MoodEntries/Create
         public IActionResult Create()
         {
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
             return View();
         }
 
-        // POST: Clients/Create
+        // POST: MoodEntries/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,UserId,FirstName,LastName,DateOfBirth,Email,Phone,EmergencyContact,EmergencyPhone,RegistrationDate,IsActive")] Client client)
+        public async Task<IActionResult> Create([Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Triggers")] MoodEntry moodEntry)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(client);
+                _context.Add(moodEntry);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(client);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", moodEntry.PatientId);
+            return View(moodEntry);
         }
 
-        // GET: Clients/Edit/5
+        // GET: MoodEntries/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +77,23 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
-            if (client == null)
+            var moodEntry = await _context.MoodEntries.FindAsync(id);
+            if (moodEntry == null)
             {
                 return NotFound();
             }
-            return View(client);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", moodEntry.PatientId);
+            return View(moodEntry);
         }
 
-        // POST: Clients/Edit/5
+        // POST: MoodEntries/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ClientId,UserId,FirstName,LastName,DateOfBirth,Email,Phone,EmergencyContact,EmergencyPhone,RegistrationDate,IsActive")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Triggers")] MoodEntry moodEntry)
         {
-            if (id != client.ClientId)
+            if (id != moodEntry.MoodEntryId)
             {
                 return NotFound();
             }
@@ -97,12 +102,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(client);
+                    _context.Update(moodEntry);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.ClientId))
+                    if (!MoodEntryExists(moodEntry.MoodEntryId))
                     {
                         return NotFound();
                     }
@@ -113,10 +118,11 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(client);
+            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", moodEntry.PatientId);
+            return View(moodEntry);
         }
 
-        // GET: Clients/Delete/5
+        // GET: MoodEntries/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +130,35 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.ClientId == id);
-            if (client == null)
+            var moodEntry = await _context.MoodEntries
+                .Include(m => m.Patient)
+                .FirstOrDefaultAsync(m => m.MoodEntryId == id);
+            if (moodEntry == null)
             {
                 return NotFound();
             }
 
-            return View(client);
+            return View(moodEntry);
         }
 
-        // POST: Clients/Delete/5
+        // POST: MoodEntries/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            if (client != null)
+            var moodEntry = await _context.MoodEntries.FindAsync(id);
+            if (moodEntry != null)
             {
-                _context.Clients.Remove(client);
+                _context.MoodEntries.Remove(moodEntry);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClientExists(int id)
+        private bool MoodEntryExists(int id)
         {
-            return _context.Clients.Any(e => e.ClientId == id);
+            return _context.MoodEntries.Any(e => e.MoodEntryId == id);
         }
     }
 }

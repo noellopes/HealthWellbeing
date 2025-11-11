@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
@@ -8,26 +9,32 @@ namespace HealthWellbeing.Models
         [Key]
         public int MoodEntryId { get; set; }
 
-        [Required]
-        public int ClientId { get; set; }
+        [Required(ErrorMessage = "Patient is required.")]
+        [Display(Name = "Patient")]
+        public int PatientId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Entry date and time is required.")]
+        [Display(Name = "Entry Date/Time")]
         public DateTime EntryDateTime { get; set; }
 
-        [Range(1, 10)]
+        [Required(ErrorMessage = "Mood score is required.")]
+        [Range(1, 10, ErrorMessage = "Mood score must be between 1 and 10.")]
+        [Display(Name = "Mood Score (1-10)")]
         public int MoodScore { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(100, ErrorMessage = "Emotion cannot exceed 100 characters.")]
+        [Display(Name = "Emotion")]
         public string? Emotion { get; set; }
 
-        [MaxLength(2000)]
+        [MaxLength(2000, ErrorMessage = "Notes cannot exceed 2000 characters.")]
+        [Display(Name = "Notes")]
         public string? Notes { get; set; }
 
-        [MaxLength(500)]
+        [MaxLength(500, ErrorMessage = "Triggers cannot exceed 500 characters.")]
+        [Display(Name = "Triggers")]
         public string? Triggers { get; set; }
 
-        // Navigation properties
-        [ForeignKey("ClientId")]
-        public virtual Client? Client { get; set; }
+        [ForeignKey("PatientId")]
+        public virtual Patient? Patient { get; set; }
     }
 }

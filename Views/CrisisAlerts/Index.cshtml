@@ -31,7 +31,7 @@
                 @Html.DisplayNameFor(model => model.Resolution)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Client)
+                @Html.DisplayNameFor(model => model.Patient)
             </th>
             <th></th>
         </tr>
@@ -58,7 +58,7 @@
                 @Html.DisplayFor(modelItem => item.Resolution)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Client.Email)
+                @Html.DisplayFor(modelItem => item.Patient.Email)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.AlertId">Edit</a> |

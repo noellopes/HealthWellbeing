@@ -11,8 +11,7 @@ namespace HealthWellbeing.Data
         {
         }
 
-        // DbSets for all models
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<Patient> Patients { get; set; }
         public DbSet<MentalHealthProfessional> MentalHealthProfessionals { get; set; }
         public DbSet<TherapySession> TherapySessions { get; set; }
         public DbSet<MoodEntry> MoodEntries { get; set; }
@@ -25,11 +24,10 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(builder);
 
-            // Configure relationships
             builder.Entity<TherapySession>()
-                .HasOne(t => t.Client)
-                .WithMany(c => c.TherapySessions)
-                .HasForeignKey(t => t.ClientId)
+                .HasOne(t => t.Patient)
+                .WithMany(p => p.TherapySessions)
+                .HasForeignKey(t => t.PatientId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<TherapySession>()

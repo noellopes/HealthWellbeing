@@ -11,9 +11,9 @@
         <div class="col-md-3">
             <div class="card text-white bg-primary">
                 <div class="card-body">
-                    <h5 class="card-title">Total Clients</h5>
-                    <h2 class="card-text">@Model.TotalClients</h2>
-                    <a asp-controller="Clients" asp-action="Index" class="text-white">View All →</a>
+                    <h5 class="card-title">Total Patients</h5>
+                    <h2 class="card-text">@Model.TotalPatients</h2>
+                    <a asp-controller="Patients" asp-action="Index" class="text-white">View All →</a>
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@
                             <thead>
                                 <tr>
                                     <th>Time</th>
-                                    <th>Client</th>
+                                    <th>Patient</th>
                                     <th>Professional</th>
                                     <th>Type</th>
                                 </tr>
@@ -70,7 +70,7 @@
                                 {
                                     <tr>
                                         <td>@session.ScheduledDateTime.ToString("HH:mm")</td>
-                                        <td>@session.Client?.FirstName @session.Client?.LastName</td>
+                                        <td>@session.Patient?.FirstName @session.Patient?.LastName</td>
                                         <td>@session.Professional?.FirstName @session.Professional?.LastName</td>
                                         <td><span class="badge bg-info">@session.Type</span></td>
                                     </tr>
@@ -100,18 +100,15 @@
                             {
                                 <div class="list-group-item">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">@alert.Client?.FirstName @alert.Client?.LastName</h6>
+                                        <h6 class="mb-1">@alert.Patient?.FirstName @alert.Patient?.LastName</h6>
                                         <small>@alert.AlertDateTime.ToString("MM/dd HH:mm")</small>
                                     </div>
                                     <p class="mb-1">@alert.Description</p>
-                                    <span class="badge
-                                                @(alert.Level == CrisisLevel.Critical ? "bg-danger" :
-                                                                                    alert.Level == CrisisLevel.High ? "bg-warning" :
-                                                                                    alert.Level == CrisisLevel.Medium ? "bg-info" : "bg-secondary")">
-                                @alert.Level
-                            </span>
-                        </div>
-                                                }
+                                    <span class="badge @(alert.Level == CrisisLevel.Critical ? "bg-danger" : alert.Level == CrisisLevel.High ? "bg-warning" : alert.Level == CrisisLevel.Medium ? "bg-info" : "bg-secondary")">
+                                        @alert.Level
+                                    </span>
+                                </div>
+                            }
                         </div>
                     }
                     else
@@ -137,7 +134,7 @@
                             <thead>
                                 <tr>
                                     <th>Date & Time</th>
-                                    <th>Client</th>
+                                    <th>Patient</th>
                                     <th>Professional</th>
                                     <th>Type</th>
                                     <th>Duration</th>
@@ -149,7 +146,7 @@
                                 {
                                     <tr>
                                         <td>@session.ScheduledDateTime.ToString("MMM dd, yyyy HH:mm")</td>
-                                        <td>@session.Client?.FirstName @session.Client?.LastName</td>
+                                        <td>@session.Patient?.FirstName @session.Patient?.LastName</td>
                                         <td>@session.Professional?.FirstName @session.Professional?.LastName</td>
                                         <td><span class="badge bg-primary">@session.Type</span></td>
                                         <td>@session.DurationMinutes min</td>
@@ -184,7 +181,7 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Client</th>
+                                    <th>Patient</th>
                                     <th>Mood Score</th>
                                     <th>Emotion</th>
                                     <th>Actions</th>
@@ -195,20 +192,18 @@
                                 {
                                     <tr>
                                         <td>@mood.EntryDateTime.ToString("MMM dd, HH:mm")</td>
-                                        <td>@mood.Client?.FirstName @mood.Client?.LastName</td>
+                                        <td>@mood.Patient?.FirstName @mood.Patient?.LastName</td>
                                         <td>
-                                            <span class="badge
-                                                        @(mood.MoodScore >= 8 ? "bg-success" :
-                                                                                                    mood.MoodScore >= 5 ? "bg-warning" : "bg-danger")">
-                                        @mood.MoodScore/10
-                                    </span>
-                                </td>
-                                <td>@mood.Emotion</td>
-                                <td>
-                                    <a asp-controller="MoodTracking" asp-action="Details" asp-route-id="@mood.MoodEntryId" class="btn btn-sm btn-info">View</a>
-                                </td>
-                            </tr>
-                                                        }
+                                            <span class="badge @(mood.MoodScore >= 8 ? "bg-success" : mood.MoodScore >= 5 ? "bg-warning" : "bg-danger")">
+                                                @mood.MoodScore/10
+                                            </span>
+                                        </td>
+                                        <td>@mood.Emotion</td>
+                                        <td>
+                                            <a asp-controller="MoodTracking" asp-action="Details" asp-route-id="@mood.MoodEntryId" class="btn btn-sm btn-info">View</a>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
                         </table>
                     }

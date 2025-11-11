@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Client>
+﻿@model IEnumerable<HealthWellbeing.Models.Patient>
 
 @{
     ViewData["Title"] = "Index";
@@ -79,9 +79,9 @@
                 @Html.DisplayFor(modelItem => item.IsActive)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ClientId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ClientId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ClientId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.PatientId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PatientId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PatientId">Delete</a>
             </td>
         </tr>
 }
