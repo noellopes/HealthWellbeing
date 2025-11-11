@@ -22,6 +22,7 @@
 </style>
 
 <div class="container mt-4">
+    <!-- Cabeçalho -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary mb-0">
             🏭 Zonas de Armazenamento
@@ -31,7 +32,25 @@
         </a>
     </div>
 
-    
+    <!-- Barra de Pesquisa -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="searchNome" value="@ViewBag.SearchNome" class="form-control shadow-sm"
+                       placeholder="🔍 Procurar por nome..." />
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao" class="form-control shadow-sm"
+                       placeholder="📍 Procurar por localização..." />
+            </div>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary w-50 me-2">Pesquisar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary w-50">Limpar</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Mensagens de Sucesso/Erro -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -48,10 +67,18 @@
         </div>
     }
 
+    <!-- Tabela de Zonas -->
     @if (!Model.Any())
     {
         <div class="alert alert-info text-center shadow-sm">
-            Nenhuma zona de armazenamento registada.
+            @if (string.IsNullOrEmpty(ViewBag.SearchNome as string) && string.IsNullOrEmpty(ViewBag.SearchLocalizacao as string))
+            {
+                <span>Nenhuma zona de armazenamento registada.</span>
+            }
+            else
+            {
+                <span>Nenhuma zona encontrada com os termos pesquisados.</span>
+            }
         </div>
     }
     else
@@ -61,7 +88,6 @@
                 <thead class="table-primary">
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.Nome)</th>
-                        <th>@Html.DisplayNameFor(model => model.Descricao)</th>
                         <th>@Html.DisplayNameFor(model => model.Localizacao)</th>
                         <th>@Html.DisplayNameFor(model => model.CapacidadeMaxima)</th>
                         <th>@Html.DisplayNameFor(model => model.Ativa)</th>
@@ -73,7 +99,6 @@
                     {
                         <tr>
                             <td class="fw-semibold">@item.Nome</td>
-                            <td>@item.Descricao</td>
                             <td>@item.Localizacao</td>
                             <td>@item.CapacidadeMaxima</td>
                             <td>
@@ -105,7 +130,7 @@
     }
 </div>
 
-
+<!-- Fechar alertas automaticamente -->
 <script>
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {
