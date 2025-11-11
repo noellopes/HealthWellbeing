@@ -31,7 +31,17 @@
         </a>
     </div>
 
-    
+    <!-- Barra de Pesquisa -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="input-group shadow-sm">
+            <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control"
+                   placeholder="🔍 Procurar por nome ou localização..." />
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+        </div>
+    </form>
+
+    <!-- Mensagens de Sucesso/Erro -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -48,10 +58,18 @@
         </div>
     }
 
+    <!-- Tabela ou Mensagem -->
     @if (!Model.Any())
     {
         <div class="alert alert-info text-center shadow-sm">
-            Nenhuma zona de armazenamento registada.
+            @if (string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+            {
+                <span>Nenhuma zona de armazenamento registada.</span>
+            }
+            else
+            {
+                <span>Nenhuma zona encontrada com o termo <strong>@ViewData["CurrentFilter"]</strong>.</span>
+            }
         </div>
     }
     else
@@ -61,7 +79,6 @@
                 <thead class="table-primary">
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.Nome)</th>
-                        <th>@Html.DisplayNameFor(model => model.Descricao)</th>
                         <th>@Html.DisplayNameFor(model => model.Localizacao)</th>
                         <th>@Html.DisplayNameFor(model => model.CapacidadeMaxima)</th>
                         <th>@Html.DisplayNameFor(model => model.Ativa)</th>
@@ -73,7 +90,6 @@
                     {
                         <tr>
                             <td class="fw-semibold">@item.Nome</td>
-                            <td>@item.Descricao</td>
                             <td>@item.Localizacao</td>
                             <td>@item.CapacidadeMaxima</td>
                             <td>
@@ -105,7 +121,7 @@
     }
 </div>
 
-
+<!-- Fechar alertas automaticamente -->
 <script>
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {

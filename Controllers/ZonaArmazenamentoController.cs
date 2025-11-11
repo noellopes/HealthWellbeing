@@ -21,31 +21,21 @@ namespace HealthWellbeing.Controllers
         // GET: ZonaArmazenamento
         public async Task<IActionResult> Index()
         {
-            // Se a tabela estiver vazia, insere 20 registos fictícios automaticamente
+            // Se a tabela estiver vazia, insere registos fictícios automaticamente
             if (!_context.ZonaArmazenamento.Any())
             {
                 var zonas = new List<ZonaArmazenamento>
                 {
-                    new ZonaArmazenamento { Nome = "Armazém Central", Descricao = "Zona principal de armazenamento geral", Localizacao = "Bloco A - Piso 0", CapacidadeMaxima = 5000 },
-                    new ZonaArmazenamento { Nome = "Depósito Norte", Descricao = "Materiais não perecíveis", Localizacao = "Bloco B - Norte", CapacidadeMaxima = 2500 },
-                    new ZonaArmazenamento { Nome = "Sala de Higienização", Descricao = "Produtos de limpeza", Localizacao = "Bloco C - Piso 0", CapacidadeMaxima = 1200 },
-                    new ZonaArmazenamento { Nome = "Farmácia Interna", Descricao = "Medicamentos e material médico", Localizacao = "Bloco D - Piso 1", CapacidadeMaxima = 3000 },
-                    new ZonaArmazenamento { Nome = "Zona Frigorífica", Descricao = "Armazenamento refrigerado", Localizacao = "Subsolo - Bloco E", CapacidadeMaxima = 800 },
-                    new ZonaArmazenamento { Nome = "Depósito Sul", Descricao = "Materiais e ferramentas", Localizacao = "Bloco F - Sul", CapacidadeMaxima = 4000 },
-                    new ZonaArmazenamento { Nome = "Sala de Emergência", Descricao = "Equipamentos de primeiros socorros", Localizacao = "Bloco A - Piso 1", CapacidadeMaxima = 600 },
-                    new ZonaArmazenamento { Nome = "Depósito Oeste", Descricao = "Materiais de escritório", Localizacao = "Bloco G - Oeste", CapacidadeMaxima = 1000 },
-                    new ZonaArmazenamento { Nome = "Zona Técnica", Descricao = "Peças e componentes técnicos", Localizacao = "Oficina - Bloco H", CapacidadeMaxima = 2000 },
-                    new ZonaArmazenamento { Nome = "Armazém Exterior", Descricao = "Materiais volumosos", Localizacao = "Exterior - Norte", CapacidadeMaxima = 7000 },
-                    new ZonaArmazenamento { Nome = "Depósito de Resíduos", Descricao = "Zona controlada para resíduos", Localizacao = "Bloco I - Lateral", CapacidadeMaxima = 500 },
-                    new ZonaArmazenamento { Nome = "Sala de Esterilização", Descricao = "Materiais esterilizados", Localizacao = "Bloco D - Piso 2", CapacidadeMaxima = 900 },
-                    new ZonaArmazenamento { Nome = "Armazém Hospitalar", Descricao = "Materiais médicos de uso diário", Localizacao = "Bloco H - Piso 1", CapacidadeMaxima = 3500 },
-                    new ZonaArmazenamento { Nome = "Depósito de Emergência", Descricao = "Equipamentos para emergências", Localizacao = "Bloco B - Subsolo", CapacidadeMaxima = 1500 },
-                    new ZonaArmazenamento { Nome = "Zona de Equipamentos Pesados", Descricao = "Máquinas e equipamentos grandes", Localizacao = "Bloco F - Piso -1", CapacidadeMaxima = 6000 },
-                    new ZonaArmazenamento { Nome = "Sala de Armazenamento Temporário", Descricao = "Materiais em trânsito ou devolução", Localizacao = "Bloco J - Piso 0", CapacidadeMaxima = 1800 },
-                    new ZonaArmazenamento { Nome = "Depósito de Segurança", Descricao = "Equipamentos de proteção individual", Localizacao = "Bloco E - Piso 1", CapacidadeMaxima = 900 },
-                    new ZonaArmazenamento { Nome = "Armazém de Consumíveis Médicos", Descricao = "Luvas, seringas e consumíveis", Localizacao = "Bloco C - Piso 1", CapacidadeMaxima = 2200 },
-                    new ZonaArmazenamento { Nome = "Zona de Calibração", Descricao = "Instrumentos calibrados", Localizacao = "Bloco G - Piso 2", CapacidadeMaxima = 1300 },
-                    new ZonaArmazenamento { Nome = "Zona Experimental", Descricao = "Espaço para testes e protótipos", Localizacao = "Bloco J - Piso 1", CapacidadeMaxima = 1600 }
+                    new ZonaArmazenamento { Nome = "Armazém Central Hospitalar", Descricao = "Zona principal de armazenamento de equipamentos médicos e material clínico", Localizacao = "Bloco A - Piso 0", CapacidadeMaxima = 5000 },
+                    new ZonaArmazenamento { Nome = "Depósito Norte Clínico", Descricao = "Armazenamento de material descartável e consumíveis", Localizacao = "Bloco B - Norte", CapacidadeMaxima = 2500 },
+                    new ZonaArmazenamento { Nome = "Sala de Higienização Hospitalar", Descricao = "Produtos de limpeza e desinfeção hospitalar", Localizacao = "Bloco C - Piso 0", CapacidadeMaxima = 1200 },
+                    new ZonaArmazenamento { Nome = "Farmácia Interna", Descricao = "Medicamentos, vacinas e antibióticos controlados", Localizacao = "Bloco D - Piso 1", CapacidadeMaxima = 3000 },
+                    new ZonaArmazenamento { Nome = "Zona Frigorífica Médica", Descricao = "Armazenamento refrigerado de fármacos sensíveis", Localizacao = "Subsolo - Bloco E", CapacidadeMaxima = 800 },
+                    new ZonaArmazenamento { Nome = "Depósito de Instrumentos Cirúrgicos", Descricao = "Instrumentos e material cirúrgico esterilizado", Localizacao = "Bloco F - Sul", CapacidadeMaxima = 4000 },
+                    new ZonaArmazenamento { Nome = "Sala de Emergência Médica", Descricao = "Equipamentos de resposta rápida a emergências", Localizacao = "Bloco A - Piso 1", CapacidadeMaxima = 600 },
+                    new ZonaArmazenamento { Nome = "Depósito de Material de Enfermagem", Descricao = "Luvas, gazes, seringas e kits de primeiros socorros", Localizacao = "Bloco G - Oeste", CapacidadeMaxima = 1000 },
+                    new ZonaArmazenamento { Nome = "Zona Técnica de Manutenção Hospitalar", Descricao = "Equipamentos e ferramentas de manutenção hospitalar", Localizacao = "Oficina - Bloco H", CapacidadeMaxima = 2000 },
+                    new ZonaArmazenamento { Nome = "Armazém de Oxigénio e Gases Médicos", Descricao = "Cilindros e equipamentos de ventilação", Localizacao = "Exterior - Norte", CapacidadeMaxima = 700 }
                 };
 
                 _context.ZonaArmazenamento.AddRange(zonas);
@@ -71,10 +61,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ZonaArmazenamento/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         // POST: ZonaArmazenamento/Create
         [HttpPost]
