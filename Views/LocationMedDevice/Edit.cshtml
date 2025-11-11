@@ -28,22 +28,25 @@
 
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label asp-for="MedicalDeviceID" class="form-label fw-bold">ID do Dispositivo Médico</label>
-                        <input asp-for="MedicalDeviceID" class="form-control">
+                        <label asp-for="MedicalDeviceID" class="form-label fw-bold"></label>
+                        <select asp-for="MedicalDeviceID" class="form-control" asp-items="ViewBag.MedicalDeviceID">
+                            <option value="">-- Selecione o dispositivo --</option>
+                        </select>
                         <span asp-validation-for="MedicalDeviceID" class="text-danger small"></span>
                     </div>
-
                     <div class="mb-3">
-                        <label asp-for="RoomID" class="form-label fw-bold">ID da Sala</label>
-                        <input asp-for="RoomID" class="form-control">
-                        <span asp-validation-for="RoomID" class="text-danger small"></span>
+                        <label asp-for="RoomId" class="form-label fw-bold"></label>
+                        <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId">
+                            <option value="">-- Selecione a sala --</option>
+                        </select>
+                        <span asp-validation-for="RoomId" class="text-danger small"></span>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="InitialDate" class="form-label fw-bold">Data de Início</label>
-                        <input asp-for="InitialDate" type="date" class="form-control">
+                        <input asp-for="InitialDate" type="date" class="form-control" readonly>
                         <span asp-validation-for="InitialDate" class="text-danger small"></span>
                     </div>
 
@@ -56,7 +59,7 @@
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-warning">
+                <button type="submit" class="btn btn-success">
                     <i class="bi bi-save me-1"></i> Salvar Alterações
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">

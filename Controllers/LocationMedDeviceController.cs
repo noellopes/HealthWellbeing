@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -46,7 +47,10 @@ namespace HealthWellbeingRoom.Controllers
         // GET: LocationMedDevices/Create
         public IActionResult Create()
         {
-            return View();
+            ViewBag.MedicalDeviceID = new SelectList(_context.Set<MedicalDevice>(), "MedicalDeviceID", "Name");
+            ViewBag.RoomId = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            return View(new LocationMedDevice());
+           
         }
 
         // POST: LocationMedDevices/Create

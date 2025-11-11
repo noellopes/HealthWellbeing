@@ -39,7 +39,7 @@ else
             <thead class="table-light">
                 <tr>
                     <th scope="col">@Html.DisplayNameFor(model => model.MedicalDeviceID)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.RoomID)</th>
+                    <th scope="col">@Html.DisplayNameFor(model => model.RoomId)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.InitialDate)</th>
                     <th scope="col">@Html.DisplayNameFor(model => model.EndDate)</th>
                     <th class="text-end" scope="col">Ações</th>
@@ -50,7 +50,7 @@ else
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => loc.MedicalDeviceID)</td>
-                        <td>@Html.DisplayFor(modelItem => loc.RoomID)</td>
+                        <td>@Html.DisplayFor(modelItem => loc.RoomId)</td>
                         <td>@loc.InitialDate.ToString("dd/MM/yyyy")</td>
                         <td>
                             @if (loc.EndDate.HasValue)

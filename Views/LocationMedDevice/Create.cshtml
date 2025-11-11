@@ -23,14 +23,17 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="MedicalDeviceID" class="form-label fw-bold"></label>
-                        <input asp-for="MedicalDeviceID" class="form-control" placeholder="Ex: 101 (ID do dispositivo)">
+                        <select asp-for="MedicalDeviceID" class="form-control" asp-items="ViewBag.MedicalDeviceID">
+                            <option value="">-- Selecione o dispositivo --</option>
+                        </select>
                         <span asp-validation-for="MedicalDeviceID" class="text-danger small"></span>
-                    </div>
-
+                    </div> 
                     <div class="mb-3">
-                        <label asp-for="RoomID" class="form-label fw-bold"></label>
-                        <input asp-for="RoomID" class="form-control" placeholder="Ex: 12 (ID da sala)">
-                        <span asp-validation-for="RoomID" class="text-danger small"></span>
+                        <label asp-for="RoomId" class="form-label fw-bold"></label>
+                        <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId">
+                            <option value="">-- Selecione a sala --</option>
+                        </select>
+                        <span asp-validation-for="RoomId" class="text-danger small"></span>
                     </div>
                 </div>
 
@@ -40,7 +43,6 @@
                         <input asp-for="InitialDate" type="date" class="form-control">
                         <span asp-validation-for="InitialDate" class="text-danger small"></span>
                     </div>
-
                 </div>
             </div>
 

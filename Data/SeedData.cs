@@ -276,161 +276,181 @@ namespace HealthWellBeingRoom.Data
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 1,
-                    RoomID = 101,
+                    RoomId = 1,
                     InitialDate = DateTime.Now.AddMonths(-3),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 2,
-                    RoomID = 104,
+                    RoomId = 2,
                     InitialDate = DateTime.Now.AddMonths(-2),
-                    EndDate = DateTime.Now.AddDays(-10)
+                    EndDate = DateTime.Now.AddDays(-10),
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 3,
-                    RoomID = 203,
+                    RoomId = 3,
                     InitialDate = DateTime.Now.AddMonths(-1),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 4,
-                    RoomID = 205,
+                    RoomId = 4,
                     InitialDate = DateTime.Now.AddDays(-45),
-                    EndDate = DateTime.Now.AddDays(-5)
+                    EndDate = DateTime.Now.AddDays(-5),
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 5,
-                    RoomID = 210,
+                    RoomId = 5,
                     InitialDate = DateTime.Now.AddDays(-30),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 6,
-                    RoomID = 110,
+                    RoomId = 1,
                     InitialDate = DateTime.Now.AddDays(-20),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 7,
-                    RoomID = 111,
+                    RoomId = 2,
                     InitialDate = DateTime.Now.AddDays(-15),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 8,
-                    RoomID = 220,
+                    RoomId = 3,
                     InitialDate = DateTime.Now.AddDays(-10),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 9,
-                    RoomID = 301,
+                    RoomId = 4,
                     InitialDate = DateTime.Now.AddDays(-8),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 10,
-                    RoomID = 302,
+                    RoomId = 5,
                     InitialDate = DateTime.Now.AddDays(-6),
-                    EndDate = DateTime.Now.AddDays(-1)
+                    EndDate = DateTime.Now.AddDays(-1),
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 11,
-                    RoomID = 105,
+                    RoomId = 1,
                     InitialDate = DateTime.Now.AddDays(-4),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 12,
-                    RoomID = 106,
+                    RoomId = 2,
                     InitialDate = DateTime.Now.AddDays(-3),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 13,
-                    RoomID = 115,
+                    RoomId = 3,
                     InitialDate = DateTime.Now.AddDays(-2),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 14,
-                    RoomID = 120,
+                    RoomId = 4,
                     InitialDate = DateTime.Now.AddDays(-1),
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 15,
-                    RoomID = 305,
+                    RoomId = 5,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 16,
-                    RoomID = 307,
+                    RoomId = 1,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 17,
-                    RoomID = 310,
+                    RoomId = 2,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 18,
-                    RoomID = 401,
+                    RoomId = 3,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 19,
-                    RoomID = 405,
+                    RoomId = 4,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 },
 
                 new LocationMedDevice
                 {
                     MedicalDeviceID = 20,
-                    RoomID = 410,
+                    RoomId = 5,
                     InitialDate = DateTime.Now,
-                    EndDate = null
+                    EndDate = null,
+                    IsCurrent = true
                 }
                 });
 
