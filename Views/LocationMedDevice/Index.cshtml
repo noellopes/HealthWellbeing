@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeing.Models
-@model IEnumerable<LocationMedDevice>
+@model HealthWellbeing.ViewModels.RPaginationInfo<LocationMedDevice>
 
 @{
     ViewData["Title"] = "Localizações de Dispositivos Médicos";
@@ -7,7 +7,7 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-@if (!Model.Any())
+@if (Model == null || !Model.Items.Any())
 {
     <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
@@ -38,15 +38,15 @@ else
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">@Html.DisplayNameFor(model => model.MedicalDeviceID)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.RoomId)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.InitialDate)</th>
-                    <th scope="col">@Html.DisplayNameFor(model => model.EndDate)</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Sala</th>
+                    <th scope="col">Data inicial</th>
+                    <th scope="col">Data final</th>
                     <th class="text-end" scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var loc in Model)
+                @foreach (var loc in Model.Items)
                 {
                     <tr>
                         <td>@(loc.MedicalDevice?.Name ?? "N/A")</td>
@@ -80,5 +80,42 @@ else
                 }
             </tbody>
         </table>
+        @* --- Secção de Paginação --- *@
+        <nav aria-label="Location Medical Device page" class="d-flex justify-content-between align-items-center">
+            @* Model.Items.Count() mostra quantos itens estão na página atual *@
+            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+
+            <ul class="pagination mb-0">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                    }
+                }
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                }
+            </ul>
+        </nav>
+
     </div>
 }

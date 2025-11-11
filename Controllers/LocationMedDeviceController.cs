@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,15 +20,35 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            var locais = await _context.LocationMedDevice
+            int itemsPerPage = 10;
+
+            // Query base (IQueryable) com Includes
+            var query = _context.LocationMedDevice
                 .Include(l => l.MedicalDevice)
                 .Include(l => l.Room)
+                .AsQueryable();
+
+            // Total de itens
+            int totalItems = await query.CountAsync();
+
+            // Instancia o ViewModel de Paginação
+            var paginationInfo = new RPaginationInfo<LocationMedDevice>(page, totalItems, itemsPerPage);
+
+            // Busca os itens da página atual
+            var locs = await query
+                .OrderBy(l => l.LocationMedDeviceID) // Ordenação consistente
+                .Skip(paginationInfo.ItemsToSkip)
+                .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
 
-            return View(locais);
+            // Atribui os itens ao ViewModel
+            paginationInfo.Items = locs;
+
+            return View(paginationInfo);
         }
+
 
         // GET: LocationMedDevice/Details/5
         public async Task<IActionResult> Details(int? id)
