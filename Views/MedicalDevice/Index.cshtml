@@ -98,7 +98,10 @@ else
                     @* Extrair a localização do dispositivo *@
                     // Pega a primeira (e única, se IsCurrent for usado corretamente) localização ativa.
                     // O Controller garante que este campo está carregado (Eager Loading).
-                    var localizacao = dispositivo.LocalizacaoDispMedicoMovel.FirstOrDefault();
+                    // Pega a localização ativa (a que ainda não tem data de fim)
+                    var localizacao = dispositivo.LocalizacaoDispMedicoMovel
+                    .FirstOrDefault(l => l.EndDate == null);
+
                     string status = dispositivo.CurrentStatus;
                     
                     <tr>

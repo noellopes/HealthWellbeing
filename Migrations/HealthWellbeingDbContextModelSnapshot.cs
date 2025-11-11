@@ -490,7 +490,7 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
                 {
                     b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
-                        .WithMany()
+                        .WithMany("LocalizacaoDispMedicoMovel")
                         .HasForeignKey("MedicalDeviceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -544,7 +544,7 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
                 {
                     b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
-                        .WithMany("LocalizacaoDispMedicoMovel")
+                        .WithMany()
                         .HasForeignKey("MedicalDeviceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

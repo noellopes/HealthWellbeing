@@ -41,7 +41,7 @@ namespace HealthWellbeingRoom.Models
         public TypeMaterial? TypeMaterial { get; set; }
 
         //Coleção para a tabela intermediária
-        public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
+        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
 
         // Status: Em manutenção (Propriedade de controlo)
         public bool IsUnderMaintenance { get; set; } = false;
@@ -59,7 +59,7 @@ namespace HealthWellbeingRoom.Models
                 }
 
                 // 2. Segunda Prioridade: Alocação (Indisponível)
-                if (LocalizacaoDispMedicoMovel.Any())
+                if (LocalizacaoDispMedicoMovel != null && LocalizacaoDispMedicoMovel.Any(loc => loc.EndDate == null))
                 {
                     return "Indisponível (Alocado)";
                 }

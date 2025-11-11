@@ -5,7 +5,7 @@
     ViewData["Title"] = "Detalhes do Dispositivo";
 
     //Obtém o registo **ATIVO** de localização (se existir).
-    LocalizacaoDispMovel_temporario? localizacao = Model.LocalizacaoDispMedicoMovel.FirstOrDefault();
+    LocationMedDevice? localizacao = Model.LocalizacaoDispMedicoMovel.FirstOrDefault();
     string localizacaoNome = localizacao?.Room?.Name ?? "N/A"; //atribuido se não houver
 
     // 2. Obtém o status calculado no modelo MedicalDevice.

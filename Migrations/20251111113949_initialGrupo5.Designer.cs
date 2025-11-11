@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251111103820_initialGrupo5")]
+    [Migration("20251111113949_initialGrupo5")]
     partial class initialGrupo5
     {
         /// <inheritdoc />
@@ -493,7 +493,7 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
                 {
                     b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
-                        .WithMany()
+                        .WithMany("LocalizacaoDispMedicoMovel")
                         .HasForeignKey("MedicalDeviceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -547,7 +547,7 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
                 {
                     b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
-                        .WithMany("LocalizacaoDispMedicoMovel")
+                        .WithMany()
                         .HasForeignKey("MedicalDeviceID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
