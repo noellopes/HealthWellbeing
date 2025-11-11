@@ -21,22 +21,51 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercicios
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(
+        int page = 1,
+        string searchNome = "",
+        string searchDescricao = "",
+        string searchGenero = "",
+        string searchGrupoMuscular = "")
         {
-            var exerciciosContext = _context.Exercicio.Include(e => e.Genero);
+            var query = _context.Exercicio
+                .Include(e => e.Genero)        // coleção de Genero
+                .Include(e => e.GrupoMuscular) // coleção de GrupoMuscular
+                .AsQueryable();
 
-            int numberExercicios = await exerciciosContext.CountAsync();
+            if (!string.IsNullOrEmpty(searchNome))
+                query = query.Where(e => e.ExercicioNome.Contains(searchNome));
 
-            var exerciciosInfo = new PaginationInfoExercicios<Exercicio>(page, numberExercicios);
+            if (!string.IsNullOrEmpty(searchDescricao))
+                query = query.Where(e => e.Descricao.Contains(searchDescricao));
 
-            exerciciosInfo.Items = await exerciciosContext
+            // Pesquisar dentro da coleção de gêneros
+            if (!string.IsNullOrEmpty(searchGenero))
+                query = query.Where(e => e.Genero.Any(g => g.NomeGenero.Contains(searchGenero)));
+
+            // Pesquisar dentro da coleção de grupos musculares
+            if (!string.IsNullOrEmpty(searchGrupoMuscular))
+                query = query.Where(e => e.GrupoMuscular.Any(gm => gm.GrupoMuscularNome.Contains(searchGrupoMuscular)));
+
+            int totalItems = await query.CountAsync();
+
+            var pagination = new PaginationInfoExercicios<Exercicio>(page, totalItems);
+
+            pagination.Items = await query
                 .OrderBy(e => e.ExercicioNome)
-                .Skip(exerciciosInfo.ItemsToSkip)
-                .Take(exerciciosInfo.ItemsPerPage)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            return View(exerciciosInfo);
+            // Guardar filtros para a view
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchDescricao = searchDescricao;
+            ViewBag.SearchGenero = searchGenero;
+            ViewBag.SearchGrupoMuscular = searchGrupoMuscular;
+
+            return View(pagination);
         }
+
 
         // GET: Exercicios/Details
         public async Task<IActionResult> Details(int? id)

@@ -1,24 +1,64 @@
 ﻿@model HealthWellbeing.Models.Genero
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Gênero";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.GeneroId" class="btn btn-warning me-2">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.GeneroId" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Apagar
+            </a>
+        </div>
+    </div>
 
-<div>
-    <h4>Genero</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeGenero)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NomeGenero)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.GeneroId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">@Model.NomeGenero</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Informações do Gênero -->
+                <div class="col-md-6 mb-3">
+                    <h5 class="fw-bold">Informações</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="text-secondary">Nome do Gênero:</th>
+                            <td>@Model.NomeGenero</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Caso queira adicionar relações futuras, como exercícios -->
+                <div class="col-md-6 mb-3">
+                    <h5 class="fw-bold">Exercícios Associados</h5>
+                    @if (Model.Exercicio != null && Model.Exercicio.Any())
+                    {
+                        <ul class="list-unstyled">
+                            @foreach (var exercicio in Model.Exercicio)
+                            {
+                                <li>
+                                    <a asp-action="Details" asp-controller="Exercicios" asp-route-id="@exercicio.ExercicioId">
+                                        @exercicio.ExercicioNome
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum exercício associado.</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

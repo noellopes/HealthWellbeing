@@ -1,34 +1,39 @@
 ﻿@model HealthWellbeing.Models.Genero
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Gênero";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <h2 class="mb-4 text-warning"><i class="fas fa-edit"></i> Editar Gênero</h2>
 
-<h4>Genero</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="GeneroId" />
-            <div class="form-group">
-                <label asp-for="NomeGenero" class="control-label"></label>
-                <input asp-for="NomeGenero" class="form-control" />
-                <span asp-validation-for="NomeGenero" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="GeneroId" />
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div asp-validation-summary="All" class="text-danger small"></div>
+
+        <!-- Nome do Gênero -->
+        <div class="mb-3">
+            <label asp-for="NomeGenero" class="form-label">Nome do Gênero *</label>
+            <input asp-for="NomeGenero" class="form-control" placeholder="Ex: Masculino, Feminino, Infantil">
+            <span asp-validation-for="NomeGenero" class="text-danger small"></span>
+        </div>
+
+        <!-- Botões -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-save"></i> Guardar Alterações
+            </button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

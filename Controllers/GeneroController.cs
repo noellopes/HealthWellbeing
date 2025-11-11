@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,13 +20,30 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Genero
-        public async Task<IActionResult> Index()
+        // GET: Generos
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Genero.ToListAsync());
+            // Consulta base
+            var generosQuery = _context.Genero.AsQueryable();
+
+            // Contar total de itens
+            int totalGeneros = await generosQuery.CountAsync();
+
+            // Criar objeto de paginação
+            var generosInfo = new PaginationInfoExercicios<Genero>(page, totalGeneros);
+
+            // Buscar os itens da página atual
+            generosInfo.Items = await generosQuery
+                .OrderBy(g => g.NomeGenero)
+                .Skip(generosInfo.ItemsToSkip)
+                .Take(generosInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(generosInfo);
         }
 
-        // GET: Genero/Details/5
+
+        // GET: Genero/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

@@ -1,33 +1,44 @@
 ﻿@model HealthWellbeing.Models.Genero
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Gênero";
 }
 
-<h1>Create</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h4>Genero</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NomeGenero" class="control-label"></label>
-                <input asp-for="NomeGenero" class="form-control" />
-                <span asp-validation-for="NomeGenero" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
     </div>
-</div>
+}
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- Nome do Gênero -->
+    <div class="mb-3">
+        <label asp-for="NomeGenero" class="form-label fw-bold">Nome do Gênero *</label>
+        <input asp-for="NomeGenero" class="form-control" placeholder="Ex: Masculino, Feminino, Outro" />
+        <span asp-validation-for="NomeGenero" class="text-danger small"></span>
+    </div>
+
+    <!-- Botões -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success me-2">
+            <i class="fas fa-save"></i> Criar Gênero
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
