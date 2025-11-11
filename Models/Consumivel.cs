@@ -12,15 +12,26 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
         public string Nome { get; set; }
 
+        [Display(Name = "Categoria")]
+        [ForeignKey("CategoriaConsumivel")]
+        public int CategoriaId { get; set; }
+
         [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
         public string? Descricao { get; set; }
 
-        // Chave estrangeira
-        [ForeignKey("CategoriaConsumivel")]
-        [Display(Name = "Categoria")]
-        public int CategoriaId { get; set; }
+        [Display(Name = "Quantidade Máxima")]
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade máxima deve ser um número positivo.")]
+        public int QuantidadeMaxima { get; set; }
 
-        // Propriedade de navegação (importante para o EF)
+        [Display(Name = "Quantidade Atual")]
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade atual deve ser um número positivo.")]
+        public int QuantidadeAtual { get; set; }
+
+        [Display(Name = "Quantidade Mínima")]
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade mínima deve ser um número positivo.")]
+        public int QuantidadeMinima { get; set; }
+
+        // Navegação
         public CategoriaConsumivel? CategoriaConsumivel { get; set; }
     }
 }
