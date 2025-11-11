@@ -82,34 +82,41 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Adicionar nova alocação
-                _context.Add(locationMedDevice);
+                // Garantir que o novo registro seja a localização atual
+                locationMedDevice.IsCurrent = true;
 
-                // Buscar o dispositivo médico associado
+                // Buscar o dispositivo médico associado, incluindo suas localizações atuais
                 var device = await _context.MedicalDevices
                     .Include(d => d.LocalizacaoDispMedicoMovel)
                     .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
 
                 if (device != null)
                 {
-                    // Se o registo é novo e ainda não tem DataFim → fica indisponível
-                    if (locationMedDevice.EndDate == null)
+                    // Marcar todas as outras localizações atuais como não atuais
+                    var currentLocations = device.LocalizacaoDispMedicoMovel
+                                                .Where(l => l.IsCurrent)
+                                                .ToList();
+
+                    foreach (var loc in currentLocations)
                     {
-                        // Simulamos a atualização do status pela presença da alocação ativa
-                        // (O getter CurrentStatus já faz isso, mas mantemos coerência)
-                        // Não há campo físico CurrentStatus, é calculado dinamicamente.
+                        loc.IsCurrent = false;
                     }
                 }
 
+                // Adicionar a nova localização
+                _context.Add(locationMedDevice);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
 
-            // Se a validação falhar, recarregar as dropdowns
+            // Recarregar dropdowns se houver erro de validação
             ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
             ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
+
             return View(locationMedDevice);
         }
+
 
         // GET: LocationMedDevice/Edit/5
         public async Task<IActionResult> Edit(int? id)
