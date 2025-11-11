@@ -4,8 +4,6 @@ using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,137 +18,168 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
-        // GET: LocationMedDevices
+        // GET: LocationMedDevice
         public async Task<IActionResult> Index()
         {
-            return View(await _context.LocationMedDevice.ToListAsync());
+            var locais = await _context.LocationMedDevice
+                .Include(l => l.MedicalDevice)
+                .Include(l => l.Room)
+                .ToListAsync();
+
+            return View(locais);
         }
 
-        // GET: LocationMedDevices/Details/5
+        // GET: LocationMedDevice/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var LocationMedDevice = await _context.LocationMedDevice
+            var location = await _context.LocationMedDevice
+                .Include(l => l.MedicalDevice)
+                .Include(l => l.Room)
                 .FirstOrDefaultAsync(m => m.LocationMedDeviceID == id);
-            if (LocationMedDevice == null)
-            {
-                return NotFound();
-            }
 
-            return View(LocationMedDevice);
+            if (location == null)
+                return NotFound();
+
+            return View(location);
         }
 
-        // GET: LocationMedDevices/Create
+        // GET: LocationMedDevice/Create
         public IActionResult Create()
         {
-            ViewBag.MedicalDeviceID = new SelectList(_context.Set<MedicalDevice>(), "MedicalDeviceID", "Name");
-            ViewBag.RoomId = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name");
+            ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name");
             return View(new LocationMedDevice());
-           
         }
 
-        // POST: LocationMedDevices/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: LocationMedDevice/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LocationMedDeviceID,MedicalDeviceID,RoomID,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
+        public async Task<IActionResult> Create([Bind("MedicalDeviceID,RoomId,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
         {
             if (ModelState.IsValid)
             {
+                // Adicionar nova alocação
                 _context.Add(locationMedDevice);
+
+                // Buscar o dispositivo médico associado
+                var device = await _context.MedicalDevices
+                    .Include(d => d.LocalizacaoDispMedicoMovel)
+                    .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
+
+                if (device != null)
+                {
+                    // Se o registo é novo e ainda não tem DataFim → fica indisponível
+                    if (locationMedDevice.EndDate == null)
+                    {
+                        // Simulamos a atualização do status pela presença da alocação ativa
+                        // (O getter CurrentStatus já faz isso, mas mantemos coerência)
+                        // Não há campo físico CurrentStatus, é calculado dinamicamente.
+                    }
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Se a validação falhar, recarregar as dropdowns
+            ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
+            ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
             return View(locationMedDevice);
         }
 
-
-        // GET: LocationMedDevices/Edit/5
+        // GET: LocationMedDevice/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var LocationMedDevice = await _context.LocationMedDevice.FindAsync(id);
-            if (LocationMedDevice == null)
-            {
+            var location = await _context.LocationMedDevice.FindAsync(id);
+            if (location == null)
                 return NotFound();
-            }
-            return View(LocationMedDevice);
+
+            ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", location.MedicalDeviceID);
+            ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", location.RoomId);
+
+            return View(location);
         }
 
-        // POST: LocationMedDevices/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: LocationMedDevice/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LocationMedDeviceID,MedicalDeviceID,RoomID,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
+        public async Task<IActionResult> Edit(int id, [Bind("LocationMedDeviceID,MedicalDeviceID,RoomId,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
         {
             if (id != locationMedDevice.LocationMedDeviceID)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(locationMedDevice);
+
+                    // Buscar o dispositivo para atualizar disponibilidade
+                    var device = await _context.MedicalDevices
+                        .Include(d => d.LocalizacaoDispMedicoMovel)
+                        .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
+
+                    if (device != null)
+                    {
+                        // Se a alocação foi encerrada (tem DataFim) → o equipamento volta a ficar disponível
+                        if (locationMedDevice.EndDate != null)
+                        {
+                            // Nada para gravar, CurrentStatus é calculado dinamicamente.
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!LocationMedDeviceExists(locationMedDevice.LocationMedDeviceID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
+            ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
             return View(locationMedDevice);
         }
 
-        // GET: LocationMedDevices/Delete/5
+        // GET: LocationMedDevice/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var LocationMedDevice = await _context.LocationMedDevice
+            var location = await _context.LocationMedDevice
+                .Include(l => l.MedicalDevice)
+                .Include(l => l.Room)
                 .FirstOrDefaultAsync(m => m.LocationMedDeviceID == id);
-            if (LocationMedDevice == null)
-            {
-                return NotFound();
-            }
 
-            return View(LocationMedDevice);
+            if (location == null)
+                return NotFound();
+
+            return View(location);
         }
 
-        // POST: LocationMedDevices/Delete/5
+        // POST: LocationMedDevice/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var LocationMedDevice = await _context.LocationMedDevice.FindAsync(id);
-            if (LocationMedDevice != null)
+            var location = await _context.LocationMedDevice.FindAsync(id);
+            if (location != null)
             {
-                _context.LocationMedDevice.Remove(LocationMedDevice);
+                _context.LocationMedDevice.Remove(location);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

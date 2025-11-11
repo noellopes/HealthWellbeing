@@ -135,13 +135,20 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<DateTime>("InitialDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MedicalDeviceID")
                         .HasColumnType("int");
 
-                    b.Property<int>("RoomID")
+                    b.Property<int>("RoomId")
                         .HasColumnType("int");
 
                     b.HasKey("LocationMedDeviceID");
+
+                    b.HasIndex("MedicalDeviceID");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("LocationMedDevice");
                 });
@@ -478,6 +485,25 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
+                {
+                    b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
+                        .WithMany()
+                        .HasForeignKey("MedicalDeviceID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MedicalDevice");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>

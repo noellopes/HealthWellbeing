@@ -24,6 +24,8 @@ namespace HealthWellBeingRoom.Data
 
             PopulateMedicalDevices(dbContext);
             PopulateLocalizacaoDispMovel_temporario(dbContext);
+
+            PopulateLocationMedDevices(dbContext);
         }
 
         private static void PopulateManufacturer(HealthWellbeingDbContext dbContext)

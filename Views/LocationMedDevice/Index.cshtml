@@ -49,8 +49,8 @@ else
                 @foreach (var loc in Model)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => loc.MedicalDeviceID)</td>
-                        <td>@Html.DisplayFor(modelItem => loc.RoomId)</td>
+                        <td>@(loc.MedicalDevice?.Name ?? "N/A")</td>
+                        <td>@(loc.Room?.Name ?? "N/A")</td>
                         <td>@loc.InitialDate.ToString("dd/MM/yyyy")</td>
                         <td>
                             @if (loc.EndDate.HasValue)
