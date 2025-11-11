@@ -1,5 +1,4 @@
 ﻿using HealthWellbeing.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Data
 {
@@ -14,7 +13,6 @@ namespace HealthWellbeing.Data
             PopulateTreatmentType(HealthWellbeingDbContext);
             //PopulatePathology
             PopulateNurses(HealthWellbeingDbContext);
-            //PupulateNurses
         }
         private static void PopulateTreatmentType(HealthWellbeingDbContext HealthWellbeingDbContext)
         {
