@@ -499,5 +499,195 @@ namespace HealthWellBeingRoom.Data
 
             dbContext.SaveChanges();
         }
+        private static void PopulateLocationMedDevices(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.LocationMedDevice.Any()) return;
+
+            dbContext.LocationMedDevice.AddRange(new List<LocationMedDevice>()
+            {
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 1,
+                    RoomId = 1,
+                    InitialDate = DateTime.Now.AddMonths(-3),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 2,
+                    RoomId = 2,
+                    InitialDate = DateTime.Now.AddMonths(-2),
+                    EndDate = DateTime.Now.AddDays(-10),
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 3,
+                    RoomId = 3,
+                    InitialDate = DateTime.Now.AddMonths(-1),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 4,
+                    RoomId = 4,
+                    InitialDate = DateTime.Now.AddDays(-45),
+                    EndDate = DateTime.Now.AddDays(-5),
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 5,
+                    RoomId = 5,
+                    InitialDate = DateTime.Now.AddDays(-30),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 6,
+                    RoomId = 1,
+                    InitialDate = DateTime.Now.AddDays(-20),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 7,
+                    RoomId = 2,
+                    InitialDate = DateTime.Now.AddDays(-15),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 8,
+                    RoomId = 3,
+                    InitialDate = DateTime.Now.AddDays(-10),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 9,
+                    RoomId = 4,
+                    InitialDate = DateTime.Now.AddDays(-8),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 10,
+                    RoomId = 5,
+                    InitialDate = DateTime.Now.AddDays(-6),
+                    EndDate = DateTime.Now.AddDays(-1),
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 11,
+                    RoomId = 1,
+                    InitialDate = DateTime.Now.AddDays(-4),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 12,
+                    RoomId = 2,
+                    InitialDate = DateTime.Now.AddDays(-3),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 13,
+                    RoomId = 3,
+                    InitialDate = DateTime.Now.AddDays(-2),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 14,
+                    RoomId = 4,
+                    InitialDate = DateTime.Now.AddDays(-1),
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 15,
+                    RoomId = 5,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 16,
+                    RoomId = 1,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 17,
+                    RoomId = 2,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 18,
+                    RoomId = 3,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 19,
+                    RoomId = 4,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                },
+
+                new LocationMedDevice
+                {
+                    MedicalDeviceID = 20,
+                    RoomId = 5,
+                    InitialDate = DateTime.Now,
+                    EndDate = null,
+                    IsCurrent = true
+                }
+                });
+
+                dbContext.SaveChanges();
+        }
+
     }
 }

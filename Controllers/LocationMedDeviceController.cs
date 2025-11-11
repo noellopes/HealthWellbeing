@@ -1,31 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
-    public class LocationMaterialsController : Controller
+    public class LocationMedDeviceController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public LocationMaterialsController(HealthWellbeingDbContext context)
+        public LocationMedDeviceController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: LocationMaterials
+        // GET: LocationMedDevices
         public async Task<IActionResult> Index()
         {
-            return View(await _context.LocationMaterial.ToListAsync());
+            return View(await _context.LocationMedDevice.ToListAsync());
         }
 
-        // GET: LocationMaterials/Details/5
+        // GET: LocationMedDevices/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +34,43 @@ namespace HealthWellbeingRoom.Controllers
                 return NotFound();
             }
 
-            var locationMaterial = await _context.LocationMaterial
-                .FirstOrDefaultAsync(m => m.LocationMaterialID == id);
-            if (locationMaterial == null)
+            var LocationMedDevice = await _context.LocationMedDevice
+                .FirstOrDefaultAsync(m => m.LocationMedDeviceID == id);
+            if (LocationMedDevice == null)
             {
                 return NotFound();
             }
 
-            return View(locationMaterial);
+            return View(LocationMedDevice);
         }
 
-        // GET: LocationMaterials/Create
+        // GET: LocationMedDevices/Create
         public IActionResult Create()
         {
-            return View();
+            ViewBag.MedicalDeviceID = new SelectList(_context.Set<MedicalDevice>(), "MedicalDeviceID", "Name");
+            ViewBag.RoomId = new SelectList(_context.Set<Room>(), "RoomId", "Name");
+            return View(new LocationMedDevice());
+           
         }
 
-        // POST: LocationMaterials/Create
+        // POST: LocationMedDevices/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LocationMaterialID,Sector,Room,Cabinet,Drawer,Shelf,IdentificationCode,Observation")] LocationMaterial locationMaterial)
+        public async Task<IActionResult> Create([Bind("LocationMedDeviceID,MedicalDeviceID,RoomID,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(locationMaterial);
+                _context.Add(locationMedDevice);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(locationMaterial);
+            return View(locationMedDevice);
         }
 
-        // GET: LocationMaterials/Edit/5
+
+        // GET: LocationMedDevices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +78,22 @@ namespace HealthWellbeingRoom.Controllers
                 return NotFound();
             }
 
-            var locationMaterial = await _context.LocationMaterial.FindAsync(id);
-            if (locationMaterial == null)
+            var LocationMedDevice = await _context.LocationMedDevice.FindAsync(id);
+            if (LocationMedDevice == null)
             {
                 return NotFound();
             }
-            return View(locationMaterial);
+            return View(LocationMedDevice);
         }
 
-        // POST: LocationMaterials/Edit/5
+        // POST: LocationMedDevices/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LocationMaterialID,Sector,Room,Cabinet,Drawer,Shelf,IdentificationCode,Observation")] LocationMaterial locationMaterial)
+        public async Task<IActionResult> Edit(int id, [Bind("LocationMedDeviceID,MedicalDeviceID,RoomID,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
         {
-            if (id != locationMaterial.LocationMaterialID)
+            if (id != locationMedDevice.LocationMedDeviceID)
             {
                 return NotFound();
             }
@@ -97,12 +102,12 @@ namespace HealthWellbeingRoom.Controllers
             {
                 try
                 {
-                    _context.Update(locationMaterial);
+                    _context.Update(locationMedDevice);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LocationMaterialExists(locationMaterial.LocationMaterialID))
+                    if (!LocationMedDeviceExists(locationMedDevice.LocationMedDeviceID))
                     {
                         return NotFound();
                     }
@@ -113,10 +118,10 @@ namespace HealthWellbeingRoom.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(locationMaterial);
+            return View(locationMedDevice);
         }
 
-        // GET: LocationMaterials/Delete/5
+        // GET: LocationMedDevices/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +129,34 @@ namespace HealthWellbeingRoom.Controllers
                 return NotFound();
             }
 
-            var locationMaterial = await _context.LocationMaterial
-                .FirstOrDefaultAsync(m => m.LocationMaterialID == id);
-            if (locationMaterial == null)
+            var LocationMedDevice = await _context.LocationMedDevice
+                .FirstOrDefaultAsync(m => m.LocationMedDeviceID == id);
+            if (LocationMedDevice == null)
             {
                 return NotFound();
             }
 
-            return View(locationMaterial);
+            return View(LocationMedDevice);
         }
 
-        // POST: LocationMaterials/Delete/5
+        // POST: LocationMedDevices/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var locationMaterial = await _context.LocationMaterial.FindAsync(id);
-            if (locationMaterial != null)
+            var LocationMedDevice = await _context.LocationMedDevice.FindAsync(id);
+            if (LocationMedDevice != null)
             {
-                _context.LocationMaterial.Remove(locationMaterial);
+                _context.LocationMedDevice.Remove(LocationMedDevice);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LocationMaterialExists(int id)
+        private bool LocationMedDeviceExists(int id)
         {
-            return _context.LocationMaterial.Any(e => e.LocationMaterialID == id);
+            return _context.LocationMedDevice.Any(e => e.LocationMedDeviceID == id);
         }
     }
 }

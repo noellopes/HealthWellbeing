@@ -16,7 +16,7 @@ namespace HealthWellbeing.Data
         }
 
         public DbSet<HealthWellbeing.Models.TypeMaterial> TypeMaterial { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.LocationMaterial> LocationMaterial { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.LocationMedDevice> LocationMedDevice { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentType> EquipmentType { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.EquipmentStatus> EquipmentStatus { get; set; } = default!;
         public DbSet<HealthWellbeingRoom.Models.Manufacturer> Manufacturer { get; set; } = default!;
