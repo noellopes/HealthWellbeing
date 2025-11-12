@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,29 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Consultas
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Consulta.ToListAsync());
+            // Base query sem Includes (a menos que tenhas navegações para carregar)
+            var consultasQuery = _context.Consulta
+                .AsNoTracking();
+
+            // total de registos
+            int numberConsultas = await consultasQuery.CountAsync();
+
+            // cria o viewmodel de paginação
+            var consultasInfo = new PaginationInfo<Consulta>(page, numberConsultas);
+
+            // define um pageSize (se o teu PaginationInfo já não tiver)
+            var pageSize = consultasInfo.ItemsPerPage > 0 ? consultasInfo.ItemsPerPage : 10;
+
+            // aplica ordenação + paginação
+            consultasInfo.Items = await consultasQuery
+                .OrderBy(c => c.DataConsulta)                   // se for DateTime?
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return View(consultasInfo);
         }
 
         // GET: Consultas/Details/5

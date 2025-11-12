@@ -1,7 +1,8 @@
-﻿using System;
-using System.Linq;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace HealthWellbeing.Data
 {
@@ -11,7 +12,7 @@ namespace HealthWellbeing.Data
         {
             if (db == null) throw new ArgumentNullException(nameof(db));
 
-            // Garante que a BD existe
+
             db.Database.EnsureCreated();
 
             PopulateConsultas(db);
@@ -21,7 +22,8 @@ namespace HealthWellbeing.Data
 
         private static void PopulateConsultas(HealthWellbeingDbContext db)
         {
-            // Base para datas/horas
+            if (db.Consulta.Any()) return;
+
             var hoje = DateTime.Today;
 
             var consulta = new[]
