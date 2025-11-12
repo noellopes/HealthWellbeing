@@ -19,7 +19,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: CategoriaConsumivel
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchString, int page = 1)
         {
             int pageSize = 10;
 
@@ -73,10 +73,19 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            var totalCategorias = await _context.CategoriaConsumivel.CountAsync();
+            // Consulta base
+            var categoriasQuery = _context.CategoriaConsumivel.AsQueryable();
+
+            // Aplicar filtro de pesquisa se houver
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                categoriasQuery = categoriasQuery.Where(c => c.Nome.Contains(searchString));
+            }
+
+            var totalCategorias = await categoriasQuery.CountAsync();
             var totalPages = (int)Math.Ceiling(totalCategorias / (double)pageSize);
 
-            var categoriasPagina = await _context.CategoriaConsumivel
+            var categoriasPagina = await categoriasQuery
                 .OrderBy(c => c.Nome)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -84,6 +93,7 @@ namespace HealthWellbeing.Controllers
 
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            ViewBag.SearchString = searchString;
 
             return View(categoriasPagina);
         }
@@ -201,6 +211,7 @@ namespace HealthWellbeing.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
         private bool CategoriaConsumivelExists(int id)
         {
             return _context.CategoriaConsumivel.Any(e => e.CategoriaId == id);
