@@ -109,6 +109,9 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(categoriaConsumivel);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Categoria criada com sucesso!";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(categoriaConsumivel);
@@ -160,6 +163,7 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Categoria alterada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(categoriaConsumivel);
@@ -195,6 +199,9 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Categoria eliminada com sucesso!";
+
             return RedirectToAction(nameof(Index));
         }
 
