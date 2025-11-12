@@ -59,7 +59,7 @@
             <table class="table table-hover align-middle">
                 <thead class="table-primary">
                     <tr>
-                        <th>@Html.DisplayNameFor(model => model.Nome)</th>
+                        <th>@Html.DisplayNameFor(model => model.First().Nome)</th>
                         <th class="text-center" style="width: 230px;">Ações</th>
                     </tr>
                 </thead>
@@ -84,10 +84,34 @@
                 </tbody>
             </table>
         </div>
+
+        @* Paginação *@
+        @if (ViewBag.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-3">
+                    <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)">Anterior</a>
+                    </li>
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     }
 </div>
 
 <script>
+    // Fecha alertas automaticamente
     setTimeout(() => {
         document.querySelectorAll('.alert').forEach(alert => {
             const bsAlert = new bootstrap.Alert(alert);
