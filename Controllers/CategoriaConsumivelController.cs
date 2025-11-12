@@ -193,17 +193,32 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var categoriaConsumivel = await _context.CategoriaConsumivel.FindAsync(id);
-            if (categoriaConsumivel != null)
+
+            if (categoriaConsumivel == null)
             {
-                _context.CategoriaConsumivel.Remove(categoriaConsumivel);
+                TempData["ErrorMessage"] = "A categoria selecionada não foi encontrada ou já foi eliminada.";
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.CategoriaConsumivel.Remove(categoriaConsumivel);
+                await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Categoria eliminada com sucesso!";
+                TempData["SuccessMessage"] = $"A categoria \"{categoriaConsumivel.Nome}\" foi eliminada com sucesso.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["ErrorMessage"] = $"Não foi possível eliminar a categoria \"{categoriaConsumivel.Nome}\" porque está associada a outros registos.";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao eliminar a categoria.";
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool CategoriaConsumivelExists(int id)
         {
