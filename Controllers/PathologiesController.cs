@@ -22,10 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: Pathologies
         public async Task<IActionResult> Index()
         {
-            ViewData["Title"] = "Lista de patologias";
-            ViewBag.ModelType = typeof(Pathology);
-            ViewBag.Properties = new List<string> { "Name", "Description", "Severity" };
-            return View("~/Views/Shared/Group1/Actions/Index.cshtml", await _context.Pathology.ToListAsync());
+            return View(await _context.Pathology.ToListAsync());
         }
 
         // GET: Pathologies/Details/5
@@ -57,15 +54,12 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PathologyId,Name,Description,Severity")] Pathology pathology)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Severity")] Pathology pathology)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(pathology);
                 await _context.SaveChangesAsync();
-                TempData["AlertType"] = "success";
-                TempData["IconClass"] = "bi bi-check-circle";
-                TempData["Message"] = "Pathology created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(pathology);
