@@ -2,30 +2,16 @@
 
 @{
     ViewData["Title"] = "Problemas de Saúde";
+    int currentPage = ViewData["CurrentPage"] as int? ?? 1;
+    int totalPages = ViewData["TotalPages"] as int? ?? 1;
 
-    // --- Captura dos filtros individuais ---
-    string cat = Context.Request.Query["categoria"].FirstOrDefault()?.ToLower() ?? "";
-    string nome = Context.Request.Query["nome"].FirstOrDefault()?.ToLower() ?? "";
-    string zona = Context.Request.Query["zona"].FirstOrDefault()?.ToLower() ?? "";
-    string prof = Context.Request.Query["profissional"].FirstOrDefault()?.ToLower() ?? "";
-    string gravidade = Context.Request.Query["gravidade"].FirstOrDefault() ?? "";
-
-    // --- Paginação ---
-    int pageSize = 10;
-
-    var filteredModel = Model.Where(p =>
-        (string.IsNullOrWhiteSpace(cat) || (p.ProblemaCategoria?.ToLower().Contains(cat) ?? false)) &&
-        (string.IsNullOrWhiteSpace(nome) || (p.ProblemaNome?.ToLower().Contains(nome) ?? false)) &&
-        (string.IsNullOrWhiteSpace(zona) || (p.ZonaAtingida?.ToLower().Contains(zona) ?? false)) &&
-        (string.IsNullOrWhiteSpace(prof) || (p.ProfissionalDeApoio?.ToLower().Contains(prof) ?? false)) &&
-        (string.IsNullOrWhiteSpace(gravidade) || p.Gravidade.ToString() == gravidade)
-    );
-
-    int totalItems = filteredModel.Count();
-    int currentPage = Convert.ToInt32(Context.Request.Query["page"].FirstOrDefault() ?? "1");
-    int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-    var items = filteredModel.Skip((currentPage - 1) * pageSize).Take(pageSize);
+    string cat = ViewData["Categoria"] as string ?? "";
+    string nome = ViewData["Nome"] as string ?? "";
+    string zona = ViewData["Zona"] as string ?? "";
+    string prof = ViewData["Profissional"] as string ?? "";
+    string gravidade = ViewData["Gravidade"] as string ?? "";
 }
+
 
 <div class="container py-4">
     <h1 class="text-center text-primary fw-bold mb-4">
@@ -44,7 +30,7 @@
         </button>
     </div>
 
-    <!-- 🔽 Área de filtros avançados -->
+    <!-- Área de filtros avançados -->
     <div class="collapse mb-4" id="filtrosAvancados">
         <div class="card card-body shadow-sm">
             <form method="get">
@@ -79,7 +65,7 @@
                     <button type="submit" class="btn btn-primary me-2">
                         <i class="bi bi-funnel"></i> Aplicar Filtros
                     </button>
-                    <a href="/ProblemaSaude" class="btn btn-outline-secondary">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
                         <i class="bi bi-x-circle"></i> Limpar
                     </a>
                 </div>
@@ -101,7 +87,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (!items.Any())
+                @if (!Model.Any())
                 {
                     <tr>
                         <td colspan="6" class="text-center text-muted">Nenhum resultado encontrado com os filtros aplicados.</td>
@@ -109,7 +95,7 @@
                 }
                 else
                 {
-                    @foreach (var item in items)
+                    @foreach (var item in Model)
                     {
                         <tr>
                             <td>@item.ProblemaCategoria</td>
