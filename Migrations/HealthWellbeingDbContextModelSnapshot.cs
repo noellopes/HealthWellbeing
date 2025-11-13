@@ -102,13 +102,18 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventTypeId"));
 
-                    b.Property<string>("EventTypeDescription")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<float>("EventTypeMultiplier")
+                        .HasColumnType("real");
 
                     b.Property<string>("EventTypeName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("EventTypeScoringMode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("EventTypeId");
 

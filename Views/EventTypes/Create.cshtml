@@ -18,9 +18,21 @@
                 <span asp-validation-for="EventTypeName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EventTypeDescription" class="control-label"></label>
-                <input asp-for="EventTypeDescription" class="form-control" />
-                <span asp-validation-for="EventTypeDescription" class="text-danger"></span>
+                <label asp-for="EventTypeScoringMode" class="control-label"></label>
+                <select asp-for="EventTypeScoringMode" class="form-control">
+                    <option value="fixed">Fixed</option>
+                    <option value="progressive">Progressive</option>
+                    <option value="ranking">Ranking</option>
+                    <option value="time_based">Time Based</option>
+                    <option value="completion">Completion</option>
+                    <option value="binary">Binary</option>
+                </select>
+                <span asp-validation-for="EventTypeScoringMode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventTypeMultiplier" class="control-label"></label>
+                <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.1" min="0" />
+                <span asp-validation-for="EventTypeMultiplier" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -34,5 +46,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -16,26 +16,32 @@
                 @Html.DisplayNameFor(model => model.EventTypeName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EventTypeDescription)
+                @Html.DisplayNameFor(model => model.EventTypeScoringMode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EventTypeMultiplier)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.EventTypeName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EventTypeDescription)
-            </td>
-            <td>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EventTypeName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EventTypeScoringMode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EventTypeMultiplier)
+                </td>
+                <td>
                     <a asp-action="Details" asp-route-id="@item.EventTypeId" class="btn btn-info">Details</a>
                     <a asp-action="Edit" asp-route-id="@item.EventTypeId" class="btn btn-warning">Edit</a>
                     <a asp-action="Delete" asp-route-id="@item.EventTypeId" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-}
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

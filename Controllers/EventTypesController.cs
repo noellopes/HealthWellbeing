@@ -54,7 +54,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeDescription")] EventType eventType)
+        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeScoringMode,EventTypeMultiplier")] EventType eventType)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeDescription")] EventType eventType)
+        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeScoringMode,EventTypeMultiplier")] EventType eventType)
         {
             if (id != eventType.EventTypeId)
             {

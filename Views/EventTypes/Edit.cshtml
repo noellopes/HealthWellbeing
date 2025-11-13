@@ -22,9 +22,22 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="EventTypeDescription" class="form-label fw-semibold"></label>
-                <textarea asp-for="EventTypeDescription" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="EventTypeDescription" class="text-danger"></span>
+                <label asp-for="EventTypeScoringMode" class="form-label fw-semibold"></label>
+                <select asp-for="EventTypeScoringMode" class="form-control">
+                    <option value="fixed">Fixed</option>
+                    <option value="progressive">Progressive</option>
+                    <option value="ranking">Ranking</option>
+                    <option value="time_based">Time Based</option>
+                    <option value="completion">Completion</option>
+                    <option value="binary">Binary</option>
+                </select>
+                <span asp-validation-for="EventTypeScoringMode" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EventTypeMultiplier" class="form-label fw-semibold"></label>
+                <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.1" min="0" />
+                <span asp-validation-for="EventTypeMultiplier" class="text-danger"></span>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-4">
@@ -36,5 +49,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

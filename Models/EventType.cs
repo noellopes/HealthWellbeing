@@ -8,7 +8,10 @@ namespace HealthWellbeing.Models {
         [Required, StringLength(200)]
         public string EventTypeName { get; set; }
 
-        public string? EventTypeDescription { get; set; }
+        [Required, StringLength(50)]
+        public string EventTypeScoringMode { get; set; }
+
+        public float EventTypeMultiplier { get; set; }
 
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialHealth : Migration
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -54,7 +54,8 @@ namespace HealthWellbeing.Migrations
                     EventTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventTypeName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    EventTypeDescription = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    EventTypeScoringMode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    EventTypeMultiplier = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
