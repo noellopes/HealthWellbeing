@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -20,9 +21,20 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: TypeMaterials
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.TypeMaterial.ToListAsync());
+            int itemsPerPage = 7;
+            int totalItems = await _context.TypeMaterial.CountAsync();
+
+            var pagination = new RPaginationInfo<TypeMaterial>(page, totalItems, itemsPerPage);
+
+            pagination.Items = await _context.TypeMaterial
+                .OrderBy(m => m.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(itemsPerPage)
+                .ToListAsync();
+
+            return View(pagination);
         }
 
         // GET: TypeMaterials/Details/5
@@ -50,8 +62,6 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // POST: TypeMaterials/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
@@ -61,10 +71,7 @@ namespace HealthWellbeingRoom.Controllers
                 _context.Add(typeMaterial);
                 await _context.SaveChangesAsync();
 
-                //Mensagem de sucesso
                 TempData["SuccessMessage"] = "Tipo de material criado com sucesso!";
-
-                //Volta para o Index (lista)
                 return RedirectToAction(nameof(Index));
             }
 
@@ -88,8 +95,6 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // POST: TypeMaterials/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
@@ -104,10 +109,7 @@ namespace HealthWellbeingRoom.Controllers
                     _context.Update(typeMaterial);
                     await _context.SaveChangesAsync();
 
-                    //  Mensagem de sucesso
                     TempData["SuccessMessage"] = "Tipo de material atualizado com sucesso!";
-
-                    //  Redireciona para os detalhes do mesmo registo
                     return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
                 }
                 catch (DbUpdateConcurrencyException)
@@ -121,7 +123,6 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(typeMaterial);
         }
-
 
         // GET: TypeMaterials/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -153,9 +154,7 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Mensagem de sucesso (igual ao padrão do prof)
             TempData["SuccessMessage"] = "Tipo de material eliminado com sucesso!";
-
             return RedirectToAction(nameof(Index));
         }
 
