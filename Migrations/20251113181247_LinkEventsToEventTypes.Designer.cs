@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251113171744_UpdateMigration")]
-    partial class UpdateMigration
+    [Migration("20251113181247_LinkEventsToEventTypes")]
+    partial class LinkEventsToEventTypes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -85,15 +85,15 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("EventStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("EventTypeId")
+                        .HasColumnType("int");
 
                     b.Property<int>("MinLevel")
                         .HasColumnType("int");
 
                     b.HasKey("EventId");
+
+                    b.HasIndex("EventTypeId");
 
                     b.ToTable("Event");
                 });
@@ -146,6 +146,17 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("LevelId");
 
                     b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.EventType", "EventType")
+                        .WithMany()
+                        .HasForeignKey("EventTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventType");
                 });
 #pragma warning restore 612, 618
         }

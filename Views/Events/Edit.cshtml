@@ -1,79 +1,77 @@
 ﻿@model HealthWellbeing.Models.Event
-@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h4>Event</h4>
-<hr />
-<div class="row">
-    <div class="col-md-6">
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Edit Event
+        </h4>
+    </div>
+    <div class="card-body">
         <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
             <input type="hidden" asp-for="EventId" />
 
-            <div class="form-group mb-3">
-                <label asp-for="EventName" class="control-label"></label>
+            <div class="mb-3">
+                <label asp-for="EventName" class="form-label fw-bold"></label>
                 <input asp-for="EventName" class="form-control" />
-                <span asp-validation-for="EventName" class="text-danger"></span>
+                <span asp-validation-for="EventName" class="text-danger small"></span>
             </div>
-            <div class="form-group mb-3">
-                <label asp-for="EventDescription" class="control-label"></label>
+
+            <div class="mb-3">
+                <label asp-for="EventDescription" class="form-label fw-bold"></label>
                 <textarea asp-for="EventDescription" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="EventDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="EventType" class="control-label"></label>
-                <input asp-for="EventType" class="form-control" />
-                <span asp-validation-for="EventType" class="text-danger"></span>
+                <span asp-validation-for="EventDescription" class="text-danger small"></span>
             </div>
 
-            <div class="row">
+            <div class="mb-4">
+                <label asp-for="EventTypeId" class="form-label fw-bold"></label>
+                <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId"></select>
+                <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+            </div>
+
+            <div class="row mb-3">
                 <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label asp-for="EventStart" class="control-label"></label>
-                        <input asp-for="EventStart" class="form-control" type="datetime-local" />
-                        <span asp-validation-for="EventStart" class="text-danger"></span>
-                    </div>
+                    <label asp-for="EventStart" class="form-label fw-bold"></label>
+                    <input asp-for="EventStart" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="EventStart" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label asp-for="EventEnd" class="control-label"></label>
-                        <input asp-for="EventEnd" class="form-control" type="datetime-local" />
-                        <span asp-validation-for="EventEnd" class="text-danger"></span>
-                    </div>
+                    <label asp-for="EventEnd" class="form-label fw-bold"></label>
+                    <input asp-for="EventEnd" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="EventEnd" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label asp-for="EventPoints" class="control-label"></label>
-                        <input asp-for="EventPoints" class="form-control" type="number" />
-                        <span asp-validation-for="EventPoints" class="text-danger"></span>
-                    </div>
+                    <label asp-for="EventPoints" class="form-label fw-bold"></label>
+                    <input asp-for="EventPoints" class="form-control" type="number" />
+                    <span asp-validation-for="EventPoints" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label asp-for="MinLevel" class="control-label"></label>
-                        <input asp-for="MinLevel" class="form-control" type="number" />
-                        <span asp-validation-for="MinLevel" class="text-danger"></span>
-                    </div>
+                    <label asp-for="MinLevel" class="form-label fw-bold"></label>
+                    <input asp-for="MinLevel" class="form-control" type="number" />
+                    <span asp-validation-for="MinLevel" class="text-danger small"></span>
                 </div>
             </div>
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
+            <div class="d-flex justify-content-end gap-2">
+                <button type-"submit" class="btn btn-warning">
+                    <i class="bi bi-save me-1"></i> Save
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                </a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; // Necessário para SelectListItem
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -19,14 +19,12 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Events
         public async Task<IActionResult> Index(string searchName, string searchType, string searchStatus, int page = 1)
         {
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
-            ViewBag.SearchStatus = searchStatus; // <- Adicionado
+            ViewBag.SearchStatus = searchStatus;
 
-            // --- Adicionado: Criar a lista para a dropdown de Status ---
             var statusList = new List<SelectListItem>
             {
                 new SelectListItem { Value = "", Text = "Todos os Estados" },
@@ -35,16 +33,14 @@ namespace HealthWellbeing.Controllers
                 new SelectListItem { Value = "Realizado", Text = "Realizado" }
             };
 
-            // Marcar o item que foi selecionado
             var selectedStatus = statusList.FirstOrDefault(s => s.Value == searchStatus);
             if (selectedStatus != null)
             {
                 selectedStatus.Selected = true;
             }
             ViewBag.StatusList = statusList;
-            // --- Fim da adição ---
 
-            var events = from e in _context.Event select e;
+            var events = _context.Event.Include(e => e.EventType).Select(e => e);
 
             if (!string.IsNullOrEmpty(searchName))
             {
@@ -53,10 +49,9 @@ namespace HealthWellbeing.Controllers
 
             if (!string.IsNullOrEmpty(searchType))
             {
-                events = events.Where(e => e.EventType.Contains(searchType));
+                events = events.Where(e => e.EventType != null && e.EventType.EventTypeName.Contains(searchType));
             }
 
-            // --- Adicionado: Lógica de filtro para o Status ---
             if (!string.IsNullOrEmpty(searchStatus))
             {
                 var now = DateTime.Now;
@@ -73,14 +68,12 @@ namespace HealthWellbeing.Controllers
                     events = events.Where(e => e.EventEnd < now);
                 }
             }
-            // --- Fim da adição ---
-
 
             int pageSize = 5;
             int totalItems = await events.CountAsync();
 
             var pagedEvents = await events
-                                    .OrderByDescending(e => e.EventStart) // Ordenar por data
+                                    .OrderByDescending(e => e.EventStart)
                                     .Skip((page - 1) * pageSize)
                                     .Take(pageSize)
                                     .ToListAsync();
@@ -90,30 +83,38 @@ namespace HealthWellbeing.Controllers
             return View(paginationInfo);
         }
 
-
-        // GET: Events/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
                 return View("InvalidEvent");
 
-            var @event = await _context.Event.FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Event
+                .Include(e => e.EventType)
+                .FirstOrDefaultAsync(m => m.EventId == id);
+
             if (@event == null)
                 return View("InvalidEvent");
 
             return View(@event);
         }
 
-        // GET: Events/Create
+        private void PopulateEventTypesDropDownList(object? selectedEventType = null)
+        {
+            var eventTypesQuery = from et in _context.EventType
+                                  orderby et.EventTypeName
+                                  select et;
+            ViewBag.EventTypeId = new SelectList(eventTypesQuery.AsNoTracking(), "EventTypeId", "EventTypeName", selectedEventType);
+        }
+
         public IActionResult Create()
         {
+            PopulateEventTypesDropDownList();
             return View();
         }
 
-        // POST: Events/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventType,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
+        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
         {
             if (ModelState.IsValid)
             {
@@ -122,10 +123,11 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = "Event created successfully!";
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateEventTypesDropDownList(@event.EventTypeId);
             return View(@event);
         }
 
-        // GET: Events/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -135,13 +137,13 @@ namespace HealthWellbeing.Controllers
             if (@event == null)
                 return View("InvalidEvent");
 
+            PopulateEventTypesDropDownList(@event.EventTypeId);
             return View(@event);
         }
 
-        // POST: Events/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventType,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
+        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
         {
             if (id != @event.EventId)
                 return View("InvalidEvent");
@@ -163,23 +165,26 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateEventTypesDropDownList(@event.EventTypeId);
             return View(@event);
         }
 
-        // GET: Events/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return View("InvalidEvent");
 
-            var @event = await _context.Event.FirstOrDefaultAsync(m => m.EventId == id);
+            var @event = await _context.Event
+                .Include(e => e.EventType)
+                .FirstOrDefaultAsync(m => m.EventId == id);
+
             if (@event == null)
                 return View("InvalidEvent");
 
             return View(@event);
         }
 
-        // POST: Events/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
