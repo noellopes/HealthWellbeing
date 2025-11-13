@@ -18,5 +18,8 @@ namespace HealthWellbeing.Models
 
         // Data da última atualização
         public DateTime DataUltimaAtualizacao { get; set; }
+
+        public Consumivel Consumivel { get; set; }
+        public ZonaArmazenamento Zona { get; set; }
     }
 }
