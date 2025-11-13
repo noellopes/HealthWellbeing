@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; // Precisamos disto
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -17,8 +17,10 @@ namespace HealthWellbeing.Models
         public string EventDescription { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O tipo de evento é obrigatório.")]
-        [StringLength(50, ErrorMessage = "O tipo de evento não pode exceder 50 caracteres.")]
-        public string EventType { get; set; } = string.Empty;
+        [Display(Name = "Tipo de Evento")]
+        public int EventTypeId { get; set; }
+
+        public virtual EventType? EventType { get; set; }
 
         [Required(ErrorMessage = "A data de início é obrigatória.")]
         [Display(Name = "Início do Evento")]
@@ -40,12 +42,7 @@ namespace HealthWellbeing.Models
         [Range(1, 100, ErrorMessage = "O nível deve estar entre 1 e 100.")]
         public int MinLevel { get; set; }
 
-        // --- MUDANÇA AQUI ---
-        // 1. Removemos a propriedade "Status" que era guardada na BD.
-        // public EventStatus Status { get; set; } = EventStatus.Agendado;
-
-        // 2. Adicionamos uma propriedade "calculada" que não vai para a BD.
-        [NotMapped] // Diz ao Entity Framework para ignorar esta propriedade
+        [NotMapped]
         [Display(Name = "Estado")]
         public EventStatus Status
         {
@@ -55,15 +52,14 @@ namespace HealthWellbeing.Models
 
                 if (now > EventEnd)
                 {
-                    return EventStatus.Realizado; // Já acabou
+                    return EventStatus.Realizado;
                 }
 
                 if (now >= EventStart && now <= EventEnd)
                 {
-                    return EventStatus.Adecorrer; // Está a acontecer
+                    return EventStatus.Adecorrer;
                 }
 
-                // Se nenhuma das acima for verdade, ainda não começou
                 return EventStatus.Agendado;
             }
         }

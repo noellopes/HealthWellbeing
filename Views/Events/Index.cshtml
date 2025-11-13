@@ -93,7 +93,6 @@ else
                         <th>Type</th>
                         <th>Início</th>
                         <th>Fim</th>
-                        <th>Duração (min)</th>
                         <th>Status</th>
                         <th>Nível Mín.</th>
                         <th>Pontos</th>
@@ -103,13 +102,11 @@ else
                 <tbody>
                     @foreach (var item in Model.Items)
                     {
-                        var duration = (item.EventEnd - item.EventStart).TotalMinutes;
                         <tr>
                             <td>@item.EventName</td>
-                            <td>@item.EventType</td>
+                            <td>@item.EventType?.EventTypeName</td>
                             <td>@item.EventStart.ToString("g")</td>
                             <td>@item.EventEnd.ToString("g")</td>
-                            <td>@Math.Round(duration)</td>
                             <td>
                                 @if (item.Status == HealthWellbeing.Models.EventStatus.Agendado)
                                 {

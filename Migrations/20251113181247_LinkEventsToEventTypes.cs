@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateMigration : Migration
+    public partial class LinkEventsToEventTypes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,25 +27,6 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Activity", x => x.Activity_Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Event",
-                columns: table => new
-                {
-                    EventId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    EventDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    EventType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventPoints = table.Column<int>(type: "int", nullable: false),
-                    MinLevel = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Event", x => x.EventId);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,6 +58,36 @@ namespace HealthWellbeing.Migrations
                 {
                     table.PrimaryKey("PK_Levels", x => x.LevelId);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Event",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    EventDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventPoints = table.Column<int>(type: "int", nullable: false),
+                    MinLevel = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Event", x => x.EventId);
+                    table.ForeignKey(
+                        name: "FK_Event_EventType_EventTypeId",
+                        column: x => x.EventTypeId,
+                        principalTable: "EventType",
+                        principalColumn: "EventTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Event_EventTypeId",
+                table: "Event",
+                column: "EventTypeId");
         }
 
         /// <inheritdoc />
@@ -89,10 +100,10 @@ namespace HealthWellbeing.Migrations
                 name: "Event");
 
             migrationBuilder.DropTable(
-                name: "EventType");
+                name: "Levels");
 
             migrationBuilder.DropTable(
-                name: "Levels");
+                name: "EventType");
         }
     }
 }

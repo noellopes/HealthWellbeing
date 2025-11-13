@@ -1,5 +1,4 @@
 ﻿@model HealthWellbeing.Models.Event
-@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Create";
@@ -24,10 +23,13 @@
                 <textarea asp-for="EventDescription" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="EventDescription" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
-                <label asp-for="EventType" class="control-label"></label>
-                <input asp-for="EventType" class="form-control" />
-                <span asp-validation-for="EventType" class="text-danger"></span>
+                <label asp-for="EventTypeId" class="control-label"></label>
+                <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId">
+                    <option value="">-- Selecione um Tipo --</option>
+                </select>
+                <span asp-validation-for="EventTypeId" class="text-danger"></span>
             </div>
 
             <div class="row">
