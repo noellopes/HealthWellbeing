@@ -20,10 +20,57 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ProblemaSaudes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string categoria,
+    string nome,
+    string zona,
+    string profissional,
+    string gravidade,
+    int page = 1)
         {
-            return View(await _context.ProblemaSaude.ToListAsync());
+            int pageSize = 10;
+
+            // --- Query base ---
+            var query = _context.ProblemaSaude.AsQueryable();
+
+            // --- Filtros ---
+            if (!string.IsNullOrWhiteSpace(categoria))
+                query = query.Where(p => p.ProblemaCategoria.ToLower().Contains(categoria.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(nome))
+                query = query.Where(p => p.ProblemaNome.ToLower().Contains(nome.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(zona))
+                query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(profissional))
+                query = query.Where(p => p.ProfissionalDeApoio.ToLower().Contains(profissional.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(gravidade))
+                query = query.Where(p => p.Gravidade.ToString() == gravidade);
+
+            // --- Paginação ---
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var items = await query
+                .OrderBy(p => p.ProblemaNome)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // --- Passar dados para a View ---
+            ViewData["CurrentPage"] = page;
+            ViewData["TotalPages"] = totalPages;
+            ViewData["Categoria"] = categoria;
+            ViewData["Nome"] = nome;
+            ViewData["Zona"] = zona;
+            ViewData["Profissional"] = profissional;
+            ViewData["Gravidade"] = gravidade;
+
+            return View(items);
         }
+
 
         // GET: ProblemaSaudes/Details/5
         public async Task<IActionResult> Details(int? id)

@@ -2,28 +2,80 @@
 
 @{
     ViewData["Title"] = "Problemas de Saúde";
+    int currentPage = ViewData["CurrentPage"] as int? ?? 1;
+    int totalPages = ViewData["TotalPages"] as int? ?? 1;
 
-    // --- Lógica simples de paginação ---
-    int pageSize = 10; // nº de itens por página
-    int totalItems = Model.Count();
-    int currentPage = Convert.ToInt32(Context.Request.Query["page"].FirstOrDefault() ?? "1");
-    int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-    var items = Model.Skip((currentPage - 1) * pageSize).Take(pageSize);
+    string cat = ViewData["Categoria"] as string ?? "";
+    string nome = ViewData["Nome"] as string ?? "";
+    string zona = ViewData["Zona"] as string ?? "";
+    string prof = ViewData["Profissional"] as string ?? "";
+    string gravidade = ViewData["Gravidade"] as string ?? "";
 }
+
 
 <div class="container py-4">
     <h1 class="text-center text-primary fw-bold mb-4">
         <i class="bi bi-heart-pulse-fill"></i> @ViewData["Title"]
     </h1>
 
+    <!-- Botões de ações -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <a class="btn btn-success shadow-sm" asp-action="Create">
             <i class="bi bi-plus-circle"></i> Adicionar Novo Problema
         </a>
+
+        <!-- Botão para abrir os filtros -->
+        <button class="btn btn-outline-primary shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosAvancados">
+            <i class="bi bi-search"></i> Procurar
+        </button>
     </div>
 
+    <!-- Área de filtros avançados -->
+    <div class="collapse mb-4" id="filtrosAvancados">
+        <div class="card card-body shadow-sm">
+            <form method="get">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Categoria</label>
+                        <input type="text" name="categoria" class="form-control" value="@cat" placeholder="Ex: Cardíaco" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Nome</label>
+                        <input type="text" name="nome" class="form-control" value="@nome" placeholder="Ex: Hipertensão" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Zona Atingida</label>
+                        <input type="text" name="zona" class="form-control" value="@zona" placeholder="Ex: Pulmões" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Profissional de Apoio</label>
+                        <input type="text" name="profissional" class="form-control" value="@prof" placeholder="Ex: Fisioterapeuta" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Gravidade</label>
+                        <input type="number" min="1" max="10" name="gravidade" class="form-control" value="@gravidade" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-funnel"></i> Aplicar Filtros
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela de resultados -->
     <div class="table-responsive shadow-sm rounded-3">
-        <table id="problemasTable" class="table table-hover table-bordered align-middle mb-0">
+        <table class="table table-hover table-bordered align-middle mb-0">
             <thead class="table-primary text-center">
                 <tr>
                     <th>Categoria</th>
@@ -35,22 +87,29 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in items)
+                @if (!Model.Any())
                 {
                     <tr>
-                        <td>@item.ProblemaCategoria</td>
-                        <td>@item.ProblemaNome</td>
-                        <td>@item.ZonaAtingida</td>
-                        <td>@item.ProfissionalDeApoio</td>
-                        <td class="text-center">
-                            <div class="d-flex align-items-center justify-content-center gap-2">
-                                <div class="progress w-50" style="height: 10px;">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated
-                                            @(item.Gravidade >= 8 ? "bg-danger" :
-                                                                                   item.Gravidade >= 5 ? "bg-warning" : "bg-success")"
+                        <td colspan="6" class="text-center text-muted">Nenhum resultado encontrado com os filtros aplicados.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.ProblemaCategoria</td>
+                            <td>@item.ProblemaNome</td>
+                            <td>@item.ZonaAtingida</td>
+                            <td>@item.ProfissionalDeApoio</td>
+                            <td class="text-center">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <div class="progress w-50" style="height: 10px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated
+                                                    @(item.Gravidade >= 8 ? "bg-danger" :
+                                                                                         item.Gravidade >= 5 ? "bg-warning" : "bg-success")"
                                      role="progressbar"
-                                     style="width: @(item.Gravidade * 10)%;">
-                                </div>
+                                     style="width: @(item.Gravidade * 10)%;"></div>
                             </div>
                             <span class="fw-bold">@item.Gravidade/10</span>
                         </div>
@@ -70,18 +129,20 @@
                     </td>
                 </tr>
                                 }
+                }
             </tbody>
         </table>
     </div>
 
-    <!-- Paginação simples -->
+    <!-- Paginação -->
     <div class="d-flex justify-content-center mt-4">
         <nav aria-label="Paginação de problemas de saúde">
             <ul class="pagination mb-0">
                 @for (int i = 1; i <= totalPages; i++)
                 {
                     <li class="page-item @(i == currentPage ? "active" : "")">
-                        <a class="page-link" href="?page=@i">@i</a>
+                        <a class="page-link"
+                           href="?page=@i&categoria=@cat&nome=@nome&zona=@zona&profissional=@prof&gravidade=@gravidade">@i</a>
                     </li>
                 }
             </ul>
@@ -116,7 +177,8 @@
         background-color: #0d6efd;
         color: white;
     }
+
+    #filtrosAvancados .form-label {
+        font-size: 0.9rem;
+    }
 </style>
-
-
-
