@@ -12,7 +12,7 @@ namespace HealthWellbeing.Models
         public string Nome { get; set; } = "";
 
         [Required(ErrorMessage = "A descrição é obrigatória.")]
-        [StringLength(300, ErrorMessage = "Máximo 300 caracteres.")]
+        [StringLength(1500, ErrorMessage = "Máximo 1500 caracteres.")]
         public string Descricao { get; set; } = "";
     }
 }

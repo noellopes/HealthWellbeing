@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel; // ← importante para PaginationInfo
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +19,42 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? q, int page = 1)
         {
-            return View(await _context.Specialities.ToListAsync());
+            // Base da query
+            var query = _context.Specialities.AsQueryable();
+
+            // Filtro de pesquisa
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                query = query.Where(s =>
+                    s.Nome.Contains(q) ||
+                    s.Descricao.Contains(q));
+            }
+
+            // Total de registos após o filtro
+            var totalItems = await query.CountAsync();
+
+            // Objeto de paginação (5 itens por página)
+            var pagination = new PaginationInfo<Specialities>(
+                currentPage: page,
+                totalItems: totalItems,
+                itemsPerPage: 5
+            );
+
+            // Itens da página atual
+            var items = await query
+                .OrderBy(s => s.Nome)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            pagination.Items = items;
+
+            // Para a View voltar a preencher a caixa de pesquisa
+            ViewBag.SearchQuery = q;
+
+            return View(pagination);
         }
 
         // GET: Specialities/Details/5
@@ -50,8 +82,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Specialities/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdEspecialidade,Nome,Descricao")] Specialities specialities)
@@ -82,8 +112,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Specialities/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdEspecialidade,Nome,Descricao")] Specialities specialities)

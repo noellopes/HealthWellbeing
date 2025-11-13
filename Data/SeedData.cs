@@ -15,6 +15,7 @@ namespace HealthWellbeing.Data
 
             db.Database.EnsureCreated();
 
+            PopulateSpecialities(db);
             PopulateConsultas(db);
             PopulateDoctor(db);
             PopulateUtenteSaude(db);
@@ -770,5 +771,68 @@ namespace HealthWellbeing.Data
             db.UtenteSaude.AddRange(utentes);
             db.SaveChanges();
         }
+        private static void PopulateSpecialities(HealthWellbeingDbContext db)
+        {
+            if (db.Specialities.Any()) return; // Evita duplicar registos
+
+            var especialidades = new[]
+            {
+        new Specialities
+        {
+            Nome = "Cardiologia",
+            Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
+        },
+        new Specialities
+        {
+            Nome = "Dermatologia",
+            Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
+        },
+        new Specialities
+        {
+            Nome = "Pediatria",
+            Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
+        },
+        new Specialities
+        {
+            Nome = "Psiquiatria",
+            Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
+        },
+        new Specialities
+        {
+            Nome = "Nutrição",
+            Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
+        },
+        new Specialities
+        {
+            Nome = "Medicina Geral e Familiar",
+            Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
+        },
+        new Specialities
+        {
+            Nome = "Ortopedia",
+            Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
+        },
+        new Specialities
+        {
+            Nome = "Ginecologia e Obstetrícia",
+            Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
+        },
+        new Specialities
+        {
+            Nome = "Psicologia",
+            Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
+        },
+        new Specialities
+        {
+            Nome = "Fisioterapia",
+            Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
+        },
+       
+    };
+
+            db.Specialities.AddRange(especialidades);
+            db.SaveChanges();
+        }
+
     }
 }
