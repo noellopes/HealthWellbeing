@@ -77,6 +77,29 @@ namespace HealthWellbeing.Data
             HealthWellbeingDbContext.Nurse.AddRange(enfermeiros);
             HealthWellbeingDbContext.SaveChanges();
         }
+
+
+        private static void PopulatePathology(HealthWellbeingDbContext HealthWellbeingDbContext)
+        {
+            if (HealthWellbeingDbContext.TreatmentType.Any()) return;
+
+            var Pathologies = new[]
+            {
+                new Pathology { Name = "Diabetes Tipo 2", Description = "Doença metabólica caracterizada por níveis elevados de glicose no sangue devido à resistência à insulina.", Severity = "Moderada" },
+                new Pathology { Name = "Hipertensão Arterial", Description = "Pressão arterial persistentemente elevada, aumentando o risco de enfarte e AVC.", Severity = "Ligeira" },
+                new Pathology { Name = "Asma", Description = "Doença inflamatória crónica das vias respiratórias que causa dificuldade respiratória.", Severity = "Grave" },
+                new Pathology { Name = "DPOC", Description = "Doença pulmonar obstrutiva crónica associada ao tabagismo e exposição a poluentes.", Severity = "Grave" },
+                new Pathology { Name = "Anemia Ferropriva", Description = "Deficiência de ferro que provoca cansaço, fraqueza e palidez.", Severity = "Ligeira" },
+                new Pathology { Name = "Artrite Reumatoide", Description = "Doença autoimune que causa inflamação crónica das articulações.", Severity = "Moderada" },
+                new Pathology { Name = "Gastrite", Description = "Inflamação do revestimento do estômago causada por bactérias, álcool ou stress.", Severity = "Ligeira" },
+                new Pathology { Name = "Enxaqueca", Description = "Dor de cabeça intensa frequentemente acompanhada de náuseas e sensibilidade à luz.", Severity = "Moderada" },
+                new Pathology { Name = "Epilepsia", Description = "Distúrbio neurológico caracterizado por crises convulsivas recorrentes.", Severity = "Grave" },
+                new Pathology { Name = "Depressão Major", Description = "Transtorno de humor caracterizado por tristeza persistente e perda de interesse.", Severity = "Grave" }
+
+            };
+
+            HealthWellbeingDbContext.Pathology.AddRange(Pathologies);
+            HealthWellbeingDbContext.SaveChanges();
+        }
     }
-         
 }
