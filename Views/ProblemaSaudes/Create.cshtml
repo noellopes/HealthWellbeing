@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Adicionar Problema de Saúde";
+
+    // ✅ 1. Obter a lista de profissionais que o controlador enviou
+    var allProfissionais = ViewData["Profissionais"] as List<ProfissionalExecutante> ?? new List<ProfissionalExecutante>();
 }
 
 <div class="container py-4" style="max-width: 600px;">
@@ -31,11 +34,32 @@
         </div>
 
         <div class="mb-3">
-            <label asp-for="ProfissionalDeApoio" class="form-label fw-semibold"></label>
-            <input asp-for="ProfissionalDeApoio" class="form-control" placeholder="Ex: Fisioterapeuta, Médico..." />
-            <span asp-validation-for="ProfissionalDeApoio" class="text-danger small"></span>
-        </div>
+            <label class="form-label fw-semibold">Profissionais de Apoio</label>
+            <div class="card p-3" style="max-height: 200px; overflow-y: auto; background-color: #fff;">
+                @if (!allProfissionais.Any())
+                {
+                    <span class="text-muted small">
+                        Nenhum profissional encontrado.
+                        <a asp-controller="ProfissionalExecutante" asp-action="Create">Adicionar um?</a>
+                    </span>
+                }
 
+                @foreach (var prof in allProfissionais)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="selectedProfissionais"
+                               value="@prof.ProfissionalExecutanteId"
+                               id="prof_@prof.ProfissionalExecutanteId" />
+
+                        <label class="form-check-label" for="prof_@prof.ProfissionalExecutanteId">
+                            @prof.Nome (@prof.Funcao)
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
         <div class="mb-4">
             <label asp-for="Gravidade" class="form-label fw-semibold"></label>
             <input asp-for="Gravidade" type="number" min="1" max="10" class="form-control" placeholder="1 a 10" />

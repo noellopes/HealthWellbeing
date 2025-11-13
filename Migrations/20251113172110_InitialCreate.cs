@@ -92,15 +92,30 @@ namespace HealthWellbeing.Migrations
                 {
                     ProblemaSaudeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ProblemaCategoria = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ProblemaNome = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    ZonaAtingida = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ProfissionalDeApoio = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    ProblemaCategoria = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ProblemaNome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ZonaAtingida = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Gravidade = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProblemaSaude", x => x.ProblemaSaudeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfissionalExecutante",
+                columns: table => new
+                {
+                    ProfissionalExecutanteId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Funcao = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfissionalExecutante", x => x.ProfissionalExecutanteId);
                 });
 
             migrationBuilder.CreateTable(
@@ -253,6 +268,30 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProblemaSaudeProfissionalExecutante",
+                columns: table => new
+                {
+                    ProblemasSaudeProblemaSaudeId = table.Column<int>(type: "int", nullable: false),
+                    ProfissionalExecutanteId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProblemaSaudeProfissionalExecutante", x => new { x.ProblemasSaudeProblemaSaudeId, x.ProfissionalExecutanteId });
+                    table.ForeignKey(
+                        name: "FK_ProblemaSaudeProfissionalExecutante_ProblemaSaude_ProblemasSaudeProblemaSaudeId",
+                        column: x => x.ProblemasSaudeProblemaSaudeId,
+                        principalTable: "ProblemaSaude",
+                        principalColumn: "ProblemaSaudeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProblemaSaudeProfissionalExecutante_ProfissionalExecutante_ProfissionalExecutanteId",
+                        column: x => x.ProfissionalExecutanteId,
+                        principalTable: "ProfissionalExecutante",
+                        principalColumn: "ProfissionalExecutanteId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BeneficioTipoExercicio",
                 columns: table => new
                 {
@@ -327,6 +366,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Musculo_GrupoMuscularId",
                 table: "Musculo",
                 column: "GrupoMuscularId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProblemaSaudeProfissionalExecutante_ProfissionalExecutanteId",
+                table: "ProblemaSaudeProfissionalExecutante",
+                column: "ProfissionalExecutanteId");
         }
 
         /// <inheritdoc />
@@ -348,7 +392,7 @@ namespace HealthWellbeing.Migrations
                 name: "Musculo");
 
             migrationBuilder.DropTable(
-                name: "ProblemaSaude");
+                name: "ProblemaSaudeProfissionalExecutante");
 
             migrationBuilder.DropTable(
                 name: "Receita");
@@ -373,6 +417,12 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "GrupoMuscular");
+
+            migrationBuilder.DropTable(
+                name: "ProblemaSaude");
+
+            migrationBuilder.DropTable(
+                name: "ProfissionalExecutante");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");

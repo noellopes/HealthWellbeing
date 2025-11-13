@@ -27,7 +27,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Muscular",
                     ProblemaNome = "Tendinite",
                     ZonaAtingida = "Braço direito",
-                    ProfissionalDeApoio = "Fisioterapeuta",
                     Gravidade = 6
                 },
                 new ProblemaSaude
@@ -35,7 +34,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Cardíaco",
                     ProblemaNome = "Hipertensão Arterial",
                     ZonaAtingida = "Coração",
-                    ProfissionalDeApoio = "Cardiologista",
                     Gravidade = 8
                 },
                 new ProblemaSaude
@@ -43,7 +41,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Respiratório",
                     ProblemaNome = "Asma",
                     ZonaAtingida = "Pulmões",
-                    ProfissionalDeApoio = "Pneumologista",
                     Gravidade = 5
                 },
                 new ProblemaSaude
@@ -51,7 +48,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Articular",
                     ProblemaNome = "Artrite",
                     ZonaAtingida = "Joelhos",
-                    ProfissionalDeApoio = "Reumatologista",
                     Gravidade = 7
                 },
                 new ProblemaSaude
@@ -59,7 +55,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Neurológico",
                     ProblemaNome = "Enxaqueca Crónica",
                     ZonaAtingida = "Cabeça",
-                    ProfissionalDeApoio = "Neurologista",
                     Gravidade = 6
                 },
                 new ProblemaSaude
@@ -67,7 +62,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Postural",
                     ProblemaNome = "Escoliose",
                     ZonaAtingida = "Coluna Vertebral",
-                    ProfissionalDeApoio = "Ortopedista",
                     Gravidade = 5
                 },
                 new ProblemaSaude
@@ -75,7 +69,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Mental",
                     ProblemaNome = "Ansiedade Generalizada",
                     ZonaAtingida = "Sistema Nervoso",
-                    ProfissionalDeApoio = "Psicólogo",
                     Gravidade = 7
                 },
                 new ProblemaSaude
@@ -83,7 +76,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Endócrino",
                     ProblemaNome = "Diabetes Tipo 2",
                     ZonaAtingida = "Sistema Endócrino",
-                    ProfissionalDeApoio = "Endocrinologista",
                     Gravidade = 8
                 },
                 new ProblemaSaude
@@ -91,7 +83,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Dermatológico",
                     ProblemaNome = "Dermatite Atópica",
                     ZonaAtingida = "Pele",
-                    ProfissionalDeApoio = "Dermatologista",
                     Gravidade = 4
                 },
                 new ProblemaSaude
@@ -99,7 +90,6 @@ namespace HealthWellbeing.Data
                     ProblemaCategoria = "Ocular",
                     ProblemaNome = "Miopia",
                     ZonaAtingida = "Olhos",
-                    ProfissionalDeApoio = "Oftalmologista",
                     Gravidade = 3
                 }
             };

@@ -28,10 +28,25 @@
                 <dd class="col-sm-8">@Model.ZonaAtingida</dd>
 
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
-                    Profissional de Apoio:
+                    Profissionais de Apoio:
                 </dt>
-                <dd class="col-sm-8">@Model.ProfissionalDeApoio</dd>
-
+                <dd class="col-sm-8">
+                    @if (Model.ProfissionalExecutante?.Any() ?? false)
+                    {
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var prof in Model.ProfissionalExecutante)
+                            {
+                                <span class="badge bg-primary fs-6">
+                                    @prof.Nome (@prof.Funcao)
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum profissional associado.</span>
+                    }
+                </dd>
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
                     Gravidade:
                 </dt>

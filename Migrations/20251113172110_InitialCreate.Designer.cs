@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251110180307_InitialCreate")]
+    [Migration("20251113172110_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -312,27 +312,51 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("ProblemaCategoria")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ProblemaNome")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("ProfissionalDeApoio")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ZonaAtingida")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("ProblemaSaudeId");
 
                     b.ToTable("ProblemaSaude");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
+                {
+                    b.Property<int>("ProfissionalExecutanteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProfissionalExecutanteId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Funcao")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProfissionalExecutanteId");
+
+                    b.ToTable("ProfissionalExecutante");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
@@ -444,6 +468,21 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("TipoExercicio");
                 });
 
+            modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
+                {
+                    b.Property<int>("ProblemasSaudeProblemaSaudeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProfissionalExecutanteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProblemasSaudeProblemaSaudeId", "ProfissionalExecutanteId");
+
+                    b.HasIndex("ProfissionalExecutanteId");
+
+                    b.ToTable("ProblemaSaudeProfissionalExecutante");
+                });
+
             modelBuilder.Entity("BeneficioTipoExercicio", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Beneficio", null)
@@ -518,6 +557,21 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("GrupoMuscular");
+                });
+
+            modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.ProblemaSaude", null)
+                        .WithMany()
+                        .HasForeignKey("ProblemasSaudeProblemaSaudeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.ProfissionalExecutante", null)
+                        .WithMany()
+                        .HasForeignKey("ProfissionalExecutanteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
