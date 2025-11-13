@@ -6,7 +6,7 @@
 
 using System.Dynamic;
 
-namespace HealthWellbeing.Views.Shared.Group1
+namespace HealthWellbeing.Utils.Group1
 {
     public static class Functions
     {
