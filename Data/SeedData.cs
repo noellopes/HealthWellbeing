@@ -1,24 +1,30 @@
 ﻿using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace HealthWellbeing.Data {
-    internal class SeedData {
-
-        internal static void Populate(HealthWellbeingDbContext? dbContext) {
+namespace HealthWellbeing.Data
+{
+    internal class SeedData
+    {
+        internal static void Populate(HealthWellbeingDbContext? dbContext)
+        {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-            dbContext.Database.EnsureCreated();
+            // dbContext.Database.EnsureCreated(); // <- Comentado, como falámos
 
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
         }
 
-        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
+        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.EventType.Any()) return;
 
             dbContext.EventType.AddRange(new List<EventType>() {
                 new EventType {
-                EventTypeName = "Treino de Cardio",
-                EventTypeDescription = "Sessão intensa de treino cardiovascular com música motivadora."
+                    EventTypeName = "Treino de Cardio",
+                    EventTypeDescription = "Sessão intensa de treino cardiovascular com música motivadora."
                 },
                 new EventType {
                     EventTypeName = "Aula de Spinning",
@@ -45,19 +51,56 @@ namespace HealthWellbeing.Data {
         {
             if (dbContext.Event.Any()) return;
 
-            dbContext.Event.AddRange(new List<Event>() {
-                new Event { EventName = "Treino de Cardio Matinal", EventDescription = "Sessão de corrida leve e alongamentos para começar o dia com energia.", EventType = "Cardio", DurationMinutes = 45, Intensity = "Média", EventDate = new DateTime(2025, 10, 10) },
-                new Event { EventName = "Aula de Pilates", EventDescription = "Treino focado em postura e flexibilidade.", EventType = "Pilates", DurationMinutes = 60, Intensity = "Baixa", EventDate = new DateTime(2025, 10, 8) },
-                new Event { EventName = "Treino Funcional", EventDescription = "Exercícios para força e coordenação geral.", EventType = "Funcional", DurationMinutes = 50, Intensity = "Alta", EventDate = new DateTime(2025, 10, 5) },
-                new Event { EventName = "Aula de Spinning", EventDescription = "Pedaladas intensas para melhorar resistência e queimar calorias.", EventType = "Spinning", DurationMinutes = 55, Intensity = "Alta", EventDate = new DateTime(2025, 10, 12) },
-                new Event { EventName = "Treino Vespertino", EventDescription = "Sessão rápida para manter a forma depois do trabalho.", EventType = "Cardio", DurationMinutes = 30, Intensity = "Média", EventDate = new DateTime(2025, 10, 11) },
-                new Event { EventName = "Zumba Energética", EventDescription = "Aula animada de dança para liberar endorfinas e tonificar o corpo.", EventType = "Zumba", DurationMinutes = 50, Intensity = "Alta", EventDate = new DateTime(2025, 10, 13) },
-                new Event { EventName = "Pilates Core", EventDescription = "Foco no fortalecimento do core e melhoria da postura.", EventType = "Pilates", DurationMinutes = 45, Intensity = "Média", EventDate = new DateTime(2025, 10, 14) },
-                new Event { EventName = "Treino Funcional Matinal", EventDescription = "Atividades funcionais para começar o dia com energia.", EventType = "Funcional", DurationMinutes = 40, Intensity = "Média", EventDate = new DateTime(2025, 10, 15) },
-                new Event { EventName = "Spinning Intenso", EventDescription = "Pedaladas de alta intensidade para desafiar o corpo.", EventType = "Spinning", DurationMinutes = 60, Intensity = "Alta", EventDate = new DateTime(2025, 10, 16) },
-                new Event { EventName = "Cardio Mix", EventDescription = "Combinação de exercícios cardiovasculares variados.", EventType = "Cardio", DurationMinutes = 50, Intensity = "Média", EventDate = new DateTime(2025, 10, 17) }
-            });
+            var eventList = new List<Event>();
+            var now = DateTime.Now;
+            var eventTypes = new[] { "Cardio", "Spinning", "Funcional", "Pilates", "Zumba" };
 
+            // Gerar 15 eventos 'Realizado' (passado)
+            for (int i = 1; i <= 15; i++)
+            {
+                eventList.Add(new Event
+                {
+                    EventName = $"Evento Passado {i}",
+                    EventDescription = $"Descrição do evento passado {i}.",
+                    EventType = eventTypes[i % 5],
+                    EventStart = now.AddDays(-i).Date.AddHours(10),
+                    EventEnd = now.AddDays(-i).Date.AddHours(11),
+                    EventPoints = 50 + (i * 5),
+                    MinLevel = (i % 3) + 1
+                });
+            }
+
+            // Gerar 5 eventos 'A Decorrer' (agora)
+            for (int i = 1; i <= 5; i++)
+            {
+                eventList.Add(new Event
+                {
+                    EventName = $"Evento A Decorrer {i}",
+                    EventDescription = $"Descrição do evento a decorrer {i}.",
+                    EventType = eventTypes[i % 5],
+                    EventStart = now.AddHours(-1), // Começou há 1 hora
+                    EventEnd = now.AddHours(i),   // Termina daqui a 'i' horas
+                    EventPoints = 100 + (i * 10),
+                    MinLevel = (i % 2) + 1
+                });
+            }
+
+            // Gerar 20 eventos 'Agendado' (futuro)
+            for (int i = 1; i <= 20; i++)
+            {
+                eventList.Add(new Event
+                {
+                    EventName = $"Evento Futuro {i}",
+                    EventDescription = $"Descrição do evento futuro {i}.",
+                    EventType = eventTypes[i % 5],
+                    EventStart = now.AddDays(i).Date.AddHours(18),
+                    EventEnd = now.AddDays(i).Date.AddHours(19),
+                    EventPoints = 75 + (i * 2),
+                    MinLevel = (i % 4) + 1
+                });
+            }
+
+            dbContext.Event.AddRange(eventList);
             dbContext.SaveChanges();
         }
     }

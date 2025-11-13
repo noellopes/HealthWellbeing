@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.Event
+@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Edit";
@@ -9,41 +10,62 @@
 <h4>Event</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="EventId" />
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="EventName" class="control-label"></label>
                 <input asp-for="EventName" class="form-control" />
                 <span asp-validation-for="EventName" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="EventDescription" class="control-label"></label>
-                <input asp-for="EventDescription" class="form-control" />
+                <textarea asp-for="EventDescription" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="EventDescription" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mb-3">
                 <label asp-for="EventType" class="control-label"></label>
                 <input asp-for="EventType" class="form-control" />
                 <span asp-validation-for="EventType" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DurationMinutes" class="control-label"></label>
-                <input asp-for="DurationMinutes" class="form-control" />
-                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EventStart" class="control-label"></label>
+                        <input asp-for="EventStart" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="EventStart" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EventEnd" class="control-label"></label>
+                        <input asp-for="EventEnd" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="EventEnd" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Intensity" class="control-label"></label>
-                <input asp-for="Intensity" class="form-control" />
-                <span asp-validation-for="Intensity" class="text-danger"></span>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EventPoints" class="control-label"></label>
+                        <input asp-for="EventPoints" class="form-control" type="number" />
+                        <span asp-validation-for="EventPoints" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="MinLevel" class="control-label"></label>
+                        <input asp-for="MinLevel" class="form-control" type="number" />
+                        <span asp-validation-for="MinLevel" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EventDate" class="control-label"></label>
-                <input asp-for="EventDate" class="form-control" />
-                <span asp-validation-for="EventDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -55,5 +77,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

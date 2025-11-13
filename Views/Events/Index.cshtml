@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Event>
+﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.Event>
 
 @{
     ViewData["Title"] = "Events";
@@ -18,7 +18,7 @@
     </div>
 }
 
-@if (!Model.Any())
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && string.IsNullOrEmpty(ViewBag.SearchType) && string.IsNullOrEmpty(ViewBag.SearchStatus))
 {
     <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
@@ -48,7 +48,7 @@ else
 
     <div class="collapse mt-2 mb-3" id="eventSearch">
         <div class="card card-body">
-            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label for="searchName" class="form-label">Event Name</label>
                     <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
@@ -57,55 +57,122 @@ else
                     <label for="searchType" class="form-label">Event Type</label>
                     <input id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-control" placeholder="Search by type" type="search" />
                 </div>
-                <div class="col-12 mt-2 d-flex gap-2">
+                <div class="col-md-4">
+                    <label for="searchStatus" class="form-label">Estado</label>
+                    <select id="searchStatus" name="searchStatus" class="form-select" asp-items="ViewBag.StatusList"></select>
+                </div>
+
+                <div class="col-12 mt-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
                     <a asp-action="Index" class="btn btn-secondary">
-                        Clear
+                        Clear Filters
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Event Name</th>
-                    <th>Description</th>
-                    <th>Type</th>
-                    <th>Duration (min)</th>
-                    <th>Intensity</th>
-                    <th>Date</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found for your search criteria.</h5>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.EventName</td>
-                        <td>@item.EventDescription</td>
-                        <td>@item.EventType</td>
-                        <td>@item.DurationMinutes</td>
-                        <td>@item.Intensity</td>
-                        <td>@item.EventDate.ToShortDateString()</td>
-                        <td class="text-end">
-                            <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-                            <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle"></i> Details
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
-                        </td>
+                        <th>Event Name</th>
+                        <th>Type</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Duração (min)</th>
+                        <th>Status</th>
+                        <th>Nível Mín.</th>
+                        <th>Pontos</th>
+                        <th class="text-end">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var duration = (item.EventEnd - item.EventStart).TotalMinutes;
+                        <tr>
+                            <td>@item.EventName</td>
+                            <td>@item.EventType</td>
+                            <td>@item.EventStart.ToString("g")</td>
+                            <td>@item.EventEnd.ToString("g")</td>
+                            <td>@Math.Round(duration)</td>
+                            <td>
+                                @if (item.Status == HealthWellbeing.Models.EventStatus.Agendado)
+                                {
+                                    <span class="badge bg-primary">@item.Status</span>
+                                }
+                                else if (item.Status == HealthWellbeing.Models.EventStatus.Adecorrer)
+                                {
+                                    <span class="badge bg-success">@item.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Status</span>
+                                }
+                            </td>
+                            <td>@item.MinLevel</td>
+                            <td>@item.EventPoints</td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-sm btn-info me-1">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <nav aria-label="Events page">
+                <ul class="pagination">
+
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType"
+                           asp-route-searchStatus="@ViewBag.SearchStatus">First</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchType="@ViewBag.SearchType"
+                               asp-route-searchStatus="@ViewBag.SearchStatus">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@Model.TotalPages"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType"
+                           asp-route-searchStatus="@ViewBag.SearchStatus">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 }

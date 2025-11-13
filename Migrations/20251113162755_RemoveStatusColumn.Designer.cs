@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251113002902_InitialHealth")]
-    partial class InitialHealth
+    [Migration("20251113162755_RemoveStatusColumn")]
+    partial class RemoveStatusColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,31 +66,32 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
 
-                    b.Property<int>("DurationMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("EventDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("EventEnd")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("EventName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("EventPoints")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EventStart")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EventType")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Intensity")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int>("MinLevel")
+                        .HasColumnType("int");
 
                     b.HasKey("EventId");
 
