@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Migrations/20251113165352_UpdateMigration.cs
     public partial class UpdateMigration : Migration
-========
-    public partial class InitialCreate : Migration
->>>>>>>> Grupo-8:Migrations/20251113161616_InitialCreate.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +40,6 @@ namespace HealthWellbeing.Migrations
                     EventType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
                     EventPoints = table.Column<int>(type: "int", nullable: false),
                     MinLevel = table.Column<int>(type: "int", nullable: false)
                 },

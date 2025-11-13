@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-<<<<<<<< HEAD:Migrations/20251113165352_UpdateMigration.Designer.cs
-    [Migration("20251113165352_UpdateMigration")]
+    [Migration("20251113171744_UpdateMigration")]
     partial class UpdateMigration
-========
-    [Migration("20251113162755_RemoveStatusColumn")]
-    partial class RemoveStatusColumn
->>>>>>>> Grupo-8:Migrations/20251113162755_RemoveStatusColumn.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
