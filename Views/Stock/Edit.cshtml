@@ -33,21 +33,12 @@
                 <input asp-for="QuantidadeMinima" class="form-control" />
                 <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="DataUltimaAtualizacao" class="control-label"></label>
-                <input asp-for="DataUltimaAtualizacao" class="form-control" />
-                <span asp-validation-for="DataUltimaAtualizacao" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
