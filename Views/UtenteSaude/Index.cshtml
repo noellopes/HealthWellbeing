@@ -120,7 +120,7 @@
 
                     <!-- BOTÕES À DIREITA -->
                     <div class="utente-actions">
-                        <a asp-controller="Consultas" asp-action="Marcar" class="utente-btn">Marcar Consulta</a>
+                        <a asp-controller="Consultas" asp-action="Create" class="utente-btn">Marcar Consulta</a>
 
                     </div>
                 </div>
@@ -130,7 +130,7 @@
             <!-- ---------- CORPO PRINCIPAL ---------- -->
 
             <div class="utente-body">
-                <h2 style="margin-top:0;color:#1f4f6a;">Bem-vindo, @nome</h2>
+                <h2 style="margin-top:0;color:#1f4f6a;">Bem-vindo, Diretor Clinico</h2>
                 <p style="margin-bottom:12px;color:#2b546c;">
                     Esta é a sua área pessoal. Use os atalhos para gerir as suas consultas e perfil.
                 </p>
@@ -157,10 +157,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Nome</th>
-                                <th>NIF</th>
-                                <th>NUS</th>
                                 <th>Idade</th>
-                                <th style="width: 210px;">Ações</th>
+                                <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -170,8 +168,6 @@
                                 {
                                     <tr>
                                         <td>@u.NomeCompleto</td>
-                                        <td>@u.Nif</td>
-                                        <td>@u.Nus</td>
                                         <td>@u.Idade</td>
                                         <td>
                                             <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@u.UtenteSaudeId">Detalhes</a>
