@@ -1,53 +1,76 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.ProfissionalExecutante>
 
 @{
-    ViewData["Title"] = "Profissionais Executantes Page";
+    ViewData["Title"] = "Lista de Profissionais";
 }
 
-<h1>Viewbag.Title</h1>
+<div class="container p-4">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Funcao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telefone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Funcao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Telefone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProfissionalExecutanteId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Lista de Profissionais Executantes</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle-fill"></i> &nbsp; Create New
+            </a>
+        </div>
+    </div>
+
+    <br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Nome)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Funcao)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Telefone)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Funcao)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Telefone)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+
+                            <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-warning mx-1">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+
+                            <a asp-action="Details" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-info mx-1">
+                                <i class="bi bi-info-circle-fill"></i> Details
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-danger mx-1">
+                                <i class="bi bi-trash-fill"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
