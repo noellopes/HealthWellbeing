@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,14 +20,28 @@ namespace HealthWellbeing.Controllers
         // URL: /UtenteSaude
         // View: Views/UtenteSaude/Index.cshtml
         // ================================
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int currentPage = 1, int itemsPerPage = 10)
         {
-            var lista = await _db.UtenteSaude
-                                 .AsNoTracking()
-                                 .OrderBy(u => u.NomeCompleto)
-                                 .ToListAsync();
-            return View(lista);
+            // Total de itens na tabela
+            var totalItems = await _db.UtenteSaude.CountAsync();
+
+            // Calcular a lista de utentes com base na páginação
+            var utentes = await _db.UtenteSaude
+                                    .AsNoTracking()
+                                    .OrderBy(u => u.NomeCompleto)
+                                    .Skip((currentPage - 1) * itemsPerPage)  // Pular os itens das páginas anteriores
+                                    .Take(itemsPerPage)  // Pegar apenas os itens da página atual
+                                    .ToListAsync();
+
+            // Criar a informação de paginação
+            var paginationInfo = new PaginationInfo<UtenteSaude>(currentPage, totalItems, itemsPerPage)
+            {
+                Items = utentes
+            };
+
+            return View(paginationInfo);
         }
+
 
         // ================================
         // DETALHES
@@ -167,4 +182,5 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
+
 }

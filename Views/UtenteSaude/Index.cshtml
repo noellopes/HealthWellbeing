@@ -1,4 +1,5 @@
-﻿@model IEnumerable<HealthWellbeing.Models.UtenteSaude>
+﻿@model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.UtenteSaude>
+
 @{
     ViewData["Title"] = "Área do Utente";
     var nome = ViewBag.Nome as string ?? "Utente";
@@ -162,9 +163,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (Model != null && Model.Any())
+                            @if (Model != null && Model.Items.Any())
                             {
-                                foreach (var u in Model)
+                                @foreach (var u in Model.Items)
+
                                 {
                                     <tr>
                                         <td>@u.NomeCompleto</td>
@@ -188,6 +190,32 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- ---------- PAGINAÇÃO ---------- -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <!-- Botão de "Previous" -->
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, itemsPerPage = Model.ItemsPerPage })" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+
+                        <!-- Páginas numeradas -->
+                        @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { currentPage = i, itemsPerPage = Model.ItemsPerPage })">@i</a>
+                            </li>
+                        }
+
+                        <!-- Botão de "Next" -->
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, itemsPerPage = Model.ItemsPerPage })" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
 
                 <!-- ---------- BOTÃO NOVO UTENTE ---------- -->
                 <div class="mt-3">
