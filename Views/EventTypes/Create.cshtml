@@ -4,45 +4,48 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h4>EventType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i> New Event Type
+        </h4>
+    </div>
+    <div class="card-body">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="EventTypeName" class="control-label"></label>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <div class="mb-3">
+                <label asp-for="EventTypeName" class="form-label fw-bold"></label>
                 <input asp-for="EventTypeName" class="form-control" />
-                <span asp-validation-for="EventTypeName" class="text-danger"></span>
+                <span asp-validation-for="EventTypeName" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="EventTypeScoringMode" class="control-label"></label>
-                <select asp-for="EventTypeScoringMode" class="form-control">
-                    <option value="fixed">Fixed</option>
-                    <option value="progressive">Progressive</option>
-                    <option value="ranking">Ranking</option>
-                    <option value="time_based">Time Based</option>
-                    <option value="completion">Completion</option>
-                    <option value="binary">Binary</option>
+
+            <div class="mb-3">
+                <label asp-for="EventTypeScoringMode" class="form-label fw-bold"></label>
+                <select asp-for="EventTypeScoringMode" class="form-select" asp-items="ViewBag.ScoringModes">
+                    <option value="">-- Selecione um Modo --</option>
                 </select>
-                <span asp-validation-for="EventTypeScoringMode" class="text-danger"></span>
+                <span asp-validation-for="EventTypeScoringMode" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="EventTypeMultiplier" class="control-label"></label>
+
+            <div class="mb-4">
+                <label asp-for="EventTypeMultiplier" class="form-label fw-bold"></label>
                 <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.1" min="0" />
-                <span asp-validation-for="EventTypeMultiplier" class="text-danger"></span>
+                <span asp-validation-for="EventTypeMultiplier" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                </a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

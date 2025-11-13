@@ -2,35 +2,80 @@
 
 @{
     ViewData["Title"] = "Details";
+    string? successMessage = TempData["SuccessMessage"]?.ToString();
 }
 
-<h1>Details</h1>
+@if (successMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
-<div>
-    <h4>EventType</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EventTypeName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EventTypeName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EventTypeScoringMode)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EventTypeScoringMode)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EventTypeMultiplier)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EventTypeMultiplier)
-        </dd>
-    </dl>
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-tag me-2"></i> Event Type Details
+        </h4>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventTypeName)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventTypeName)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventTypeScoringMode)
+            </dt>
+            <dd class="col-sm-9">
+                @if (Model.EventTypeScoringMode == "fixed") {
+                    <span class="badge bg-primary">Fixo</span>
+                }
+                else if (Model.EventTypeScoringMode == "progressive") {
+                    <span class="badge bg-success">Progressivo</span>
+                }
+                else if (Model.EventTypeScoringMode == "time_based") {
+                    <span class="badge bg-info">Baseado em Tempo</span>
+                }
+                else if (Model.EventTypeScoringMode == "completion") {
+                    <span class="badge bg-secondary">Conclusão</span>
+                }
+                else if (Model.EventTypeScoringMode == "binary") {
+                    <span class="badge bg-dark">Binário</span>
+                }
+                else {
+                    <span class="badge bg-light text-dark">@Model.EventTypeScoringMode</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventTypeMultiplier)
+            </dt>
+            <dd class="col-sm-9">
+                <span class="fw-bold @(Model.EventTypeMultiplier > 2.0 ? "text-success" : Model.EventTypeMultiplier > 1.0 ? "text-primary" : "text-muted")">
+                    @Model.EventTypeMultiplier.ToString("F1")x
+                </span>
+            </dd>
+        </dl>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.EventTypeId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+    <a asp-action="Edit" asp-route-id="@Model?.EventTypeId" class="btn btn-warning">
+        <i class="bi bi-pencil-square me-1"></i> Edit
+    </a>
+    <a asp-action="Delete" asp-route-id="@Model?.EventTypeId" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Delete
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+    </a>
 </div>
