@@ -1,59 +1,64 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Stock>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Gestão de Stock";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-box-seam"></i> Gestão de Stock
+        </h2>
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle"></i> Novo Stock
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ConsumivelID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ZonaID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.QuantidadeAtual)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.QuantidadeMinima)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataUltimaAtualizacao)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ConsumivelID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ZonaID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.QuantidadeAtual)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.QuantidadeMinima)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataUltimaAtualizacao)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.StockId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.StockId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.StockId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <table class="table table-striped table-bordered align-middle shadow-sm">
+        <thead class="table-primary">
+            <tr class="text-center">
+                <th>Consumível</th>
+                <th>Zona</th>
+                <th>Quantidade Atual</th>
+                <th>Quantidade Mínima</th>
+                <th>Última Atualização</th>
+                <th style="width:180px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    var stockBaixo = item.QuantidadeAtual < (item.QuantidadeMinima);
+                    <tr class="text-center @(stockBaixo ? "table-danger" : "")">
+                        <td>@item.ConsumivelID</td>
+                        <td>@item.ZonaID</td>
+                        <td>@item.QuantidadeAtual</td>
+                        <td>@item.QuantidadeMinima</td>
+                        <td>@item.DataUltimaAtualizacao.ToShortDateString()</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-action="Details" asp-route-id="@item.StockId" class="btn btn-info btn-sm text-white">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.StockId" class="btn btn-warning btn-sm text-white">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.StockId" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhum registo de stock encontrado.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
