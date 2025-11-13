@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251111170700_InitialMigration")]
+    [Migration("20251113124403_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -280,31 +280,47 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdditionalNotes")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CanceledReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("CompletedDuration")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<int?>("DurationMinutes")
+                    b.Property<int?>("EstimatedDuration")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
+
                     b.Property<int>("NurseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PathologyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Remarks")
+                    b.Property<string>("Observations")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("Result")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                    b.Property<int?>("PathologyId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

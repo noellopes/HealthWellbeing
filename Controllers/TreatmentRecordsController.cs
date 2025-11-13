@@ -29,7 +29,7 @@ namespace HealthWellbeing.Controllers
             var MAX_ITEMS_PER_PAGE = 1;
 
             // Define as propriadades visiveis do modelo
-            IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt"];
+            IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"];
 
             // Query Base para otimizar as consultas
             IQueryable<TreatmentRecord> treatments = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType).AsNoTracking();
@@ -73,7 +73,7 @@ namespace HealthWellbeing.Controllers
 
             ViewData["Title"] = "Detalhes do tratamento";
             ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
+            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt" };
             return View("~/Views/Shared/Group1/Actions/Details.cshtml", treatmentRecord);
         }
 
@@ -106,9 +106,9 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
+            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
+            ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
             return View("CreateOrEdit", treatmentRecord);
         }
 
@@ -176,9 +176,9 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["NurseId"] = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
-            ViewData["PathologyId"] = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
-            ViewData["TreatmentId"] = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
+            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
+            ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
             return View("CreateOrEdit", treatmentRecord);
         }
 

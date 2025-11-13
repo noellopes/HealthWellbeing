@@ -9,8 +9,8 @@ namespace HealthWellbeing.Utils.Group1.Services
             { "Nurse.Name", (query, val) => query.Where(t => t.Nurse.Name.Contains(val)) },
             { "TreatmentType.Name", (query, val) => query.Where(t => t.TreatmentType.Name.Contains(val)) },
             { "Pathology.Name", (query, val) => query.Where(t => t.Pathology.Name.Contains(val)) },
-            { "Remarks", (query, val) => query.Where(t => t.Remarks.Contains(val)) },
-            { "Result", (query, val) => query.Where(t => t.Result.Contains(val)) },
+            //{ "Remarks", (query, val) => query.Where(t => t.Remarks.Contains(val)) },
+            //{ "Result", (query, val) => query.Where(t => t.Result.Contains(val)) },
             { "Status", (query, val) => query.Where(t => t.Status.ToString().Contains(val)) }
         };
 
@@ -44,9 +44,9 @@ namespace HealthWellbeing.Utils.Group1.Services
                 "TreatmentType.Name" => descending ? query.OrderByDescending(t => t.TreatmentType.Name) : query.OrderBy(t => t.TreatmentType.Name),
                 "Pathology.Name" => descending ? query.OrderByDescending(t => t.Pathology.Name) : query.OrderBy(t => t.Pathology.Name),
                 "TreatmentDate" => descending ? query.OrderByDescending(t => t.TreatmentDate) : query.OrderBy(t => t.TreatmentDate),
-                "DurationMinutes" => descending ? query.OrderByDescending(t => t.DurationMinutes) : query.OrderBy(t => t.DurationMinutes),
-                "Remarks" => descending ? query.OrderByDescending(t => t.Remarks) : query.OrderBy(t => t.Remarks),
-                "Result" => descending ? query.OrderByDescending(t => t.Result) : query.OrderBy(t => t.Result),
+                "CompletedDuration" => descending ? query.OrderByDescending(t => t.CompletedDuration) : query.OrderBy(t => t.CompletedDuration),
+                //"Remarks" => descending ? query.OrderByDescending(t => t.Remarks) : query.OrderBy(t => t.Remarks),
+                //"Result" => descending ? query.OrderByDescending(t => t.Result) : query.OrderBy(t => t.Result),
                 "Status" => descending ? query.OrderByDescending(t => t.Status) : query.OrderBy(t => t.Status),
                 "CreatedAt" => descending ? query.OrderByDescending(t => t.CreatedAt) : query.OrderBy(t => t.CreatedAt),
                 _ => descending ? query.OrderByDescending(t => t.Id) : query.OrderBy(t => t.Id),

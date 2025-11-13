@@ -9,84 +9,94 @@ namespace HealthWellbeing.Models
         [Key]
         public int Id { get; set; }
 
-        // Relationship with the Patient
-        /*[Required(ErrorMessage = "The Patient is required.")]
+        // Relationships
+        // Patient
+        /*
+        [Required(ErrorMessage = "The Patient is required.")]
         [Display(Name = "Patient")]
         public int PatientId { get; set; }
 
         [ForeignKey(nameof(PatientId))]
-        public HealthPatient? Patient { get; set; }*/
-
-        // Relationship with the Nurse
-        [Required(ErrorMessage = "The responsible Nurse is required.")]
-        [Display(Name = "Responsible Nurse")]
+        public HealthPatient? Patient { get; set; }
+        */
+        [Required(ErrorMessage = "É necessário um(a) enfermeiro(a) responsável.")]
+        [Display(Name = "Enfermeiro(a) Responsável")]
         public int NurseId { get; set; }
 
         [ForeignKey(nameof(NurseId))]
-        [Display(Name = "Responsible Nurse")]
         public Nurse? Nurse { get; set; }
 
-        // Treatment Type
-        [Required(ErrorMessage = "The treatment type is required.")]
-        [Display(Name = "Treatment Type")]
+        [Required(ErrorMessage = "É necessário especificar o tipo de tratamento.")]
+        [Display(Name = "Tipo de tratamento")]
         public int TreatmentId { get; set; }
 
         [ForeignKey(nameof(TreatmentId))]
-        [Display(Name = "Treatment Type")]
         public TreatmentType? TreatmentType { get; set; }
 
-        // Associated pathology (optional)
-        [Display(Name = "Pathology")]
+        [Display(Name = "Patologia associada")]
         public int? PathologyId { get; set; }
 
         [ForeignKey(nameof(PathologyId))]
         public Pathology? Pathology { get; set; }
 
-        // Date and time of session
-        [Required(ErrorMessage = "The treatment date is required.")]
-        [Display(Name = "Treatment Date")]
+        // Treatment information
+        [Required(ErrorMessage = "É necessário informar a data pretendida do tratamento.")]
+        [Display(Name = "Data pretendida para o tratamento")]
         [DataType(DataType.Date)]
         public DateTime TreatmentDate { get; set; }
 
-        // Duration (minutes)
-        [Display(Name = "Duration (minutes)")]
-        public int? DurationMinutes { get; set; }
+        [StringLength(300, ErrorMessage = "As notas adicionais não devem exceder os 300 caracteres.")]
+        [Display(Name = "Notas adicionais")]
+        public string? AdditionalNotes { get; set; }
 
-        // Description and remarks
-        [StringLength(500, ErrorMessage = "Remarks must be at most 500 characters long.")]
-        [Display(Name = "Remarks / Description")]
-        public string? Remarks { get; set; }
+        [Display(Name = "Duração estimada do tratamento")]
+        public int? EstimatedDuration { get; set; }
 
-        // Treatment result
-        [StringLength(300, ErrorMessage = "The result must be at most 300 characters long.")]
-        [Display(Name = "Result / Progress")]
-        public string? Result { get; set; }
+        [StringLength(500, ErrorMessage = "As observações não devem exceder os 500 caracteres")]
+        [Display(Name = "Observações")]
+        public string? Observations { get; set; }
 
-        // Treatment status
-        [Display(Name = "Treatment Status")]
+        [Display(Name = "Estado do tratamento")]
         public TreatmentStatus Status { get; set; } = TreatmentStatus.Scheduled;
 
-        // Record creation date
-        [Display(Name = "Submission Date")]
+        [Display(Name = "Duração total do tratamento")]
+        public int? CompletedDuration { get; set; }
+
+        // Cancellation details
+        [StringLength(500, ErrorMessage = "O motivo do cancelamento não deve exceder 500 caracteres.")]
+        [Display(Name = "Motivo do cancelamento")]
+        public String? CanceledReason { get; set; }
+
+        [Display(Name = "Data de cancelamento")]
+        public DateTime? CanceledAt { get; set; }
+
+        // Audit fields
+        [Display(Name = "Data de submissão")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+        [Display(Name = "Data de modificação")]
+        public DateTime? ModifiedAt { get; set; }
+
+        [Display(Name = "Modificado por")]
+        public int? ModifiedBy { get; set; }
+
+        // Soft deletion
         public bool IsDeleted { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }
     }
 
     public enum TreatmentStatus
     {
-        [Display(Name = "Scheduled (Planned)")]
+        [Display(Name = "Agendado (Planeado)")]
         Scheduled,
 
-        [Display(Name = "In Progress")]
+        [Display(Name = "Em progresso")]
         InProgress,
 
-        [Display(Name = "Completed Successfully")]
+        [Display(Name = "Concluído")]
         Completed,
 
-        [Display(Name = "Canceled / Aborted")]
+        [Display(Name = "Cancelado")]
         Canceled
     }
-
 }
