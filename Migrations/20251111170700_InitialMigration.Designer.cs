@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251027173401_InitialMigration")]
+    [Migration("20251111170700_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -283,8 +283,14 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int?>("DurationMinutes")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("NurseId")
                         .HasColumnType("int");

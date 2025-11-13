@@ -10,8 +10,8 @@ namespace HealthWellbeing.Data
 
             HealthWellbeingDbContext.Database.EnsureCreated();
 
+            PopulatePathology(HealthWellbeingDbContext);
             PopulateTreatmentType(HealthWellbeingDbContext);
-            //PopulatePathology
             PopulateNurses(HealthWellbeingDbContext);
         }
         private static void PopulateTreatmentType(HealthWellbeingDbContext HealthWellbeingDbContext)
@@ -81,7 +81,7 @@ namespace HealthWellbeing.Data
 
         private static void PopulatePathology(HealthWellbeingDbContext HealthWellbeingDbContext)
         {
-            if (HealthWellbeingDbContext.TreatmentType.Any()) return;
+            if (HealthWellbeingDbContext.Pathology.Any()) return;
 
             var Pathologies = new[]
             {

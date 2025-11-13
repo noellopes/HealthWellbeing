@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Utils.Group1.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
-    public class TreatmentRecord
+    public class TreatmentRecord : ISoftDeletable
     {
         [Key]
         public int Id { get; set; }
@@ -68,6 +69,9 @@ namespace HealthWellbeing.Models
         // Record creation date
         [Display(Name = "Submission Date")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 
     public enum TreatmentStatus

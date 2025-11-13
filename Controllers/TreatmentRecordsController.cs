@@ -1,12 +1,13 @@
-﻿using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.Utils.Group1.Interfaces;
-using HealthWellbeing.Utils.Group1.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Models;
 
 namespace HealthWellbeing.Controllers
 {
@@ -101,14 +102,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(treatmentRecord);
                 await _context.SaveChangesAsync();
-                var alert = new AlertItem
-                {
-                    AlertType = "success",
-                    IconClass = "bi bi-check-circle",
-                    Message = "Treatment record created successfully.",
-                    Dismissible = true
-                };
-                TempData["Alert"] = Validator.TryValidateObject(alert, new ValidationContext(alert), new List<ValidationResult>(), true) ? JsonConvert.SerializeObject(alert) : null;
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "Treatment record created successfully.", true);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -220,7 +214,11 @@ namespace HealthWellbeing.Controllers
             var treatmentRecord = await _context.TreatmentRecord.FindAsync(id);
             if (treatmentRecord != null)
             {
+                // Soft Delete
                 _context.TreatmentRecord.Remove(treatmentRecord);
+
+                // Hard Delete
+                //await Functions.HardDeleteByIdAsync<TreatmentRecord>(_context, treatmentRecord.Id);
             }
 
             await _context.SaveChangesAsync();

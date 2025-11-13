@@ -155,7 +155,9 @@ namespace HealthWellbeing.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Result = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
                 constraints: table =>
                 {
