@@ -1,36 +1,50 @@
 ﻿@model HealthWellbeing.Models.Pathology
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Patologia";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
 
-<div>
-    <h4>Pathology</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Severity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Severity)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-info text-white rounded-top-4 py-3">
+            <h4 class="mb-0">
+                <i class="bi bi-info-circle me-2"></i>Detalhes da Patologia
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <dl class="row mb-4">
+
+                <dt class="col-sm-3 fw-semibold text-secondary">Nome</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3 fw-semibold text-secondary">Descrição</dt>
+                <dd class="col-sm-9">@Model.Description</dd>
+
+                <dt class="col-sm-3 fw-semibold text-secondary">Gravidade</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-danger px-3 py-2 rounded-pill">
+                        @Model.Severity
+                    </span>
+                </dd>
+
+            </dl>
+
+            <div class="d-flex justify-content-between mt-4">
+
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-3 px-4">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-3 px-4">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
 </div>
