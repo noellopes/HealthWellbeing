@@ -52,5 +52,10 @@ namespace HealthWellbeing.Utils.Group1.Models
 
             return JsonSerializer.Serialize(alert);
         }
+
+        public AlertItem Clone()
+        {
+            return (AlertItem)this.MemberwiseClone();
+        }
     }
 }

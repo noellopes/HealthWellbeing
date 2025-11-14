@@ -24,6 +24,7 @@ namespace HealthWellbeing.Models
         public int NurseId { get; set; }
 
         [ForeignKey(nameof(NurseId))]
+        [Display(Name = "Enfermeiro(a) Responsável")]
         public Nurse? Nurse { get; set; }
 
         [Required(ErrorMessage = "É necessário especificar o tipo de tratamento.")]
@@ -31,12 +32,14 @@ namespace HealthWellbeing.Models
         public int TreatmentId { get; set; }
 
         [ForeignKey(nameof(TreatmentId))]
+        [Display(Name = "Tipo de tratamento")]
         public TreatmentType? TreatmentType { get; set; }
 
         [Display(Name = "Patologia associada")]
         public int? PathologyId { get; set; }
 
         [ForeignKey(nameof(PathologyId))]
+        [Display(Name = "Patologia associada")]
         public Pathology? Pathology { get; set; }
 
         // Treatment information

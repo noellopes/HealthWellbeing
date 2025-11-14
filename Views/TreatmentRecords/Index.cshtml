@@ -1,30 +1,12 @@
-﻿@using HealthWellbeing.Utils.Group1.Models
+﻿@using HealthWellbeing.Utils.Group1
+@using HealthWellbeing.Utils.Group1.Models
 @model PaginatedList<TreatmentRecord>
 
 @{
-    /*
-    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
-    * DON'T MODIFY — Instead, copy into your own folder
-    * Pass Model, ViewBag.ModelType, and ViewBag.Properties (list of property names)
-    */
-
     var modelType = ViewBag.ModelType as Type;
     var properties = ViewBag.Properties as List<string>;
     var noConfig = modelType == null || properties == null || properties.Count == 0;
     var noData = Model == null || !Model.Any();
-
-    var configAlertModel = new AlertItem {
-        AlertType = "danger",
-        IconClass = "bi bi-exclamation-circle",
-        Message = "Configuration error: Model type or properties list not provided.",
-        Dismissible = false
-    };
-    var noDataAlertModel = new AlertItem {
-        AlertType = "warning",
-        IconClass = "bi bi-exclamation-triangle",
-        Message = "No records found.",
-        Dismissible = false
-    };
 
     if (TempData["Alert"] != null)
     {
@@ -38,7 +20,7 @@
 
 @if (noConfig)
 {
-    <partial name="Group1/Partials/Alert" model="configAlertModel" />
+    <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_CONFIG_ALERT" />
 }
 else
 {
@@ -54,7 +36,7 @@ else
     <div class="table-responsive">
         @if (noData)
         {
-            <partial name="Group1/Partials/Alert" model="noDataAlertModel" />
+            <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_DATA_ALERT" />
         }
         else
         {
@@ -87,9 +69,9 @@ else
                                    asp-route-sortOrder="@sortOrder"
                                    asp-route-searchBy="@ViewBag.CurrentSearchBy"
                                    asp-route-searchString="@ViewBag.CurrentSearchString"
-                                   asp-route-pageNumber="@ViewBag.CurrentPage"
+                                   asp-route-page="@ViewBag.CurrentPage"
                                    style="@(!isActiveSort ? "color: black !important" : "color: blue !important")">
-                                    @HealthWellbeing.Utils.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])
+                                    @Functions.GetDisplayName(modelType, prop.Split('.')[0])
                                     @if (isActiveSort)
                                     {
                                         if (isDescending)
@@ -113,7 +95,7 @@ else
                         <tr>
                             @foreach (var prop in properties)
                             {
-                                <td>@HealthWellbeing.Utils.Group1.Functions.GetNestedPropertyValue(item, prop)</td>
+                                <td>@Functions.GetNestedPropertyValue(item, prop)</td>
                             }
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-2"><i class="bi bi-info-circle"></i> Detalhes</a>
@@ -127,9 +109,10 @@ else
     @if (Model.TotalPages > 1)
     {
         <partial name="Group1/Partials/Pagination" model="new PaginationProps {
-            PageIndex = Model?.PageIndex ?? 1,
+            CurrentPage = Model?.PageIndex ?? 1,
             PrevDisabled = !Model.HasPreviousPage,
             NextDisabled = !Model.HasNextPage,
+            TotalPages = Model.TotalPages,
         }" />
     }
 }

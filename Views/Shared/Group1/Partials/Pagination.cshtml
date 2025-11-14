@@ -18,17 +18,28 @@
                asp-route-sortOrder="@ViewBag.CurrentSort"
                asp-route-searchBy="@ViewBag.CurrentSearchBy"
                asp-route-searchString="@ViewBag.CurrentSearchString"
-               asp-route-pageNumber="@(@Model.PageIndex - 1)"
+               asp-route-page="@(@Model.CurrentPage - 1)"
                aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+            }
+            else
+            {
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+            }
+        }
         <li class="page-item @nextDisabled">
             <a class="page-link" asp-action="Index"
                asp-route-sortOrder="@ViewBag.CurrentSort"
                asp-route-searchBy="@ViewBag.CurrentSearchBy"
                asp-route-searchString="@ViewBag.CurrentSearchString"
-               asp-route-pageNumber="@(@Model.PageIndex + 1)"
+               asp-route-page="@(@Model.CurrentPage + 1)"
                aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>

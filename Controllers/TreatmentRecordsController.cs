@@ -23,10 +23,10 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TreatmentRecords
-        public async Task<IActionResult> Index(string sortOrder, string searchBy, string searchString, int pageNumber = 1)
+        public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
             // Controla quantos itens por pagina
-            var MAX_ITEMS_PER_PAGE = 1;
+            var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<TreatmentRecord>();
 
             // Define as propriadades visiveis do modelo
             IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"];
@@ -46,11 +46,11 @@ namespace HealthWellbeing.Controllers
             ViewBag.CurrentSort = sortOrder;
             ViewBag.CurrentSearchBy = searchBy;
             ViewBag.CurrentSearchString = searchString;
-            ViewBag.CurrentPage = pageNumber;
+            ViewBag.CurrentPage = page;
 
             // Aplica paginação e devolve a view com o modelo paginado
-            var paginatedList = await PaginatedList<TreatmentRecord>.CreateAsync(treatments, pageNumber, MAX_ITEMS_PER_PAGE);
-            return View("~/Views/Shared/Group1/Actions/Index.cshtml", paginatedList);
+            var paginatedList = await PaginatedList<TreatmentRecord>.CreateAsync(treatments, page, MAX_ITEMS_PER_PAGE);
+            return View(paginatedList);
         }
 
         // GET: TreatmentRecords/Details/5
@@ -58,7 +58,7 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
             var treatmentRecord = await _context.TreatmentRecord
@@ -68,7 +68,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (treatmentRecord == null)
             {
-                return NotFound();
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
             ViewData["Title"] = "Detalhes do tratamento";
@@ -85,7 +85,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("CreateOrEdit");
+            return View("Request");
         }
 
         // POST: TreatmentRecords/Create
@@ -93,13 +93,14 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate,DurationMinutes,Remarks,Result,Status")] TreatmentRecord treatmentRecord)
+        public async Task<IActionResult> Create([Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate")] TreatmentRecord treatmentRecord)
         {
             ViewData["Title"] = "Marcação de tratamento";
-            treatmentRecord.CreatedAt = DateTime.Now;
 
             if (ModelState.IsValid)
             {
+                //treatmentRecord.CreatedAt = DateTime.Now;
+                treatmentRecord.NurseId = Random.Shared.Next(1, 21);
                 _context.Add(treatmentRecord);
                 await _context.SaveChangesAsync();
                 TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "Treatment record created successfully.", true);
@@ -109,7 +110,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
-            return View("CreateOrEdit", treatmentRecord);
+            return View("Request", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Edit/5
@@ -127,10 +128,9 @@ namespace HealthWellbeing.Controllers
             }
 
             ViewData["Title"] = "Editar marcação de tratamento";
-            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("CreateOrEdit", treatmentRecord);
+            return View("Request", treatmentRecord);
         }
 
         // POST: TreatmentRecords/Edit/5
@@ -138,7 +138,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate,DurationMinutes,Remarks,Result,Status,CreatedAt")] TreatmentRecord treatmentRecord)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AdditionalNotes,Status")] TreatmentRecord treatmentRecord)
         {
             if (id != treatmentRecord.Id)
             {
@@ -179,7 +179,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
-            return View("CreateOrEdit", treatmentRecord);
+            return View("Request", treatmentRecord);
         }
 
         // GET: TreatmentRecords/Delete/5

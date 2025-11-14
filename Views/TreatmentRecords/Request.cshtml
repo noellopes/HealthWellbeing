@@ -15,10 +15,6 @@
                 <input type="hidden" asp-for="Id" />
             }
             <div class="form-group">
-                <label asp-for="NurseId" class="control-label"></label>
-                <select asp-for="NurseId" class="form-control" asp-items="ViewBag.NurseId"></select>
-            </div>
-            <div class="form-group">
                 <label asp-for="TreatmentId" class="control-label"></label>
                 <select asp-for="TreatmentId" class="form-control" asp-items="ViewBag.TreatmentId"></select>
             </div>
@@ -32,25 +28,9 @@
                 <span asp-validation-for="TreatmentDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CompletedDuration" class="control-label"></label>
-                <input asp-for="CompletedDuration" class="form-control" />
-                <span asp-validation-for="CompletedDuration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observations" class="control-label"></label>
-                <textarea asp-for="Observations" class="form-control" ></textarea>
-                <span asp-validation-for="Observations" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="AdditionalNotes" class="control-label"></label>
                 <textarea asp-for="AdditionalNotes" class="form-control" ></textarea>
                 <span asp-validation-for="AdditionalNotes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control"
-                        asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.TreatmentStatus>()"></select>
-                <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="border-top mt-4 form-group text-right">
                 <button type="submit" class="btn btn-sm btn-outline-primary mt-4 mr-2">
