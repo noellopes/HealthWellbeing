@@ -1,25 +1,92 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Pathology>
+﻿@using HealthWellbeing.Utils.Group1
+@using HealthWellbeing.Utils.Group1.Models
+@model PaginatedList<Pathology>
 
 @{
-    ViewData["Title"] = "Pathologies";
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+    var noData = Model == null || !Model.Any();
+
+    if (TempData["Alert"] != null)
+    {
+        var alertJson = TempData["Alert"] as string;
+        var alertModel = alertJson == null ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<AlertItem>(alertJson);
+        <partial name="Group1/Partials/Alert" model="alertModel" />
+    }
+
+    var currentSort = ViewBag.CurrentSort?.ToString() ?? "";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary">@ViewData["Title"]</h2>
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+
+@if (noConfig)
+{
+    <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_CONFIG_ALERT" />
+}
+else
+{
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
         <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Create New
+            <i class="bi bi-plus-circle me-1"></i> Criar
         </a>
     </div>
-
-    <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4">
+    <partial name="Group1/Partials/Search" />
+    <div class="table-responsive">
+        @if (noData)
+        {
+            <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_DATA_ALERT" />
+        }
+        else
+        {
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>@Html.DisplayNameFor(model => model.Name)</th>
-                        <th>@Html.DisplayNameFor(model => model.Description)</th>
-                        <th>@Html.DisplayNameFor(model => model.Severity)</th>
+                        <th>
+                            @{
+                                string sortOrder;
+
+                                if (currentSort == "Name")
+                                {
+                                    sortOrder = "Name" + "_desc";
+                                }
+                                else if (currentSort == "Name" + "_desc")
+                                {
+                                    sortOrder = "";
+                                }
+                                else
+                                {
+                                    sortOrder = "Name";
+                                }
+
+                                var isActiveSort = (currentSort == "Name" || currentSort == "Name" + "_desc");
+                                var isDescending = currentSort.EndsWith("_desc");
+                            }
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@sortOrder"
+                               asp-route-searchBy="@ViewBag.CurrentSearchBy"
+                               asp-route-searchString="@ViewBag.CurrentSearchString"
+                               asp-route-page="@ViewBag.CurrentPage"
+                               style="@(!isActiveSort ? "color: black !important" : "color: blue !important")">
+                                Name
+                                @if (isActiveSort)
+                                {
+                                    if (isDescending)
+                                    {
+                                        <span class="ml-1">&#x25BC;</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="ml-1">&#x25B2;</span>
+                                    }
+                                }
+                            </a>
+                        </th>
+                        <th>Description</th>
+                        <th>Severity</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -52,6 +119,15 @@
                     }
                 </tbody>
             </table>
-        </div>
+        }
     </div>
-</div>
+    @if (Model.TotalPages > 1)
+    {
+        <partial name="Group1/Partials/Pagination" model="new PaginationProps {
+            CurrentPage = Model?.PageIndex ?? 1,
+            PrevDisabled = !Model.HasPreviousPage,
+            NextDisabled = !Model.HasNextPage,
+            TotalPages = Model.TotalPages,
+        }" />
+    }
+}

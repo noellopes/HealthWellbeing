@@ -1,28 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class PathologiesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private readonly IRecordFilterService<Pathology> _filterService;
 
-        public PathologiesController(HealthWellbeingDbContext context)
+        public PathologiesController(HealthWellbeingDbContext context, IRecordFilterService<Pathology> filterService)
         {
             _context = context;
+            _filterService = filterService;
         }
 
         // GET: Pathologies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
-            return View(await _context.Pathology.ToListAsync());
+            // Controla quantos itens por pagina
+            var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<Pathology>();
+
+            // Define as propriadades visiveis do modelo
+            IReadOnlyList<string> baseProperties = ["Name", "Severity", "Description"];
+
+            // Query Base para otimizar as consultas
+            IQueryable<Pathology> pathologies = _context.Pathology.AsNoTracking();
+
+            // Aplica filtragem com os parametros atuais
+            pathologies = _filterService.ApplyFilter(pathologies, searchBy, searchString);
+            pathologies = _filterService.ApplySorting(pathologies, sortOrder);
+
+            // Popula os dados necessarios a view
+            ViewData["Title"] = "Patologias";
+            ViewBag.ModelType = typeof(Pathology);
+            ViewBag.Properties = baseProperties.ToList();
+            ViewBag.SearchProperties = _filterService.SearchableProperties;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.CurrentSearchBy = searchBy;
+            ViewBag.CurrentSearchString = searchString;
+            ViewBag.CurrentPage = page;
+
+            // Aplica paginação e devolve a view com o modelo paginado
+            var paginatedList = await PaginatedList<Pathology>.CreateAsync(pathologies, page, MAX_ITEMS_PER_PAGE);
+            return View(paginatedList);
         }
 
         // GET: Pathologies/Details/5
