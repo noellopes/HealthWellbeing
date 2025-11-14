@@ -183,15 +183,22 @@ namespace HealthWellBeingRoom.Controllers
                 try
                 {
                     _context.Update(medicalDevices);
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(); 
+                    return RedirectToAction(nameof(Details),
+                        new
+                        {
+                            id = medicalDevices.MedicalDeviceID,
+                            SuccessMessage = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!"
+                        }
+                    );
 
-                    TempData["SuccessMessage"] = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID))
                     {
-                        return View("NotFound");
+                        ViewBag.MedDeviceWasDeleted = true;
+                        //return View("NotFound");
                     }
                     else
                     {

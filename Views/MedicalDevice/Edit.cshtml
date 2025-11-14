@@ -7,6 +7,20 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+@if (ViewBag.MedDeviceWasDeleted != null)
+{
+    <div class="alert alert-danger d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
+        <div class="ps-4">
+            <h4 class="alert-heading mb-2">Alteração Concorrente Detetada</h4>
+            <p class="mb-0">
+                O dispositivo médico que estava a editar foi eliminado por outro utilizador. As suas alterações atuais não podem ser guardadas no dispositivo original.
+                No entanto, pode criar um novo dispositivo com as informações que inseriu.
+            </p>
+        </div>
+    </div>
+}
+
 <div class="card shadow-sm">
 
     <div class="card-header bg-warning text-dark">
@@ -20,6 +34,11 @@
         <form asp-action="Edit" method="post">
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            @if (ViewBag.MedDeviceWasDeleted == null)
+            {
+                <input type="hidden" asp-for="MedicalDeviceID" />
+            }
 
             <input type="hidden" asp-for="MedicalDeviceID" />
             <input type="hidden" asp-for="RegistrationDate" />
@@ -79,13 +98,25 @@
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
 
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-save me-1"></i> Salvar Alterações
-                </button>
+                @if (ViewBag.MedDeviceWasDeleted != null)
+                {
+                    <button type="submit" asp-action="Create" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Criar novo dispositivo
+                    </button>
+                    <a asp-action="Index" class="btn btn-danger">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar para a lista
+                    </a>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Salvar Alterações
+                    </button>
 
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
-                </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+                    </a>
+                }
             </div>
 
         </form>
