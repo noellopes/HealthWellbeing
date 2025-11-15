@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using static HealthWellbeing.Models.Room;
+using HealthWellbeingRoom.ViewModels;
+
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -25,21 +28,82 @@ namespace HealthWellbeingRoom.Controllers
 
         // GET: Rooms
         // Lista paginada das salas existentes
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchName, string searchStatus, string searchSpecialty, string searchLocation, int page = 1)
         {
-            var query = _context.Room.AsQueryable();
+            // Traz todos os registos para memória para permitir filtragem com métodos C#
+            var allRooms = await _context.Room.ToListAsync();
 
-            var totalItems = await query.CountAsync();
+            // Filtro por nome (insensível a acentos e capitalização)
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                var normalizedSearch = RemoveDiacritics.Normalize(searchName);
+                allRooms = allRooms
+                    .Where(r => RemoveDiacritics.Normalize(r.Name).Contains(normalizedSearch))
+                    .ToList();
+            }
+
+            // Filtro por estado (aplicado apenas se o utilizador escolher um valor)
+            if (!string.IsNullOrEmpty(searchStatus) && Enum.TryParse<Room.RoomStatus>(searchStatus, out var status))
+            {
+                allRooms = allRooms
+                    .Where(r => r.Status == status)
+                    .ToList();
+            }
+
+            // Filtro por especialidade
+            if (!string.IsNullOrEmpty(searchSpecialty))
+            {
+                var normalizedSpecialty = RemoveDiacritics.Normalize(searchSpecialty);
+                allRooms = allRooms
+                    .Where(r => RemoveDiacritics.Normalize(r.Specialty).Contains(normalizedSpecialty))
+                    .ToList();
+            }
+
+            // Filtro por localização
+            if (!string.IsNullOrEmpty(searchLocation))
+            {
+                var normalizedLocation = RemoveDiacritics.Normalize(searchLocation);
+                allRooms = allRooms
+                    .Where(r => RemoveDiacritics.Normalize(r.Location).Contains(normalizedLocation))
+                    .ToList();
+            }
+
+            // Total de registos após filtros
+            var totalItems = allRooms.Count;
             var pagination = new RPaginationInfo<Room>(page, totalItems);
 
-            pagination.Items = await query
+            // Dados paginados
+            pagination.Items = allRooms
                 .OrderBy(r => r.Name)
-                .Skip((page - 1) * pagination.ItemsPerPage)
+                .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage)
-                .ToListAsync();
+                .ToList();
+
+            // Persistência dos filtros na view
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchStatus = searchStatus;
+
+            // Lista de estados com nomes amigáveis
+            ViewBag.Status = new SelectList(
+                Enum.GetValues(typeof(Room.RoomStatus))
+                    .Cast<Room.RoomStatus>()
+                    .Select(s => new { Value = s.ToString(), Text = GetDisplayName(s) }),
+                "Value", "Text", searchStatus
+            );
 
             return View(pagination);
         }
+
+        // Função auxiliar para extrair o nome amigável do enum
+        private string GetDisplayName(Enum value)
+        {
+            var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
+            var attr = member != null
+                ? Attribute.GetCustomAttribute(member, typeof(DisplayAttribute)) as DisplayAttribute
+                : null;
+            return attr?.Name ?? value.ToString();
+        }
+
 
         // GET: Rooms/Details/5
         public async Task<IActionResult> Details(int? id)

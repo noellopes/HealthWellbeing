@@ -5,7 +5,6 @@
 
 @model RPaginationInfo<Room>
 
-
 @{
     ViewData["Title"] = "Lista de Salas";
 
@@ -22,12 +21,68 @@
     <i class="bi bi-houses-fill"></i> Lista de Salas
 </h1>
 
-<div class="mb-3">
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle-fill"></i> Criar Nova Sala
-    </a>
+<!-- BOTÕES DE AÇÃO -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Salas Registadas</h2>
+    <div>
+        <!-- Botão para abrir o formulário de pesquisa -->
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+        <!-- Botão para criar nova sala -->
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle-fill"></i> Criar Nova Sala
+        </a>
+    </div>
 </div>
 
+<!-- FORMULÁRIO DE PESQUISA -->
+<div class="collapse mt-2 mb-2" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+            <!-- Primeira linha: Nome e Estado -->
+            <div class="col-md-6">
+                <label for="searchName" class="form-label">Nome</label>
+                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchStatus" class="form-label">Estado</label>
+                @Html.DropDownList(
+                "searchStatus",
+                                new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
+                                "Pesquisar pelo estado",
+                                new { @class = "form-select text-muted" }
+                                )
+            </div>
+
+            <!-- Segunda linha: Especialidade e Localização -->
+            <div class="col-md-6">
+                <label for="searchSpecialty" class="form-label">Especialidade</label>
+                <input id="searchSpecialty" name="searchSpecialty" value="@ViewBag.SearchSpecialty" class="form-control" placeholder="Pesquisar pela especialidade" type="search" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchLocation" class="form-label">Localização</label>
+                <input id="searchLocation" name="searchLocation" value="@ViewBag.SearchLocation" class="form-control" placeholder="Pesquisar pela localização" type="search" />
+            </div>
+
+            <!-- Botões -->
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- TABELA DE SALAS -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
@@ -43,7 +98,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Items)//os intens sao as salas
+            @foreach (var item in Model.Items) // os itens são as salas paginadas
             {
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
@@ -90,8 +145,7 @@
         </tbody>
     </table>
 
-@*  ADICAO DA PAGINACAO *@
-
+    <!-- PAGINAÇÃO -->
     <nav aria-label="Room page" class="d-flex justify-content-between align-items-center">
         <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
 
@@ -127,5 +181,4 @@
             }
         </ul>
     </nav>
-
 </div>
