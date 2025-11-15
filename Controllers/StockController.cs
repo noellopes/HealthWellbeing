@@ -24,6 +24,13 @@ namespace HealthWellbeing.Controllers
                 .OrderByDescending(s => s.DataUltimaAtualizacao)
                 .ToListAsync();
 
+            // Passar dicionários para converter IDs em nomes na View
+            ViewBag.Consumiveis = _context.Consumivel
+                .ToDictionary(c => c.ConsumivelId, c => c.Nome);
+
+            ViewBag.Zonas = _context.ZonaArmazenamento
+                .ToDictionary(z => z.Id, z => z.Nome);
+
             return View(stocks);
         }
 
@@ -36,7 +43,7 @@ namespace HealthWellbeing.Controllers
         // POST: Stock/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima")] Stock stock)
+        public async Task<IActionResult> Create([Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima,QuantidadeMaxima")] Stock stock)
         {
             if (ModelState.IsValid)
             {
@@ -64,7 +71,7 @@ namespace HealthWellbeing.Controllers
         // POST: Stock/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima")] Stock stock)
+        public async Task<IActionResult> Edit(int id, [Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima,QuantidadeMaxima")] Stock stock)
         {
             if (id != stock.StockId)
                 return NotFound();
@@ -104,7 +111,15 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-                await _context.SaveChangesAsync();
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var stock = await _context.Stock.FindAsync(id);
+            if (stock != null)
+                _context.Stock.Remove(stock);
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
