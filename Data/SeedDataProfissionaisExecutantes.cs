@@ -1,21 +1,27 @@
-﻿// Data/SeedDataProfissionalExecutante.cs (CORRIGIDO)
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellBeing.Models;
+﻿using HealthWellbeing.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
-namespace HealthWellbeing.Data // <<-- Corrigido o namespace se necessário
+namespace HealthWellbeing.Data
 {
+    // A classe SeedDataProfissionalExecutante deve ser pública
     public class SeedDataProfissionalExecutante
     {
-
-        private static void PopulateProfissionais(HealthWellbeingDbContext dbContext) // <<-- Nome do DbContext Corrigido
+        // ✅ MÉTODO DE ENTRADA CORRIGIDO: Este método é chamado a partir do Program.cs
+        public static void Populate(HealthWellbeingDbContext? dbContext)
         {
+            if (dbContext == null) return;
+
+            // Chama o método que insere os dados
+            PopulateProfissionais(dbContext);
+        }
+
+        private static void PopulateProfissionais(HealthWellbeingDbContext dbContext)
+        {
+            // Se os Profissionais Executantes já existirem, não faz nada
             if (dbContext.ProfissionalExecutante.Any()) return;
 
-            
-
+            // --- 1. INSERIR OS PROFISSIONAIS ---
             var profissionais = new[]
             {
                 new ProfissionalExecutante
@@ -63,6 +69,7 @@ namespace HealthWellbeing.Data // <<-- Corrigido o namespace se necessário
             };
 
             dbContext.ProfissionalExecutante.AddRange(profissionais);
+            // ✅ Salva todas as alterações na base de dados
             dbContext.SaveChanges();
         }
     }
