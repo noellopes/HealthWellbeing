@@ -20,27 +20,11 @@ namespace HealthWellbeing.Controllers
         // GET: Stock
         public async Task<IActionResult> Index()
         {
-            // Ordena por data mais recente
             var stocks = await _context.Stock
                 .OrderByDescending(s => s.DataUltimaAtualizacao)
                 .ToListAsync();
 
             return View(stocks);
-        }
-
-        // GET: Stock/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var stock = await _context.Stock
-                .FirstOrDefaultAsync(m => m.StockId == id);
-
-            if (stock == null)
-                return NotFound();
-
-            return View(stock);
         }
 
         // GET: Stock/Create
@@ -120,17 +104,7 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-        // POST: Stock/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var stock = await _context.Stock.FindAsync(id);
-            if (stock != null)
-            {
-                _context.Stock.Remove(stock);
                 await _context.SaveChangesAsync();
-            }
 
             return RedirectToAction(nameof(Index));
         }
