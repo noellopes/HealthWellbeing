@@ -35,16 +35,16 @@ else
         var dbcontext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
 
         //Chama o Populate
-        SeedData.Populate(dbcontext);
+        SeedData.Populate(dbcontext);//aplica apenas migracoes relevantes
     }
 }
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
-}
+//Evitar aplicar migration de ApplicationDbContext pois a base ja tem Identity
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
+//    var context = services.GetRequiredService<ApplicationDbContext>();
+//    context.Database.Migrate();
+//}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
