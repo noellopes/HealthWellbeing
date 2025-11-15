@@ -1,26 +1,31 @@
 ﻿using HealthWellbeingRoom.Models;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
     public class Room
     {
-        // ID da sala, chave primária
+        // Chave primária
+        [Key]
         public int RoomId { get; set; }
 
-        // Propriedade formatada para exibição do ID com 3 dígitos (ex: 001, 012, 123)
+        // ID formatado com 3 dígitos (ex: 001)
+        [NotMapped]
         public string FormattedRoomId => RoomId.ToString("D3");
 
-
-        // Tipo da sala (consultas ou tratamentos), não precisa de ser validado
-        public enum RoomType { Consultas, Tratamentos }
+        // Enum para tipo de sala
+        public enum RoomType
+        {
+            Consultas,
+            Tratamentos
+        }
 
         [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
         public RoomType RoomsType { get; set; }
 
-        // Especialidade da sala (pediatria, cardiologia, etc)
+        // Especialidade médica
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100, ErrorMessage = "A especialidade não pode exceder 100 caracteres.")]
         public string Specialty { get; set; }
@@ -30,19 +35,19 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
         public string Name { get; set; }
 
-        // Capacidade da sala (1 a 50), não precisa de ser validado
+        // Capacidade da sala
+        [Range(1, 50, ErrorMessage = "A capacidade deve estar entre 1 e 50.")]
         public int Capacity { get; set; }
 
-        // Localização da sala (piso, ala, etc)
+        // Localização física
         [Required(ErrorMessage = "A localização é obrigatória.")]
         public string Location { get; set; }
 
-        // Horário de funcionamento da sala (ex: 08:00 - 18:00)
+        // Horário de funcionamento
         [Required(ErrorMessage = "O horário de funcionamento é obrigatório.")]
         public string OperatingHours { get; set; }
 
-        // Estado da sala (disponível, indisponível, limpeza, manutenção, fora de serviço)
-
+        // Enum para estado da sala
         public enum RoomStatus
         {
             [Display(Name = "Criado")]
@@ -58,13 +63,14 @@ namespace HealthWellbeing.Models
             [Display(Name = "Fora de serviço")]
             ForaDeServico
         }
+
         public RoomStatus Status { get; set; } = RoomStatus.Criado;
 
-        // Observações adicionais (máximo 500 caracteres)
+        // Observações
         [StringLength(500, ErrorMessage = "As observações não podem exceder 500 caracteres.")]
         public string Notes { get; set; }
 
-        //Coleção para a tabela intermediária
+        // Relação com tabela intermediária
         public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
     }
 }
