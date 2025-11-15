@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class MigracaoInicialFinal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,17 +72,11 @@ namespace HealthWellbeing.Migrations
                     Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Funcao = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Telefone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    ProfissionalExecutanteId1 = table.Column<int>(type: "int", nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProfissionalExecutante", x => x.ProfissionalExecutanteId);
-                    table.ForeignKey(
-                        name: "FK_ProfissionalExecutante_ProfissionalExecutante_ProfissionalExecutanteId1",
-                        column: x => x.ProfissionalExecutanteId1,
-                        principalTable: "ProfissionalExecutante",
-                        principalColumn: "ProfissionalExecutanteId");
                 });
 
             migrationBuilder.CreateTable(
@@ -211,11 +205,6 @@ namespace HealthWellbeing.Migrations
                 name: "IX_ExameTipo_ExameTipoId1",
                 table: "ExameTipo",
                 column: "ExameTipoId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProfissionalExecutante_ProfissionalExecutanteId1",
-                table: "ProfissionalExecutante",
-                column: "ProfissionalExecutanteId1");
         }
 
         /// <inheritdoc />

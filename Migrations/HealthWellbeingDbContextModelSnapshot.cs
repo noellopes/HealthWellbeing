@@ -250,17 +250,12 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("ProfissionalExecutanteId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefone")
                         .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
                     b.HasKey("ProfissionalExecutanteId");
-
-                    b.HasIndex("ProfissionalExecutanteId1");
 
                     b.ToTable("ProfissionalExecutante");
                 });
@@ -337,13 +332,6 @@ namespace HealthWellbeing.Migrations
                         .HasForeignKey("ExameTipoId1");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.ProfissionalExecutante", null)
-                        .WithMany("profissionalExecutantes")
-                        .HasForeignKey("ProfissionalExecutanteId1");
-                });
-
             modelBuilder.Entity("HealthWellBeing.Models.Utente", b =>
                 {
                     b.Navigation("Exames");
@@ -352,11 +340,6 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.ExameTipo", b =>
                 {
                     b.Navigation("exametipo");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
-                {
-                    b.Navigation("profissionalExecutantes");
                 });
 #pragma warning restore 612, 618
         }
