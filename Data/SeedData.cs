@@ -20,46 +20,61 @@ namespace HealthWellbeing.Data
             if (dbContext.EventType.Any()) return;
 
             dbContext.EventType.AddRange(new List<EventType>() {
-                new EventType { EventTypeName = "Competição Desportiva", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.5f },
+                //EDUCAÇÃO E FORMAÇÃO
                 new EventType { EventTypeName = "Workshop Educacional", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Aula de Grupo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.5f },
-                new EventType { EventTypeName = "Desafio de Resistência", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.2f },
-                new EventType { EventTypeName = "Torneio", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.8f },
-                new EventType { EventTypeName = "Seminário", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.1f },
-                new EventType { EventTypeName = "Treino Personalizado", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f },
-                new EventType { EventTypeName = "Maratona", EventTypeScoringMode = "time_based", EventTypeMultiplier = 3.0f },
-                new EventType { EventTypeName = "Campeonato", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.7f },
-                new EventType { EventTypeName = "Palestra", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Aula Experimental", EventTypeScoringMode = "binary", EventTypeMultiplier = 1.2f },
-                new EventType { EventTypeName = "Desafio de Força", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.1f },
-                new EventType { EventTypeName = "Competição por Equipas", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.4f },
-                new EventType { EventTypeName = "Workshop Interativo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
-                new EventType { EventTypeName = "Aula de Técnica", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.6f },
-                new EventType { EventTypeName = "Desafio de Velocidade", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.3f },
-                new EventType { EventTypeName = "Liga Desportiva", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.9f },
-                new EventType { EventTypeName = "Sessão de Demonstração", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Treino de Grupo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.4f },
-                new EventType { EventTypeName = "Competição Individual", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.2f },
-                new EventType { EventTypeName = "Workshop Prático", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.5f },
-                new EventType { EventTypeName = "Aula Avançada", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.9f },
-                new EventType { EventTypeName = "Desafio de Precisão", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.0f },
-                new EventType { EventTypeName = "Torneio por Eliminação", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.6f },
-                new EventType { EventTypeName = "Conferência", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Aula para Iniciantes", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
-                new EventType { EventTypeName = "Competição por Pontos", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.3f },
-                new EventType { EventTypeName = "Workshop Teórico", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Treino de Resistência", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.1f },
-                new EventType { EventTypeName = "Desafio de Equilíbrio", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f },
-                new EventType { EventTypeName = "Campeonato por Fases", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.7f },
-                new EventType { EventTypeName = "Aula Especializada", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.7f },
-                new EventType { EventTypeName = "Workshop de Técnica", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.4f },
-                new EventType { EventTypeName = "Competição por Tempo", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.4f },
-                new EventType { EventTypeName = "Treino de Flexibilidade", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.5f },
-                new EventType { EventTypeName = "Desafio de Coordenação", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.9f },
-                new EventType { EventTypeName = "Torneio Round Robin", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.5f },
+                new EventType { EventTypeName = "Seminário Temático", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.1f },
+                new EventType { EventTypeName = "Palestra Informativa", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
+                new EventType { EventTypeName = "Demonstração Técnica", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
                 new EventType { EventTypeName = "Sessão de Orientação", EventTypeScoringMode = "fixed", EventTypeMultiplier = 1.0f },
-                new EventType { EventTypeName = "Aula de Consolidação", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
-                new EventType { EventTypeName = "Competição de Habilidades", EventTypeScoringMode = "ranking", EventTypeMultiplier = 2.2f }
+
+                //TREINO CARDIOVASCULAR
+                new EventType { EventTypeName = "Sessão de Running", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.0f },
+                new EventType { EventTypeName = "Treino de Cycling", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.1f },
+                new EventType { EventTypeName = "Aula de Cardio-Grupo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.5f },
+                new EventType { EventTypeName = "Treino de Natação", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.2f },
+                new EventType { EventTypeName = "Sessão de HIIT", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f },
+
+                //TREINO DE FORÇA
+                new EventType { EventTypeName = "Treino de Musculação", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.7f },
+                new EventType { EventTypeName = "Sessão de CrossFit", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.1f },
+                new EventType { EventTypeName = "Treino Funcional", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.6f },
+                new EventType { EventTypeName = "Aula de Powerlifting", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.0f },
+                new EventType { EventTypeName = "Treino de Calistenia", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.5f },
+
+                //BEM-ESTAR E MOBILIDADE
+                new EventType { EventTypeName = "Aula de Yoga", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
+                new EventType { EventTypeName = "Sessão de Pilates", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.4f },
+                new EventType { EventTypeName = "Treino de Flexibilidade", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.5f },
+                new EventType { EventTypeName = "Aula de Mobilidade", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.3f },
+                new EventType { EventTypeName = "Sessão de Alongamento", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.2f },
+
+                //DESPORTOS E ARTES MARCIAS
+                new EventType { EventTypeName = "Aula de Artes Marciais", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f },
+                new EventType { EventTypeName = "Treino de Boxe", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.9f },
+                new EventType { EventTypeName = "Sessão de Lutas", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f },
+                new EventType { EventTypeName = "Aula de Defesa Pessoal", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.4f },
+                new EventType { EventTypeName = "Treino Desportivo Coletivo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.6f },
+
+                //DESAFIOS E COMPETIÇÕES
+                new EventType { EventTypeName = "Competição de Running", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.5f },
+                new EventType { EventTypeName = "Torneio Desportivo", EventTypeScoringMode = "binary", EventTypeMultiplier = 2.3f },
+                new EventType { EventTypeName = "Desafio de Resistência", EventTypeScoringMode = "time_based", EventTypeMultiplier = 2.4f },
+                new EventType { EventTypeName = "Competição de Força", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.2f },
+                new EventType { EventTypeName = "Desafio de Superação", EventTypeScoringMode = "progressive", EventTypeMultiplier = 2.1f },
+
+                //ATIVIDADES EM GRUPO
+                new EventType { EventTypeName = "Aula de Grupo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.4f },
+                new EventType { EventTypeName = "Treino Coletivo", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.5f },
+                new EventType { EventTypeName = "Workshop Prático", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
+                new EventType { EventTypeName = "Sessão de Team Building", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.2f },
+                new EventType { EventTypeName = "Aula Experimental", EventTypeScoringMode = "binary", EventTypeMultiplier = 1.1f },
+
+                //ESPECIALIZADOS E TÉCNICOS
+                new EventType { EventTypeName = "Treino Técnico", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.6f },
+                new EventType { EventTypeName = "Workshop de Técnica", EventTypeScoringMode = "completion", EventTypeMultiplier = 1.3f },
+                new EventType { EventTypeName = "Aula Avançada", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.7f },
+                new EventType { EventTypeName = "Sessão de Perfeiçoamento", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.5f },
+                new EventType { EventTypeName = "Treino Especializado", EventTypeScoringMode = "progressive", EventTypeMultiplier = 1.8f }
             });
 
             dbContext.SaveChanges();

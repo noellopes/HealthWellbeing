@@ -17,5 +17,15 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Level> Levels { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Activity_> Activity { get; set; } = default!;
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.EventType)
+                .WithMany()
+                .HasForeignKey(e => e.EventTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+        }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class LinkEventsToEventTypes : Migration
+    public partial class UpdateRestrictionMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,8 +80,7 @@ namespace HealthWellbeing.Migrations
                         name: "FK_Event_EventType_EventTypeId",
                         column: x => x.EventTypeId,
                         principalTable: "EventType",
-                        principalColumn: "EventTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "EventTypeId");
                 });
 
             migrationBuilder.CreateIndex(

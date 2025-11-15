@@ -150,7 +150,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
                         .WithMany()
                         .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("EventType");

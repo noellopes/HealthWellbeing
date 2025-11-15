@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using System.Data;
 
 namespace HealthWellbeing.Controllers {
     public class EventTypesController : Controller {
@@ -65,7 +66,7 @@ namespace HealthWellbeing.Controllers {
         // GET: EventTypes/Details/5
         public async Task<IActionResult> Details(int? id) {
             if (id == null)
-                return View("InvalidEventType");
+                return NotFound();
 
             var eventType = await _context.EventType.FirstOrDefaultAsync(m => m.EventTypeId == id);
             if (eventType == null)
@@ -116,7 +117,7 @@ namespace HealthWellbeing.Controllers {
         // GET: EventTypes/Edit/5
         public async Task<IActionResult> Edit(int? id) {
             if (id == null)
-                return View("InvalidEventType");
+                return NotFound();
 
             var eventType = await _context.EventType.FindAsync(id);
             if (eventType == null)
@@ -140,7 +141,7 @@ namespace HealthWellbeing.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeScoringMode,EventTypeMultiplier")] EventType eventType) {
             if (id != eventType.EventTypeId)
-                return View("InvalidEventType");
+                return NotFound();
 
             if (ModelState.IsValid) {
                 try {
@@ -149,10 +150,12 @@ namespace HealthWellbeing.Controllers {
                     TempData["SuccessMessage"] = "Event type updated successfully!";
                 }
                 catch (DbUpdateConcurrencyException) {
-                    if (!EventTypeExists(eventType.EventTypeId))
-                        return View("InvalidEventType");
-                    else
+                    if (!EventTypeExists(eventType.EventTypeId)) {
+                        return NotFound();
+                    }
+                    else {
                         throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -173,11 +176,14 @@ namespace HealthWellbeing.Controllers {
         // GET: EventTypes/Delete/5
         public async Task<IActionResult> Delete(int? id) {
             if (id == null)
-                return View("InvalidEventType");
+                return NotFound();
 
             var eventType = await _context.EventType.FirstOrDefaultAsync(m => m.EventTypeId == id);
-            if (eventType == null)
-                return View("InvalidEventType");
+            if (eventType == null) {
+                TempData["ErrorMessage"] = "This Event Type is no longer available, as it has already been removed.";
+                return NotFound();
+            }
+                
 
             return View(eventType);
         }
@@ -187,13 +193,28 @@ namespace HealthWellbeing.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) {
             var eventType = await _context.EventType.FindAsync(id);
-            if (eventType == null)
-                return View("InvalidEventType");
 
-            _context.EventType.Remove(eventType);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Event type deleted successfully!";
+            if (eventType != null) {
+                try {
+                    _context.EventType.Remove(eventType);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Event type deleted successfully!";
+                }
+                catch(Exception) {
+                    int numberEvents = await _context.Event.Where(e => e.EventTypeId == id).CountAsync();
+
+                    if (numberEvents > 0) {
+                        ViewBag.Error = $"Unable to delete Event Type. This Event Type is associated with {numberEvents} Events. To proceed with deletion, please remove all Events linked to this Event Type first.";
+                    }
+                    else {
+                        ViewBag.Error = "Could not delete this Event Type. An error occurred while deleting the Event Type.";
+                    }
+                    return View("Delete", eventType);
+
+                }
+            }
             return RedirectToAction(nameof(Index));
+
         }
 
         private bool EventTypeExists(int id) {

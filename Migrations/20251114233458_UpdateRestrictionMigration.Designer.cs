@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251113181247_LinkEventsToEventTypes")]
-    partial class LinkEventsToEventTypes
+    [Migration("20251114233458_UpdateRestrictionMigration")]
+    partial class UpdateRestrictionMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,7 +153,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
                         .WithMany()
                         .HasForeignKey("EventTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("EventType");
