@@ -2,10 +2,6 @@
 
 @{
     ViewData["Title"] = "Gestão de Stock";
-
-    // Dicionários passados do Controller
-    var consumiveis = ViewBag.Consumiveis as Dictionary<int, string> ?? new Dictionary<int, string>();
-    var zonas = ViewBag.Zonas as Dictionary<int, string> ?? new Dictionary<int, string>();
 }
 
 <div class="container mt-4">
@@ -59,17 +55,9 @@
                                 <a asp-action="Delete" asp-route-id="@item.StockId" class="btn btn-danger text-white px-3" title="Eliminar stock">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </a>
-                            </div>
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="text-center text-muted">Nenhum registo de stock encontrado.</td>
-                </tr>
-            }
         </tbody>
     </table>
 </div>
