@@ -14,7 +14,7 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "A função é obrigatória")]
         [StringLength(150)]
-        public string Funcao { get; set; } // Futuramente poderá ser uma entidade (e.g. tabela Função)
+        public string Funcao { get; set; } 
 
 
 
