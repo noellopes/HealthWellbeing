@@ -6,14 +6,11 @@ namespace HealthWellbeing.Models
     {
         public int StockId { get; set; }
 
-        // FK para Consumível e Zona
         public int ConsumivelID { get; set; }
         public int ZonaID { get; set; }
 
-        // Quantidade atual (pode ser futuramente calculada)
         public int QuantidadeAtual { get; set; }
 
-        // Quantidade mínima para alerta
         public int QuantidadeMinima { get; set; }
 
         // Data da última atualização
