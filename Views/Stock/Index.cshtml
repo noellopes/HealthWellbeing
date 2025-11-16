@@ -3,9 +3,12 @@
 @{
     ViewData["Title"] = "Gestão de Stock";
 
-    // Dicionários passados do Controller
-    var consumiveis = ViewBag.Consumiveis as Dictionary<int, string> ?? new Dictionary<int, string>();
-    var zonas = ViewBag.Zonas as Dictionary<int, string> ?? new Dictionary<int, string>();
+    <td>@item.Consumivel?.Nome</td>
+    <td>@item.Zona?.Nome</td>
+    <td>@item.QuantidadeAtual</td>
+    <td>@item.QuantidadeMinima</td>
+    <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
+
 }
 
 <div class="container mt-4">

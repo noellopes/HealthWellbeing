@@ -17,22 +17,17 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Stock
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var stocks = await _context.Stock
-                .OrderByDescending(s => s.DataUltimaAtualizacao)
-                .ToListAsync();
+            var stock = _context.Stock
+                .Include(s => s.Consumivel)
+                .Include(s => s.Zona)
+                .ToList();
 
-            // Passar dicionários para converter IDs em nomes na View
-            ViewBag.Consumiveis = _context.Consumivel
-                .ToDictionary(c => c.ConsumivelId, c => c.Nome);
-
-            ViewBag.Zonas = _context.ZonaArmazenamento
-                .ToDictionary(z => z.Id, z => z.Nome);
-
-            return View(stocks);
+            return View(stock);
         }
+
+
 
         // GET: Stock/Create
         public IActionResult Create()
