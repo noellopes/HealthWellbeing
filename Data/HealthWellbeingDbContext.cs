@@ -13,6 +13,8 @@ namespace HealthWellbeing.Data
         // Tabelas
         public DbSet<Alergia> Alergia { get; set; } = default!;
         public DbSet<Alimento> Alimentos { get; set; } = default!;
+
+        public DbSet<AlergiaAlimento> AlergiaAlimento { get; set; }
         public DbSet<AlimentoSubstituto> AlimentoSubstitutos { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<ComponenteReceita> ComponenteReceita { get; set; } = default!;
@@ -39,6 +41,22 @@ namespace HealthWellbeing.Data
                 .WithMany(a => a.SubstituidoPor)
                 .HasForeignKey(a => a.AlimentoSubstitutoRefId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasKey(aa => new { aa.AlergiaId, aa.AlimentoId });
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasOne(aa => aa.Alergia)
+                .WithMany(a => a.AlimentosAssociados)
+                .HasForeignKey(aa => aa.AlergiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasOne(aa => aa.Alimento)
+                .WithMany(al => al.AlergiaRelacionadas)
+                .HasForeignKey(aa => aa.AlimentoId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
 
         }
     }
