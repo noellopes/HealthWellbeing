@@ -10,16 +10,12 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "The name cannot exceed 100 characters")]
         public string Name { get; set; } = default!;
 
-        [StringLength(500, ErrorMessage = "The description cannot exceed 500 characters")]
         public string? Description { get; set; }
 
-        [Range(10, 300, ErrorMessage = "The duration must be between 10 and 300 minutes")]
+        [Range(45, 120, ErrorMessage = "The duration must be between 45 and 120 minutes")]
         public int DurationMinutes { get; set; } = 60;
 
-        [Required(ErrorMessage = "The intensity is required")]
-        [StringLength(20)]
-        public string Intensity { get; set; } = "Moderate";
-
+        [Required(ErrorMessage = "The 'Active' status is required.")]
         public bool IsActive { get; set; } = true;
     }
 }

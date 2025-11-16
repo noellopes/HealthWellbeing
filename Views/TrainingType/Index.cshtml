@@ -19,7 +19,6 @@
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th class="d-none d-md-table-cell">@Html.DisplayNameFor(model => model.Description)</th>
                 <th>@Html.DisplayNameFor(model => model.DurationMinutes)</th>
-                <th class="d-none d-lg-table-cell">@Html.DisplayNameFor(model => model.Intensity)</th>
                 <th>@Html.DisplayNameFor(model => model.IsActive)</th>
                 <th>Actions</th>
             </tr>
@@ -33,7 +32,6 @@
                         @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
-                    <td class="d-none d-lg-table-cell">@Html.DisplayFor(modelItem => item.Intensity)</td>
                     <td>
                         @{
                             string badgeClass = item.IsActive ? "bg-success" : "bg-danger";
