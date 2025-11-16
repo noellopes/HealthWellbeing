@@ -64,16 +64,65 @@ internal class SeedData
             return;
         }
 
-        context.Alergia.AddRange(
-            new Alergia { Nome = "Alergia ao Amendoim", Descricao = "Reação alérgica grave a proteínas do amendoim.", Gravidade = GravidadeAlergia.Grave, Sintomas = "Urticária, dificuldade para respirar, inchaço na garganta.", AlimentoId = 1 },
-            new Alergia { Nome = "Alergia ao Leite", Descricao = "Sensibilidade às proteínas do leite de vaca.", Gravidade = GravidadeAlergia.Moderada, Sintomas = "Cólicas, diarreia, erupções cutâneas.", AlimentoId = 4 },
-            new Alergia { Nome = "Alergia ao Ovo", Descricao = "Reação imunológica às proteínas da clara ou gema do ovo.", Gravidade = GravidadeAlergia.Leve, Sintomas = "Coceira, vermelhidão, desconforto gastrointestinal.", AlimentoId = 2 },
-            new Alergia { Nome = "Alergia ao Trigo", Descricao = "Reação às proteínas do trigo, incluindo o glúten.", Gravidade = GravidadeAlergia.Moderada, Sintomas = "Inchaço abdominal, erupções cutâneas, fadiga.", AlimentoId = 3 },
-            new Alergia { Nome = "Alergia a Frutos do Mar", Descricao = "Reação a crustáceos e moluscos.", Gravidade = GravidadeAlergia.Moderada, Sintomas = "Inchaço facial, vômitos, anafilaxia.", AlimentoId = 5 }
-        );
+        // Cria as alergias base
+        var alergias = new List<Alergia>
+    {
+        new Alergia
+        {
+            Nome = "Alergia ao Amendoim",
+            Descricao = "Reação alérgica grave a proteínas do amendoim.",
+            Gravidade = GravidadeAlergia.Grave,
+            Sintomas = "Urticária, dificuldade para respirar, inchaço na garganta."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Leite",
+            Descricao = "Sensibilidade às proteínas do leite de vaca.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Cólicas, diarreia, erupções cutâneas."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Ovo",
+            Descricao = "Reação imunológica às proteínas da clara ou gema do ovo.",
+            Gravidade = GravidadeAlergia.Leve,
+            Sintomas = "Coceira, vermelhidão, desconforto gastrointestinal."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Trigo",
+            Descricao = "Reação às proteínas do trigo, incluindo o glúten.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Inchaço abdominal, erupções cutâneas, fadiga."
+        },
+        new Alergia
+        {
+            Nome = "Alergia a Frutos do Mar",
+            Descricao = "Reação a crustáceos e moluscos.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Inchaço facial, vômitos, anafilaxia."
+        }
+    };
 
+        context.Alergia.AddRange(alergias);
+        context.SaveChanges();
+
+        // Associa os alimentos existentes às alergias
+        var alimentos = context.Alimentos.ToList();
+
+        var alergiaAlimentos = new List<AlergiaAlimento>
+    {
+        new AlergiaAlimento { AlergiaId = alergias[0].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
+        new AlergiaAlimento { AlergiaId = alergias[1].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 },
+        new AlergiaAlimento { AlergiaId = alergias[2].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Ovo")?.AlimentoId ?? 2 },
+        new AlergiaAlimento { AlergiaId = alergias[3].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
+        new AlergiaAlimento { AlergiaId = alergias[4].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 }
+    };
+
+        context.AlergiaAlimento.AddRange(alergiaAlimentos);
         context.SaveChanges();
     }
+
 
     private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
     {

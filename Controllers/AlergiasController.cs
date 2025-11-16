@@ -22,25 +22,27 @@ namespace HealthWellbeing.Controllers
         // GET: Alergias
         public async Task<IActionResult> Index()
         {
-            var healthWellbeingDbContext = _context.Alergia.Include(a => a.Alimento);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            var alergias = await _context.Alergia
+                .Include(a => a.AlimentosAssociados)        // 👈 inclui a relação
+                    .ThenInclude(aa => aa.Alimento)      // 👈 inclui os alimentos
+                .ToListAsync();
+
+            return View(alergias);
         }
 
         // GET: Alergias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var alergia = await _context.Alergia
-                .Include(a => a.Alimento)
-                .FirstOrDefaultAsync(m => m.AlergiaId== id);
+                .Include(a => a.AlimentosAssociados)
+                    .ThenInclude(aa => aa.Alimento)
+                .FirstOrDefaultAsync(m => m.AlergiaId == id);
+
             if (alergia == null)
-            {
                 return NotFound();
-            }
 
             return View(alergia);
         }
@@ -48,95 +50,171 @@ namespace HealthWellbeing.Controllers
         // GET: Alergias/Create
         public IActionResult Create()
         {
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
+            var alimentos = _context.Alimentos
+                .Select(a => new { id = a.AlimentoId, nome = a.Name })
+                .ToList();
+            ViewBag.Alimentos = alimentos;
+
+            // Passando os valores do enum GravidadeAlergia para a view
+            ViewBag.Gravidades = Enum.GetValues(typeof(GravidadeAlergia))
+                                     .Cast<GravidadeAlergia>()
+                                     .Select(g => new SelectListItem
+                                     {
+                                         Value = g.ToString(),
+                                         Text = g.ToString()
+                                     }).ToList();
+
             return View();
         }
 
+
+
         // POST: Alergias/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AlergiaId,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
+        public async Task<IActionResult> Create(Alergia alergia, string selectedAlimentosIds)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(alergia);
                 await _context.SaveChangesAsync();
+
+                if (!string.IsNullOrEmpty(selectedAlimentosIds))
+                {
+                    var ids = selectedAlimentosIds.Split(',').Select(int.Parse).ToList();
+                    foreach (var id in ids)
+                    {
+                        var alergiaAlimento = new AlergiaAlimento
+                        {
+                            AlergiaId = alergia.AlergiaId,
+                            AlimentoId = id
+                        };
+                        _context.AlergiaAlimento.Add(alergiaAlimento);
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
+
             return View(alergia);
         }
+
+
 
         // GET: Alergias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var alergia = await _context.Alergia.FindAsync(id);
-            if (alergia == null)
-            {
-                return NotFound();
-            }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
+            var alergia = await _context.Alergia
+                .Include(a => a.AlimentosAssociados)
+                    .ThenInclude(aa => aa.Alimento)
+                .FirstOrDefaultAsync(a => a.AlergiaId == id);
+
+            if (alergia == null) return NotFound();
+
+            var alimentos = _context.Alimentos
+                .Select(a => new { id = a.AlimentoId, nome = a.Name })
+                .ToList();
+            ViewBag.Alimentos = alimentos;
+
+            // Passar alimentos já selecionados para JS
+            ViewBag.SelectedAlimentos = alergia.AlimentosAssociados
+                .Select(aa => new { id = aa.AlimentoId, nome = aa.Alimento.Name })
+                .ToList();
+
+            // Enum Gravidade
+            ViewBag.Gravidades = Enum.GetValues(typeof(GravidadeAlergia))
+                                     .Cast<GravidadeAlergia>()
+                                     .Select(g => new SelectListItem
+                                     {
+                                         Value = g.ToString(),
+                                         Text = g.ToString()
+                                     }).ToList();
+
             return View(alergia);
         }
 
+
         // POST: Alergias/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AlergiaId,Nome,Descricao,Gravidade,Sintomas,AlimentoId")] Alergia alergia)
+        public async Task<IActionResult> Edit(int id, Alergia alergia, string selectedAlimentosIds)
         {
-            if (id != alergia.AlergiaId)
-            {
-                return NotFound();
-            }
+            if (id != alergia.AlergiaId) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Atualiza dados básicos
                     _context.Update(alergia);
+                    await _context.SaveChangesAsync();
+
+                    // Atualiza relações Alimento <-> Alergia
+                    var existing = _context.AlergiaAlimento
+                        .Where(aa => aa.AlergiaId == id)
+                        .ToList();
+
+                    _context.AlergiaAlimento.RemoveRange(existing);
+
+                    if (!string.IsNullOrEmpty(selectedAlimentosIds))
+                    {
+                        var ids = selectedAlimentosIds.Split(',').Select(int.Parse).ToList();
+                        foreach (var aid in ids)
+                        {
+                            _context.AlergiaAlimento.Add(new AlergiaAlimento
+                            {
+                                AlergiaId = id,
+                                AlimentoId = aid
+                            });
+                        }
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AlergiaExists(alergia.AlergiaId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!AlergiaExists(alergia.AlergiaId)) return NotFound();
+                    else throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alergia.AlimentoId);
+
+            // Recarrega dados caso ModelState não seja válido
+            var alimentos = _context.Alimentos
+                .Select(a => new { id = a.AlimentoId, nome = a.Name })
+                .ToList();
+            ViewBag.Alimentos = alimentos;
+            ViewBag.SelectedAlimentos = selectedAlimentosIds?.Split(',')
+                .Select(id => new { id = int.Parse(id), nome = alimentos.First(a => a.id == int.Parse(id)).nome })
+                .ToList();
+
+            ViewBag.Gravidades = Enum.GetValues(typeof(GravidadeAlergia))
+                                     .Cast<GravidadeAlergia>()
+                                     .Select(g => new SelectListItem
+                                     {
+                                         Value = g.ToString(),
+                                         Text = g.ToString()
+                                     }).ToList();
+
             return View(alergia);
         }
+
 
         // GET: Alergias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var alergia = await _context.Alergia
-                .Include(a => a.Alimento)
-                .FirstOrDefaultAsync(m => m.AlergiaId== id);
+                .FirstOrDefaultAsync(m => m.AlergiaId == id);
+
             if (alergia == null)
-            {
                 return NotFound();
-            }
 
             return View(alergia);
         }
@@ -148,9 +226,7 @@ namespace HealthWellbeing.Controllers
         {
             var alergia = await _context.Alergia.FindAsync(id);
             if (alergia != null)
-            {
                 _context.Alergia.Remove(alergia);
-            }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -158,7 +234,7 @@ namespace HealthWellbeing.Controllers
 
         private bool AlergiaExists(int id)
         {
-            return _context.Alergia.Any(e => e.AlergiaId== id);
+            return _context.Alergia.Any(e => e.AlergiaId == id);
         }
     }
 }
