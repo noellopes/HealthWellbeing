@@ -136,9 +136,11 @@
                     }
                 </td>
                 <td class="text-end">
+                    <div class="d-flex gap-2 justify-content-end">
                     <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.RestricaoAlimentarId">Ver</a>
                     <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId">Editar</a>
                     <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId">Excluir</a>
+                    </div>
                 </td>
             </tr>
         }
