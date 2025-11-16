@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateRestrictionMigration : Migration
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,18 +45,18 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Levels",
+                name: "Level",
                 columns: table => new
                 {
                     LevelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LevelNumber = table.Column<int>(type: "int", nullable: false),
+                    LevelAtual = table.Column<int>(type: "int", nullable: false),
                     LevelCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Levels", x => x.LevelId);
+                    table.PrimaryKey("PK_Level", x => x.LevelId);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,7 +99,7 @@ namespace HealthWellbeing.Migrations
                 name: "Event");
 
             migrationBuilder.DropTable(
-                name: "Levels");
+                name: "Level");
 
             migrationBuilder.DropTable(
                 name: "EventType");

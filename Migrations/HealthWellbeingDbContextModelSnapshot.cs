@@ -133,16 +133,16 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("LevelAtual")
+                        .HasColumnType("int");
+
                     b.Property<string>("LevelCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelNumber")
-                        .HasColumnType("int");
-
                     b.HasKey("LevelId");
 
-                    b.ToTable("Levels");
+                    b.ToTable("Level");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>

@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: Levels
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Levels.ToListAsync());
+            return View(await _context.Level.ToListAsync());
         }
 
         // GET: Levels/Details/5
@@ -33,14 +33,14 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var levels = await _context.Levels
+            var level = await _context.Level
                 .FirstOrDefaultAsync(m => m.LevelId == id);
-            if (levels == null)
+            if (level == null)
             {
                 return NotFound();
             }
 
-            return View(levels);
+            return View(level);
         }
 
         // GET: Levels/Create
@@ -54,16 +54,15 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelNumber")] Level levels)
+        public async Task<IActionResult> Create([Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
         {
             if (ModelState.IsValid)
             {
-                var newLevel = new Level(levels.LevelNumber);
-                _context.Add(newLevel);
+                _context.Add(level);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(levels);
+            return View(level);
         }
 
         // GET: Levels/Edit/5
@@ -74,12 +73,12 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var levels = await _context.Levels.FindAsync(id);
-            if (levels == null)
+            var level = await _context.Level.FindAsync(id);
+            if (level == null)
             {
                 return NotFound();
             }
-            return View(levels);
+            return View(level);
         }
 
         // POST: Levels/Edit/5
@@ -87,9 +86,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber")] Level levels)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
         {
-            if (id != levels.LevelId)
+            if (id != level.LevelId)
             {
                 return NotFound();
             }
@@ -98,13 +97,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    levels.LevelCategory = levels.GetCircleColor(levels.LevelNumber);
-                    _context.Update(levels);
+                    _context.Update(level);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LevelsExists(levels.LevelId))
+                    if (!LevelExists(level.LevelId))
                     {
                         return NotFound();
                     }
@@ -115,7 +113,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(levels);
+            return View(level);
         }
 
         // GET: Levels/Delete/5
@@ -126,14 +124,14 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var levels = await _context.Levels
+            var level = await _context.Level
                 .FirstOrDefaultAsync(m => m.LevelId == id);
-            if (levels == null)
+            if (level == null)
             {
                 return NotFound();
             }
 
-            return View(levels);
+            return View(level);
         }
 
         // POST: Levels/Delete/5
@@ -141,19 +139,19 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var levels = await _context.Levels.FindAsync(id);
-            if (levels != null)
+            var level = await _context.Level.FindAsync(id);
+            if (level != null)
             {
-                _context.Levels.Remove(levels);
+                _context.Level.Remove(level);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool LevelsExists(int id)
+        private bool LevelExists(int id)
         {
-            return _context.Levels.Any(e => e.LevelId == id);
+            return _context.Level.Any(e => e.LevelId == id);
         }
     }
 }

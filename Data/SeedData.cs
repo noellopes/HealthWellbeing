@@ -5,18 +5,16 @@ using System.Linq;
 
 namespace HealthWellbeing.Data
 {
-    internal class SeedData
-    {
-        internal static void Populate(HealthWellbeingDbContext? dbContext)
-        {
+    internal class SeedData {
+        internal static void Populate(HealthWellbeingDbContext? dbContext) {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
+            PopulateLevels(dbContext);
         }
 
-        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext)
-        {
+        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
             if (dbContext.EventType.Any()) return;
 
             dbContext.EventType.AddRange(new List<EventType>() {
@@ -80,8 +78,7 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateEvents(HealthWellbeingDbContext dbContext)
-        {
+        private static void PopulateEvents(HealthWellbeingDbContext dbContext) {
             if (dbContext.Event.Any()) return;
 
             var eventTypes = dbContext.EventType.ToList();
@@ -134,6 +131,54 @@ namespace HealthWellbeing.Data
             eventList.Add(new Event { EventName = "Competição de E-Sports", EventDescription = "Torneio de FIFA.", EventTypeId = eventTypes[39].EventTypeId, EventStart = now.AddDays(20), EventEnd = now.AddDays(20).AddHours(5), EventPoints = 220, MinLevel = 1 });
 
             dbContext.Event.AddRange(eventList);
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateLevels(HealthWellbeingDbContext dbContext) {
+            if (dbContext.Level.Any()) return;
+
+            dbContext.Level.AddRange(new List<Level>() {
+                new Level { LevelAtual = 1, LevelCategory = "Iniciante", Description = "Primeiros passos na jornada de saúde" },
+                new Level { LevelAtual = 2, LevelCategory = "Iniciante", Description = "Começando a criar rotinas saudáveis" },
+                new Level { LevelAtual = 3, LevelCategory = "Iniciante", Description = "Ganhando consistência nos exercícios" },
+                new Level { LevelAtual = 4, LevelCategory = "Iniciante", Description = "Progresso constante na saúde" },
+                new Level { LevelAtual = 5, LevelCategory = "Iniciante", Description = "Final da fase inicial - bons hábitos estabelecidos" },
+                new Level { LevelAtual = 6, LevelCategory = "Intermediário", Description = "Entrando na fase intermediária" },
+                new Level { LevelAtual = 7, LevelCategory = "Intermediário", Description = "Desenvolvendo resistência física" },
+                new Level { LevelAtual = 8, LevelCategory = "Intermediário", Description = "Melhorando performance geral" },
+                new Level { LevelAtual = 9, LevelCategory = "Intermediário", Description = "Consolidação de técnicas avançadas" },
+                new Level { LevelAtual = 10, LevelCategory = "Intermediário", Description = "Pronto para desafios maiores" },
+                new Level { LevelAtual = 11, LevelCategory = "Avançado", Description = "Início da jornada avançada" },
+                new Level { LevelAtual = 12, LevelCategory = "Avançado", Description = "Domínio de exercícios complexos" },
+                new Level { LevelAtual = 13, LevelCategory = "Avançado", Description = "Excelência em treino cardiovascular" },
+                new Level { LevelAtual = 14, LevelCategory = "Avançado", Description = "Especialização em força e resistência" },
+                new Level { LevelAtual = 15, LevelCategory = "Avançado", Description = "Atleta completo em formação" },
+                new Level { LevelAtual = 16, LevelCategory = "Especialista", Description = "Primeiro nível de especialista" },
+                new Level { LevelAtual = 17, LevelCategory = "Especialista", Description = "Técnicas avançadas de condicionamento" },
+                new Level { LevelAtual = 18, LevelCategory = "Especialista", Description = "Mestre em rotinas personalizadas" },
+                new Level { LevelAtual = 19, LevelCategory = "Especialista", Description = "Referência na comunidade fitness" },
+                new Level { LevelAtual = 20, LevelCategory = "Especialista", Description = "Especialista consolidado" },
+                new Level { LevelAtual = 21, LevelCategory = "Mestre", Description = "Iniciando o caminho de mestre" },
+                new Level { LevelAtual = 22, LevelCategory = "Mestre", Description = "Domínio completo de múltiplas modalidades" },
+                new Level { LevelAtual = 23, LevelCategory = "Mestre", Description = "Liderança natural em treinos em grupo" },
+                new Level { LevelAtual = 24, LevelCategory = "Mestre", Description = "Inspiração para outros utilizadores" },
+                new Level { LevelAtual = 25, LevelCategory = "Mestre", Description = "Mestre em saúde e bem-estar" },
+                new Level { LevelAtual = 26, LevelCategory = "Grão-Mestre", Description = "Primeiro nível de grão-mestre" },
+                new Level { LevelAtual = 27, LevelCategory = "Grão-Mestre", Description = "Excelência em todos os aspectos do fitness" },
+                new Level { LevelAtual = 28, LevelCategory = "Grão-Mestre", Description = "Conhecimento profundo de nutrição e exercício" },
+                new Level { LevelAtual = 29, LevelCategory = "Grão-Mestre", Description = "Lenda em formação na aplicação" },
+                new Level { LevelAtual = 30, LevelCategory = "Grão-Mestre", Description = "Grão-mestre consolidado" },
+                new Level { LevelAtual = 31, LevelCategory = "Lendário", Description = "Entrada no hall lendário" },
+                new Level { LevelAtual = 32, LevelCategory = "Lendário", Description = "Consistência lendária nos treinos" },
+                new Level { LevelAtual = 33, LevelCategory = "Lendário", Description = "Performance excecional continuada" },
+                new Level { LevelAtual = 34, LevelCategory = "Lendário", Description = "Ícone da aplicação" },
+                new Level { LevelAtual = 35, LevelCategory = "Lendário", Description = "Lenda viva do fitness" },
+                new Level { LevelAtual = 36, LevelCategory = "Mítico", Description = "Alcançando status mítico" },
+                new Level { LevelAtual = 37, LevelCategory = "Mítico", Description = "Força e determinação sobre-humanas" },
+                new Level { LevelAtual = 38, LevelCategory = "Mítico", Description = "Lenda entre lendas" },
+                new Level { LevelAtual = 39, LevelCategory = "Mítico", Description = "Próximo do nível máximo" },
+                new Level { LevelAtual = 40, LevelCategory = "Mítico", Description = "Nível máximo - Mito vivo da aplicação" }
+            });
             dbContext.SaveChanges();
         }
     }

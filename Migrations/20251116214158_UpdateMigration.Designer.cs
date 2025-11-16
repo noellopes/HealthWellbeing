@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251114233458_UpdateRestrictionMigration")]
-    partial class UpdateRestrictionMigration
+    [Migration("20251116214158_UpdateMigration")]
+    partial class UpdateMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -136,16 +136,16 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("LevelAtual")
+                        .HasColumnType("int");
+
                     b.Property<string>("LevelCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelNumber")
-                        .HasColumnType("int");
-
                     b.HasKey("LevelId");
 
-                    b.ToTable("Levels");
+                    b.ToTable("Level");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>

@@ -6,7 +6,7 @@
 
 <h1>Edit</h1>
 
-<h4>Levels</h4>
+<h4>Level</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,11 +14,20 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="LevelId" />
             <div class="form-group">
-                <label asp-for="LevelNumber" class="control-label"></label>
-                <input asp-for="LevelNumber" class="form-control" />
-                <span asp-validation-for="LevelNumber" class="text-danger"></span>
+                <label asp-for="LevelAtual" class="control-label"></label>
+                <input asp-for="LevelAtual" class="form-control" />
+                <span asp-validation-for="LevelAtual" class="text-danger"></span>
             </div>
-            <br/>
+            <div class="form-group">
+                <label asp-for="LevelCategory" class="control-label"></label>
+                <input asp-for="LevelCategory" class="form-control" />
+                <span asp-validation-for="LevelCategory" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
