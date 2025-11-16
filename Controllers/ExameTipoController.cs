@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -21,42 +22,41 @@ namespace HealthWellbeing.Controllers
 
         // GET: ExameTipoes
         public async Task<IActionResult> Index(
-            int page = 1, // Parâmetro de paginação
-            string searchNome = "", // Parâmetro de pesquisa por Nome
-            string searchEspecialidade = "") // Parâmetro de pesquisa por Especialidade
+            int page = 1,
+            string searchNome = "",
+            string searchEspecialidade = "")
         {
-            // 1. Armazenar termos de pesquisa na ViewBag (necessário para manter o formulário preenchido)
+            // 1. Configuração da Pesquisa (para View e Links)
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchEspecialidade = searchEspecialidade;
 
-            // 2. Criar a consulta AsQueryable para filtros
+            // 2. Aplicação dos Filtros na Query
             var examesQuery = _context.ExameTipo.AsQueryable();
 
-            // 3. Aplicação dos filtros (Lógica de Pesquisa do ficheiro 13_search.pdf)
             if (!string.IsNullOrEmpty(searchNome))
             {
-                // Filtra a consulta onde o Nome contém a string de pesquisa
                 examesQuery = examesQuery.Where(et => et.Nome.Contains(searchNome));
             }
-
             if (!string.IsNullOrEmpty(searchEspecialidade))
             {
-                // Filtra a consulta onde a Especialidade contém a string de pesquisa
                 examesQuery = examesQuery.Where(et => et.Especialidade.Contains(searchEspecialidade));
             }
 
-            // 4. Paginação (Apenas Ordenação por enquanto, para usar o IEnumerable<T>)
-            // Se usasse o PaginationInfo<T>, a lógica seria:
-            // int totalExames = await examesQuery.CountAsync(); [cite: 553]
-            // var examesInfo = new PaginationInfo<ExameTipo>(page, totalExames); [cite: 554]
+            // 3. Contagem e Criação do ViewModel de Paginação
+            int totalExames = await examesQuery.CountAsync();
 
-            var examesPaginados = await examesQuery
-                .OrderBy(et => et.Nome) // Ordenar por Nome
-                // .Skip() e .Take() seriam inseridos aqui para paginação [cite: 557]
+            // Instanciar o ViewModel (ItemsPerPage=5 para forçar 2 páginas de teste)
+            var examesInfo = new PaginationInfo<ExameTipo>(page, totalExames, itemsPerPage: 5);
+
+            // 4. Ordenação e Aplicação da Paginação (Skip/Take)
+            examesInfo.Items = await examesQuery
+                .OrderBy(et => et.Nome)
+                .Skip(examesInfo.ItemsToSkip) // Pula os itens das páginas anteriores
+                .Take(examesInfo.ItemsPerPage) // Pega apenas os 5 itens da página atual
                 .ToListAsync();
 
-            // Retorna a lista filtrada/ordenada
-            return View(examesPaginados);
+            // Retorna o ViewModel de Paginação
+            return View(examesInfo);
         }
 
         // GET: ExameTipoes/Details/5
