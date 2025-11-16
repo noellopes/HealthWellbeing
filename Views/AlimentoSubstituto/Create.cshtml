@@ -1,56 +1,106 @@
 ﻿@model HealthWellbeing.Models.AlimentoSubstituto
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar";
 }
 
-<h1>Create</h1>
-
-<h4>AlimentoSubstituto</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="AlimentoOriginalId" class="control-label"></label>
-                <select asp-for="AlimentoOriginalId" class ="form-control" asp-items="ViewBag.AlimentoOriginalId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="AlimentoSubstitutoRefId" class="control-label"></label>
-                <select asp-for="AlimentoSubstitutoRefId" class ="form-control" asp-items="ViewBag.AlimentoSubstitutoRefId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Motivo" class="control-label"></label>
-                <input asp-for="Motivo" class="form-control" />
-                <span asp-validation-for="Motivo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProporcaoEquivalente" class="control-label"></label>
-                <input asp-for="ProporcaoEquivalente" class="form-control" />
-                <span asp-validation-for="ProporcaoEquivalente" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observacoes" class="control-label"></label>
-                <input asp-for="Observacoes" class="form-control" />
-                <span asp-validation-for="Observacoes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FatorSimilaridade" class="control-label"></label>
-                <input asp-for="FatorSimilaridade" class="form-control" />
-                <span asp-validation-for="FatorSimilaridade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+}
+
+<!-- Cabeçalho padronizado como no Index -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Novo Alimento Substituto</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="AlimentoOriginalId" class="form-label"></label>
+                        <select asp-for="AlimentoOriginalId" class="form-select"
+                            asp-items="ViewBag.AlimentoOriginalId"></select>
+                        <span asp-validation-for="AlimentoOriginalId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AlimentoSubstitutoRefId" class="form-label"></label>
+                        <select asp-for="AlimentoSubstitutoRefId" class="form-select"
+                            asp-items="ViewBag.AlimentoSubstitutoRefId"></select>
+                        <span asp-validation-for="AlimentoSubstitutoRefId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Motivo" class="form-label"></label>
+                        <input asp-for="Motivo" class="form-control" />
+                        <span asp-validation-for="Motivo" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProporcaoEquivalente" class="form-label"></label>
+                        <div>
+                            <input asp-for="ProporcaoEquivalente" class="form-control" type="number" step="0.01" min="0"
+                                max="10" />
+                        </div>
+                        <span class="text-muted small">Valor absoluto (não é porcentagem). Ex.: 1 = mesma porção</span>
+                        <span asp-validation-for="ProporcaoEquivalente" class="text-danger d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observacoes" class="form-label"></label>
+                        <input asp-for="Observacoes" class="form-control" />
+                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FatorSimilaridade" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="FatorSimilaridade" class="form-control" type="number" step="0.01" min="0"
+                                max="1" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span class="text-muted small">Valor entre 0 e 1 (ex.: 0.75 = 75%)</span>
+                        <span asp-validation-for="FatorSimilaridade" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <input type="submit" value="Criar" class="btn btn-primary me-2" />
+                        <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Ajusta jQuery Validate para aceitar vírgula como separador decimal e converte para ponto antes da validação
+        (function () {
+            if (window.jQuery && jQuery.validator) {
+                jQuery.validator.methods.number = function (value, element) {
+                    if (this.optional(element)) return true;
+                    var val = String(value).replace(',', '.');
+                    return /^-?(?:\d+)(?:\.\d+)?$/.test(val);
+                };
+                jQuery.validator.methods.range = function (value, element, param) {
+                    if (this.optional(element)) return true;
+                    var val = parseFloat(String(value).replace(',', '.'));
+                    return val >= param[0] && val <= param[1];
+                };
+            }
+        })();
+    </script>
 }

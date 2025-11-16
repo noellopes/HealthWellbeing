@@ -2,65 +2,136 @@
 
 @{
     ViewData["Title"] = "Index";
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 10);
+    var totalCount = (int)(ViewBag.TotalCount ?? 0);
+    var startItem = totalCount == 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+    var endItem = startItem == 0 ? 0 : startItem + Model.Count() - 1;
+
+    // Valores de busca vindos do controller
+    var searchOriginal = (string)ViewBag.SearchOriginalName ?? string.Empty;
+    var searchSubstituto = (string)ViewBag.SearchSubstitutoName ?? string.Empty;
+    var searchFactorOp = (string)ViewBag.SearchFactorOp ?? "gt";
+    var searchFactorValueObj = ViewBag.SearchFactorValue;
+    decimal? searchFactorValue = searchFactorValueObj != null ? (decimal?)searchFactorValueObj : null;
 }
 
-<h1>Alimento Substituto</h1>
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<p>
-<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
-</p>
-<table class="table">
-    <thead>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Alimento Substituto</h1>
+    <div class="d-flex">
+        <!-- botão que agora abre/fecha o painel de busca inline -->
+        <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#searchPanel" role="button"
+            aria-expanded="false" aria-controls="searchPanel">
+            Pesquisar
+        </a>
+        <a class="btn btn-primary" asp-action="Create">Novo</a>
+    </div>
+</div>
+
+<!-- Painel de Busca inline (substitui o modal) -->
+<div class="collapse mt-2 mb-3" id="searchPanel">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="originalName" class="form-label">Alimento Original</label>
+                <input type="search" id="originalName" name="originalName" class="form-control"
+                    value="@(searchOriginal)" placeholder="Nome do alimento original" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="substitutoName" class="form-label">Alimento Substituto</label>
+                <input type="search" id="substitutoName" name="substitutoName" class="form-control"
+                    value="@(searchSubstituto)" placeholder="Nome do alimento substituto" />
+            </div>
+
+            <div class="col-md-2">
+                <label for="factorOp" class="form-label">Comparador</label>
+                <select class="form-select" id="factorOp" name="factorOp">
+                    @* Evita C# dentro do atributo <option> usando blocos condicionalmente *@
+                    @if (searchFactorOp == "gt")
+                    {
+                        <option value="gt" selected>Maior que</option>
+                    }
+                    else
+                    {
+                        <option value="gt">Maior que</option>
+                    }
+
+                    @if (searchFactorOp == "eq")
+                    {
+                        <option value="eq" selected>Igual a</option>
+                    }
+                    else
+                    {
+                        <option value="eq">Igual a</option>
+                    }
+
+                    @if (searchFactorOp == "lt")
+                    {
+                        <option value="lt" selected>Menor que</option>
+                    }
+                    else
+                    {
+                        <option value="lt">Menor que</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label for="factorValue" class="form-label">Valor (0 a 1)</label>
+                <input type="number" step="0.01" min="0" max="1" class="form-control" id="factorValue"
+                    name="factorValue"
+                    value="@(searchFactorValue.HasValue? searchFactorValue.Value.ToString("0.##") : "")"
+                    placeholder="ex: 0.5" />
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mb-2 text-muted">
+    <small>Mostrando <strong>@startItem</strong> a <strong>@endItem</strong> de <strong>@totalCount</strong>
+        itens</small>
+</div>
+
+<table class="table table-hover shadow-sm">
+    <thead class="table-light">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AlimentoOriginal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AlimentoSubstitutoRef)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Motivo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProporcaoEquivalente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Observacoes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FatorSimilaridade)
-            </th>
+            <th>Alimento Original</th>
+            <th>Alimento Substituto</th>
+            <th>@Html.DisplayNameFor(model => model.Motivo)</th>
+            <th>@Html.DisplayNameFor(model => model.FatorSimilaridade)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
         <tr>
+                <td>@Html.DisplayFor(modelItem => item.AlimentoOriginal.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.AlimentoSubstitutoRef.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Motivo)</td>
             <td>
-                    @Html.DisplayFor(modelItem => item.AlimentoOriginal.Name)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.AlimentoSubstitutoRef.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Motivo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProporcaoEquivalente)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Observacoes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FatorSimilaridade)
+                    @(item.FatorSimilaridade.HasValue ? string.Format("{0:P0}", item.FatorSimilaridade) : "-")
             </td>
             <td>
                     <div class="btn-group" role="group">
-
                         <a asp-action="Details" asp-route-id="@item.AlimentoSubstitutoId"
                             class="btn btn-sm btn-secondary ms-1">Ver</a>
                         <a asp-action="Edit" asp-route-id="@item.AlimentoSubstitutoId"
-                            class="btn btn-sm btn-warning ms-1 ">Editar</a>
+                            class="btn btn-sm btn-warning ms-1">Editar</a>
                         <a asp-action="Delete" asp-route-id="@item.AlimentoSubstitutoId"
                             class="btn btn-sm btn-danger ms-1">Apagar</a>
                     </div>
@@ -69,3 +140,31 @@
 }
     </tbody>
 </table>
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)"
+                    asp-route-originalName="@(searchOriginal)" asp-route-substitutoName="@(searchSubstituto)"
+                    asp-route-factorOp="@(searchFactorOp)" asp-route-factorValue="@(searchFactorValue)">« Anterior</a>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")" aria-current="@(i == currentPage ? "page" : null)">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(i)" asp-route-originalName="@(searchOriginal)"
+                        asp-route-substitutoName="@(searchSubstituto)" asp-route-factorOp="@(searchFactorOp)"
+                        asp-route-factorValue="@(searchFactorValue)">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)"
+                    asp-route-originalName="@(searchOriginal)" asp-route-substitutoName="@(searchSubstituto)"
+                    asp-route-factorOp="@(searchFactorOp)" asp-route-factorValue="@(searchFactorValue)">Próximo »</a>
+            </li>
+        </ul>
+    </nav>
+}
