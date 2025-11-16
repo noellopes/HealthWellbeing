@@ -4,13 +4,30 @@
     ViewData["Title"] = "Detalhes da sala";
 }
 
+@*  interpretar fromCreation *@
+@{
+    bool fromCreation = false;
+    if (ViewContext.RouteData.Values["fromCreation"]?.ToString() == "true")
+    {
+        fromCreation = true;
+    }
+}
+
 <h1 class="mb-4 text-info">
     <i class="bi bi-info-circle-fill me-2"></i>
     @ViewData["Title"]
 </h1>
 
-<div class="card shadow-sm">
+@* Bloco para exibir a mensagem de sucesso, apenas apos a criacao *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
 
+<div class="card shadow-sm">
     <div class="card-header bg-info text-white">
         <h4 class="mb-0">
             <i class="bi bi-door-open me-2"></i>
@@ -19,9 +36,7 @@
     </div>
 
     <div class="card-body">
-
         <dl class="row mb-0 mt-4">
-
             <dt class="col-sm-3 fw-bold text-muted">Id</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.FormattedRoomId)</dd>
 
@@ -39,13 +54,10 @@
 
             <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
-
         </dl>
-
     </div>
 
     <div class="card-footer d-flex justify-content-end gap-2">
-
         <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning me-2">
             <i class="bi bi-pencil-square me-1"></i> Editar
         </a>
@@ -54,9 +66,18 @@
             <i class="bi bi-trash me-1"></i> Eliminar
         </a>
 
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
-        </a>
-
+@*A logica nao funciona ainda *@
+        @if (fromCreation)
+        {
+            <a asp-action="Index" class="btn btn-success">
+                <i class="bi bi-arrow-right-circle me-1"></i> Ir à Lista
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+            </a>
+        }
     </div>
 </div>

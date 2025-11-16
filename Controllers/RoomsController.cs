@@ -125,9 +125,11 @@ namespace HealthWellbeingRoom.Controllers
 
                 // Mensagem de sucesso via TempData
                 TempData["SuccessMessage"] = "Sala criada com sucesso!";
+                //Gravar que o detalhe vem de nova criacao de sala
+                TempData["FromRoomCreation"] = true;
 
                 // Redireciona para a página de detalhes da sala recém-criada
-                return RedirectToAction("Details", new { id = room.RoomId });
+                return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
             }
 
             return View(room);

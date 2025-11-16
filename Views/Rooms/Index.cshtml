@@ -129,9 +129,10 @@
                         <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square"></i> Editar
                         </a>
-                        <a asp-action="Details" asp-route-id="@item.RoomId" class="btn btn-sm btn-info me-1">
+                        <a asp-action="Details" asp-route-id="@item.RoomId" asp-route-fromCreation="false" class="btn btn-sm btn-info me-1">
                             <i class="bi bi-info-circle-fill"></i> Detalhes
                         </a>
+
                         <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn btn-sm btn-danger">
                             <i class="bi bi-trash-fill"></i> Eliminar
                         </a>
