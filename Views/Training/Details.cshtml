@@ -1,0 +1,83 @@
+﻿@model HealthWellbeing.Models.Training
+
+@{
+    ViewData["Title"] = "Training Session Details";
+}
+
+<h1 class="display-4 text-primary mb-4">Training Session Details</h1>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">@Model.Name</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Trainer)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Trainer.Name) (@Html.DisplayFor(model => model.Trainer.Email))
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.TrainingType)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.TrainingType.Name)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Duration)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Duration) minutes
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.DayOfWeek)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.DayOfWeek)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.StartTime)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.StartTime)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.MaxParticipants)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.MaxParticipants)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.TrainingId" class="btn btn-primary me-2 shadow-sm">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>

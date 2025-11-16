@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System; 
 
 namespace HealthWellbeing.Models
 {
@@ -23,5 +24,16 @@ namespace HealthWellbeing.Models
         [Phone(ErrorMessage = "Enter a valid phone number.")]
         [StringLength(15)]
         public string Phone { get; set; } = string.Empty;
+
+
+        [Required(ErrorMessage = "Birth date is required.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Birth Date")]
+        public DateTime BirthDate { get; set; }
+
+        [Required(ErrorMessage = "Gender is required.")]
+        [StringLength(10)]
+        public string Gender { get; set; } = default!;
+
     }
 }
