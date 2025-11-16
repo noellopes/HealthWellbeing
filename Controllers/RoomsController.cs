@@ -122,11 +122,18 @@ namespace HealthWellbeingRoom.Controllers
             {
                 _context.Add(room);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                // Mensagem de sucesso via TempData
+                TempData["SuccessMessage"] = "Sala criada com sucesso!";
+
+                // Redireciona para a página de detalhes da sala recém-criada
+                return RedirectToAction("Details", new { id = room.RoomId });
             }
 
             return View(room);
         }
+
+
 
         public async Task<IActionResult> Edit(int? id)
         {
