@@ -4,6 +4,14 @@
     ViewData["Title"] = "Criar Alergia";
 }
 
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <h1>Criar Alergia</h1>
 
 <div class="row">
@@ -35,7 +43,7 @@
                 <span asp-validation-for="Sintomas" class="text-danger"></span>
             </div>
 
-            <!-- SELEÇÃO DE ALIMENTOS COM SELECT -->
+            <!-- SELEÇÃO DE ALIMENTOS -->
             <div class="form-group mb-3">
                 <label>Alimentos relacionados</label>
                 <select id="alimentosSelect" class="form-control">
@@ -47,10 +55,8 @@
                 </select>
             </div>
 
-            <!-- Lista de alimentos selecionados -->
             <div id="selectedAlimentos" class="mb-2"></div>
 
-            <!-- Campo escondido para enviar os IDs -->
             <input type="hidden" id="selectedAlimentosInput" name="selectedAlimentosIds" />
 
             <div class="form-group">
@@ -78,7 +84,6 @@
                 renderSelected();
             }
 
-            // Reset para permitir re-seleção
             select.selectedIndex = 0;
         });
 
