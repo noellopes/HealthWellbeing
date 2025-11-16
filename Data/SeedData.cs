@@ -76,7 +76,6 @@ internal class SeedData
             return;
         }
 
-        // Cria as alergias base
         var alergias = new List<Alergia>
     {
         new Alergia
@@ -111,8 +110,50 @@ internal class SeedData
         {
             Nome = "Alergia a Frutos do Mar",
             Descricao = "Reação a crustáceos e moluscos.",
-            Gravidade = GravidadeAlergia.Moderada,
+            Gravidade = GravidadeAlergia.Grave,
             Sintomas = "Inchaço facial, vômitos, anafilaxia."
+        },
+        new Alergia
+        {
+            Nome = "Alergia a Castanhas",
+            Descricao = "Reação a proteínas encontradas em castanhas, nozes e amêndoas.",
+            Gravidade = GravidadeAlergia.Grave,
+            Sintomas = "Prurido, inchaço, risco de anafilaxia."
+        },
+        new Alergia
+        {
+            Nome = "Alergia à Soja",
+            Descricao = "Reação às proteínas encontradas nos grãos de soja.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Erupções, desconforto abdominal, tosse."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Peixe",
+            Descricao = "Reação imunológica a proteínas de peixes diversos.",
+            Gravidade = GravidadeAlergia.Grave,
+            Sintomas = "Inchaço facial, vômitos, dificuldade respiratória."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Frango",
+            Descricao = "Hipersensibilidade às proteínas da carne de frango.",
+            Gravidade = GravidadeAlergia.Leve,
+            Sintomas = "Vermelhidão, urticária, irritação na pele."
+        },
+        new Alergia
+        {
+            Nome = "Alergia ao Glúten",
+            Descricao = "Reação não-celíaca às proteínas do glúten.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Dores abdominais, náuseas, fadiga."
+        },
+        new Alergia
+        {
+            Nome = "Alergia a Lacticínios",
+            Descricao = "Reação a derivados do leite, mesmo quando sem lactose.",
+            Gravidade = GravidadeAlergia.Moderada,
+            Sintomas = "Inchaço, diarréia, irritação nasal."
         }
     };
 
@@ -128,32 +169,20 @@ internal class SeedData
         new AlergiaAlimento { AlergiaId = alergias[1].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 },
         new AlergiaAlimento { AlergiaId = alergias[2].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Ovo")?.AlimentoId ?? 2 },
         new AlergiaAlimento { AlergiaId = alergias[3].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
-        new AlergiaAlimento { AlergiaId = alergias[4].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 }
+        new AlergiaAlimento { AlergiaId = alergias[4].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
+
+        // Associações das novas alergias (usando alimentos existentes)
+        new AlergiaAlimento { AlergiaId = alergias[5].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
+        new AlergiaAlimento { AlergiaId = alergias[6].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 }, // soja associada ao trigo (aproximação)
+        new AlergiaAlimento { AlergiaId = alergias[7].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frutos do Mar")?.AlimentoId ?? 5 },
+        new AlergiaAlimento { AlergiaId = alergias[8].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
+        new AlergiaAlimento { AlergiaId = alergias[9].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
+        new AlergiaAlimento { AlergiaId = alergias[10].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 }
     };
 
         context.AlergiaAlimento.AddRange(alergiaAlimentos);
         context.SaveChanges();
     }
-
-
-    // private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
-    // {
-    //     if (context.RestricaoAlimentar.Any())
-    //     {
-    //         return;
-    //     }
-
-    //     context.RestricaoAlimentar.AddRange(
-    //         new RestricaoAlimentar { Nome = "Intolerância à Lactose", Tipo = TipoRestricao.IntoleranciaLactose, Gravidade = GravidadeRestricao.Moderada, Descricao = "Dificuldade em digerir lactose.", AlimentoId = 4 },
-    //         new RestricaoAlimentar { Nome = "Dieta Vegana", Tipo = TipoRestricao.Vegana, Gravidade = GravidadeRestricao.Leve, Descricao = "Exclusão de produtos de origem animal." },
-    //         new RestricaoAlimentar { Nome = "Baixo Sódio", Tipo = TipoRestricao.BaixoSodio, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de sódio." },
-    //         new RestricaoAlimentar { Nome = "Sem Glúten", Tipo = TipoRestricao.IntoleranciaGluten, Gravidade = GravidadeRestricao.Moderada, Descricao = "Exclusão de alimentos com glúten.", AlimentoId = 3 },
-    //         new RestricaoAlimentar { Nome = "Sem Açúcar", Tipo = TipoRestricao.SemAcucar, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de açúcar." }
-    //     );
-
-    //     context.SaveChanges();
-    // }
-
 
 
     private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)

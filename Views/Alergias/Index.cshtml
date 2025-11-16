@@ -87,7 +87,18 @@
             <tr class="@rowClass">
                 <td>@item.Nome</td>
                 <td>@item.Descricao</td>
-                <td>@item.Gravidade</td>
+                <td>
+                    @{
+                        var gravidadeBadgeClass = item.Gravidade switch
+                        {
+                            GravidadeAlergia.Leve => "badge bg-success",
+                            GravidadeAlergia.Moderada => "badge bg-warning",
+                            GravidadeAlergia.Grave => "badge bg-danger",
+                            _ => "badge bg-secondary"
+                        };
+                    }
+                    <span class="@gravidadeBadgeClass">@item.Gravidade</span>
+                </td>
                 <td>@item.Sintomas</td>
                 @*
                 <td>
@@ -106,9 +117,11 @@
                     }
                 </td> *@
                 <td class="text-end">
+                    <div class="d-flex gap-2 justify-content-end">
                     <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.AlergiaId">Ver</a>
                     <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.AlergiaId">Editar</a>
                     <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.AlergiaId">Apagar</a>
+                    </div>
                 </td>
             </tr>
         }
