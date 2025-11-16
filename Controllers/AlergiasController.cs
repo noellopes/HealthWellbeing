@@ -20,15 +20,47 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Alergias
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string nome, string alimento, int page = 1)
         {
-            var alergias = await _context.Alergia
-                .Include(a => a.AlimentosAssociados)        // 👈 inclui a relação
-                    .ThenInclude(aa => aa.Alimento)      // 👈 inclui os alimentos
+            int pageSize = 10;
+
+            var query = _context.Alergia
+                .Include(a => a.AlimentosAssociados)
+                    .ThenInclude(aa => aa.Alimento)
+                .AsQueryable();
+
+            // FILTRO POR NOME DA ALERGIA
+            if (!string.IsNullOrEmpty(nome))
+                query = query.Where(a => a.Nome.Contains(nome));
+
+            // FILTRO POR NOME DO ALIMENTO
+            if (!string.IsNullOrEmpty(alimento))
+                query = query.Where(a => a.AlimentosAssociados
+                    .Any(aa => aa.Alimento.Name.Contains(alimento)));
+
+            // CONTAGEM TOTAL
+            int totalCount = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // PAGINAÇÃO
+            var alergias = await query
+                .OrderBy(a => a.Nome)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            // Passando filtros e metadados para a View
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+
+            ViewBag.SearchNome = nome;
+            ViewBag.SearchAlimento = alimento;
 
             return View(alergias);
         }
+
 
         // GET: Alergias/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -93,6 +125,9 @@ namespace HealthWellbeing.Controllers
                     }
                     await _context.SaveChangesAsync();
                 }
+
+                TempData["AlertType"] = "success";
+                TempData["AlertMessage"] = "Alergia criada com sucesso!";
 
                 return RedirectToAction(nameof(Index));
             }
@@ -180,6 +215,9 @@ namespace HealthWellbeing.Controllers
                     else throw;
                 }
 
+                TempData["AlertType"] = "success";
+                TempData["AlertMessage"] = "Alergia atualizada com sucesso!";
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -229,6 +267,10 @@ namespace HealthWellbeing.Controllers
                 _context.Alergia.Remove(alergia);
 
             await _context.SaveChangesAsync();
+
+            TempData["AlertType"] = "warning";
+            TempData["AlertMessage"] = "Alergia apagada com sucesso!";
+
             return RedirectToAction(nameof(Index));
         }
 
