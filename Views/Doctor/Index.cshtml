@@ -15,12 +15,6 @@
             <th>
                 Nome
             </th>
-            <th>
-               Telemovel
-            </th>
-            <th>
-               Email
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -29,12 +23,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Telemovel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
                     <a asp-action="Details" class="btn btn-sm btn-primary text-white" asp-route-id="@item.IdMedico">Detalhes</a> |
