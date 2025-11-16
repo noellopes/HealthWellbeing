@@ -87,10 +87,8 @@
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
             <tr>
-                <th>Tipo de Sala</th>
                 <th>Especialidade</th>
                 <th>Nome</th>
-                <th>Capacidade</th>
                 <th>Localização</th>
                 <th>Horário F.</th>
                 <th>Estado</th>
@@ -101,10 +99,8 @@
             @foreach (var item in Model.Items) // os itens são as salas paginadas
             {
                 <tr>
-                    <td>@Html.DisplayFor(modelItem => item.RoomsType)</td>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                    <td class="text-center">@Html.DisplayFor(modelItem => item.Capacity)</td>
                     <td>@Html.DisplayFor(modelItem => item.Location)</td>
                     <td>@Html.DisplayFor(modelItem => item.OperatingHours)</td>
                     <td>

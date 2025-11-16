@@ -129,24 +129,24 @@ namespace HealthWellBeingRoom.Data
             // Verificar se já existem salas
             if (!dbContext.Room.Any())
             {
-                var roomTypes = Enum.GetValues(typeof(Room.RoomType)).Cast<Room.RoomType>().ToList();
                 var roomStatuses = Enum.GetValues(typeof(Room.RoomStatus)).Cast<Room.RoomStatus>().ToList();
 
                 var rooms = new List<Room>
-                {
-                    new Room { Name = "UTI 1", RoomsType = roomTypes[0], Specialty = "Cuidados Intensivos", Capacity = 2, Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos críticos." },
-                    new Room { Name = "UTI 2", RoomsType = roomTypes[0], Specialty = "Cuidados Intensivos", Capacity = 2, Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos de suporte vital." },
-                    new Room { Name = "Centro Cirúrgico 1", RoomsType = roomTypes[1], Specialty = "Cirurgia Geral", Capacity = 1, Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[1], Notes = "Cirurgias de média complexidade." },
-                    new Room { Name = "Centro Cirúrgico 2", RoomsType = roomTypes[1], Specialty = "Ortopedia", Capacity = 1, Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Cirurgias ortopédicas." },
-                    new Room { Name = "Sala de Exames 1", RoomsType = roomTypes[1], Specialty = "Radiologia", Capacity = 1, Location = "Bloco C", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Equipamentos de imagem." },
-                    new Room { Name = "Consultório 1", RoomsType = roomTypes[0], Specialty = "Pediatria", Capacity = 1, Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas ambulatoriais." },
-                    new Room { Name = "Consultório 2", RoomsType = roomTypes[0], Specialty = "Cardiologia", Capacity = 1, Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas especializadas." },
-                    new Room { Name = "Laboratório", RoomsType = roomTypes[1], Specialty = "Análises Clínicas", Capacity = 3, Location = "Bloco E", OperatingHours = "07:00 - 19:00", Status = roomStatuses[0], Notes = "Coleta e exames laboratoriais." },
-                    new Room { Name = "Farmácia", RoomsType = roomTypes[1], Specialty = "Controle de Medicamentos", Capacity = 2, Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Armazenamento e dispensação de medicamentos." }
-                };
+        {
+            new Room { Name = "UTI 1", Specialty = "Cuidados Intensivos", Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos críticos." },
+            new Room { Name = "UTI 2", Specialty = "Cuidados Intensivos", Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Equipamentos de suporte vital." },
+            new Room { Name = "Centro Cirúrgico 1", Specialty = "Cirurgia Geral", Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[1], Notes = "Cirurgias de média complexidade." },
+            new Room { Name = "Centro Cirúrgico 2", Specialty = "Ortopedia", Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Cirurgias ortopédicas." },
+            new Room { Name = "Sala de Exames 1", Specialty = "Radiologia", Location = "Bloco C", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Equipamentos de imagem." },
+            new Room { Name = "Consultório 1", Specialty = "Pediatria", Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas ambulatoriais." },
+            new Room { Name = "Consultório 2", Specialty = "Cardiologia", Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas especializadas." },
+            new Room { Name = "Laboratório", Specialty = "Análises Clínicas", Location = "Bloco E", OperatingHours = "07:00 - 19:00", Status = roomStatuses[0], Notes = "Coleta e exames laboratoriais." },
+            new Room { Name = "Farmácia", Specialty = "Controle de Medicamentos", Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Armazenamento e dispensação de medicamentos." }
+        };
 
                 dbContext.Room.AddRange(rooms);
                 dbContext.SaveChanges();
+
             }
 
             // verificar se já existem equipamentos

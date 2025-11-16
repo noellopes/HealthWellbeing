@@ -12,13 +12,12 @@ using System.Threading.Tasks;
 using static HealthWellbeing.Models.Room;
 using HealthWellbeingRoom.ViewModels;
 
+// ... (usings mantidos)
 
 namespace HealthWellbeingRoom.Controllers
 {
-    // Controlador responsável pela gestão das salas
     public class RoomsController : Controller
     {
-        // Injeção do contexto da base de dados
         private readonly HealthWellbeingDbContext _context;
 
         public RoomsController(HealthWellbeingDbContext context)
@@ -26,14 +25,10 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
-        // GET: Rooms
-        // Lista paginada das salas existentes
         public async Task<IActionResult> Index(string searchName, string searchStatus, string searchSpecialty, string searchLocation, int page = 1)
         {
-            // Traz todos os registos para memória para permitir filtragem com métodos C#
             var allRooms = await _context.Room.ToListAsync();
 
-            // Filtro por nome (insensível a acentos e capitalização)
             if (!string.IsNullOrEmpty(searchName))
             {
                 var normalizedSearch = RemoveDiacritics.Normalize(searchName);
@@ -42,7 +37,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Filtro por estado (aplicado apenas se o utilizador escolher um valor)
             if (!string.IsNullOrEmpty(searchStatus) && Enum.TryParse<Room.RoomStatus>(searchStatus, out var status))
             {
                 allRooms = allRooms
@@ -50,7 +44,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Filtro por especialidade
             if (!string.IsNullOrEmpty(searchSpecialty))
             {
                 var normalizedSpecialty = RemoveDiacritics.Normalize(searchSpecialty);
@@ -59,7 +52,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Filtro por localização
             if (!string.IsNullOrEmpty(searchLocation))
             {
                 var normalizedLocation = RemoveDiacritics.Normalize(searchLocation);
@@ -68,22 +60,18 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Total de registos após filtros
             var totalItems = allRooms.Count;
             var pagination = new RPaginationInfo<Room>(page, totalItems);
 
-            // Dados paginados
             pagination.Items = allRooms
                 .OrderBy(r => r.Name)
                 .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage)
                 .ToList();
 
-            // Persistência dos filtros na view
             ViewBag.SearchName = searchName;
             ViewBag.SearchStatus = searchStatus;
 
-            // Lista de estados com nomes amigáveis
             ViewBag.Status = new SelectList(
                 Enum.GetValues(typeof(Room.RoomStatus))
                     .Cast<Room.RoomStatus>()
@@ -94,7 +82,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(pagination);
         }
 
-        // Função auxiliar para extrair o nome amigável do enum
         private string GetDisplayName(Enum value)
         {
             var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
@@ -104,8 +91,6 @@ namespace HealthWellbeingRoom.Controllers
             return attr?.Name ?? value.ToString();
         }
 
-
-        // GET: Rooms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -124,17 +109,14 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
-        // GET: Rooms/Create
         public IActionResult Create()
         {
-            ViewBag.RoomsTypeList = new SelectList(new List<string> { "Consulta", "Tratamentos" });
             return View();
         }
 
-        // POST: Rooms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomId,RoomsType,Specialty,Name,Capacity,Location,OperatingHours,Status,Notes")] Room room)
+        public async Task<IActionResult> Create([Bind("RoomId,Specialty,Name,Location,OperatingHours,Status,Notes")] Room room)
         {
             if (ModelState.IsValid)
             {
@@ -143,11 +125,9 @@ namespace HealthWellbeingRoom.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.RoomsTypeList = new SelectList(Enum.GetValues(typeof(RoomType)));
             return View(room);
         }
 
-        // GET: Rooms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -163,10 +143,9 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
-        // POST: Rooms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomId,RoomsType,Specialty,Name,Capacity,Location,OperatingHours,Status,Notes")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomId,Specialty,Name,Location,OperatingHours,Status,Notes")] Room room)
         {
             if (id != room.RoomId)
             {
@@ -196,7 +175,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
-        // GET: Rooms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -214,7 +192,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
-        // POST: Rooms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

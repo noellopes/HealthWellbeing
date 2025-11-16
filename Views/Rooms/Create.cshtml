@@ -12,15 +12,6 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
             <div class="mb-3">
-                <label asp-for="RoomsType" class="form-label">Tipo de Sala</label>
-                <select asp-for="RoomsType" class="form-select" onchange="toggleCamposEspecificos()">
-                    <option value="">Selecione o tipo...</option>
-                    <option value="Consultas">Consultas</option>
-                    <option value="Tratamentos">Tratamentos</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
                 <label asp-for="Specialty" class="form-label">Especialidade</label>
                 <select asp-for="Specialty" class="form-select">
                     <option value="">Selecione a especialidade...</option>
@@ -46,12 +37,6 @@
                 <label asp-for="Name" class="form-label fw-bold">Nome</label>
                 <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" />
                 <span asp-validation-for="Name" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Capacity" class="form-label fw-bold">Capacidade</label>
-                <input asp-for="Capacity" class="form-control" type="number" min="1" />
-                <span asp-validation-for="Capacity" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">

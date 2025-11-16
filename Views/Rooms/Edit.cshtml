@@ -27,16 +27,6 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
             <div class="mb-3">
-                <label asp-for="RoomsType" class="form-label fw-bold">Tipo de Sala</label>
-                <select asp-for="RoomsType" class="form-select">
-                    <option value="">Selecione o tipo...</option>
-                    <option value="Consultas">Consultas</option>
-                    <option value="Tratamentos">Tratamentos</option>
-                </select>
-                <span asp-validation-for="RoomsType" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
                 <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
                 <select asp-for="Specialty" class="form-select">
                     <option value="">Selecione a especialidade...</option>
@@ -63,12 +53,6 @@
                 <label asp-for="Name" class="form-label fw-bold">Nome</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Capacity" class="form-label fw-bold">Capacidade</label>
-                <input asp-for="Capacity" class="form-control" type="number" min="1" />
-                <span asp-validation-for="Capacity" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">

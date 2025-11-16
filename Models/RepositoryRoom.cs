@@ -32,12 +32,10 @@ namespace HealthWellbeingRoom.Models
             {
                 // Atualiza os campos da sala com os novos valores
                 existingRoom.Name = updatedRoom.Name;
-                existingRoom.Capacity = updatedRoom.Capacity;
                 existingRoom.Specialty = updatedRoom.Specialty;
                 existingRoom.Location = updatedRoom.Location;
                 existingRoom.Notes = updatedRoom.Notes;
                 existingRoom.Status = updatedRoom.Status;
-                existingRoom.RoomsType = updatedRoom.RoomsType;
                 existingRoom.OperatingHours = updatedRoom.OperatingHours;
             }
         }
