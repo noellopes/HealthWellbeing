@@ -20,9 +20,43 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ExameTipoes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            int page = 1, // Parâmetro de paginação
+            string searchNome = "", // Parâmetro de pesquisa por Nome
+            string searchEspecialidade = "") // Parâmetro de pesquisa por Especialidade
         {
-            return View(await _context.ExameTipo.ToListAsync());
+            // 1. Armazenar termos de pesquisa na ViewBag (necessário para manter o formulário preenchido)
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchEspecialidade = searchEspecialidade;
+
+            // 2. Criar a consulta AsQueryable para filtros
+            var examesQuery = _context.ExameTipo.AsQueryable();
+
+            // 3. Aplicação dos filtros (Lógica de Pesquisa do ficheiro 13_search.pdf)
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                // Filtra a consulta onde o Nome contém a string de pesquisa
+                examesQuery = examesQuery.Where(et => et.Nome.Contains(searchNome));
+            }
+
+            if (!string.IsNullOrEmpty(searchEspecialidade))
+            {
+                // Filtra a consulta onde a Especialidade contém a string de pesquisa
+                examesQuery = examesQuery.Where(et => et.Especialidade.Contains(searchEspecialidade));
+            }
+
+            // 4. Paginação (Apenas Ordenação por enquanto, para usar o IEnumerable<T>)
+            // Se usasse o PaginationInfo<T>, a lógica seria:
+            // int totalExames = await examesQuery.CountAsync(); [cite: 553]
+            // var examesInfo = new PaginationInfo<ExameTipo>(page, totalExames); [cite: 554]
+
+            var examesPaginados = await examesQuery
+                .OrderBy(et => et.Nome) // Ordenar por Nome
+                // .Skip() e .Take() seriam inseridos aqui para paginação [cite: 557]
+                .ToListAsync();
+
+            // Retorna a lista filtrada/ordenada
+            return View(examesPaginados);
         }
 
         // GET: ExameTipoes/Details/5

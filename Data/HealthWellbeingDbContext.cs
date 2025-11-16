@@ -28,7 +28,7 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Seeding para a classe ExameTipo (sua responsabilidade)
+            // Seeding para a classe ExameTipo
             modelBuilder.Entity<ExameTipo>().HasData(
                 new ExameTipo
                 {
