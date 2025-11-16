@@ -1,4 +1,5 @@
-﻿@model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.UtenteSaude>
+﻿@model PaginationInfo<UtenteSaude>
+
 
 @{
     ViewData["Title"] = "Área do Utente";
@@ -141,6 +142,52 @@
                 <a class="utente-btn" asp-controller="Consultas" asp-action="Index" role="button">As minhas Consultas</a>
 
 
+                <!-- ---------- Search ---------- -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h4">Lista de Utentes</h2>
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary me-2"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#utenteSearch"
+                           aria-expanded="false"
+                           aria-controls="utenteSearch">
+                            <i class="bi bi-search me-1"></i> Pesquisar
+                        </a>
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+                        </a>
+                    </div>
+                </div>
+
+                <div class="collapse mt-2 mb-2" id="utenteSearch">
+                    <div class="card card-body">
+                        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                            <div class="col-md-6">
+                                <label for="searchNome" class="form-label">Nome</label>
+                                <input id="searchNome" name="searchNome"
+                                       value="@ViewBag.SearchNome"
+                                       class="form-control"
+                                       placeholder="Pesquisar por nome"
+                                       type="search" />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="searchNif" class="form-label">NIF</label>
+                                <input id="searchNif" name="searchNif"
+                                       value="@ViewBag.SearchNif"
+                                       class="form-control"
+                                       placeholder="Pesquisar por NIF"
+                                       type="search" />
+                            </div>
+
+                            <div class="col-12 mt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-1"></i> Pesquisar
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
 
                 <!-- ---------- MENSAGEM DE SUCESSO ---------- -->
@@ -190,32 +237,58 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- ---------- PAGINAÇÃO ---------- -->
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <!-- Botão de "Previous" -->
-                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage - 1, itemsPerPage = Model.ItemsPerPage })" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+              @{
+    // Só para garantir que nunca vão null
+    string searchNome = ViewBag.SearchNome ?? "";
+    string searchNif  = ViewBag.SearchNif ?? "";
+}
 
-                        <!-- Páginas numeradas -->
-                        @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
-                        {
-                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                                <a class="page-link" href="@Url.Action("Index", new { currentPage = i, itemsPerPage = Model.ItemsPerPage })">@i</a>
-                            </li>
-                        }
+<!-- ---------- PAGINAÇÃO ---------- -->
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
 
-                        <!-- Botão de "Next" -->
-                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { currentPage = Model.CurrentPage + 1, itemsPerPage = Model.ItemsPerPage })" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+        <!-- Botão "Previous" -->
+        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("Index", new {
+                        page = Model.CurrentPage - 1,
+                        searchNome = searchNome,
+                        searchNif  = searchNif
+               })"
+               aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+
+        <!-- Páginas numeradas -->
+        @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link"
+                   href="@Url.Action("Index", new {
+                            page = i,
+                            searchNome = searchNome,
+                            searchNif  = searchNif
+                   })">
+                    @i
+                </a>
+            </li>
+        }
+
+        <!-- Botão "Next" -->
+        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               href="@Url.Action("Index", new {
+                        page = Model.CurrentPage + 1,
+                        searchNome = searchNome,
+                        searchNif  = searchNif
+               })"
+               aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
                 <!-- ---------- BOTÃO NOVO UTENTE ---------- -->
                 <div class="mt-3">

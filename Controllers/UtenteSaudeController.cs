@@ -20,27 +20,47 @@ namespace HealthWellbeing.Controllers
         // URL: /UtenteSaude
         // View: Views/UtenteSaude/Index.cshtml
         // ================================
-        public async Task<IActionResult> Index(int currentPage = 1, int itemsPerPage = 10)
+        // GET: UtenteSaude
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchNome = "",
+            string searchNif = "")
         {
-            // Total de itens na tabela
-            var totalItems = await _db.UtenteSaude.CountAsync();
+            // 1) Começamos com um IQueryable
+            var utentesQuery = _db.UtenteSaude
+                .AsQueryable();
 
-            // Calcular a lista de utentes com base na páginação
-            var utentes = await _db.UtenteSaude
-                                    .AsNoTracking()
-                                    .OrderBy(u => u.NomeCompleto)
-                                    .Skip((currentPage - 1) * itemsPerPage)  // Pular os itens das páginas anteriores
-                                    .Take(itemsPerPage)  // Pegar apenas os itens da página atual
-                                    .ToListAsync();
-
-            // Criar a informação de paginação
-            var paginationInfo = new PaginationInfo<UtenteSaude>(currentPage, totalItems, itemsPerPage)
+            // 2) Aplicar filtros se tiverem valor
+            if (!string.IsNullOrWhiteSpace(searchNome))
             {
-                Items = utentes
-            };
+                utentesQuery = utentesQuery
+                    .Where(u => u.NomeCompleto.Contains(searchNome));
+            }
 
-            return View(paginationInfo);
+            if (!string.IsNullOrWhiteSpace(searchNif))
+            {
+                utentesQuery = utentesQuery
+                    .Where(u => u.Nif.Contains(searchNif));
+            }
+
+            // 3) Guardar valores para a View (inputs ficam preenchidos)
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+
+            // 4) Paginação
+            int numberUtentes = await utentesQuery.CountAsync();
+
+            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            utentesInfo.Items = await utentesQuery
+                .OrderBy(u => u.NomeCompleto)
+                .Skip(utentesInfo.ItemsToSkip)
+                .Take(utentesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(utentesInfo);
         }
+
 
 
         // ================================
