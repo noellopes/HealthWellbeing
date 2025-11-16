@@ -136,6 +136,26 @@ internal class SeedData
     }
 
 
+    // private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
+    // {
+    //     if (context.RestricaoAlimentar.Any())
+    //     {
+    //         return;
+    //     }
+
+    //     context.RestricaoAlimentar.AddRange(
+    //         new RestricaoAlimentar { Nome = "Intolerância à Lactose", Tipo = TipoRestricao.IntoleranciaLactose, Gravidade = GravidadeRestricao.Moderada, Descricao = "Dificuldade em digerir lactose.", AlimentoId = 4 },
+    //         new RestricaoAlimentar { Nome = "Dieta Vegana", Tipo = TipoRestricao.Vegana, Gravidade = GravidadeRestricao.Leve, Descricao = "Exclusão de produtos de origem animal." },
+    //         new RestricaoAlimentar { Nome = "Baixo Sódio", Tipo = TipoRestricao.BaixoSodio, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de sódio." },
+    //         new RestricaoAlimentar { Nome = "Sem Glúten", Tipo = TipoRestricao.IntoleranciaGluten, Gravidade = GravidadeRestricao.Moderada, Descricao = "Exclusão de alimentos com glúten.", AlimentoId = 3 },
+    //         new RestricaoAlimentar { Nome = "Sem Açúcar", Tipo = TipoRestricao.SemAcucar, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de açúcar." }
+    //     );
+
+    //     context.SaveChanges();
+    // }
+
+
+
     private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
     {
         if (context.RestricaoAlimentar.Any())
@@ -143,16 +163,263 @@ internal class SeedData
             return;
         }
 
-        context.RestricaoAlimentar.AddRange(
-            new RestricaoAlimentar { Nome = "Intolerância à Lactose", Tipo = TipoRestricao.IntoleranciaLactose, Gravidade = GravidadeRestricao.Moderada, Descricao = "Dificuldade em digerir lactose.", AlimentoId = 4 },
-            new RestricaoAlimentar { Nome = "Dieta Vegana", Tipo = TipoRestricao.Vegana, Gravidade = GravidadeRestricao.Leve, Descricao = "Exclusão de produtos de origem animal." },
-            new RestricaoAlimentar { Nome = "Baixo Sódio", Tipo = TipoRestricao.BaixoSodio, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de sódio." },
-            new RestricaoAlimentar { Nome = "Sem Glúten", Tipo = TipoRestricao.IntoleranciaGluten, Gravidade = GravidadeRestricao.Moderada, Descricao = "Exclusão de alimentos com glúten.", AlimentoId = 3 },
-            new RestricaoAlimentar { Nome = "Sem Açúcar", Tipo = TipoRestricao.SemAcucar, Gravidade = GravidadeRestricao.Leve, Descricao = "Redução do consumo de açúcar." }
-        );
+        var restricoes = new List<RestricaoAlimentar>
+        {
+            new RestricaoAlimentar 
+            { 
+                Nome = "Intolerância à Lactose", 
+                Tipo = TipoRestricao.IntoleranciaLactose, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Dificuldade em digerir lactose presente em laticínios." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Dieta Vegana", 
+                Tipo = TipoRestricao.Vegana, 
+                Gravidade = GravidadeRestricao.Leve, 
+                Descricao = "Exclusão total de produtos de origem animal." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Restrição de Sódio", 
+                Tipo = TipoRestricao.BaixoSodio, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Controle rigoroso de consumo de sódio para hipertensos." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Doença Celíaca", 
+                Tipo = TipoRestricao.IntoleranciaGluten, 
+                Gravidade = GravidadeRestricao.Grave, 
+                Descricao = "Intolerância permanente ao glúten. Pode causar danos intestinais." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Diabetes - Controle de Açúcar", 
+                Tipo = TipoRestricao.SemAcucar, 
+                Gravidade = GravidadeRestricao.Grave, 
+                Descricao = "Restrição total de açúcares refinados e controle de carboidratos." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Vegetariana Estrita", 
+                Tipo = TipoRestricao.Vegetariana, 
+                Gravidade = GravidadeRestricao.Leve, 
+                Descricao = "Dieta sem carne, mas pode incluir laticínios e ovos." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Alergia a Frutos do Mar", 
+                Tipo = TipoRestricao.Outra, 
+                Gravidade = GravidadeRestricao.Grave, 
+                Descricao = "Alergia severa a crustáceos e moluscos." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Restrição Religiosa - Halal", 
+                Tipo = TipoRestricao.Religiosa, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Alimentação de acordo com preceitos islâmicos." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Sensibilidade ao Glúten", 
+                Tipo = TipoRestricao.IntoleranciaGluten, 
+                Gravidade = GravidadeRestricao.Leve, 
+                Descricao = "Sensibilidade não celíaca ao glúten." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Dieta Low Carb", 
+                Tipo = TipoRestricao.SemAcucar, 
+                Gravidade = GravidadeRestricao.Leve, 
+                Descricao = "Redução de carboidratos e açúcares para controle de peso." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Alergia a Amendoim", 
+                Tipo = TipoRestricao.Outra, 
+                Gravidade = GravidadeRestricao.Grave, 
+                Descricao = "Alergia severa a amendoim e derivados." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Restrição Religiosa - Kosher", 
+                Tipo = TipoRestricao.Religiosa, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Alimentação de acordo com leis dietéticas judaicas." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Intolerância à Frutose", 
+                Tipo = TipoRestricao.Outra, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Dificuldade em digerir frutose presente em frutas e mel." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Dieta Paleolítica", 
+                Tipo = TipoRestricao.Outra, 
+                Gravidade = GravidadeRestricao.Leve, 
+                Descricao = "Baseada em alimentos supostamente disponíveis na era paleolítica." 
+            },
+            new RestricaoAlimentar 
+            { 
+                Nome = "Alergia a Ovos", 
+                Tipo = TipoRestricao.Outra, 
+                Gravidade = GravidadeRestricao.Moderada, 
+                Descricao = "Alergia a proteínas presentes em ovos." 
+            }
+        };
 
+        context.RestricaoAlimentar.AddRange(restricoes);
+        context.SaveChanges();
+
+        // Agora cria as associações N:N com alimentos
+        PopulateRestricaoAlimentarAssociacoes(context, restricoes);
+    }
+
+
+
+    private static void PopulateRestricaoAlimentarAssociacoes(HealthWellbeingDbContext context, List<RestricaoAlimentar> restricoes)
+    {
+        var associacoes = new List<RestricaoAlimentarAlimento>();
+        
+        // Obtém todos os alimentos disponíveis
+        var alimentos = context.Alimentos.ToList();
+        
+        if (!alimentos.Any()) return;
+
+        // Intolerância à Lactose - associa com laticínios
+        var lactose = restricoes.First(r => r.Nome == "Intolerância à Lactose");
+        var laticinios = alimentos.Where(a => a.Name.Contains("Leite") || a.Name.Contains("Queijo")).Take(3);
+        foreach (var alimento in laticinios)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = lactose.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Vegana - associa com carnes, ovos, laticínios
+        var vegana = restricoes.First(r => r.Nome == "Dieta Vegana");
+        var produtosAnimais = alimentos.Where(a => a.Name.Contains("Frango") || a.Name.Contains("Salmão") || a.Name.Contains("Queijo") || a.Name.Contains("Leite")).Take(4);
+        foreach (var alimento in produtosAnimais)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = vegana.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Baixo Sódio - associa com alimentos processados
+        var baixoSodio = restricoes.First(r => r.Nome == "Restrição de Sódio");
+        var alimentosProcessados = alimentos.Where(a => a.Name.Contains("Queijo") || a.Name.Contains("Pão")).Take(2);
+        foreach (var alimento in alimentosProcessados)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = baixoSodio.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Doença Celíaca - associa com trigo, pão
+        var celiaca = restricoes.First(r => r.Nome == "Doença Celíaca");
+        var comGluten = alimentos.Where(a => a.Name.Contains("Pão") || a.Name.Contains("Aveia")).Take(3);
+        foreach (var alimento in comGluten)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = celiaca.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Diabetes - associa com açúcares e carboidratos
+        var diabetes = restricoes.First(r => r.Nome == "Diabetes - Controle de Açúcar");
+        var acucarados = alimentos.Where(a => a.Name.Contains("Banana") || a.Name.Contains("Batata Doce") || a.Name.Contains("Arroz")).Take(3);
+        foreach (var alimento in acucarados)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = diabetes.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Alergia a Frutos do Mar
+        var frutosMar = restricoes.First(r => r.Nome == "Alergia a Frutos do Mar");
+        var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Salmão")).Take(1);
+        foreach (var alimento in frutosMarAlimentos)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = frutosMar.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Alergia a Amendoim (simulada com alimentos existentes)
+        var amendoim = restricoes.First(r => r.Nome == "Alergia a Amendoim");
+        var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Feijão") || a.Name.Contains("Aveia")).Take(2);
+        foreach (var alimento in amendoimAlimentos)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = amendoim.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Alergia a Ovos (simulada com alimentos existentes)
+        var ovos = restricoes.First(r => r.Nome == "Alergia a Ovos");
+        var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana")).Take(2);
+        foreach (var alimento in ovosAlimentos)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = ovos.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Intolerância à Frutose - associa com frutas doces
+        var frutose = restricoes.First(r => r.Nome == "Intolerância à Frutose");
+        var frutasDoces = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana") || a.Name.Contains("Batata Doce")).Take(3);
+        foreach (var alimento in frutasDoces)
+        {
+            associacoes.Add(new RestricaoAlimentarAlimento 
+            { 
+                RestricaoAlimentarId = frutose.RestricaoAlimentarId, 
+                AlimentoId = alimento.AlimentoId 
+            });
+        }
+
+        // Adiciona algumas associações aleatórias para as restrições restantes
+        var random = new Random();
+        var restricoesSemAssociacao = restricoes.Except(new[] { lactose, vegana, baixoSodio, celiaca, diabetes, frutosMar, amendoim, ovos, frutose });
+
+        foreach (var restricao in restricoesSemAssociacao)
+        {
+            var alimentosAleatorios = alimentos.OrderBy(x => random.Next()).Take(2);
+            foreach (var alimento in alimentosAleatorios)
+            {
+                associacoes.Add(new RestricaoAlimentarAlimento 
+                { 
+                    RestricaoAlimentarId = restricao.RestricaoAlimentarId, 
+                    AlimentoId = alimento.AlimentoId 
+                });
+            }
+        }
+
+        context.RestricaoAlimentarAlimento.AddRange(associacoes);
         context.SaveChanges();
     }
+
+
 
     private static void PopulateAlimentoSubstitutos(HealthWellbeingDbContext context)
     {
