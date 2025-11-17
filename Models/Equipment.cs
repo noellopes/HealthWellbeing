@@ -19,9 +19,8 @@ namespace HealthWellbeingRoom.Models
 
         public int RoomId { get; set; }
 
-
         public Room? Room { get; set; }
-
+   
         [Required(ErrorMessage = "Data de compra é obrigatório.")]
         public required DateTime PurchaseDate { get; set; }
 
