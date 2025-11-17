@@ -1,10 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
@@ -17,6 +14,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        // LISTA DE STOCK
         public IActionResult Index()
         {
             var stock = _context.Stock
@@ -27,78 +25,94 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-
-
-        // GET: Stock/Create
+        // CRIAR NOVO STOCK (GET)
         public IActionResult Create()
         {
+            ViewBag.Consumiveis = _context.Consumivel.ToList();
+            ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
             return View();
         }
 
-        // POST: Stock/Create
+        // CRIAR NOVO STOCK (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima,QuantidadeMaxima")] Stock stock)
+        public IActionResult Create(Stock stock)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                stock.DataUltimaAtualizacao = DateTime.Now;
-                _context.Add(stock);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewBag.Consumiveis = _context.Consumivel.ToList();
+                ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
+                return View(stock);
             }
-            return View(stock);
+
+            stock.DataUltimaAtualizacao = DateTime.Now;
+
+            _context.Stock.Add(stock);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Stock criado com sucesso!";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Stock/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // DETALHES
+        public IActionResult Details(int id)
         {
-            if (id == null)
-                return NotFound();
+            var stock = _context.Stock
+                .Include(s => s.Consumivel)
+                .Include(s => s.Zona)
+                .FirstOrDefault(s => s.StockId == id);
 
-            var stock = await _context.Stock.FindAsync(id);
             if (stock == null)
                 return NotFound();
 
             return View(stock);
         }
 
-        // POST: Stock/Edit/5
+        // EDITAR (GET)
+        public IActionResult Edit(int id)
+        {
+            var stock = _context.Stock.Find(id);
+
+            if (stock == null)
+                return NotFound();
+
+            ViewBag.Consumiveis = _context.Consumivel.ToList();
+            ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
+
+            return View(stock);
+        }
+
+        // EDITAR (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("StockId,ConsumivelID,ZonaID,QuantidadeAtual,QuantidadeMinima,QuantidadeMaxima")] Stock stock)
+        public IActionResult Edit(int id, Stock stock)
         {
             if (id != stock.StockId)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    stock.DataUltimaAtualizacao = DateTime.Now;
-                    _context.Update(stock);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!StockExists(stock.StockId))
-                        return NotFound();
-                    else
-                        throw;
-                }
-                return RedirectToAction(nameof(Index));
+                ViewBag.Consumiveis = _context.Consumivel.ToList();
+                ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
+                return View(stock);
             }
-            return View(stock);
+
+            stock.DataUltimaAtualizacao = DateTime.Now;
+
+            _context.Update(stock);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Stock atualizado com sucesso!";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Stock/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // ELIMINAR (GET)
+        public IActionResult Delete(int id)
         {
-            if (id == null)
-                return NotFound();
-
-            var stock = await _context.Stock
-                .FirstOrDefaultAsync(m => m.StockId == id);
+            var stock = _context.Stock
+                .Include(s => s.Consumivel)
+                .Include(s => s.Zona)
+                .FirstOrDefault(s => s.StockId == id);
 
             if (stock == null)
                 return NotFound();
@@ -106,22 +120,22 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
+        // ELIMINAR (POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int id)
         {
-            var stock = await _context.Stock.FindAsync(id);
+            var stock = _context.Stock.Find(id);
+
             if (stock != null)
+            {
                 _context.Stock.Remove(stock);
+                _context.SaveChanges();
+            }
 
-            await _context.SaveChangesAsync();
-
+            TempData["Success"] = "Stock removido com sucesso!";
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool StockExists(int id)
-        {
-            return _context.Stock.Any(e => e.StockId == id);
         }
     }
 }
+

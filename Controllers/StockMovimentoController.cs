@@ -14,20 +14,26 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // LISTA DE MOVIMENTOS (HISTÓRICO)
+        // ===============================
+        // LISTA DE COMPRAS (ENTRADAS)
+        // ===============================
         public IActionResult Index()
         {
             var movimentos = _context.StockMovimento
+                .Where(m => m.Tipo == "Entrada")
                 .Include(m => m.Stock)
-                .ThenInclude(s => s.Consumivel)
-                .Include(m => m.Stock.Zona)
+                    .ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock)
+                    .ThenInclude(s => s.Zona)
                 .OrderByDescending(m => m.Data)
                 .ToList();
 
             return View(movimentos);
         }
 
-        // FORMULÁRIO DE COMPRA
+        // ===============================
+        // FORMULÁRIO PARA REGISTAR COMPRA
+        // ===============================
         public IActionResult CreateEntrada()
         {
             ViewBag.Stocks = _context.Stock
@@ -38,7 +44,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // PROCESSAR COMPRA
+        // ===============================
+        // PROCESSAR COMPRA (POST)
+        // ===============================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateEntrada(StockMovimento movimento)
@@ -53,11 +61,11 @@ namespace HealthWellbeing.Controllers
                 return View(movimento);
             }
 
-            // MARCAR ESTE MOVIMENTO COMO ENTRADA
+            // Definir tipo como compra (entrada)
             movimento.Tipo = "Entrada";
             movimento.Data = DateTime.Now;
 
-            // Obter o stock afetado
+            // Obter stock associado
             var stock = _context.Stock.FirstOrDefault(s => s.StockId == movimento.StockId);
 
             if (stock == null)
@@ -66,26 +74,28 @@ namespace HealthWellbeing.Controllers
                 return View(movimento);
             }
 
-            // Aumentar quantidade atual
+            // Atualizar quantidade atual
             stock.QuantidadeAtual += movimento.Quantidade;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
-            // Guardar no histórico
+            // Guardar o movimento de entrada
             _context.StockMovimento.Add(movimento);
             _context.SaveChanges();
 
-            TempData["Success"] = "Entrada registada com sucesso!";
-            return RedirectToAction("Index", "Stock");
+            TempData["Success"] = "Compra registada com sucesso!";
+            return RedirectToAction(nameof(Index));
         }
 
-
-        // DETALHES
+        // ===============================
+        // DETALHES DE UM MOVIMENTO
+        // ===============================
         public IActionResult Details(int id)
         {
             var movimento = _context.StockMovimento
                 .Include(m => m.Stock)
-                .ThenInclude(s => s.Consumivel)
-                .Include(m => m.Stock.Zona)
+                    .ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock)
+                    .ThenInclude(s => s.Zona)
                 .FirstOrDefault(m => m.Id == id);
 
             if (movimento == null)
@@ -94,7 +104,9 @@ namespace HealthWellbeing.Controllers
             return View(movimento);
         }
 
-        // DELETE
+        // ===============================
+        // APAGAR UM MOVIMENTO
+        // ===============================
         public IActionResult Delete(int id)
         {
             var movimento = _context.StockMovimento
@@ -119,7 +131,7 @@ namespace HealthWellbeing.Controllers
                 _context.SaveChanges();
             }
 
-            TempData["Success"] = "Movimento removido do histórico.";
+            TempData["Success"] = "Movimento removido com sucesso!";
             return RedirectToAction(nameof(Index));
         }
     }

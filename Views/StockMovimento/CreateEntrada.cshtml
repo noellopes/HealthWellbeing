@@ -7,49 +7,62 @@
 <div class="container mt-4">
 
     <h2 class="fw-bold text-primary mb-4">
-        🛒 Nova Compra de Consumível
+        📥 Nova Compra de Consumível
     </h2>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <form asp-action="CreateEntrada" method="post">
+        <div class="card shadow-sm">
+            <div class="card-body">
 
-            <form asp-action="CreateEntrada" method="post">
-
+                <!-- Seleção do Stock (Consumível + Zona) -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Consumível</label>
                     <select asp-for="StockId" class="form-select" required>
-                        <option value="">-- Escolha o consumível --</option>
+                        <option value="">-- Selecione um Consumível --</option>
 
                         @foreach (var s in ViewBag.Stocks)
                         {
                             <option value="@s.StockId">
-                                @s.Consumivel.Nome — Zona: @s.Zona.Nome — (Atual: @s.QuantidadeAtual / Min: @s.QuantidadeMinima)
+                                @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
                             </option>
                         }
                     </select>
+                    <span asp-validation-for="StockId" class="text-danger"></span>
                 </div>
 
+                <!-- Quantidade -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Quantidade a Comprar</label>
-                    <input asp-for="Quantidade" type="number" class="form-control" min="1" required />
+                    <label asp-for="Quantidade" class="form-label fw-bold"></label>
+                    <input asp-for="Quantidade" class="form-control" />
+                    <span asp-validation-for="Quantidade" class="text-danger"></span>
                 </div>
 
+                <!-- Descrição -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Descrição (opcional)</label>
-                    <textarea asp-for="Descricao" class="form-control"></textarea>
+                    <label asp-for="Descricao" class="form-label fw-bold"></label>
+                    <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn btn-success px-4">
-                    ✔️ Confirmar Compra
-                </button>
-
-                <a asp-action="Index" class="btn btn-secondary px-4">
-                    Cancelar
-                </a>
-
-            </form>
-
+            </div>
         </div>
-    </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary px-4">
+                ❮ Voltar
+            </a>
+
+            <button type="submit" class="btn btn-success px-5">
+                ✔ Confirmar Compra
+            </button>
+        </div>
+
+    </form>
 
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
