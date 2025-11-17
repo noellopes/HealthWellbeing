@@ -5,6 +5,7 @@ using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
@@ -16,15 +17,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-    {
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(
+    options => {
+        // Sign in
         options.SignIn.RequireConfirmedAccount = false;
 
         // Password
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
         options.Password.RequireUppercase = true;
-        //options.Password.
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 6;
+        options.Password.RequireNonAlphanumeric = true;
+
+        // Lockout
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+        options.Lockout.MaxFailedAccessAttempts = 5;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
@@ -39,24 +48,35 @@ builder.Services.AddScoped<IRecordFilterService<TreatmentRecord>, TreatmentRecor
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<HealthWellbeingDbContext>();
-    context.Database.Migrate();
-    SeedDataGroup1.Populate(context);
+
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    SeedDataGroup1.SeedRoles(roleManager);
+
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+    SeedDataGroup1.SeedDefaultAdmin(userManager);
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+    else
+    {
+        var AppContext = services.GetService<ApplicationDbContext>();
+        var DataContext = services.GetRequiredService<HealthWellbeingDbContext>();
+
+        app.UseMigrationsEndPoint();
+        DataContext.Database.Migrate();
+       
+        SeedDataGroup1.SeedUsers(userManager);
+        SeedDataGroup1.Populate(DataContext);
+        SeedDataGroup1.Populate(DataContext);
+    }
 }
 
 app.UseHttpsRedirection();
