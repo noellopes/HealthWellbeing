@@ -31,10 +31,10 @@ else
 	using (var serviceScope = app.Services.CreateScope())
 	{
 		var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-		SeedData.Populate(dbContext);
-    SeedDataExercicio.Populate(dbContext);
-    SeedDataTipoExercicio.Populate(dbContext);
-    SeedDataProblemaSaude.Populate(dbContext);
+		SeedDataGinasio.Populate(dbContext);
+		SeedDataExercicio.Populate(dbContext);
+		SeedDataTipoExercicio.Populate(dbContext);
+		SeedDataProblemaSaude.Populate(dbContext);
 	}
 }
 
