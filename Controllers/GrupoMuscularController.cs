@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,21 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: GrupoMuscular
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.GrupoMuscular.ToListAsync());
+            var grupoMuscularContext = _context.GrupoMuscular.AsQueryable();
+
+            int numberGrupoMusculares = await grupoMuscularContext.CountAsync();
+
+            var grupoMuscularInfo = new PaginationInfoExercicios<GrupoMuscular>(page, numberGrupoMusculares);
+
+            grupoMuscularInfo.Items = await grupoMuscularContext
+                .OrderBy(m => m.GrupoMuscularNome)
+                .Skip(grupoMuscularInfo.ItemsToSkip)
+                .Take(grupoMuscularInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(grupoMuscularInfo);
         }
 
         // GET: GrupoMuscular/Details/5
