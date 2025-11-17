@@ -139,17 +139,26 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Verifica se já existe uma sala com o mesmo nome (ignorando maiúsculas/minúsculas e espaços)
+                var nomeNormalizado = room.Name.Trim().ToLower();
+                var salaExistente = await _context.Room
+                    .AnyAsync(r => r.Name.Trim().ToLower() == nomeNormalizado);
+
+                if (salaExistente)
+                {
+                    ModelState.AddModelError("Name", "Já existe uma sala com este nome, por favor insira outro nome.");
+                    return View(room);
+                }
+
                 _context.Add(room);
                 await _context.SaveChangesAsync();
 
-                // Mensagem de sucesso via TempData
                 TempData["SuccessMessage"] = "Sala criada com sucesso!";
-                //Gravar que o detalhe vem de nova criacao de sala
                 TempData["FromRoomCreation"] = true;
 
-                // Redireciona para a página de detalhes da sala recém-criada
                 return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
             }
+
 
             return View(room);
         }
