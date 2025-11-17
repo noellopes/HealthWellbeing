@@ -144,6 +144,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<TimeOnly>("HoraInicio")
                         .HasColumnType("time");
 
+                    b.Property<string>("SearchTerm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("IdConsulta");
 
                     b.ToTable("Consulta");

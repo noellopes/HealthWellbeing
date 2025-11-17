@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,27 +22,54 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Consultas
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string searchTerm = "")
         {
-            // Base query sem Includes (a menos que tenhas navegações para carregar)
-            var consultasQuery = _context.Consulta
-                .AsNoTracking();
 
-            // total de registos
+            var consultasQuery = _context.Consulta
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                // Aceitar formatos comuns em PT
+                var culture = new CultureInfo("pt-PT");
+                var formats = new[] { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd" };
+
+                if (DateTime.TryParseExact(searchTerm.Trim(),
+                                           formats,
+                                           culture,
+                                           DateTimeStyles.None,
+                                           out var dataPesquisa))
+                    
+                {
+                    // FILTRAR APENAS POR DATA (sem hora)
+                    consultasQuery = consultasQuery.Where(c =>
+                        c.DataMarcacao.Date == dataPesquisa.Date ||
+                        c.DataConsulta.Date == dataPesquisa.Date
+                    );
+                }
+                else
+                {
+                    // Se o utilizador escrever algo que não é data válida, podes:
+                    // - ou não filtrar (deixar tudo)
+                    // - ou devolver 0 resultados. Aqui vou devolver 0 resultados:
+                    consultasQuery = consultasQuery.Where(c => false);
+                }
+            }
+
+            // Aqui já não há nada "estranho" na query, CountAsync funciona
             int numberConsultas = await consultasQuery.CountAsync();
 
-            // cria o viewmodel de paginação
             var consultasInfo = new PaginationInfo<Consulta>(page, numberConsultas);
 
-            // define um pageSize (se o teu PaginationInfo já não tiver)
             var pageSize = consultasInfo.ItemsPerPage > 0 ? consultasInfo.ItemsPerPage : 10;
 
-            // aplica ordenação + paginação
             consultasInfo.Items = await consultasQuery
-                .OrderBy(c => c.DataConsulta)                   // se for DateTime?
+                .OrderBy(c => c.DataConsulta)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.SearchTerm = searchTerm;
 
             return View(consultasInfo);
         }
