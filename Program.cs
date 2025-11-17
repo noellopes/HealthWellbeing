@@ -36,6 +36,13 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
     context.Database.Migrate();
+
+    // Migrar e popular HealthWellbeingDbContext (exercícios)
+    var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
+    healthContext.Database.Migrate();
+    SeedDataExercicio.Populate(healthContext);
+    SeedDataTipoExercicio.Populate(healthContext);
+    SeedDataProblemaSaude.Populate(healthContext);
 }
 
 app.UseHttpsRedirection();
