@@ -1,103 +1,161 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Consumivel>
+﻿@using HealthWellbeing.Models
+@using HealthWellbeing.ViewModels
+
+@model PaginationInfo<Consumivel>
 
 @{
     ViewData["Title"] = "Consumíveis";
+    var successMessage = TempData["SuccessMessage"];
 }
 
-<style>
-    .btn-acao {
-        display: inline-flex;
-        align-items: center;
-        font-weight: 500;
-        padding: 4px 10px;
-    }
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-    .badge {
-        font-size: 0.85rem;
-    }
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
-    .table td, .table th {
-        vertical-align: middle;
-    }
-</style>
-
-<div class="container mt-4">
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Nenhum Consumível Encontrado</h4>
+            <p>Não existem consumíveis com os filtros selecionados.</p>
+        </div>
+    </div>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Criar Novo
+    </a>
+}
+else
+{
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold text-primary mb-0">
-            🛒 Consumíveis
-        </h2>
-        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">
-            Novo Consumível
-        </a>
+        <h2 class="h4">Lista de Consumíveis</h2>
+
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+                <i class="bi bi-search me-1"></i> Procurar
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Criar Novo
+            </a>
+        </div>
     </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+    <div class="collapse mt-2 mb-2" id="postSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
 
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+                <div class="col-md-4">
+                    <label class="form-label">Nome</label>
+                    <input name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Pesquisar por nome" type="search" />
+                </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info text-center shadow-sm">
-            Nenhum consumível registado.
+                <div class="col-md-4">
+                    <label class="form-label">Categoria</label>
+                    <input name="searchCategoria" value="@ViewBag.SearchCategoria" class="form-control" placeholder="Pesquisar por categoria" type="search" />
+                </div>
+
+                <div class="col-12 mt-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Procurar
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Limpar
+                    </a>
+                </div>
+
+            </form>
         </div>
-    }
-    else
-    {
-        <div class="table-responsive shadow-sm">
-            <table class="table table-hover align-middle">
-                <thead class="table-primary">
-                    <tr>
-                        <th>@Html.DisplayNameFor(model => model.Nome)</th>
-                        <th>Categoria</th>
-                        <th>@Html.DisplayNameFor(model => model.QuantidadeAtual)</th>
-                        <th>@Html.DisplayNameFor(model => model.QuantidadeMinima)</th>
-                        <th class="text-center" style="width: 230px;">Ações</th>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Qtd. Atual</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var lowStock = item.QuantidadeAtual < item.QuantidadeMinima ? "table-danger" : "";
+
+                    <tr class="@lowStock">
+                        <td>@item.Nome</td>
+
+                        <td>@item.CategoriaConsumivel?.Nome</td>
+
+                        <td>
+                            @if (item.QuantidadeAtual < item.QuantidadeMinima)
+                            {
+                                <span class="badge bg-danger">@item.QuantidadeAtual</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">@item.QuantidadeAtual</span>
+                            }
+                        </td>
+
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Detalhes
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Apagar
+                            </a>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td class="fw-semibold">@item.Nome</td>
-                            <td>@item.CategoriaConsumivel?.Nome</td>
-                            <td>@item.QuantidadeAtual</td>
-                            <td>@item.QuantidadeMinima</td>
-                            <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-info text-white me-1 btn-acao">
-                                    Ver
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-warning text-white me-1 btn-acao">
-                                    Editar
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-danger btn-acao">
-                                    Eliminar
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
+                }
+            </tbody>
+        </table>
 
-<script>
-    setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(alert => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        });
-    }, 4000);
-</script>
+        <nav aria-label="Consumíveis pages">
+            <ul class="pagination">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                    }
+                }
+
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
