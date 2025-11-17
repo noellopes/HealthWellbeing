@@ -2,18 +2,17 @@
 
 namespace HealthWellbeing.Models
 {
-    public class ProfissionalExecutante
+    public class Sala
     {
-        public int Id { get; set; }
+        public int SalaId { get; set; }
 
         public string Numero_de_sala { get; set; }
         [Phone(ErrorMessage = "Número Obrigatório")]
         public string Laboratorio { get; set; }
         [StringLength(100)]
+        public string TipoSala { get; set; }
 
-        [Phone(ErrorMessage = "Laboratório Obrigatório")]
-
-        public string Tipo_de_sala { get; set; }
-
+        [StringLength(500)]
+        public string? Laboratorio { get; set; }
     }
 }
