@@ -66,9 +66,9 @@ namespace HealthWellbeingRoom.Controllers
             var status = await _context.Set<EquipmentStatus>().OrderBy(e => e.Name).ToListAsync();
 
             // Atribuir 1ª opção "Todos" aos filtros
-            rooms.Insert(0, new Room { RoomId = -1, Name = "Todas" });
-            types.Insert(0, new EquipmentType { EquipmentTypeId = -1, Name = "Todos" });
-            status.Insert(0, new EquipmentStatus { EquipmentStatusId = -1, Name = "Todos" });
+            rooms.Insert(0, new Room { RoomId = -1, Name = "-- Todas Salas --" });
+            types.Insert(0, new EquipmentType { EquipmentTypeId = -1, Name = "-- Todos Tipos --" });
+            status.Insert(0, new EquipmentStatus { EquipmentStatusId = -1, Name = "-- Todos Estados --" });
 
 
             // Salvar os filtros na ViewBag
