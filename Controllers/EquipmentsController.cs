@@ -134,7 +134,13 @@ namespace HealthWellbeingRoom.Controllers
             {
                 _context.Add(equipment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = equipment.EquipmentId,
+                        SuccessMessage = "Equipamento criado com sucesso."
+                    }
+                );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
