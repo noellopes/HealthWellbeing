@@ -19,12 +19,34 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gestão de Ginásio
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Client" asp-action="Index">Client</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Member" asp-action="Index">Member</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Plan" asp-action="Index">Plan</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="MemberPlan" asp-action="Index">MemberPlan</a></li>
+
+                                <li><hr class="dropdown-divider"></li>
+
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Trainer" asp-action="Index">Trainer</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Training" asp-action="Index">Training</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingPlan" asp-action="Index">TrainingPlan</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingType" asp-action="Index">TrainingType</a></li>
+                            </ul>
                         </li>
+                        @*<li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>*@
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
