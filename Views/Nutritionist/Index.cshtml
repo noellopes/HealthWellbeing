@@ -1,9 +1,11 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Nutritionist>
+
 @{
     ViewData["Title"] = "Nutritionists";
     var success = TempData["Success"] as string;
     var error = TempData["Error"] as string;
 }
+
 <h1>@ViewData["Title"]</h1>
 
 @if (!string.IsNullOrWhiteSpace(success))
@@ -15,18 +17,21 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<p><a class="btn btn-primary" asp-action="Create">Create New</a></p>
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Nutritionist</a>
+</p>
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">No nutritionists yet.</div>
+    <div class="alert alert-info">There are no nutritionists yet.</div>
 }
 else
 {
     <table class="table table-striped align-middle">
         <thead>
             <tr>
-                <th>@Html.DisplayNameFor(m => m.First().Name)</th>
+                <th>Name</th>
+                
                 <th class="text-end">Actions</th>
             </tr>
         </thead>
@@ -35,6 +40,7 @@ else
             {
                 <tr>
                     <td>@n.Name</td>
+                    
                     <td class="text-end">
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@n.NutritionistId">Details</a>
                         <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@n.NutritionistId">Edit</a>

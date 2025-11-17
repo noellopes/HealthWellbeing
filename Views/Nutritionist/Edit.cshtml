@@ -1,22 +1,12 @@
 ﻿@model HealthWellbeing.Models.Nutritionist
+
 @{
     ViewData["Title"] = "Edit Nutritionist";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
 }
+
 <h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
-
 <form asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
     <input type="hidden" asp-for="NutritionistId" />
 
     <div class="mb-3">
@@ -25,8 +15,20 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {

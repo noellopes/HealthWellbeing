@@ -26,7 +26,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Subcategories")]
         public ICollection<FoodCategory> SubCategory { get; set; } = new List<FoodCategory>();
 
-        // Optional: relation to Food if exists in your domain
         public ICollection<Food>? Foods { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class FixedNutritionist : Migration
+    public partial class freshstart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
