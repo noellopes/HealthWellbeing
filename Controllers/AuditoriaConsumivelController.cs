@@ -16,38 +16,32 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // INDEX COM PAGINAÇÃO + PESQUISA
-        public async Task<IActionResult> Index(
-            int page = 1,
-            int pageSize = 10,
-            string? searchConsumivel = "")
+        // INDEX COM PAGINAÇÃO + PESQUISA (igual ao Consumivel)
+        public async Task<IActionResult> Index(string? searchConsumivel, int page = 1)
         {
             var query = _context.AuditoriaConsumivel
                 .Include(a => a.Consumivel)
                 .AsQueryable();
 
-            // Sala só incluída se existir DbSet<Sala>
+            // incluir Sala apenas se existir DbSet<Sala> no DbContext
             if (_context.GetType().GetProperty("Sala") != null)
-            {
                 query = query.Include(a => a.Sala);
-            }
 
-            // FILTROS
             if (!string.IsNullOrWhiteSpace(searchConsumivel))
                 query = query.Where(a => a.Consumivel != null && a.Consumivel.Nome.Contains(searchConsumivel));
 
             int totalItems = await query.CountAsync();
-            var pagination = new PaginationInfo<AuditoriaConsumivel>(page, totalItems, pageSize);
+            var model = new PaginationInfo<AuditoriaConsumivel>(page, totalItems);
 
-            pagination.Items = await query
-                .OrderBy(a => a.DataConsumo)
-                .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage)
+            model.Items = await query
+                .OrderByDescending(a => a.DataConsumo)
+                .Skip(model.ItemsToSkip)
+                .Take(model.ItemsPerPage)
                 .ToListAsync();
 
             ViewBag.SearchConsumivel = searchConsumivel;
 
-            return View(pagination);
+            return View(model);
         }
 
         // DETAILS
@@ -56,52 +50,99 @@ namespace HealthWellbeing.Controllers
             if (id == null)
                 return NotFound();
 
-            var auditoria = _context.AuditoriaConsumivel.AsQueryable();
+            var auditoriaQuery = _context.AuditoriaConsumivel
+                .Include(a => a.Consumivel)
+                .AsQueryable();
 
-            auditoria = auditoria.Include(a => a.Consumivel);
             if (_context.GetType().GetProperty("Sala") != null)
-                auditoria = auditoria.Include(a => a.Sala);
+                auditoriaQuery = auditoriaQuery.Include(a => a.Sala);
 
-            var item = await auditoria.FirstOrDefaultAsync(a => a.AuditoriaConsumivelId == id);
+            var item = await auditoriaQuery.FirstOrDefaultAsync(a => a.AuditoriaConsumivelId == id);
             if (item == null)
                 return NotFound();
 
             return View(item);
         }
 
-        // CREATE
+        // CREATE GET
         public IActionResult Create()
         {
-            ViewData["ConsumivelID"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome");
+            // NOTE: usamos ViewBag com as chaves exatas que a tua view espera (SalaID, ConsumivelID)
+            ViewBag.ConsumivelID = new SelectList(_context.Consumivel.OrderBy(c => c.Nome), "ConsumivelId", "Nome");
 
-            // Sala opcional
             if (_context.GetType().GetProperty("Sala") != null)
-                ViewData["SalaId"] = new SelectList(_context.Set<Sala>(), "SalaId", "TipoSala");
+            {
+                // Só cria o SelectList se existir DbSet<Sala> no DbContext
+                ViewBag.SalaID = new SelectList(_context.Set<Sala>().OrderBy(s => s.TipoSala), "SalaId", "TipoSala");
+            }
+            else
+            {
+                ViewBag.SalaID = null;
+            }
 
             return View();
         }
 
+        // CREATE POST: desconta stock e valida
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AuditoriaConsumivel auditoria)
+        public async Task<IActionResult> Create([Bind("AuditoriaConsumivelId,SalaId,ConsumivelID,QuantidadeUsada,DataConsumo")] AuditoriaConsumivel auditoria)
         {
-            if (ModelState.IsValid)
+            // Recarregar dropdowns caso seja necessário retornar a view com erros
+            ViewBag.ConsumivelID = new SelectList(_context.Consumivel.OrderBy(c => c.Nome), "ConsumivelId", "Nome", auditoria.ConsumivelID);
+            if (_context.GetType().GetProperty("Sala") != null)
+                ViewBag.SalaID = new SelectList(_context.Set<Sala>().OrderBy(s => s.TipoSala), "SalaId", "TipoSala", auditoria.SalaId);
+
+            // Validações básicas
+            if (auditoria.ConsumivelID == null)
             {
-                _context.Add(auditoria);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Auditoria criada com sucesso!";
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("ConsumivelID", "Escolha um consumível.");
             }
 
-            ViewData["ConsumivelID"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", auditoria.ConsumivelID);
+            if (auditoria.QuantidadeUsada <= 0)
+            {
+                ModelState.AddModelError("QuantidadeUsada", "A quantidade usada deve ser maior que 0.");
+            }
 
-            if (_context.GetType().GetProperty("Sala") != null)
-                ViewData["SalaId"] = new SelectList(_context.Set<Sala>(), "SalaId", "TipoSala", auditoria.SalaId);
+            // Se já houver erros, devolve a view com os dropdowns carregados
+            if (!ModelState.IsValid)
+            {
+                return View(auditoria);
+            }
 
-            return View(auditoria);
+            // Obter consumível do DB
+            var consumivel = await _context.Consumivel
+                .FirstOrDefaultAsync(c => c.ConsumivelId == auditoria.ConsumivelID);
+
+            if (consumivel == null)
+            {
+                ModelState.AddModelError("ConsumivelID", "Consumível selecionado não existe.");
+                return View(auditoria);
+            }
+
+            // Verificar stock suficiente
+            if (auditoria.QuantidadeUsada > consumivel.QuantidadeAtual)
+            {
+                ModelState.AddModelError("QuantidadeUsada", $"Quantidade insuficiente! Só existem {consumivel.QuantidadeAtual} unidades em stock.");
+                return View(auditoria);
+            }
+
+            // Tudo OK -> descontar e guardar (numa única operação)
+            consumivel.QuantidadeAtual -= auditoria.QuantidadeUsada;
+            _context.Update(consumivel);
+
+            // Se DataConsumo não tiver valor (0) assume agora
+            if (auditoria.DataConsumo == default)
+                auditoria.DataConsumo = DateTime.Now;
+
+            _context.Add(auditoria);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Auditoria registada e stock atualizado!";
+            return RedirectToAction(nameof(Index));
         }
 
-        // EDIT
+        // EDIT GET
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -109,10 +150,9 @@ namespace HealthWellbeing.Controllers
             var auditoria = await _context.AuditoriaConsumivel.FindAsync(id);
             if (auditoria == null) return NotFound();
 
-            ViewData["ConsumivelID"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", auditoria.ConsumivelID);
-
+            ViewBag.ConsumivelID = new SelectList(_context.Consumivel.OrderBy(c => c.Nome), "ConsumivelId", "Nome", auditoria.ConsumivelID);
             if (_context.GetType().GetProperty("Sala") != null)
-                ViewData["SalaId"] = new SelectList(_context.Set<Sala>(), "SalaId", "TipoSala", auditoria.SalaId);
+                ViewBag.SalaID = new SelectList(_context.Set<Sala>().OrderBy(s => s.TipoSala), "SalaId", "TipoSala", auditoria.SalaId);
 
             return View(auditoria);
         }
@@ -121,50 +161,80 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, AuditoriaConsumivel auditoria)
         {
-            if (id != auditoria.AuditoriaConsumivelId) return NotFound();
+            if (id != auditoria.AuditoriaConsumivelId)
+                return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(auditoria);
+
+            // Buscar auditoria original
+            var original = await _context.AuditoriaConsumivel
+                .Include(a => a.Consumivel)
+                .FirstOrDefaultAsync(a => a.AuditoriaConsumivelId == id);
+
+            if (original == null)
+                return NotFound();
+
+            // Buscar consumível associado
+            var consumivel = await _context.Consumivel.FindAsync(auditoria.ConsumivelID);
+
+            if (consumivel == null)
             {
-                try
-                {
-                    _context.Update(auditoria);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Auditoria atualizada com sucesso!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.AuditoriaConsumivel.Any(a => a.AuditoriaConsumivelId == auditoria.AuditoriaConsumivelId))
-                        return NotFound();
-                    throw;
-                }
+                ModelState.AddModelError("ConsumivelID", "Consumível inválido.");
+                return View(auditoria);
             }
 
-            ViewData["ConsumivelID"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", auditoria.ConsumivelID);
+            // Calcular diferença
+            int quantidadeOriginal = original.QuantidadeUsada;
+            int quantidadeNova = auditoria.QuantidadeUsada;
+            int diferenca = quantidadeNova - quantidadeOriginal;
 
-            if (_context.GetType().GetProperty("Sala") != null)
-                ViewData["SalaId"] = new SelectList(_context.Set<Sala>(), "SalaId", "TipoSala", auditoria.SalaId);
+            // Se a diferença for positiva → retirar stock adicional
+            if (diferenca > 0)
+            {
+                if (consumivel.QuantidadeAtual < diferenca)
+                {
+                    ModelState.AddModelError("QuantidadeUsada",
+                        $"Quantidade insuficiente! Só existem {consumivel.QuantidadeAtual} unidades em stock.");
+                    return View(auditoria);
+                }
 
-            return View(auditoria);
+                consumivel.QuantidadeAtual -= diferenca;
+            }
+            // Se for negativa → devolver stock
+            else if (diferenca < 0)
+            {
+                consumivel.QuantidadeAtual += Math.Abs(diferenca);
+            }
+
+            // Atualizar auditoria
+            original.ConsumivelID = auditoria.ConsumivelID;
+            original.SalaId = auditoria.SalaId;
+            original.QuantidadeUsada = auditoria.QuantidadeUsada;
+            original.DataConsumo = auditoria.DataConsumo;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Auditoria atualizada com sucesso!";
+
+            return RedirectToAction(nameof(Index));
         }
 
-        // DELETE
+        // DELETE GET
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var auditoria = _context.AuditoriaConsumivel.AsQueryable();
-            auditoria = auditoria.Include(a => a.Consumivel);
-
+            var auditoriaQuery = _context.AuditoriaConsumivel.Include(a => a.Consumivel).AsQueryable();
             if (_context.GetType().GetProperty("Sala") != null)
-                auditoria = auditoria.Include(a => a.Sala);
+                auditoriaQuery = auditoriaQuery.Include(a => a.Sala);
 
-            var item = await auditoria.FirstOrDefaultAsync(a => a.AuditoriaConsumivelId == id);
+            var item = await auditoriaQuery.FirstOrDefaultAsync(a => a.AuditoriaConsumivelId == id);
             if (item == null) return NotFound();
 
             return View(item);
         }
 
+        // DELETE POST
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
