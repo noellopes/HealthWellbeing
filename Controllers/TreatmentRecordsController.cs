@@ -48,7 +48,7 @@ namespace HealthWellbeing.Controllers
                     TreatmentDate = t.TreatmentDate,
                     CompletedDuration = t.CompletedDuration
                 },
-                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration"]
+                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration"]
             );
 
             DtoSelector AdminSelector = new(t => new TreatmentRecordListDTO
@@ -64,7 +64,7 @@ namespace HealthWellbeing.Controllers
                 Status = t.Status.ToString(),
                 CreatedAt = t.CreatedAt
             },
-                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
+                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
             );
 
             DtoSelector selector = BaseSelector;
