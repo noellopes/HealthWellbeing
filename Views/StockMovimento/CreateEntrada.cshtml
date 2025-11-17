@@ -1,22 +1,55 @@
-﻿@{
-    ViewData["Title"] = "Entrada de Stock";
+﻿@model HealthWellbeing.Models.StockMovimento
+
+@{
+    ViewData["Title"] = "Nova Compra";
 }
 
-<h2>Adicionar Entrada de Stock</h2>
+<div class="container mt-4">
 
-<form method="post">
-    <input type="hidden" name="stockId" value="@ViewBag.StockId" />
+    <h2 class="fw-bold text-primary mb-4">
+        🛒 Nova Compra de Consumível
+    </h2>
 
-    <div class="mb-3">
-        <label>Quantidade a adicionar</label>
-        <input class="form-control" type="number" name="quantidade" min="1" required />
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="CreateEntrada" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Consumível</label>
+                    <select asp-for="StockId" class="form-select" required>
+                        <option value="">-- Escolha o consumível --</option>
+
+                        @foreach (var s in ViewBag.Stocks)
+                        {
+                            <option value="@s.StockId">
+                                @s.Consumivel.Nome — Zona: @s.Zona.Nome — (Atual: @s.QuantidadeAtual / Min: @s.QuantidadeMinima)
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Quantidade a Comprar</label>
+                    <input asp-for="Quantidade" type="number" class="form-control" min="1" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descrição (opcional)</label>
+                    <textarea asp-for="Descricao" class="form-control"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success px-4">
+                    ✔️ Confirmar Compra
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary px-4">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label>Descrição (opcional)</label>
-        <input class="form-control" type="text" name="descricao" />
-    </div>
-
-    <button type="submit" class="btn btn-success">Confirmar Entrada</button>
-</form>
-
+</div>
