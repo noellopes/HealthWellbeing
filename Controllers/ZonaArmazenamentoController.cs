@@ -37,7 +37,7 @@ namespace HealthWellbeing.Controllers
             // Paginação
             int totalZonas = await zonasQuery.CountAsync();
 
-            var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 20);
+            var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 10);
 
             pagination.Items = await zonasQuery
                 .OrderBy(z => z.Nome)

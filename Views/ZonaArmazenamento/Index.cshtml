@@ -67,8 +67,12 @@
     <!-- Tabela -->
     @if (Model.Items == null || !Model.Items.Any())
     {
-        <div class="alert alert-info text-center shadow-sm">
-            Nenhuma zona encontrada.
+        <div class="alert alert-warning text-center shadow-sm p-4"
+             role="alert"
+             style="font-size: 1.15rem; border-left: 6px solid #d39e00;">
+            ⚠️ <strong>Nenhuma zona encontrada!</strong>
+            <br />
+            Verifique os termos pesquisados e tente novamente.
         </div>
     }
     else
