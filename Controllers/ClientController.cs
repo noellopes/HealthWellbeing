@@ -81,6 +81,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var client = await _context.Client
+                .Include(c => c.Membership)
                 .FirstOrDefaultAsync(m => m.ClientId == id);
 
             if (client == null)

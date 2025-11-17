@@ -5,190 +5,244 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
-	public class MemberController : Controller
-	{
-		private readonly HealthWellbeingDbContext _context;
+    public class MemberController : Controller
+    {
+        private readonly HealthWellbeingDbContext _context;
 
-		public MemberController(HealthWellbeingDbContext context)
-		{
-			_context = context;
-		}
+        public MemberController(HealthWellbeingDbContext context)
+        {
+            _context = context;
+        }
 
-		// --- EXISTING ACTIONS (Index, Details, Edit, Delete, etc. are retained) ---
+        // --- AÇÃO INDEX ATUALIZADA ---
+        // GET: Member
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
+        {
+            // Criar a query base, incluindo o Cliente
+            var membersQuery = _context.Member
+                .Include(m => m.Client)
+                .AsQueryable();
 
-		// GET: Member
-		public async Task<IActionResult> Index()
-		{
-			// Eager load Client data for better display in the Member Index, if needed
-			var members = _context.Member.Include(m => m.Client);
-			return View(await members.ToListAsync());
-		}
+            // Adicionar lógica de pesquisa (através do Cliente)
+            // Adicionámos "m.Client != null" para segurança
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Name.Contains(searchName));
+            }
+            if (!string.IsNullOrEmpty(searchPhone))
+            {
+                membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Phone.Contains(searchPhone));
+            }
+            if (!string.IsNullOrEmpty(searchEmail))
+            {
+                membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Email.Contains(searchEmail));
+            }
 
-		// GET: Member/Details/5 (Assuming you want to include Client data here too)
-		public async Task<IActionResult> Details(int? id)
-		{
-			if (id == null)
-			{
-				return NotFound();
-			}
+            // Passar a pesquisa para o ViewBag
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchPhone = searchPhone;
+            ViewBag.SearchEmail = searchEmail;
 
-			var member = await _context.Member
-				.Include(m => m.Client) // Include the Client data
-				.FirstOrDefaultAsync(m => m.MemberId == id);
+            // Adicionar lógica de paginação
+            int numberMembers = await membersQuery.CountAsync();
+            // Quantos itens por página quiser
+            var membersInfo = new PaginationInfo<Member>(page, numberMembers, 5);
 
-			if (member == null)
-			{
-				return NotFound();
-			}
+            membersInfo.Items = await membersQuery
+                .OrderBy(m => m.Client.Name) // Ordenar pelo nome do cliente
+                .Skip(membersInfo.ItemsToSkip)
+                .Take(membersInfo.ItemsPerPage)
+                .ToListAsync();
 
-			return View(member);
-		}
+            return View(membersInfo);
+        }
 
-		// --- NEW/MODIFIED CREATE ACTIONS FOR "MAKE MEMBER" ---
-
-		// GET: Member/Create?clientId={clientId}
-		// This action receives the ClientId from the Client Index page
-		public IActionResult Create(string clientId)
-		{
-			if (string.IsNullOrEmpty(clientId))
-			{
-				// If the link was manually entered without a ClientId
-				TempData["Message"] = "Client ID is required to create a membership.";
-				return RedirectToAction("Index", "Client");
-			}
-
-			// 1. Find the Client
-			var client = _context.Client.Find(clientId);
-			if (client == null)
-			{
-				TempData["Message"] = $"Client ID '{clientId}' not found.";
-				return RedirectToAction("Index", "Client");
-			}
-
-			// 2. Check if the client is ALREADY a member
-			if (_context.Member.Any(m => m.ClientId == clientId))
-			{
-				// Redirect back to client list or details with a warning
-				TempData["Message"] = $"Client **{client.Name}** is already an active member.";
-				TempData["MessageType"] = "warning"; // Use TempData to signal a warning type
-				return RedirectToAction("Index", "Client");
-			}
+        // --- FIM DA AÇÃO INDEX ATUALIZADA ---
 
 
-			// Initialize the Member object with the foreign key (ClientId)
-			var member = new Member { ClientId = clientId };
+        // GET: Member/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-			// Pass the Client name/details to the view using ViewBag for display
-			ViewBag.ClientName = client.Name;
+            var member = await _context.Member
+                .Include(m => m.Client) // Include the Client data
+                .FirstOrDefaultAsync(m => m.MemberId == id);
 
-			return View(member);
-		}
+            if (member == null)
+            {
+                return NotFound();
+            }
 
-		// POST: Member/Create
-		// To protect from overposting attacks, we only bind the ClientId
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("ClientId")] Member member)
-		{
-			// We rely on the ClientId being present from the hidden field in the form
-			if (string.IsNullOrEmpty(member.ClientId))
-			{
-				ModelState.AddModelError("ClientId", "Client ID is missing.");
-			}
+            return View(member);
+        }
 
-			// Ensure we retrieve the client object before saving, in case we need the name for the message
-			var client = await _context.Client.FindAsync(member.ClientId);
+        // --- CREATE ACTIONS ---
+        public IActionResult Create(string clientId)
+        {
+            if (string.IsNullOrEmpty(clientId))
+            {
+                TempData["Message"] = "Client ID is required to create a membership.";
+                return RedirectToAction("Index", "Client");
+            }
+            var client = _context.Client.Find(clientId);
+            if (client == null)
+            {
+                TempData["Message"] = $"Client ID '{clientId}' not found.";
+                return RedirectToAction("Index", "Client");
+            }
+            if (_context.Member.Any(m => m.ClientId == clientId))
+            {
+                TempData["Message"] = $"Client <strong>{client.Name}</strong> is already an active member.";
+                TempData["MessageType"] = "warning";
+                return RedirectToAction("Index", "Client");
+            }
 
-			if (ModelState.IsValid && client != null)
-			{
-				// Since MemberId is the primary key and identity, we only set the foreign key ClientId
-				member.Client = client; // Attach the client object for navigation property to be correctly tracked (optional but helpful)
+            var member = new Member { ClientId = clientId };
+            // Passar todos os detalhes para a View de confirmação
+            ViewBag.ClientName = client.Name;
+            ViewBag.ClientPhone = client.Phone;
+            ViewBag.ClientEmail = client.Email;
 
-				_context.Add(member);
-				await _context.SaveChangesAsync();
+            return View(member);
+        }
 
-				// Success message
-				TempData["Message"] = $"Membership successfully created for Client: **{client.Name}**";
-				TempData["MessageType"] = "success";
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("ClientId")] Member member)
+        {
+            if (string.IsNullOrEmpty(member.ClientId))
+            {
+                ModelState.AddModelError("ClientId", "Client ID is missing.");
+            }
 
-				// Redirect back to the Client Index page to see the new status
-				return RedirectToAction("Index", "Client");
-			}
+            var client = await _context.Client.FindAsync(member.ClientId);
 
-			// If validation fails, re-populate ViewBag for view display
-			ViewBag.ClientName = client?.Name ?? "Unknown Client";
+            if (ModelState.IsValid && client != null)
+            {
+                member.Client = client;
+                _context.Add(member);
+                await _context.SaveChangesAsync();
 
-			return View(member);
-		}
+                TempData["Message"] = $"Membership successfully created for Client: <strong>{client.Name}</strong>";
+                TempData["MessageType"] = "success";
+                return RedirectToAction("Index", "Client");
+            }
 
-		// --- EXISTING ACTIONS (Edit, Delete, Exists) ---
+            // Se o ModelState falhar, repopular o ViewBag
+            ViewBag.ClientName = client?.Name ?? "Unknown Client";
+            ViewBag.ClientPhone = client?.Phone ?? "N/A";
+            ViewBag.ClientEmail = client?.Email ?? "N/A";
 
-		// GET: Member/Edit/5
-		public async Task<IActionResult> Edit(int? id)
-		{
-			// ... (keep original logic) ...
-			if (id == null) return NotFound();
-			var member = await _context.Member.FindAsync(id);
-			if (member == null) return NotFound();
-			return View(member);
-		}
+            return View(member);
+        }
 
-		// POST: Member/Edit/5
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("MemberId,ClientId")] Member member)
-		{
-			// ... (keep original logic) ...
-			if (id != member.MemberId) return NotFound();
+        // GET: Member/Edit/5 (O 'id' aqui é o MemberId)
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					_context.Update(member);
-					await _context.SaveChangesAsync();
-				}
-				catch (DbUpdateConcurrencyException)
-				{
-					if (!MemberExists(member.MemberId)) return NotFound();
-					else throw;
-				}
-				return RedirectToAction(nameof(Index));
-			}
-			return View(member);
-		}
+            // 1. Encontrar o Membro E incluir o Cliente associado
+            var member = await _context.Member
+                .Include(m => m.Client)
+                .FirstOrDefaultAsync(m => m.MemberId == id);
 
-		// GET: Member/Delete/5
-		public async Task<IActionResult> Delete(int? id)
-		{
-			// ... (keep original logic) ...
-			if (id == null) return NotFound();
-			var member = await _context.Member.FirstOrDefaultAsync(m => m.MemberId == id);
-			if (member == null) return NotFound();
-			return View(member);
-		}
+            if (member == null || member.Client == null)
+            {
+                return NotFound();
+            }
 
-		// POST: Member/Delete/5
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteConfirmed(int id)
-		{
-			// ... (keep original logic) ...
-			var member = await _context.Member.FindAsync(id);
-			if (member != null)
-			{
-				_context.Member.Remove(member);
-			}
-			await _context.SaveChangesAsync();
-			return RedirectToAction(nameof(Index));
-		}
+            // 2. Enviar o OBJETO CLIENTE (e não o Membro) para a View
+            return View(member.Client);
+        }
 
-		private bool MemberExists(int id)
-		{
-			return _context.Member.Any(e => e.MemberId == id);
-		}
-	}
+        // POST: Member/Edit/5
+        // A View vai enviar os dados de um Client, por isso o [Bind] é para o Client
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        // O 'id' (MemberId) é ignorado, e o 'ClientId' vem do form
+        public async Task<IActionResult> Edit(string ClientId, [Bind("ClientId,Name,Email,Phone,Address,BirthDate,Gender")] Client client)
+        {
+            // 1. Validar que o ClientId do form corresponde ao objeto
+            if (ClientId != client.ClientId)
+            {
+                return NotFound();
+            }
+
+            // 2. Validar o modelo do CLIENTE
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    // 3. Atualizar o CLIENTE na base de dados
+                    _context.Update(client);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Client.Any(e => e.ClientId == client.ClientId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                // 4. Redirecionar de volta para o ÍNDICE DE MEMBROS
+                TempData["Message"] = $"Dados do cliente <strong>{client.Name}</strong> atualizados com sucesso.";
+                TempData["MessageType"] = "success";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Se o modelo falhar, volta à View de Edição
+            return View(client);
+        }
+
+        // GET: Member/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            // É importante incluir o Cliente aqui para a View de Delete
+            var member = await _context.Member
+                .Include(m => m.Client)
+                .FirstOrDefaultAsync(m => m.MemberId == id);
+            if (member == null) return NotFound();
+            return View(member);
+        }
+
+        // POST: Member/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var member = await _context.Member.FindAsync(id);
+            if (member != null)
+            {
+                _context.Member.Remove(member);
+            }
+            await _context.SaveChangesAsync();
+
+            // Mensagem de sucesso para a página de Membros
+            TempData["Message"] = "Membership successfully deleted.";
+            TempData["MessageType"] = "success";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool MemberExists(int id)
+        {
+            return _context.Member.Any(e => e.MemberId == id);
+        }
+    }
 }

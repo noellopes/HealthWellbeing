@@ -2,8 +2,11 @@
 
 @{
     ViewData["Title"] = "Confirm New Membership";
-    // Retrieve Client Name passed from the controller (MemberController.cs)
+
+    // Recuperar todos os detalhes do cliente do ViewBag
     string clientName = ViewBag.ClientName as string ?? "Error: Client Name Not Found";
+    string clientPhone = ViewBag.ClientPhone as string ?? "N/A";
+    string clientEmail = ViewBag.ClientEmail as string ?? "N/A";
 }
 
 <h1 class="display-4 text-info mb-4"><i class="bi bi-person-plus-fill"></i> Confirm New Membership</h1>
@@ -16,20 +19,32 @@
 
             <div class="alert alert-primary mb-4" role="alert">
                 <p class="lead mb-1">
-                    Please confirm that you want to **create a new membership record** for the client below.
+                    Please confirm that you want to create a new membership record for the client below.
                 </p>
                 <p class="mb-0">
                     No further details are required for this basic membership link.
                 </p>
             </div>
 
+            <!-- --- ALTERAÇÃO AQUI --- -->
+            <!-- Mostrar os novos detalhes do Cliente -->
             <div class="mb-3 p-3 border rounded bg-light">
-                <p class="fw-bold mb-1">Client Name:</p>
-                <span class="fs-5 text-dark">@clientName</span>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-bold">Client Name:</dt>
+                    <dd class="col-sm-8 fs-5 text-dark">@clientName</dd>
 
-                <p class="fw-bold mb-1 mt-2">Client ID:</p>
-                <span class="text-muted">@Model.ClientId</span>
+                    <dt class="col-sm-4 fw-bold">Phone:</dt>
+                    <dd class="col-sm-8 text-dark">@clientPhone</dd>
+
+                    <dt class="col-sm-4 fw-bold">Email:</dt>
+                    <dd class="col-sm-8 text-dark">@clientEmail</dd>
+
+                    <dt class="col-sm-4 fw-bold mt-2">Client ID:</dt>
+                    <dd class="col-sm-8 text-muted mt-2">@Model.ClientId</dd>
+                </dl>
             </div>
+            <!-- --- FIM DA ALTERAÇÃO --- -->
+
 
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>

@@ -1,24 +1,114 @@
 ﻿@model HealthWellbeing.Models.Member
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Member Details";
+    // Criamos uma variável 'client' para ser mais fácil de aceder
+    var client = Model.Client;
 }
 
-<h1>Details</h1>
+<h1 class="display-4 text-primary mb-4">Member Details</h1>
+
+@* Adicionámos um @if para verificar se o Cliente foi carregado (boa prática).
+    O MemberController.cs (action Details) DEVE ter .Include(m => m.Client)
+*@
+@if (client == null)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> Client data could not be loaded for this member.
+        <br />
+        Ensure the Controller is using <code>.Include(m => m.Client)</code>.
+    </div>
+}
+else
+{
+    <div class="card shadow-lg mb-4">
+        <div class="card-header bg-primary text-white">
+            <!-- Mostra o nome do CLIENTE no cabeçalho -->
+            <h4 class="mb-0">@client.Name</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+
+                <!-- Secção de Informação do Membro -->
+                <dt class="col-sm-3 fw-bold">
+                    Member ID
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.MemberId)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Client ID
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ClientId)
+                </dd>
+
+                <!-- Linha separadora -->
+                <dt class="col-12"><hr class="my-2" /></dt>
+
+                <!-- Secção de Informação do Cliente (copiada da sua View 'Client/Details') -->
+                <dt class="col-sm-3 fw-bold">
+                    Name
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.Name)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Email
+                </dt>
+                <dd class="col-sm-9">
+                    <a href="mailto:@client.Email" class="text-decoration-none">@Html.DisplayFor(model => client.Email)</a>
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Phone
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.Phone)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Address
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.Address)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Birth Date
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.BirthDate)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Gender
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.Gender)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">
+                    Registration Date
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => client.RegistrationDate)
+                </dd>
+
+            </dl>
+        </div>
+    </div>
+}
 
 <div>
-    <h4>Member</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ClientId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ClientId)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MemberId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <!-- Os botões agora usam o ID do Membro (Model.MemberId) -->
+    <a asp-action="Edit" asp-route-id="@Model?.MemberId" class="btn btn-primary me-2 shadow-sm">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
 </div>
