@@ -21,21 +21,6 @@ namespace HealthWellbeing.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BeneficioTipoExercicio", b =>
-                {
-                    b.Property<int>("BeneficiosBeneficioId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TipoExercicioId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BeneficiosBeneficioId", "TipoExercicioId");
-
-                    b.HasIndex("TipoExercicioId");
-
-                    b.ToTable("BeneficioTipoExercicio");
-                });
-
             modelBuilder.Entity("ExercicioGenero", b =>
                 {
                     b.Property<int>("ExercicioId")
@@ -465,6 +450,21 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("TipoExercicio");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicioBeneficio", b =>
+                {
+                    b.Property<int>("TipoExercicioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BeneficioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TipoExercicioId", "BeneficioId");
+
+                    b.HasIndex("BeneficioId");
+
+                    b.ToTable("TipoExercicioBeneficio");
+                });
+
             modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
                 {
                     b.Property<int>("ProblemasSaudeProblemaSaudeId")
@@ -478,21 +478,6 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("ProfissionalExecutanteId");
 
                     b.ToTable("ProblemaSaudeProfissionalExecutante");
-                });
-
-            modelBuilder.Entity("BeneficioTipoExercicio", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Beneficio", null)
-                        .WithMany()
-                        .HasForeignKey("BeneficiosBeneficioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.TipoExercicio", null)
-                        .WithMany()
-                        .HasForeignKey("TipoExercicioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ExercicioGenero", b =>
@@ -556,6 +541,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("GrupoMuscular");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicioBeneficio", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Beneficio", "Beneficio")
+                        .WithMany("TipoExercicioBeneficios")
+                        .HasForeignKey("BeneficioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.TipoExercicio", "TipoExercicio")
+                        .WithMany("TipoExercicioBeneficios")
+                        .HasForeignKey("TipoExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Beneficio");
+
+                    b.Navigation("TipoExercicio");
+                });
+
             modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ProblemaSaude", null)
@@ -576,9 +580,19 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("AlergiasRelacionadas");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Beneficio", b =>
+                {
+                    b.Navigation("TipoExercicioBeneficios");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
                     b.Navigation("Musculos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
+                {
+                    b.Navigation("TipoExercicioBeneficios");
                 });
 #pragma warning restore 612, 618
         }

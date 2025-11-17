@@ -14,8 +14,7 @@ namespace HealthWellbeing.Models
         [StringLength(500, ErrorMessage = "A descrição deve ter no máximo 500 caracteres.")]
         public string DescricaoBeneficio { get; set; }
 
-        // Relacionamento N:N — um benefício pode estar ligado a vários tipos de exercício
-        public ICollection<TipoExercicio>? TipoExercicio { get; set; }
+        public ICollection<TipoExercicioBeneficio>? TipoExercicioBeneficios { get; set; }
     }
 
 }

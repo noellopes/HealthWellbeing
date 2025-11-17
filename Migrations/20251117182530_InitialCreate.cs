@@ -292,23 +292,23 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BeneficioTipoExercicio",
+                name: "TipoExercicioBeneficio",
                 columns: table => new
                 {
-                    BeneficiosBeneficioId = table.Column<int>(type: "int", nullable: false),
-                    TipoExercicioId = table.Column<int>(type: "int", nullable: false)
+                    TipoExercicioId = table.Column<int>(type: "int", nullable: false),
+                    BeneficioId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BeneficioTipoExercicio", x => new { x.BeneficiosBeneficioId, x.TipoExercicioId });
+                    table.PrimaryKey("PK_TipoExercicioBeneficio", x => new { x.TipoExercicioId, x.BeneficioId });
                     table.ForeignKey(
-                        name: "FK_BeneficioTipoExercicio_Beneficio_BeneficiosBeneficioId",
-                        column: x => x.BeneficiosBeneficioId,
+                        name: "FK_TipoExercicioBeneficio_Beneficio_BeneficioId",
+                        column: x => x.BeneficioId,
                         principalTable: "Beneficio",
                         principalColumn: "BeneficioId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BeneficioTipoExercicio_TipoExercicio_TipoExercicioId",
+                        name: "FK_TipoExercicioBeneficio_TipoExercicio_TipoExercicioId",
                         column: x => x.TipoExercicioId,
                         principalTable: "TipoExercicio",
                         principalColumn: "TipoExercicioId",
@@ -348,11 +348,6 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaAlimentoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeneficioTipoExercicio_TipoExercicioId",
-                table: "BeneficioTipoExercicio",
-                column: "TipoExercicioId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ExercicioGenero_GeneroId",
                 table: "ExercicioGenero",
                 column: "GeneroId");
@@ -371,6 +366,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_ProblemaSaudeProfissionalExecutante_ProfissionalExecutanteId",
                 table: "ProblemaSaudeProfissionalExecutante",
                 column: "ProfissionalExecutanteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TipoExercicioBeneficio_BeneficioId",
+                table: "TipoExercicioBeneficio",
+                column: "BeneficioId");
         }
 
         /// <inheritdoc />
@@ -378,9 +378,6 @@ namespace HealthWellbeing.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Alergia");
-
-            migrationBuilder.DropTable(
-                name: "BeneficioTipoExercicio");
 
             migrationBuilder.DropTable(
                 name: "ExercicioGenero");
@@ -401,13 +398,10 @@ namespace HealthWellbeing.Migrations
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
+                name: "TipoExercicioBeneficio");
+
+            migrationBuilder.DropTable(
                 name: "Alimento");
-
-            migrationBuilder.DropTable(
-                name: "Beneficio");
-
-            migrationBuilder.DropTable(
-                name: "TipoExercicio");
 
             migrationBuilder.DropTable(
                 name: "Genero");
@@ -423,6 +417,12 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProfissionalExecutante");
+
+            migrationBuilder.DropTable(
+                name: "Beneficio");
+
+            migrationBuilder.DropTable(
+                name: "TipoExercicio");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");

@@ -18,9 +18,7 @@ namespace HealthWellbeing.Models
         [StringLength(250, ErrorMessage = "As caracetrísticas devem ter no máximo 250 caracteres.")]
         public string CaracteristicasTipoExercicios { get; set; }
 
-        
-        // Relacionamento N:N — um tipo de exercício pode ter vários benefícios
-        public ICollection<Beneficio>? Beneficios { get; set; }
+        public ICollection<TipoExercicioBeneficio>? TipoExercicioBeneficios { get; set; }
     }
 }
 

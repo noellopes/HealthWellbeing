@@ -2,12 +2,12 @@
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace HealthWellbeing.Controllers
 {
@@ -22,31 +22,34 @@ namespace HealthWellbeing.Controllers
 
         // GET: TipoExercicio
         public async Task<IActionResult> Index(
-    int page = 1,
-    string searchNome = "",
-    string searchDescricao = "",
-    string searchBeneficio = "")
+            int page = 1,
+            string searchNome = "",
+            string searchDescricao = "",
+            string searchBeneficio = "")
         {
+            
             var query = _context.TipoExercicio
-                .Include(t => t.Beneficios)
+                .Include(t => t.TipoExercicioBeneficios)
+                    .ThenInclude(tb => tb.Beneficio)
                 .AsQueryable();
 
-            // 🔍 Filtragem por Nome
+            //Filtragem por Nome
             if (!string.IsNullOrEmpty(searchNome))
             {
                 query = query.Where(t => t.NomeTipoExercicios.Contains(searchNome));
             }
 
-            // 🔍 Filtragem por Descrição
+            //Filtragem por Descrição
             if (!string.IsNullOrEmpty(searchDescricao))
             {
                 query = query.Where(t => t.DescricaoTipoExercicios.Contains(searchDescricao));
             }
 
-            // 🔍 Filtragem por Benefício
+            //Filtragem por Benefício
             if (!string.IsNullOrEmpty(searchBeneficio))
             {
-                query = query.Where(t => t.Beneficios.Any(b => b.NomeBeneficio.Contains(searchBeneficio)));
+                query = query.Where(t => t.TipoExercicioBeneficios
+                    .Any(tb => tb.Beneficio.NomeBeneficio.Contains(searchBeneficio)));
             }
 
             // Guardar os valores de pesquisa para a view
@@ -56,6 +59,7 @@ namespace HealthWellbeing.Controllers
 
             // Paginação
             int total = await query.CountAsync();
+
             var pagination = new PaginationInfoExercicios<TipoExercicio>(page, total);
 
             pagination.Items = await query
@@ -70,18 +74,14 @@ namespace HealthWellbeing.Controllers
         // GET: TipoExercicio/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var tipoExercicio = await _context.TipoExercicio
-                .Include(t => t.Beneficios) // ✅ ADICIONADO: Carrega os benefícios relacionados
+                .Include(t => t.TipoExercicioBeneficios) // Tabela intermédia
+                    .ThenInclude(tb => tb.Beneficio)     // Tabela final
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
-            if (tipoExercicio == null)
-            {
-                return NotFound();
-            }
+
+            if (tipoExercicio == null) return NotFound();
 
             return View(tipoExercicio);
         }
@@ -89,34 +89,29 @@ namespace HealthWellbeing.Controllers
         // GET: TipoExercicio/Create
         public IActionResult Create()
         {
-            // ✅ ADICIONADO: Carrega os benefícios para mostrar no checkbox list
-            ViewData["Beneficios"] = _context.Beneficio.ToList();
+            ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
             return View();
         }
 
         // POST: TipoExercicio/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
             TipoExercicio tipoExercicio,
-            int[] selectedBeneficios) // ✅ ADICIONADO: Parâmetro para benefícios selecionados
+            int[] selectedBeneficios)
         {
             if (ModelState.IsValid)
             {
-                // ✅ ADICIONADO: Lógica para associar benefícios selecionados
                 if (selectedBeneficios != null && selectedBeneficios.Any())
                 {
-                    tipoExercicio.Beneficios = new List<Beneficio>();
+                    tipoExercicio.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
                     foreach (var beneficioId in selectedBeneficios)
                     {
-                        var beneficio = await _context.Beneficio.FindAsync(beneficioId);
-                        if (beneficio != null)
+                        tipoExercicio.TipoExercicioBeneficios.Add(new TipoExercicioBeneficio
                         {
-                            tipoExercicio.Beneficios.Add(beneficio);
-                        }
+                            BeneficioId = beneficioId
+                        });
                     }
                 }
 
@@ -125,82 +120,75 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // ✅ ADICIONADO: Recarrega benefícios em caso de erro
-            ViewData["Beneficios"] = _context.Beneficio.ToList();
+            ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
             return View(tipoExercicio);
         }
 
         // GET: TipoExercicio/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var tipoExercicio = await _context.TipoExercicio
-                .Include(t => t.Beneficios) // ✅ ADICIONADO: Carrega benefícios relacionados
+                .Include(t => t.TipoExercicioBeneficios)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
-            if (tipoExercicio == null)
-            {
-                return NotFound();
-            }
 
-            // ✅ ADICIONADO: Carrega lista de benefícios e os selecionados
-            ViewData["Beneficios"] = _context.Beneficio.ToList();
-            ViewData["SelectedBeneficios"] = tipoExercicio.Beneficios?
-                .Select(b => b.BeneficioId).ToList() ?? new List<int>();
+            if (tipoExercicio == null) return NotFound();
+
+            ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+
+            ViewData["SelectedBeneficios"] = tipoExercicio.TipoExercicioBeneficios?
+                .Select(tb => tb.BeneficioId).ToList() ?? new List<int>();
 
             return View(tipoExercicio);
         }
 
         // POST: TipoExercicio/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
             TipoExercicio tipoExercicio,
-            int[] selectedBeneficios) // ✅ ADICIONADO: Parâmetro para benefícios selecionados
+            int[] selectedBeneficios)
         {
-            if (id != tipoExercicio.TipoExercicioId)
-            {
-                return NotFound();
-            }
+            if (id != tipoExercicio.TipoExercicioId) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // ✅ ADICIONADO: Carrega entidade existente com benefícios
+                   
                     var tipoExercicioExistente = await _context.TipoExercicio
-                        .Include(t => t.Beneficios)
+                        .Include(t => t.TipoExercicioBeneficios)
                         .FirstOrDefaultAsync(t => t.TipoExercicioId == id);
 
-                    if (tipoExercicioExistente == null)
-                    {
-                        return NotFound();
-                    }
+                    if (tipoExercicioExistente == null) return NotFound();
 
-                    // ✅ ADICIONADO: Atualiza propriedades básicas
                     tipoExercicioExistente.NomeTipoExercicios = tipoExercicio.NomeTipoExercicios;
                     tipoExercicioExistente.DescricaoTipoExercicios = tipoExercicio.DescricaoTipoExercicios;
                     tipoExercicioExistente.CaracteristicasTipoExercicios = tipoExercicio.CaracteristicasTipoExercicios;
 
-                    // ✅ ADICIONADO: Atualiza benefícios
-                    tipoExercicioExistente.Beneficios?.Clear();
-                    if (selectedBeneficios != null && selectedBeneficios.Any())
+                    
+                    if (tipoExercicioExistente.TipoExercicioBeneficios != null)
                     {
-                        tipoExercicioExistente.Beneficios ??= new List<Beneficio>();
+                        tipoExercicioExistente.TipoExercicioBeneficios.Clear();
+                    }
+                    else
+                    {
+                        tipoExercicioExistente.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
+                    }
+
+        
+                    if (selectedBeneficios != null)
+                    {
                         foreach (var beneficioId in selectedBeneficios)
                         {
-                            var beneficio = await _context.Beneficio.FindAsync(beneficioId);
-                            if (beneficio != null)
+                            tipoExercicioExistente.TipoExercicioBeneficios.Add(new TipoExercicioBeneficio
                             {
-                                tipoExercicioExistente.Beneficios.Add(beneficio);
-                            }
+                                TipoExercicioId = id,
+                                BeneficioId = beneficioId
+                            });
                         }
                     }
 
@@ -209,25 +197,20 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoExercicioExists(tipoExercicio.TipoExercicioId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!TipoExercicioExists(tipoExercicio.TipoExercicioId)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
 
-            // ✅ ADICIONADO: Recarrega dados em caso de erro
-            ViewData["Beneficios"] = _context.Beneficio.ToList();
-            var tipoExercicioComBeneficios = await _context.TipoExercicio
-                .Include(t => t.Beneficios)
-                .FirstOrDefaultAsync(t => t.TipoExercicioId == id);
-            ViewData["SelectedBeneficios"] = tipoExercicioComBeneficios?.Beneficios?
-                .Select(b => b.BeneficioId).ToList() ?? new List<int>();
+            // Se falhar, recarrega os dados para a View
+            ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+
+            // Precisamos recarregar os que estavam selecionados caso haja erro de validação
+            // Aqui usamos os que vieram do formulário (selectedBeneficios)
+            ViewData["SelectedBeneficios"] = selectedBeneficios != null
+                ? selectedBeneficios.ToList()
+                : new List<int>();
 
             return View(tipoExercicio);
         }
@@ -235,18 +218,14 @@ namespace HealthWellbeing.Controllers
         // GET: TipoExercicio/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var tipoExercicio = await _context.TipoExercicio
-                .Include(t => t.Beneficios) // ✅ ADICIONADO: Carrega benefícios para mostrar relações
+                .Include(t => t.TipoExercicioBeneficios)
+                    .ThenInclude(tb => tb.Beneficio) 
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
-            if (tipoExercicio == null)
-            {
-                return NotFound();
-            }
+
+            if (tipoExercicio == null) return NotFound();
 
             return View(tipoExercicio);
         }
@@ -261,7 +240,6 @@ namespace HealthWellbeing.Controllers
             {
                 _context.TipoExercicio.Remove(tipoExercicio);
             }
-
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
