@@ -3,9 +3,21 @@
 
 @{
     ViewData["Title"] = "Localizações de Dispositivos Médicos";
+    var successMessage = TempData["SuccessMessage"];
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
 
 @if (Model == null || !Model.Items.Any())
 {
