@@ -140,7 +140,33 @@ namespace HealthWellBeingRoom.Data
                     new Room { Name = "Consultório 1", Specialty = "Pediatria", Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas ambulatoriais." },
                     new Room { Name = "Consultório 2", Specialty = "Cardiologia", Location = "Bloco D", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Consultas especializadas." },
                     new Room { Name = "Laboratório", Specialty = "Análises Clínicas", Location = "Bloco E", OperatingHours = "07:00 - 19:00", Status = roomStatuses[0], Notes = "Coleta e exames laboratoriais." },
-                    new Room { Name = "Farmácia", Specialty = "Controle de Medicamentos", Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Armazenamento e dispensação de medicamentos." }
+                    new Room { Name = "Farmácia", Specialty = "Controle de Medicamentos", Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Armazenamento e dispensação de medicamentos." },
+                    new Room { Name = "UTI Neonatal", Specialty = "Neonatologia", Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Cuidados intensivos para recém-nascidos." },
+                    new Room { Name = "Sala de Recuperação", Specialty = "Pós-Operatório", Location = "Bloco B", OperatingHours = "24h", Status = roomStatuses[2], Notes = "Monitoramento pós-cirúrgico." },
+                    new Room { Name = "Sala de Hemodiálise", Specialty = "Nefrologia", Location = "Bloco C", OperatingHours = "06:00 - 22:00", Status = roomStatuses[0], Notes = "Tratamento renal." },
+                    new Room { Name = "Consultório 3", Specialty = "Dermatologia", Location = "Bloco D", OperatingHours = "09:00 - 17:00", Status = roomStatuses[0], Notes = "Tratamento de pele." },
+                    new Room { Name = "Consultório 4", Specialty = "Ginecologia", Location = "Bloco D", OperatingHours = "08:00 - 16:00", Status = roomStatuses[0], Notes = "Consultas femininas." },
+                    new Room { Name = "Sala de Vacinação", Specialty = "Imunologia", Location = "Bloco E", OperatingHours = "08:00 - 18:00", Status = roomStatuses[1], Notes = "Campanhas de vacinação." },
+                    new Room { Name = "Sala de Esterilização", Specialty = "Controle de Infecção", Location = "Bloco F", OperatingHours = "07:00 - 19:00", Status = roomStatuses[3], Notes = "Esterilização de materiais." },
+                    new Room { Name = "Sala de Emergência", Specialty = "Urgência", Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Atendimento imediato." },
+                    new Room { Name = "Sala de Triagem", Specialty = "Classificação de Risco", Location = "Bloco A", OperatingHours = "24h", Status = roomStatuses[0], Notes = "Avaliação inicial de pacientes." },
+                    new Room { Name = "Sala de Endoscopia", Specialty = "Gastroenterologia", Location = "Bloco B", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Exames digestivos." },
+                    new Room { Name = "Sala de Ultrassonografia", Specialty = "Imagem", Location = "Bloco C", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Exames por imagem." },
+                    new Room { Name = "Sala de Tomografia", Specialty = "Radiologia", Location = "Bloco C", OperatingHours = "08:00 - 20:00", Status = roomStatuses[2], Notes = "Tomografias computadorizadas." },
+                    new Room { Name = "Sala de Ressonância", Specialty = "Neurologia", Location = "Bloco C", OperatingHours = "08:00 - 20:00", Status = roomStatuses[0], Notes = "Ressonância magnética." },
+                    new Room { Name = "Consultório 5", Specialty = "Psiquiatria", Location = "Bloco D", OperatingHours = "09:00 - 17:00", Status = roomStatuses[0], Notes = "Atendimento psicológico." },
+                    new Room { Name = "Consultório 6", Specialty = "Endocrinologia", Location = "Bloco D", OperatingHours = "08:00 - 16:00", Status = roomStatuses[0], Notes = "Controle hormonal." },
+                    new Room { Name = "Sala de Coleta", Specialty = "Laboratório", Location = "Bloco E", OperatingHours = "07:00 - 19:00", Status = roomStatuses[0], Notes = "Coleta de amostras." },
+                    new Room { Name = "Sala de Armazenamento", Specialty = "Logística Hospitalar", Location = "Bloco F", OperatingHours = "08:00 - 20:00", Status = roomStatuses[1], Notes = "Estoque de insumos." },
+                    new Room { Name = "Sala de Nutrição", Specialty = "Nutrição Clínica", Location = "Bloco G", OperatingHours = "08:00 - 17:00", Status = roomStatuses[0], Notes = "Avaliação nutricional." },
+                    new Room { Name = "Sala de Fisioterapia", Specialty = "Reabilitação", Location = "Bloco G", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Sessões de fisioterapia." },
+                    new Room { Name = "Sala de Terapia Ocupacional", Specialty = "Reabilitação", Location = "Bloco G", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Atividades terapêuticas." },
+                    new Room { Name = "Sala de Audiometria", Specialty = "Otorrinolaringologia", Location = "Bloco H", OperatingHours = "09:00 - 17:00", Status = roomStatuses[0], Notes = "Testes auditivos." },
+                    new Room { Name = "Sala de Oftalmologia", Specialty = "Visão", Location = "Bloco H", OperatingHours = "09:00 - 17:00", Status = roomStatuses[0], Notes = "Exames oculares." },
+                    new Room { Name = "Sala de Eletrocardiograma", Specialty = "Cardiologia", Location = "Bloco H", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Monitoramento cardíaco." },
+                    new Room { Name = "Sala de Eletroencefalograma", Specialty = "Neurologia", Location = "Bloco H", OperatingHours = "08:00 - 18:00", Status = roomStatuses[0], Notes = "Monitoramento cerebral." },
+                    new Room { Name = "Sala de Curativos", Specialty = "Enfermagem", Location = "Bloco I", OperatingHours = "08:00 - 20:00", Status = roomStatuses[0], Notes = "Tratamento de feridas." },
+                    new Room { Name = "Sala de Isolamento", Specialty = "Controle de Infecção", Location = "Bloco I", OperatingHours = "24h", Status = roomStatuses[2], Notes = "Pacientes com doenças contagiosas." }
                 };
 
                 dbContext.Room.AddRange(rooms);
@@ -237,7 +263,7 @@ namespace HealthWellBeingRoom.Data
                     TypeMaterialID = 1
                 },
                 new MedicalDevice {
-                    Name = "Monitor de Paciente Vital X5", 
+                    Name = "Monitor de Paciente Vital X5",
                     SerialNumber = "MT-VITAL-X5-002",
                     RegistrationDate = DateTime.Now.AddDays(-140),
                     Observation = "Aguardando nova bateria.",
@@ -365,7 +391,7 @@ namespace HealthWellBeingRoom.Data
                 },
                 new MedicalDevice {
                     Name = "Oxímetro de Pulso Portátil",
-                    SerialNumber = "MT-OXI-HAND-02", 
+                    SerialNumber = "MT-OXI-HAND-02",
                     RegistrationDate = DateTime.Now.AddDays(-6),
                     Observation = "Unidade nova, em caixa.",
                     TypeMaterialID = 4
@@ -687,7 +713,7 @@ namespace HealthWellBeingRoom.Data
                 }
                 });
 
-                dbContext.SaveChanges();
+            dbContext.SaveChanges();
         }
 
     }

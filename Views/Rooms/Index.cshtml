@@ -15,13 +15,25 @@
         var attr = member?.GetCustomAttribute<DisplayAttribute>();
         return attr?.Name ?? value.ToString();
     }
+
+    // Função local para definir a cor da bolinha com base no estado da sala
+    string GetStatusColor(Room.RoomStatus status) => status switch
+    {
+        Room.RoomStatus.Disponivel => "bg-success",
+        Room.RoomStatus.Criado => "bg-secondary",
+        Room.RoomStatus.Indisponivel => "bg-danger",
+        Room.RoomStatus.Limpeza => "bg-warning",
+        Room.RoomStatus.Manutencao => "bg-info",
+        Room.RoomStatus.ForaDeServico => "bg-dark",
+        _ => "bg-light"
+    };
 }
 
 <h1 class="mb-4 text-primary">
     <i class="bi bi-houses-fill"></i> Lista de Salas
 </h1>
 
-@* MENSAGEM DE SUCESSO *@
+@* MENSAGENS DE SUCESSO *@
 @if (TempData["successMessageEdit"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -44,11 +56,9 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Salas Registadas</h2>
     <div>
-        <!-- Botão para abrir o formulário de pesquisa -->
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
-        <!-- Botão para criar nova sala -->
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Criar Nova Sala
         </a>
@@ -69,11 +79,11 @@
             <div class="col-md-6">
                 <label for="searchStatus" class="form-label">Estado</label>
                 @Html.DropDownList(
-                "searchStatus",
-                                new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
-                                "Pesquisar pelo estado",
-                                new { @class = "form-select text-muted" }
-                                )
+                    "searchStatus",
+                    new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
+                    "Pesquisar pelo estado",
+                    new { @class = "form-select ", @id= "searchStatus" }
+                )
             </div>
 
             <!-- Segunda linha: Especialidade e Localização -->
@@ -87,17 +97,41 @@
                 <input id="searchLocation" name="searchLocation" value="@ViewBag.SearchLocation" class="form-control" placeholder="Pesquisar pela localização" type="search" />
             </div>
 
-            <!-- Botões -->
-            <div class="col-12 mt-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Pesquisar
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    Limpar
-                </a>
+            <!-- Terceira linha: Horário de funcionamento alinhado à esquerda -->
+            <div class="col-md-6">
+                <label for="searchOperatingHours" class="form-label">Horário de funcionamento</label>
+                <input id="searchOperatingHours" name="searchOperatingHours" value="@ViewBag.SearchOperatingHours" class="form-control" placeholder="Pesquisar pela hora de funcionamento" type="search" />
             </div>
 
+            <!-- Botões alinhados à esquerda e com mesma largura -->
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary flex-fill">Limpar</a>
+            </div>
         </form>
+
+        @* Script para alterar dinamica que altera a cor do estado se selecionado para negrito *@
+        <script>
+            // Aguarda o carregamento completo do DOM
+            document.addEventListener("DOMContentLoaded", function () {
+                // Seleciona o elemento <select> pelo ID
+                const statusSelect = document.getElementById("searchStatus");
+
+                function updateStatusStyle() {
+                    if (statusSelect.value === "") {
+                        statusSelect.classList.add("text-muted");
+                    } else {
+                        statusSelect.classList.remove("text-muted");
+                    }
+                }
+                // Atualiza ao carregar e ao mudar
+                updateStatusStyle();
+                statusSelect.addEventListener("change", updateStatusStyle);
+            });
+        </script>
+
     </div>
 </div>
 
@@ -115,53 +149,39 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Items) // os itens são as salas paginadas
+            @foreach (var item in Model.Items)
             {
+                var color = GetStatusColor(item.Status);
+                var displayName = GetDisplayName(item.Status);
+
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.Specialty)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
                     <td>@Html.DisplayFor(modelItem => item.Location)</td>
                     <td>@Html.DisplayFor(modelItem => item.OperatingHours)</td>
                     <td>
-                        @{
-                            // Define a cor da bolinha com base no estado da sala
-                            var color = item.Status switch
-                            {
-                                Room.RoomStatus.Disponivel => "bg-success",
-                                Room.RoomStatus.Criado => "bg-secondary",
-                                Room.RoomStatus.Indisponivel => "bg-danger",
-                                Room.RoomStatus.Limpeza => "bg-warning",
-                                Room.RoomStatus.Manutencao => "bg-info",
-                                Room.RoomStatus.ForaDeServico => "bg-dark",
-                                _ => "bg-light"
-                            };
-
-                            // Extrai o nome amigável do enum usando DisplayAttribute
-                            var displayName = GetDisplayName(item.Status);
-                        }
-
-                        <!-- Bolinha colorida + nome amigável do estado -->
-                        <span class="rounded-circle d-inline-block me-2 @color" style="width:10px; height:10px;"></span>
+                        <!-- Bolinha colorida com tooltip + nome amigável -->
+                        <span class="rounded-circle d-inline-block me-2 @color" style="width:10px; height:10px;" title="@displayName"></span>
                         @displayName
                     </td>
                     <td class="text-center">
                         <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn btn-sm btn-warning me-1">
-                            <i class="bi bi-pencil-square"></i> Editar
+                            <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
                         </a>
                         <a asp-action="Details" asp-route-id="@item.RoomId" asp-route-fromCreation="false" class="btn btn-sm btn-info me-1">
-                            <i class="bi bi-info-circle-fill"></i> Detalhes
+                            <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
                         </a>
-
                         <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash-fill"></i> Eliminar
+                            <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
                         </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    @* MENSAGEM QUANDO NÃO HÁ SALAS NA PESQUISA *@
-    @if (!Model.Items.Any()) // Verifica se a lista de salas está vazia
+
+    @* MENSAGEM QUANDO NÃO HÁ SALAS *@
+    @if (!Model.Items.Any())
     {
         <div class="alert alert-warning d-flex align-items-center border-2 mt-3" role="alert">
             <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
@@ -174,7 +194,12 @@
 
     <!-- PAGINAÇÃO -->
     <nav aria-label="Room page" class="d-flex justify-content-between align-items-center">
-        <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+        <span>
+            Mostrando @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
+            -
+            @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
+            de @Model.TotalItems
+        </span>
 
         <ul class="pagination mb-0">
             @if (Model.CurrentPage == 1)

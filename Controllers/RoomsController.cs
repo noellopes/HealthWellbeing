@@ -29,7 +29,7 @@ namespace HealthWellbeingRoom.Controllers
 
 
 
-        public async Task<IActionResult> Index(string searchName, string searchStatus, string searchSpecialty, string searchLocation, int page = 1)
+        public async Task<IActionResult> Index(string searchName, string searchStatus, string searchSpecialty, string searchLocation, string searchOperatingHours, int page = 1)
         {
             var allRooms = await _context.Room.ToListAsync();
 
@@ -61,6 +61,14 @@ namespace HealthWellbeingRoom.Controllers
                 var normalizedLocation = RemoveDiacritics.Normalize(searchLocation);
                 allRooms = allRooms
                     .Where(r => RemoveDiacritics.Normalize(r.Location).Contains(normalizedLocation))
+                    .ToList();
+            }
+
+            if (!string.IsNullOrEmpty(searchOperatingHours))
+            {
+                var normalizedOperatingHours = RemoveDiacritics.Normalize(searchOperatingHours);
+                allRooms = allRooms
+                    .Where(r => RemoveDiacritics.Normalize(r.OperatingHours).Contains(searchOperatingHours))
                     .ToList();
             }
 

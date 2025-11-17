@@ -11,57 +11,65 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <div class="mb-3">
-                <label asp-for="Specialty" class="form-label">Especialidade</label>
-                <select asp-for="Specialty" class="form-select">
-                    <option value="">Selecione a especialidade...</option>
-                    <option value="Cardiologia">Cardiologia</option>
-                    <option value="Dermatologia">Dermatologia</option>
-                    <option value="Pediatria">Pediatria</option>
-                    <option value="Ginecologia">Ginecologia</option>
-                    <option value="Urologia">Urologia</option>
-                    <option value="Neurologia">Neurologia</option>
-                    <option value="Psiquiatria">Psiquiatria</option>
-                    <option value="Oftalmologia">Oftalmologia</option>
-                    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-                    <option value="Endocrinologia">Endocrinologia</option>
-                    <option value="Reumatologia">Reumatologia</option>
-                    <option value="Gastroenterologia">Gastroenterologia</option>
-                    <option value="Pneumologia">Pneumologia</option>
-                    <option value="Nefrologia">Nefrologia</option>
-                    <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
-                </select>
+            <!-- Linha 1: Especialidade e Nome -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Specialty" class="form-label">Especialidade</label>
+                    <select asp-for="Specialty" class="form-select">
+                        <option value="">Selecione a especialidade...</option>
+                        <option value="Cardiologia">Cardiologia</option>
+                        <option value="Dermatologia">Dermatologia</option>
+                        <option value="Pediatria">Pediatria</option>
+                        <option value="Ginecologia">Ginecologia</option>
+                        <option value="Urologia">Urologia</option>
+                        <option value="Neurologia">Neurologia</option>
+                        <option value="Psiquiatria">Psiquiatria</option>
+                        <option value="Oftalmologia">Oftalmologia</option>
+                        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+                        <option value="Endocrinologia">Endocrinologia</option>
+                        <option value="Reumatologia">Reumatologia</option>
+                        <option value="Gastroenterologia">Gastroenterologia</option>
+                        <option value="Pneumologia">Pneumologia</option>
+                        <option value="Nefrologia">Nefrologia</option>
+                        <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-bold">Nome</label>
-                <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" />
-                <span asp-validation-for="Name" class="text-danger small"></span>
+            <!-- Linha 2: Localização e Horário de Funcionamento -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Location" class="form-label fw-bold">Localização</label>
+                    <input asp-for="Location" class="form-control" placeholder="Ex: Piso 2, Ala B" />
+                    <span asp-validation-for="Location" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
+                    <input asp-for="OperatingHours" class="form-control" placeholder="Ex: 08:00 - 18:00" />
+                    <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Location" class="form-label fw-bold">Localização</label>
-                <input asp-for="Location" class="form-control" placeholder="Ex: Piso 2, Ala B" />
-                <span asp-validation-for="Location" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
-                <input asp-for="OperatingHours" class="form-control" placeholder="Ex: 08:00 - 18:00" />
-                <span asp-validation-for="OperatingHours" class="text-danger small"></span>
-            </div>
-
+            <!-- Linha 3: Observação -->
             <div class="mb-3">
                 <label asp-for="Notes" class="form-label fw-bold">Observação</label>
                 <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
                 <span asp-validation-for="Notes" class="text-danger small"></span>
             </div>
 
-            <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-success">
+            <!-- Botões lado a lado com mesma largura e botão cinza -->
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-success flex-fill">
                     <i class="bi bi-check-circle-fill"></i> Criar Sala
                 </button>
-                <a asp-action="Index" class="btn btn-outline-secondary">
+                <a asp-action="Index" class="btn btn-secondary flex-fill">
                     <i class="bi bi-arrow-left-circle"></i> Voltar à Lista
                 </a>
             </div>
