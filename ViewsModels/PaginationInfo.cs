@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace HealthWellbeing.Models
 {
     // Usamos <T> para tornar esta classe genérica (serve para Eventos, Livros, etc.)
-    public class PaginationInfo<T>
+    public class PaginationInfoGroup8<T>
     {
         // A lista de itens da página atual
         public IEnumerable<T> Items { get; set; }
@@ -21,7 +21,7 @@ namespace HealthWellbeing.Models
         public int LastPageShow { get; set; }
         private const int DisplayPages = 5; // Quantos números de página mostrar
 
-        public PaginationInfo(IEnumerable<T> items, int totalItems, int pageSize, int currentPage)
+        public PaginationInfoGroup8(IEnumerable<T> items, int totalItems, int pageSize, int currentPage)
         {
             Items = items;
             TotalItems = totalItems;

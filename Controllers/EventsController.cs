@@ -78,7 +78,7 @@ namespace HealthWellbeing.Controllers
                                     .Take(pageSize)
                                     .ToListAsync();
 
-            var paginationInfo = new PaginationInfo<Event>(pagedEvents, totalItems, pageSize, page);
+            var paginationInfo = new PaginationInfoGroup8<Event>(pagedEvents, totalItems, pageSize, page);
 
             return View(paginationInfo);
         }
