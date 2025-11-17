@@ -1,51 +1,89 @@
 ﻿@model HealthWellbeing.Models.ConsumivelFornecedor
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Fornecedores";
 }
 
-<h1>Editar Fornecedores</h1>
+<style>
+    .edit-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="FornecedorId" />
-            <div class="form-group">
-                <label asp-for="NomeEmpresa" class="control-label"></label>
-                <input asp-for="NomeEmpresa" class="form-control" />
-                <span asp-validation-for="NomeEmpresa" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NIF" class="control-label"></label>
-                <input asp-for="NIF" class="form-control" />
-                <span asp-validation-for="NIF" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Morada" class="control-label"></label>
-                <input asp-for="Morada" class="form-control" />
-                <span asp-validation-for="Morada" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telefone" class="control-label"></label>
-                <input asp-for="Telefone" class="form-control" />
-                <span asp-validation-for="Telefone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-3">
-                <input type="submit" value="Guardar" class="btn btn-success" />
-                <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-            </div>
-        </form>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="edit-container">
+    <div class="card">
+        <div class="card-header">
+            ✏️ Editar Zona de Armazenamento
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="FornecedorId" />
+
+                <div class="mb-3">
+                    <label asp-for="NomeEmpresa" class="form-label"></label>
+                    <input asp-for="NomeEmpresa" class="form-control" />
+                    <span asp-validation-for="NomeEmpresa" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NIF" class="form-label"></label>
+                    <input asp-for="NIF" class="form-control" />
+                    <span asp-validation-for="NIF" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Morada" class="form-label"></label>
+                    <input asp-for="Morada" class="form-control" />
+                    <span asp-validation-for="Morada" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Telefone" class="form-label"></label>
+                    <input asp-for="Telefone" class="form-control" />
+                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-spacing">💾 Guardar alterações</button>
+                    <a asp-action="Index" class="btn btn-secondary">⬅️ Voltar</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

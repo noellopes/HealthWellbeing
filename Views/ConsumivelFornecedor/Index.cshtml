@@ -1,51 +1,125 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.ConsumivelFornecedor>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Fornecedores";
 }
-<h1>Lista de Fornecedores</h1>
-<p>
-    <a asp-action="Create" class="btn btn-success">Adicionar Novo</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NomeEmpresa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Morada)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telefone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NomeEmpresa)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Morada)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Telefone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                    <a asp-action="Details" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-success">Ver</a>
-                    <a asp-action="Edit" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-warning">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-danger">Apagar</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<style>
+    .btn-acao {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        padding: 4px 10px;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+<div class="container mt-4">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary mb-0">
+            🧾 Fornecedores
+        </h2>
+        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">Adicionar Novo</a>
+    </div>
+
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="searchNome" value="@ViewBag.SearchNome" class="form-control shadow-sm"
+                       placeholder="Procurar por nome..." />
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="searchTelefone" value="@ViewBag.searchTelefone" class="form-control shadow-sm"
+                       placeholder="Procurar por Telefone..." />
+            </div>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary w-50 me-2">Pesquisar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary w-50">Limpar</a>
+            </div>
+        </div>
+    </form>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            @if (string.IsNullOrEmpty(ViewBag.SearchNome as string) && string.IsNullOrEmpty(ViewBag.SearchLocalizacao as string))
+            {
+                <span>Nenhuma zona de armazenamento registada.</span>
+            }
+            else
+            {
+                <span>Nenhuma zona encontrada com os termos pesquisados.</span>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.NomeEmpresa)</th>
+                        <th>@Html.DisplayNameFor(model => model.Morada)</th>
+                        <th>@Html.DisplayNameFor(model => model.Telefone)</th>
+                        <th>@Html.DisplayNameFor(model => model.Email)</th>
+                        <th class="text-center" style="width: 230px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.NomeEmpresa</td>
+                            <td>@item.Morada</td>
+                            <td>@item.Telefone</td>
+                            <td>@item.Email</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-info text-white me-1 btn-acao">
+                                    Ver
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-warning text-white me-1 btn-acao">
+                                    Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-danger btn-acao">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 4000);
+</script>
+

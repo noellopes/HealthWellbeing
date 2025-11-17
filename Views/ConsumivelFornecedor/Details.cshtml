@@ -1,47 +1,69 @@
 ﻿@model HealthWellbeing.Models.ConsumivelFornecedor
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes";
 }
+<style>
+    .details-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
 
-<h1>Detalhes dos Fornecedores</h1>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeEmpresa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NomeEmpresa)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NIF)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NIF)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Morada)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Morada)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-    </dl>
-</div>
-<div class="form-group mt-3">
-    <a asp-action="Edit" asp-route-id="@Model?.FornecedorId" class="btn btn-success">Editar</a>
-    <a asp-action="Index"class="btn btn-secondary">Voltar</a>
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+</style>
+<div class="details-container">
+    <div class="card">
+        <div class="card-header">
+            📄 Detalhes dos Fornecedores
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.NomeEmpresa)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.NomeEmpresa)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.NIF)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.NIF)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Morada)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Morada)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Telefone)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Telefone)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Email)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Email)</dd>
+            </dl>
+
+            <div class="d-flex justify-content-end">
+                <a asp-action="Edit" asp-route-id="@Model?.FornecedorId" class="btn btn-warning text-white me-2">Editar</a>
+                <a asp-action="Index"class="btn btn-secondary">Voltar</a>
+            </div>
 </div>

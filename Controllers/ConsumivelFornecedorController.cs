@@ -61,9 +61,23 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ConsumivelFornecedor
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchNome = "", string searchTelefone = "")
         {
-            return View(await _context.ConsumivelFornecedor.ToListAsync());
+
+            var fornecedoresQuery = _context.ConsumivelFornecedor.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchNome))
+                fornecedoresQuery = fornecedoresQuery
+                    .Where(f => f.NomeEmpresa.Contains(searchNome));
+
+            if (!string.IsNullOrEmpty(searchTelefone))
+                fornecedoresQuery = fornecedoresQuery
+                    .Where(f => f.Telefone.Contains(searchTelefone));
+
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchContato = searchTelefone;
+
+            return View(await fornecedoresQuery.ToListAsync());
         }
 
         // GET: ConsumivelFornecedor/Details/5
