@@ -14,6 +14,32 @@
         </div>
     </div>
 
+    <!-- Alert Messages -->
+    @if (TempData["AlertMessage"] != null)
+    {
+        var alertType = TempData["AlertType"]?.ToString() ?? "info";
+        var alertClass = alertType switch
+        {
+            "success" => "alert-success",
+            "warning" => "alert-warning",
+            "danger" => "alert-danger",
+            _ => "alert-info"
+        };
+        var iconClass = alertType switch
+        {
+            "success" => "bi-check-circle-fill",
+            "warning" => "bi-exclamation-triangle-fill",
+            "danger" => "bi-x-circle-fill",
+            _ => "bi-info-circle-fill"
+        };
+
+        <div class="alert @alertClass alert-dismissible fade show" role="alert">
+            <i class="bi @iconClass me-2"></i>
+            <strong>@TempData["AlertMessage"]</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
     <!-- Search and Filter Form -->
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">

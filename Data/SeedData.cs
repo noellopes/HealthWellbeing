@@ -540,11 +540,12 @@ internal class SeedData
         }
 
         context.Receita.AddRange(
+            // Receitas Rápidas (5-15 minutos)
             new Receita
             {
-                Nome = "Salada de Frutas",
-                Descricao = "Uma deliciosa salada de frutas.",
-                ModoPreparo = "Misture as frutas em uma tigela.",
+                Nome = "Salada de Frutas Tropical",
+                Descricao = "Salada refrescante com frutas tropicais e mel.",
+                ModoPreparo = "Corte as frutas em cubos. Misture numa tigela grande. Adicione mel a gosto e sirva gelada.",
                 TempoPreparo = 10,
                 Porcoes = 2,
                 Calorias = 150,
@@ -555,9 +556,47 @@ internal class SeedData
             },
             new Receita
             {
-                Nome = "Sopa de Legumes",
-                Descricao = "Sopa nutritiva e saborosa.",
-                ModoPreparo = "Cozinhe os legumes e bata no liquidificador.",
+                Nome = "Vitamina de Banana com Aveia",
+                Descricao = "Bebida saudável e energética para o pequeno-almoço.",
+                ModoPreparo = "Bata a banana com leite no liquidificador. Adicione aveia e mel. Sirva imediatamente.",
+                TempoPreparo = 5,
+                Porcoes = 1,
+                Calorias = 120,
+                Proteinas = 5,
+                HidratosCarbono = 25,
+                Gorduras = 2
+            },
+            new Receita
+            {
+                Nome = "Omelete de Legumes",
+                Descricao = "Omelete nutritiva com vegetais frescos.",
+                ModoPreparo = "Bata os ovos. Adicione cenoura ralada e cebola picada. Frite em frigideira antiaderente.",
+                TempoPreparo = 15,
+                Porcoes = 1,
+                Calorias = 180,
+                Proteinas = 12,
+                HidratosCarbono = 8,
+                Gorduras = 10
+            },
+            new Receita
+            {
+                Nome = "Sanduíche Natural de Frango",
+                Descricao = "Sanduíche leve e saboroso para lanches.",
+                ModoPreparo = "Desfie o frango cozido. Misture com maionese light. Monte no pão integral com alface e tomate.",
+                TempoPreparo = 10,
+                Porcoes = 1,
+                Calorias = 280,
+                Proteinas = 25,
+                HidratosCarbono = 32,
+                Gorduras = 8
+            },
+
+            // Receitas Médias (20-35 minutos)
+            new Receita
+            {
+                Nome = "Sopa de Legumes Caseira",
+                Descricao = "Sopa nutritiva e reconfortante com vegetais frescos.",
+                ModoPreparo = "Refogue cebola e alho. Adicione batata, cenoura e outros legumes picados. Cubra com água e cozinhe por 20 minutos. Bata no liquidificador se desejar.",
                 TempoPreparo = 30,
                 Porcoes = 4,
                 Calorias = 100,
@@ -566,9 +605,176 @@ internal class SeedData
                 Gorduras = 2,
                 RestricoesAlimentarId = new List<int> { 4 }
             },
-            new Receita { Nome = "Arroz Integral", Descricao = "Arroz saudável e rico em fibras.", ModoPreparo = "Cozinhe o arroz com água e sal.", TempoPreparo = 25, Porcoes = 3, Calorias = 130, Proteinas = 4, HidratosCarbono = 28, Gorduras = 1 },
-            new Receita { Nome = "Frango Grelhado", Descricao = "Frango grelhado com temperos.", ModoPreparo = "Tempere o frango e grelhe até dourar.", TempoPreparo = 20, Porcoes = 2, Calorias = 200, Proteinas = 35, HidratosCarbono = 0, Gorduras = 5 },
-            new Receita { Nome = "Vitamina de Banana", Descricao = "Bebida saudável e energética.", ModoPreparo = "Bata a banana com leite no liquidificador.", TempoPreparo = 5, Porcoes = 1, Calorias = 120, Proteinas = 5, HidratosCarbono = 25, Gorduras = 2 }
+            new Receita
+            {
+                Nome = "Arroz Integral com Feijão",
+                Descricao = "Prato clássico português, nutritivo e saboroso.",
+                ModoPreparo = "Cozinhe o arroz integral em água com sal. Prepare o feijão com cebola, alho e louro. Sirva junto.",
+                TempoPreparo = 25,
+                Porcoes = 3,
+                Calorias = 250,
+                Proteinas = 8,
+                HidratosCarbono = 45,
+                Gorduras = 3
+            },
+            new Receita
+            {
+                Nome = "Frango Grelhado com Ervas",
+                Descricao = "Peito de frango grelhado temperado com ervas aromáticas.",
+                ModoPreparo = "Tempere o frango com sal, pimenta, alecrim e alho. Grelhe em frigideira ou grelhador até dourar. Sirva com salada.",
+                TempoPreparo = 20,
+                Porcoes = 2,
+                Calorias = 200,
+                Proteinas = 35,
+                HidratosCarbono = 0,
+                Gorduras = 5
+            },
+            new Receita
+            {
+                Nome = "Bacalhau à Brás",
+                Descricao = "Prato tradicional português com bacalhau desfiado.",
+                ModoPreparo = "Demolhe o bacalhau. Refogue cebola e alho, adicione batata palha e bacalhau desfiado. Misture ovos batidos e finalize com azeitonas.",
+                TempoPreparo = 35,
+                Porcoes = 4,
+                Calorias = 320,
+                Proteinas = 28,
+                HidratosCarbono = 22,
+                Gorduras = 14
+            },
+            new Receita
+            {
+                Nome = "Batata Doce Assada",
+                Descricao = "Acompanhamento saudável e rico em fibras.",
+                ModoPreparo = "Lave as batatas doces. Corte ao meio e tempere com azeite e sal. Asse no forno a 200°C por 30 minutos.",
+                TempoPreparo = 30,
+                Porcoes = 2,
+                Calorias = 150,
+                Proteinas = 3,
+                HidratosCarbono = 32,
+                Gorduras = 2
+            },
+
+            // Receitas Elaboradas (40+ minutos)
+            new Receita
+            {
+                Nome = "Caldo Verde",
+                Descricao = "Sopa tradicional portuguesa com couve e chouriço.",
+                ModoPreparo = "Cozinhe as batatas até ficarem macias. Esmague-as. Adicione a couve cortada finamente e o chouriço em rodelas. Cozinhe por mais 10 minutos.",
+                TempoPreparo = 40,
+                Porcoes = 6,
+                Calorias = 180,
+                Proteinas = 8,
+                HidratosCarbono = 24,
+                Gorduras = 6
+            },
+            new Receita
+            {
+                Nome = "Arroz de Frango",
+                Descricao = "Arroz cremoso com pedaços de frango suculentos.",
+                ModoPreparo = "Refogue o frango em pedaços. Adicione cebola, alho e tomate. Junte o arroz e caldo de galinha. Cozinhe até ficar cremoso.",
+                TempoPreparo = 45,
+                Porcoes = 4,
+                Calorias = 280,
+                Proteinas = 22,
+                HidratosCarbono = 38,
+                Gorduras = 6
+            },
+            new Receita
+            {
+                Nome = "Lasanha de Legumes",
+                Descricao = "Lasanha vegetariana com camadas de legumes e queijo.",
+                ModoPreparo = "Prepare o molho de tomate com legumes. Monte camadas alternando massa, molho, legumes e queijo. Asse no forno por 40 minutos a 180°C.",
+                TempoPreparo = 60,
+                Porcoes = 6,
+                Calorias = 320,
+                Proteinas = 15,
+                HidratosCarbono = 42,
+                Gorduras = 12
+            },
+            new Receita
+            {
+                Nome = "Salmão Assado com Legumes",
+                Descricao = "Prato sofisticado e saudável, rico em ômega-3.",
+                ModoPreparo = "Tempere o salmão com limão, sal e ervas. Disponha numa assadeira com legumes ao redor. Regue com azeite e asse a 200°C por 25 minutos.",
+                TempoPreparo = 35,
+                Porcoes = 2,
+                Calorias = 350,
+                Proteinas = 32,
+                HidratosCarbono = 15,
+                Gorduras = 18
+            },
+            new Receita
+            {
+                Nome = "Feijoada Completa",
+                Descricao = "Prato tradicional brasileiro rico e saboroso.",
+                ModoPreparo = "Cozinhe o feijão preto com carnes de porco. Adicione linguiça, bacon e temperos. Sirva com arroz, couve e laranja.",
+                TempoPreparo = 90,
+                Porcoes = 8,
+                Calorias = 420,
+                Proteinas = 28,
+                HidratosCarbono = 45,
+                Gorduras = 16
+            },
+            new Receita
+            {
+                Nome = "Risotto de Cogumelos",
+                Descricao = "Arroz cremoso italiano com cogumelos frescos.",
+                ModoPreparo = "Refogue cebola em manteiga. Adicione o arroz e vá juntando caldo aos poucos, mexendo sempre. Acrescente cogumelos salteados e queijo parmesão.",
+                TempoPreparo = 40,
+                Porcoes = 4,
+                Calorias = 310,
+                Proteinas = 10,
+                HidratosCarbono = 48,
+                Gorduras = 9
+            },
+            new Receita
+            {
+                Nome = "Empadão de Frango",
+                Descricao = "Torta portuguesa recheada com frango desfiado.",
+                ModoPreparo = "Prepare a massa com farinha, manteiga e ovos. Faça o recheio com frango, azeitonas e ovo cozido. Monte e asse por 45 minutos.",
+                TempoPreparo = 60,
+                Porcoes = 8,
+                Calorias = 380,
+                Proteinas = 18,
+                HidratosCarbono = 35,
+                Gorduras = 20
+            },
+            new Receita
+            {
+                Nome = "Açorda de Marisco",
+                Descricao = "Prato alentejano com pão e marisco.",
+                ModoPreparo = "Cozinhe o marisco. Prepare uma base com pão, alho, coentros e azeite. Adicione o marisco e ovos escalfados.",
+                TempoPreparo = 50,
+                Porcoes = 4,
+                Calorias = 290,
+                Proteinas = 24,
+                HidratosCarbono = 28,
+                Gorduras = 10
+            },
+            new Receita
+            {
+                Nome = "Pudim de Leite Condensado",
+                Descricao = "Sobremesa clássica portuguesa cremosa e doce.",
+                ModoPreparo = "Caramelize uma forma com açúcar. Bata leite condensado, leite e ovos. Despeje na forma e cozinhe em banho-maria por 50 minutos.",
+                TempoPreparo = 70,
+                Porcoes = 8,
+                Calorias = 280,
+                Proteinas = 8,
+                HidratosCarbono = 42,
+                Gorduras = 8
+            },
+            new Receita
+            {
+                Nome = "Polvo à Lagareiro",
+                Descricao = "Polvo assado com batatas e muito azeite.",
+                ModoPreparo = "Cozinhe o polvo até ficar macio. Asse com batatas a murro, alho e azeite abundante no forno a 200°C por 30 minutos.",
+                TempoPreparo = 80,
+                Porcoes = 4,
+                Calorias = 340,
+                Proteinas = 30,
+                HidratosCarbono = 25,
+                Gorduras = 14
+            }
         );
 
         context.SaveChanges();

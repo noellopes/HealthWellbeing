@@ -20,7 +20,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita
-        public async Task<IActionResult> Index(string searchNome, int? minTempoPreparo, int? maxTempoPreparo, int page = 1, int pageSize = 3)
+        public async Task<IActionResult> Index(string searchNome, int? minTempoPreparo, int? maxTempoPreparo, int page = 1, int pageSize = 10)
         {
             // Base query
             var query = _context.Receita
@@ -179,6 +179,9 @@ namespace HealthWellbeing.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                TempData["AlertMessage"] = $"Receita '{receita.Nome}' criada com sucesso!";
+                TempData["AlertType"] = "success";
+
                 return RedirectToAction(nameof(Index));
             }
             return View(receita);
@@ -273,6 +276,9 @@ namespace HealthWellbeing.Controllers
                     }
 
                     await _context.SaveChangesAsync();
+
+                    TempData["AlertMessage"] = $"Receita '{receita.Nome}' atualizada com sucesso!";
+                    TempData["AlertType"] = "warning";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -316,10 +322,14 @@ namespace HealthWellbeing.Controllers
             var receita = await _context.Receita.FindAsync(id);
             if (receita != null)
             {
+                var receitaNome = receita.Nome;
                 _context.Receita.Remove(receita);
+                await _context.SaveChangesAsync();
+                
+                TempData["AlertMessage"] = $"Receita '{receitaNome}' apagada com sucesso!";
+                TempData["AlertType"] = "danger";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
