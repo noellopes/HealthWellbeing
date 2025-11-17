@@ -1,0 +1,133 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfoExercicios<HealthWellbeing.Models.TipoExercicio>
+
+@{
+    ViewData["Title"] = "Tipos de Exercício";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista</h2>
+    <div>
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+            <i class="bi bi-search me-1"></i> Pesquisa
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+        </a>
+    </div>
+</div>
+
+<div class="collapse mb-3" id="searchForm">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchNome" class="form-label">Nome</label>
+                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchDescricao" class="form-label">Descrição</label>
+                <input id="searchDescricao" name="searchDescricao" value="@ViewBag.SearchDescricao" class="form-control" placeholder="Procurar por descrição" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchBeneficio" class="form-label">Benefício</label>
+                <input id="searchBeneficio" name="searchBeneficio" value="@ViewBag.SearchBeneficio" class="form-control" placeholder="Procurar por benefício" />
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Procurar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning">Nenhum tipo de exercício encontrado.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Benefícios</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.NomeTipoExercicios</td>
+                        <td>@item.DescricaoTipoExercicios</td>
+                        <td>
+                            @if (item.Beneficios?.Any() ?? false)
+                            {
+                                @foreach (var b in item.Beneficios.Take(3))
+                                {
+                                    <span class="badge bg-primary me-1 mb-1">@b.NomeBeneficio</span>
+                                }
+                                @if (item.Beneficios.Count > 3)
+                                {
+                                    <span class="badge bg-secondary">+@(item.Beneficios.Count - 3) mais</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Nenhum</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-warning">Editar</a>
+                            <a asp-action="Details" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-info">Detalhes</a>
+                            <a asp-action="Delete" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-danger">Apagar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav>
+            <ul class="pagination">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="1">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                    }
+                }
+
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                }
+            </ul>
+        </nav>
+    </div>
+}

@@ -22,5 +22,14 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Plan> Plan { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Trainer> Trainer { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Training> Training { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Exercicio> Exercicio { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TipoExercicio> TipoExercicio { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Beneficio> Beneficio { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ProblemaSaude> ProblemaSaude { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
+        public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+
     }
 }
