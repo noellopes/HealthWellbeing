@@ -22,6 +22,59 @@
     <a asp-action="Create" class="btn btn-success">Adicionar Novo Terapeuta</a>
 </p>
 
+@* FORMULÁRIO DE PESQUISA *@
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get">
+            <div class="row">
+
+                @* Filtro por Nome *@
+                <div class="col-md-4">
+                    <label class="form-label">Nome</label>
+                    <input type="text"
+                           name="nome"
+                           value="@ViewBag.NomeFiltro"
+                           class="form-control"
+                           placeholder="Pesquisar por nome..." />
+                </div>
+
+                @* Filtro por Especialidade *@
+                <div class="col-md-4">
+                    <label class="form-label">Especialidade</label>
+                    <input type="text"
+                           name="especialidade"
+                           value="@ViewBag.EspecialidadeFiltro"
+                           class="form-control"
+                           placeholder="Pesquisar por especialidade..." />
+                </div>
+
+                @* Filtro por Ativo *@
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="ativo" class="form-select">
+                        <option value="">Todos</option>
+
+                        <option value="true"
+                                selected="@(ViewBag.AtivoFiltro != null && ViewBag.AtivoFiltro == true)">
+                            Ativo
+                        </option>
+
+                        <option value="false"
+                                selected="@(ViewBag.AtivoFiltro != null && ViewBag.AtivoFiltro == false)">
+                            Inativo
+                        </option>
+                    </select>
+                </div>
+
+                @* Botão Filtrar *@
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @* Tabela que lista todos os terapeutas *@
 <table class="table table-striped table-bordered">
     <thead class="table-dark">
@@ -36,7 +89,6 @@
         </tr>
     </thead>
     <tbody>
-        @* Percorre todos os terapeutas do modelo *@
         @foreach (var item in Model)
         {
             <tr>
@@ -55,9 +107,7 @@
                         <span class="badge bg-secondary">Inativo</span>
                     }
                 </td>
-
                 <td>
-                    @* Botões *@
                     <a asp-action="Details" asp-route-id="@item.TerapeutaId" class="btn btn-info btn-sm">Detalhes</a>
                     <a asp-action="Edit" asp-route-id="@item.TerapeutaId" class="btn btn-primary btn-sm">Editar</a>
                     <a asp-action="Delete" asp-route-id="@item.TerapeutaId" class="btn btn-danger btn-sm">Eliminar</a>
@@ -69,7 +119,6 @@
 
 @* Paginação *@
 @{
-    // Valores padrão
     int paginaAtual = ViewBag.Page ?? 1;
     int totalPaginas = ViewBag.TotalPaginas ?? 1;
 }
@@ -79,28 +128,42 @@
     <nav aria-label="Paginação de terapeutas">
         <ul class="pagination justify-content-center">
 
-            @* Botão para a primeira página *@
+            @* Primeira página *@
             <li class="page-item @(paginaAtual == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="1">«</a>
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-nome="@ViewBag.NomeFiltro"
+                   asp-route-especialidade="@ViewBag.EspecialidadeFiltro"
+                   asp-route-ativo="@ViewBag.AtivoFiltro">«</a>
             </li>
 
-            @* Calcula o intervalo de páginas a mostrar *@
+            @* Intervalo dinâmico *@
             @{
                 int startPage = Math.Max(1, paginaAtual - 3);
                 int endPage = Math.Min(totalPaginas, paginaAtual + 3);
             }
 
-            @* Mostra as páginas dentro do intervalo definido *@
             @for (int i = startPage; i <= endPage; i++)
             {
                 <li class="page-item @(i == paginaAtual ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-nome="@ViewBag.NomeFiltro"
+                       asp-route-especialidade="@ViewBag.EspecialidadeFiltro"
+                       asp-route-ativo="@ViewBag.AtivoFiltro">@i</a>
                 </li>
             }
 
-            @* Botão para a última página *@
+            @* Última página *@
             <li class="page-item @(paginaAtual == totalPaginas ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="@totalPaginas">»</a>
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@totalPaginas"
+                   asp-route-nome="@ViewBag.NomeFiltro"
+                   asp-route-especialidade="@ViewBag.EspecialidadeFiltro"
+                   asp-route-ativo="@ViewBag.AtivoFiltro">»</a>
             </li>
         </ul>
     </nav>

@@ -20,24 +20,49 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeuta
-
         [HttpGet]
-        public async Task<IActionResult> Index(string? successMessage = null, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(
+            string? successMessage = null,
+            string? nome = null,
+            string? especialidade = null,
+            bool? ativo = null,
+            int page = 1,
+            int pageSize = 10)
         {
             // Passa mensagem de sucesso (vinda de Create/Edit/Delete)
             ViewBag.SuccessMessage = successMessage;
 
-            // Contagem do numero total de terapeutas existentes
-            int totalRegistos = await _context.Terapeutas.CountAsync();
+            // Query inicial
+            IQueryable<TerapeutaModel> query = _context.Terapeutas.AsQueryable();
 
-            // Calculo do número total de páginas
-            int totalPaginas = totalRegistos == 0 ? 1 : (int)Math.Ceiling((double)totalRegistos / pageSize);
+            // FILTROS
+            if (!string.IsNullOrWhiteSpace(nome))
+            {
+                query = query.Where(t => t.Nome.Contains(nome));
+            }
 
-            // Garantia que o número da página é válido
-            page = Math.Max(1, Math.Min(page, totalPaginas == 0 ? 1 : totalPaginas));
+            if (!string.IsNullOrWhiteSpace(especialidade))
+            {
+                query = query.Where(t => t.Especialidade.Contains(especialidade));
+            }
 
-            // Vai selecionar apenas os terapeutas da página atual
-            var terapeutas = await _context.Terapeutas
+            if (ativo.HasValue)
+            {
+                query = query.Where(t => t.Ativo == ativo.Value);
+            }
+
+            // Contagem após filtragem
+            int totalRegistos = await query.CountAsync();
+
+            // Cálculo do número total de páginas
+            int totalPaginas = totalRegistos == 0 ? 1 :
+                (int)Math.Ceiling((double)totalRegistos / pageSize);
+
+            // Garantir que a página é válida
+            page = Math.Max(1, Math.Min(page, totalPaginas));
+
+            // Aplicar paginação
+            var terapeutas = await query
                 .OrderBy(t => t.Nome)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -49,13 +74,15 @@ namespace HealthWellbeing.Controllers
             ViewBag.TotalRegistos = totalRegistos;
             ViewBag.PageSize = pageSize;
 
-            // lista de terapeutas
+            // Valores dos filtros para manter na View
+            ViewBag.NomeFiltro = nome;
+            ViewBag.EspecialidadeFiltro = especialidade;
+            ViewBag.AtivoFiltro = ativo;
+
             return View(terapeutas);
         }
 
-
         // GET: Terapeuta/Details/5
-
         public async Task<IActionResult> Details(int? id, string? successMessage = null)
         {
             if (id == null)
@@ -76,16 +103,13 @@ namespace HealthWellbeing.Controllers
             return View(terapeutaModel);
         }
 
-
         // GET: Terapeuta/Create
-
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Terapeuta/Create
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TerapeutaId,Nome,Especialidade,Telefone,Email,AnosExperiencia,Ativo")] TerapeutaModel terapeutaModel)
@@ -107,7 +131,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeuta/Edit/5
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -125,7 +148,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Terapeuta/Edit/5
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TerapeutaId,Nome,Especialidade,Telefone,Email,AnosExperiencia,Ativo")] TerapeutaModel terapeutaModel)
@@ -166,7 +188,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Terapeuta/Delete/5
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -186,7 +207,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Terapeuta/Delete/5
-
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -206,9 +226,7 @@ namespace HealthWellbeing.Controllers
             });
         }
 
-
         // Função para verificar se o terapeuta existe
-
         private bool TerapeutaModelExists(int id)
         {
             return _context.Terapeutas.Any(e => e.TerapeutaId == id);
