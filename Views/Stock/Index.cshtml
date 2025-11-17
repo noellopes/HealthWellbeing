@@ -6,6 +6,7 @@
 
 <div class="container mt-4">
 
+    <!-- TÍTULO + BOTÃO -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">
             🏭 Gestão de Stock
@@ -15,6 +16,68 @@
             ➕ Adicionar Stock
         </a>
     </div>
+
+    <!-- ======================= -->
+    <!-- BARRA DE PESQUISA       -->
+    <!-- ======================= -->
+
+    <form method="get" asp-action="Index" class="mb-4">
+
+        <div class="row g-3">
+
+            <!-- Procurar por nome -->
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">🔍</span>
+                    <input type="text"
+                           name="searchNome"
+                           value="@ViewBag.SearchNome"
+                           class="form-control"
+                           placeholder="Procurar por consumível..." />
+                </div>
+            </div>
+
+            <!-- Procurar por zona -->
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">📍</span>
+                    <input type="text"
+                           name="searchZona"
+                           value="@ViewBag.SearchZona"
+                           class="form-control"
+                           placeholder="Procurar por zona..." />
+                </div>
+            </div>
+
+            <!-- Stock crítico -->
+            <div class="col-md-2 d-flex align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="stockCritico"
+                           @(ViewBag.StockCritico ? "checked" : "") />
+
+                    <label class="form-check-label">
+                        ⚠️ Só stock crítico
+                    </label>
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                    Limpar
+                </a>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- ======================= -->
+    <!-- TABELA DE STOCK         -->
+    <!-- ======================= -->
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped shadow-sm">
@@ -31,44 +94,59 @@
             </thead>
 
             <tbody>
+
                 @if (Model == null || !Model.Any())
                 {
+                    <!-- QUANDO NÃO EXISTE STOCK -->
                     <tr>
-                        <td colspan="7" class="text-center text-muted">
-                            Nenhum registo de stock encontrado.
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <h5 class="fw-bold">Nenhum registo de stock encontrado.</h5>
+                            <p>Adicione consumíveis ou configure zonas para começar.</p>
                         </td>
                     </tr>
                 }
                 else
                 {
-                    foreach (var item in Model)
+                    @foreach (var item in Model)
                     {
                         <tr class="text-center">
+
                             <td>@item.Consumivel?.Nome</td>
                             <td>@item.Zona?.Nome</td>
-                            <td>@item.QuantidadeAtual</td>
+
+                            <!-- MARCAR STOCK CRÍTICO -->
+                            <td class="fw-bold @(item.QuantidadeAtual < item.QuantidadeMinima ? "text-danger" : "")">
+                                @item.QuantidadeAtual
+                                @(item.QuantidadeAtual < item.QuantidadeMinima ? " ⚠️" : "")
+                            </td>
+
                             <td>@item.QuantidadeMinima</td>
                             <td>@item.QuantidadeMaxima</td>
                             <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
 
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <a asp-action="Details" asp-route-id="@item.StockId" class="btn btn-info btn-sm text-white px-3">
+                                    <a asp-action="Details" asp-route-id="@item.StockId"
+                                       class="btn btn-info btn-sm text-white px-3">
                                         Ver
                                     </a>
 
-                                    <a asp-action="Edit" asp-route-id="@item.StockId" class="btn btn-warning btn-sm px-3">
+                                    <a asp-action="Edit" asp-route-id="@item.StockId"
+                                       class="btn btn-warning btn-sm px-3">
                                         Editar
                                     </a>
 
-                                    <a asp-action="Delete" asp-route-id="@item.StockId" class="btn btn-danger btn-sm px-3">
+                                    <a asp-action="Delete" asp-route-id="@item.StockId"
+                                       class="btn btn-danger btn-sm px-3">
                                         Eliminar
                                     </a>
                                 </div>
                             </td>
+
                         </tr>
                     }
                 }
+
             </tbody>
         </table>
     </div>

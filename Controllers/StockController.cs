@@ -14,26 +14,84 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // LISTA DE STOCK
-        public IActionResult Index()
+        // =====================================================
+        // Garante que existe Stock criado para cada Consumível
+        // =====================================================
+        private void GarantirStockBase()
         {
-            var stock = _context.Stock
-                .Include(s => s.Consumivel)
-                .Include(s => s.Zona)
-                .ToList();
+            var consumiveis = _context.Consumivel.ToList();
+            var zonas = _context.ZonaArmazenamento.ToList();
 
-            return View(stock);
+            // Se faltar consumíveis ou zonas, não faz nada
+            if (!consumiveis.Any() || !zonas.Any())
+                return;
+
+            var zonaDefault = zonas.First();
+
+            foreach (var c in consumiveis)
+            {
+                bool existeStock = _context.Stock.Any(s => s.ConsumivelID == c.ConsumivelId);
+
+                // Cria stock base caso ainda não exista
+                if (!existeStock)
+                {
+                    _context.Stock.Add(new Stock
+                    {
+                        ConsumivelID = c.ConsumivelId,
+                        ZonaID = zonaDefault.Id,
+                        QuantidadeAtual = 0,
+                        QuantidadeMinima = 5,
+                        QuantidadeMaxima = 100,
+                        DataUltimaAtualizacao = DateTime.Now
+                    });
+                }
+            }
+
+            _context.SaveChanges();
         }
 
-        // CRIAR NOVO STOCK (GET)
+        // ===========================
+        // LISTA + PESQUISA
+        // ===========================
+        public IActionResult Index(string searchNome = "", string searchZona = "", bool stockCritico = false)
+        {
+            GarantirStockBase();
+
+            var query = _context.Stock
+                .Include(s => s.Consumivel)
+                .Include(s => s.Zona)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchNome))
+                query = query.Where(s => s.Consumivel.Nome.Contains(searchNome));
+
+            if (!string.IsNullOrWhiteSpace(searchZona))
+                query = query.Where(s => s.Zona.Nome.Contains(searchZona));
+
+            if (stockCritico)
+                query = query.Where(s => s.QuantidadeAtual < s.QuantidadeMinima);
+
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchZona = searchZona;
+            ViewBag.StockCritico = stockCritico;
+
+            return View(query.ToList());
+        }
+
+        // ===========================
+        // CREATE GET
+        // ===========================
         public IActionResult Create()
         {
             ViewBag.Consumiveis = _context.Consumivel.ToList();
             ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
+
             return View();
         }
 
-        // CRIAR NOVO STOCK (POST)
+        // ===========================
+        // CREATE POST
+        // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stock stock)
@@ -54,7 +112,9 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // DETALHES
+        // ===========================
+        // DETAILS
+        // ===========================
         public IActionResult Details(int id)
         {
             var stock = _context.Stock
@@ -63,18 +123,26 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefault(s => s.StockId == id);
 
             if (stock == null)
-                return NotFound();
+            {
+                TempData["Error"] = "O stock não foi encontrado.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(stock);
         }
 
-        // EDITAR (GET)
+        // ===========================
+        // EDIT GET
+        // ===========================
         public IActionResult Edit(int id)
         {
             var stock = _context.Stock.Find(id);
 
             if (stock == null)
-                return NotFound();
+            {
+                TempData["Error"] = "O stock não existe.";
+                return RedirectToAction(nameof(Index));
+            }
 
             ViewBag.Consumiveis = _context.Consumivel.ToList();
             ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
@@ -82,7 +150,9 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-        // EDITAR (POST)
+        // ===========================
+        // EDIT POST
+        // ===========================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Stock stock)
@@ -106,7 +176,9 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ELIMINAR (GET)
+        // ===========================
+        // DELETE GET
+        // ===========================
         public IActionResult Delete(int id)
         {
             var stock = _context.Stock
@@ -115,12 +187,17 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefault(s => s.StockId == id);
 
             if (stock == null)
-                return NotFound();
+            {
+                TempData["Error"] = "O stock já não existe.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(stock);
         }
 
-        // ELIMINAR (POST)
+        // ===========================
+        // DELETE POST
+        // ===========================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -138,4 +215,3 @@ namespace HealthWellbeing.Controllers
         }
     }
 }
-

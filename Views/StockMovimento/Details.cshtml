@@ -16,23 +16,31 @@
     <div class="card-body">
         <dl class="row mb-0">
 
-            <dt class="col-sm-3 fw-bold text-muted">Consumível</dt>
-            <dd class="col-sm-9">@Model.Stock?.Consumivel?.Nome</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Consumível</dt>
+            <dd class="col-sm-8">
+                @Model.Stock?.Consumivel?.Nome ?? "<i class='text-muted'>Não disponível</i>"
+            </dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Zona de Armazenamento</dt>
-            <dd class="col-sm-9">@Model.Stock?.Zona?.Nome</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Zona de Armazenamento</dt>
+            <dd class="col-sm-8">
+                @Model.Stock?.Zona?.Nome ?? "<i class='text-muted'>Não disponível</i>"
+            </dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Quantidade Comprada</dt>
-            <dd class="col-sm-9">@Model.Quantidade</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Quantidade Comprada</dt>
+            <dd class="col-sm-8">@Model.Quantidade</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
-            <dd class="col-sm-9">@Model.Tipo</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Tipo</dt>
+            <dd class="col-sm-8">@Model.Tipo</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Data</dt>
-            <dd class="col-sm-9">@Model.Data.ToString("dd/MM/yyyy HH:mm")</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Data</dt>
+            <dd class="col-sm-8">@Model.Data.ToString("dd/MM/yyyy HH:mm")</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Descrição</dt>
-            <dd class="col-sm-9">@Model.Descricao</dd>
+            <dt class="col-sm-4 fw-bold text-muted">Descrição</dt>
+            <dd class="col-sm-8">
+                @(!string.IsNullOrWhiteSpace(Model.Descricao)
+                                ? Model.Descricao
+                                : "<i class='text-muted'>Sem descrição</i>")
+            </dd>
 
         </dl>
     </div>
