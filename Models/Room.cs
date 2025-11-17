@@ -57,11 +57,6 @@ namespace HealthWellbeing.Models
         public string? Notes { get; set; }
 
         // Relação com tabela intermediária
-        //garante que ao carregar uma sala, suas localizações de dispositivos médicos móveis associados também sejam carregados
-        public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
-
-        //Relacao com Equipamentos
-        //Garante que ao carregar uma sala, seus equipamentos associados também sejam carregados
-        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
+        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
     }
 }
