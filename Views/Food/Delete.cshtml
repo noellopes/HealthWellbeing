@@ -2,18 +2,21 @@
 @{
     ViewData["Title"] = "Delete Food";
 }
-<h1>Delete Food</h1>
-<p class="text-danger">Are you sure you want to delete this item?</p>
 
-<dl class="row">
-    <dt class="col-sm-3">Name</dt>
-    <dd class="col-sm-9">@Model.Name</dd>
-    <dt class="col-sm-3">Category</dt>
-    <dd class="col-sm-9">@Model.Category?.Name</dd>
-</dl>
+<h1>Delete Food</h1>
+
+<h5>Are you sure you want to delete this food?</h5>
+
+<div class="mb-3">
+    <strong>@Model.Name</strong><br />
+    <span class="text-muted">@Model.Description</span><br />
+    <span>Category: @Model.FoodCategory?.Name</span>
+</div>
 
 <form asp-action="Delete" method="post">
     <input type="hidden" asp-for="FoodId" />
-    <button type="submit" class="btn btn-danger">Delete</button>
+    <button type="submit" class="btn btn-danger" onclick="return confirm('This action cannot be undone. Proceed?');">
+        Delete
+    </button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

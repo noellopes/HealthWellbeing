@@ -5,20 +5,26 @@
 
 <h1 class="mb-3">Foods</h1>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create new</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Food</a>
 </p>
 
 <table class="table table-striped align-middle">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(m => m.First().Name)</th>
-            <th>@Html.DisplayNameFor(m => m.First().Category)</th>
-            <th>@Html.DisplayNameFor(m => m.First().KcalPer100g)</th>
-            <th>@Html.DisplayNameFor(m => m.First().ProteinPer100g)</th>
-            <th>@Html.DisplayNameFor(m => m.First().CarbsPer100g)</th>
-            <th>@Html.DisplayNameFor(m => m.First().FatPer100g)</th>
-            <th class="text-end">Actions</th>
+            <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Description)</th>
+            <th>Category</th>
+            <th style="width:180px;"></th>
         </tr>
     </thead>
     <tbody>
@@ -26,11 +32,8 @@
         {
             <tr>
                 <td>@item.Name</td>
-                <td>@item.Category?.Name</td>
-                <td>@item.KcalPer100g</td>
-                <td>@item.ProteinPer100g</td>
-                <td>@item.CarbsPer100g</td>
-                <td>@item.FatPer100g</td>
+                <td>@item.Description</td>
+                <td>@item.FoodCategory?.Name</td>
                 <td class="text-end">
                     <a asp-action="Details" asp-route-id="@item.FoodId" class="btn btn-sm btn-outline-secondary">Details</a>
                     <a asp-action="Edit" asp-route-id="@item.FoodId" class="btn btn-sm btn-outline-primary">Edit</a>

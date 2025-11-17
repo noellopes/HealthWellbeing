@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index()
         {
             var foods = await _context.Food
-                .Include(f => f.Category)
+                .Include(f => f.FoodCategory)
                 .AsNoTracking()
                 .OrderBy(f => f.Name)
                 .ToListAsync();
@@ -36,7 +36,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var food = await _context.Food
-                .Include(f => f.Category)
+                .Include(f => f.FoodCategory)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.FoodId == id);
 
@@ -119,7 +119,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var food = await _context.Food
-                .Include(f => f.Category)
+                .Include(f => f.FoodCategory)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.FoodId == id);
 

@@ -2,21 +2,24 @@
 @{
     ViewData["Title"] = "Delete Food Portion";
 }
-<h1 class="mb-3">Delete Food Portion</h1>
-<hr />
 
-<h5>Are you sure you want to delete this record?</h5>
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-danger">Are you sure you want to delete this portion?</div>
 
 <dl class="row">
-    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.FoodName)</dt>
-    <dd class="col-sm-10">@Model.FoodName</dd>
+    <dt class="col-sm-3">Food</dt>
+    <dd class="col-sm-9">@Model.Food?.Name</dd>
 
-    <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Amount)</dt>
-    <dd class="col-sm-10">@Model.Amount</dd>
+    <dt class="col-sm-3">Label</dt>
+    <dd class="col-sm-9">@Model.Label</dd>
+
+    <dt class="col-sm-3">Amount</dt>
+    <dd class="col-sm-9">@Model.AmountGramsMl g/ml</dd>
 </dl>
 
-<form asp-action="Delete" method="post">
+<form asp-action="Delete">
     <input type="hidden" asp-for="FoodPortionId" />
     <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

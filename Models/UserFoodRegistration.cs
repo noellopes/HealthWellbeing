@@ -1,37 +1,45 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
     public class UserFoodRegistration
     {
         [Key]
-        public int Id { get; set; }
+        public int UserFoodRegistrationId { get; set; }
 
-        [Required(ErrorMessage = "Name is required")]
-        [StringLength(100, ErrorMessage = "The name must be at most 100 characters long")]
-        public string Name { get; set; }
+        [Required]
+        [Display(Name = "Client")]
+        public string ClientId { get; set; } = string.Empty;
+        public Client? Client { get; set; }
 
-        [Required(ErrorMessage = "User ID is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "User ID must be greater than 0")]
-        public int UserId { get; set; }
+        [Required]
+        [Display(Name = "Food")]
+        public int FoodId { get; set; }
+        public Food? Food { get; set; }
 
-        [Required(ErrorMessage = "Meal date and time is required")]
-        [Display(Name = "Meal Date and Time")]
-        [DataType(DataType.DateTime)]
-        public DateTime MealDateTime { get; set; }
+        [Required]
+        [Display(Name = "Portion")]
+        public int FoodPortionId { get; set; }
+        public FoodPortion? FoodPortion { get; set; }
 
-        [Required(ErrorMessage = "Meal type is required")]
-        [StringLength(20, ErrorMessage = "Meal type must be at most 20 characters long")]
-        public string MealType { get; set; }
+        [Range(0.1, 99.9)]
+        [Display(Name = "Portions Count")]
+        public decimal PortionsCount { get; set; }
 
-        [Required(ErrorMessage = "Food name is required")]
-        [StringLength(100, ErrorMessage = "Food name must be at most 100 characters long")]
-        public string FoodName { get; set; }
+        [Required, StringLength(30)]
+        [Display(Name = "Meal Type")]
+        public string MealType { get; set; } = string.Empty;  // Breakfast, Lunch, etc.
 
-        [Range(0.1, 1000, ErrorMessage = "Quantity must be greater than 0")]
-        public double Quantity { get; set; }
+        [Display(Name = "Date & Time of Meal")]
+        public DateTime MealDateTime { get; set; } = DateTime.Now;
 
-        [StringLength(250, ErrorMessage = "Notes must be at most 250 characters long")]
+        [Display(Name = "Estimated Energy (kcal)")]
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal? EstimatedEnergyKcal { get; set; }
+
+        [StringLength(200)]
         public string? Notes { get; set; }
     }
 }
