@@ -17,7 +17,6 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "Número de Série é obrigatório.")]
         public required string SerialNumber { get; set; }
 
-        [ForeignKey("Room")] // Chave estrangeira para Room
         public int RoomId { get; set; }
 
 
