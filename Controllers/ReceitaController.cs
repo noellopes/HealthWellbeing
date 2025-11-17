@@ -20,12 +20,57 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchNome, int? minTempoPreparo, int? maxTempoPreparo, int page = 1, int pageSize = 10)
         {
-            var receitas = await _context.Receita
+            // Base query
+            var query = _context.Receita
                 .Include(r => r.ReceitaComponentes)
                     .ThenInclude(rc => rc.ComponenteReceita)
+                .AsQueryable();
+
+            // Filter by name (if provided)
+            if (!string.IsNullOrWhiteSpace(searchNome))
+            {
+                var term = searchNome.Trim().ToLower();
+                query = query.Where(r => r.Nome.ToLower().Contains(term) || 
+                                        (r.Descricao != null && r.Descricao.ToLower().Contains(term)));
+            }
+
+            // Filter by preparation time range (if provided)
+            if (minTempoPreparo.HasValue)
+            {
+                query = query.Where(r => r.TempoPreparo >= minTempoPreparo.Value);
+            }
+            if (maxTempoPreparo.HasValue)
+            {
+                query = query.Where(r => r.TempoPreparo <= maxTempoPreparo.Value);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Calculate pagination
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            if (totalPages < 1) totalPages = 1;
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            // Apply pagination and execute query
+            var receitas = await query
+                .OrderBy(r => r.Nome)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            // Pass pagination and filter info to view
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.SearchNome = searchNome ?? string.Empty;
+            ViewBag.MinTempoPreparo = minTempoPreparo;
+            ViewBag.MaxTempoPreparo = maxTempoPreparo;
+
             return View(receitas);
         }
 

@@ -1,80 +1,319 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Receita>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Receitas";
 }
-<h1>Receitas</h1>
-<p>
-<p><a class="btn btn-primary" asp-action="Create">Novo</a></p>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TempoPreparo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Porcoes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Calorias)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Proteinas)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HidratosCarbono)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gorduras)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Nome)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Descricao)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TempoPreparo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Porcoes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Calorias)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Proteinas)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HidratosCarbono)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Gorduras)
-                </td>
-                <td>
 
-                    <div class="btn-group" role="group">
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-3">
+                <i class="bi bi-book"></i> Receitas
+            </h1>
+            <hr />
+        </div>
+    </div>
 
-                        <a asp-action="Details" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-secondary ms-1">Detalhes</a>
-                        <a asp-action="Edit" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-warning ms-1 ">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.ReceitaId" class="btn btn-sm btn-danger ms-1">Apagar</a>
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-search"></i> Pesquisar Receitas</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="searchNome" class="form-label fw-bold">Nome ou Descrição</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="searchNome" 
+                               name="searchNome" 
+                               value="@ViewBag.SearchNome" 
+                               placeholder="Ex: Bolo, Salada..." />
                     </div>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                    <div class="col-md-3">
+                        <label for="minTempoPreparo" class="form-label fw-bold">Tempo Mínimo (min)</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="minTempoPreparo" 
+                               name="minTempoPreparo" 
+                               value="@ViewBag.MinTempoPreparo" 
+                               min="0" 
+                               placeholder="Ex: 10" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="maxTempoPreparo" class="form-label fw-bold">Tempo Máximo (min)</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="maxTempoPreparo" 
+                               name="maxTempoPreparo" 
+                               value="@ViewBag.MaxTempoPreparo" 
+                               min="0" 
+                               placeholder="Ex: 60" />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="btn-group w-100" role="group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search"></i> Pesquisar
+                            </button>
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Limpar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Summary and Create Button -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <p class="text-muted">
+                <strong>@ViewBag.TotalCount</strong> receita(s) encontrada(s)
+                @if (!string.IsNullOrWhiteSpace(ViewBag.SearchNome))
+                {
+                    <span> | Pesquisa: <strong>@ViewBag.SearchNome</strong></span>
+                }
+            </p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-success" asp-action="Create">
+                <i class="bi bi-plus-circle"></i> Nova Receita
+            </a>
+        </div>
+    </div>
+
+    <!-- Receitas Table -->
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Nome)</th>
+                                <th>@Html.DisplayNameFor(model => model.Descricao)</th>
+                                <th class="text-center">
+                                    <i class="bi bi-clock"></i> 
+                                    @Html.DisplayNameFor(model => model.TempoPreparo)
+                                </th>
+                                <th class="text-center">
+                                    <i class="bi bi-people"></i> 
+                                    @Html.DisplayNameFor(model => model.Porcoes)
+                                </th>
+                                <th class="text-center">
+                                    <i class="bi bi-fire"></i> 
+                                    Calorias
+                                </th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Nome</strong>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(item.Descricao))
+                                        {
+                                            if (item.Descricao.Length > 60)
+                                            {
+                                                @(item.Descricao.Substring(0, 60) + "...")
+                                            }
+                                            else
+                                            {
+                                                @item.Descricao
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted fst-italic">Sem descrição</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">@item.TempoPreparo min</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">@item.Porcoes</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-warning text-dark">@item.Calorias kcal</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Details" 
+                                               asp-route-id="@item.ReceitaId" 
+                                               class="btn btn-sm btn-outline-secondary" 
+                                               title="Ver Detalhes">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" 
+                                               asp-route-id="@item.ReceitaId" 
+                                               class="btn btn-sm btn-outline-warning" 
+                                               title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" 
+                                               asp-route-id="@item.ReceitaId" 
+                                               class="btn btn-sm btn-outline-danger" 
+                                               title="Apagar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Nenhuma receita encontrada.</strong>
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchNome) || ViewBag.MinTempoPreparo != null || ViewBag.MaxTempoPreparo != null)
+                    {
+                        <p class="mb-0 mt-2">Tente ajustar os filtros de pesquisa.</p>
+                    }
+                    else
+                    {
+                        <p class="mb-0 mt-2">
+                            <a asp-action="Create" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Criar primeira receita
+                            </a>
+                        </p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <nav aria-label="Paginação de receitas" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Button -->
+                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("Index", new { 
+                           page = ViewBag.CurrentPage - 1, 
+                           searchNome = ViewBag.SearchNome,
+                           minTempoPreparo = ViewBag.MinTempoPreparo,
+                           maxTempoPreparo = ViewBag.MaxTempoPreparo
+                       })"
+                       aria-label="Anterior">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @{
+                    int currentPage = ViewBag.CurrentPage;
+                    int totalPages = ViewBag.TotalPages;
+                    int startPage = Math.Max(1, currentPage - 2);
+                    int endPage = Math.Min(totalPages, currentPage + 2);
+                }
+
+                <!-- First Page -->
+                @if (startPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="@Url.Action("Index", new { 
+                               page = 1, 
+                               searchNome = ViewBag.SearchNome,
+                               minTempoPreparo = ViewBag.MinTempoPreparo,
+                               maxTempoPreparo = ViewBag.MaxTempoPreparo
+                           })">1</a>
+                    </li>
+                    @if (startPage > 2)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                }
+
+                <!-- Page Numbers -->
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" 
+                           href="@Url.Action("Index", new { 
+                               page = i, 
+                               searchNome = ViewBag.SearchNome,
+                               minTempoPreparo = ViewBag.MinTempoPreparo,
+                               maxTempoPreparo = ViewBag.MaxTempoPreparo
+                           })">@i</a>
+                    </li>
+                }
+
+                <!-- Last Page -->
+                @if (endPage < totalPages)
+                {
+                    @if (endPage < totalPages - 1)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    }
+                    <li class="page-item">
+                        <a class="page-link" 
+                           href="@Url.Action("Index", new { 
+                               page = totalPages, 
+                               searchNome = ViewBag.SearchNome,
+                               minTempoPreparo = ViewBag.MinTempoPreparo,
+                               maxTempoPreparo = ViewBag.MaxTempoPreparo
+                           })">@totalPages</a>
+                    </li>
+                }
+
+                <!-- Next Button -->
+                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                    <a class="page-link" 
+                       href="@Url.Action("Index", new { 
+                           page = ViewBag.CurrentPage + 1, 
+                           searchNome = ViewBag.SearchNome,
+                           minTempoPreparo = ViewBag.MinTempoPreparo,
+                           maxTempoPreparo = ViewBag.MaxTempoPreparo
+                       })"
+                       aria-label="Próxima">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Info -->
+        <div class="text-center text-muted mb-4">
+            <small>
+                Página @ViewBag.CurrentPage de @ViewBag.TotalPages
+                (@ViewBag.PageSize itens por página)
+            </small>
+        </div>
+    }
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+    
+    .pagination .page-link {
+        color: #0d6efd;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+</style>
