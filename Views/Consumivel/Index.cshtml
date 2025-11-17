@@ -3,8 +3,6 @@
 
 @model PaginationInfo<Consumivel>
 
-
-
 @{
     ViewData["Title"] = "Consumíveis";
     var successMessage = TempData["SuccessMessage"];
@@ -84,18 +82,31 @@ else
             <thead class="table-light">
                 <tr>
                     <th>Nome</th>
-                    <th>Descrição</th>
                     <th>Categoria</th>
+                    <th>Qtd. Atual</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.Items)
                 {
-                    <tr>
+                    var lowStock = item.QuantidadeAtual < item.QuantidadeMinima ? "table-danger" : "";
+
+                    <tr class="@lowStock">
                         <td>@item.Nome</td>
-                        <td>@item.Descricao</td>
+
                         <td>@item.CategoriaConsumivel?.Nome</td>
+
+                        <td>
+                            @if (item.QuantidadeAtual < item.QuantidadeMinima)
+                            {
+                                <span class="badge bg-danger">@item.QuantidadeAtual</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">@item.QuantidadeAtual</span>
+                            }
+                        </td>
 
                         <td class="text-end">
                             <a asp-action="Edit" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-warning me-1">
