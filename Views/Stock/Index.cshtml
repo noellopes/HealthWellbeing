@@ -34,7 +34,6 @@
                     <tr class="text-center @(stockBaixo ? "table-danger" : "")">
 
                         <td>@item.Consumivel?.Nome</td>
-
                         <td>@item.Zona?.Nome</td>
 
                         <td>
@@ -46,9 +45,7 @@
                         </td>
 
                         <td>@item.QuantidadeMinima</td>
-
                         <td>@item.QuantidadeMaxima</td>
-
                         <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
 
                         <td>
@@ -71,14 +68,6 @@
                         </td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="7" class="text-center text-muted">
-                        Nenhum registo de stock encontrado.
-                    </td>
-                </tr>
             }
         </tbody>
     </table>
