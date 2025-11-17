@@ -1,31 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class TreatmentTypesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private readonly IRecordFilterService<TreatmentType> _filterService;
 
-        public TreatmentTypesController(HealthWellbeingDbContext context)
+        public TreatmentTypesController(HealthWellbeingDbContext context, IRecordFilterService<TreatmentType> filterService) 
         {
             _context = context;
+            _filterService = filterService;
         }
 
         // GET: TreatmentTypes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
-            ViewData["Title"] = "Tipos de tratamentos";
+            // Controla quantos itens por pagina
+            var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<TreatmentType>();
+
+            // Define as propriadades visiveis do modelo
+            IReadOnlyList<string> baseProperties = ["Name", "Description", "EstimatedDuration", "Priority"];
+
+            // Query Base para otimizar as consultas
+            IQueryable<TreatmentType> treatment_types = _context.TreatmentType.AsNoTracking();
+
+            // Aplica filtragem com os parametros atuais
+            treatment_types = _filterService.ApplyFilter(treatment_types, searchBy, searchString);
+            treatment_types = _filterService.ApplySorting(treatment_types, sortOrder);
+
+            // Popula os dados necessarios a view
+            ViewData["Title"] = "Tipos de Tratamento";
             ViewBag.ModelType = typeof(TreatmentType);
-            ViewBag.Properties = new List<string> { "Name", "Description", "EstimatedDuration", "Priority" };
-            return View("~/Views/Shared/Group1/Actions/Index.cshtml", await _context.TreatmentType.ToListAsync());
+            ViewBag.Properties = baseProperties.ToList();
+            ViewBag.SearchProperties = _filterService.SearchableProperties;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.CurrentSearchBy = searchBy;
+            ViewBag.CurrentSearchString = searchString;
+            ViewBag.CurrentPage = page;
+
+            // Aplica paginação e devolve a view com o modelo paginado
+            var paginatedList = await PaginatedList<TreatmentType>.CreateAsync(treatment_types, page, MAX_ITEMS_PER_PAGE);
+            return View(paginatedList);
         }
 
         // GET: TreatmentTypes/Details/5
@@ -63,9 +85,6 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(treatmentType);
                 await _context.SaveChangesAsync();
-                TempData["AlertType"] = "success";
-                TempData["IconClass"] = "bi bi-check-circle";
-                TempData["Message"] = "Treatment type created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             return View(treatmentType);

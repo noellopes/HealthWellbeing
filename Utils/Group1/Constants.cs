@@ -11,6 +11,7 @@ namespace HealthWellbeing.Utils.Group1
         private static readonly Dictionary<Type, int> _maxItemsPerPage = new() {
             { typeof(TreatmentRecord), 1 },
             { typeof(Pathology), 5 },
+            { typeof(TreatmentType), 5 },
         };
 
         public static readonly AlertItem DEFAULT_NO_CONFIG_ALERT = new AlertItem
