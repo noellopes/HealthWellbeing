@@ -210,14 +210,32 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var room = await _context.Room.FindAsync(id);
-            if (room != null)
+            // Carrega a sala com os equipamentos associados
+            var room = await _context.Room
+                .Include(r => r.Equipments) // Inclui os equipamentos ligados à sala
+                .FirstOrDefaultAsync(r => r.RoomId == id);
+
+            // Verifica se a sala existe
+            if (room == null)
             {
-                _context.Room.Remove(room);
-                //Notificação de remocao com sucesso
-                TempData["SuccessMessageDelete"] = $"Sala \"{room.Name}\" Eliminada com sucesso!";
-                await _context.SaveChangesAsync();
+                TempData["ErrorMessageDelete"] = "Sala não encontrada.";
+                return RedirectToAction(nameof(Index));
             }
+
+            // Verifica se a sala tem equipamentos associados
+            if (room.Equipments.Any())
+            {
+                TempData["ErrorMessageDelete"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Remove a sala do contexto
+            _context.Room.Remove(room);
+
+            // Notificação de remoção com sucesso
+            TempData["SuccessMessageDelete"] = $"Sala \"{room.Name}\" eliminada com sucesso!";
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 

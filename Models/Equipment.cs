@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -16,7 +17,9 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "Número de Série é obrigatório.")]
         public required string SerialNumber { get; set; }
 
+        [ForeignKey("Room")] // Chave estrangeira para Room
         public int RoomId { get; set; }
+
 
         public Room? Room { get; set; }
 

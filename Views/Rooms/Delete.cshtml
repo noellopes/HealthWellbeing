@@ -9,6 +9,18 @@
     @ViewData["Title"]
 </h1>
 
+@* MENSAGEM DE ERRO SE O ROOM NÃO PODE SER ELIMINADO POR TER RELAÇÕES DE EQUIPAMENTOS *@
+
+@if (TempData["errorMessageDelete"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["errorMessageDelete"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
 <div class="card shadow-sm">
 
     <div class="card-header bg-danger text-white">
