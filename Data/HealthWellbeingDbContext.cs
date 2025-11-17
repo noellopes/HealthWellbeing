@@ -16,6 +16,12 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Member> Member { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Client> Client { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TrainingType> TrainingType { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Plan> Plan { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Trainer> Trainer { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Training> Training { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Exercicio> Exercicio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Beneficio> Beneficio { get; set; } = default!;

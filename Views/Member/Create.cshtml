@@ -1,0 +1,59 @@
+﻿@model HealthWellbeing.Models.Member
+
+@{
+    ViewData["Title"] = "Confirm New Membership";
+    // Retrieve Client Name passed from the controller (MemberController.cs)
+    string clientName = ViewBag.ClientName as string ?? "Error: Client Name Not Found";
+}
+
+<h1 class="display-4 text-info mb-4"><i class="bi bi-person-plus-fill"></i> Confirm New Membership</h1>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4">
+            <h4 class="card-title text-info">Membership Registration</h4>
+            <hr class="mb-4" />
+
+            <div class="alert alert-primary mb-4" role="alert">
+                <p class="lead mb-1">
+                    Please confirm that you want to **create a new membership record** for the client below.
+                </p>
+                <p class="mb-0">
+                    No further details are required for this basic membership link.
+                </p>
+            </div>
+
+            <div class="mb-3 p-3 border rounded bg-light">
+                <p class="fw-bold mb-1">Client Name:</p>
+                <span class="fs-5 text-dark">@clientName</span>
+
+                <p class="fw-bold mb-1 mt-2">Client ID:</p>
+                <span class="text-muted">@Model.ClientId</span>
+            </div>
+
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="ClientId" />
+
+                <div class="mb-3 d-flex justify-content-between pt-3">
+                    <button type="submit" class="btn btn-success btn-lg shadow">
+                        <i class="bi bi-check-circle"></i> Confirm and Create Member
+                    </button>
+
+                    <a asp-controller="Client" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        // Include validation scripts even though we only have a hidden field,
+        // in case more fields are added later.
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

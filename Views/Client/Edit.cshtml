@@ -1,19 +1,21 @@
 ﻿@model HealthWellbeing.Models.Client
 
 @{
-    ViewData["Title"] = "Register New Client";
+    ViewData["Title"] = "Edit Client";
 }
 
-<h1 class="display-4 text-primary mb-4">Register New Client</h1>
+<h1 class="display-4 text-primary mb-4">Edit Client</h1>
 
-<h4 class="mb-3">Enter Client Details</h4>
+<h4 class="mb-3">Client Details</h4>
 <hr class="mb-4" />
 
 <div class="row justify-content-center">
     <div class="col-lg-6 col-md-8">
         <div class="card shadow-lg p-4">
-            <form asp-action="Create">
+            <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="ClientId" />
 
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label fw-bold"></label>
@@ -51,7 +53,7 @@
                     <span asp-validation-for="Gender" class="text-danger"></span>
                 </div>
                 <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Register Client" class="btn btn-primary btn-lg shadow" />
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
 
                     <a asp-action="Index" class="btn btn-secondary btn-lg">
                         <i class="bi bi-arrow-left"></i> Back to List

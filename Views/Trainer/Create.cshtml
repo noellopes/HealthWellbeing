@@ -1,12 +1,12 @@
-﻿@model HealthWellbeing.Models.Client
+﻿@model HealthWellbeing.Models.Trainer
 
 @{
-    ViewData["Title"] = "Register New Client";
+    ViewData["Title"] = "Register New Trainer";
 }
 
-<h1 class="display-4 text-primary mb-4">Register New Client</h1>
+<h1 class="display-4 text-primary mb-4">Register New Trainer</h1>
 
-<h4 class="mb-3">Enter Client Details</h4>
+<h4 class="mb-3">Enter Trainer Details</h4>
 <hr class="mb-4" />
 
 <div class="row justify-content-center">
@@ -22,6 +22,12 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="Speciality" class="form-label fw-bold"></label>
+                    <input asp-for="Speciality" class="form-control" />
+                    <span asp-validation-for="Speciality" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
                     <label asp-for="Email" class="form-label fw-bold"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -33,25 +39,8 @@
                     <span asp-validation-for="Phone" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label fw-bold"></label>
-                    <input asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="BirthDate" class="form-label fw-bold"></label>
-                    <input asp-for="BirthDate" type="date" class="form-control" />
-                    <span asp-validation-for="BirthDate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Gender" class="form-label fw-bold"></label>
-                    <input asp-for="Gender" class="form-control" />
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
                 <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Register Client" class="btn btn-primary btn-lg shadow" />
+                    <input type="submit" value="Register Trainer" class="btn btn-primary btn-lg shadow" />
 
                     <a asp-action="Index" class="btn btn-secondary btn-lg">
                         <i class="bi bi-arrow-left"></i> Back to List
