@@ -14,8 +14,5 @@ namespace HealthWellbeing.Models
 
 
         public string Tipo_de_sala { get; set; }
-
-        [StringLength(500)]
-
     }
 }
