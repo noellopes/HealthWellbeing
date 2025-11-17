@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,10 +21,56 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Client
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "", string searchMember = "")
         {
-			return View(await _context.Client.Include(c => c.Membership).ToListAsync());
-		}
+            var clientsQuery = _context.Client
+                .Include(c => c.Membership)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                clientsQuery = clientsQuery.Where(c => c.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchPhone))
+            {
+                clientsQuery = clientsQuery.Where(c => c.Phone.Contains(searchPhone));
+            }
+
+            if (!string.IsNullOrEmpty(searchEmail))
+            {
+                clientsQuery = clientsQuery.Where(c => c.Email.Contains(searchEmail));
+            }
+
+            if (!string.IsNullOrEmpty(searchMember))
+            {
+                if (searchMember == "Yes")
+                {
+                    clientsQuery = clientsQuery.Where(c => c.Membership != null);
+                }
+                else if (searchMember == "No")
+                {
+                    clientsQuery = clientsQuery.Where(c => c.Membership == null);
+                }
+            }
+
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchPhone = searchPhone;
+            ViewBag.SearchEmail = searchEmail;
+            ViewBag.SearchMember = searchMember;
+
+            int numberClients = await clientsQuery.CountAsync();
+
+            var clientsInfo = new PaginationInfo<Client>(page, numberClients, 5);
+
+            clientsInfo.Items = await clientsQuery
+                .OrderBy(c => c.Name)
+                .Skip(clientsInfo.ItemsToSkip)
+                .Take(clientsInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(clientsInfo);
+        }
 
         // GET: Client/Details/5
         public async Task<IActionResult> Details(string id)
