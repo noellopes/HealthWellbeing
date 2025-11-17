@@ -20,7 +20,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita
-        public async Task<IActionResult> Index(string searchNome, int? minTempoPreparo, int? maxTempoPreparo, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string searchNome, int? minTempoPreparo, int? maxTempoPreparo, int page = 1, int pageSize = 3)
         {
             // Base query
             var query = _context.Receita
