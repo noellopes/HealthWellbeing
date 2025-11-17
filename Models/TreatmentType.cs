@@ -9,19 +9,25 @@ namespace HealthWellbeing.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Name is Required!!")]
+        [Required(ErrorMessage = "O nome é obrigatório!")]
+        [StringLength(50, ErrorMessage = "O nome deve ter no máximo 50 caracteres.")]
+        [Display(Name = "Nome")]
         public required string Name { get; set; }
 
-        [Required(ErrorMessage = "Description is Required!!")]
+        [Required(ErrorMessage = "A descrição é obrigatória!")]
+        [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
+        [Display(Name = "Descrição")]
         public required string Description { get; set; }
 
-        [Required(ErrorMessage = "EstimatedDuration is Required!!")]
+        [Required(ErrorMessage = "A duração estimada é obrigatória!")]
+        [Range(1, 480, ErrorMessage = "A duração estimada deve estar entre 1 e 480 minutos.")]
+        [Display(Name = "Duração Estimada")]
         public required int EstimatedDuration { get; set; }
 
-        [Required(ErrorMessage = "Priority is Required!!")]
+        [Required(ErrorMessage = "A prioridade é obrigatória!")]
+        [Display(Name = "Prioridade")]
         public string? Priority { get; set; }         //Se é Urgente, Normal, Rotina
 
     }
 
-
-    }
+}
