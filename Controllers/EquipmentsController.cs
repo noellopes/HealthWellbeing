@@ -81,8 +81,7 @@ namespace HealthWellbeingRoom.Controllers
             var equipmentInfo = new RPaginationInfo<Equipment>(page, await equipmentQuery.CountAsync());
             equipmentInfo.Items = await equipmentQuery
                 .OrderBy(e => e.Name)
-                //.Skip(equipmentInfo.ItemsToSkip)
-                .Skip((page - 1) * equipmentInfo.ItemsPerPage)
+                .Skip(equipmentInfo.ItemsToSkip)
                 .Take(equipmentInfo.ItemsPerPage)
                 .ToListAsync();
 
