@@ -21,15 +21,33 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: TypeMaterials
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchName = "",
+            string searchDescription = "")
         {
             int itemsPerPage = 7;
-            int totalItems = await _context.TypeMaterial.CountAsync();
 
+            // Query base
+            var query = _context.TypeMaterial.AsQueryable();
+
+            // FILTROS
+            if (!string.IsNullOrEmpty(searchName))
+                query = query.Where(t => t.Name.Contains(searchName));
+
+            if (!string.IsNullOrEmpty(searchDescription))
+                query = query.Where(t => t.Description.Contains(searchDescription));
+
+            // Guardar valores dos filtros para a View
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchDescription = searchDescription;
+
+            // PAGINAÇÃO
+            int totalItems = await query.CountAsync();
             var pagination = new RPaginationInfo<TypeMaterial>(page, totalItems, itemsPerPage);
 
-            pagination.Items = await _context.TypeMaterial
-                .OrderBy(m => m.Name)
+            pagination.Items = await query
+                .OrderBy(t => t.Name)
                 .Skip(pagination.ItemsToSkip)
                 .Take(itemsPerPage)
                 .ToListAsync();
@@ -40,17 +58,12 @@ namespace HealthWellbeingRoom.Controllers
         // GET: TypeMaterials/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var typeMaterial = await _context.TypeMaterial
                 .FirstOrDefaultAsync(m => m.TypeMaterialID == id);
-            if (typeMaterial == null)
-            {
-                return NotFound();
-            }
+
+            if (typeMaterial == null) return NotFound();
 
             return View(typeMaterial);
         }
@@ -81,16 +94,11 @@ namespace HealthWellbeingRoom.Controllers
         // GET: TypeMaterials/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var typeMaterial = await _context.TypeMaterial.FindAsync(id);
-            if (typeMaterial == null)
-            {
-                return NotFound();
-            }
+            if (typeMaterial == null) return NotFound();
+
             return View(typeMaterial);
         }
 
@@ -99,8 +107,7 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
-            if (id != typeMaterial.TypeMaterialID)
-                return NotFound();
+            if (id != typeMaterial.TypeMaterialID) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -114,7 +121,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TypeMaterialExists(typeMaterial.TypeMaterialID))
+                    if (!_context.TypeMaterial.Any(e => e.TypeMaterialID == typeMaterial.TypeMaterialID))
                         return NotFound();
                     else
                         throw;
@@ -127,17 +134,12 @@ namespace HealthWellbeingRoom.Controllers
         // GET: TypeMaterials/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var typeMaterial = await _context.TypeMaterial
                 .FirstOrDefaultAsync(m => m.TypeMaterialID == id);
-            if (typeMaterial == null)
-            {
-                return NotFound();
-            }
+
+            if (typeMaterial == null) return NotFound();
 
             return View(typeMaterial);
         }
@@ -156,11 +158,6 @@ namespace HealthWellbeingRoom.Controllers
 
             TempData["SuccessMessage"] = "Tipo de material eliminado com sucesso!";
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TypeMaterialExists(int id)
-        {
-            return _context.TypeMaterial.Any(e => e.TypeMaterialID == id);
         }
     }
 }
