@@ -173,35 +173,30 @@ internal class SeedData
         new Plan
         {
             Name = "Basic Wellness Plan",
-            Description = "A beginner-friendly plan including 3 workouts per week focused on flexibility and general health.",
             Price = 29.99m,
             DurationDays = 30
         },
         new Plan
         {
             Name = "Advanced Fitness Plan",
-            Description = "An intensive 6-week plan designed for strength, endurance, and fat loss.",
             Price = 59.99m,
             DurationDays = 45
         },
         new Plan
         {
             Name = "Mind & Body Balance",
-            Description = "A 2-month program combining yoga, meditation, and Pilates for mental and physical harmony.",
             Price = 79.99m,
             DurationDays = 60
         },
         new Plan
         {
             Name = "Ultimate Transformation Plan",
-            Description = "A 3-month premium plan featuring personal coaching, nutrition guidance, and high-intensity training.",
             Price = 99.99m,
             DurationDays = 90
         },
         new Plan
         {
             Name = "Corporate Health Boost",
-            Description = "A 1-month team-focused plan to improve workplace wellness, stress management, and physical activity.",
             Price = 49.99m,
             DurationDays = 30
         }
@@ -221,7 +216,6 @@ internal class SeedData
         new Trainer
         {
             Name = "John Smith",
-            Speciality = "HIIT (High Intensity Interval Training)",
             Email = "john.smith@fitnesspro.com",
             Phone = "555-1112233",
             BirthDate = new DateTime(1988, 7, 10),
@@ -230,7 +224,6 @@ internal class SeedData
         new Trainer
         {
             Name = "Emma Johnson",
-            Speciality = "Strength Training",
             Email = "emma.johnson@strongfit.net",
             Phone = "555-2223344",
             BirthDate = new DateTime(1992, 11, 25),
@@ -239,7 +232,6 @@ internal class SeedData
         new Trainer
         {
             Name = "Carlos Mendes",
-            Speciality = "Yoga Basics",
             Email = "carlos.mendes@yogabalance.org",
             Phone = "555-3334455",
             BirthDate = new DateTime(1975, 4, 1),
@@ -248,7 +240,6 @@ internal class SeedData
         new Trainer
         {
             Name = "Sophie Lee",
-            Speciality = "Pilates Core Strength",
             Email = "sophie.lee@corewellness.com",
             Phone = "555-4445566",
             BirthDate = new DateTime(1996, 2, 14),
@@ -257,7 +248,6 @@ internal class SeedData
         new Trainer
         {
             Name = "Maria Rodriguez",
-            Speciality = "Zumba Dance",
             Email = "maria.rodriguez@zumbafit.com",
             Phone = "555-5557788",
             BirthDate = new DateTime(1985, 9, 30),

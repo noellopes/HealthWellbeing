@@ -24,12 +24,6 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Speciality" class="form-label fw-bold"></label>
-                    <input asp-for="Speciality" class="form-control" />
-                    <span asp-validation-for="Speciality" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="Email" class="form-label fw-bold"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
@@ -39,6 +33,29 @@
                     <label asp-for="Phone" class="form-label fw-bold"></label>
                     <input asp-for="Phone" class="form-control" />
                     <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Address" class="form-label fw-bold"></label>
+                    <input asp-for="Address" class="form-control" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="BirthDate" class="form-label fw-bold"></label>
+                    <input asp-for="BirthDate" class="form-control" type="date" />
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Gender" class="form-label fw-bold"></label>
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">-- Select Gender --</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3 d-flex justify-content-between pt-2">

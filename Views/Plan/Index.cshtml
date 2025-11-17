@@ -19,9 +19,6 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th class="d-none d-md-table-cell">
-                    @Html.DisplayNameFor(model => model.Description)
-                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Price)
                 </th>
@@ -39,9 +36,6 @@
                 <tr>
                     <td class="fw-bold">
                         @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td class="d-none d-md-table-cell text-truncate" style="max-width: 200px;">
-                        @Html.DisplayFor(modelItem => item.Description)
                     </td>
                     <td>
                         @string.Format("{0:C}", item.Price)

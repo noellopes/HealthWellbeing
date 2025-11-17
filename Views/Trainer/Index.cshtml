@@ -19,14 +19,20 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th class="d-none d-md-table-cell">
-                    @Html.DisplayNameFor(model => model.Speciality)
-                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Email)
                 </th>
                 <th class="d-none d-sm-table-cell">
                     @Html.DisplayNameFor(model => model.Phone)
+                </th>
+                <th class="d-none d-xl-table-cell">
+                    @Html.DisplayNameFor(model => model.Address)
+                </th>
+                <th class="d-none d-lg-table-cell">
+                    @Html.DisplayNameFor(model => model.BirthDate)
+                </th>
+                <th class="d-none d-xl-table-cell">
+                    @Html.DisplayNameFor(model => model.Gender)
                 </th>
                 <th>
                     Actions
@@ -40,9 +46,6 @@
                     <td class="fw-bold">
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-                    <td class="d-none d-md-table-cell">
-                        @Html.DisplayFor(modelItem => item.Speciality)
-                    </td>
                     <td>
                         <a href="mailto:@item.Email" class="text-decoration-none">
                             @Html.DisplayFor(modelItem => item.Email)
@@ -50,6 +53,15 @@
                     </td>
                     <td class="d-none d-sm-table-cell">
                         @Html.DisplayFor(modelItem => item.Phone)
+                    </td>
+                    <td class="d-none d-xl-table-cell">
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td class="d-none d-lg-table-cell">
+                        @Html.DisplayFor(modelItem => item.BirthDate)
+                    </td>
+                    <td class="d-none d-xl-table-cell">
+                        @Html.DisplayFor(modelItem => item.Gender)
                     </td>
                     <td class="text-nowrap">
                         <a asp-action="Edit" asp-route-id="@item.TrainerId" class="btn btn-sm btn-outline-primary me-1">Edit</a>

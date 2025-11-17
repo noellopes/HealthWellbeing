@@ -52,7 +52,7 @@ namespace HealthWellbeing.Controllers
 		// POST: Plan/Create
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Name,Description,Price,DurationDays")] Plan plan)
+		public async Task<IActionResult> Create([Bind("Name,Price,DurationDays")] Plan plan)
 		{
 			if (ModelState.IsValid)
 			{
@@ -82,7 +82,7 @@ namespace HealthWellbeing.Controllers
 		// POST: Plan/Edit/5
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, [Bind("PlanId,Name,Description,Price,DurationDays")] Plan plan)
+		public async Task<IActionResult> Edit(int id, [Bind("PlanId,Name,Price,DurationDays")] Plan plan)
 		{
 			if (id != plan.PlanId)
 			{
