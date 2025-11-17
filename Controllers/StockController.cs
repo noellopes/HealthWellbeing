@@ -32,7 +32,6 @@ namespace HealthWellbeing.Controllers
             {
                 bool existeStock = _context.Stock.Any(s => s.ConsumivelID == c.ConsumivelId);
 
-                // Cria stock base caso ainda não exista
                 if (!existeStock)
                 {
                     _context.Stock.Add(new Stock
@@ -85,7 +84,6 @@ namespace HealthWellbeing.Controllers
         {
             ViewBag.Consumiveis = _context.Consumivel.ToList();
             ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
-
             return View();
         }
 
