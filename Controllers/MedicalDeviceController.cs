@@ -73,6 +73,14 @@ namespace HealthWellBeingRoom.Controllers
             //Atribuir os itens à paginação
             paginationInfo.Items = listaDeDispositivos;
 
+            // 1. Carregar Tipos de Material para o Dropdown
+            // Usamos 'Name' como valor submetido e texto visível
+            ViewBag.TypeMaterialList = new SelectList(await _context.TypeMaterial.OrderBy(t => t.Name).ToListAsync(),"Name","Name",searchType);
+
+            // 2. Carregar Salas para o Dropdown
+            // Usamos 'Name' como valor submetido e texto visível
+            ViewBag.RoomList = new SelectList(await _context.Room.OrderBy(s => s.Name).ToListAsync(),"Name","Name",searchRoom);
+
             //Retornar para a view
             return View(paginationInfo);
         }

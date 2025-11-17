@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeingRoom.Models
-@model HealthWellbeing.ViewModels.RPaginationInfo<MedicalDevice> 
+@model HealthWellbeing.ViewModels.RPaginationInfo<MedicalDevice>
 
 @{
     ViewData["Title"] = "Dispositivos Médicos Registados";
@@ -19,67 +19,67 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-@* Usamos Model.Items para verificar se há dados na página atual *@
-@if (Model == null || !Model.Items.Any())
+@* --- AÇÕES PRINCIPAIS (Registar e Pesquisar) --- *@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista de Dispositivos</h2>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Registar Novo
+        </a>
+    </div>
+</div>
+
+@* --- FORMULÁRIO DE PESQUISA (Seu código existente) --- *@
+<div class="collapse mt-2 mb-2" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchName" class="form-label">Nome</label>
+                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+            </div>
+            <div class="col-md-4">
+                <label for="searchType" class="form-label">Tipo</label>
+                <select id="searchType" name="searchType" class="form-control" asp-items="ViewBag.TypeMaterialList">
+                    <option value="">-- Todos os Tipos --</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="searchRoom" class="form-label">Sala</label>
+                <select id="searchRoom" name="searchRoom" class="form-control" asp-items="ViewBag.RoomList">
+                    <option value="">-- Todas as Salas --</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* --- RESULTADOS DA PESQUISA --- *@
+@if (!Model.Items.Any())
 {
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+    // Exibe a mensagem de aviso se não houver itens (após pesquisa ou lista geral)
+    <div class="alert alert-warning d-flex align-items-center border-2 mt-4" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
         <div class="ps-3">
             <h4 class="alert-heading">Nenhum Dispositivo Encontrado</h4>
-            <p>Não há dispositivos médicos registados na base de dados.</p>
+            <p>Não há dispositivos que correspondam aos filtros de pesquisa ou registados na base de dados.</p>
         </div>
     </div>
-
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i> Registar Novo
-    </a>
-
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
-    </a>
 }
 else
 {
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Dispositivos</h2>
-        <div class="d-flex justify-content-end">
-            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
-                <i class="bi bi-search me-1"></i> Pesquisar
-            </a>
-            <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i> Registar Novo
-            </a>
-        </div>
-    </div>
-
-    <div class="collapse mt-2 mb-2" id="postSearch">
-        <div class="card card-body">
-            <form asp-action="Index" method="get" class="row g-2 align-items-end">
-                <div class="col-md-4">
-                    <label for="searchName" class="form-label">Nome</label>
-                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
-                </div>
-                <div class="col-md-4">
-                    <label for="searchType" class="form-label">Tipo</label>
-                    <input id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-control" placeholder="Pesquisar pelo tipo" type="search" />
-                </div>
-                <div class="col-md-4">
-                    <label for="searchRoom" class="form-label">Sala</label>
-                    <input id="searchRoom" name="searchRoom" value="@ViewBag.SearchRoom" class="form-control" placeholder="Pesquisar pela sala" type="search" />
-                </div>
-
-                <div class="col-12 mt-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search me-1"></i> Pesquisar
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        Limpar
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    @* --- TABELA DE ITENS (Seu código existente) --- *@
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="table-light">
@@ -96,14 +96,12 @@ else
                 {
 
                     @* Extrair a localização do dispositivo *@
-                    // Pega a primeira (e única, se IsCurrent for usado corretamente) localização ativa.
-                    // O Controller garante que este campo está carregado (Eager Loading).
                     // Pega a localização ativa (a que ainda não tem data de fim)
                     var localizacao = dispositivo.LocalizacaoDispMedicoMovel
                     .FirstOrDefault(l => l.EndDate == null);
 
                     string status = dispositivo.CurrentStatus;
-                    
+
                     <tr>
                         <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
 
@@ -158,7 +156,7 @@ else
             </tbody>
         </table>
 
-        @* --- Secção de Paginação --- *@
+        @* --- Secção de Paginação (Seu código existente) --- *@
         <nav aria-label="Medical Device page" class="d-flex justify-content-between align-items-center">
             @* Model.Items.Count() mostra quantos itens estão na página atual *@
             <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
