@@ -167,6 +167,9 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     _context.Update(room);
                     await _context.SaveChangesAsync();
+
+                    //Notificação de atualizacao com sucesso
+                    TempData["SuccessMessageEdit"] = $"Sala \"{room.Name}\" atualizada com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -179,8 +182,10 @@ namespace HealthWellbeingRoom.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(room);
         }
 
@@ -209,9 +214,10 @@ namespace HealthWellbeingRoom.Controllers
             if (room != null)
             {
                 _context.Room.Remove(room);
+                //Notificação de remocao com sucesso
+                TempData["SuccessMessageDelete"] = $"Sala \"{room.Name}\" Eliminada com sucesso!";
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
