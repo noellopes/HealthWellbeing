@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251117112100_InitialCreate")]
+    [Migration("20251117113410_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -385,6 +385,39 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Stock");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.StockMovimento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("StockMovimento");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.ZonaArmazenamento", b =>
                 {
                     b.Property<int>("Id")
@@ -481,6 +514,17 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Consumivel");
 
                     b.Navigation("Zona");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.StockMovimento", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Stock", "Stock")
+                        .WithMany()
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stock");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>

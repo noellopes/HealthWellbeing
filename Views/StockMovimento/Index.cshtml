@@ -1,0 +1,70 @@
+﻿@model IEnumerable<HealthWellbeing.Models.StockMovimento>
+
+@{
+    ViewData["Title"] = "Compras de Consumíveis";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            📥 Compras de Consumíveis
+        </h2>
+
+        <a asp-action="CreateEntrada" class="btn btn-success px-4">
+            ➕ Nova Compra
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
+                <tr>
+                    <th>Consumível</th>
+                    <th>Zona</th>
+                    <th>Quantidade</th>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th style="width:170px;">Ações</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any(m => m.Tipo == "Entrada"))
+                {
+                    foreach (var item in Model.Where(m => m.Tipo == "Entrada"))
+                    {
+                        <tr class="text-center">
+                            <td>@item.Stock?.Consumivel?.Nome</td>
+                            <td>@item.Stock?.Zona?.Nome</td>
+                            <td>@item.Quantidade</td>
+                            <td>@item.Data.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.Descricao</td>
+
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm text-white px-3">
+                                        Ver
+                                    </a>
+
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm px-3">
+                                        Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            Nenhuma compra registada.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
