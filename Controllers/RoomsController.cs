@@ -25,6 +25,10 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
+
+
+
+
         public async Task<IActionResult> Index(string searchName, string searchStatus, string searchSpecialty, string searchLocation, int page = 1)
         {
             var allRooms = await _context.Room.ToListAsync();
@@ -82,6 +86,9 @@ namespace HealthWellbeingRoom.Controllers
             return View(pagination);
         }
 
+
+
+
         private string GetDisplayName(Enum value)
         {
             var member = value.GetType().GetMember(value.ToString()).FirstOrDefault();
@@ -90,6 +97,10 @@ namespace HealthWellbeingRoom.Controllers
                 : null;
             return attr?.Name ?? value.ToString();
         }
+
+
+
+
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -109,10 +120,18 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
+
+
+
+
         public IActionResult Create()
         {
             return View();
         }
+
+
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -152,6 +171,10 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("RoomId,Specialty,Name,Location,OperatingHours,Status,Notes")] Room room)
@@ -189,6 +212,10 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
+
+
+
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -206,38 +233,38 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
 
+
+
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // Carrega a sala com os equipamentos associados
             var room = await _context.Room
-                .Include(r => r.Equipments) // Inclui os equipamentos ligados à sala
+                .Include(r => r.Equipments)
                 .FirstOrDefaultAsync(r => r.RoomId == id);
 
-            // Verifica se a sala existe
             if (room == null)
             {
                 TempData["ErrorMessageDelete"] = "Sala não encontrada.";
-                return RedirectToAction(nameof(Index));
+                return View("Delete"); // ou return NotFound();
             }
 
-            // Verifica se a sala tem equipamentos associados
             if (room.Equipments.Any())
             {
                 TempData["ErrorMessageDelete"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
-                return RedirectToAction(nameof(Index));
+                return View("Delete", room); //permanece na mesma página
             }
 
-            // Remove a sala do contexto
             _context.Room.Remove(room);
-
-            // Notificação de remoção com sucesso
-            TempData["SuccessMessageDelete"] = $"Sala \"{room.Name}\" eliminada com sucesso!";
             await _context.SaveChangesAsync();
-
+            TempData["SuccessMessageDelete"] = $"Sala \"{room.Name}\" eliminada com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
+
+
+
 
         private bool RoomExists(int id)
         {

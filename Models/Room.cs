@@ -58,5 +58,6 @@ namespace HealthWellbeing.Models
 
         // Relação com tabela intermediária
         public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
+        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
     }
 }
