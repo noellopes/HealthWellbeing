@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251105172721_FreshStart")]
+    [Migration("20251113155947_FreshStart")]
     partial class FreshStart
     {
         /// <inheritdoc />
