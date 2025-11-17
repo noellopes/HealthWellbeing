@@ -1,0 +1,175 @@
+﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.Event>
+
+@{
+    ViewData["Title"] = "Events";
+    var successMessage = TempData["SuccessMessage"];
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && string.IsNullOrEmpty(ViewBag.SearchType) && string.IsNullOrEmpty(ViewBag.SearchStatus))
+{
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">No Events Found</h4>
+            <p>No events are currently available.</p>
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Create New Event
+    </a>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4">Event List</h2>
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#eventSearch" aria-expanded="false" aria-controls="eventSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Create New
+            </a>
+        </div>
+    </div>
+
+    <div class="collapse mt-2 mb-3" id="eventSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="searchName" class="form-label">Event Name</label>
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchType" class="form-label">Event Type</label>
+                    <input id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-control" placeholder="Search by type" type="search" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchStatus" class="form-label">Estado</label>
+                    <select id="searchStatus" name="searchStatus" class="form-select" asp-items="ViewBag.StatusList"></select>
+                </div>
+
+                <div class="col-12 mt-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found for your search criteria.</h5>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Type</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Status</th>
+                        <th>Nível Mín.</th>
+                        <th>Pontos</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.EventName</td>
+                            <td>@item.EventType?.EventTypeName</td>
+                            <td>@item.EventStart.ToString("g")</td>
+                            <td>@item.EventEnd.ToString("g")</td>
+                            <td>
+                                @if (item.Status == HealthWellbeing.Models.EventStatus.Agendado)
+                                {
+                                    <span class="badge bg-primary">@item.Status</span>
+                                }
+                                else if (item.Status == HealthWellbeing.Models.EventStatus.Adecorrer)
+                                {
+                                    <span class="badge bg-success">@item.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Status</span>
+                                }
+                            </td>
+                            <td>@item.MinLevel</td>
+                            <td>@item.EventPoints</td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-sm btn-info me-1">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <nav aria-label="Events page">
+                <ul class="pagination">
+
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType"
+                           asp-route-searchStatus="@ViewBag.SearchStatus">First</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchType="@ViewBag.SearchType"
+                               asp-route-searchStatus="@ViewBag.SearchStatus">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@Model.TotalPages"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType"
+                           asp-route-searchStatus="@ViewBag.SearchStatus">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+}

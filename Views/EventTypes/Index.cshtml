@@ -1,0 +1,150 @@
+﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.EventType>
+
+@{
+    ViewData["Title"] = "Event Types";
+    var successMessage = TempData["SuccessMessage"];
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (successMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Event Type List</h2>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#eventTypeSearch" aria-expanded="false" aria-controls="eventTypeSearch">
+            <i class="bi bi-search me-1"></i> Search
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Create New
+        </a>
+    </div>
+</div>
+
+<div class="collapse mt-2 mb-2" id="eventTypeSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="searchName" class="form-label">Event Type Name</label>
+                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+            </div>
+            <div class="col-md-6">
+                <label for="searchScoringMode" class="form-label">Scoring Mode</label>
+                <select id="searchScoringMode" name="searchScoringMode" class="form-select" asp-items="ViewBag.ScoringModeList">
+                    <option value="">All Scoring Modes</option>
+                </select>
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Search
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Clear
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Items.Any()) {
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">No Event Types Found</h4>
+            <p>There are no event types matching your criteria.</p>
+        </div>
+    </div>
+}
+else {
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Event Type Name</th>
+                    <th>Scoring Mode</th>
+                    <th>Multiplier</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items) {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.EventTypeName)</td>
+                        <td>
+                            @if (item.EventTypeScoringMode == "fixed") {
+                                <span class="badge bg-primary">Fixo</span>
+                            }
+                            else if (item.EventTypeScoringMode == "progressive") {
+                                <span class="badge bg-success">Progressivo</span>
+                            }
+                            else if (item.EventTypeScoringMode == "time_based") {
+                                <span class="badge bg-info">Baseado em Tempo</span>
+                            }
+                            else if (item.EventTypeScoringMode == "completion") {
+                                <span class="badge bg-secondary">Conclusão</span>
+                            }
+                            else if (item.EventTypeScoringMode == "binary") {
+                                <span class="badge bg-dark">Binário</span>
+                            }
+                            else {
+                                <span class="badge bg-light text-dark">@item.EventTypeScoringMode</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="fw-bold @(item.EventTypeMultiplier > 2.0 ? "text-success" : item.EventTypeMultiplier > 1.0 ? "text-primary" : "text-muted")">
+                                @item.EventTypeMultiplier.ToString("F1")x
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Details
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Event Types page">
+            <ul class="pagination">
+                @if (Model.CurrentPage == 1) {
+                    <li class="page-item disabled"><a class="page-link">First</a></li>
+                }
+                else {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">First</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                    if (p == Model.CurrentPage) {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">@p</a></li>
+                    }
+                }
+
+                @if (Model.CurrentPage == Model.TotalPages) {
+                    <li class="page-item disabled"><a class="page-link">Last</a></li>
+                }
+                else {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">Last</a></li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
