@@ -8,7 +8,7 @@ namespace HealthWellbeing.Models
 
         public string Numero_de_sala { get; set; }
         [Phone(ErrorMessage = "Número Obrigatório")]
-        public string Laboratorio { get; set; }
+        
         [StringLength(100)]
         public string TipoSala { get; set; }
 
