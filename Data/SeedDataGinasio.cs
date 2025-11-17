@@ -2,7 +2,7 @@
 using HealthWellbeing.Models;
 using System.Collections.Generic;
 
-internal class SeedData
+internal class SeedDataGinasio
 {
     internal static void Populate(HealthWellbeingDbContext? dbContext)
     {
@@ -15,11 +15,7 @@ internal class SeedData
         PopulateMember(dbContext, clients);
         PopulateTrainingType(dbContext);
         PopulatePlan(dbContext);
-
-        // --- ALTERAÇÃO AQUI: Capturamos a lista de Trainers ---
         var trainers = PopulateTrainer(dbContext);
-
-        // --- NOVO MÉTODO: Povoamento dos Treinos Agendados ---
         PopulateTraining(dbContext, trainers);
     }
 
