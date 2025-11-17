@@ -1,9 +1,11 @@
 ﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeingRoom.Models
 {
     public class LocalizacaoDispMovel_temporario //Para testes do MedicalDevice
     {
+        [Key]
         public int Id { get; set; }
 
         // Chaves Estrangeiras

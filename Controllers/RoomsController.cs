@@ -255,14 +255,14 @@ namespace HealthWellbeingRoom.Controllers
             //verificar se tem equipamentos associados
             if (room.Equipments.Any())
             {
-                TempData["ErrorMessageDelete"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
+                TempData["ErrorMessageDelete"] = $"A sala \"{room.Name}\" não pode ser eliminada porque possui equipamentos.";
                 return View("Delete", room); //permanece na mesma página
             }
 
             //verificar se tem dispositivos moveis associados
             if (room.LocalizacaoDispMedicoMovel.Any())
             {
-                TempData["errorMessageDeleteDispositivo"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
+                TempData["errorMessageDeleteDispositivo"] = $"A sala \"{room.Name}\" não pode ser eliminada porque possui dispositivos medicos.";
                 return View("Delete", room); //permanece na mesma página
             }
 
