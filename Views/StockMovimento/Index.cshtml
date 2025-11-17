@@ -16,23 +16,40 @@
         </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped shadow-sm">
-            <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
-                <tr>
-                    <th>Consumível</th>
-                    <th>Zona</th>
-                    <th>Quantidade</th>
-                    <th>Data</th>
-                    <th>Descrição</th>
-                    <th style="width:170px;">Ações</th>
-                </tr>
-            </thead>
+    @{
+        var compras = Model?.Where(m => m.Tipo == "Entrada").ToList() ?? new List<HealthWellbeing.Models.StockMovimento>();
+    }
 
-            <tbody>
-                @if (Model != null && Model.Any(m => m.Tipo == "Entrada"))
-                {
-                    foreach (var item in Model.Where(m => m.Tipo == "Entrada"))
+    @if (!compras.Any())
+    {
+        <!-- ALERTA QUANDO NÃO EXISTEM COMPRAS -->
+        <div class="alert alert-warning text-center py-4">
+            <h4 class="fw-bold">Nenhuma compra registada</h4>
+            <p>Ainda não existem entradas de stock registadas.</p>
+
+            <a asp-action="CreateEntrada" class="btn btn-success">
+                ➕ Registar Primeira Compra
+            </a>
+        </div>
+    }
+    else
+    {
+        <!-- TABELA DAS COMPRAS -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped shadow-sm">
+                <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
+                    <tr>
+                        <th>Consumível</th>
+                        <th>Zona</th>
+                        <th>Quantidade</th>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th style="width:170px;">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in compras)
                     {
                         <tr class="text-center">
                             <td>@item.Stock?.Consumivel?.Nome</td>
@@ -54,17 +71,8 @@
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">
-                            Nenhuma compra registada.
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
