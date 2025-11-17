@@ -1,6 +1,7 @@
 ﻿@using HealthWellbeing.Utils.Group1
 @using HealthWellbeing.Utils.Group1.Models
-@model PaginatedList<TreatmentRecord>
+@using HealthWellbeing.Utils.Group1.DTOs
+@model PaginatedList<TreatmentRecordListDTO>
 
 @{
     var modelType = ViewBag.ModelType as Type;
@@ -28,11 +29,14 @@ else
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Criar
+        <a asp-action="Schedule" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Agendar
         </a>
     </div>
-    <partial name="Group1/Partials/Search" />
+    @if (!noData)
+    {
+        <partial name="Group1/Partials/Search" />
+    }
     <div class="table-responsive">
         @if (noData)
         {

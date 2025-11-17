@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1;
+using HealthWellbeing.Utils.Group1.DTOs;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.Utils.Group1;
-using HealthWellbeing.Utils.Group1.Interfaces;
-using HealthWellbeing.Utils.Group1.Models;
+using System.Linq.Expressions;
 
 namespace HealthWellbeing.Controllers
 {
@@ -28,9 +30,6 @@ namespace HealthWellbeing.Controllers
             // Controla quantos itens por pagina
             var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<TreatmentRecord>();
 
-            // Define as propriadades visiveis do modelo
-            IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"];
-
             // Query Base para otimizar as consultas
             IQueryable<TreatmentRecord> treatments = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType).AsNoTracking();
 
@@ -38,10 +37,43 @@ namespace HealthWellbeing.Controllers
             treatments = _filterService.ApplyFilter(treatments, searchBy, searchString);
             treatments = _filterService.ApplySorting(treatments, sortOrder);
 
+            // Define as propriadades visiveis do modelo
+            DtoSelector BaseSelector = new(
+                t => new TreatmentRecordListDTO
+                {
+                    Id = t.Id,
+                    NurseName = t.Nurse.Name,
+                    TreatmentTypeName = t.TreatmentType.Name,
+                    PathologyName = t.Pathology.Name,
+                    TreatmentDate = t.TreatmentDate,
+                    CompletedDuration = t.CompletedDuration
+                },
+                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration"]
+            );
+
+            DtoSelector AdminSelector = new(t => new TreatmentRecordListDTO
+            {
+                Id = t.Id,
+                NurseName = t.Nurse.Name,
+                TreatmentTypeName = t.TreatmentType.Name,
+                PathologyName = t.Pathology.Name,
+                TreatmentDate = t.TreatmentDate,
+                CompletedDuration = t.CompletedDuration,
+                Observations = t.Observations,
+                AdditionalNotes = t.AdditionalNotes,
+                Status = t.Status.ToString(),
+                CreatedAt = t.CreatedAt
+            },
+                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
+            );
+
+            DtoSelector selector = BaseSelector;
+            IQueryable<TreatmentRecordListDTO> treatmentsProprieties = treatments.Select(selector.Params).AsNoTracking();
+
             // Popula os dados necessarios a view
             ViewData["Title"] = "Lista de tratamentos";
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = baseProperties.ToList();
+            ViewBag.ModelType = typeof(TreatmentRecordListDTO);
+            ViewBag.Properties = selector.DisplayFields.ToList();
             ViewBag.SearchProperties = _filterService.SearchableProperties;
             ViewBag.CurrentSort = sortOrder;
             ViewBag.CurrentSearchBy = searchBy;
@@ -49,7 +81,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.CurrentPage = page;
 
             // Aplica paginação e devolve a view com o modelo paginado
-            var paginatedList = await PaginatedList<TreatmentRecord>.CreateAsync(treatments, page, MAX_ITEMS_PER_PAGE);
+            var paginatedList = await PaginatedList<TreatmentRecordListDTO>.CreateAsync(treatmentsProprieties, page, MAX_ITEMS_PER_PAGE);
             return View(paginatedList);
         }
 
@@ -70,30 +102,30 @@ namespace HealthWellbeing.Controllers
             {
                 return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
+            IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "AdditionalNotes", "Observations", "CompletedDuration", "Status", "CreatedAt"];
 
             ViewData["Title"] = "Detalhes do tratamento";
             ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt" };
+            ViewBag.Properties = baseProperties.ToList();
             return View("~/Views/Shared/Group1/Actions/Details.cshtml", treatmentRecord);
         }
 
-        // GET: TreatmentRecords/Create
+        // GET: TreatmentRecords/Schedule
         //[Authorize(Roles = "Administrator")]
-        public IActionResult Create()
+        public IActionResult Schedule()
         {
             ViewData["Title"] = "Marcação de tratamento";
-            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name");
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("Request");
+            return View();
         }
 
-        // POST: TreatmentRecords/Create
+        // POST: TreatmentRecords/Schedule
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NurseId,TreatmentId,PathologyId,TreatmentDate")] TreatmentRecord treatmentRecord)
+        public async Task<IActionResult> Schedule([Bind("Id,TreatmentTypeId,PathologyId,TreatmentDate")] TreatmentRecord treatmentRecord)
         {
             ViewData["Title"] = "Marcação de tratamento";
 
@@ -103,14 +135,13 @@ namespace HealthWellbeing.Controllers
                 treatmentRecord.NurseId = Random.Shared.Next(1, 21);
                 _context.Add(treatmentRecord);
                 await _context.SaveChangesAsync();
-                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "Treatment record created successfully.", true);
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O pedido de agendamento de tratamento foi registado com sucesso", true);
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentTypeId);
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
-            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
-            return View("Request", treatmentRecord);
+            return View(treatmentRecord);
         }
 
         // GET: TreatmentRecords/Edit/5
@@ -178,7 +209,7 @@ namespace HealthWellbeing.Controllers
 
             ViewBag.NurseId = new SelectList(_context.Nurse, "Id", "Name", treatmentRecord.NurseId);
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name", treatmentRecord.PathologyId);
-            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentId);
+            ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name", treatmentRecord.TreatmentTypeId);
             return View("Request", treatmentRecord);
         }
 

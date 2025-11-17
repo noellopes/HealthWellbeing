@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Data
 {
-    public class SeedData
+    public class SeedDataGroup1
     {
         internal static void Populate(HealthWellbeingDbContext? HealthWellbeingDbContext)
         {

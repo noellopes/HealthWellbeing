@@ -1,22 +1,13 @@
 ﻿@model HealthWellbeing.Models.TreatmentRecord
 
-@{
-    var isNew = Model == null || (Model?.Id == null || Model.Id == 0);
-    var formAction = isNew ? "Create" : "Edit";
-}
-
 <h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
 <div class="card shadow-sm">
     <div class="card-body">
-        <form asp-action="@formAction">
+        <form asp-action="Schedule">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @if (!isNew)
-            {
-                <input type="hidden" asp-for="Id" />
-            }
             <div class="form-group">
-                <label asp-for="TreatmentId" class="control-label"></label>
-                <select asp-for="TreatmentId" class="form-control" asp-items="ViewBag.TreatmentId"></select>
+                <label asp-for="TreatmentTypeId" class="control-label"></label>
+                <select asp-for="TreatmentTypeId" class="form-control" asp-items="ViewBag.TreatmentId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="PathologyId" class="control-label"></label>
@@ -29,7 +20,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="AdditionalNotes" class="control-label"></label>
-                <textarea asp-for="AdditionalNotes" class="form-control" ></textarea>
+                <textarea asp-for="AdditionalNotes" class="form-control"></textarea>
                 <span asp-validation-for="AdditionalNotes" class="text-danger"></span>
             </div>
             <div class="border-top mt-4 form-group text-right">
@@ -38,12 +29,6 @@
                 </button>
                 <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-4"><i class="bi bi-arrow-left-circle me-1"></i> Cancelar</a>
             </div>
-            @if (!isNew)
-            {
-                <div class="d-flex justify-content-end border-top mt-4 form-group">
-                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-2 mt-4"><i class="bi bi-trash"></i> Remover</a>
-                </div>
-            }
         </form>
     </div>
 </div>

@@ -29,9 +29,9 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "É necessário especificar o tipo de tratamento.")]
         [Display(Name = "Tipo de tratamento")]
-        public int TreatmentId { get; set; }
+        public int TreatmentTypeId { get; set; }
 
-        [ForeignKey(nameof(TreatmentId))]
+        [ForeignKey(nameof(TreatmentTypeId))]
         [Display(Name = "Tipo de tratamento")]
         public TreatmentType? TreatmentType { get; set; }
 
