@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LevelAtual)
+                @Html.DisplayNameFor(model => model.LevelCurrent)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LevelCategory)
@@ -28,7 +28,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.LevelAtual)
+                @Html.DisplayFor(modelItem => item.LevelCurrent)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LevelCategory)

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251117184952_InitialHealth")]
+    [Migration("20251117194156_InitialHealth")]
     partial class InitialHealth
     {
         /// <inheritdoc />
@@ -136,12 +136,12 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelAtual")
-                        .HasColumnType("int");
-
                     b.Property<string>("LevelCategory")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LevelCurrent")
+                        .HasColumnType("int");
 
                     b.HasKey("LevelId");
 
