@@ -171,7 +171,15 @@ namespace HealthWellbeingRoom.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),
+                     new
+                     {
+                         id = locationMedDevice.LocationMedDeviceID,
+                         SuccessMessage = "Localização editado com sucesso."
+                     }
+                 );
+
+
             }
 
             ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
@@ -208,6 +216,7 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            TempData["SuccessMessage"] = "Localização eliminado com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 
