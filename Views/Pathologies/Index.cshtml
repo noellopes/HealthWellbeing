@@ -45,49 +45,49 @@ else
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>
-                            @{
+                            @foreach (var prop in properties)
+                            {
                                 string sortOrder;
 
-                                if (currentSort == "Name")
+                                if (currentSort == prop)
                                 {
-                                    sortOrder = "Name" + "_desc";
+                                    sortOrder = prop + "_desc";
                                 }
-                                else if (currentSort == "Name" + "_desc")
+                                else if (currentSort == prop + "_desc")
                                 {
                                     sortOrder = "";
                                 }
                                 else
                                 {
-                                    sortOrder = "Name";
+                                    sortOrder = prop;
                                 }
 
-                                var isActiveSort = (currentSort == "Name" || currentSort == "Name" + "_desc");
+                                var isActiveSort = (currentSort == prop || currentSort == prop + "_desc");
                                 var isDescending = currentSort.EndsWith("_desc");
+
+                            <th>
+                                <a asp-action="Index"
+                                   asp-route-sortOrder="@sortOrder"
+                                   asp-route-searchBy="@ViewBag.CurrentSearchBy"
+                                   asp-route-searchString="@ViewBag.CurrentSearchString"
+                                   asp-route-page="@ViewBag.CurrentPage"
+                                   style="@(!isActiveSort ? "color: black !important" : "color: blue !important")">
+                                        @Functions.GetDisplayName(modelType, prop.Split('.')[0])
+                                        @if (isActiveSort)
+                                        {
+                                            if (isDescending)
+                                            {
+                                            <span class="ml-1">&#x25BC;</span>
+                                            }
+                                            else
+                                            {
+                                            <span class="ml-1">&#x25B2;</span>
+                                            }
+                                        }
+                                </a>
+                            </th>
                             }
-                            <a asp-action="Index"
-                               asp-route-sortOrder="@sortOrder"
-                               asp-route-searchBy="@ViewBag.CurrentSearchBy"
-                               asp-route-searchString="@ViewBag.CurrentSearchString"
-                               asp-route-page="@ViewBag.CurrentPage"
-                               style="@(!isActiveSort ? "color: black !important" : "color: blue !important")">
-                                Name
-                                @if (isActiveSort)
-                                {
-                                    if (isDescending)
-                                    {
-                                        <span class="ml-1">&#x25BC;</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="ml-1">&#x25B2;</span>
-                                    }
-                                }
-                            </a>
-                        </th>
-                        <th>Description</th>
-                        <th>Severity</th>
-                        <th class="text-center">Actions</th>
+                        <th> </th>
                     </tr>
                 </thead>
                 <tbody>
