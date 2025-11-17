@@ -10,7 +10,7 @@
 
 @if (successMessage != null)
 {
-    <div class="container py-4">
+    <div class="container py-2">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             @successMessage
@@ -19,44 +19,80 @@
     </div>
 }
 
-@if (Model == null || !Model.Items.Any())
-{
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
-        <div class="ps-3">
-            <h4 class="alert-heading">Nenhuma Localização Encontrada</h4>
-            <p>Não há localizações de dispositivos médicos registadas na base de dados.</p>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista de Localizações</h2>
 
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i> Registar Nova Localização
-    </a>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchBox" aria-expanded="false" aria-controls="searchBox">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
 
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
-    </a>
-}
-else
-{
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Localizações</h2>
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle me-1"></i> Registar Nova
         </a>
     </div>
+</div>
 
-    <div class="table-responsive">
+<!-- ========== FORMULÁRIO DE PESQUISA ========== -->
+<div class="collapse mt-2 mb-2" id="searchBox">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+            <div class="col-md-4">
+                <label class="form-label">Dispositivo</label>
+                <input name="searchDevice" value="@ViewBag.SearchDevice"
+                       class="form-control" placeholder="Nome do dispositivo" type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Sala</label>
+                <input name="searchRoom" value="@ViewBag.SearchRoom"
+                       class="form-control" placeholder="Nome da sala" type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Data (AAAA-MM-DD)</label>
+                <input name="searchDate" value="@ViewBag.SearchDate"
+                       class="form-control" placeholder="AAAA-MM-DD" type="search" />
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@if (Model == null || !Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2 mt-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Nenhuma Localização Encontrada</h4>
+            <p>Não há localizações que correspondam aos critérios de pesquisa.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive mt-3">
         <table class="table table-bordered table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Sala</th>
-                    <th scope="col">Data inicial</th>
-                    <th scope="col">Data final</th>
-                    <th class="text-end" scope="col">Ações</th>
+                    <th>Dispositivo</th>
+                    <th>Sala</th>
+                    <th>Data inicial</th>
+                    <th>Data final</th>
+                    <th class="text-end">Ações</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var loc in Model.Items)
                 {
@@ -92,40 +128,58 @@ else
                 }
             </tbody>
         </table>
-        @* --- Secção de Paginação --- *@
+
+        <!-- PAGINAÇÃO -->
         <nav aria-label="Location Medical Device page" class="d-flex justify-content-between align-items-center">
-            @* Model.Items.Count() mostra quantos itens estão na página atual *@
-            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+            <span>Mostrando @Model.Items.Count() de @Model.TotalItems itens</span>
 
             <ul class="pagination mb-0">
+
                 @if (Model.CurrentPage == 1)
                 {
                     <li class="page-item disabled"><a class="page-link">Primeira</a></li>
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+                    <li class="page-item">
+                        <a class="page-link" asp-route-page="1"
+                           asp-route-searchDevice="@ViewBag.SearchDevice"
+                           asp-route-searchRoom="@ViewBag.SearchRoom"
+                           asp-route-searchDate="@ViewBag.SearchDate">Primeira</a>
+                    </li>
                 }
 
                 @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                 {
                     if (p == Model.CurrentPage)
                     {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        <li class="page-item active"><a class="page-link">@p</a></li>
                     }
                     else
                     {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                        <li class="page-item">
+                            <a class="page-link" asp-route-page="@p"
+                               asp-route-searchDevice="@ViewBag.SearchDevice"
+                               asp-route-searchRoom="@ViewBag.SearchRoom"
+                               asp-route-searchDate="@ViewBag.SearchDate">@p</a>
+                        </li>
                     }
                 }
+
                 @if (Model.CurrentPage == Model.TotalPages)
                 {
                     <li class="page-item disabled"><a class="page-link">Última</a></li>
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                    <li class="page-item">
+                        <a class="page-link" asp-route-page="@Model.TotalPages"
+                           asp-route-searchDevice="@ViewBag.SearchDevice"
+                           asp-route-searchRoom="@ViewBag.SearchRoom"
+                           asp-route-searchDate="@ViewBag.SearchDate">Última</a>
+                    </li>
                 }
+
             </ul>
         </nav>
 

@@ -20,35 +20,60 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchDevice = "",
+            string searchRoom = "",
+            string searchDate = "")
         {
             int itemsPerPage = 10;
 
-            // Query base (IQueryable) com Includes
             var query = _context.LocationMedDevice
                 .Include(l => l.MedicalDevice)
                 .Include(l => l.Room)
                 .AsQueryable();
 
+            // -------------------------
+            //        FILTROS
+            // -------------------------
+
+            if (!string.IsNullOrEmpty(searchDevice))
+            {
+                query = query.Where(l => l.MedicalDevice.Name.Contains(searchDevice));
+            }
+
+            if (!string.IsNullOrEmpty(searchRoom))
+            {
+                query = query.Where(l => l.Room.Name.Contains(searchRoom));
+            }
+
+            if (!string.IsNullOrEmpty(searchDate))
+            {
+                if (DateTime.TryParse(searchDate, out DateTime parsedDate))
+                {
+                    query = query.Where(l => l.InitialDate.Date == parsedDate.Date);
+                }
+            }
+
+            // Enviar valores para a View
+            ViewBag.SearchDevice = searchDevice;
+            ViewBag.SearchRoom = searchRoom;
+            ViewBag.SearchDate = searchDate;
+
             // Total de itens
             int totalItems = await query.CountAsync();
 
-            // Instancia o ViewModel de Paginação
+            // Paginação
             var paginationInfo = new RPaginationInfo<LocationMedDevice>(page, totalItems, itemsPerPage);
 
-            // Busca os itens da página atual
-            var locs = await query
-                .OrderBy(l => l.LocationMedDeviceID) // Ordenação consistente
+            paginationInfo.Items = await query
+                .OrderBy(l => l.LocationMedDeviceID)
                 .Skip(paginationInfo.ItemsToSkip)
                 .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
 
-            // Atribui os itens ao ViewModel
-            paginationInfo.Items = locs;
-
             return View(paginationInfo);
         }
-
 
         // GET: LocationMedDevice/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -82,41 +107,33 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Garantir que o novo registro seja a localização atual
                 locationMedDevice.IsCurrent = true;
 
-                // Buscar o dispositivo médico associado, incluindo suas localizações atuais
                 var device = await _context.MedicalDevices
                     .Include(d => d.LocalizacaoDispMedicoMovel)
                     .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
 
                 if (device != null)
                 {
-                    // Marcar todas as outras localizações atuais como não atuais
                     var currentLocations = device.LocalizacaoDispMedicoMovel
-                                                .Where(l => l.IsCurrent)
-                                                .ToList();
+                        .Where(l => l.IsCurrent)
+                        .ToList();
 
                     foreach (var loc in currentLocations)
-                    {
                         loc.IsCurrent = false;
-                    }
                 }
 
-                // Adicionar a nova localização
                 _context.Add(locationMedDevice);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarregar dropdowns se houver erro de validação
             ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
             ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
 
             return View(locationMedDevice);
         }
-
 
         // GET: LocationMedDevice/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -148,19 +165,9 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     _context.Update(locationMedDevice);
 
-                    // Buscar o dispositivo para atualizar disponibilidade
                     var device = await _context.MedicalDevices
                         .Include(d => d.LocalizacaoDispMedicoMovel)
                         .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
-
-                    if (device != null)
-                    {
-                        // Se a alocação foi encerrada (tem DataFim) → o equipamento volta a ficar disponível
-                        if (locationMedDevice.EndDate != null)
-                        {
-                            // Nada para gravar, CurrentStatus é calculado dinamicamente.
-                        }
-                    }
 
                     await _context.SaveChangesAsync();
                 }
@@ -171,19 +178,18 @@ namespace HealthWellbeingRoom.Controllers
                     else
                         throw;
                 }
+
                 return RedirectToAction(nameof(Details),
-                     new
-                     {
-                         id = locationMedDevice.LocationMedDeviceID,
-                         SuccessMessage = "Localização editado com sucesso."
-                     }
-                 );
-
-
+                    new
+                    {
+                        id = locationMedDevice.LocationMedDeviceID,
+                        SuccessMessage = "Localização editada com sucesso."
+                    });
             }
 
             ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
             ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
+
             return View(locationMedDevice);
         }
 
@@ -216,7 +222,7 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            TempData["SuccessMessage"] = "Localização eliminado com sucesso.";
+            TempData["SuccessMessage"] = "Localização eliminada com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 
