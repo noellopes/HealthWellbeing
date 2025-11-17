@@ -101,6 +101,18 @@ namespace HealthWellbeing.Controllers
                 return View(stock);
             }
 
+            // Buscar zona selecionada
+            var zona = _context.ZonaArmazenamento.FirstOrDefault(z => z.Id == stock.ZonaID);
+
+            if (zona == null)
+            {
+                ModelState.AddModelError("", "A zona selecionada não existe.");
+                return View(stock);
+            }
+
+            // Atribui automaticamente a capacidade máxima da zona ao stock
+            stock.QuantidadeMaxima = (int)zona.CapacidadeMaxima;
+
             stock.DataUltimaAtualizacao = DateTime.Now;
 
             _context.Stock.Add(stock);
@@ -165,6 +177,16 @@ namespace HealthWellbeing.Controllers
                 return View(stock);
             }
 
+            var zona = _context.ZonaArmazenamento.FirstOrDefault(z => z.Id == stock.ZonaID);
+
+            if (zona == null)
+            {
+                ModelState.AddModelError("", "A zona selecionada não existe.");
+                return View(stock);
+            }
+
+            // Atualiza a capacidade máxima automaticamente
+            stock.QuantidadeMaxima = (int)zona.CapacidadeMaxima;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
             _context.Update(stock);
@@ -173,6 +195,7 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Stock atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
 
         // ===========================
         // DELETE GET
