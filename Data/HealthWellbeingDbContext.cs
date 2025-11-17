@@ -23,8 +23,9 @@ namespace HealthWellbeing.Data
 
         public DbSet<CategoriaAlimento> CategoriaAlimento { get; set; } = default!;
 
-
         public DbSet<Receita> Receita { get; set; } = default!;
+
+        public DbSet<ReceitaComponente> ReceitaComponente { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,6 +74,22 @@ namespace HealthWellbeing.Data
                 .HasOne(ra => ra.Alimento)
                 .WithMany(a => a.RestricoesAssociadas)
                 .HasForeignKey(ra => ra.AlimentoId);
+
+            // N:N Receita ↔ ComponenteReceita
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasKey(rc => new { rc.ReceitaId, rc.ComponenteReceitaId });
+
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasOne(rc => rc.Receita)
+                .WithMany(r => r.ReceitaComponentes)
+                .HasForeignKey(rc => rc.ReceitaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasOne(rc => rc.ComponenteReceita)
+                .WithMany(c => c.ReceitaComponentes)
+                .HasForeignKey(rc => rc.ComponenteReceitaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

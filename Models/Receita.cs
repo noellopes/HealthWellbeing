@@ -44,13 +44,11 @@ namespace HealthWellbeing.Models
         [Display(Name = "Gorduras (g)")]
         public decimal Gorduras { get; set; }
 
-        public List<int> ComponentesReceitaId { get; set; } = new List<int>();
+        // N:N relationship with ComponenteReceita through ReceitaComponente
+        public ICollection<ReceitaComponente> ReceitaComponentes { get; set; } = new List<ReceitaComponente>();
+
+        // N:N relationship with RestricaoAlimentar (keeping existing structure)
         public List<int> RestricoesAlimentarId { get; set; } = new List<int>();
-
-        // Relação 1:N com componentes
-        public ICollection<ComponenteReceita> Componentes { get; set; } = new List<ComponenteReceita>();
-
-        // Relação N:N com restrições alimentares
         public ICollection<RestricaoAlimentar>? RestricoesAlimentares { get; set; }
     }
 }

@@ -34,7 +34,7 @@ namespace HealthWellbeing.Models
         [Display(Name = "É opcional?")]
         public bool IsOpcional { get; set; } = false;
 
-
-        public ICollection<Receita>? ReceitaRelacionadas { get; set; }
+        // N:N relationship with Receita through ReceitaComponente
+        public ICollection<ReceitaComponente> ReceitaComponentes { get; set; } = new List<ReceitaComponente>();
     }
 }

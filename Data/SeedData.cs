@@ -551,7 +551,6 @@ internal class SeedData
                 Proteinas = 2,
                 HidratosCarbono = 35,
                 Gorduras = 1,
-                ComponentesReceitaId = new List<int> { 1, 2 },
                 RestricoesAlimentarId = new List<int> { 2 }
             },
             new Receita
@@ -565,7 +564,6 @@ internal class SeedData
                 Proteinas = 3,
                 HidratosCarbono = 20,
                 Gorduras = 2,
-                ComponentesReceitaId = new List<int> { 3, 4 },
                 RestricoesAlimentarId = new List<int> { 4 }
             },
             new Receita { Nome = "Arroz Integral", Descricao = "Arroz saudável e rico em fibras.", ModoPreparo = "Cozinhe o arroz com água e sal.", TempoPreparo = 25, Porcoes = 3, Calorias = 130, Proteinas = 4, HidratosCarbono = 28, Gorduras = 1 },
