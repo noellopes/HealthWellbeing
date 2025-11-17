@@ -34,7 +34,7 @@ builder.Services.AddControllersWithViews();
 
 // GROUP 1 - Filtering Service (Sort/Search)
 builder.Services.AddScoped<IRecordFilterService<Pathology>, PathologyFilterService>();
-
+builder.Services.AddScoped<IRecordFilterService<TreatmentType>, TreatmentTypeFilterService>();
 builder.Services.AddScoped<IRecordFilterService<TreatmentRecord>, TreatmentRecordFilterService>();
 
 var app = builder.Build();
