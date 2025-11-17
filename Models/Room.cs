@@ -57,6 +57,6 @@ namespace HealthWellbeing.Models
         public string? Notes { get; set; }
 
         // Relação com tabela intermediária
-        public ICollection<LocalizacaoDispMovel_temporario> LocalizacaoDispMedicoMovel { get; set; } = new List<LocalizacaoDispMovel_temporario>();
+        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
     }
 }
