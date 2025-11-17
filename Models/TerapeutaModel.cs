@@ -20,7 +20,7 @@ namespace HealthWellbeing.Models
         // Telefone — obrigatório
         [Required(ErrorMessage = "O telefone é obrigatório.")]
         [Phone(ErrorMessage = "O número de telefone não é válido.")]
-        [StringLength(9, ErrorMessage = "O número de telefone tem de ter 9 caracteres.")]
+        [StringLength(20, ErrorMessage = "O número de telefone tem de ter menos de 20 digitos.")]
         public string Telefone { get; set; } = string.Empty;
 
         // Email — obrigatório
