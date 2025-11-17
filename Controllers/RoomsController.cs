@@ -242,17 +242,27 @@ namespace HealthWellbeingRoom.Controllers
         {
             var room = await _context.Room
                 .Include(r => r.Equipments)
+                .Include(r => r.LocalizacaoDispMedicoMovel) // include para dispositivos medicos moveis
                 .FirstOrDefaultAsync(r => r.RoomId == id);
 
+            //verificar se a sala existe
             if (room == null)
             {
                 TempData["ErrorMessageDelete"] = "Sala não encontrada.";
                 return View("Delete"); // ou return NotFound();
             }
 
+            //verificar se tem equipamentos associados
             if (room.Equipments.Any())
             {
                 TempData["ErrorMessageDelete"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
+                return View("Delete", room); //permanece na mesma página
+            }
+
+            //verificar se tem dispositivos moveis associados
+            if (room.LocalizacaoDispMedicoMovel.Any())
+            {
+                TempData["errorMessageDeleteDispositivo"] = $"A sala \"{room.Name}\" não pode ser eliminada porque tem equipamentos registados.";
                 return View("Delete", room); //permanece na mesma página
             }
 

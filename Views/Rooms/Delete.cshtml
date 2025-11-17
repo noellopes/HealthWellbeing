@@ -1,5 +1,6 @@
 ﻿@model HealthWellbeing.Models.Room
 
+
 @{
     ViewData["Title"] = "Eliminar Sala";
 }
@@ -9,13 +10,22 @@
     @ViewData["Title"]
 </h1>
 
-@* MENSAGEM DE ERRO SE O ROOM NÃO PODE SER ELIMINADO POR TER RELAÇÕES DE EQUIPAMENTOS *@
-
+@* Mensagem de alerta que a sala nao pode ser eliminada por ter um equipamento *@
 @if (TempData["errorMessageDelete"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         @TempData["errorMessageDelete"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* Mensagem de alerta que a sala nao pode ser eliminada por ter um dispositivo medico *@
+@if (TempData["errorMessageDeleteDispositivo"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["errorMessageDeleteDispositivo"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
