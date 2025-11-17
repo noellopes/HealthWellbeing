@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251116135841_InitialCreate")]
+    [Migration("20251117112100_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -365,6 +365,9 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("QuantidadeAtual")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantidadeMaxima")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantidadeMinima")

@@ -13,7 +13,7 @@ namespace HealthWellbeing.Models
 
         public int QuantidadeMinima { get; set; }
 
-
+        public int QuantidadeMaxima { get; set; }
 
         // Data da última atualização
         public DateTime DataUltimaAtualizacao { get; set; }

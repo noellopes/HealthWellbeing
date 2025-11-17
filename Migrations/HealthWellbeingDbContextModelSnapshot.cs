@@ -364,6 +364,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("QuantidadeAtual")
                         .HasColumnType("int");
 
+                    b.Property<int>("QuantidadeMaxima")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuantidadeMinima")
                         .HasColumnType("int");
 
