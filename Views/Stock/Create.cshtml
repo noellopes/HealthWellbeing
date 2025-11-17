@@ -4,20 +4,25 @@
     ViewData["Title"] = "Criar Stock";
 }
 
-<h2 class="text-primary fw-bold mb-4">➕ Criar Stock</h2>
+<h2 class="text-primary fw-bold mb-4">
+    <i class="bi bi-plus-circle"></i> Criar Stock
+</h2>
 
-<form asp-action="Create">
+<form asp-action="Create" method="post">
+
+    <!-- Consumível -->
     <div class="mb-3">
         <label class="form-label">Consumível</label>
         <select asp-for="ConsumivelID" class="form-select" required>
             <option value="">-- Escolha o Consumível --</option>
             @foreach (var c in ViewBag.Consumiveis)
             {
-                <option value="@c.Id">@c.Nome</option>
+                <option value="@c.ConsumivelId">@c.Nome</option>
             }
         </select>
     </div>
 
+    <!-- Zona -->
     <div class="mb-3">
         <label class="form-label">Zona de Armazenamento</label>
         <select asp-for="ZonaID" class="form-select" required>
@@ -29,22 +34,24 @@
         </select>
     </div>
 
+    <!-- Quantidades -->
     <div class="mb-3">
         <label class="form-label">Quantidade Atual</label>
-        <input asp-for="QuantidadeAtual" class="form-control" type="number" required />
+        <input asp-for="QuantidadeAtual" class="form-control" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Quantidade Mínima</label>
-        <input asp-for="QuantidadeMinima" class="form-control" type="number" required />
+        <input asp-for="QuantidadeMinima" class="form-control" />
     </div>
 
     <div class="mb-3">
         <label class="form-label">Quantidade Máxima</label>
-        <input asp-for="QuantidadeMaxima" class="form-control" type="number" required />
+        <input asp-for="QuantidadeMaxima" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-success px-4">Criar</button>
-    <a asp-action="Index" class="btn btn-secondary px-4">Voltar</a>
+    <button type="submit" class="btn btn-success mt-3">Criar</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Voltar</a>
+
 </form>
 

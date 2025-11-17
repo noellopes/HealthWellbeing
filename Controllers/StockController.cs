@@ -22,7 +22,6 @@ namespace HealthWellbeing.Controllers
             var consumiveis = _context.Consumivel.ToList();
             var zonas = _context.ZonaArmazenamento.ToList();
 
-            // Se faltar consumíveis ou zonas, não faz nada
             if (!consumiveis.Any() || !zonas.Any())
                 return;
 
@@ -86,6 +85,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
             return View();
         }
+
 
         // ===========================
         // CREATE POST
