@@ -2,17 +2,20 @@
 
 namespace HealthWellbeing.Models
 {
-    public class Sala
+    public class SaladeExames
     {
-        public int SalaId { get; set; }
+        public int Id { get; set; }
 
-        public string Numero_de_sala { get; set; }
-        [Phone(ErrorMessage = "Número Obrigatório")]
-        
+        [Required(ErrorMessage = "A instância do Tipo de Sala é obrigatória")]
         [StringLength(100)]
-        public string TipoSala { get; set; }
+        public string Laboratorio { get; set; }
 
         [StringLength(500)]
-        public string? Laboratorio { get; set; }
+
+
+        public string Tipo_de_sala { get; set; }
+
+        [StringLength(500)]
+
     }
 }
