@@ -3,7 +3,7 @@
     ViewData["Title"] = "Food Record Details";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1><i class="bi bi-archive"></i> @ViewData["Title"]</h1>
 
 <dl class="row">
     <dt class="col-sm-3">Client</dt>
@@ -32,6 +32,6 @@
 </dl>
 
 <div class="mt-3">
-    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.UserFoodRegistrationId">Edit</a>
-    <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.UserFoodRegistrationId"><i class="bi bi-pencil-square"></i> Edit</a>
+    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-backspace"></i> Back</a>
 </div>

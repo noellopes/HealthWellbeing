@@ -3,7 +3,7 @@
     ViewData["Title"] = "Add Food Record";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1><i class="bi bi-plus-circle"></i> @ViewData["Title"]</h1>
 
 <form asp-action="Create" method="post">
     <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
@@ -50,8 +50,8 @@
         <textarea asp-for="Notes" class="form-control"></textarea>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-backspace"></i> Back</a>
 </form>
 
 @section Scripts {

@@ -3,7 +3,7 @@
     ViewData["Title"] = "Create Food Plan";
 }
 
-<h1>Create Food Plan</h1>
+<h1><i class="bi bi-plus-circle"></i> Create Food Plan</h1>
 
 @if (TempData["Error"] != null)
 {
@@ -60,8 +60,8 @@
     </div>
 
     <div class="mt-3">
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create</button>
+        <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
     </div>
 </form>
 
