@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace HealthWellbeing.Controllers
 {
     public class TipoExercicioController : Controller
@@ -27,61 +26,71 @@ namespace HealthWellbeing.Controllers
             string searchDescricao = "",
             string searchBeneficio = "")
         {
-            
             var query = _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
                     .ThenInclude(tb => tb.Beneficio)
                 .AsQueryable();
 
-            //Filtragem por Nome
+            // --- Blocos de Filtragem ---
             if (!string.IsNullOrEmpty(searchNome))
             {
                 query = query.Where(t => t.NomeTipoExercicios.Contains(searchNome));
             }
 
-            //Filtragem por Descrição
             if (!string.IsNullOrEmpty(searchDescricao))
             {
                 query = query.Where(t => t.DescricaoTipoExercicios.Contains(searchDescricao));
             }
 
-            //Filtragem por Benefício
             if (!string.IsNullOrEmpty(searchBeneficio))
             {
                 query = query.Where(t => t.TipoExercicioBeneficios
                     .Any(tb => tb.Beneficio.NomeBeneficio.Contains(searchBeneficio)));
             }
 
-            // Guardar os valores de pesquisa para a view
+            // Guardar os valores para a View manter os filtros
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchDescricao = searchDescricao;
             ViewBag.SearchBeneficio = searchBeneficio;
 
-            // Paginação
+            // --- Paginação ---
             int total = await query.CountAsync();
 
             var pagination = new PaginationInfoExercicios<TipoExercicio>(page, total);
 
-            pagination.Items = await query
-                .OrderBy(t => t.NomeTipoExercicios)
-                .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage)
-                .ToListAsync();
+            // Só executamos a query paginada se houver resultados
+            if (total > 0)
+            {
+                pagination.Items = await query
+                    .OrderBy(t => t.NomeTipoExercicios)
+                    .Skip(pagination.ItemsToSkip)
+                    .Take(pagination.ItemsPerPage)
+                    .ToListAsync();
+            }
+            else
+            {
+                pagination.Items = new List<TipoExercicio>();
+            }
 
             return View(pagination);
         }
 
         // GET: TipoExercicio/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string SuccessMessage = "")
         {
             if (id == null) return NotFound();
 
             var tipoExercicio = await _context.TipoExercicio
-                .Include(t => t.TipoExercicioBeneficios) // Tabela intermédia
-                    .ThenInclude(tb => tb.Beneficio)     // Tabela final
+                .Include(t => t.TipoExercicioBeneficios)
+                    .ThenInclude(tb => tb.Beneficio)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
-            if (tipoExercicio == null) return NotFound();
+            if (tipoExercicio == null)
+            {
+                return View("InvalidTipoExercicio");
+            }
+
+            ViewBag.SuccessMessage = SuccessMessage;
 
             return View(tipoExercicio);
         }
@@ -103,6 +112,7 @@ namespace HealthWellbeing.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Adicionar os benefícios selecionados à lista N:N
                 if (selectedBeneficios != null && selectedBeneficios.Any())
                 {
                     tipoExercicio.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
@@ -117,7 +127,13 @@ namespace HealthWellbeing.Controllers
 
                 _context.Add(tipoExercicio);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = tipoExercicio.TipoExercicioId,
+                        SuccessMessage = "Tipo de Exercício criado com sucesso."
+                    });
             }
 
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
@@ -133,10 +149,14 @@ namespace HealthWellbeing.Controllers
                 .Include(t => t.TipoExercicioBeneficios)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
-            if (tipoExercicio == null) return NotFound();
+            if (tipoExercicio == null)
+            {
+                return View("InvalidTipoExercicio");
+            }
 
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
 
+            // Preencher os checkboxes já selecionados
             ViewData["SelectedBeneficios"] = tipoExercicio.TipoExercicioBeneficios?
                 .Select(tb => tb.BeneficioId).ToList() ?? new List<int>();
 
@@ -158,18 +178,27 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                   
                     var tipoExercicioExistente = await _context.TipoExercicio
                         .Include(t => t.TipoExercicioBeneficios)
                         .FirstOrDefaultAsync(t => t.TipoExercicioId == id);
 
-                    if (tipoExercicioExistente == null) return NotFound();
+                    // Se foi apagado entretanto (concorrência manual)
+                    if (tipoExercicioExistente == null)
+                    {
+                        // Preparamos os dados para permitir a recriação na View de Erro
+                        ViewData["SelectedBeneficios"] = selectedBeneficios != null
+                            ? selectedBeneficios.ToList()
+                            : new List<int>();
 
+                        return View("InvalidTipoExercicio", tipoExercicio);
+                    }
+
+                    // Atualizar dados simples
                     tipoExercicioExistente.NomeTipoExercicios = tipoExercicio.NomeTipoExercicios;
                     tipoExercicioExistente.DescricaoTipoExercicios = tipoExercicio.DescricaoTipoExercicios;
                     tipoExercicioExistente.CaracteristicasTipoExercicios = tipoExercicio.CaracteristicasTipoExercicios;
 
-                    
+                    // Atualizar relacionamentos N:N
                     if (tipoExercicioExistente.TipoExercicioBeneficios != null)
                     {
                         tipoExercicioExistente.TipoExercicioBeneficios.Clear();
@@ -179,7 +208,6 @@ namespace HealthWellbeing.Controllers
                         tipoExercicioExistente.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
                     }
 
-        
                     if (selectedBeneficios != null)
                     {
                         foreach (var beneficioId in selectedBeneficios)
@@ -194,20 +222,34 @@ namespace HealthWellbeing.Controllers
 
                     _context.Update(tipoExercicioExistente);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Details),
+                        new
+                        {
+                            id = tipoExercicio.TipoExercicioId,
+                            SuccessMessage = "Tipo de Exercício editado com sucesso."
+                        });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoExercicioExists(tipoExercicio.TipoExercicioId)) return NotFound();
-                    else throw;
+                    if (!TipoExercicioExists(tipoExercicio.TipoExercicioId))
+                    {
+
+                        ViewData["SelectedBeneficios"] = selectedBeneficios != null
+                            ? selectedBeneficios.ToList()
+                            : new List<int>();
+
+                        return View("InvalidTipoExercicio", tipoExercicio);
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-                return RedirectToAction(nameof(Index));
             }
 
-            // Se falhar, recarrega os dados para a View
+            // Se houver erro de validação, recarregar a view Edit
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
-
-            // Precisamos recarregar os que estavam selecionados caso haja erro de validação
-            // Aqui usamos os que vieram do formulário (selectedBeneficios)
             ViewData["SelectedBeneficios"] = selectedBeneficios != null
                 ? selectedBeneficios.ToList()
                 : new List<int>();
@@ -222,10 +264,14 @@ namespace HealthWellbeing.Controllers
 
             var tipoExercicio = await _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
-                    .ThenInclude(tb => tb.Beneficio) 
+                    .ThenInclude(tb => tb.Beneficio)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
-            if (tipoExercicio == null) return NotFound();
+            if (tipoExercicio == null)
+            {
+                TempData["SuccessMessage"] = "O registo já não existe (provavelmente já foi eliminado).";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(tipoExercicio);
         }
@@ -239,8 +285,10 @@ namespace HealthWellbeing.Controllers
             if (tipoExercicio != null)
             {
                 _context.TipoExercicio.Remove(tipoExercicio);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Tipo de Exercício eliminado com sucesso.";
             return RedirectToAction(nameof(Index));
         }
 
