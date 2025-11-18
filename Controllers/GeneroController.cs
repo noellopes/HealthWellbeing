@@ -99,9 +99,7 @@ namespace HealthWellbeing.Controllers
             return View(genero);
         }
 
-        // POST: Genero/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Genero/Edit/
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("GeneroId,NomeGenero")] Genero genero)
@@ -115,26 +113,38 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(genero);
+                    // Tenta encontrar o registo na BD para garantir que existe
+                    var generoExistente = await _context.Genero.FindAsync(id);
+
+                    // SE O GÉNERO FOI APAGADO (é null), mostramos a página de recuperação
+                    if (generoExistente == null)
+                    {
+                        return View("InvalidGenero", genero);
+                    }
+
+                    // Atualiza os valores do registo existente com os novos valores do formulário
+                    _context.Entry(generoExistente).CurrentValues.SetValues(genero);
+
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!GeneroExists(genero.GeneroId))
                     {
-                        return NotFound();
+                        // Caso a exceção ocorra exatamente no momento do save
+                        return View("GeneroDeleted", genero);
                     }
                     else
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(genero);
         }
 
-        // GET: Genero/Delete/5
+        // GET: Genero/Delete/
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

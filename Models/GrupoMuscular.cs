@@ -18,6 +18,6 @@ namespace HealthWellbeing.Models
         public string? LocalizacaoCorporal { get; set; }
         public ICollection<Musculo>? Musculos { get; set; } = new List<Musculo>();
 
-        public ICollection<Exercicio>? Exercicio { get; set; }
+        public ICollection<ExercicioGrupoMuscular>? ExercicioGrupoMusculares { get; set; }
     }
 }
