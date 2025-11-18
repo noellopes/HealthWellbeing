@@ -1,18 +1,15 @@
 ﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Plan>
 
 @{
-    ViewData["Title"] = "Training Plans";
+    ViewData["Title"] = "Plans"; // Alterado de "Training Plans" para "Plans"
 
-    // Variáveis para manter a pesquisa nos links de paginação (do PlanController)
-    var searchName = ViewBag.SearchName;
-    var searchMinPrice = ViewBag.SearchMinPrice;
-    var searchMaxPrice = ViewBag.SearchMaxPrice;
-    var searchDuration = ViewBag.SearchDuration;
+    // Variável de busca - apenas pelo nome do plano
+    var searchPlan = ViewBag.SearchPlanName as string;
 }
 
-<h1 class="display-4 text-primary mb-4">Training Plans</h1>
+<h1 class="display-4 text-primary mb-4">Plans</h1> @* Alterado de "Training Plans" para "Plans" *@
 
-@* Mensagens de Sucesso/Erro (Ainda não implementadas no seu PlanController, mas bom ter a estrutura) *@
+@* Mensagens de Sucesso/Erro (Mantido do MemberPlan) *@
 @if (TempData["Message"] != null)
 {
     var message = TempData["Message"].ToString();
@@ -28,81 +25,60 @@
     <h2 class="h4 mb-0">Available Plans</h2>
     <div class="d-flex justify-content-end">
 
+        @* Botão que abre/fecha o painel de busca *@
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#planSearch" aria-expanded="false" aria-controls="planSearch">
             <i class="bi bi-search me-1"></i> Search/Filter
         </a>
 
+        @* Botão para criar um novo plano *@
         <a asp-action="Create" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Create New Plan
         </a>
-
     </div>
 </div>
 
 @* Formulário de Pesquisa e Filtro *@
-<div class="collapse @(
-     !string.IsNullOrWhiteSpace(searchName) ||
-     searchMinPrice.HasValue ||
-     searchMaxPrice.HasValue ||
-     searchDuration.HasValue ? "show" : ""
-        )" id="planSearch">
+@* A classe 'show' é adicionada se houver um termo de busca *@
+<div class="collapse @(!string.IsNullOrWhiteSpace(searchPlan) ? "show" : "") mt-2 mb-2" id="planSearch">
     <div class="card card-body shadow-sm">
-        <form asp-action="Index" method="get" class="row g-3">
+        <form asp-action="Index" method="get" class="row g-2">
 
-            @* Pesquisa por Nome *@
+            @* Pesquisa por Nome do Plano *@
             <div class="col-md-6">
-                <label for="searchName" class="form-label">Plan Name</label>
-                <input id="searchName" name="searchName" value="@searchName" class="form-control" placeholder="Search by name..." type="search" />
+                <label for="searchPlanName" class="form-label">Plan Name</label>
+                <input id="searchPlanName" name="searchPlanName" value="@searchPlan" class="form-control" placeholder="Search by plan name..." type="search" />
             </div>
 
-            @* Filtro por Duração *@
+            @* Coluna vazia para alinhar *@
             <div class="col-md-6">
-                <label for="searchDuration" class="form-label">Duration (Days)</label>
-                <input id="searchDuration" name="searchDuration" value="@searchDuration" class="form-control" placeholder="e.g., 30 or 90" type="number" min="1" max="365" />
+                @* Espaço Vazio *@
             </div>
 
-            @* Filtro por Preço Mínimo *@
-            <div class="col-md-6">
-                <label for="searchMinPrice" class="form-label">Minimum Price</label>
-                <input id="searchMinPrice" name="searchMinPrice" value="@searchMinPrice" class="form-control" placeholder="e.g., 50.00" type="number" step="0.01" min="1" />
-            </div>
-
-            @* Filtro por Preço Máximo *@
-            <div class="col-md-6">
-                <label for="searchMaxPrice" class="form-label">Maximum Price</label>
-                <input id="searchMaxPrice" name="searchMaxPrice" value="@searchMaxPrice" class="form-control" placeholder="e.g., 150.00" type="number" step="0.01" min="1" />
-            </div>
-
-            @* Botões *@
-            <div class="col-12 d-flex gap-2 mt-4">
+            <div class="col-12 d-flex gap-2 mt-2">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-search me-1"></i> Search
                 </button>
-                <a asp-action="Index" class="btn btn-secondary">Clear Filters</a>
+                <a asp-action="Index" class="btn btn-secondary">Clear</a>
             </div>
         </form>
     </div>
 </div>
 
 @* Tabela de Resultados *@
-@if (!Model.Items.Any())
+@if (Model == null || !Model.Items.Any())
 {
-<div class="alert alert-warning mt-4" role="alert">
-    <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> No Plans Found</h4>
-    <p>There are no training plans matching your criteria.</p>
-    <hr />
-    <p class="mb-0">Please adjust your search filters or <a asp-action="Create" class="alert-link">create a new plan</a>.</p>
-</div>
+    <div class="alert alert-warning mt-4" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> No Plans Found</h4>
+        <p>There are no training plans available.</p>
+    </div>
 }
 else
 {
-    <div class="table-responsive shadow-sm rounded mt-4">
+    <div class="table-responsive shadow-sm rounded">
         <table class="table table-striped table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
                     <th>Plan Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
                     <th>Duration (Days)</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -112,28 +88,19 @@ else
                 {
                     <tr>
                         <td class="fw-bold">@Html.DisplayFor(modelItem => item.Name)</td>
-                        <td>
-                            @if (!string.IsNullOrWhiteSpace(item.Description))
-                            {
-                                @(item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)
-                            }
-                            else
-                            {
-                                <em>No description</em>
-                            }
-                        </td>
-                        <td>@item.Price.ToString("C")</td> @* Formata como moeda *@
                         <td>@Html.DisplayFor(modelItem => item.DurationDays)</td>
+
+                        @* Botões de Ação no estilo MemberPlan (tamanho 'sm') *@
                         <td class="text-end">
                             <div class="btn-group" role="group">
                                 <a asp-action="Edit" asp-route-id="@item.PlanId" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
+                                    <i class="bi bi-pencil-square"></i> Edit
                                 </a>
                                 <a asp-action="Details" asp-route-id="@item.PlanId" class="btn btn-sm btn-info" title="Details">
-                                    <i class="bi bi-info-circle"></i>
+                                    <i class="bi bi-info-circle"></i> Details
                                 </a>
                                 <a asp-action="Delete" asp-route-id="@item.PlanId" class="btn btn-sm btn-danger" title="Delete">
-                                    <i class="bi bi-trash"></i>
+                                    <i class="bi bi-trash"></i> Delete
                                 </a>
                             </div>
                         </td>
@@ -143,17 +110,15 @@ else
         </table>
     </div>
 
-    @* Paginação *@
+    @* Paginação (Mantido do MemberPlan) *@
     <nav aria-label="Plan pages" class="mt-3">
         <ul class="pagination justify-content-center">
+
             @* Botão "First" (Primeira Página) *@
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                 <a class="page-link" asp-action="Index"
                    asp-route-page="1"
-                   asp-route-searchName="@searchName"
-                   asp-route-searchMinPrice="@searchMinPrice"
-                   asp-route-searchMaxPrice="@searchMaxPrice"
-                   asp-route-searchDuration="@searchDuration">First</a>
+                   asp-route-searchPlanName="@searchPlan">First</a>
             </li>
 
             @* Links para Páginas Numeradas *@
@@ -163,22 +128,14 @@ else
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@p"
-                       asp-route-searchName="@searchName"
-                       asp-route-searchMinPrice="@searchMinPrice"
-                       asp-route-searchMaxPrice="@searchMaxPrice"
-                       asp-route-searchDuration="@searchDuration">@p</a>
+                       asp-route-searchPlanName="@searchPlan">@p</a>
                 </li>
             }
 
             @* Botão "Last" (Última Página) *@
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@Model.TotalPages"
-                   asp-route-searchName="@searchName"
-                   asp-route-searchMinPrice="@searchMinPrice"
-                   asp-route-searchMaxPrice="@searchMaxPrice"
-                   asp-route-searchDuration="@searchDuration">Last</a>
+                <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                   asp-route-searchPlanName="@searchPlan">Last</a>
             </li>
         </ul>
     </nav>
