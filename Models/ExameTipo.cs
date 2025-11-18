@@ -16,7 +16,7 @@ namespace HealthWellbeing.Models
 
 
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
-        [StringLength(100)]
+        // A validação de tamanho de string é REMOVIDA para o tipo INT.
         public int EspecialidadeId { get; set; } // FK
         public Especialidade? Especialidade { get; set; } // Propriedade de Navegação
 
