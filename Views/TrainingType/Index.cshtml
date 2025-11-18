@@ -17,7 +17,6 @@
         <thead class="table-dark">
             <tr>
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
-                <th class="d-none d-md-table-cell">@Html.DisplayNameFor(model => model.Description)</th>
                 <th>@Html.DisplayNameFor(model => model.DurationMinutes)</th>
                 <th>@Html.DisplayNameFor(model => model.IsActive)</th>
                 <th>Actions</th>
@@ -28,9 +27,6 @@
             {
                 <tr>
                     <td class="fw-bold">@Html.DisplayFor(modelItem => item.Name)</td>
-                    <td class="d-none d-md-table-cell text-truncate" style="max-width: 200px;">
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
                     <td>@Html.DisplayFor(modelItem => item.DurationMinutes)</td>
                     <td>
                         @{

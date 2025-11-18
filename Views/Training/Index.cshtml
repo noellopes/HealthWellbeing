@@ -21,10 +21,9 @@
 
                 <th>@Html.DisplayNameFor(model => model.Name)</th>
                 <th class="d-none d-md-table-cell">@Html.DisplayNameFor(model => model.Duration)</th>
-                <th>@Html.DisplayNameFor(model => model.DayOfWeek)</th>
+                @*<th>@Html.DisplayNameFor(model => model.DayOfWeek)</th>
                 <th>@Html.DisplayNameFor(model => model.StartTime)</th>
-                <th>@Html.DisplayNameFor(model => model.MaxParticipants)</th>
-
+                <th>@Html.DisplayNameFor(model => model.MaxParticipants)</th>*@
                 <th>Actions</th>
             </tr>
         </thead>
@@ -40,11 +39,9 @@
 
                     <td class="d-none d-md-table-cell">@Html.DisplayFor(modelItem => item.Duration) min</td>
 
-                    <td>@Html.DisplayFor(modelItem => item.DayOfWeek)</td>
-
+                    @*<td>@Html.DisplayFor(modelItem => item.DayOfWeek)</td>
                     <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
-
-                    <td>@Html.DisplayFor(modelItem => item.MaxParticipants)</td>
+                    <td>@Html.DisplayFor(modelItem => item.MaxParticipants)</td>*@
 
                     <td class="text-nowrap">
                         <a asp-action="Edit" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-primary me-1">Edit</a>
