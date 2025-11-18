@@ -74,7 +74,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.MusculoId == id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
 
             return View(musculo);
@@ -115,7 +115,7 @@ namespace HealthWellbeing.Controllers
             var musculo = await _context.Musculo.FindAsync(id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
             ViewData["GrupoMuscularId"] = new SelectList(_context.Set<GrupoMuscular>(), "GrupoMuscularId", "GrupoMuscularNome", musculo.GrupoMuscularId);
             return View(musculo);
@@ -144,7 +144,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!MusculoExists(musculo.MusculoId))
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(InvalidMusculo), musculo);
                     }
                     else
                     {
@@ -170,7 +170,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.MusculoId == id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
 
             return View(musculo);
@@ -189,6 +189,13 @@ namespace HealthWellbeing.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Musculo/InvalidMusculo
+        public IActionResult InvalidMusculo(Musculo musculo)
+        {
+            // Esta Action apenas retorna a View, passando o objeto Musculo (que pode conter os dados a recuperar)
+            return View(musculo);
         }
 
         private bool MusculoExists(int id)

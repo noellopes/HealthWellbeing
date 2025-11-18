@@ -53,6 +53,14 @@ namespace HealthWellbeing.Controllers
             return View(paginated);
         }
 
+        // GET: GrupoMuscular/InvalidGrupoMuscular
+        public IActionResult InvalidGrupoMuscular(GrupoMuscular grupoMuscular)
+        {
+            // Esta Action apenas retorna a View, passando o objeto GrupoMuscular 
+            // (que pode conter os dados a recuperar).
+            return View(grupoMuscular);
+        }
+
         // GET: GrupoMuscular/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -65,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.GrupoMuscularId == id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
 
             return View(grupoMuscular);
@@ -104,7 +112,7 @@ namespace HealthWellbeing.Controllers
             var grupoMuscular = await _context.GrupoMuscular.FindAsync(id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
             return View(grupoMuscular);
         }
@@ -132,7 +140,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!GrupoMuscularExists(grupoMuscular.GrupoMuscularId))
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(InvalidGrupoMuscular), grupoMuscular);
                     }
                     else
                     {
@@ -156,7 +164,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.GrupoMuscularId == id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
 
             return View(grupoMuscular);
