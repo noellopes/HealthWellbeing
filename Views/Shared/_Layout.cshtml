@@ -26,21 +26,24 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
 
-                        <!-- FoodHabits -->
+                        <!-- Dropdown FoodHabits -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="navHealthDropdown"
                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Food Habits
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
-                                <li><a class="dropdown-item" asp-controller="FoodCategory" asp-action="Index">Food Categories</a></li>
+                                <li><a class="dropdown-item" asp-controller="UserFoodRegistration" asp-action="Index">Daily Registration</a></li>
+                                <li><a class="dropdown-item" asp-controller="Goal" asp-action="Index">Goals</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodPlan" asp-action="Index">Plans</a></li>
+                                <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" asp-controller="Food" asp-action="Index">Foods</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodCategory" asp-action="Index">Food Categories</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodPortion" asp-action="Index">Food Portions</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodComponent" asp-action="Index">Food Components</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" asp-controller="NutrientComponent" asp-action="Index">Nutrients</a></li>
                                 <li><a class="dropdown-item" asp-controller="FoodNutrient" asp-action="Index">Food Nutrients</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-controller="Goal" asp-action="Index">Goals</a></li>
-                                <li><a class="dropdown-item" asp-controller="FoodPlan" asp-action="Index">Food Plans</a></li>
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" asp-controller="Nutritionist" asp-action="Index">Nutritionists</a></li>
                             </ul>

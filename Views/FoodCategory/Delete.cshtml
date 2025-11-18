@@ -1,31 +1,27 @@
 ﻿@model HealthWellbeing.Models.FoodCategory
 @{
     ViewData["Title"] = "Delete Category";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
 }
-<h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrWhiteSpace(success))
+<h1>Delete Category</h1>
+
+@if (TempData["Error"] != null)
 {
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
+    <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<div class="alert alert-danger">Are you sure you want to delete <strong>@Model.Name</strong>?</div>
+<h5>Are you sure you want to delete this category?</h5>
+<div class="mb-3">
+    <strong>@Model.Name</strong>
+    <div class="text-muted">@Model.Description</div>
+    <div>Parent: @Model.ParentCategory?.Name</div>
+</div>
 
-<dl class="row">
-    <dt class="col-sm-3">Parent</dt>
-    <dd class="col-sm-9">@Model.ParentCategory?.Name</dd>
-    <dt class="col-sm-3">Description</dt>
-    <dd class="col-sm-9">@Model.Description</dd>
-</dl>
-
-<form asp-action="Delete">
+<form asp-action="Delete" method="post">
     <input type="hidden" asp-for="FoodCategoryId" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger"
+            onclick="return confirm('This action cannot be undone. Proceed?');">
+        Delete
+    </button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
 </form>

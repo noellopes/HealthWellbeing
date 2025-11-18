@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
@@ -16,120 +17,160 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: /FoodPortion
         public async Task<IActionResult> Index()
         {
             var list = await _context.FoodPortion
+                .Include(p => p.Food)
                 .AsNoTracking()
-                .OrderBy(x => x.FoodName)
-                .ThenBy(x => x.Amount)
+                .OrderBy(p => p.Food!.Name)
+                .ThenBy(p => p.AmountGramsMl)
                 .ToListAsync();
 
             return View(list);
         }
 
-        // GET: /FoodPortion/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.FoodPortion
+            var portion = await _context.FoodPortion
+                .Include(p => p.Food)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.FoodPortionId == id);
+                .FirstOrDefaultAsync(p => p.FoodPortionId == id);
 
-            if (item == null) return NotFound();
-            return View(item);
+            if (portion == null) return NotFound();
+            return View(portion);
         }
 
-        // GET: /FoodPortion/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new FoodPortion());
+            await LoadFoodsAsync();
+            return View();
         }
 
-        // POST: /FoodPortion/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(FoodPortion model)
+        public async Task<IActionResult> Create([Bind("FoodId,Portion,AmountGramsMl")] FoodPortion model)
         {
-            // Uniqueness defensive check (também garantido por índice único na BD)
-            if (await _context.FoodPortion.AnyAsync(p => p.FoodName == model.FoodName && p.Amount == model.Amount))
-                ModelState.AddModelError(nameof(FoodPortion.FoodName), "This portion already exists for the given food.");
+            if (await _context.FoodPortion
+                .AnyAsync(p => p.FoodId == model.FoodId && p.Portion.ToLower() == model.Portion.Trim().ToLower()))
+            {
+                ModelState.AddModelError(nameof(FoodPortion.Portion), "This portion label already exists for the selected food.");
+            }
 
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                await LoadFoodsAsync(model.FoodId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
+            }
 
-            _context.Add(model);
-            await _context.SaveChangesAsync();
-            TempData["Msg"] = "Record created.";
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                model.Portion = model.Portion.Trim();
+                _context.Add(model);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Food portion created successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Error creating record: {ex.GetBaseException().Message}";
+                await LoadFoodsAsync(model.FoodId);
+                return View(model);
+            }
         }
 
-        // GET: /FoodPortion/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.FoodPortion.FindAsync(id);
-            if (item == null) return NotFound();
+            var model = await _context.FoodPortion.FindAsync(id);
+            if (model == null) return NotFound();
 
-            return View(item);
+            await LoadFoodsAsync(model.FoodId);
+            return View(model);
         }
 
-        // POST: /FoodPortion/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, FoodPortion model)
+        public async Task<IActionResult> Edit(int id, [Bind("FoodPortionId,FoodId,Portion,AmountGramsMl")] FoodPortion model)
         {
             if (id != model.FoodPortionId) return NotFound();
 
             if (await _context.FoodPortion
-                .AnyAsync(p => p.FoodPortionId != id && p.FoodName == model.FoodName && p.Amount == model.Amount))
-                ModelState.AddModelError(nameof(FoodPortion.FoodName), "This portion already exists for the given food.");
+                .AnyAsync(p => p.FoodPortionId != id && p.FoodId == model.FoodId && p.Portion.ToLower() == model.Portion.Trim().ToLower()))
+            {
+                ModelState.AddModelError(nameof(FoodPortion.Portion), "This portion label already exists for the selected food.");
+            }
 
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                await LoadFoodsAsync(model.FoodId);
+                TempData["Error"] = "Please correct the errors below.";
+                return View(model);
+            }
 
             try
             {
-                _context.Update(model);
-                await _context.SaveChangesAsync();
-                TempData["Msg"] = "Record updated.";
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                var exists = await _context.FoodPortion.AnyAsync(e => e.FoodPortionId == id);
-                if (!exists) return NotFound();
-                throw;
-            }
+                var entity = await _context.FoodPortion.FirstOrDefaultAsync(p => p.FoodPortionId == id);
+                if (entity == null) return NotFound();
 
-            return RedirectToAction(nameof(Index));
+                entity.FoodId = model.FoodId;
+                entity.Portion = model.Portion.Trim();
+                entity.AmountGramsMl = model.AmountGramsMl;
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Food portion updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not save changes: {ex.GetBaseException().Message}";
+                await LoadFoodsAsync(model.FoodId);
+                return View(model);
+            }
         }
 
-        // GET: /FoodPortion/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.FoodPortion
+            var model = await _context.FoodPortion
+                .Include(p => p.Food)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.FoodPortionId == id);
+                .FirstOrDefaultAsync(p => p.FoodPortionId == id);
 
-            if (item == null) return NotFound();
-            return View(item);
+            if (model == null) return NotFound();
+            return View(model);
         }
 
-        // POST: /FoodPortion/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.FoodPortion.FindAsync(id);
-            if (item != null)
+            var portion = await _context.FoodPortion.FirstOrDefaultAsync(p => p.FoodPortionId == id);
+            if (portion == null) return NotFound();
+
+            try
             {
-                _context.FoodPortion.Remove(item);
+                _context.FoodPortion.Remove(portion);
                 await _context.SaveChangesAsync();
-                TempData["Msg"] = "Record removed.";
+                TempData["Success"] = "Food portion deleted successfully.";
             }
+            catch (DbUpdateException ex)
+            {
+                TempData["Error"] = $"Could not delete record: {ex.GetBaseException().Message}";
+            }
+
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadFoodsAsync(int? selectedId = null)
+        {
+            ViewBag.FoodId = new SelectList(
+                await _context.Food.AsNoTracking().OrderBy(f => f.Name).ToListAsync(),
+                "FoodId", "Name", selectedId);
         }
     }
 }

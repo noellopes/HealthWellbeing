@@ -12,7 +12,6 @@ namespace HealthWellbeing.Models
         [Required, StringLength(120)]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(300)]
         public string? Description { get; set; }
 
         [Required]
@@ -20,6 +19,6 @@ namespace HealthWellbeing.Models
         public FoodCategory? FoodCategory { get; set; }
 
         public ICollection<FoodNutrient>? FoodNutrients { get; set; }
-        public ICollection<FoodPlan>? Plans { get; set; }
+        public ICollection<FoodPlan>? FoodPlans { get; set; }
     }
 }

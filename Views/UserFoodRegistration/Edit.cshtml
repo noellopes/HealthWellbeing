@@ -1,56 +1,71 @@
 ﻿@model HealthWellbeing.Models.UserFoodRegistration
-
 @{
     ViewData["Title"] = "Edit Food Record";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>@ViewData["Title"]</h1>
 
-<hr />
+@if (success != null)
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (error != null)
+{
+    <div class="alert alert-danger">@error</div>
+}
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="Id" />
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="UserFoodRegistrationId" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="UserId" class="form-label"></label>
-                <input asp-for="UserId" class="form-control" type="number" min="1" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MealDateTime" class="form-label"></label>
-                <input asp-for="MealDateTime" class="form-control" type="datetime-local" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="MealType" class="form-label"></label>
-                <input asp-for="MealType" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="FoodName" class="form-label"></label>
-                <input asp-for="FoodName" class="form-control" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Quantity" class="form-label"></label>
-                <input asp-for="Quantity" class="form-control" type="number" step="0.1" min="0.1" />
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Notes" class="form-label"></label>
-                <textarea asp-for="Notes" class="form-control"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-            <a asp-action="Index" class="btn btn-secondary">Back</a>
-        </form>
+    <div class="mb-3">
+        <label asp-for="ClientId" class="form-label"></label>
+        <select asp-for="ClientId" asp-items="ViewBag.ClientId" class="form-select"></select>
+        <span asp-validation-for="ClientId" class="text-danger"></span>
     </div>
-</div>
+
+    <div class="mb-3">
+        <label asp-for="FoodId" class="form-label"></label>
+        <select asp-for="FoodId" asp-items="ViewBag.FoodId" class="form-select"></select>
+        <span asp-validation-for="FoodId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="FoodPortionId" class="form-label"></label>
+        <select asp-for="FoodPortionId" asp-items="ViewBag.FoodPortionId" class="form-select"></select>
+        <span asp-validation-for="FoodPortionId" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col">
+            <label asp-for="PortionsCount" class="form-label"></label>
+            <input asp-for="PortionsCount" class="form-control" />
+            <span asp-validation-for="PortionsCount" class="text-danger"></span>
+        </div>
+        <div class="col">
+            <label asp-for="MealType" class="form-label"></label>
+            <input asp-for="MealType" class="form-control" />
+            <span asp-validation-for="MealType" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3 mt-2">
+        <label asp-for="MealDateTime" class="form-label"></label>
+        <input asp-for="MealDateTime" type="datetime-local" class="form-control" />
+        <span asp-validation-for="MealDateTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

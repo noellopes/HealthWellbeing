@@ -1,0 +1,35 @@
+﻿@model HealthWellbeing.Models.Goal
+@{
+    ViewData["Title"] = "Delete Goal";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+}
+<h1>@ViewData["Title"]</h1>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-danger">Are you sure you want to delete this goal?</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Client</dt>
+    <dd class="col-sm-9">@Model.Client?.Name</dd>
+
+    <dt class="col-sm-3">Goal Type</dt>
+    <dd class="col-sm-9">@Model.GoalType</dd>
+
+    <dt class="col-sm-3">Calories</dt>
+    <dd class="col-sm-9">@Model.DailyCalories</dd>
+</dl>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="GoalId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

@@ -1,22 +1,17 @@
 ﻿@model HealthWellbeing.Models.FoodCategory
 @{
     ViewData["Title"] = "Create Category";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
-}
-<h1>@ViewData["Title"]</h1>
-
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
 }
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+<h1>Create Category</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form asp-action="Create" method="post" novalidate>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
@@ -25,21 +20,22 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label" asp-for="ParentCategoryId">Parent Category</label>
-        <select asp-for="ParentCategoryId" class="form-select" asp-items="ViewBag.ParentCategoryId">
-            <option value="">-- None --</option>
+        <label asp-for="Description" class="form-label"></label>
+        <input asp-for="Description" class="form-control" />
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ParentCategoryId" class="form-label"></label>
+        <select asp-for="ParentCategoryId" class="form-select"
+                asp-items="ViewBag.ParentCategoryId">
+            <option value="">(no parent)</option>
         </select>
         <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <button class="btn btn-primary" type="submit">Create</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancel</a>
 </form>
 
 @section Scripts {

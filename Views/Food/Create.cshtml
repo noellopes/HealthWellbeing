@@ -6,17 +6,10 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
+<h1>Create Food</h1>
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+<form asp-action="Create" method="post" novalidate>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
@@ -25,19 +18,21 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="FoodCategoryId" class="form-label">Category</label>
-        <select asp-for="FoodCategoryId" class="form-select" asp-items="ViewBag.FoodCategoryId"></select>
-        <span asp-validation-for="FoodCategoryId" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
         <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" rows="3" class="form-control"></textarea>
+        <input asp-for="Description" class="form-control" />
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary" type="submit">Create</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <div class="mb-3">
+        <label asp-for="FoodCategoryId" class="form-label"></label>
+        <select asp-for="FoodCategoryId" asp-items="ViewBag.FoodCategoryId" class="form-select">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="FoodCategoryId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
 
 @section Scripts {

@@ -1,42 +1,34 @@
 ﻿@model HealthWellbeing.Models.UserFoodRegistration
-
 @{
-    ViewData["Title"] = "Delete Record";
+    ViewData["Title"] = "Delete Food Record";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>@ViewData["Title"]</h1>
 
-<hr />
+<div class="alert alert-danger">Are you sure you want to delete this record?</div>
 
-<h4>Are you sure you want to delete this record?</h4>
+<dl class="row">
+    <dt class="col-sm-3">Client</dt>
+    <dd class="col-sm-9">@Model.Client?.Name</dd>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">Name</dt>
-        <dd class="col-sm-9">@Model.Name</dd>
+    <dt class="col-sm-3">Food</dt>
+    <dd class="col-sm-9">@Model.Food?.Name</dd>
 
-        <dt class="col-sm-3">User ID</dt>
-        <dd class="col-sm-9">@Model.UserId</dd>
+    <dt class="col-sm-3">Portion</dt>
+    <dd class="col-sm-9">@Model.FoodPortion?.Portion</dd>
 
-        <dt class="col-sm-3">Meal Date and Time</dt>
-        <dd class="col-sm-9">@Model.MealDateTime</dd>
+    <dt class="col-sm-3">Meal Type</dt>
+    <dd class="col-sm-9">@Model.MealType</dd>
 
-        <dt class="col-sm-3">Meal Type</dt>
-        <dd class="col-sm-9">@Model.MealType</dd>
+    <dt class="col-sm-3">Date</dt>
+    <dd class="col-sm-9">@Model.MealDateTime.ToString("dd/MM/yyyy HH:mm")</dd>
 
-        <dt class="col-sm-3">Food Name</dt>
-        <dd class="col-sm-9">@Model.FoodName</dd>
+    <dt class="col-sm-3">Estimated Energy (kcal)</dt>
+    <dd class="col-sm-9">@Model.EstimatedEnergyKcal</dd>
+</dl>
 
-        <dt class="col-sm-3">Quantity</dt>
-        <dd class="col-sm-9">@Model.Quantity</dd>
-
-        <dt class="col-sm-3">Notes</dt>
-        <dd class="col-sm-9">@Model.Notes</dd>
-    </dl>
-</div>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="Id" />
+<form asp-action="Delete">
+    <input type="hidden" asp-for="UserFoodRegistrationId" />
     <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

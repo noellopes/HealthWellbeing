@@ -1,0 +1,25 @@
+﻿@model HealthWellbeing.Models.Nutritionist
+
+@{
+    ViewData["Title"] = "Delete Nutritionist";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this nutritionist?
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <p class="card-text"><strong>Name:</strong> @Model.Name</p>
+        <p class="card-text"><strong>Email:</strong> @Model.Email</p>
+        <p class="card-text"><strong>Phone:</strong> @Model.Phone</p>
+    </div>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="NutritionistId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

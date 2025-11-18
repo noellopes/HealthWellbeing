@@ -1,0 +1,18 @@
+﻿@model HealthWellbeing.Models.Nutritionist
+
+@{
+    ViewData["Title"] = "Nutritionist Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <p class="card-text"><strong>Name:</strong> @Model.Name</p>
+        <p class="card-text"><strong>Email:</strong> @Model.Email</p>
+        <p class="card-text"><strong>Phone:</strong> @Model.Phone</p>
+    </div>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.NutritionistId" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
