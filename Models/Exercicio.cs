@@ -40,10 +40,7 @@ namespace HealthWellbeing.Models
         [Range(1, 100, ErrorMessage = "As séries devem ser entre 1 e 100.")]
         public int Series { get; set; }
 
-        // Lista de grupos Generos
-        public ICollection<Genero>? Genero { get; set; }
-
-        // Lista de grupos musculares
-        public ICollection<GrupoMuscular>? GrupoMuscular { get; set; }
+        public ICollection<ExercicioGenero>? ExercicioGeneros { get; set; }
+        public ICollection<ExercicioGrupoMuscular>? ExercicioGrupoMusculares { get; set; }
     }
 }

@@ -19,25 +19,61 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Exercicio> Exercicio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Beneficio> Beneficio { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TipoExercicioBeneficio> TipoExercicioBeneficio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ProblemaSaude> ProblemaSaude { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // --- CONFIGURAÇÃO CASCADE DELETE ---
+            modelBuilder.Entity<TipoExercicioBeneficio>()
+                .HasKey(tb => new { tb.TipoExercicioId, tb.BeneficioId });
 
-            // Configuração para a relação Muitos-para-Muitos (Problema <-> Profissional)
-            // Isto garante que ao apagar o Problema, as linhas na tabela de união são apagadas.
+            modelBuilder.Entity<TipoExercicioBeneficio>()
+                .HasOne(tb => tb.TipoExercicio)
+                .WithMany(t => t.TipoExercicioBeneficios)
+                .HasForeignKey(tb => tb.TipoExercicioId);
+
+            modelBuilder.Entity<TipoExercicioBeneficio>()
+                .HasOne(tb => tb.Beneficio)
+                .WithMany(b => b.TipoExercicioBeneficios)
+                .HasForeignKey(tb => tb.BeneficioId);
+
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasKey(eg => new { eg.ExercicioId, eg.GeneroId });
+
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasOne(eg => eg.Exercicio)
+                .WithMany(e => e.ExercicioGeneros)
+                .HasForeignKey(eg => eg.ExercicioId);
+
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasOne(eg => eg.Genero)
+                .WithMany(g => g.ExercicioGeneros)
+                .HasForeignKey(eg => eg.GeneroId);
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasKey(egm => new { egm.ExercicioId, egm.GrupoMuscularId });
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasOne(egm => egm.Exercicio)
+                .WithMany(e => e.ExercicioGrupoMusculares)
+                .HasForeignKey(egm => egm.ExercicioId);
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasOne(egm => egm.GrupoMuscular)
+                .WithMany(gm => gm.ExercicioGrupoMusculares)
+                .HasForeignKey(egm => egm.GrupoMuscularId);
+
             modelBuilder.Entity<ProblemaSaude>()
                     .HasMany(p => p.ProfissionalExecutante)      // Lado A: Problema tem Profissionais
                     .WithMany(p => p.ProblemasSaude)              // Lado B: Profissional tem Problemas <--- O ERRO ESTAVA AQUI (Faltava esta ligação)
                     .UsingEntity(j => j.ToTable("ProblemaSaudeProfissionais"));
+
         }
     }
 

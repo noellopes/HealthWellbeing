@@ -1,5 +1,8 @@
 ﻿using HealthWellbeing.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Data
 {
@@ -17,9 +20,27 @@ namespace HealthWellbeing.Data
 
         private static void PopulateExercicios(HealthWellbeingDbContext dbContext)
         {
-            // Se já houver exercícios, não faz nada
+            // 1. Verifica se já existem exercícios. Se sim, não faz nada.
             if (dbContext.Exercicio.Any()) return;
 
+            // 2. Cria ou recupera os Gêneros (Masculino, Feminino, Unisexo)
+            var generoMasculino = dbContext.Genero.FirstOrDefault(g => g.NomeGenero == "Masculino")
+                                  ?? new Genero { NomeGenero = "Masculino" };
+
+            var generoFeminino = dbContext.Genero.FirstOrDefault(g => g.NomeGenero == "Feminino")
+                                 ?? new Genero { NomeGenero = "Feminino" };
+
+            var generoUnisexo = dbContext.Genero.FirstOrDefault(g => g.NomeGenero == "Unisexo")
+                                ?? new Genero { NomeGenero = "Unisexo" };
+
+            // Adiciona ao contexto se forem novos (ID == 0)
+            if (generoMasculino.GeneroId == 0) dbContext.Genero.Add(generoMasculino);
+            if (generoFeminino.GeneroId == 0) dbContext.Genero.Add(generoFeminino);
+            if (generoUnisexo.GeneroId == 0) dbContext.Genero.Add(generoUnisexo);
+
+            dbContext.SaveChanges(); // Guarda os géneros para gerar os IDs reais
+
+            // 3. Criação dos Exercícios com a associação ao Gênero correto
             var exercicios = new[]
             {
                 new Exercicio
@@ -33,7 +54,11 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    // A maioria dos exercícios básicos são para ambos os sexos
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -46,7 +71,10 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 4,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -59,7 +87,10 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -72,7 +103,11 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Halteres",
                     Repeticoes = 12,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoMasculino.GeneroId }, // Exemplo: se quiseres associar a Masculino E Feminino explicitamente em vez de Unisexo
+                        new ExercicioGenero { GeneroId = generoFeminino.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -85,20 +120,27 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 1,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
-                    ExercicioNome = "Elevação de Pernas",
-                    Descricao = "Exercício para abdómen inferior e core.",
-                    Duracao = 8,
+                    ExercicioNome = "Elevação Pélvica", // Exemplo comum em treinos focados em glúteos
+                    Descricao = "Exercício focado na região glútea.",
+                    Duracao = 10,
                     Intencidade = 5,
                     CaloriasGastas = 40,
-                    Instrucoes = "Deitar de costas, levantar pernas mantendo-as esticadas e descer lentamente.",
+                    Instrucoes = "Deitar de costas, joelhos dobrados, elevar a bacia contraindo os glúteos.",
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoFeminino.GeneroId }, // Exemplo: focado em público feminino (embora homens façam)
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -111,7 +153,10 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Halteres",
                     Repeticoes = 12,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -124,20 +169,27 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 10,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
-                    ExercicioNome = "Alongamento de Pernas",
-                    Descricao = "Exercício de flexibilidade para pernas e glúteos.",
-                    Duracao = 5,
-                    Intencidade = 3,
-                    CaloriasGastas = 10,
-                    Instrucoes = "Sentar, esticar pernas e alcançar os pés lentamente.",
-                    EquipamentoNecessario = "Nenhum",
-                    Repeticoes = 1,
-                    Series = 2,
-                    //Genero = "Unisexo"
+                    ExercicioNome = "Supino Reto", // Exemplo clássico associado a treino de peito masculino
+                    Descricao = "Exercício de força para peitoral maior.",
+                    Duracao = 15,
+                    Intencidade = 8,
+                    CaloriasGastas = 90,
+                    Instrucoes = "Deitar no banco, descer a barra até ao peito e empurrar para cima.",
+                    EquipamentoNecessario = "Barra e Banco",
+                    Repeticoes = 10,
+                    Series = 4,
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoMasculino.GeneroId }, // Exemplo de target
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 },
                 new Exercicio
                 {
@@ -150,7 +202,10 @@ namespace HealthWellbeing.Data
                     EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 3,
-                    //Genero = "Unisexo"
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = generoUnisexo.GeneroId }
+                    }
                 }
             };
 

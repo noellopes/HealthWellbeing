@@ -5,7 +5,7 @@
 namespace HealthWellbeing.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class roles : Migration
+    public partial class cargos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
