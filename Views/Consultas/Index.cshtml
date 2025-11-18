@@ -46,10 +46,10 @@
 
             <div class="col-12 mt-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Search
+                    <i class="bi bi-search me-1"></i> Procurar
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">
-                    Clear
+                    Limpar
                 </a>
             </div>
         </form>
@@ -99,8 +99,8 @@ else
                 <tr>
                     <th>Data Marcação</th>
                     <th>Data Consulta</th>
-                    <th>Hora Início</th>
-                    <th>Hora Fim</th>
+                    <th>Médico</th>
+                    <th>Especialidade</th>
                     <th>Estado</th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -112,6 +112,8 @@ else
                     <tr class="text-center">
                         <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@consulta.DataConsulta.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@consulta.Doctor?.Nome</td>
+                        <td>@consulta.Speciality?.Nome</td>
                         
                     <td>
                         <span class="@Badge(consulta.Estado) px-3 py-2 rounded-pill">

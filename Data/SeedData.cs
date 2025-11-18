@@ -16,148 +16,71 @@ namespace HealthWellbeing.Data
             db.Database.EnsureCreated();
 
             PopulateSpecialities(db);
-            PopulateConsultas(db);
             PopulateDoctor(db);
+            PopulateConsultas(db);
             PopulateUtenteSaude(db);
         }
 
-        private static void PopulateConsultas(HealthWellbeingDbContext db)
+        private static void PopulateSpecialities(HealthWellbeingDbContext db)
         {
-            if (db.Consulta.Any()) return;
+            if (db.Specialities.Any()) return; // Evita duplicar registos
 
-            var hoje = DateTime.Today;
-
-            var consulta = new[]
+            var especialidades = new[]
             {
-                // -- Exemplo base --
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(10, 30),
-                    HoraFim      = new TimeOnly(11, 30),
-                },
+        new Specialities
+        {
+            Nome = "Cardiologia",
+            Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
+        },
+        new Specialities
+        {
+            Nome = "Dermatologia",
+            Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
+        },
+        new Specialities
+        {
+            Nome = "Pediatria",
+            Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
+        },
+        new Specialities
+        {
+            Nome = "Psiquiatria",
+            Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
+        },
+        new Specialities
+        {
+            Nome = "Nutrição",
+            Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
+        },
+        new Specialities
+        {
+            Nome = "Medicina Geral e Familiar",
+            Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
+        },
+        new Specialities
+        {
+            Nome = "Ortopedia",
+            Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
+        },
+        new Specialities
+        {
+            Nome = "Ginecologia e Obstetrícia",
+            Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
+        },
+        new Specialities
+        {
+            Nome = "Psicologia",
+            Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
+        },
+        new Specialities
+        {
+            Nome = "Fisioterapia",
+            Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
+        },
 
-                // FUTURAS (Agendada)
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 5, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 12, 1, 11, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 15),
-                    HoraFim      = new TimeOnly(12, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(15, 0),
-                    HoraFim      = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 30),
-                    HoraFim      = new TimeOnly(17, 0),
-                },
+    };
 
-                // HOJE (para testar “Hoje”)
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-2).AddHours(10),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 30),
-                    HoraFim      = new TimeOnly(10, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(14, 0),
-                    HoraFim      = new TimeOnly(14, 30),
-                },
-
-                // EXPIRADAS
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 15, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 8, 20, 11, 25, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 25, 11, 45, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 45),
-                    HoraFim      = new TimeOnly(12, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 7, 5, 13, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 8, 10, 16, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 0),
-                    HoraFim      = new TimeOnly(16, 30),
-                },
-
-                // CANCELADAS
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(9, 0),
-                    HoraFim          = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 9, 15, 11, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 8, 10, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(15, 0),
-                    HoraFim          = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 6, 10, 12, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 7, 5, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 7, 3, 14, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(10, 30),
-                    HoraFim          = new TimeOnly(11, 0),
-                },
-
-                // MAIS FUTURAS
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(13, 30),
-                    HoraFim      = new TimeOnly(14, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 25, 8, 55, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 12, 12, 8, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(8, 30),
-                    HoraFim      = new TimeOnly(9, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 27, 16, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 22, 17, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(17, 0),
-                    HoraFim      = new TimeOnly(17, 30),
-                }
-            };
-
-            db.Consulta.AddRange(consulta);
+            db.Specialities.AddRange(especialidades);
             db.SaveChanges();
         }
 
@@ -189,6 +112,185 @@ namespace HealthWellbeing.Data
             db.Doctor.AddRange(doctor);
             db.SaveChanges();
         }
+
+        private static void PopulateConsultas(HealthWellbeingDbContext db)
+        {
+            if (db.Consulta.Any()) return;
+
+            var hoje = DateTime.Today;
+
+            var especialidade = db.Specialities.First();   // por ex., Cardiologia
+            var medico = db.Doctor.First();               // por ex., Ana Martins
+
+            var consulta = new[]
+            {
+                // -- Exemplo base --
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(10, 30),
+                    HoraFim      = new TimeOnly(11, 30),
+
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+
+                // FUTURAS (Agendada)
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 11, 5, 9, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(9, 0),
+                    HoraFim      = new TimeOnly(9, 30),
+
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 12, 1, 11, 15, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(11, 15),
+                    HoraFim      = new TimeOnly(12, 0),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(15, 0),
+                    HoraFim      = new TimeOnly(15, 45),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(16, 30),
+                    HoraFim      = new TimeOnly(17, 0),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+
+                // HOJE (para testar “Hoje”)
+                new Consulta
+                {
+                    DataMarcacao = hoje.AddDays(-2).AddHours(10),
+                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(9, 30),
+                    HoraFim      = new TimeOnly(10, 0),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
+                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(14, 0),
+                    HoraFim      = new TimeOnly(14, 30),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+
+                // EXPIRADAS
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 9, 15, 9, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(9, 0),
+                    HoraFim      = new TimeOnly(9, 30),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 8, 20, 11, 25, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 9, 25, 11, 45, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(11, 45),
+                    HoraFim      = new TimeOnly(12, 15),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 7, 5, 13, 10, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 8, 10, 16, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(16, 0),
+                    HoraFim      = new TimeOnly(16, 30),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+
+                // CANCELADAS
+                new Consulta
+                {
+                    DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
+                    DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
+                    DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio       = new TimeOnly(9, 0),
+                    HoraFim          = new TimeOnly(9, 30),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao     = new DateTime(2025, 9, 15, 11, 30, 0, DateTimeKind.Unspecified),
+                    DataConsulta     = new DateTime(2025, 10, 10, 15, 0, 0, DateTimeKind.Unspecified),
+                    DataCancelamento = new DateTime(2025, 10, 8, 10, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio       = new TimeOnly(15, 0),
+                    HoraFim          = new TimeOnly(15, 45),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao     = new DateTime(2025, 6, 10, 12, 0, 0, DateTimeKind.Unspecified),
+                    DataConsulta     = new DateTime(2025, 7, 5, 10, 30, 0, DateTimeKind.Unspecified),
+                    DataCancelamento = new DateTime(2025, 7, 3, 14, 15, 0, DateTimeKind.Unspecified),
+                    HoraInicio       = new TimeOnly(10, 30),
+                    HoraFim          = new TimeOnly(11, 0),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+
+                // MAIS FUTURAS
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(13, 30),
+                    HoraFim      = new TimeOnly(14, 15),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 25, 8, 55, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2025, 12, 12, 8, 30, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(8, 30),
+                    HoraFim      = new TimeOnly(9, 0),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                },
+                new Consulta
+                {
+                    DataMarcacao = new DateTime(2025, 10, 27, 16, 10, 0, DateTimeKind.Unspecified),
+                    DataConsulta = new DateTime(2026, 1, 22, 17, 0, 0, DateTimeKind.Unspecified),
+                    HoraInicio   = new TimeOnly(17, 0),
+                    HoraFim      = new TimeOnly(17, 30),
+                    IdMedico     = medico.IdMedico,
+                    IdEspecialidade = especialidade.IdEspecialidade
+                }
+            };
+
+            db.Consulta.AddRange(consulta);
+            db.SaveChanges();
+        }
+
+        
 
         private static void PopulateUtenteSaude(HealthWellbeingDbContext db)
         {
@@ -775,68 +877,7 @@ namespace HealthWellbeing.Data
             db.UtenteSaude.AddRange(utentes);
             db.SaveChanges();
         }
-        private static void PopulateSpecialities(HealthWellbeingDbContext db)
-        {
-            if (db.Specialities.Any()) return; // Evita duplicar registos
-
-            var especialidades = new[]
-            {
-        new Specialities
-        {
-            Nome = "Cardiologia",
-            Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
-        },
-        new Specialities
-        {
-            Nome = "Dermatologia",
-            Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
-        },
-        new Specialities
-        {
-            Nome = "Pediatria",
-            Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
-        },
-        new Specialities
-        {
-            Nome = "Psiquiatria",
-            Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
-        },
-        new Specialities
-        {
-            Nome = "Nutrição",
-            Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
-        },
-        new Specialities
-        {
-            Nome = "Medicina Geral e Familiar",
-            Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
-        },
-        new Specialities
-        {
-            Nome = "Ortopedia",
-            Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
-        },
-        new Specialities
-        {
-            Nome = "Ginecologia e Obstetrícia",
-            Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
-        },
-        new Specialities
-        {
-            Nome = "Psicologia",
-            Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
-        },
-        new Specialities
-        {
-            Nome = "Fisioterapia",
-            Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
-        },
-       
-    };
-
-            db.Specialities.AddRange(especialidades);
-            db.SaveChanges();
-        }
+        
 
     }
 }

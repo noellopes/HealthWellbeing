@@ -26,24 +26,6 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Consulta",
-                columns: table => new
-                {
-                    IdConsulta = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DataMarcacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DataCancelamento = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    HoraInicio = table.Column<TimeOnly>(type: "time", nullable: false),
-                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
-                    SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Consulta", x => x.IdConsulta);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Doctor",
                 columns: table => new
                 {
@@ -159,6 +141,38 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Consulta",
+                columns: table => new
+                {
+                    IdConsulta = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DataMarcacao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DataConsulta = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DataCancelamento = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    HoraInicio = table.Column<TimeOnly>(type: "time", nullable: false),
+                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
+                    SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdMedico = table.Column<int>(type: "int", nullable: false),
+                    DoctorIdMedico = table.Column<int>(type: "int", nullable: true),
+                    IdEspecialidade = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Consulta", x => x.IdConsulta);
+                    table.ForeignKey(
+                        name: "FK_Consulta_Doctor_DoctorIdMedico",
+                        column: x => x.DoctorIdMedico,
+                        principalTable: "Doctor",
+                        principalColumn: "IdMedico");
+                    table.ForeignKey(
+                        name: "FK_Consulta_Specialities_IdEspecialidade",
+                        column: x => x.IdEspecialidade,
+                        principalTable: "Specialities",
+                        principalColumn: "IdEspecialidade",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alergia",
                 columns: table => new
                 {
@@ -191,6 +205,16 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaAlimentoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Consulta_DoctorIdMedico",
+                table: "Consulta",
+                column: "DoctorIdMedico");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Consulta_IdEspecialidade",
+                table: "Consulta",
+                column: "IdEspecialidade");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UtenteSaude_Nif",
                 table: "UtenteSaude",
                 column: "Nif",
@@ -219,22 +243,22 @@ namespace HealthWellbeing.Migrations
                 name: "Consulta");
 
             migrationBuilder.DropTable(
-                name: "Doctor");
-
-            migrationBuilder.DropTable(
                 name: "Receita");
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
-                name: "Specialities");
-
-            migrationBuilder.DropTable(
                 name: "UtenteSaude");
 
             migrationBuilder.DropTable(
                 name: "Alimento");
+
+            migrationBuilder.DropTable(
+                name: "Doctor");
+
+            migrationBuilder.DropTable(
+                name: "Specialities");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -19,8 +20,14 @@ namespace HealthWellbeing.Models
         DataCancelamento.HasValue ? "Cancelada" :
         (DataConsulta.Date < DateTime.Today) ? "Expirada" :
         (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
-
         public string? SearchTerm { get; set; }
-
+        
+        public int IdMedico { get; set; }
+        public Doctor? Doctor { get; set; }
+        
+        [ForeignKey(nameof(Speciality))]
+        public int IdEspecialidade { get; set; }
+        
+        public Specialities? Speciality { get; set; }
     }
 }

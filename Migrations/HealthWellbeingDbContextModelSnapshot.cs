@@ -138,16 +138,29 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("DataMarcacao")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DoctorIdMedico")
+                        .HasColumnType("int");
+
                     b.Property<TimeOnly>("HoraFim")
                         .HasColumnType("time");
 
                     b.Property<TimeOnly>("HoraInicio")
                         .HasColumnType("time");
 
+                    b.Property<int>("IdEspecialidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdMedico")
+                        .HasColumnType("int");
+
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdConsulta");
+
+                    b.HasIndex("DoctorIdMedico");
+
+                    b.HasIndex("IdEspecialidade");
 
                     b.ToTable("Consulta");
                 });
@@ -359,9 +372,36 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Categoria");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Consulta", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
+                        .WithMany("Consultas")
+                        .HasForeignKey("DoctorIdMedico");
+
+                    b.HasOne("HealthWellbeing.Models.Specialities", "Speciality")
+                        .WithMany("Consultas")
+                        .HasForeignKey("IdEspecialidade")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Speciality");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
                     b.Navigation("AlergiasRelacionadas");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
+                {
+                    b.Navigation("Consultas");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
+                {
+                    b.Navigation("Consultas");
                 });
 #pragma warning restore 612, 618
         }

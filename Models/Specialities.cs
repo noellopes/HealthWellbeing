@@ -14,5 +14,7 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A descrição é obrigatória.")]
         [StringLength(1500, ErrorMessage = "Máximo 1500 caracteres.")]
         public string Descricao { get; set; } = "";
+
+        public ICollection<Consulta>? Consultas { get; set; }
     }
 }

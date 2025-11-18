@@ -26,6 +26,8 @@ namespace HealthWellbeing.Controllers
         {
 
             var consultasQuery = _context.Consulta
+                .Include(c => c.Doctor)
+                .Include(c => c.Speciality)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
