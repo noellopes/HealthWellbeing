@@ -10,7 +10,6 @@
 </h1>
 
 <div class="card shadow-sm">
-
     <div class="card-header bg-warning text-dark">
         <h4 class="mb-0">
             <i class="bi bi-gear-fill me-2"></i>
@@ -19,54 +18,60 @@
     </div>
 
     <div class="card-body">
-
         <form asp-action="Edit">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="RoomId" />
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <div class="mb-3">
-                <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
-                <select asp-for="Specialty" class="form-select">
-                    <option value="">Selecione a especialidade...</option>
-                    <option value="Cardiologia">Cardiologia</option>
-                    <option value="Dermatologia">Dermatologia</option>
-                    <option value="Pediatria">Pediatria</option>
-                    <option value="Ginecologia">Ginecologia</option>
-                    <option value="Urologia">Urologia</option>
-                    <option value="Neurologia">Neurologia</option>
-                    <option value="Psiquiatria">Psiquiatria</option>
-                    <option value="Oftalmologia">Oftalmologia</option>
-                    <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-                    <option value="Endocrinologia">Endocrinologia</option>
-                    <option value="Reumatologia">Reumatologia</option>
-                    <option value="Gastroenterologia">Gastroenterologia</option>
-                    <option value="Pneumologia">Pneumologia</option>
-                    <option value="Nefrologia">Nefrologia</option>
-                    <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
-                </select>
-                <span asp-validation-for="Specialty" class="text-danger small"></span>
+            <!--Especialidade e Nome -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
+                    <select asp-for="Specialty" class="form-select">
+                        <option value="">Selecione a especialidade...</option>
+                        <option value="Cardiologia">Cardiologia</option>
+                        <option value="Dermatologia">Dermatologia</option>
+                        <option value="Pediatria">Pediatria</option>
+                        <option value="Ginecologia">Ginecologia</option>
+                        <option value="Urologia">Urologia</option>
+                        <option value="Neurologia">Neurologia</option>
+                        <option value="Psiquiatria">Psiquiatria</option>
+                        <option value="Oftalmologia">Oftalmologia</option>
+                        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
+                        <option value="Endocrinologia">Endocrinologia</option>
+                        <option value="Reumatologia">Reumatologia</option>
+                        <option value="Gastroenterologia">Gastroenterologia</option>
+                        <option value="Pneumologia">Pneumologia</option>
+                        <option value="Nefrologia">Nefrologia</option>
+                        <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                    </select>
+                    <span asp-validation-for="Specialty" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label fw-bold">Nome</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger small"></span>
+            <!--Localização e Horário -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Location" class="form-label fw-bold">Localização</label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
+                    <input asp-for="OperatingHours" class="form-control" />
+                    <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Location" class="form-label fw-bold">Localização</label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
-                <input asp-for="OperatingHours" class="form-control" />
-                <span asp-validation-for="OperatingHours" class="text-danger small"></span>
-            </div>
-
+            <!--Estado -->
             <div class="mb-3">
                 <label class="form-label fw-bold">Estado</label>
                 <div>
@@ -98,22 +103,22 @@
                 <span asp-validation-for="Status" class="text-danger small"></span>
             </div>
 
+            <!-- Observação -->
             <div class="mb-3">
                 <label asp-for="Notes" class="form-label fw-bold">Observação</label>
                 <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Notes" class="text-danger small"></span>
             </div>
 
+            <!-- Botões -->
             <div class="card-footer d-flex justify-content-end gap-2 mt-4">
                 <button type="submit" class="btn btn-success me-2">
                     <i class="bi bi-save-fill me-1"></i> Guardar Alterações
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e voltar à lista
                 </a>
             </div>
-
-
         </form>
     </div>
 </div>
