@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,29 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Doctor.ToListAsync());
+            // Base query sem Includes (a menos que tenhas navegações para carregar)
+            var doctorQuery = _context.Doctor
+                .AsNoTracking();
+
+            // total de registos
+            int numberDoctors = await doctorQuery.CountAsync();
+
+            // cria o viewmodel de paginação
+            var DoctorInfo = new PaginationInfo<Doctor>(page, numberDoctors);
+
+            // define um pageSize 
+            var pageSize = 6;
+
+            // aplica ordenação + paginação
+            DoctorInfo.Items = await doctorQuery
+                .OrderBy(d => d.Nome)                   
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return View(DoctorInfo);
         }
 
         // GET: Doctors/Details
