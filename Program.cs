@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 internal class Program
 {
+
+
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -40,7 +42,8 @@ internal class Program
             var services = scope.ServiceProvider;
             var context = services.GetRequiredService<ApplicationDbContext>();
             context.Database.Migrate();
-
+            var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
+            SeedDataMaterialEquipamentoAssociado.Populate(healthContext);
         }
 
         app.UseHttpsRedirection();
@@ -49,7 +52,7 @@ internal class Program
         app.UseRouting();
 
         app.UseAuthorization();
-
+        
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
