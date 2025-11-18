@@ -78,19 +78,20 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            // Se o ID for nulo, mostra a página Invalido
             if (id == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
-            // Inclui os profissionais para mostrar nos detalhes
             var problemaSaude = await _context.ProblemaSaude
                 .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
+            // Se não encontrar o registo, mostra a página Invalido
             if (problemaSaude == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
             return View(problemaSaude);
@@ -140,25 +141,26 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            // Se o ID for nulo, mostra a página Invalido
             if (id == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
-            // Carrega o problema de saúde E os profissionais já associados
             var problemaSaude = await _context.ProblemaSaude
                 .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
+            // Se não encontrar o registo, mostra a página Invalido
             if (problemaSaude == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
-            // Carrega a lista completa de profissionais para as checkboxes
+            // Carrega a lista completa de profissionais
             ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
 
-            // Carrega os IDs dos profissionais que já estão selecionados
+            // Carrega os IDs selecionados
             ViewData["SelectedProfissionais"] = problemaSaude.ProfissionalExecutante
                 .Select(p => p.ProfissionalExecutanteId).ToList();
 
@@ -175,7 +177,7 @@ namespace HealthWellbeing.Controllers
         {
             if (id != problemaSaude.ProblemaSaudeId)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
             if (ModelState.IsValid)
@@ -190,7 +192,7 @@ namespace HealthWellbeing.Controllers
 
                     if (problemaSaudeExistente == null)
                     {
-                        return NotFound();
+                        return View("Invalido");
                     }
 
                     // 2. Atualizar propriedades simples
@@ -221,7 +223,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!ProblemaSaudeExists(problemaSaude.ProblemaSaudeId))
                     {
-                        return NotFound();
+                        return View("Invalido");
                     }
                     else
                     {
@@ -240,19 +242,20 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            // Se o ID for nulo, mostra a página Invalido
             if (id == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
-            // Inclui profissionais para mostrar o que está associado
             var problemaSaude = await _context.ProblemaSaude
                 .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
+            // Se não encontrar o registo, mostra a página Invalido
             if (problemaSaude == null)
             {
-                return NotFound();
+                return View("Invalido");
             }
 
             return View(problemaSaude);

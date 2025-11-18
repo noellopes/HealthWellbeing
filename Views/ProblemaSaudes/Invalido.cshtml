@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Problema de Saúde Inválido";
+}
+
+<h1 class="mb-4 text-warning">Item Não Encontrado</h1>
+
+<div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm">
+    <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+    <div>
+        <h4>Este Problema de Saúde já não existe.</h4>
+        <p class="mb-0">Pode ter sido removido por outro utilizador recentemente.</p>
+    </div>
+</div>
+
+<div class="mt-4 text-end">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista
+    </a>
+</div>

@@ -9,10 +9,11 @@ namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
     {
-        public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
+        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
         }
+
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
@@ -25,5 +26,20 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
 
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // --- CONFIGURAÇÃO CASCADE DELETE ---
+
+            // Configuração para a relação Muitos-para-Muitos (Problema <-> Profissional)
+            // Isto garante que ao apagar o Problema, as linhas na tabela de união são apagadas.
+            modelBuilder.Entity<ProblemaSaude>()
+                    .HasMany(p => p.ProfissionalExecutante)      // Lado A: Problema tem Profissionais
+                    .WithMany(p => p.ProblemasSaude)              // Lado B: Profissional tem Problemas <--- O ERRO ESTAVA AQUI (Faltava esta ligação)
+                    .UsingEntity(j => j.ToTable("ProblemaSaudeProfissionais"));
+        }
     }
+
 }
