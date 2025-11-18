@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.Utils.Group1;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Controllers
 {
@@ -85,6 +87,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(treatmentType);
                 await _context.SaveChangesAsync();
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O tipo de tratamento foi criado com sucesso", true);
                 return RedirectToAction(nameof(Index));
             }
             return View(treatmentType);
@@ -136,6 +139,7 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O tipo de tratamento foi editado com sucesso", true);
                 return RedirectToAction(nameof(Index));
             }
             return View(treatmentType);
@@ -171,6 +175,7 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
+            TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O tipo de tratamento foi eliminado com sucesso", true);
             return RedirectToAction(nameof(Index));
         }
 
