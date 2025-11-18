@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Models
 {
-    public class TerapeutaModel
+    public class Terapeuta
     {
         [Key]
         public int TerapeutaId { get; set; }
@@ -20,7 +20,7 @@ namespace HealthWellbeing.Models
         // Telefone — obrigatório
         [Required(ErrorMessage = "O telefone é obrigatório.")]
         [Phone(ErrorMessage = "O número de telefone não é válido.")]
-        [StringLength(20, ErrorMessage = "O número de telefone tem de ter menos de 20 digitos.")]
+        [StringLength(20, ErrorMessage = "O número de telefone tem de ter menos de 20 dígitos.")]
         public string Telefone { get; set; } = string.Empty;
 
         // Email — obrigatório
@@ -29,10 +29,22 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O email não pode ter mais de 100 caracteres.")]
         public string Email { get; set; } = string.Empty;
 
-        // Anos de experiência — obrigatório
-        [Required(ErrorMessage = "Os anos de experiência são obrigatórios.")]
-        [Range(0, 60, ErrorMessage = "Os anos de experiência devem estar entre 0 e 60.")]
-        public int AnosExperiencia { get; set; }
+
+
+        // Ano de entrada no serviço — obrigatório
+        [Required(ErrorMessage = "O ano de entrada é obrigatório.")]
+        [Range(1900, 2100, ErrorMessage = "O ano de entrada deve ser válido.")]
+        public int AnoEntrada { get; set; }
+
+        // Calculo dos anos de experiência
+        public int AnosExperiencia
+        {
+            get
+            {
+                int anoAtual = DateTime.Now.Year;
+                return anoAtual - AnoEntrada;
+            }
+        }
 
         // Ativo
         public bool Ativo { get; set; }
@@ -41,4 +53,3 @@ namespace HealthWellbeing.Models
         public ICollection<AgendamentoModel> Agendamentos { get; set; } = new List<AgendamentoModel>();
     }
 }
-

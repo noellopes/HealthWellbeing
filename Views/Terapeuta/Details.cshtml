@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.TerapeutaModel
+﻿@model HealthWellbeing.Models.Terapeuta
 
 @{
     ViewData["Title"] = "Detalhes do Terapeuta";
@@ -42,6 +42,13 @@
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt class="col-sm-2">
+            Ano de Entrada
+        </dt>
+        <dd class="col-sm-10">
+            @Model.AnoEntrada
         </dd>
 
         <dt class="col-sm-2">
