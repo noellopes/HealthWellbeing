@@ -52,7 +52,7 @@ namespace HealthWellbeing.Controllers
         // GET: Exames/Create
         public IActionResult Create()
         {
-            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Especialidade");
+            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Nome");
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "EstadoComponente");
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante, "ProfissionalExecutanteId", "Email");
             ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoSala");
@@ -73,7 +73,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Especialidade", exame.ExameTipoId);
+            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "EstadoComponente", exame.MaterialEquipamentoAssociadoId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante, "ProfissionalExecutanteId", "Email", exame.ProfissionalExecutanteId);
             ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoSala", exame.SalaDeExameId);
@@ -94,7 +94,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Especialidade", exame.ExameTipoId);
+            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "EstadoComponente", exame.MaterialEquipamentoAssociadoId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante, "ProfissionalExecutanteId", "Email", exame.ProfissionalExecutanteId);
             ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoSala", exame.SalaDeExameId);
@@ -134,7 +134,7 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Especialidade", exame.ExameTipoId);
+            ViewData["ExameTipoId"] = new SelectList(_context.ExameTipo, "ExameTipoId", "Nome", exame.ExameTipoId);
             ViewData["MaterialEquipamentoAssociadoId"] = new SelectList(_context.MaterialEquipamentoAssociado, "MaterialEquipamentoAssociadoId", "EstadoComponente", exame.MaterialEquipamentoAssociadoId);
             ViewData["ProfissionalExecutanteId"] = new SelectList(_context.ProfissionalExecutante, "ProfissionalExecutanteId", "Email", exame.ProfissionalExecutanteId);
             ViewData["SalaDeExameId"] = new SelectList(_context.SalaDeExame, "SalaId", "TipoSala", exame.SalaDeExameId);
