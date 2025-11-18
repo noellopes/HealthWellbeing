@@ -42,29 +42,29 @@ namespace HealthWellbeing.Controllers
                 t => new TreatmentRecordListDTO
                 {
                     Id = t.Id,
-                    NurseName = t.Nurse.Name,
-                    TreatmentTypeName = t.TreatmentType.Name,
-                    PathologyName = t.Pathology.Name,
+                    Nurse = t.Nurse.Name,
+                    TreatmentType = t.TreatmentType.Name,
+                    Pathology = t.Pathology.Name,
                     TreatmentDate = t.TreatmentDate,
                     CompletedDuration = t.CompletedDuration
                 },
-                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration"]
+                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration"]
             );
 
             DtoSelector AdminSelector = new(t => new TreatmentRecordListDTO
             {
                 Id = t.Id,
-                NurseName = t.Nurse.Name,
-                TreatmentTypeName = t.TreatmentType.Name,
-                PathologyName = t.Pathology.Name,
+                Nurse = t.Nurse.Name,
+                TreatmentType = t.TreatmentType.Name,
+                Pathology= t.Pathology.Name,
                 TreatmentDate = t.TreatmentDate,
                 CompletedDuration = t.CompletedDuration,
-                Observations = t.Observations,
-                AdditionalNotes = t.AdditionalNotes,
+                Observations = t.Observations ?? "-",
+                AdditionalNotes = t.AdditionalNotes ?? "-",
                 Status = t.Status.ToString(),
                 CreatedAt = t.CreatedAt
             },
-                ["NurseName", "TreatmentTypeName", "PathologyName", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
+                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
             );
 
             DtoSelector selector = BaseSelector;

@@ -6,9 +6,9 @@ namespace HealthWellbeing.Utils.Group1.Services
     public class TreatmentRecordFilterService : IRecordFilterService<TreatmentRecord>
     {
         private readonly Dictionary<string, Func<IQueryable<TreatmentRecord>, string, IQueryable<TreatmentRecord>>> _filterMap = new(StringComparer.OrdinalIgnoreCase) {
-            { "Nurse.Name", (query, val) => query.Where(t => t.Nurse.Name.Contains(val)) },
-            { "TreatmentType.Name", (query, val) => query.Where(t => t.TreatmentType.Name.Contains(val)) },
-            { "Pathology.Name", (query, val) => query.Where(t => t.Pathology.Name.Contains(val)) },
+            { "Nurse", (query, val) => query.Where(t => t.Nurse.Name.Contains(val)) },
+            { "TreatmentType", (query, val) => query.Where(t => t.TreatmentType.Name.Contains(val)) },
+            { "Pathology", (query, val) => query.Where(t => t.Pathology.Name.Contains(val)) },
             //{ "Remarks", (query, val) => query.Where(t => t.Remarks.Contains(val)) },
             //{ "Result", (query, val) => query.Where(t => t.Result.Contains(val)) },
             { "Status", (query, val) => query.Where(t => t.Status.ToString().Contains(val)) }

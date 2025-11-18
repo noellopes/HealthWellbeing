@@ -31,7 +31,14 @@
             }
             else
             {
-                <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-sortOrder="@ViewBag.CurrentSort"
+                       asp-route-searchBy="@ViewBag.CurrentSearchBy"
+                       asp-route-searchString="@ViewBag.CurrentSearchString"
+                       asp-route-page="@p">@p</a>
+                </li>
             }
         }
         <li class="page-item @nextDisabled">

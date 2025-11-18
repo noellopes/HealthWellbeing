@@ -7,13 +7,13 @@ namespace HealthWellbeing.Utils.Group1.DTOs
         public required int Id { get; set; }
 
         [Display(Name = "Enfermeiro(a) Responsável")]
-        public string NurseName { get; set; }
+        public string Nurse { get; set; }
 
         [Display(Name = "Tipo de tratamento")]
-        public string TreatmentTypeName { get; set; }
+        public string TreatmentType { get; set; }
 
         [Display(Name = "Patologia associada")]
-        public string PathologyName { get; set; }
+        public string Pathology { get; set; }
 
         public DateTime TreatmentDate { get; set; }
         public int? CompletedDuration { get; set; }
