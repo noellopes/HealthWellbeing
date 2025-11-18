@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,11 +21,45 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Musculo
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchGrupo = "")
         {
-            var healthWellbeingDbContext = _context.Musculo.Include(m => m.GrupoMuscular);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            var musculosQuery = _context.Musculo
+                .Include(m => m.GrupoMuscular)
+                .AsQueryable();
+
+            // Filtro por nome do músculo
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                musculosQuery = musculosQuery.Where(m => m.Nome_Musculo.Contains(searchNome));
+            }
+
+            // Filtro por nome do grupo muscular
+            if (!string.IsNullOrEmpty(searchGrupo))
+            {
+                musculosQuery = musculosQuery.Where(m => m.GrupoMuscular.GrupoMuscularNome.Contains(searchGrupo));
+            }
+
+            // Guardar filtros para usar na View
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchGrupo = searchGrupo;
+
+            // Contar resultados
+            int numberMusculos = await musculosQuery.CountAsync();
+
+            // Criar paginação
+            var musculosInfo = new PaginationInfoExercicios<Musculo>(page, numberMusculos);
+
+            // Buscar itens da página
+            musculosInfo.Items = await musculosQuery
+                .OrderBy(m => m.Nome_Musculo)
+                .Skip(musculosInfo.ItemsToSkip)
+                .Take(musculosInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(musculosInfo);
         }
+
+
 
         // GET: Musculo/Details/5
         public async Task<IActionResult> Details(int? id)

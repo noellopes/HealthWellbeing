@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,36 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: GrupoMuscular
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+        int page = 1,
+        string searchNome = "",
+        string searchLocalizacao = "")
         {
-            return View(await _context.GrupoMuscular.ToListAsync());
+            // Começa com a query completa
+            var query = _context.GrupoMuscular.AsQueryable();
+
+            // Filtra pelo nome se houver
+            if (!string.IsNullOrEmpty(searchNome))
+                query = query.Where(g => g.GrupoMuscularNome.Contains(searchNome));
+
+            // Filtra pela localização corporal se houver
+            if (!string.IsNullOrEmpty(searchLocalizacao))
+                query = query.Where(g => g.LocalizacaoCorporal.Contains(searchLocalizacao));
+
+            // Mantém os valores da pesquisa para a view
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchLocalizacao = searchLocalizacao;
+
+            // Paginação
+            int totalItems = await query.CountAsync();
+            var paginated = new PaginationInfoExercicios<GrupoMuscular>(page, totalItems);
+            paginated.Items = await query
+                .OrderBy(g => g.GrupoMuscularNome)
+                .Skip(paginated.ItemsToSkip)
+                .Take(paginated.ItemsPerPage)
+                .ToListAsync();
+
+            return View(paginated);
         }
 
         // GET: GrupoMuscular/Details/5

@@ -1,33 +1,40 @@
 ﻿@model HealthWellbeing.Models.GrupoMuscular
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar Grupo Muscular";
 }
 
-<h1>Delete</h1>
+<div class="container mt-4">
+    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>GrupoMuscular</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GrupoMuscularNome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GrupoMuscularNome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LocalizacaoCorporal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LocalizacaoCorporal)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
+    <p class="lead">Tem a certeza que deseja eliminar este grupo muscular? Esta ação não pode ser desfeita.</p>
+
+    <div class="card mb-4 shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+            Dados do Grupo Muscular
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nome do Grupo</dt>
+                <dd class="col-sm-9">@Model.GrupoMuscularNome</dd>
+
+                <dt class="col-sm-3">Localização Corporal</dt>
+                <dd class="col-sm-9">@Model.LocalizacaoCorporal</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="GrupoMuscularId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+
+        <div class="d-flex">
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="fas fa-trash-alt"></i> Eliminar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
     </form>
 </div>

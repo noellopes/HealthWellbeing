@@ -1,30 +1,49 @@
 ﻿@model HealthWellbeing.Models.Musculo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Músculo";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary">@ViewData["Title"]</h1>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary me-2">
+                Voltar à Lista
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.MusculoId" class="btn btn-warning me-2">
+                Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.MusculoId" class="btn btn-danger"
+               >
+                Apagar
+            </a>
+        </div>
+    </div>
 
-<div>
-    <h4>Musculo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nome_Musculo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nome_Musculo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GrupoMuscular)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GrupoMuscular.GrupoMuscularNome)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MusculoId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">@Model.Nome_Musculo</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+
+                <!-- Informações do Músculo -->
+                <div class="col-md-6 mb-3">
+                    <h5 class="fw-bold">Informações do Músculo</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="text-secondary">Nome do Músculo:</th>
+                            <td>@Model.Nome_Musculo</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Grupo Muscular:</th>
+                            <td>@Model.GrupoMuscular?.GrupoMuscularNome</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -4,32 +4,32 @@
     ViewData["Title"] = "Criar Grupo Muscular";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr>
+<div class="container mt-4">
+    <h2 class="mb-4 text-success"><i class="fas fa-plus-circle"></i> @ViewData["Title"]</h2>
 
-<div class="row">
-    <form asp-action="Create">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
 
-        <div class="mb-2">
-            <label asp-for="GrupoMuscularNome" class="control-label p-2"></label>
+        <div class="mb-3">
+            <label asp-for="GrupoMuscularNome" class="form-label">Nome do Grupo *</label>
             <input asp-for="GrupoMuscularNome" class="form-control" />
-            <span asp-validation-for="GrupoMuscularNome" class="text-danger"></span>
+            <span asp-validation-for="GrupoMuscularNome" class="text-danger small"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="LocalizacaoCorporal" class="control-label p-2"></label>
+            <label asp-for="LocalizacaoCorporal" class="form-label">Localização Corporal *</label>
             <input asp-for="LocalizacaoCorporal" class="form-control" />
-            <span asp-validation-for="LocalizacaoCorporal" class="text-danger"></span>
+            <span asp-validation-for="LocalizacaoCorporal" class="text-danger small"></span>
         </div>
 
-        <div>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar à Lista
-            </a>
+        <div class="mt-4">
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save"></i> Criar Grupo Muscular
             </button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
         </div>
     </form>
 </div>
