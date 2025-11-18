@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251113121230_MigracaoInicial")]
-    partial class MigracaoInicial
+    [Migration("20251117153440_AtualizarConsulta")]
+    partial class AtualizarConsulta
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,10 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<TimeOnly>("HoraInicio")
                         .HasColumnType("time");
+
+                    b.Property<string>("SearchTerm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdConsulta");
 

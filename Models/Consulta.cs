@@ -20,5 +20,7 @@ namespace HealthWellbeing.Models
         (DataConsulta.Date < DateTime.Today) ? "Expirada" :
         (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
 
+        public string SearchTerm { get; set; }
+
     }
 }
