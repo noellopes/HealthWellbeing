@@ -12,15 +12,14 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
         public string Nome { get; set; } = string.Empty;
 
-        // Especialidade — obrigatório
+        // Especialidade — obrigatória
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(40, ErrorMessage = "A especialidade não pode ter mais de 40 caracteres.")]
         public string Especialidade { get; set; } = string.Empty;
 
-        // Telefone — obrigatório
+        // Telefone — obrigatório, exatamente 9 dígitos
         [Required(ErrorMessage = "O telefone é obrigatório.")]
-        [Phone(ErrorMessage = "O número de telefone não é válido.")]
-        [StringLength(20, ErrorMessage = "O número de telefone tem de ter menos de 20 dígitos.")]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "O número de telefone deve ter exatamente 9 dígitos.")]
         public string Telefone { get; set; } = string.Empty;
 
         // Email — obrigatório
@@ -29,20 +28,19 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O email não pode ter mais de 100 caracteres.")]
         public string Email { get; set; } = string.Empty;
 
-
-
         // Ano de entrada no serviço — obrigatório
         [Required(ErrorMessage = "O ano de entrada é obrigatório.")]
-        [Range(1900, 2100, ErrorMessage = "O ano de entrada deve ser válido.")]
+        [Range(1900, 9999, ErrorMessage = "O ano de entrada deve ser válido.")]
         public int AnoEntrada { get; set; }
 
-        // Calculo dos anos de experiência
+        // Cálculo dos anos de experiência
         public int AnosExperiencia
         {
             get
             {
                 int anoAtual = DateTime.Now.Year;
-                return anoAtual - AnoEntrada;
+                int anos = anoAtual - AnoEntrada;
+                return anos < 0 ? 0 : anos;
             }
         }
 
