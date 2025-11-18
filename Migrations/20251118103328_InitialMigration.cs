@@ -52,7 +52,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Severity = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Severity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,8 +105,8 @@ namespace HealthWellbeing.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     EstimatedDuration = table.Column<int>(type: "int", nullable: false),
                     Priority = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -148,7 +148,7 @@ namespace HealthWellbeing.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NurseId = table.Column<int>(type: "int", nullable: false),
-                    TreatmentId = table.Column<int>(type: "int", nullable: false),
+                    TreatmentTypeId = table.Column<int>(type: "int", nullable: false),
                     PathologyId = table.Column<int>(type: "int", nullable: true),
                     TreatmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AdditionalNotes = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
@@ -179,8 +179,8 @@ namespace HealthWellbeing.Migrations
                         principalTable: "Pathology",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_TreatmentRecord_TreatmentType_TreatmentId",
-                        column: x => x.TreatmentId,
+                        name: "FK_TreatmentRecord_TreatmentType_TreatmentTypeId",
+                        column: x => x.TreatmentTypeId,
                         principalTable: "TreatmentType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -229,9 +229,9 @@ namespace HealthWellbeing.Migrations
                 column: "PathologyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TreatmentRecord_TreatmentId",
+                name: "IX_TreatmentRecord_TreatmentTypeId",
                 table: "TreatmentRecord",
-                column: "TreatmentId");
+                column: "TreatmentTypeId");
         }
 
         /// <inheritdoc />
