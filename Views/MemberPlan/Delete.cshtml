@@ -1,0 +1,45 @@
+﻿@model HealthWellbeing.Models.MemberPlan
+
+@{
+    ViewData["Title"] = "Delete Subscription";
+}
+
+<h1 class="display-4 text-danger mb-3">Delete Subscription</h1>
+
+<h3 class="alert alert-warning border-0 shadow-sm p-3" role="alert">
+    ⚠️ Are you sure you want to remove the plan <strong>@Model.Plan.Name</strong> from <strong>@Model.Member.Client.Name</strong>?
+</h3>
+<hr class="mb-4" />
+
+<div class="card shadow-lg mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">Subscription Details</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3 fw-bold">Client</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Member.Client.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">Plan</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Plan.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">Start Date</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartDate)</dd>
+
+            <dt class="col-sm-3 fw-bold">End Date</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndDate)</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" class="d-flex align-items-center mt-4">
+    <input type="hidden" asp-for="MemberPlanId" />
+
+    <button type="submit" class="btn btn-danger btn-lg shadow-sm me-3">
+        <i class="bi bi-trash"></i> Confirm Delete
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary btn-lg">
+        <i class="bi bi-x-circle"></i> Cancel
+    </a>
+</form>

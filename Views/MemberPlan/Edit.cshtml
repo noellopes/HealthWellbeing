@@ -1,0 +1,68 @@
+﻿@model HealthWellbeing.Models.MemberPlan
+
+@{
+    ViewData["Title"] = "Edit Subscription";
+}
+
+<h1 class="display-4 text-primary mb-4">Edit Subscription</h1>
+<hr class="mb-4" />
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="MemberPlanId" />
+
+                <!-- Estes campos estão escondidos ou disabled para não mudar o cliente/plano facilmente -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Member</label>
+                    <select asp-for="MemberId" class="form-select" asp-items="ViewBag.MemberId" disabled></select>
+                    <input type="hidden" asp-for="MemberId" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Plan</label>
+                    <select asp-for="PlanId" class="form-select" asp-items="ViewBag.PlanId" disabled></select>
+                    <input type="hidden" asp-for="PlanId" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="StartDate" class="form-label fw-bold"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EndDate" class="form-label fw-bold"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Status" class="form-label fw-bold"></label>
+                    <select asp-for="Status" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-between pt-2">
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
