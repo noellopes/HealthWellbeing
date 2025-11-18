@@ -30,21 +30,23 @@
             @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
         </dd>
 
-        <!-- ✅ ADICIONADO: Benefícios Associados -->
         <dt class="col-sm-2">
             Benefícios Associados
         </dt>
         <dd class="col-sm-10">
-            @if (Model.Beneficios != null && Model.Beneficios.Any())
+     
+            @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
             {
                 <ul class="list-unstyled">
-                    @foreach (var beneficio in Model.Beneficios)
+                    @foreach (var item in Model.TipoExercicioBeneficios)
                     {
                         <li>
-                            <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
+                           
+                            <a href="@Url.Action("Details", "Beneficio", new { id = item.BeneficioId })"
                                target="_blank"
                                class="text-decoration-none">
-                                📌 @beneficio.NomeBeneficio
+                                
+                                📌 @(item.Beneficio?.NomeBeneficio ?? "Benefício não encontrado")
                             </a>
                         </li>
                     }

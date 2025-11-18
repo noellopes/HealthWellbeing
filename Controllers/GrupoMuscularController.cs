@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Authorization;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,44 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: GrupoMuscular
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+        int page = 1,
+        string searchNome = "",
+        string searchLocalizacao = "")
         {
-            return View(await _context.GrupoMuscular.ToListAsync());
+            // Começa com a query completa
+            var query = _context.GrupoMuscular.AsQueryable();
+
+            // Filtra pelo nome se houver
+            if (!string.IsNullOrEmpty(searchNome))
+                query = query.Where(g => g.GrupoMuscularNome.Contains(searchNome));
+
+            // Filtra pela localização corporal se houver
+            if (!string.IsNullOrEmpty(searchLocalizacao))
+                query = query.Where(g => g.LocalizacaoCorporal.Contains(searchLocalizacao));
+
+            // Mantém os valores da pesquisa para a view
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchLocalizacao = searchLocalizacao;
+
+            // Paginação
+            int totalItems = await query.CountAsync();
+            var paginated = new PaginationInfoExercicios<GrupoMuscular>(page, totalItems);
+            paginated.Items = await query
+                .OrderBy(g => g.GrupoMuscularNome)
+                .Skip(paginated.ItemsToSkip)
+                .Take(paginated.ItemsPerPage)
+                .ToListAsync();
+
+            return View(paginated);
+        }
+
+        // GET: GrupoMuscular/InvalidGrupoMuscular
+        public IActionResult InvalidGrupoMuscular(GrupoMuscular grupoMuscular)
+        {
+            // Esta Action apenas retorna a View, passando o objeto GrupoMuscular 
+            // (que pode conter os dados a recuperar).
+            return View(grupoMuscular);
         }
 
         // GET: GrupoMuscular/Details/5
@@ -39,7 +75,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.GrupoMuscularId == id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
 
             return View(grupoMuscular);
@@ -78,7 +114,7 @@ namespace HealthWellbeing.Controllers
             var grupoMuscular = await _context.GrupoMuscular.FindAsync(id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
             return View(grupoMuscular);
         }
@@ -106,7 +142,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!GrupoMuscularExists(grupoMuscular.GrupoMuscularId))
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(InvalidGrupoMuscular), grupoMuscular);
                     }
                     else
                     {
@@ -130,7 +166,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.GrupoMuscularId == id);
             if (grupoMuscular == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
             }
 
             return View(grupoMuscular);

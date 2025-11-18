@@ -1,41 +1,139 @@
-﻿@model IEnumerable<HealthWellbeing.Models.GrupoMuscular>
+﻿@model HealthWellbeing.ViewModels.PaginationInfoExercicios<HealthWellbeing.Models.GrupoMuscular>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Grupos Musculares";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
+    <h2 class="mb-3 text-primary"><i class="fas fa-dumbbell"></i> @ViewData["Title"]</h2>
+    <p class="text-muted">Lista dos grupos musculares registados no sistema:</p>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.GrupoMuscularNome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LocalizacaoCorporal)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.GrupoMuscularNome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LocalizacaoCorporal)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.GrupoMuscularId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.GrupoMuscularId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.GrupoMuscularId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="d-flex justify-content-end mb-3">
+        <div>
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+                <i class="bi bi-search me-1"></i> Pesquisa
+            </a>
+            <a asp-action="Create" class="btn btn-success me-2">
+                <i class="bi bi-plus-circle me-1"></i> Criar Novo
+            </a>
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-home me-1"></i> Início
+            </a>
+        </div>
+    </div>
+
+    <div class="collapse mb-3" id="searchForm">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchNome" class="form-label">Nome do Grupo</label>
+                    <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+                </div>
+                <div class="col-md-6">
+                    <label for="searchLocalizacao" class="form-label">Localização Corporal</label>
+                    <input id="searchLocalizacao" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao" class="form-control" placeholder="Procurar por localização" />
+                </div>
+                <div class="col-12 mt-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Pesquisar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Items.Any() == true)
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome do Grupo</th>
+                        <th>Localização Corporal</th>
+                        <th class="text-center" style="width: 260px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.GrupoMuscularNome</td>
+                            <td>@item.LocalizacaoCorporal</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.GrupoMuscularId" class="btn btn-primary btn-sm me-1">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.GrupoMuscularId" class="btn btn-warning btn-sm me-1">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.GrupoMuscularId" class="btn btn-danger btn-sm"
+                                   >
+                                    <i class="fas fa-trash-alt"></i> Apagar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <nav aria-label="Grupos Musculares page">
+                <ul class="pagination">
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Início</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">Início</a>
+                        </li>
+                    }
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchNome="@ViewBag.SearchNome"
+                                   asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">@p</a>
+                            </li>
+                        }
+                    }
+
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Fim</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">Fim</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3">
+            Nenhum grupo muscular encontrado.
+        </div>
+    }
+</div>

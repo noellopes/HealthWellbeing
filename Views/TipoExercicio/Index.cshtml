@@ -70,15 +70,20 @@ else
                         <td>@item.NomeTipoExercicios</td>
                         <td>@item.DescricaoTipoExercicios</td>
                         <td>
-                            @if (item.Beneficios?.Any() ?? false)
+                            @if (item.TipoExercicioBeneficios != null && item.TipoExercicioBeneficios.Any())
                             {
-                                @foreach (var b in item.Beneficios.Take(3))
+                                @foreach (var tb in item.TipoExercicioBeneficios.Take(3))
                                 {
-                                    <span class="badge bg-primary me-1 mb-1">@b.NomeBeneficio</span>
+                                    
+                                    if (tb.Beneficio != null)
+                                    {
+                                        <span class="badge bg-primary me-1 mb-1">@tb.Beneficio.NomeBeneficio</span>
+                                    }
                                 }
-                                @if (item.Beneficios.Count > 3)
+
+                                @if (item.TipoExercicioBeneficios.Count > 3)
                                 {
-                                    <span class="badge bg-secondary">+@(item.Beneficios.Count - 3) mais</span>
+                                    <span class="badge bg-secondary">+@(item.TipoExercicioBeneficios.Count - 3) mais</span>
                                 }
                             }
                             else
@@ -98,13 +103,23 @@ else
 
         <nav>
             <ul class="pagination">
+                @{
+                    var routeData = new Dictionary<string, string>
+                        {
+                        { "searchNome", ViewBag.SearchNome },
+                        { "searchDescricao", ViewBag.SearchDescricao },
+                        { "searchBeneficio", ViewBag.SearchBeneficio }
+                        };
+                }
+
                 @if (Model.CurrentPage == 1)
                 {
                     <li class="page-item disabled"><a class="page-link">Primeira</a></li>
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="1">Primeira</a></li>
+                    routeData["page"] = "1";
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Primeira</a></li>
                 }
 
                 @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
@@ -115,7 +130,8 @@ else
                     }
                     else
                     {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                        routeData["page"] = p.ToString();
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a></li>
                     }
                 }
 
@@ -125,7 +141,8 @@ else
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                    routeData["page"] = Model.TotalPages.ToString();
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Última</a></li>
                 }
             </ul>
         </nav>

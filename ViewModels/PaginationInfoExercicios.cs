@@ -8,19 +8,7 @@
         {
             TotalItems = totalItems;
             ItemsPerPage = itemsPerPage;
-
-            if (currentPage < 1)
-            {
-                CurrentPage = 1;
-            }
-            else if (currentPage > TotalPages)
-            {
-                CurrentPage = TotalPages;
-            }
-            else
-            {
-                CurrentPage = currentPage;
-            }
+            CurrentPage = Math.Clamp(currentPage, 1, TotalPages);
         }
 
         public IEnumerable<T>? Items { get; set; } = null;
@@ -31,7 +19,7 @@
 
         public int CurrentPage { get; private set; }
 
-        public int TotalPages => (int)Math.Ceiling((double)TotalItems / ItemsPerPage);
+        public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)TotalItems / ItemsPerPage));
 
         public int FirstPageShow => Math.Max(1, CurrentPage - NUMBER_PAGES_SHOW_BEFORE_AFTER);
 

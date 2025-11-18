@@ -55,12 +55,12 @@
                         <tr>
                             <th class="text-secondary">Géneros:</th>
                             <td>
-                                @if (Model.Genero?.Any() == true)
+                                @if (Model.ExercicioGeneros?.Any() == true)
                                 {
-                                    foreach (var genero in Model.Genero)
+                                    foreach (var item in Model.ExercicioGeneros)
                                     {
                                         <span class="badge bg-success me-1">
-                                            @genero.NomeGenero
+                                            @item.Genero.NomeGenero
                                         </span>
                                     }
                                 }
@@ -88,12 +88,12 @@
                         <tr>
                             <th class="text-secondary">Músculos Trabalhados:</th>
                             <td>
-                                @if (Model.GrupoMuscular?.Any() == true)
+                                @if (Model.ExercicioGrupoMusculares?.Any() == true)
                                 {
-                                    foreach (var musculo in Model.GrupoMuscular)
+                                    foreach (var item in Model.ExercicioGrupoMusculares)
                                     {
                                         <span class="badge bg-info text-dark me-1">
-                                            @musculo.GrupoMuscularNome
+                                            @item.GrupoMuscular.GrupoMuscularNome
                                         </span>
                                     }
                                 }

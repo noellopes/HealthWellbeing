@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,11 +21,45 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Musculo
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchGrupo = "")
         {
-            var healthWellbeingDbContext = _context.Musculo.Include(m => m.GrupoMuscular);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            var musculosQuery = _context.Musculo
+                .Include(m => m.GrupoMuscular)
+                .AsQueryable();
+
+            // Filtro por nome do músculo
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                musculosQuery = musculosQuery.Where(m => m.Nome_Musculo.Contains(searchNome));
+            }
+
+            // Filtro por nome do grupo muscular
+            if (!string.IsNullOrEmpty(searchGrupo))
+            {
+                musculosQuery = musculosQuery.Where(m => m.GrupoMuscular.GrupoMuscularNome.Contains(searchGrupo));
+            }
+
+            // Guardar filtros para usar na View
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchGrupo = searchGrupo;
+
+            // Contar resultados
+            int numberMusculos = await musculosQuery.CountAsync();
+
+            // Criar paginação
+            var musculosInfo = new PaginationInfoExercicios<Musculo>(page, numberMusculos);
+
+            // Buscar itens da página
+            musculosInfo.Items = await musculosQuery
+                .OrderBy(m => m.Nome_Musculo)
+                .Skip(musculosInfo.ItemsToSkip)
+                .Take(musculosInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(musculosInfo);
         }
+
+
 
         // GET: Musculo/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -39,7 +74,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.MusculoId == id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
 
             return View(musculo);
@@ -80,7 +115,7 @@ namespace HealthWellbeing.Controllers
             var musculo = await _context.Musculo.FindAsync(id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
             ViewData["GrupoMuscularId"] = new SelectList(_context.Set<GrupoMuscular>(), "GrupoMuscularId", "GrupoMuscularNome", musculo.GrupoMuscularId);
             return View(musculo);
@@ -109,7 +144,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!MusculoExists(musculo.MusculoId))
                     {
-                        return NotFound();
+                        return RedirectToAction(nameof(InvalidMusculo), musculo);
                     }
                     else
                     {
@@ -135,7 +170,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.MusculoId == id);
             if (musculo == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(InvalidMusculo), new Musculo { MusculoId = id.Value });
             }
 
             return View(musculo);
@@ -154,6 +189,13 @@ namespace HealthWellbeing.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Musculo/InvalidMusculo
+        public IActionResult InvalidMusculo(Musculo musculo)
+        {
+            // Esta Action apenas retorna a View, passando o objeto Musculo (que pode conter os dados a recuperar)
+            return View(musculo);
         }
 
         private bool MusculoExists(int id)

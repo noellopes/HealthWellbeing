@@ -45,12 +45,12 @@
 
                 <dt class="col-sm-3">Gêneros Associados</dt>
                 <dd class="col-sm-9">
-                    @if (Model.Genero != null && Model.Genero.Any())
+                    @if (Model.ExercicioGeneros != null && Model.ExercicioGeneros.Any())
                     {
                         <ul class="list-unstyled mb-0">
-                            @foreach (var genero in Model.Genero)
+                            @foreach (var item in Model.ExercicioGeneros)
                             {
-                                <li>@genero.NomeGenero</li>
+                                <li>@item.Genero.NomeGenero</li>
                             }
                         </ul>
                     }
@@ -62,12 +62,12 @@
 
                 <dt class="col-sm-3">Grupos Musculares Associados</dt>
                 <dd class="col-sm-9">
-                    @if (Model.GrupoMuscular != null && Model.GrupoMuscular.Any())
+                    @if (Model.ExercicioGrupoMusculares != null && Model.ExercicioGrupoMusculares.Any())
                     {
                         <ul class="list-unstyled mb-0">
-                            @foreach (var grupo in Model.GrupoMuscular)
+                            @foreach (var item in Model.ExercicioGrupoMusculares)
                             {
-                                <li>@grupo.GrupoMuscularNome</li>
+                                <li>@item.GrupoMuscular.GrupoMuscularNome</li>
                             }
                         </ul>
                     }

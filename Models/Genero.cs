@@ -11,6 +11,6 @@ namespace HealthWellbeing.Models
         [StringLength(50, ErrorMessage = "O nome do gênero não pode exceder 50 caracteres.")]
         public string NomeGenero { get; set; }
 
-        public ICollection<Exercicio>? Exercicio { get; set; }
+        public ICollection<ExercicioGenero>? ExercicioGeneros { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using HealthWellbeing.Models;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Data
 {
@@ -9,89 +11,107 @@ namespace HealthWellbeing.Data
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-            dbContext.Database.EnsureCreated();
-
             PopulateTipoExercicios(dbContext);
         }
 
         private static void PopulateTipoExercicios(HealthWellbeingDbContext dbContext)
         {
-            // Se já houver tipos de exercício ou benefícios, não faz nada
-            if (dbContext.TipoExercicio.Any() || dbContext.Beneficio.Any()) return;
-
             // ------------------------------
-            // Benefícios fictícios
+            // 1. Garantir que os Benefícios existem
             // ------------------------------
-            var beneficios = new[]
+            if (!dbContext.Beneficio.Any())
             {
-                new Beneficio
+                var novosBeneficios = new[]
                 {
-                    NomeBeneficio = "Melhora da resistência cardiovascular",
-                    DescricaoBeneficio = "Aumenta a capacidade do coração e pulmões, melhorando a circulação sanguínea e a respiração."
-                },
-                new Beneficio
-                {
-                    NomeBeneficio = "Fortalecimento muscular",
-                    DescricaoBeneficio = "Aumenta a força e a massa muscular, contribuindo para uma melhor postura e desempenho físico."
-                },
-                new Beneficio
-                {
-                    NomeBeneficio = "Aumento da flexibilidade",
-                    DescricaoBeneficio = "Melhora a amplitude de movimento das articulações e previne lesões musculares."
-                },
-                new Beneficio
-                {
-                    NomeBeneficio = "Redução do stress",
-                    DescricaoBeneficio = "Ajuda a reduzir a ansiedade e melhora o humor através da liberação de endorfinas."
-                },
-                new Beneficio
-                {
-                    NomeBeneficio = "Perda de peso",
-                    DescricaoBeneficio = "Auxilia no controle do peso corporal através do aumento do gasto calórico."
-                }
-            };
-            dbContext.Beneficio.AddRange(beneficios);
-            dbContext.SaveChanges();
+                    new Beneficio { NomeBeneficio = "Melhora da resistência cardiovascular", DescricaoBeneficio = "Aumenta a capacidade do coração e pulmões..." },
+                    new Beneficio { NomeBeneficio = "Fortalecimento muscular", DescricaoBeneficio = "Aumenta a força e a massa muscular..." },
+                    new Beneficio { NomeBeneficio = "Aumento da flexibilidade", DescricaoBeneficio = "Melhora a amplitude de movimento..." },
+                    new Beneficio { NomeBeneficio = "Redução do stress", DescricaoBeneficio = "Ajuda a reduzir a ansiedade..." },
+                    new Beneficio { NomeBeneficio = "Perda de peso", DescricaoBeneficio = "Auxilia no controle do peso..." }
+                };
+
+                dbContext.Beneficio.AddRange(novosBeneficios);
+                dbContext.SaveChanges(); 
+            }
 
             // ------------------------------
-            // Tipos de exercício fictícios
+            // 2. Verificar se já existem Exercícios (Se sim, sai)
+            // ------------------------------
+            if (dbContext.TipoExercicio.Any()) return;
+
+            // ------------------------------
+            // 3. Recuperar os Benefícios da BD
+            // ------------------------------
+            
+            var beneficiosDb = dbContext.Beneficio.ToDictionary(b => b.NomeBeneficio, b => b);
+
+            // Verificação de segurança caso falte algum benefício
+            if (beneficiosDb.Count == 0) return;
+
+            // Helpers para buscar o objeto facilmente pelo nome (evita erros de índice)
+            Beneficio GetBen(string nome) => beneficiosDb.ContainsKey(nome) ? beneficiosDb[nome] : beneficiosDb.First().Value;
+
+            // ------------------------------
+            // 4. Criar Tipos de Exercício
             // ------------------------------
             var tipoExercicios = new[]
             {
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Cardiovascular",
-                    DescricaoTipoExercicios = "Atividades que aumentam a frequência cardíaca e melhoram a resistência aeróbica.",
-                    CaracteristicasTipoExercicios = "Alta queima calórica, movimento contínuo, melhora da capacidade respiratória.",
-                    Beneficios = new List<Beneficio> { beneficios[0], beneficios[4], beneficios[3] } // resistência, perda de peso, stress
+                    DescricaoTipoExercicios = "Atividades que aumentam a frequência cardíaca.",
+                    CaracteristicasTipoExercicios = "Alta queima calórica, movimento contínuo.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Melhora da resistência cardiovascular") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Perda de peso") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Redução do stress") }
+                    }
                 },
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Força",
-                    DescricaoTipoExercicios = "Exercícios focados no fortalecimento dos músculos e ossos.",
-                    CaracteristicasTipoExercicios = "Uso de pesos ou resistência corporal, aumento da força e massa muscular.",
-                    Beneficios = new List<Beneficio> { beneficios[1], beneficios[4] } // força, perda de peso
+                    DescricaoTipoExercicios = "Exercícios focados no fortalecimento.",
+                    CaracteristicasTipoExercicios = "Uso de pesos ou resistência corporal.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Fortalecimento muscular") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Perda de peso") }
+                    }
                 },
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Flexibilidade",
-                    DescricaoTipoExercicios = "Atividades que melhoram o alongamento e mobilidade articular.",
-                    CaracteristicasTipoExercicios = "Movimentos suaves, foco em amplitude e postura.",
-                    Beneficios = new List<Beneficio> { beneficios[2], beneficios[3] } // flexibilidade, stress
+                    DescricaoTipoExercicios = "Atividades que melhoram o alongamento.",
+                    CaracteristicasTipoExercicios = "Movimentos suaves, foco em amplitude.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Aumento da flexibilidade") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Redução do stress") }
+                    }
                 },
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Funcional",
-                    DescricaoTipoExercicios = "Exercícios que simulam movimentos do dia a dia, melhorando equilíbrio e coordenação.",
-                    CaracteristicasTipoExercicios = "Trabalho com peso corporal, foco em movimentos compostos e equilíbrio.",
-                    Beneficios = new List<Beneficio> { beneficios[1], beneficios[3], beneficios[4] } // força, stress, perda de peso
+                    DescricaoTipoExercicios = "Exercícios que simulam movimentos do dia a dia.",
+                    CaracteristicasTipoExercicios = "Trabalho com peso corporal, equilíbrio.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Fortalecimento muscular") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Redução do stress") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Perda de peso") }
+                    }
                 },
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Alongamento",
-                    DescricaoTipoExercicios = "Atividades voltadas para relaxamento muscular e mobilidade.",
-                    CaracteristicasTipoExercicios = "Movimentos lentos e controlados, foco na respiração e relaxamento.",
-                    Beneficios = new List<Beneficio> { beneficios[2], beneficios[3] } // flexibilidade, stress
+                    DescricaoTipoExercicios = "Atividades voltadas para relaxamento muscular.",
+                    CaracteristicasTipoExercicios = "Movimentos lentos, foco na respiração.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Aumento da flexibilidade") },
+                        new TipoExercicioBeneficio { Beneficio = GetBen("Redução do stress") }
+                    }
                 }
             };
 
