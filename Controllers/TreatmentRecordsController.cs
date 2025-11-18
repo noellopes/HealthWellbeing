@@ -7,9 +7,6 @@ using HealthWellbeing.Utils.Group1.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 
 namespace HealthWellbeing.Controllers
 {
@@ -197,14 +194,7 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-                var alert = new AlertItem
-                {
-                    AlertType = "success",
-                    IconClass = "bi bi-check-circle",
-                    Message = "Treatment record edited successfully.",
-                    Dismissible = true
-                };
-                TempData["Alert"] = Validator.TryValidateObject(alert, new ValidationContext(alert), new List<ValidationResult>(), true) ? JsonConvert.SerializeObject(alert) : null;
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "Os dados do tratamento foram atualizados com sucesso", true);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -254,14 +244,8 @@ namespace HealthWellbeing.Controllers
             }
 
             await _context.SaveChangesAsync();
-            var alert = new AlertItem
-            {
-                AlertType = "success",
-                IconClass = "bi bi-check-circle",
-                Message = "Treatment record deleted successfully.",
-                Dismissible = true
-            };
-            TempData["Alert"] = Validator.TryValidateObject(alert, new ValidationContext(alert), new List<ValidationResult>(), true) ? JsonConvert.SerializeObject(alert) : null;
+
+            TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O registo do tratamento foi removido com sucesso", true);
             return RedirectToAction(nameof(Index));
         }
 
