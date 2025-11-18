@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -61,7 +61,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ConsumivelFornecedor
-        public async Task<IActionResult> Index(string searchNome = "", string searchTelefone = "")
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchTelefone = "")
         {
 
             var fornecedoresQuery = _context.ConsumivelFornecedor.AsQueryable();
@@ -77,7 +77,17 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchContato = searchTelefone;
 
-            return View(await fornecedoresQuery.ToListAsync());
+            int totalFornecedores = await fornecedoresQuery.CountAsync();
+
+            var pagination = new PaginationInfo<ConsumivelFornecedor>(page, totalFornecedores);
+
+            pagination.Items = await fornecedoresQuery
+                .OrderBy(z => z.NomeEmpresa)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            return View(pagination);
         }
 
         // GET: ConsumivelFornecedor/Details/5

@@ -38,10 +38,11 @@
         padding: 6px 10px;
     }
 </style>
+
 <div class="details-container">
     <div class="card">
         <div class="card-header">
-            📄 Detalhes dos Fornecedores
+            📄 Detalhes do Fornecedor
         </div>
 
         <div class="card-body">
@@ -63,7 +64,13 @@
             </dl>
 
             <div class="d-flex justify-content-end">
-                <a asp-action="Edit" asp-route-id="@Model?.FornecedorId" class="btn btn-warning text-white me-2">Editar</a>
-                <a asp-action="Index"class="btn btn-secondary">Voltar</a>
+                <a asp-action="Edit" asp-route-id="@Model.FornecedorId" class="btn btn-warning text-white me-2">
+                    ✏️ Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    ⬅️ Voltar
+                </a>
             </div>
+        </div>
+    </div>
 </div>
