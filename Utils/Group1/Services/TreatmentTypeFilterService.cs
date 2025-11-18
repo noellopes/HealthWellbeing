@@ -37,6 +37,7 @@ namespace HealthWellbeing.Utils.Group1.Services
             return sortProperty switch
             {
                 "Name" => descending ? query.OrderByDescending(t => t.Name) : query.OrderBy(t => t.Name),
+                "Description" => descending ? query.OrderByDescending(t => t.Description) : query.OrderBy(t => t.Description),
                 "EstimatedDuration" => descending ? query.OrderByDescending(t => t.EstimatedDuration) : query.OrderBy(t => t.EstimatedDuration),
                 _ => descending ? query.OrderByDescending(t => t.Id) : query.OrderBy(t => t.Id),
             };
