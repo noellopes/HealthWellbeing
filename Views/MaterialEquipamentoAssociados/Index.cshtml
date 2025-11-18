@@ -1,11 +1,13 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.MaterialEquipamentoAssociado>
 
 @{
-    ViewData["Title"] = "Lista de Materiais e Equipamentos associados";
+    ViewData["Title"] = "Stock de Materiais e Equipamentos";
+    // Variáveis da ViewBag para serem usadas nos links de paginação
+    var searchNome = ViewBag.SearchNome;
+    var searchEstado = ViewBag.SearchEstado;
 }
 
 <div class="container mt-4">
-
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -18,10 +20,42 @@
         <h1 class="display-6">Stock de Materiais e Equipamentos</h1>
         <div class="d-flex justify-content-end">
 
+            @* Botão de Pesquisa (com o colapso igual ao exemplo) *@
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse"
+               data-bs-target="#stockSearch" aria-expanded="false"
+               aria-controls="stockSearch">
+                <i class="bi bi-search me-1"></i> Pesquisar
+            </a>
+
             @* Botão Criar Novo *@
             <a asp-action="Create" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-circle"></i> Adicionar Novo
             </a>
+        </div>
+    </div>
+
+    @* Área de Pesquisa Colapsável (Funcionalidade de Pesquisa Visualmente Adicionada) *@
+    <div class="collapse mt-2 mb-4" id="stockSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+                <div class="col-md-4">
+                    <label for="searchNome" class="form-label">Nome do Material/Equipamento</label>
+                    <input id="searchNome" name="searchNome" value="@searchNome"
+                           class="form-control" placeholder="Pesquisar por nome" type="search" />
+                </div>
+
+                <div class="col-md-4">
+                    <label for="searchEstado" class="form-label">Estado</label>
+                    <input id="searchEstado" name="searchEstado" value="@searchEstado"
+                           class="form-control" placeholder="Pesquisar por estado" type="search" />
+                </div>
+
+                <div class="col-12 mt-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Pesquisar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Limpar Filtros</a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -31,19 +65,22 @@
             <thead class="table-dark">
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.First().NomeEquipamento)
+                        @* Alterado de model.Items.First() para model.First() *@
+                        @Html.DisplayNameFor(model => model.NomeEquipamento)
                     </th>
                     <th class="text-center">
-                        @Html.DisplayNameFor(model => model.First().Quantidade)
+                        @* Alterado de model.Items.First() para model.First() *@
+                        @Html.DisplayNameFor(model => model.Quantidade)
                     </th>
                     <th class="d-none d-sm-table-cell">
-                        @Html.DisplayNameFor(model => model.First().EstadoComponente)
+                        @* Alterado de model.Items.First() para model.First() *@
+                        @Html.DisplayNameFor(model => model.EstadoComponente)
                     </th>
                     <th class="text-center" style="width: 250px;">Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model) // Iteração direta no Model
+                @foreach (var item in Model)
                 {
                     <tr>
                         <td>

@@ -12,21 +12,34 @@ namespace HealthWellBeing.Controllers
     public class MaterialEquipamentoAssociadosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
-        // ITEMS_PER_PAGE não é mais necessário para a listagem simples
-        // private const int ITEMS_PER_PAGE = 5; 
 
         public MaterialEquipamentoAssociadosController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: MaterialEquipamentoAssociados
-        // Revertido para listagem simples sem Paginação/Filtros
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchNome = "", string searchEstado = "")
         {
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchEstado = searchEstado;
 
-            return View(await _context.MaterialEquipamentoAssociado.ToListAsync());
+            var materialQuery = _context.MaterialEquipamentoAssociado.AsQueryable();
 
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                materialQuery = materialQuery.Where(m => m.NomeEquipamento.Contains(searchNome));
+            }
+
+            if (!string.IsNullOrEmpty(searchEstado))
+            {
+                materialQuery = materialQuery.Where(m => m.EstadoComponente.Contains(searchEstado));
+            }
+
+            var materiais = await materialQuery
+                .OrderBy(m => m.NomeEquipamento)
+                .ToListAsync();
+
+            return View(materiais);
         }
 
         // GET: MaterialEquipamentoAssociados/Details/5
@@ -64,7 +77,6 @@ namespace HealthWellBeing.Controllers
             {
                 _context.Add(materialEquipamentoAssociado);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi adicionado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(materialEquipamentoAssociado);
@@ -115,7 +127,7 @@ namespace HealthWellBeing.Controllers
                     else
                     {
                         throw;
-                    }
+                }
                 }
                 return RedirectToAction(nameof(Index));
             }
