@@ -41,6 +41,7 @@ internal class Program
             var context = services.GetRequiredService<ApplicationDbContext>();
             context.Database.Migrate();
             var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
+            //healthContext.Database.ExecuteSqlRaw("DELETE FROM MaterialEquipamentoAssociado");
             SeedDataMaterialEquipamentoAssociado.Populate(healthContext);
             SeedDataProfissionalExecutante.Populate(healthContext);
         }
