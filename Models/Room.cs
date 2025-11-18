@@ -43,9 +43,9 @@ namespace HealthWellbeing.Models
             Disponivel,
             [Display(Name = "Indisponível")]
             Indisponivel,
-            [Display(Name = "Limpeza")]
+            [Display(Name = "Em Limpeza")]
             Limpeza,
-            [Display(Name = "Manutenção")]
+            [Display(Name = "Em Manutenção")]
             Manutencao,
             [Display(Name = "Fora de serviço")]
             ForaDeServico
