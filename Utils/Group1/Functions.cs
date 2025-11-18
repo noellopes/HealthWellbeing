@@ -97,6 +97,20 @@ namespace HealthWellbeing.Utils.Group1
             return propInfo.Name;
         }
 
+        public static string GetEnumDisplayName(Enum value)
+        {
+            var memberInfo = value.GetType().GetMember(value.ToString());
+            if (memberInfo.Length > 0)
+            {
+                var displayAttr = memberInfo[0]
+                    .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                    .FirstOrDefault() as System.ComponentModel.DataAnnotations.DisplayAttribute;
+                if (displayAttr != null)
+                    return displayAttr.Name;
+            }
+            return value.ToString();
+        }
+
         /// <summary>
         /// Resolves and returns the value of a nested property on an object, 
         /// given a dot-separated property path (e.g. "Nurse.Name").

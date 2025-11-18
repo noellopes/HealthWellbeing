@@ -29,7 +29,7 @@ namespace HealthWellbeing.Utils.Group1.DTOs
         public string AdditionalNotes { get; set; }
 
         [Display(Name = "Estado do tratamento")]
-        public TreatmentStatus Status { get; set; }
+        public string Status { get; set; }
 
         [Display(Name = "Data de submissão")]
         public DateTime CreatedAt { get; set; }

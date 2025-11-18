@@ -61,7 +61,7 @@ namespace HealthWellbeing.Controllers
                 CompletedDuration = t.CompletedDuration,
                 Observations = t.Observations ?? "-",
                 AdditionalNotes = t.AdditionalNotes ?? "-",
-                Status = t.Status,
+                Status = Functions.GetEnumDisplayName(t.Status),
                 CreatedAt = t.CreatedAt
             },
                 ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
