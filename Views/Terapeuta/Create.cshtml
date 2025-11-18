@@ -1,59 +1,67 @@
-﻿@model HealthWellbeing.Models.TerapeutaModel
+﻿@model HealthWellbeing.Models.Terapeuta
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Terapeuta";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
-
-<h4>TerapeutaModel</h4>
+<h1>Criar Novo Terapeuta</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Especialidade" class="control-label"></label>
-                <input asp-for="Especialidade" class="form-control" />
-                <span asp-validation-for="Especialidade" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telefone" class="control-label"></label>
-                <input asp-for="Telefone" class="form-control" />
-                <span asp-validation-for="Telefone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AnosExperiencia" class="control-label"></label>
-                <input asp-for="AnosExperiencia" class="form-control" />
-                <span asp-validation-for="AnosExperiencia" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Ativo" /> @Html.DisplayNameFor(model => model.Ativo)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<form asp-action="Create">
+
+    <!-- Mensagem de validação geral -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Nome -->
+    <div class="form-group mb-3">
+        <label asp-for="Nome" class="control-label"></label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <!-- Especialidade -->
+    <div class="form-group mb-3">
+        <label asp-for="Especialidade" class="control-label"></label>
+        <input asp-for="Especialidade" class="form-control" />
+        <span asp-validation-for="Especialidade" class="text-danger"></span>
+    </div>
+
+    <!-- Telefone -->
+    <div class="form-group mb-3">
+        <label asp-for="Telefone" class="control-label"></label>
+        <input asp-for="Telefone" class="form-control" />
+        <span asp-validation-for="Telefone" class="text-danger"></span>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group mb-3">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <!-- Ano Entrada -->
+    <div class="form-group mb-3">
+        <label asp-for="AnoEntrada" class="control-label"></label>
+        <input asp-for="AnoEntrada" type="number" min="1900" max="2100" class="form-control" />
+        <span asp-validation-for="AnoEntrada" class="text-danger"></span>
+    </div>
+
+    <!-- Ativo -->
+    <div class="form-group form-check mb-3">
+        <input class="form-check-input" asp-for="Ativo" />
+        <label class="form-check-label" asp-for="Ativo"></label>
+    </div>
+
+    <!-- Botões -->
+    <div class="form-group mt-3">
+        <input type="submit" value="Guardar" class="btn btn-primary" /> |
+        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    </div>
+
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 }
