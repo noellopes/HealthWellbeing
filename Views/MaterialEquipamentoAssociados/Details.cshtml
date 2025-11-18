@@ -1,36 +1,82 @@
 ﻿@model HealthWellbeing.Models.MaterialEquipamentoAssociado
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Material/Equipamento";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
 
-<div>
-    <h4>MaterialEquipamentoAssociado</h4>
+    <h1 class="display-6 mb-3">Detalhes do Material/Equipamento</h1>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeEquipamento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NomeEquipamento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantidade)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantidade)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EstadoComponente)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EstadoComponente)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MaterialEquipamentoAssociadoId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+
+            <div class="card shadow-lg">
+                @* Cabeçalho do Card (Pode ser ajustado para a cor que desejar, aqui usei primary) *@
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i>
+                        Informações: @Model.NomeEquipamento
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    @* Lista de Definição (Dl) em duas colunas *@
+                    <dl class="row mb-0">
+
+                        @* Detalhe: NomeEquipamento *@
+                        <dt class="col-sm-3 text-muted">
+                            @Html.DisplayNameFor(model => model.NomeEquipamento)
+                        </dt>
+                        <dd class="col-sm-9 fw-bold">
+                            @Html.DisplayFor(model => model.NomeEquipamento)
+                        </dd>
+
+                        @* Detalhe: Quantidade *@
+                        <dt class="col-sm-3 text-muted">
+                            @Html.DisplayNameFor(model => model.Quantidade)
+                        </dt>
+                        <dd class="col-sm-9">
+                            <span class="badge bg-secondary">
+                                @Html.DisplayFor(model => model.Quantidade)
+                            </span>
+                        </dd>
+
+                        @* Detalhe: EstadoComponente *@
+                        <dt class="col-sm-3 text-muted">
+                            @Html.DisplayNameFor(model => model.EstadoComponente)
+                        </dt>
+                        <dd class="col-sm-9">
+                            @* Estilização do Estado com Badge para melhor destaque *@
+                            @{
+                                var badgeClass = Model.EstadoComponente?.ToLower() switch
+                                {
+                                    "bom" => "bg-success",
+                                    "danificado" => "bg-danger",
+                                    "em manutenção" => "bg-warning text-dark",
+                                    _ => "bg-info text-dark"
+                                };
+                            }
+                            <span class="badge @badgeClass">
+                                @Html.DisplayFor(model => model.EstadoComponente)
+                            </span>
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+
+            @* Botões de Ação *@
+            <div class="mt-4 d-flex justify-content-start">
+                <a asp-action="Edit" asp-route-id="@Model?.MaterialEquipamentoAssociadoId" class="btn btn-warning me-2 shadow-sm">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                    <i class="bi bi-arrow-left-short"></i> Voltar para a Lista
+                </a>
+            </div>
+
+        </div>
+    </div>
 </div>

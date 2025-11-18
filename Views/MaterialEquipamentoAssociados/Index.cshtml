@@ -1,47 +1,69 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.MaterialEquipamentoAssociado>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Materiais e Equipamentos associados";
 }
 
-<h1>Index</h1>
+<div class="container mt-4">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NomeEquipamento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantidade)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EstadoComponente)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NomeEquipamento)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantidade)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EstadoComponente)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Sucesso!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">Stock de Materiais e Equipamentos</h1>
+        <div class="d-flex justify-content-end">
+
+            @* Botão Criar Novo *@
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-circle"></i> Adicionar Novo
+            </a>
+        </div>
+    </div>
+
+    @* Tabela Estilizada *@
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.First().NomeEquipamento)
+                    </th>
+                    <th class="text-center">
+                        @Html.DisplayNameFor(model => model.First().Quantidade)
+                    </th>
+                    <th class="d-none d-sm-table-cell">
+                        @Html.DisplayNameFor(model => model.First().EstadoComponente)
+                    </th>
+                    <th class="text-center" style="width: 250px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) // Iteração direta no Model
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NomeEquipamento)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Quantidade)
+                        </td>
+                        <td class="d-none d-sm-table-cell">
+                            @Html.DisplayFor(modelItem => item.EstadoComponente)
+                        </td>
+                        <td class="text-center text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
+                            <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
+                            <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

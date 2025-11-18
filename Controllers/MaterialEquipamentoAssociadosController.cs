@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
-namespace HealthWellbeing.Controllers
+namespace HealthWellBeing.Controllers
 {
     public class MaterialEquipamentoAssociadosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        // ITEMS_PER_PAGE não é mais necessário para a listagem simples
+        // private const int ITEMS_PER_PAGE = 5; 
 
         public MaterialEquipamentoAssociadosController(HealthWellbeingDbContext context)
         {
@@ -20,9 +21,12 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: MaterialEquipamentoAssociados
+        // Revertido para listagem simples sem Paginação/Filtros
         public async Task<IActionResult> Index()
         {
+
             return View(await _context.MaterialEquipamentoAssociado.ToListAsync());
+
         }
 
         // GET: MaterialEquipamentoAssociados/Details/5
@@ -60,6 +64,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(materialEquipamentoAssociado);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi adicionado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
             return View(materialEquipamentoAssociado);
@@ -99,6 +104,7 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(materialEquipamentoAssociado);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi atualizado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -143,6 +149,7 @@ namespace HealthWellbeing.Controllers
             if (materialEquipamentoAssociado != null)
             {
                 _context.MaterialEquipamentoAssociado.Remove(materialEquipamentoAssociado);
+                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi apagado com sucesso!";
             }
 
             await _context.SaveChangesAsync();

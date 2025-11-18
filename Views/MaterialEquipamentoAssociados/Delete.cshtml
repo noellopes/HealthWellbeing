@@ -1,39 +1,67 @@
 ﻿@model HealthWellbeing.Models.MaterialEquipamentoAssociado
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Apagar Material/Equipamento";
 }
 
-<h1>Delete</h1>
+<div class="container mt-4">
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>MaterialEquipamentoAssociado</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeEquipamento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NomeEquipamento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantidade)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantidade)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EstadoComponente)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EstadoComponente)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="MaterialEquipamentoAssociadoId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+
+            @* Cartão de Aviso de Perigo (Danger Card) *@
+            <div class="card border-danger shadow-lg">
+
+                <div class="card-header bg-danger text-white">
+                    <h1 class="h4 mb-0">Apagar Material/Equipamento</h1>
+                </div>
+
+                <div class="card-body">
+                    <h3 class="card-title text-danger mb-4">Tem certeza de que deseja apagar este item?</h3>
+                    <p class="card-text">A exclusão deste item é **irreversível**.</p>
+
+                    <hr class="my-3" />
+
+                    @* Lista de Detalhes para Confirmação *@
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.NomeEquipamento)
+                        </dt>
+                        <dd class="col-sm-8 fw-bold">
+                            @Html.DisplayFor(model => model.NomeEquipamento)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.Quantidade)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.Quantidade)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.EstadoComponente)
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.EstadoComponente)
+                        </dd>
+                    </dl>
+                </div>
+
+                @* Rodapé com Botões de Ação (Justified) *@
+                <div class="card-footer d-flex justify-content-between">
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="MaterialEquipamentoAssociadoId" />
+                        <button type="submit" value="Delete" class="btn btn-danger shadow-sm">
+                            <i class="bi bi-trash"></i> Sim, Apagar
+                        </button>
+                    </form>
+
+                    <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
