@@ -1,43 +1,55 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.FoodCategory>
+
 @{
     ViewData["Title"] = "Food Categories";
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
 }
 
-<h1 class="mb-3">Food Categories</h1>
+<h1>@ViewData["Title"]</h1>
 
-@if (TempData["Success"] != null)
+@if (!string.IsNullOrWhiteSpace(success))
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success">@success</div>
 }
-@if (TempData["Error"] != null)
+@if (!string.IsNullOrWhiteSpace(error))
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-danger">@error</div>
 }
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create">Create New Category</a>
 </p>
 
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.First().Name)</th>
-            <th>Parent</th>
-            <th style="width:180px;"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+@if (!Model.Any())
+{
+    <div class="alert alert-info">There are no food categories yet.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
             <tr>
-                <td>@item.Name</td>
-                <td>@item.ParentCategory?.Name</td>
-                <td class="text-end">
-                    <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@item.FoodCategoryId">Details</a>
-                    <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.FoodCategoryId">Edit</a>
-                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.FoodCategoryId">Delete</a>
-                </td>
+                <th>Category Name</th>
+               
+                <th>Parent Category</th>
+                <th class="text-end">Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.Name</td>
+               
+                    <td>@category.ParentCategory?.Name</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@category.FoodCategoryId">Details</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@category.FoodCategoryId">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@category.FoodCategoryId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -48,12 +48,29 @@ internal static class SeedData
         if (db.Nutritionist.Any()) return;
 
         db.Nutritionist.AddRange(
-            new Nutritionist { Name = "Dr. Sara Healthy" },
-            new Nutritionist { Name = "Dr. Miguel Fit" }
+            new Nutritionist
+            {
+                Name = "Dr. João Carvalho",
+                Email = "joao.carvalho@healthwellbeing.com",
+                Phone = "912345678"
+            },
+            new Nutritionist
+            {
+                Name = "Dra. Sofia Martins",
+                Email = "sofia.martins@healthwellbeing.com",
+                Phone = "913987654"
+            },
+            new Nutritionist
+            {
+                Name = "Dr. Ricardo Soares",
+                Email = "ricardo.soares@healthwellbeing.com",
+                Phone = "914567890"
+            }
         );
 
         db.SaveChanges();
     }
+
 
     // ================================================================
     // FOOD CATEGORY

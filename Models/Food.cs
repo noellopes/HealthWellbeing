@@ -12,7 +12,6 @@ namespace HealthWellbeing.Models
         [Required, StringLength(120)]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(300)]
         public string? Description { get; set; }
 
         [Required]
