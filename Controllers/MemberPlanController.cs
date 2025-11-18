@@ -21,7 +21,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: MemberPlan
-        public async Task<IActionResult> Index(int page = 1, string searchClientName = "", string searchPlanName = "")
+        public async Task<IActionResult> Index(int page = 1, string searchClientName = "", string searchPlanName = "", string searchStatus = "")
         {
             var memberPlansQuery = _context.MemberPlan
                 .Include(mp => mp.Member)
@@ -39,11 +39,18 @@ namespace HealthWellbeing.Controllers
                 memberPlansQuery = memberPlansQuery.Where(mp => mp.Plan.Name.Contains(searchPlanName));
             }
 
+            // Filtro de Estado (Status)
+            if (!string.IsNullOrEmpty(searchStatus))
+            {
+                memberPlansQuery = memberPlansQuery.Where(mp => mp.Status == searchStatus);
+            }
+
             ViewBag.SearchClientName = searchClientName;
             ViewBag.SearchPlanName = searchPlanName;
+            ViewBag.SearchStatus = searchStatus;
 
             int totalItems = await memberPlansQuery.CountAsync();
-            var paginationInfo = new PaginationInfo<MemberPlan>(page, totalItems, 7);
+            var paginationInfo = new PaginationInfo<MemberPlan>(page, totalItems, 5);
 
             paginationInfo.Items = await memberPlansQuery
                 .OrderByDescending(mp => mp.StartDate) // Ordenar por data mais recente
