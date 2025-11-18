@@ -193,13 +193,22 @@
     }
 
     <!-- PAGINAÇÃO -->
+
     <nav aria-label="Room page" class="d-flex justify-content-between align-items-center">
-        <span>
-            Mostrando @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
-            -
-            @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
-            de @Model.TotalItems
-        </span>
+       @* CONDICAO PARA QUE CASO NAO TENHA ITEN MOSTRE MENSAGEM DO ELSE *@
+        @if (Model.TotalItems > 0)
+        {
+            <span>
+                Mostrando @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
+                -
+                @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
+                de @Model.TotalItems
+            </span>
+        }
+        else
+        {
+            <span>0 itens</span>
+        }
 
         <ul class="pagination mb-0">
             @if (Model.CurrentPage == 1)
