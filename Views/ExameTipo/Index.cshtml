@@ -61,7 +61,7 @@
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Nome)</th>
                     <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>
-                    <th>@Html.DisplayNameFor(model => model.Items.First().Especialidade)</th>
+                    <th>@Html.DisplayNameFor(model => model.Items.First().Especialidade!.Nome)</th>
                     <th class="text-center" style="width: 250px;">Ações</th>
                 </tr>
             </thead>
@@ -71,7 +71,7 @@
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Nome)</td>
                         <td class="d-none d-sm-table-cell">@Html.DisplayFor(modelItem => item.Descricao)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Especialidade)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Especialidade!.Nome)</td>
                         <td class="text-center text-nowrap">
                             <a asp-action="Edit" asp-route-id="@item.ExameTipoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
                             <a asp-action="Details" asp-route-id="@item.ExameTipoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>

@@ -22,16 +22,18 @@ namespace HealthWellbeing.Controllers
 
         // GET: ExameTipoes
         public async Task<IActionResult> Index(
+
             int page = 1,
             string searchNome = "",
             string searchEspecialidade = "")
+
         {
             // 1. Configuração da Pesquisa (para View e Links)
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchEspecialidade = searchEspecialidade;
 
             // 2. Aplicação dos Filtros na Query
-            var examesQuery = _context.ExameTipo.AsQueryable();
+            var examesQuery = _context.ExameTipo.Include(et => et.Especialidade).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchNome))
             {
@@ -41,6 +43,7 @@ namespace HealthWellbeing.Controllers
             {
                 examesQuery = examesQuery.Where(et => et.Especialidade.Nome.Contains(searchEspecialidade));
             }
+
 
             // 3. Contagem e Criação do ViewModel de Paginação
             int totalExames = await examesQuery.CountAsync();
@@ -68,6 +71,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var exameTipo = await _context.ExameTipo
+                .Include(et => et.Especialidade) // ADICIONADO: Carrega a Especialidade
                 .FirstOrDefaultAsync(m => m.ExameTipoId == id);
             if (exameTipo == null)
             {
@@ -80,6 +84,7 @@ namespace HealthWellbeing.Controllers
         // GET: ExameTipoes/Create
         public IActionResult Create()
         {
+            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades.OrderBy(e => e.Nome), "EspecialidadeId", "Nome");
             return View();
         }
 
@@ -118,7 +123,9 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exameTipo = await _context.ExameTipo.FindAsync(id);
+            var exameTipo = await _context.ExameTipo
+                .Include(et => et.Especialidade) // ADICIONADO: Carrega a Especialidade
+                .FirstOrDefaultAsync(m => m.ExameTipoId == id);
             if (exameTipo == null)
             {
                 return NotFound();
@@ -183,6 +190,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var exameTipo = await _context.ExameTipo
+                .Include(et => et.Especialidade) // ADICIONADO: Carrega a Especialidade
                 .FirstOrDefaultAsync(m => m.ExameTipoId == id);
             if (exameTipo == null)
             {

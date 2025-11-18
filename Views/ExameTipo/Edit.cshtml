@@ -35,9 +35,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Especialidade" class="form-label"></label>
-                            <input asp-for="Especialidade" class="form-control" />
-                            <span asp-validation-for="Especialidade" class="text-danger"></span>
+                            <label asp-for="EspecialidadeId" class="form-label">Especialidade</label>
+
+                            <select asp-for="EspecialidadeId" class="form-select" asp-items="@(ViewData["EspecialidadeId"] as SelectList)">
+                                <option value="">-- Selecione a Especialidade --</option>
+                            </select>
+
+                            <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">
