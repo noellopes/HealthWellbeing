@@ -17,8 +17,8 @@ namespace HealthWellbeing.Models
         // Nome ou descrição da porção (ex: "1 cup cooked (150 g)")
         [Required]
         [StringLength(80)]
-        [Display(Name = "Portion Label")]
-        public string Label { get; set; } = string.Empty;
+        [Display(Name = "Portion")]
+        public string Portion { get; set; } = string.Empty;
 
         // Quantidade equivalente em gramas ou ml
         [Range(1, 9999)]

@@ -273,7 +273,7 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("FoodId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Label")
+                    b.Property<string>("Portion")
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");

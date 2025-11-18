@@ -50,12 +50,12 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FoodId,Label,AmountGramsMl")] FoodPortion model)
+        public async Task<IActionResult> Create([Bind("FoodId,Portion,AmountGramsMl")] FoodPortion model)
         {
             if (await _context.FoodPortion
-                .AnyAsync(p => p.FoodId == model.FoodId && p.Label.ToLower() == model.Label.Trim().ToLower()))
+                .AnyAsync(p => p.FoodId == model.FoodId && p.Portion.ToLower() == model.Portion.Trim().ToLower()))
             {
-                ModelState.AddModelError(nameof(FoodPortion.Label), "This portion label already exists for the selected food.");
+                ModelState.AddModelError(nameof(FoodPortion.Portion), "This portion label already exists for the selected food.");
             }
 
             if (!ModelState.IsValid)
@@ -67,7 +67,7 @@ namespace HealthWellbeing.Controllers
 
             try
             {
-                model.Label = model.Label.Trim();
+                model.Portion = model.Portion.Trim();
                 _context.Add(model);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Food portion created successfully.";
@@ -94,14 +94,14 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FoodPortionId,FoodId,Label,AmountGramsMl")] FoodPortion model)
+        public async Task<IActionResult> Edit(int id, [Bind("FoodPortionId,FoodId,Portion,AmountGramsMl")] FoodPortion model)
         {
             if (id != model.FoodPortionId) return NotFound();
 
             if (await _context.FoodPortion
-                .AnyAsync(p => p.FoodPortionId != id && p.FoodId == model.FoodId && p.Label.ToLower() == model.Label.Trim().ToLower()))
+                .AnyAsync(p => p.FoodPortionId != id && p.FoodId == model.FoodId && p.Portion.ToLower() == model.Portion.Trim().ToLower()))
             {
-                ModelState.AddModelError(nameof(FoodPortion.Label), "This portion label already exists for the selected food.");
+                ModelState.AddModelError(nameof(FoodPortion.Portion), "This portion label already exists for the selected food.");
             }
 
             if (!ModelState.IsValid)
@@ -117,7 +117,7 @@ namespace HealthWellbeing.Controllers
                 if (entity == null) return NotFound();
 
                 entity.FoodId = model.FoodId;
-                entity.Label = model.Label.Trim();
+                entity.Portion = model.Portion.Trim();
                 entity.AmountGramsMl = model.AmountGramsMl;
 
                 await _context.SaveChangesAsync();

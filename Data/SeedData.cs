@@ -174,9 +174,9 @@ internal static class SeedData
         var milk = db.Food.First(f => f.Name == "Milk (whole)");
 
         db.FoodPortion.AddRange(
-            new FoodPortion { Food = apple, Label = "1 medium (150 g)", AmountGramsMl = 150 },
-            new FoodPortion { Food = rice, Label = "1 cup cooked (150 g)", AmountGramsMl = 150 },
-            new FoodPortion { Food = milk, Label = "1 glass (200 ml)", AmountGramsMl = 200 }
+            new FoodPortion { Food = apple, Portion = "1 medium (150 g)", AmountGramsMl = 150 },
+            new FoodPortion { Food = rice, Portion = "1 cup cooked (150 g)", AmountGramsMl = 150 },
+            new FoodPortion { Food = milk, Portion = "1 glass (200 ml)", AmountGramsMl = 200 }
         );
 
         db.SaveChanges();
