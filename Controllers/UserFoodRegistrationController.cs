@@ -180,9 +180,9 @@ namespace HealthWellbeing.Controllers
                 await _context.FoodPortion
                     .Include(p => p.Food)
                     .AsNoTracking()
-                    .OrderBy(p => p.Label)
+                    .OrderBy(p => p.Portion)
                     .ToListAsync(),
-                "FoodPortionId", "Label", portionId);
+                "FoodPortionId", "Portion", portionId);
         }
 
         private async Task<decimal?> CalculateEnergyAsync(int foodId, int portionId, decimal portionsCount)
