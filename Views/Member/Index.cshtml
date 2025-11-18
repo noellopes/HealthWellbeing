@@ -3,9 +3,13 @@
 
 @{
     ViewData["Title"] = "Members";
+
+    var searchName = ViewBag.SearchName;
+    var searchPhone = ViewBag.SearchPhone;
+    var searchEmail = ViewBag.SearchEmail;
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
 
 @* Bloco para mostrar mensagens de sucesso/erro *@
 @if (TempData["Message"] != null)
@@ -42,19 +46,19 @@
             @* 1. Name (col-md-4) *@
             <div class="col-md-4">
                 <label for="searchName" class="form-label">Name</label>
-                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+                <input id="searchName" name="searchName" value="@searchName" class="form-control" placeholder="Search by name" type="search" />
             </div>
 
             @* 2. Phone (col-md-4) *@
             <div class="col-md-4">
                 <label for="searchPhone" class="form-label">Phone</label>
-                <input id="searchPhone" name="searchPhone" value="@ViewBag.SearchPhone" class="form-control" placeholder="Search by phone" type="search" />
+                <input id="searchPhone" name="searchPhone" value="@searchPhone" class="form-control" placeholder="Search by phone" type="search" />
             </div>
 
             @* 3. Email (col-md-4) *@
             <div class="col-md-4">
                 <label for="searchEmail" class="form-label">Email</label>
-                <input id="searchEmail" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control" placeholder="Search by email" type="search" />
+                <input id="searchEmail" name="searchEmail" value="@searchEmail" class="form-control" placeholder="Search by email" type="search" />
             </div>
 
             @* Botões *@
@@ -97,7 +101,7 @@ else
                 {
                     <tr>
                         @* Aceder aos dados do Cliente (item.Client) *@
-                        <td>@Html.DisplayFor(modelItem => item.Client.Name)</td>
+                        <td class="fw-bold">@Html.DisplayFor(modelItem => item.Client.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.MemberId)</td>
 
                         <td class="text-end">
@@ -133,9 +137,9 @@ else
             {
                 <li class="page-item">
                     <a class="page-link" asp-action="Index"
-                       asp-route-searchName="@ViewBag.SearchName"
-                       asp-route-searchPhone="@ViewBag.SearchPhone"
-                       asp-route-searchEmail="@ViewBag.SearchEmail">First</a>
+                       asp-route-searchName="@searchName"
+                       asp-route-searchPhone="@searchPhone"
+                       asp-route-searchEmail="@searchEmail">First</a>
                 </li>
             }
 
@@ -150,9 +154,9 @@ else
                 {
                     <li class="page-item">
                         <a class="page-link" asp-action="Index" asp-route-page="@p"
-                           asp-route-searchName="@ViewBag.SearchName"
-                           asp-route-searchPhone="@ViewBag.SearchPhone"
-                           asp-route-searchEmail="@ViewBag.SearchEmail">@p</a>
+                           asp-route-searchName="@searchName"
+                           asp-route-searchPhone="@searchPhone"
+                           asp-route-searchEmail="@searchEmail">@p</a>
                     </li>
                 }
             }
@@ -166,9 +170,9 @@ else
             {
                 <li class="page-item">
                     <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
-                       asp-route-searchName="@ViewBag.SearchName"
-                       asp-route-searchPhone="@ViewBag.SearchPhone"
-                       asp-route-searchEmail="@ViewBag.SearchEmail">Last</a>
+                       asp-route-searchName="@searchName"
+                       asp-route-searchPhone="@searchPhone"
+                       asp-route-searchEmail="@searchEmail">Last</a>
                 </li>
             }
         </ul>
