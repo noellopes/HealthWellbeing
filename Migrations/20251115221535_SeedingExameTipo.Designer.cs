@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251115221535_SeedingExameTipo")]
+    partial class SeedingExameTipo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,111 +224,6 @@ namespace HealthWellbeing.Migrations
                             Descricao = "Análise laboratorial de amostra de urina.",
                             Especialidade = "Urologia",
                             Nome = "Exame de Urina Tipo II"
-                        },
-                        new
-                        {
-                            ExameTipoId = 9,
-                            Descricao = "Exame endoscópico para visualização do intestino grosso.",
-                            Especialidade = "Gastroenterologia",
-                            Nome = "Colonoscopia"
-                        },
-                        new
-                        {
-                            ExameTipoId = 10,
-                            Descricao = "Exame do esófago, estômago e duodeno.",
-                            Especialidade = "Gastroenterologia",
-                            Nome = "Endoscopia Digestiva Alta"
-                        },
-                        new
-                        {
-                            ExameTipoId = 11,
-                            Descricao = "Rastreio e diagnóstico de cancro da mama.",
-                            Especialidade = "Radiologia",
-                            Nome = "Mamografia Digital"
-                        },
-                        new
-                        {
-                            ExameTipoId = 12,
-                            Descricao = "Avaliação dos órgãos pélvicos femininos ou masculinos.",
-                            Especialidade = "Ginecologia",
-                            Nome = "Ecografia Pélvica"
-                        },
-                        new
-                        {
-                            ExameTipoId = 13,
-                            Descricao = "Avalia a capacidade pulmonar e o fluxo de ar.",
-                            Especialidade = "Pneumologia",
-                            Nome = "Prova de Função Respiratória"
-                        },
-                        new
-                        {
-                            ExameTipoId = 14,
-                            Descricao = "Monitorização contínua da atividade elétrica do coração.",
-                            Especialidade = "Cardiologia",
-                            Nome = "Holter 24 Horas"
-                        },
-                        new
-                        {
-                            ExameTipoId = 15,
-                            Descricao = "Medição dos níveis de hormonas tiroideias no sangue.",
-                            Especialidade = "Endocrinologia",
-                            Nome = "Análise Hormonal (Tireoide)"
-                        },
-                        new
-                        {
-                            ExameTipoId = 16,
-                            Descricao = "Testes cutâneos para identificação de alergénios específicos.",
-                            Especialidade = "Imunoalergologia",
-                            Nome = "Teste de Alergias"
-                        },
-                        new
-                        {
-                            ExameTipoId = 17,
-                            Descricao = "Registo da atividade elétrica cerebral.",
-                            Especialidade = "Neurologia",
-                            Nome = "Eletroencefalograma (EEG)"
-                        },
-                        new
-                        {
-                            ExameTipoId = 18,
-                            Descricao = "Visualização detalhada dos vasos sanguíneos.",
-                            Especialidade = "Radiologia",
-                            Nome = "Angiografia por TC"
-                        },
-                        new
-                        {
-                            ExameTipoId = 19,
-                            Descricao = "Avaliação da acuidade visual e pressão intraocular.",
-                            Especialidade = "Oftalmologia",
-                            Nome = "Exame Oftalmológico Completo"
-                        },
-                        new
-                        {
-                            ExameTipoId = 20,
-                            Descricao = "Avaliação da capacidade auditiva.",
-                            Especialidade = "Otorrinolaringologia",
-                            Nome = "Audiograma"
-                        },
-                        new
-                        {
-                            ExameTipoId = 21,
-                            Descricao = "Colheita de pequena amostra de tecido cutâneo.",
-                            Especialidade = "Dermatologia",
-                            Nome = "Biopsia de Pele"
-                        },
-                        new
-                        {
-                            ExameTipoId = 22,
-                            Descricao = "Detecção e quantificação de substâncias químicas no organismo.",
-                            Especialidade = "Medicina Legal",
-                            Nome = "Análise Toxicológica"
-                        },
-                        new
-                        {
-                            ExameTipoId = 23,
-                            Descricao = "Identificação de bactérias que podem causar infeção urinária.",
-                            Especialidade = "Urologia",
-                            Nome = "Cultura de Urina"
                         });
                 });
 

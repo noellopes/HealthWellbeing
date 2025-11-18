@@ -19,7 +19,7 @@ namespace HealthWellbeing.Models
         public string Especialidade { get; set; }
         
 
-       public ICollection<ExameTipo>? exametipo { get; set; }
+       
 
     }
 

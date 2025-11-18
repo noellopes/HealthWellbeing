@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,9 +21,42 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ExameTipoes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchNome = "",
+            string searchEspecialidade = "")
         {
-            return View(await _context.ExameTipo.ToListAsync());
+            // 1. Configuração da Pesquisa (para View e Links)
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchEspecialidade = searchEspecialidade;
+
+            // 2. Aplicação dos Filtros na Query
+            var examesQuery = _context.ExameTipo.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                examesQuery = examesQuery.Where(et => et.Nome.Contains(searchNome));
+            }
+            if (!string.IsNullOrEmpty(searchEspecialidade))
+            {
+                examesQuery = examesQuery.Where(et => et.Especialidade.Contains(searchEspecialidade));
+            }
+
+            // 3. Contagem e Criação do ViewModel de Paginação
+            int totalExames = await examesQuery.CountAsync();
+
+            // Instanciar o ViewModel (ItemsPerPage=5 para forçar 2 páginas de teste)
+            var examesInfo = new PaginationInfo<ExameTipo>(page, totalExames, itemsPerPage: 5);
+
+            // 4. Ordenação e Aplicação da Paginação (Skip/Take)
+            examesInfo.Items = await examesQuery
+                .OrderBy(et => et.Nome)
+                .Skip(examesInfo.ItemsToSkip) // Pula os itens das páginas anteriores
+                .Take(examesInfo.ItemsPerPage) // Pega apenas os 5 itens da página atual
+                .ToListAsync();
+
+            // Retorna o ViewModel de Paginação
+            return View(examesInfo);
         }
 
         // GET: ExameTipoes/Details/5
