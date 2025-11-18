@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
