@@ -29,7 +29,7 @@ namespace HealthWellbeing.Controllers
             var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<Pathology>();
 
             // Define as propriadades visiveis do modelo
-            IReadOnlyList<string> baseProperties = ["Name", "Severity", "Description"];
+            IReadOnlyList<string> baseProperties = ["Name", "Description", "Severity"];
 
             // Query Base para otimizar as consultas
             IQueryable<Pathology> pathologies = _context.Pathology.AsNoTracking();
