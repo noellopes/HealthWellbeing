@@ -22,6 +22,8 @@ namespace HealthWellbeing.Data // <<-- Corrigido o namespace se necessário
         private static void PopulateMaterialEquipamentoAssociado(HealthWellbeingDbContext dbContext) // <<-- Nome do DbContext Corrigido
         {
 
+            if (dbContext.MaterialEquipamentoAssociado.Any()) return;
+
             var materialEquipamentoAssociado = new[]
             {
                 // 1

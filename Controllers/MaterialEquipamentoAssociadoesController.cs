@@ -10,22 +10,22 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class MaterialEquipamentoAssociadoesController : Controller
+    public class MaterialEquipamentoAssociadosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public MaterialEquipamentoAssociadoesController(HealthWellbeingDbContext context)
+        public MaterialEquipamentoAssociadosController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // GET: MaterialEquipamentoAssociadoes
+        // GET: MaterialEquipamentoAssociados
         public async Task<IActionResult> Index()
         {
             return View(await _context.MaterialEquipamentoAssociado.ToListAsync());
         }
 
-        // GET: MaterialEquipamentoAssociadoes/Details/5
+        // GET: MaterialEquipamentoAssociados/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,13 +43,13 @@ namespace HealthWellbeing.Controllers
             return View(materialEquipamentoAssociado);
         }
 
-        // GET: MaterialEquipamentoAssociadoes/Create
+        // GET: MaterialEquipamentoAssociados/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: MaterialEquipamentoAssociadoes/Create
+        // POST: MaterialEquipamentoAssociados/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
             return View(materialEquipamentoAssociado);
         }
 
-        // GET: MaterialEquipamentoAssociadoes/Edit/5
+        // GET: MaterialEquipamentoAssociados/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,7 +81,7 @@ namespace HealthWellbeing.Controllers
             return View(materialEquipamentoAssociado);
         }
 
-        // POST: MaterialEquipamentoAssociadoes/Edit/5
+        // POST: MaterialEquipamentoAssociados/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -116,7 +116,7 @@ namespace HealthWellbeing.Controllers
             return View(materialEquipamentoAssociado);
         }
 
-        // GET: MaterialEquipamentoAssociadoes/Delete/5
+        // GET: MaterialEquipamentoAssociados/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -134,7 +134,7 @@ namespace HealthWellbeing.Controllers
             return View(materialEquipamentoAssociado);
         }
 
-        // POST: MaterialEquipamentoAssociadoes/Delete/5
+        // POST: MaterialEquipamentoAssociados/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
