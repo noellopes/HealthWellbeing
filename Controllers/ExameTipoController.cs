@@ -88,7 +88,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExameTipoId,Nome,Descricao,Especialidade")] ExameTipo exameTipo)
+        public async Task<IActionResult> Create([Bind("ExameTipoId,Nome,Descricao,EspecialidadeId")] ExameTipo exameTipo)
         {
             // 1. Verificar se o nome já existe na base de dados
             var nomeJaExiste = await _context.ExameTipo
@@ -106,6 +106,7 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades, "EspecialidadeId", "Nome", exameTipo.EspecialidadeId);
             return View(exameTipo);
         }
 
@@ -122,6 +123,7 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades, "EspecialidadeId", "Nome", exameTipo.EspecialidadeId);
             return View(exameTipo);
         }
 
@@ -130,11 +132,20 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExameTipoId,Nome,Descricao,Especialidade")] ExameTipo exameTipo)
+        public async Task<IActionResult> Edit(int id, [Bind("ExameTipoId,Nome,Descricao,EspecialidadeId")] ExameTipo exameTipo)
         {
             if (id != exameTipo.ExameTipoId)
             {
                 return NotFound();
+            }
+
+            // Lógica de Unicidade: Checa se o nome existe em OUTRO registo
+            var nomeJaExisteEmOutro = await _context.ExameTipo
+                .AnyAsync(et => et.Nome == exameTipo.Nome && et.ExameTipoId != id);
+
+            if (nomeJaExisteEmOutro)
+            {
+                ModelState.AddModelError("Nome", "Este nome já está em uso por outro Tipo de Exame. Por favor, escolha um nome único.");
             }
 
             if (ModelState.IsValid)
@@ -158,7 +169,9 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades, "EspecialidadeId", "Nome", exameTipo.EspecialidadeId);
             return View(exameTipo);
+            
         }
 
         // GET: ExameTipoes/Delete/5
