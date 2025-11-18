@@ -43,6 +43,32 @@ namespace HealthWellbeing.Data
                 .WithMany(b => b.TipoExercicioBeneficios)
                 .HasForeignKey(tb => tb.BeneficioId);
 
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasKey(eg => new { eg.ExercicioId, eg.GeneroId });
+
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasOne(eg => eg.Exercicio)
+                .WithMany(e => e.ExercicioGeneros)
+                .HasForeignKey(eg => eg.ExercicioId);
+
+            modelBuilder.Entity<ExercicioGenero>()
+                .HasOne(eg => eg.Genero)
+                .WithMany(g => g.ExercicioGeneros)
+                .HasForeignKey(eg => eg.GeneroId);
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasKey(egm => new { egm.ExercicioId, egm.GrupoMuscularId });
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasOne(egm => egm.Exercicio)
+                .WithMany(e => e.ExercicioGrupoMusculares)
+                .HasForeignKey(egm => egm.ExercicioId);
+
+            modelBuilder.Entity<ExercicioGrupoMuscular>()
+                .HasOne(egm => egm.GrupoMuscular)
+                .WithMany(gm => gm.ExercicioGrupoMusculares)
+                .HasForeignKey(egm => egm.GrupoMuscularId);
+
         }
     }
 }

@@ -36,28 +36,6 @@
                         </tr>
                     </table>
                 </div>
-
-                <!-- Caso queira adicionar relações futuras, como exercícios -->
-                <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold">Exercícios Associados</h5>
-                    @if (Model.Exercicio != null && Model.Exercicio.Any())
-                    {
-                        <ul class="list-unstyled">
-                            @foreach (var exercicio in Model.Exercicio)
-                            {
-                                <li>
-                                    <a asp-action="Details" asp-controller="Exercicios" asp-route-id="@exercicio.ExercicioId">
-                                        @exercicio.ExercicioNome
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <span class="text-muted">Nenhum exercício associado.</span>
-                    }
-                </div>
             </div>
         </div>
     </div>
