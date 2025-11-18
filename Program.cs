@@ -44,6 +44,7 @@ else
             context.Database.Migrate();
             var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
             SeedDataMaterialEquipamentoAssociado.Populate(healthContext);
+            SeedDataProfissionalExecutante.Populate(healthContext);
         }
 
 app.UseHttpsRedirection();
