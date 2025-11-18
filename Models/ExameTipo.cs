@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellBeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
@@ -16,10 +17,11 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
         [StringLength(100)]
-        public string Especialidade { get; set; }
-        
+        public int EspecialidadeId { get; set; } // FK
+        public Especialidade? Especialidade { get; set; } // Propriedade de Navegação
 
-       
+
+
 
     }
 
