@@ -18,7 +18,22 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "Severity is Required")]
         [Display(Name = "Gravidade")]
-        public required string Severity { get; set; }
+        public required PathologySeverityLevel Severity { get; set; } = PathologySeverityLevel.NotDesignated;
+
+        public enum PathologySeverityLevel
+        {
+            [Display(Name = "Não designada")]
+            NotDesignated,
+
+            [Display(Name = "Ligeira")]
+            Mild,
+
+            [Display(Name = "Moderada")]
+            Moderate,
+
+            [Display(Name = "Grave")]
+            Severe
+        }
 
     }
 }
