@@ -30,8 +30,11 @@
 
                 <div class="mb-3">
                     <label asp-for="Severity" class="form-label fw-semibold"></label>
-                    <input asp-for="Severity" class="form-control rounded-3" />
-                    <span asp-validation-for="Severity" class="text-danger small"></span>
+                    <select asp-for="Severity"
+                            class="form-control"
+                            asp-items="Html.GetEnumSelectList<Pathology.PathologySeverityLevel>()">
+                    </select>
+                    <span asp-validation-for="Severity" class="text-danger"></span>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
