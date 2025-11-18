@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels; // Adicionar este using
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,10 +20,58 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        // GET: Training
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", int? searchTrainerId = null, int? searchTrainingTypeId = null, int? searchDuration = null)
         {
-            var healthWellbeingDbContext = _context.Training.Include(t => t.Trainer).Include(t => t.TrainingType);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            var trainingsQuery = _context.Training
+                .Include(t => t.Trainer)
+                .Include(t => t.TrainingType)
+                .AsQueryable();
+
+            // Filtragem
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                trainingsQuery = trainingsQuery.Where(t => t.Name.Contains(searchName));
+            }
+
+            if (searchTrainerId.HasValue)
+            {
+                trainingsQuery = trainingsQuery.Where(t => t.TrainerId == searchTrainerId.Value);
+            }
+
+            if (searchTrainingTypeId.HasValue)
+            {
+                trainingsQuery = trainingsQuery.Where(t => t.TrainingTypeId == searchTrainingTypeId.Value);
+            }
+
+            // Nova lógica para Duração
+            if (searchDuration.HasValue)
+            {
+                trainingsQuery = trainingsQuery.Where(t => t.Duration == searchDuration.Value);
+            }
+
+            // Guardar valores de pesquisa para o View
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchTrainerId = searchTrainerId;
+            ViewBag.SearchTrainingTypeId = searchTrainingTypeId;
+            ViewBag.SearchDuration = searchDuration; // Guardar duração na ViewBag
+
+            // Para os dropdowns de filtro
+            ViewData["TrainerId"] = new SelectList(_context.Trainer.OrderBy(t => t.Name), "TrainerId", "Name", searchTrainerId);
+            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType.OrderBy(tt => tt.Name), "TrainingTypeId", "Name", searchTrainingTypeId);
+
+            int totalTrainings = await trainingsQuery.CountAsync();
+
+            var trainingsInfo = new PaginationInfo<Training>(page, totalTrainings, 8);
+
+            trainingsInfo.Items = await trainingsQuery
+                .OrderBy(t => t.DayOfWeek)
+                .ThenBy(t => t.StartTime)
+                .Skip(trainingsInfo.ItemsToSkip)
+                .Take(trainingsInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(trainingsInfo);
         }
 
         public async Task<IActionResult> Details(int? id)
