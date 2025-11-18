@@ -39,7 +39,7 @@ namespace HealthWellbeing.Controllers
             }
             if (!string.IsNullOrEmpty(searchEspecialidade))
             {
-                examesQuery = examesQuery.Where(et => et.Especialidade.Contains(searchEspecialidade));
+                examesQuery = examesQuery.Where(et => et.Especialidade.Nome.Contains(searchEspecialidade));
             }
 
             // 3. Contagem e Criação do ViewModel de Paginação
