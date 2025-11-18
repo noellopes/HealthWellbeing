@@ -1,21 +1,26 @@
 ﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Client>
-@using HealthWellbeing.Models 
+@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Clients";
-    
+
     // Usado para o dropdown de Member
     var searchMember = ViewBag.SearchMember ?? "";
+
+    // Usado para manter os valores de pesquisa na paginação
+    var searchName = ViewBag.SearchName;
+    var searchPhone = ViewBag.SearchPhone;
+    var searchEmail = ViewBag.SearchEmail;
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
 
 @* Bloco para mostrar mensagens de sucesso/erro *@
 @if (TempData["Message"] != null)
 {
     var message = TempData["Message"].ToString();
     var messageType = TempData["MessageType"]?.ToString() ?? "info";
-    
+
     <div class="alert alert-@messageType alert-dismissible fade show shadow-sm" role="alert">
         @Html.Raw(message)
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -25,7 +30,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4 mb-0">Client List</h2>
     <div class="d-flex justify-content-end">
-        
+
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#clientSearch" aria-expanded="false" aria-controls="clientSearch">
             <i class="bi bi-search me-1"></i> Search
         </a>
@@ -40,25 +45,25 @@
 @* Formulário de Pesquisa (com 4 colunas 'col-md-3') *@
 <div class="collapse mt-2 mb-2" id="clientSearch">
     <div class="card card-body shadow-sm">
-        
+
         <form asp-action="Index" method="get" class="row g-2">
 
             @* Name (col-md-3) *@
             <div class="col-md-3">
                 <label for="searchName" class="form-label">Name</label>
-                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+                <input id="searchName" name="searchName" value="@searchName" class="form-control" placeholder="Search by name" type="search" />
             </div>
 
             @* Phone (col-md-3) *@
             <div class="col-md-3">
                 <label for="searchPhone" class="form-label">Phone</label>
-                <input id="searchPhone" name="searchPhone" value="@ViewBag.SearchPhone" class="form-control" placeholder="Search by phone" type="search" />
+                <input id="searchPhone" name="searchPhone" value="@searchPhone" class="form-control" placeholder="Search by phone" type="search" />
             </div>
 
             @* Email (col-md-3) *@
             <div class="col-md-3">
                 <label for="searchEmail" class="form-label">Email</label>
-                <input id="searchEmail" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control" placeholder="Search by email" type="search" />
+                <input id="searchEmail" name="searchEmail" value="@searchEmail" class="form-control" placeholder="Search by email" type="search" />
             </div>
 
             @* 4. Dropdown Member (col-md-3)*@
@@ -141,7 +146,7 @@ else
                 {
                     bool isMember = item.Membership != null;
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td class="fw-bold">@Html.DisplayFor(modelItem => item.Name)</td>
                         <td>@Html.DisplayFor(modelItem => item.Phone)</td>
                         <td>@Html.DisplayFor(modelItem => item.Email)</td>
                         <td>
@@ -190,11 +195,13 @@ else
             }
             else
             {
-                <li class="page-item"><a class="page-link" asp-action="Index" 
-                    asp-route-searchName="@ViewBag.SearchName" 
-                    asp-route-searchPhone="@ViewBag.SearchPhone"
-                    asp-route-searchEmail="@ViewBag.SearchEmail"
-                    asp-route-searchMember="@ViewBag.SearchMember">First</a></li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-searchName="@searchName"
+                       asp-route-searchPhone="@searchPhone"
+                       asp-route-searchEmail="@searchEmail"
+                       asp-route-searchMember="@searchMember">First</a>
+                </li>
             }
 
             @* Links das Páginas (ex: 1, 2, 3) *@
@@ -206,11 +213,13 @@ else
                 }
                 else
                 {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p"
-                        asp-route-searchName="@ViewBag.SearchName" 
-                        asp-route-searchPhone="@ViewBag.SearchPhone"
-                        asp-route-searchEmail="@ViewBag.SearchEmail"
-                        asp-route-searchMember="@ViewBag.SearchMember">@p</a></li>
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p"
+                           asp-route-searchName="@searchName"
+                           asp-route-searchPhone="@searchPhone"
+                           asp-route-searchEmail="@searchEmail"
+                           asp-route-searchMember="@searchMember">@p</a>
+                    </li>
                 }
             }
 
@@ -221,11 +230,13 @@ else
             }
             else
             {
-                <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
-                    asp-route-searchName="@ViewBag.SearchName" 
-                    asp-route-searchPhone="@ViewBag.SearchPhone"
-                    asp-route-searchEmail="@ViewBag.SearchEmail"
-                    asp-route-searchMember="@ViewBag.SearchMember">Last</a></li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                       asp-route-searchName="@searchName"
+                       asp-route-searchPhone="@searchPhone"
+                       asp-route-searchEmail="@searchEmail"
+                       asp-route-searchMember="@searchMember">Last</a>
+                </li>
             }
         </ul>
     </nav>
