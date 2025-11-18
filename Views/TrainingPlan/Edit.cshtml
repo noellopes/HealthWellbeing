@@ -1,0 +1,51 @@
+﻿@model HealthWellbeing.Models.TrainingPlan
+
+@{
+    ViewData["Title"] = "Edit Training Plan";
+}
+
+<h1 class="display-4 text-primary mb-4">Edit Training Plan</h1>
+<hr class="mb-4" />
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="TrainingPlanId" />
+
+                <!-- Plan e Training geralmente não se editam, mas pode-se permitir se fizer sentido para o seu negócio -->
+                <div class="mb-3">
+                    <label asp-for="PlanId" class="form-label fw-bold">Subscription Plan</label>
+                    <select asp-for="PlanId" class="form-select" asp-items="ViewBag.PlanId"></select>
+                    <span asp-validation-for="PlanId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TrainingId" class="form-label fw-bold">Training Module</label>
+                    <select asp-for="TrainingId" class="form-select" asp-items="ViewBag.TrainingId"></select>
+                    <span asp-validation-for="TrainingId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DaysPerWeek" class="form-label fw-bold"></label>
+                    <input asp-for="DaysPerWeek" class="form-control" type="number" min="1" max="7" />
+                    <span asp-validation-for="DaysPerWeek" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-between pt-2">
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

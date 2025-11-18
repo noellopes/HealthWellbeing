@@ -1,0 +1,51 @@
+﻿@model HealthWellbeing.Models.TrainingPlan
+
+@{
+    ViewData["Title"] = "Training Plan Details";
+}
+
+<h1 class="display-4 text-primary mb-4">Training Plan Details</h1>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Configuration #@Model.TrainingPlanId</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+
+            <!-- Detalhes do Plano -->
+            <dt class="col-sm-3 fw-bold">Subscription Plan</dt>
+            <dd class="col-sm-9 fs-5">@Html.DisplayFor(model => model.Plan.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Plan Price</dt>
+            <dd class="col-sm-9 text-muted">@Html.DisplayFor(model => model.Plan.Price) €</dd>
+
+            <hr class="my-3" />
+
+            <!-- Detalhes do Treino -->
+            <dt class="col-sm-3 fw-bold">Training Module</dt>
+            <dd class="col-sm-9 fs-5">@Html.DisplayFor(model => model.Training.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Description</dt>
+            <dd class="col-sm-9 text-muted">@Html.DisplayFor(model => model.Training.Description)</dd>
+
+            <hr class="my-3" />
+
+            <!-- Configuração Específica -->
+            <dt class="col-sm-3 fw-bold">Frequency</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-info text-dark fs-6">@Model.DaysPerWeek Days / Week</span>
+            </dd>
+
+        </dl>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.TrainingPlanId" class="btn btn-warning me-2 shadow-sm">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>
