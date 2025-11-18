@@ -61,13 +61,13 @@ namespace HealthWellbeing.Controllers
                 CompletedDuration = t.CompletedDuration,
                 Observations = t.Observations ?? "-",
                 AdditionalNotes = t.AdditionalNotes ?? "-",
-                Status = t.Status.ToString(),
+                Status = t.Status,
                 CreatedAt = t.CreatedAt
             },
                 ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
             );
 
-            DtoSelector selector = BaseSelector;
+            DtoSelector selector = AdminSelector;
             IQueryable<TreatmentRecordListDTO> treatmentsProprieties = treatments.Select(selector.Params).AsNoTracking();
 
             // Popula os dados necessarios a view

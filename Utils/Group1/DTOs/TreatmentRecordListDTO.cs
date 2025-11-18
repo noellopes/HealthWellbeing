@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Utils.Group1.DTOs
 {
@@ -15,11 +16,22 @@ namespace HealthWellbeing.Utils.Group1.DTOs
         [Display(Name = "Patologia associada")]
         public string Pathology { get; set; }
 
+        [Display(Name = "Data pretendida para o tratamento")]
         public DateTime TreatmentDate { get; set; }
+
+        [Display(Name = "Duração total do tratamento")]
         public int? CompletedDuration { get; set; }
+
+        [Display(Name = "Observações")]
         public string Observations { get; set; }
+
+        [Display(Name = "Notas adicionais")]
         public string AdditionalNotes { get; set; }
-        public string? Status { get; set; }
+
+        [Display(Name = "Estado do tratamento")]
+        public TreatmentStatus Status { get; set; }
+
+        [Display(Name = "Data de submissão")]
         public DateTime CreatedAt { get; set; }
     }
 }

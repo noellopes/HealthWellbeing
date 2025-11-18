@@ -32,7 +32,7 @@ namespace HealthWellbeing.Utils.Group1.Services
         {
             if (string.IsNullOrEmpty(sortOrder))
             {
-                sortOrder = "Nurse.Name";
+                sortOrder = "Nurse";
             }
 
             bool descending = sortOrder.EndsWith("_desc", StringComparison.OrdinalIgnoreCase);
@@ -40,9 +40,9 @@ namespace HealthWellbeing.Utils.Group1.Services
 
             return sortProperty switch
             {
-                "Nurse.Name" => descending ? query.OrderByDescending(t => t.Nurse.Name) : query.OrderBy(t => t.Nurse.Name),
-                "TreatmentType.Name" => descending ? query.OrderByDescending(t => t.TreatmentType.Name) : query.OrderBy(t => t.TreatmentType.Name),
-                "Pathology.Name" => descending ? query.OrderByDescending(t => t.Pathology.Name) : query.OrderBy(t => t.Pathology.Name),
+                "Nurse" => descending ? query.OrderByDescending(t => t.Nurse.Name) : query.OrderBy(t => t.Nurse.Name),
+                "TreatmentType" => descending ? query.OrderByDescending(t => t.TreatmentType.Name) : query.OrderBy(t => t.TreatmentType.Name),
+                "Pathology" => descending ? query.OrderByDescending(t => t.Pathology.Name) : query.OrderBy(t => t.Pathology.Name),
                 "TreatmentDate" => descending ? query.OrderByDescending(t => t.TreatmentDate) : query.OrderBy(t => t.TreatmentDate),
                 "CompletedDuration" => descending ? query.OrderByDescending(t => t.CompletedDuration) : query.OrderBy(t => t.CompletedDuration),
                 //"Remarks" => descending ? query.OrderByDescending(t => t.Remarks) : query.OrderBy(t => t.Remarks),
