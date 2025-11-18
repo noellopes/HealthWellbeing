@@ -7,7 +7,7 @@ namespace HealthWellbeing.Utils.Group1.Services
     {
         private readonly Dictionary<string, Func<IQueryable<Pathology>, string, IQueryable<Pathology>>> _filterMap = new(StringComparer.OrdinalIgnoreCase) {
             { "Name", (query, val) => query.Where(t => t.Name.Contains(val)) },
-            { "Severity", (query, val) => query.Where(t => t.Severity.Contains(val)) },
+            { "Severity", (query, val) => query.Where(t => t.Severity.ToString().Contains(val)) },
         };
 
         public IReadOnlyList<string> SearchableProperties => _filterMap.Keys.ToList();

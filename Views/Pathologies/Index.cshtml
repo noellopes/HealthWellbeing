@@ -97,10 +97,17 @@ else
                             <td class="fw-semibold">@Html.DisplayFor(modelItem => item.Name)</td>
                             <td>@Html.DisplayFor(modelItem => item.Description)</td>
                             <td>
-                                <span class="badge
-                                    @(item.Severity == "Grave" ? "bg-danger" :
-                                      item.Severity == "Moderada" ? "bg-warning text-dark" :
-                                      "bg-success")">
+                                @{
+                                    string badgeClass = item.Severity switch
+                                    {
+                                        Pathology.PathologySeverityLevel.Severe => "bg-danger",
+                                        Pathology.PathologySeverityLevel.Moderate => "bg-warning text-dark",
+                                        Pathology.PathologySeverityLevel.Mild => "bg-success",
+                                        Pathology.PathologySeverityLevel.NotDesignated => "bg-secondary",
+                                        _ => "bg-light text-dark"
+                                    };
+                                }
+                                <span class="badge @badgeClass">
                                     @Html.DisplayFor(modelItem => item.Severity)
                                 </span>
                             </td>
