@@ -4,7 +4,7 @@
     var success = TempData["Success"] as string;
     var error = TempData["Error"] as string;
 }
-<h1>@ViewData["Title"]</h1>
+<h1><i class="bi bi-pencil-square"></i> @ViewData["Title"]</h1>
 
 @if (!string.IsNullOrWhiteSpace(success))
 {
@@ -25,8 +25,8 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    <button class="btn btn-primary" type="submit"><i class="bi bi-floppy"></i> Save</button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-backspace"></i> Back</a>
 </form>
 
 @section Scripts {

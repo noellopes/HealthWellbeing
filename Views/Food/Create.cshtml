@@ -3,7 +3,7 @@
     ViewData["Title"] = "Create Food";
 }
 
-<h1>Create Food</h1>
+<h1><i class="bi bi-plus-circle"></i> Create Food</h1>
 
 <form asp-action="Create" method="post" novalidate>
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
@@ -28,8 +28,8 @@
         <span asp-validation-for="FoodCategoryId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create</button>
+    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
 </form>
 
 @section Scripts {

@@ -4,7 +4,7 @@
     var success = TempData["Success"] as string;
     var error = TempData["Error"] as string;
 }
-<h1>@ViewData["Title"]</h1>
+<h1><i class="bi bi-trash"></i> @ViewData["Title"]</h1>
 
 @if (!string.IsNullOrWhiteSpace(success))
 {
@@ -24,6 +24,6 @@
 
 <form asp-action="Delete">
     <input type="hidden" asp-for="NutritionistId" />
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> Cancel</a>
 </form>
