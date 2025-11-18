@@ -136,13 +136,33 @@ internal class SeedDataGinasio
         if (dbContext.Plan.Any()) return dbContext.Plan.ToList();
 
         var plans = new List<Plan>
-        {
-            new Plan { Name = "Basic Wellness Plan", Description = "Access to gym + 1 class/week.", Price = 29.99m, DurationDays = 30 },
-            new Plan { Name = "Advanced Fitness Plan", Description = "Unlimited gym + 3 classes/week.", Price = 59.99m, DurationDays = 30 },
-            new Plan { Name = "Mind & Body Balance", Description = "Yoga and Pilates focus.", Price = 79.99m, DurationDays = 60 },
-            new Plan { Name = "Ultimate Transformation Plan", Description = "Personal coaching included.", Price = 99.99m, DurationDays = 90 },
-            new Plan { Name = "Corporate Health Boost", Description = "Team-focused plan.", Price = 49.99m, DurationDays = 30 }
-        };
+    {
+        // Existing 5 plans
+        new Plan { Name = "Basic Wellness Plan", Description = "Access to gym + 1 class/week.", Price = 29.99m, DurationDays = 30 },
+        new Plan { Name = "Advanced Fitness Plan", Description = "Unlimited gym + 3 classes/week.", Price = 59.99m, DurationDays = 30 },
+        new Plan { Name = "Mind & Body Balance", Description = "Yoga and Pilates focus.", Price = 79.99m, DurationDays = 60 },
+        new Plan { Name = "Ultimate Transformation Plan", Description = "Personal coaching included.", Price = 99.99m, DurationDays = 90 },
+        new Plan { Name = "Corporate Health Boost", Description = "Team-focused plan.", Price = 49.99m, DurationDays = 30 },
+
+        // 17 New plans
+        new Plan { Name = "Quick Start 7-Day Trial", Description = "Full gym access for 7 days. One-time fee.", Price = 9.99m, DurationDays = 7 },
+        new Plan { Name = "Senior Active Life", Description = "Classes tailored for seniors (low impact).", Price = 35.00m, DurationDays = 30 },
+        new Plan { Name = "Student Fit Pass", Description = "Discounted unlimited monthly access for students.", Price = 45.00m, DurationDays = 30 },
+        new Plan { Name = "Cardio Focus Pack", Description = "Unlimited spin and aerobic classes.", Price = 65.50m, DurationDays = 60 },
+        new Plan { Name = "Strength & Bulk 3 Months", Description = "Access to heavy lifting zone + nutrition guide.", Price = 180.00m, DurationDays = 90 },
+        new Plan { Name = "Family Flex Plan (Per Quarter)", Description = "Discounted access for 3 or more family members.", Price = 199.90m, DurationDays = 90 },
+        new Plan { Name = "Weekend Warrior", Description = "Access only on Saturdays and Sundays.", Price = 19.99m, DurationDays = 30 },
+        new Plan { Name = "Personal Trainer (10 Sessions)", Description = "Bundle of 10 one-on-one training sessions.", Price = 350.00m, DurationDays = 0 }, // Duração 0 para planos baseados em sessões
+        new Plan { Name = "Hydro-Therapy Pass", Description = "Access to pool and aquafitness classes only.", Price = 40.00m, DurationDays = 30 },
+        new Plan { Name = "Virtual Home Training", Description = "Access to all online live and recorded classes.", Price = 25.99m, DurationDays = 30 },
+        new Plan { Name = "Weight Loss Journey (6 months)", Description = "Personal coaching, diet plan, and bi-weekly checkups.", Price = 450.00m, DurationDays = 180 },
+        new Plan { Name = "Pilates Only Annual", Description = "Unlimited access to all Pilates classes, paid yearly.", Price = 799.00m, DurationDays = 365 },
+        new Plan { Name = "Powerlifting Specialist", Description = "Exclusive access to advanced power racks and certified coaches.", Price = 85.00m, DurationDays = 30 },
+        new Plan { Name = "Physical Rehab Support", Description = "Custom low-impact exercises with specialized equipment.", Price = 120.00m, DurationDays = 60 },
+        new Plan { Name = "Kids Sports Camp", Description = "Summer program focused on movement and coordination for children.", Price = 150.00m, DurationDays = 14 },
+        new Plan { Name = "Monthly Gym Only", Description = "Standard access to all gym equipment, no classes included.", Price = 39.99m, DurationDays = 30 },
+        new Plan { Name = "Executive Lunch Break", Description = "Access restricted to 11h00 to 14h00 on weekdays.", Price = 30.00m, DurationDays = 30 }
+    };
 
         dbContext.Plan.AddRange(plans);
         dbContext.SaveChanges();

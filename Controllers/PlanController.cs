@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
@@ -18,14 +19,56 @@ namespace HealthWellbeing.Controllers
 			_context = context;
 		}
 
-		// GET: Plan
-		public async Task<IActionResult> Index()
-		{
-			return View(await _context.Plan.ToListAsync());
-		}
+        // GET: Plan
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchName = "",
+            decimal? searchMinPrice = null,
+            decimal? searchMaxPrice = null,
+            int? searchDuration = null)
+        {
+            var plansQuery = _context.Plan.AsQueryable();
 
-		// GET: Plan/Details/5
-		public async Task<IActionResult> Details(int? id)
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                plansQuery = plansQuery.Where(p => p.Name.Contains(searchName));
+            }
+
+            if (searchMinPrice.HasValue)
+            {
+                plansQuery = plansQuery.Where(p => p.Price >= searchMinPrice.Value);
+            }
+
+            if (searchMaxPrice.HasValue)
+            {
+                plansQuery = plansQuery.Where(p => p.Price <= searchMaxPrice.Value);
+            }
+
+            if (searchDuration.HasValue)
+            {
+                plansQuery = plansQuery.Where(p => p.DurationDays == searchDuration.Value);
+            }
+
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchMinPrice = searchMinPrice;
+            ViewBag.SearchMaxPrice = searchMaxPrice;
+            ViewBag.SearchDuration = searchDuration;
+
+            int totalPlans = await plansQuery.CountAsync();
+
+            var plansInfo = new PaginationInfo<Plan>(page, totalPlans, 9);
+
+            plansInfo.Items = await plansQuery
+                .OrderBy(p => p.Name)
+                .Skip(plansInfo.ItemsToSkip)
+                .Take(plansInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(plansInfo);
+        }
+
+        // GET: Plan/Details/5
+        public async Task<IActionResult> Details(int? id)
 		{
 			if (id == null)
 			{
