@@ -38,25 +38,26 @@ namespace HealthWellbeing.Controllers
             treatments = _filterService.ApplySorting(treatments, sortOrder);
 
             // Define as propriadades visiveis do modelo
-            DtoSelector BaseSelector = new(
-                t => new TreatmentRecordListDTO
-                {
-                    Id = t.Id,
-                    Nurse = t.Nurse.Name,
-                    TreatmentType = t.TreatmentType.Name,
-                    Pathology = t.Pathology.Name,
-                    TreatmentDate = t.TreatmentDate,
-                    CompletedDuration = t.CompletedDuration
-                },
-                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration"]
-            );
+            DtoSelector<TreatmentRecord, TreatmentRecordListDTO> selector;
 
-            DtoSelector AdminSelector = new(t => new TreatmentRecordListDTO
+            DtoSelector<TreatmentRecord, TreatmentRecordListDTO> BaseSelector = new(t => new TreatmentRecordListDTO
             {
                 Id = t.Id,
                 Nurse = t.Nurse.Name,
                 TreatmentType = t.TreatmentType.Name,
-                Pathology= t.Pathology.Name,
+                Pathology = t.Pathology.Name,
+                TreatmentDate = t.TreatmentDate,
+                CompletedDuration = t.CompletedDuration
+            },
+                ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration"]
+            );
+
+            DtoSelector<TreatmentRecord, TreatmentRecordListDTO> AdminSelector = new(t => new TreatmentRecordListDTO
+            {
+                Id = t.Id,
+                Nurse = t.Nurse.Name,
+                TreatmentType = t.TreatmentType.Name,
+                Pathology = t.Pathology.Name,
                 TreatmentDate = t.TreatmentDate,
                 CompletedDuration = t.CompletedDuration,
                 Observations = t.Observations ?? "-",
@@ -67,7 +68,7 @@ namespace HealthWellbeing.Controllers
                 ["Nurse", "TreatmentType", "Pathology", "TreatmentDate", "CompletedDuration", "Observations", "AdditionalNotes", "Status", "CreatedAt"]
             );
 
-            DtoSelector selector = AdminSelector;
+            selector = AdminSelector;
             IQueryable<TreatmentRecordListDTO> treatmentsProprieties = treatments.Select(selector.Params).AsNoTracking();
 
             // Popula os dados necessarios a view

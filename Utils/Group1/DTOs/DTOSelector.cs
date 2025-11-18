@@ -3,8 +3,8 @@ using System.Linq.Expressions;
 
 namespace HealthWellbeing.Utils.Group1.DTOs
 {
-    public record DtoSelector(
-        Expression<Func<TreatmentRecord, TreatmentRecordListDTO>> Params,
+    public record DtoSelector<TModel, TDto>(
+        Expression<Func<TModel, TDto>> Params,
         IReadOnlyList<string> DisplayFields
     );
 }
