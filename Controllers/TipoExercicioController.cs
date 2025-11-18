@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "TipoExercicio")]
     public class TipoExercicioController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

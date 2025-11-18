@@ -5,18 +5,11 @@ namespace HealthWellbeing.Data
 {
     public class SeedDataProblemaSaude
     {
-        internal static void Populate(HealthWellbeingDbContext? dbContext)
+        public static void Populate(HealthWellbeingDbContext dbContext)
         {
-            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
-
-            // Cria a base de dados se não existir
+            // Garante que a BD existe
             dbContext.Database.EnsureCreated();
 
-            PopulateProblemasSaude(dbContext);
-        }
-
-        private static void PopulateProblemasSaude(HealthWellbeingDbContext dbContext)
-        {
             // Se já houver problemas de saúde, não faz nada
             if (dbContext.ProblemaSaude.Any()) return;
 

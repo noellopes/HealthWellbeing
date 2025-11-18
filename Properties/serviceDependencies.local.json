@@ -7,6 +7,10 @@
     "mssql2": {
       "type": "mssql.local",
       "connectionId": "ConnectionStrings:HealthWellbeingConnection"
+    },
+    "mssql3": {
+      "type": "mssql.local",
+      "connectionId": "ConnectionStrings:AppliocationDbContextConnection"
     }
   }
 }

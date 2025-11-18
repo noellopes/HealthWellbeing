@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251113172110_InitialCreate")]
+    [Migration("20251118140833_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -480,7 +480,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("ProfissionalExecutanteId");
 
-                    b.ToTable("ProblemaSaudeProfissionalExecutante");
+                    b.ToTable("ProblemaSaudeProfissionais", (string)null);
                 });
 
             modelBuilder.Entity("BeneficioTipoExercicio", b =>

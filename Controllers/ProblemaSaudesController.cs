@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "ProblemasSaude")]
     public class ProblemaSaudesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
