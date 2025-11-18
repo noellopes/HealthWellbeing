@@ -138,9 +138,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("DataMarcacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DoctorIdMedico")
-                        .HasColumnType("int");
-
                     b.Property<TimeOnly>("HoraFim")
                         .HasColumnType("time");
 
@@ -158,9 +155,9 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("IdConsulta");
 
-                    b.HasIndex("DoctorIdMedico");
-
                     b.HasIndex("IdEspecialidade");
+
+                    b.HasIndex("IdMedico");
 
                     b.ToTable("Consulta");
                 });
@@ -374,13 +371,15 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Consulta", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
-                        .WithMany("Consultas")
-                        .HasForeignKey("DoctorIdMedico");
-
                     b.HasOne("HealthWellbeing.Models.Specialities", "Speciality")
                         .WithMany("Consultas")
                         .HasForeignKey("IdEspecialidade")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
+                        .WithMany("Consultas")
+                        .HasForeignKey("IdMedico")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

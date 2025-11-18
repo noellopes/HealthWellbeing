@@ -153,17 +153,17 @@ namespace HealthWellbeing.Migrations
                     HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
                     SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
-                    DoctorIdMedico = table.Column<int>(type: "int", nullable: true),
                     IdEspecialidade = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Consulta", x => x.IdConsulta);
                     table.ForeignKey(
-                        name: "FK_Consulta_Doctor_DoctorIdMedico",
-                        column: x => x.DoctorIdMedico,
+                        name: "FK_Consulta_Doctor_IdMedico",
+                        column: x => x.IdMedico,
                         principalTable: "Doctor",
-                        principalColumn: "IdMedico");
+                        principalColumn: "IdMedico",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Consulta_Specialities_IdEspecialidade",
                         column: x => x.IdEspecialidade,
@@ -205,14 +205,14 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaAlimentoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Consulta_DoctorIdMedico",
-                table: "Consulta",
-                column: "DoctorIdMedico");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Consulta_IdEspecialidade",
                 table: "Consulta",
                 column: "IdEspecialidade");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Consulta_IdMedico",
+                table: "Consulta",
+                column: "IdMedico");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UtenteSaude_Nif",

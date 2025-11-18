@@ -21,13 +21,14 @@ namespace HealthWellbeing.Models
         (DataConsulta.Date < DateTime.Today) ? "Expirada" :
         (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
         public string? SearchTerm { get; set; }
-        
+
+        [ForeignKey(nameof(Doctor))]
         public int IdMedico { get; set; }
         public Doctor? Doctor { get; set; }
         
         [ForeignKey(nameof(Speciality))]
         public int IdEspecialidade { get; set; }
-        
+
         public Specialities? Speciality { get; set; }
     }
 }
