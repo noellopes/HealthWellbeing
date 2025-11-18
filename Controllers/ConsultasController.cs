@@ -97,6 +97,9 @@ namespace HealthWellbeing.Controllers
         // GET: Consultas/Create
         public IActionResult Create()
         {
+            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Nome");
+            ViewData["IdEspecialidade"] = new SelectList(_context.Specialities, "IdEspecialidade", "Nome");
+
             return View();
         }
 
@@ -113,6 +116,10 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Nome", consulta.IdMedico);
+            ViewData["IdEspecialidade"] = new SelectList(_context.Specialities, "IdEspecialidade", "Nome", consulta.IdEspecialidade);
+
             return View(consulta);
         }
 
