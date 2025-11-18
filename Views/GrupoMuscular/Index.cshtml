@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.GrupoMuscular>
+﻿@model HealthWellbeing.ViewModels.PaginationInfoExercicios<HealthWellbeing.Models.GrupoMuscular>
 
 @{
     ViewData["Title"] = "Grupos Musculares";
@@ -10,6 +10,9 @@
 
     <div class="d-flex justify-content-end mb-3">
         <div>
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+                <i class="bi bi-search me-1"></i> Pesquisa
+            </a>
             <a asp-action="Create" class="btn btn-success me-2">
                 <i class="bi bi-plus-circle me-1"></i> Criar Novo
             </a>
@@ -19,7 +22,28 @@
         </div>
     </div>
 
-    @if (Model?.Any() == true)
+    <div class="collapse mb-3" id="searchForm">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchNome" class="form-label">Nome do Grupo</label>
+                    <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+                </div>
+                <div class="col-md-6">
+                    <label for="searchLocalizacao" class="form-label">Localização Corporal</label>
+                    <input id="searchLocalizacao" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao" class="form-control" placeholder="Procurar por localização" />
+                </div>
+                <div class="col-12 mt-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Pesquisar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Items.Any() == true)
     {
         <div class="table-responsive shadow-sm rounded">
             <table class="table table-striped table-hover align-middle">
@@ -31,7 +55,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.Items)
                     {
                         <tr>
                             <td>@item.GrupoMuscularNome</td>
@@ -52,6 +76,58 @@
                     }
                 </tbody>
             </table>
+
+            <nav aria-label="Grupos Musculares page">
+                <ul class="pagination">
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Início</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">Início</a>
+                        </li>
+                    }
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchNome="@ViewBag.SearchNome"
+                                   asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">@p</a>
+                            </li>
+                        }
+                    }
+
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Fim</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao">Fim</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
         </div>
     }
     else

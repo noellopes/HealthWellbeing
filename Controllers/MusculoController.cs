@@ -21,22 +21,45 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Musculo
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchGrupo = "")
         {
-            var musculoContext = _context.Musculo.Include(b => b.GrupoMuscular);
+            var musculosQuery = _context.Musculo
+                .Include(m => m.GrupoMuscular)
+                .AsQueryable();
 
-            int numberMusculos = await musculoContext.CountAsync();
+            // Filtro por nome do músculo
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                musculosQuery = musculosQuery.Where(m => m.Nome_Musculo.Contains(searchNome));
+            }
 
-            var musculoInfo = new PaginationInfoExercicios<Musculo>(page, numberMusculos);
+            // Filtro por nome do grupo muscular
+            if (!string.IsNullOrEmpty(searchGrupo))
+            {
+                musculosQuery = musculosQuery.Where(m => m.GrupoMuscular.GrupoMuscularNome.Contains(searchGrupo));
+            }
 
-            musculoInfo.Items = await musculoContext
+            // Guardar filtros para usar na View
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchGrupo = searchGrupo;
+
+            // Contar resultados
+            int numberMusculos = await musculosQuery.CountAsync();
+
+            // Criar paginação
+            var musculosInfo = new PaginationInfoExercicios<Musculo>(page, numberMusculos);
+
+            // Buscar itens da página
+            musculosInfo.Items = await musculosQuery
                 .OrderBy(m => m.Nome_Musculo)
-                .Skip(musculoInfo.ItemsToSkip)
-                .Take(musculoInfo.ItemsPerPage)
+                .Skip(musculosInfo.ItemsToSkip)
+                .Take(musculosInfo.ItemsPerPage)
                 .ToListAsync();
 
-            return View(musculoInfo);
+            return View(musculosInfo);
         }
+
+
 
         // GET: Musculo/Details/5
         public async Task<IActionResult> Details(int? id)
