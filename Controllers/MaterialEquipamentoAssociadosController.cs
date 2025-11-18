@@ -12,13 +12,18 @@ namespace HealthWellBeing.Controllers
     public class MaterialEquipamentoAssociadosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private const int ITEMS_PER_PAGE = 5; // Configuração do tamanho da página
 
         public MaterialEquipamentoAssociadosController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string searchNome = "", string searchEstado = "")
+        // GET: MaterialEquipamentoAssociados
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchNome = "",
+            string searchEstado = "")
         {
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchEstado = searchEstado;
@@ -35,11 +40,17 @@ namespace HealthWellBeing.Controllers
                 materialQuery = materialQuery.Where(m => m.EstadoComponente.Contains(searchEstado));
             }
 
-            var materiais = await materialQuery
+            int totalMateriais = await materialQuery.CountAsync();
+
+            var materialInfo = new PaginationInfo<MaterialEquipamentoAssociado>(page, totalMateriais, itemsPerPage: ITEMS_PER_PAGE);
+
+            materialInfo.Items = await materialQuery
                 .OrderBy(m => m.NomeEquipamento)
+                .Skip(materialInfo.ItemsToSkip) // Pula os itens das páginas anteriores
+                .Take(materialInfo.ItemsPerPage) // Pega apenas os 5 itens da página atual
                 .ToListAsync();
 
-            return View(materiais);
+            return View(materialInfo);
         }
 
         // GET: MaterialEquipamentoAssociados/Details/5
@@ -127,7 +138,7 @@ namespace HealthWellBeing.Controllers
                     else
                     {
                         throw;
-                }
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.MaterialEquipamentoAssociado>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.MaterialEquipamentoAssociado>
 
 @{
     ViewData["Title"] = "Stock de Materiais e Equipamentos";
@@ -8,6 +8,8 @@
 }
 
 <div class="container mt-4">
+
+    @* Esta secção (TempData) deve ser incluída se o Controller enviar mensagens de sucesso/erro. *@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -65,42 +67,85 @@
             <thead class="table-dark">
                 <tr>
                     <th>
-                        @* Alterado de model.Items.First() para model.First() *@
-                        @Html.DisplayNameFor(model => model.NomeEquipamento)
+                        @Html.DisplayNameFor(model => model.Items.First().NomeEquipamento)
                     </th>
                     <th class="text-center">
-                        @* Alterado de model.Items.First() para model.First() *@
-                        @Html.DisplayNameFor(model => model.Quantidade)
+                        @Html.DisplayNameFor(model => model.Items.First().Quantidade)
                     </th>
                     <th class="d-none d-sm-table-cell">
-                        @* Alterado de model.Items.First() para model.First() *@
-                        @Html.DisplayNameFor(model => model.EstadoComponente)
+                        @Html.DisplayNameFor(model => model.Items.First().EstadoComponente)
                     </th>
                     <th class="text-center" style="width: 250px;">Ações</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.NomeEquipamento)
-                        </td>
-                        <td class="text-center">
-                            @Html.DisplayFor(modelItem => item.Quantidade)
-                        </td>
-                        <td class="d-none d-sm-table-cell">
-                            @Html.DisplayFor(modelItem => item.EstadoComponente)
-                        </td>
-                        <td class="text-center text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
-                            <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
-                            <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
-                        </td>
-                    </tr>
+                @foreach (var item in Model.Items!)
+                { // Iteração no Model.Items
+                  <tr>
+                      <td>
+                          @Html.DisplayFor(modelItem => item.NomeEquipamento)
+                      </td>
+                      <td class="text-center">
+                          @Html.DisplayFor(modelItem => item.Quantidade)
+                      </td>
+                      <td class="d-none d-sm-table-cell">
+                          @Html.DisplayFor(modelItem => item.EstadoComponente)
+                      </td>
+                      <td class="text-center text-nowrap">
+                          <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
+                          <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
+                          <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
+                      </td>
+                  </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @* BLOCO DE PAGINAÇÃO - ATIVADO PARA O MODELO PaginationInfo *@
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Navegação do Stock" class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                @* Link "Primeiro" (First) *@
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="1"
+                       asp-route-searchNome="@searchNome"
+                       asp-route-searchEstado="@searchEstado">Primeiro</a>
+                </li>
+
+                @* Links Numéricos *@
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                        @if (p == Model.CurrentPage)
+                        {
+                            <a class="page-link" href="#">@p</a>
+                        }
+                        else
+                        {
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchNome="@searchNome"
+                               asp-route-searchEstado="@searchEstado">@p</a>
+                        }
+                    </li>
+                }
+
+                @* Link "Último" (Last) *@
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@Model.TotalPages"
+                       asp-route-searchNome="@searchNome"
+                       asp-route-searchEstado="@searchEstado">Último</a>
+                </li>
+
+            </ul>
+        </nav>
+    }
 
 </div>
