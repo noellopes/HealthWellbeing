@@ -251,7 +251,7 @@ internal class SeedDataGinasio
 
         dbContext.MemberPlan.AddRange(memberPlans);
         dbContext.SaveChanges();
-    }*/
+    }
 
     private static void PopulateTrainingPlan(HealthWellbeingDbContext dbContext, List<Plan> plans, List<Training> trainings)
     {
@@ -298,21 +298,8 @@ internal class SeedDataGinasio
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Deep Water Toning"), DaysPerWeek = 1 });
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Zumba Gold"), DaysPerWeek = 1 });
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Sunday Morning"), DaysPerWeek = 1 });
-                MemberId = member.MemberId,
-                PlanId = plan.PlanId,
-                StartDate = isActive ? DateTime.Now.AddDays(-random.Next(1, 30)) : DateTime.Now.AddDays(-random.Next(100, 200)),
-                EndDate = isActive ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(-10),
-                Status = isActive ? "Active" : "Expired"
-            });
-
-            planIndex++;
-        }
 
         dbContext.TrainingPlan.AddRange(trainingPlans);
-        dbContext.SaveChanges();
-    }
-}
-        dbContext.MemberPlan.AddRange(memberPlans);
         dbContext.SaveChanges();
     }
 }
