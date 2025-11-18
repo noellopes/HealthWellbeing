@@ -90,6 +90,15 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ExameTipoId,Nome,Descricao,Especialidade")] ExameTipo exameTipo)
         {
+            // 1. Verificar se o nome já existe na base de dados
+            var nomeJaExiste = await _context.ExameTipo
+                .AnyAsync(et => et.Nome == exameTipo.Nome);
+
+            if (nomeJaExiste)
+            {
+                // 2. Adicionar erro ao ModelState se o nome for repetido
+                ModelState.AddModelError("Nome", "Já existe um Tipo de Exame com este nome. Por favor, escolha um nome único.");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(exameTipo);
