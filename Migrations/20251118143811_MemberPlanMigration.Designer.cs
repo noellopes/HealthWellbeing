@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251118143811_MemberPlanMigration")]
+    partial class MemberPlanMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -673,32 +676,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Training");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>
-                {
-                    b.Property<int>("TrainingPlanId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingPlanId"));
-
-                    b.Property<int>("DaysPerWeek")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TrainingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TrainingPlanId");
-
-                    b.HasIndex("PlanId");
-
-                    b.HasIndex("TrainingId");
-
-                    b.ToTable("TrainingPlan");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.TrainingType", b =>
                 {
                     b.Property<int>("TrainingTypeId")
@@ -864,25 +841,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Trainer");
 
                     b.Navigation("TrainingType");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TrainingPlan", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Plan", "Plan")
-                        .WithMany()
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.Training", "Training")
-                        .WithMany()
-                        .HasForeignKey("TrainingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Plan");
-
-                    b.Navigation("Training");
                 });
 
             modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>

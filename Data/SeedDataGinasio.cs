@@ -32,7 +32,7 @@ internal class SeedDataGinasio
         var trainings = PopulateTraining(dbContext, trainers);
 
         // 7. Popula Inscrições (MemberPlan) usando as listas guardadas
-        //PopulateMemberPlan(dbContext, members, plans);
+        PopulateMemberPlan(dbContext, members, plans);
 
         // 8. Popula Planos de Treino (TrainingPlan) usando as listas guardadas
         PopulateTrainingPlan(dbContext, plans, trainings);
@@ -214,7 +214,7 @@ internal class SeedDataGinasio
         return trainings;
     }
 
-    /*private static void PopulateMemberPlan(HealthWellbeingDbContext dbContext, List<Member> members, List<Plan> plans)
+    private static void PopulateMemberPlan(HealthWellbeingDbContext dbContext, List<Member> members, List<Plan> plans)
     {
         if (dbContext.MemberPlan.Any()) return;
 
@@ -298,8 +298,21 @@ internal class SeedDataGinasio
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Deep Water Toning"), DaysPerWeek = 1 });
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Zumba Gold"), DaysPerWeek = 1 });
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Sunday Morning"), DaysPerWeek = 1 });
+                MemberId = member.MemberId,
+                PlanId = plan.PlanId,
+                StartDate = isActive ? DateTime.Now.AddDays(-random.Next(1, 30)) : DateTime.Now.AddDays(-random.Next(100, 200)),
+                EndDate = isActive ? DateTime.Now.AddDays(30) : DateTime.Now.AddDays(-10),
+                Status = isActive ? "Active" : "Expired"
+            });
+
+            planIndex++;
+        }
 
         dbContext.TrainingPlan.AddRange(trainingPlans);
+        dbContext.SaveChanges();
+    }
+}
+        dbContext.MemberPlan.AddRange(memberPlans);
         dbContext.SaveChanges();
     }
 }

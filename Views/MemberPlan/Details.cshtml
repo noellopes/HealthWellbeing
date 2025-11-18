@@ -1,0 +1,56 @@
+﻿@model HealthWellbeing.Models.MemberPlan
+
+@{
+    ViewData["Title"] = "Subscription Details";
+}
+
+<h1 class="display-4 text-primary mb-4">Subscription Details</h1>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">@Model.Member.Client.Name</h4>
+        <span class="badge bg-light text-primary fs-6">@Model.Status</span>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+
+            <!-- Detalhes do Plano -->
+            <dt class="col-sm-3 fw-bold">Plan Name</dt>
+            <dd class="col-sm-9 fs-5">@Html.DisplayFor(model => model.Plan.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">Description</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Plan.Description)</dd>
+
+            <dt class="col-sm-3 fw-bold">Price</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Plan.Price) €</dd>
+
+            <hr class="my-3" />
+
+            <!-- Datas -->
+            <dt class="col-sm-3 fw-bold">Start Date</dt>
+            <dd class="col-sm-9">@Model.StartDate.ToLongDateString()</dd>
+
+            <dt class="col-sm-3 fw-bold">End Date</dt>
+            <dd class="col-sm-9">@Model.EndDate.ToLongDateString()</dd>
+
+            <hr class="my-3" />
+
+            <!-- Dados do Membro -->
+            <dt class="col-sm-3 fw-bold text-muted">Client Email</dt>
+            <dd class="col-sm-9 text-muted">@Model.Member.Client.Email</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Client Phone</dt>
+            <dd class="col-sm-9 text-muted">@Model.Member.Client.Phone</dd>
+
+        </dl>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.MemberPlanId" class="btn btn-warning me-2 shadow-sm">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>

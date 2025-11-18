@@ -30,6 +30,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.MemberPlan> MemberPlan { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TrainingPlan> TrainingPlan { get; set; } = default!;
 
     }
