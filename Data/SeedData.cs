@@ -21,13 +21,16 @@ namespace HealthWellbeing.Data
             // 2. Grupos Musculares e Músculos (Dependência para Exercícios)
             PopulateGruposMusculares(dbContext);
 
-            // 3. Exercícios (Depende de 1 e 2)
+            // 3. Equipamentos (NOVO - Dependência para Exercícios)
+            PopulateEquipamentos(dbContext);
+
+            // 4. Exercícios (Depende de 1, 2 e 3)
             PopulateExercicios(dbContext);
 
-            // 4. Problemas de Saúde (Independente)
+            // 5. Problemas de Saúde (Independente)
             PopulateProblemasSaude(dbContext);
 
-            // 5. Tipos de Exercício e Benefícios (Independente)
+            // 6. Tipos de Exercício e Benefícios (Independente)
             PopulateTiposExercicio(dbContext);
         }
 
@@ -43,7 +46,7 @@ namespace HealthWellbeing.Data
             };
 
             dbContext.Genero.AddRange(generos);
-            dbContext.SaveChanges(); // Salvar para gerar IDs
+            dbContext.SaveChanges();
         }
 
         private static void PopulateGruposMusculares(HealthWellbeingDbContext dbContext)
@@ -71,10 +74,9 @@ namespace HealthWellbeing.Data
             };
 
             dbContext.GrupoMuscular.AddRange(grupos);
-            dbContext.SaveChanges(); // Salvar para gerar IDs necessários para os músculos
+            dbContext.SaveChanges();
 
-            // --- Criação dos Músculos (Associados aos grupos criados acima) ---
-            // Recarregar grupos da BD para garantir que temos os IDs corretos
+            // --- Criação dos Músculos ---
             var gruposDb = dbContext.GrupoMuscular.ToList();
             Func<string, int> getId = nome => gruposDb.First(g => g.GrupoMuscularNome == nome).GrupoMuscularId;
 
@@ -99,6 +101,28 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
+        // --- NOVO MÉTODO: POPULAR EQUIPAMENTOS ---
+        private static void PopulateEquipamentos(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.Equipamento.Any()) return;
+
+            var equipamentos = new[]
+            {
+                new Equipamento { NomeEquipamento = "Halteres" },
+                new Equipamento { NomeEquipamento = "Barra Olímpica" },
+                new Equipamento { NomeEquipamento = "Banco de Musculação" },
+                new Equipamento { NomeEquipamento = "Tapete de Yoga" },
+                new Equipamento { NomeEquipamento = "Bola de Pilates" },
+                new Equipamento { NomeEquipamento = "Elásticos de Resistência" },
+                new Equipamento { NomeEquipamento = "Passadeira" },
+                new Equipamento { NomeEquipamento = "Bicicleta Estática" },
+                new Equipamento { NomeEquipamento = "Kettlebell" }
+            };
+
+            dbContext.Equipamento.AddRange(equipamentos);
+            dbContext.SaveChanges();
+        }
+
         private static void PopulateExercicios(HealthWellbeingDbContext dbContext)
         {
             if (dbContext.Exercicio.Any()) return;
@@ -106,10 +130,12 @@ namespace HealthWellbeing.Data
             // Recuperar referências para fazer as ligações
             var generos = dbContext.Genero.ToDictionary(g => g.NomeGenero, g => g.GeneroId);
             var grupos = dbContext.GrupoMuscular.ToDictionary(g => g.GrupoMuscularNome, g => g.GrupoMuscularId);
+            var equipamentos = dbContext.Equipamento.ToDictionary(e => e.NomeEquipamento, e => e.EquipamentoId);
 
-            // Helper para obter ID de forma segura
+            // Helpers para obter IDs de forma segura
             int GetGenId(string nome) => generos.ContainsKey(nome) ? generos[nome] : generos.Values.First();
             int GetGrId(string nome) => grupos.ContainsKey(nome) ? grupos[nome] : grupos.Values.First();
+            int GetEqId(string nome) => equipamentos.ContainsKey(nome) ? equipamentos[nome] : 0;
 
             var exercicios = new[]
             {
@@ -121,17 +147,19 @@ namespace HealthWellbeing.Data
                     Intencidade = 6,
                     CaloriasGastas = 50,
                     Instrucoes = "Deitar no chão, mãos alinhadas aos ombros, flexionar braços mantendo corpo reto.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
-                    // Associação Gênero
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Peito e Tríceps)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
+                    },
+                    // Flexão geralmente não precisa de equipamento, mas podemos por Tapete se quisermos
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
                     }
                 },
                 new Exercicio
@@ -142,16 +170,15 @@ namespace HealthWellbeing.Data
                     Intencidade = 7,
                     CaloriasGastas = 80,
                     Instrucoes = "Ficar em pé, afastar pernas, flexionar joelhos mantendo costas retas.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 4,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Pernas e Glúteos)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
-                    }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>() // Sem equipamento
                 },
                 new Exercicio
                 {
@@ -161,14 +188,16 @@ namespace HealthWellbeing.Data
                     Intencidade = 5,
                     CaloriasGastas = 30,
                     Instrucoes = "Apoiar antebraços e ponta dos pés, mantendo corpo reto.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Abdômen)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
                     }
                 },
                 new Exercicio
@@ -179,7 +208,6 @@ namespace HealthWellbeing.Data
                     Intencidade = 7,
                     CaloriasGastas = 70,
                     Instrucoes = "Inclinar tronco, puxar halteres em direção ao abdómen.",
-                    EquipamentoNecessario = "Halteres",
                     Repeticoes = 12,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero>
@@ -187,11 +215,15 @@ namespace HealthWellbeing.Data
                         new ExercicioGenero { GeneroId = GetGenId("Masculino") },
                         new ExercicioGenero { GeneroId = GetGenId("Feminino") }
                     },
-                    // CORREÇÃO: Associação Grupo Muscular (Costas e Bíceps)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Costas") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Bíceps") }
+                    },
+                    // Associa Halteres
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
                     }
                 },
                 new Exercicio
@@ -202,16 +234,15 @@ namespace HealthWellbeing.Data
                     Intencidade = 6,
                     CaloriasGastas = 150,
                     Instrucoes = "Correr no mesmo lugar elevando os joelhos.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 1,
                     Series = 1,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Pernas e Panturrilhas)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") }
-                    }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>() // Sem equipamento
                 },
                 new Exercicio
                 {
@@ -221,7 +252,6 @@ namespace HealthWellbeing.Data
                     Intencidade = 5,
                     CaloriasGastas = 40,
                     Instrucoes = "Deitar, elevar a bacia contraindo glúteos.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 15,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero>
@@ -229,11 +259,14 @@ namespace HealthWellbeing.Data
                         new ExercicioGenero { GeneroId = GetGenId("Feminino") },
                         new ExercicioGenero { GeneroId = GetGenId("Unisexo") }
                     },
-                    // CORREÇÃO: Associação Grupo Muscular (Glúteos e Pernas)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
                     }
                 },
                 new Exercicio
@@ -244,15 +277,19 @@ namespace HealthWellbeing.Data
                     Intencidade = 8,
                     CaloriasGastas = 90,
                     Instrucoes = "Empurrar barra para cima deitado no banco.",
-                    EquipamentoNecessario = "Barra e Banco",
                     Repeticoes = 10,
                     Series = 4,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Masculino") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Peito e Tríceps)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") }
+                    },
+                    // Associa Barra e Banco
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Barra Olímpica") },
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Banco de Musculação") }
                     }
                 },
                 new Exercicio
@@ -263,14 +300,16 @@ namespace HealthWellbeing.Data
                     Intencidade = 5,
                     CaloriasGastas = 35,
                     Instrucoes = "Deitar, levantar ombros do chão.",
-                    EquipamentoNecessario = "Nenhum",
                     Repeticoes = 20,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    // CORREÇÃO: Associação Grupo Muscular (Abdômen)
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
                     }
                 }
             };
@@ -301,7 +340,6 @@ namespace HealthWellbeing.Data
 
         private static void PopulateTiposExercicio(HealthWellbeingDbContext dbContext)
         {
-            // 1. Se não houver benefícios, cria
             if (!dbContext.Beneficio.Any())
             {
                 var novosBeneficios = new[]
@@ -318,7 +356,6 @@ namespace HealthWellbeing.Data
 
             if (dbContext.TipoExercicio.Any()) return;
 
-            // Recuperar Benefícios para ligar
             var beneficiosDb = dbContext.Beneficio.ToDictionary(b => b.NomeBeneficio, b => b);
             Beneficio GetBen(string nome) => beneficiosDb.ContainsKey(nome) ? beneficiosDb[nome] : beneficiosDb.First().Value;
 

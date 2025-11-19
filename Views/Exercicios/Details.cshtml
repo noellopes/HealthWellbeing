@@ -5,7 +5,7 @@
     string? successMessage = Context.Request.Query["SuccessMessage"];
 }
 
-<div class="container">
+<div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>@ViewData["Title"]</h1>
         <div>
@@ -40,12 +40,11 @@
         <div class="card-body">
             <div class="row">
 
-                <!-- Informações básicas -->
                 <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold">Informações Básicas</h5>
-                    <table class="table table-borderless">
+                    <h5 class="fw-bold text-primary border-bottom pb-2">Informações Básicas</h5>
+                    <table class="table table-borderless mt-2">
                         <tr>
-                            <th class="text-secondary">Descrição:</th>
+                            <th class="text-secondary" style="width: 140px;">Descrição:</th>
                             <td>@Model.Descricao</td>
                         </tr>
                         <tr>
@@ -54,16 +53,34 @@
                         </tr>
                         <tr>
                             <th class="text-secondary">Intensidade:</th>
-                            <td>@Model.Intencidade / 10</td>
+                            <td>
+                                <span class="badge bg-warning text-dark">@Model.Intencidade / 10</span>
+                            </td>
                         </tr>
                         <tr>
-                            <th class="text-secondary">Calorias Gastas:</th>
-                            <td>@Model.CaloriasGastas cal</td>
+                            <th class="text-secondary">Calorias:</th>
+                            <td>@Model.CaloriasGastas kcal</td>
                         </tr>
+
                         <tr>
-                            <th class="text-secondary">Equipamento:</th>
-                            <td>@Model.EquipamentoNecessario</td>
+                            <th class="text-secondary">Equipamentos:</th>
+                            <td>
+                                @if (Model.ExercicioEquipamentos?.Any() == true)
+                                {
+                                    foreach (var item in Model.ExercicioEquipamentos)
+                                    {
+                                        <span class="badge bg-primary me-1">
+                                            @item.Equipamento.NomeEquipamento
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Nenhum equipamento necessário</span>
+                                }
+                            </td>
                         </tr>
+
                         <tr>
                             <th class="text-secondary">Géneros:</th>
                             <td>
@@ -78,19 +95,18 @@
                                 }
                                 else
                                 {
-                                    <span class="text-muted">Nenhum gênero definido</span>
+                                    <span class="text-muted small">Nenhum gênero definido</span>
                                 }
                             </td>
                         </tr>
                     </table>
                 </div>
 
-                <!-- Treino -->
                 <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold">Configuração do Treino</h5>
-                    <table class="table table-borderless">
+                    <h5 class="fw-bold text-primary border-bottom pb-2">Configuração do Treino</h5>
+                    <table class="table table-borderless mt-2">
                         <tr>
-                            <th class="text-secondary">Séries:</th>
+                            <th class="text-secondary" style="width: 140px;">Séries:</th>
                             <td>@Model.Series</td>
                         </tr>
                         <tr>
@@ -98,20 +114,20 @@
                             <td>@Model.Repeticoes</td>
                         </tr>
                         <tr>
-                            <th class="text-secondary">Músculos Trabalhados:</th>
+                            <th class="text-secondary">Músculos:</th>
                             <td>
                                 @if (Model.ExercicioGrupoMusculares?.Any() == true)
                                 {
                                     foreach (var item in Model.ExercicioGrupoMusculares)
                                     {
-                                        <span class="badge bg-info text-dark me-1">
+                                        <span class="badge bg-secondary me-1">
                                             @item.GrupoMuscular.GrupoMuscularNome
                                         </span>
                                     }
                                 }
                                 else
                                 {
-                                    <span class="text-muted">Nenhum músculo definido</span>
+                                    <span class="text-muted small">Nenhum músculo definido</span>
                                 }
                             </td>
                         </tr>
@@ -120,17 +136,17 @@
 
             </div>
 
-            <!-- Instruções -->
             <div class="mt-4">
-                <h5 class="fw-bold">Instruções</h5>
-                <div class="border rounded p-3 bg-light">
+                <h5 class="fw-bold text-primary border-bottom pb-2">Instruções</h5>
+                <div class="border rounded p-3 bg-light mt-2">
                     @if (!string.IsNullOrEmpty(Model.Instrucoes))
                     {
-                        @Model.Instrucoes
+                        /* Permite quebras de linha se houver */
+                        @Html.Raw(Model.Instrucoes.Replace("\n", "<br>"))
                     }
                     else
                     {
-                        <span class="text-muted">Nenhuma instrução definida</span>
+                        <span class="text-muted fst-italic">Nenhuma instrução definida</span>
                     }
                 </div>
             </div>

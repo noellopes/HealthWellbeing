@@ -2,9 +2,11 @@
 
 @{
     ViewData["Title"] = "Exercício Não Encontrado";
-    // Recupera as listas de IDs que vêm da ViewBag do Controller
+
+    // Retrieve ID lists from Controller's ViewData
     var selectedGeneros = ViewData["GenerosIds"] as int[] ?? new int[0];
     var selectedGrupos = ViewData["GruposMuscularesIds"] as int[] ?? new int[0];
+    var selectedEquipamentos = ViewData["EquipamentosIds"] as int[] ?? new int[0]; // NEW: Retrieve Equipments
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -14,7 +16,7 @@
     <div class="ps-4">
         <h4 class="alert-heading mb-2">O registo não existe</h4>
         <p class="mb-0">
-            O exercício que tentou editar ou visualizar já não existe na base de dados.
+            O exercício que tentou editar já não existe na base de dados.
             Provavelmente foi eliminado por outro utilizador recentemente.
         </p>
     </div>
@@ -42,7 +44,6 @@
                 <input type="hidden" asp-for="Intencidade" />
                 <input type="hidden" asp-for="CaloriasGastas" />
                 <input type="hidden" asp-for="Instrucoes" />
-                <input type="hidden" asp-for="EquipamentoNecessario" />
                 <input type="hidden" asp-for="Repeticoes" />
                 <input type="hidden" asp-for="Series" />
 
@@ -54,6 +55,11 @@
                 @foreach (var id in selectedGrupos)
                 {
                     <input type="hidden" name="GrupoMuscularIds" value="@id" />
+                }
+
+                @foreach (var id in selectedEquipamentos)
+                {
+                    <input type="hidden" name="equipamentosIds" value="@id" />
                 }
 
                 <div class="d-flex gap-2 mt-3">

@@ -3,6 +3,11 @@
 
 @{
     ViewData["Title"] = "Editar Exercício";
+
+    // Helpers para recuperar os IDs selecionados vindos do Controller
+    var generosSel = ViewBag.GenerosSelecionados as List<int> ?? new List<int>();
+    var gruposSel = ViewBag.GruposSelecionados as List<int> ?? new List<int>();
+    var equipamentosSel = ViewBag.EquipamentosSelecionados as List<int> ?? new List<int>();
 }
 
 <div class="container mt-4">
@@ -14,37 +19,101 @@
 
         <div asp-validation-summary="All" class="text-danger small"></div>
 
-        <!-- Nome -->
         <div class="mb-3">
             <label asp-for="ExercicioNome" class="form-label">Nome *</label>
             <input asp-for="ExercicioNome" class="form-control" />
             <span asp-validation-for="ExercicioNome" class="text-danger small"></span>
         </div>
 
-        <!-- Descrição -->
         <div class="mb-3">
             <label asp-for="Descricao" class="form-label">Descrição *</label>
             <textarea asp-for="Descricao" rows="3" class="form-control"></textarea>
             <span asp-validation-for="Descricao" class="text-danger small"></span>
         </div>
 
-        <!-- Grupos Musculares -->
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold">Equipamentos Necessários</label>
+            <small class="form-text text-muted d-block">Selecione os equipamentos necessários</small>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.Equipamentos != null && ((IEnumerable<HealthWellbeing.Models.Equipamento>)ViewBag.Equipamentos).Any())
+                {
+                    <div class="row">
+                        @foreach (var item in (IEnumerable<HealthWellbeing.Models.Equipamento>)ViewBag.Equipamentos)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="equipamentosIds"
+                                           value="@item.EquipamentoId"
+                                           id="eq_@item.EquipamentoId"
+                                           @(equipamentosSel.Contains(item.EquipamentoId) ? "checked" : "") />
+                                    <label class="form-check-label" for="eq_@item.EquipamentoId">
+                                        @item.NomeEquipamento
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">
+                        <p class="mb-0">Nenhum equipamento registado no sistema.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold">Gêneros Associados</label>
+            <small class="form-text text-muted d-block">Selecione os gêneros associados</small>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.Generos != null && ((IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos).Any())
+                {
+                    <div class="row">
+                        @foreach (var genero in (IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="generosIds"
+                                           value="@genero.GeneroId"
+                                           id="genero_@genero.GeneroId"
+                                           @(generosSel.Contains(genero.GeneroId) ? "checked" : "") />
+                                    <label class="form-check-label" for="genero_@genero.GeneroId">
+                                        @genero.NomeGenero
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">
+                        <p class="mb-1">Nenhum gênero encontrado.</p>
+                        <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">Criar Gênero</a>
+                    </div>
+                }
+            </div>
+        </div>
+
         <div class="form-group mb-4">
             <label class="control-label fw-bold">Grupos Musculares Associados</label>
-            <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
+            <small class="form-text text-muted d-block">Selecione os grupos musculares associados</small>
             <div class="border p-3 rounded mt-2">
                 @if (ViewBag.GruposMusculares != null && ((IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares).Any())
                 {
                     <div class="row">
                         @foreach (var grupo in (IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares)
                         {
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-4 mb-2">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox"
                                            name="gruposMuscularesIds"
                                            value="@grupo.GrupoMuscularId"
                                            id="grupo_@grupo.GrupoMuscularId"
-                                           @(ViewBag.GruposSelecionados != null && ((List<int>)ViewBag.GruposSelecionados).Contains(grupo.GrupoMuscularId) ? "checked" : "") />
+                                           @(gruposSel.Contains(grupo.GrupoMuscularId) ? "checked" : "") />
                                     <label class="form-check-label" for="grupo_@grupo.GrupoMuscularId">
                                         @grupo.GrupoMuscularNome
                                     </label>
@@ -55,17 +124,14 @@
                 }
                 else
                 {
-                    <div class="alert alert-warning">
-                        <p class="mb-1">Nenhum grupo muscular encontrado no sistema.</p>
-                        <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">
-                            Criar Grupo Muscular
-                        </a>
+                    <div class="alert alert-warning mb-0">
+                        <p class="mb-1">Nenhum grupo muscular encontrado.</p>
+                        <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">Criar Grupo Muscular</a>
                     </div>
                 }
             </div>
         </div>
 
-        <!-- Linha com duração / intensidade / calorias -->
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label asp-for="Duracao" class="form-label">Duração (min) *</label>
@@ -86,74 +152,28 @@
             </div>
         </div>
 
-        <!-- Equipamento / Repetições / Séries -->
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label asp-for="EquipamentoNecessario" class="form-label">Equipamento *</label>
-                <input asp-for="EquipamentoNecessario" class="form-control" />
-                <span asp-validation-for="EquipamentoNecessario" class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-3 mb-3">
                 <label asp-for="Repeticoes" class="form-label">Repetições *</label>
                 <input asp-for="Repeticoes" type="number" class="form-control" min="1" />
                 <span asp-validation-for="Repeticoes" class="text-danger small"></span>
             </div>
 
-            <div class="col-md-3 mb-3">
+            <div class="col-md-6 mb-3">
                 <label asp-for="Series" class="form-label">Séries *</label>
                 <input asp-for="Series" type="number" class="form-control" min="1" />
                 <span asp-validation-for="Series" class="text-danger small"></span>
             </div>
         </div>
 
-        <!-- Instruções -->
         <div class="mb-3">
             <label asp-for="Instrucoes" class="form-label">Instruções *</label>
             <textarea asp-for="Instrucoes" rows="3" class="form-control"></textarea>
             <span asp-validation-for="Instrucoes" class="text-danger small"></span>
         </div>
 
-        <!-- Gêneros -->
-        <div class="form-group mb-4">
-            <label class="control-label fw-bold">Gêneros Associados</label>
-            <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
-            <div class="border p-3 rounded mt-2">
-                @if (ViewBag.Generos != null && ((IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos).Any())
-                {
-                    <div class="row">
-                        @foreach (var genero in (IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos)
-                        {
-                            <div class="col-md-6 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                           name="generosIds"
-                                           value="@genero.GeneroId"
-                                           id="genero_@genero.GeneroId"
-                                           @(ViewBag.GenerosSelecionados != null && ((List<int>)ViewBag.GenerosSelecionados).Contains(genero.GeneroId) ? "checked" : "") />
-                                    <label class="form-check-label" for="genero_@genero.GeneroId">
-                                        @genero.NomeGenero
-                                    </label>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-warning">
-                        <p class="mb-1">Nenhum gênero encontrado no sistema.</p>
-                        <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
-                            Criar Gênero
-                        </a>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Botões -->
         <div class="mt-4">
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-warning">
                 <i class="fas fa-save"></i> Guardar Alterações
             </button>
             <a asp-action="Index" class="btn btn-secondary ms-2">

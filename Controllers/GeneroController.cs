@@ -21,12 +21,23 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Generos
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(string searchNomeGenero, int page = 1)
         {
             // Consulta base
             var generosQuery = _context.Genero.AsQueryable();
 
-            // Contar total de itens
+            // Lógica de Filtro (Pesquisa)
+            if (!string.IsNullOrEmpty(searchNomeGenero))
+            {
+                // Filtra pelo nome do género
+                generosQuery = generosQuery
+                    .Where(g => g.NomeGenero.Contains(searchNomeGenero));
+
+                // Guarda o texto na ViewBag para manter na caixa de pesquisa após o reload
+                ViewBag.SearchNomeGenero = searchNomeGenero;
+            }
+
+            // Contar total de itens (já considerando o filtro, se existir)
             int totalGeneros = await generosQuery.CountAsync();
 
             // Criar objeto de paginação

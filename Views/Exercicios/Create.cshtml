@@ -18,21 +18,55 @@
 
     <div asp-validation-summary="All" class="text-danger"></div>
 
-    <!-- Nome do Exercício -->
     <div class="mb-3">
         <label asp-for="ExercicioNome" class="form-label">Nome do Exercício *</label>
         <input asp-for="ExercicioNome" class="form-control" placeholder="Ex: Flexões, Corrida, Agachamentos">
         <span asp-validation-for="ExercicioNome" class="text-danger small"></span>
     </div>
 
-    <!-- Descrição -->
     <div class="mb-3">
         <label asp-for="Descricao" class="form-label">Descrição *</label>
         <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Descreva o exercício..."></textarea>
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
-    <!-- Grupos Musculares Associados -->
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold">Equipamentos Necessários</label>
+        <small class="form-text text-muted d-block">Selecione os equipamentos necessários para este exercício</small>
+        <div class="border p-3 rounded mt-2">
+            @if (ViewBag.Equipamentos != null && ((IEnumerable<SelectListItem>)ViewBag.Equipamentos).Any())
+            {
+                <div class="row">
+                    @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Equipamentos)
+                    {
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="equipamentosIds"
+                                       value="@item.Value"
+                                       id="eq_@item.Value" />
+                                <label class="form-check-label" for="eq_@item.Value">
+                                    <a href="@Url.Action("Details", "Equipamento", new { id = item.Value })"
+                                       target="_blank"
+                                       class="text-decoration-none"
+                                       title="Ver detalhes do equipamento">
+                                        @item.Text
+                                    </a>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <p class="mb-1">Nenhum equipamento encontrado no sistema.</p>
+                </div>
+            }
+        </div>
+    </div>
+
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Grupos Musculares Associados</label>
         <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
@@ -70,7 +104,6 @@
                     </a>
                 </div>
             }
-
         </div>
         @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
         {
@@ -78,60 +111,6 @@
         }
     </div>
 
-    <div class="row">
-        <!-- Duração -->
-        <div class="col-md-4 mb-3">
-            <label asp-for="Duracao" class="form-label">Duração (minutos) *</label>
-            <input asp-for="Duracao" type="number" step="0.1" class="form-control" placeholder="Ex: 30.5">
-            <span asp-validation-for="Duracao" class="text-danger small"></span>
-        </div>
-
-        <!-- Intensidade -->
-        <div class="col-md-4 mb-3">
-            <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
-            <input asp-for="Intencidade" type="number" class="form-control" placeholder="1 a 10">
-            <span asp-validation-for="Intencidade" class="text-danger small"></span>
-        </div>
-
-        <!-- Calorias Gastas -->
-        <div class="col-md-4 mb-3">
-            <label asp-for="CaloriasGastas" class="form-label">Calorias Gastas *</label>
-            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control" placeholder="Ex: 250.5">
-            <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Equipamento -->
-        <div class="col-md-6 mb-3">
-            <label asp-for="EquipamentoNecessario" class="form-label">Equipamento Necessário *</label>
-            <input asp-for="EquipamentoNecessario" class="form-control" placeholder="Ex: Halteres, Bola, Nenhum">
-            <span asp-validation-for="EquipamentoNecessario" class="text-danger small"></span>
-        </div>
-
-        <!-- Repetições -->
-        <div class="col-md-3 mb-3">
-            <label asp-for="Repeticoes" class="form-label">Repetições *</label>
-            <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
-            <span asp-validation-for="Repeticoes" class="text-danger small"></span>
-        </div>
-
-        <!-- Séries -->
-        <div class="col-md-3 mb-3">
-            <label asp-for="Series" class="form-label">Séries *</label>
-            <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
-            <span asp-validation-for="Series" class="text-danger small"></span>
-        </div>
-    </div>
-
-    <!-- Instruções -->
-    <div class="mb-3">
-        <label asp-for="Instrucoes" class="form-label">Instruções *</label>
-        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo..."></textarea>
-        <span asp-validation-for="Instrucoes" class="text-danger small"></span>
-    </div>
-
-    <!-- Gêneros Associados -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Gêneros Associados</label>
         <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
@@ -139,7 +118,7 @@
             @if (ViewBag.Generos != null && ((IEnumerable<SelectListItem>)ViewBag.Generos).Any())
             {
                 <div class="row">
-                    @foreach (var genero in ViewBag.Generos as IEnumerable<SelectListItem>)
+                    @foreach (var genero in (IEnumerable<SelectListItem>)ViewBag.Generos)
                     {
                         <div class="col-md-6 mb-2">
                             <div class="form-check">
@@ -176,7 +155,46 @@
         }
     </div>
 
-    <!-- Botões -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Duracao" class="form-label">Duração (minutos) *</label>
+            <input asp-for="Duracao" type="number" step="0.1" class="form-control" placeholder="Ex: 30.5">
+            <span asp-validation-for="Duracao" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
+            <input asp-for="Intencidade" type="number" class="form-control" placeholder="1 a 10">
+            <span asp-validation-for="Intencidade" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="CaloriasGastas" class="form-label">Calorias Gastas *</label>
+            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control" placeholder="Ex: 250.5">
+            <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Repeticoes" class="form-label">Repetições *</label>
+            <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
+            <span asp-validation-for="Repeticoes" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="Series" class="form-label">Séries *</label>
+            <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
+            <span asp-validation-for="Series" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Instrucoes" class="form-label">Instruções *</label>
+        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo..."></textarea>
+        <span asp-validation-for="Instrucoes" class="text-danger small"></span>
+    </div>
+
     <div class="mt-4">
         <button type="submit" class="btn btn-success">
             <i class="fas fa-save"></i> Criar Exercício
