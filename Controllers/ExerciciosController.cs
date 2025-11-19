@@ -53,7 +53,7 @@ namespace HealthWellbeing.Controllers
 
             int totalItems = await query.CountAsync();
 
-            var pagination = new PaginationInfoExercicios<Exercicio>(page, totalItems);
+            var pagination = new PaginationInfo<Exercicio>(page, totalItems);
 
             pagination.Items = await query
                 .OrderBy(e => e.ExercicioNome)
@@ -129,7 +129,13 @@ namespace HealthWellbeing.Controllers
 
                 _context.Add(exercicio);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = exercicio.ExercicioId,
+                        SuccessMessage = "Exercicio criado com sucesso"
+                    }
+                );
             }
 
             ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
@@ -223,7 +229,12 @@ namespace HealthWellbeing.Controllers
                     }
 
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Details),
+                        new
+                        {
+                            id = exercicio.ExercicioId,
+                            SuccessMessage = "Exercicio editado com sucesso"
+                        });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -257,7 +268,11 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.ExercicioGrupoMusculares).ThenInclude(gm => gm.GrupoMuscular)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
 
-            if (exercicio == null) return NotFound();
+            if (exercicio == null)
+            {
+                TempData["SuccessMessage"] = "Este exercicio ja foi eliminado";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(exercicio);
         }
@@ -277,9 +292,10 @@ namespace HealthWellbeing.Controllers
                 // Opcional: Se o DeleteBehavior for Cascade (ver PDF página 9), isto acontece automaticamente,
                 // mas limpar manualmente é mais seguro se a configuração mudar.
                 _context.Exercicio.Remove(exercicio);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Exercicio foi apagado com sucesso";
             return RedirectToAction(nameof(Index));
         }
 

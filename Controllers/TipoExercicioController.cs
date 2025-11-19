@@ -58,7 +58,7 @@ namespace HealthWellbeing.Controllers
             // --- Paginação ---
             int total = await query.CountAsync();
 
-            var pagination = new PaginationInfoExercicios<TipoExercicio>(page, total);
+            var pagination = new PaginationInfo<TipoExercicio>(page, total);
 
             // Só executamos a query paginada se houver resultados
             if (total > 0)

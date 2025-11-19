@@ -47,7 +47,7 @@ namespace HealthWellbeing.Controllers
             int numberMusculos = await musculosQuery.CountAsync();
 
             // Criar paginação
-            var musculosInfo = new PaginationInfoExercicios<Musculo>(page, numberMusculos);
+            var musculosInfo = new PaginationInfo<Musculo>(page, numberMusculos);
 
             // Buscar itens da página
             musculosInfo.Items = await musculosQuery

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Models;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -50,8 +51,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Beneficio/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BeneficioId,NomeBeneficio,DescricaoBeneficio")] Beneficio beneficio)
@@ -82,8 +81,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Beneficio/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BeneficioId,NomeBeneficio,DescricaoBeneficio")] Beneficio beneficio)
@@ -117,7 +114,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Beneficio/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool concurrencyError = false)
         {
             if (id == null)
             {
@@ -126,9 +123,36 @@ namespace HealthWellbeing.Controllers
 
             var beneficio = await _context.Beneficio
                 .FirstOrDefaultAsync(m => m.BeneficioId == id);
+
             if (beneficio == null)
             {
-                return NotFound();
+                // Se não for encontrado no GET, e não for por erro de concorrência, é NotFound
+                if (!concurrencyError)
+                {
+                    return NotFound();
+                }
+                // Se for concurrencyError, o item já foi apagado. Redirecionar para Index
+                return RedirectToAction(nameof(Index));
+            }
+
+            // --- Verificação de Associação ---
+            var hasAssociations = await _context.TipoExercicioBeneficio
+                .AnyAsync(tb => tb.BeneficioId == id);
+
+            if (hasAssociations)
+            {
+                ViewData["ErrorMessage"] = $"Não é possível excluir o benefício '{beneficio.NomeBeneficio}', pois está **associado a um ou mais Tipos de Exercício**.";
+                ViewData["DisableDelete"] = true; // Sinal para a View desabilitar o botão
+            }
+            // ------------------------------------
+
+            if (concurrencyError)
+            {
+                ViewData["ErrorMessage"] = ViewData["ErrorMessage"] != null
+                    ? ViewData["ErrorMessage"]
+                    : "O benefício foi modificado por outro utilizador. Por favor, reveja e tente novamente.";
+
+                // Se houver erro de concorrência, o botão deve estar ativo (a não ser que haja associação)
             }
 
             return View(beneficio);
@@ -139,13 +163,45 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Busca o benefício e verifica se ele foi apagado por outro
             var beneficio = await _context.Beneficio.FindAsync(id);
-            if (beneficio != null)
+            if (beneficio == null)
             {
-                _context.Beneficio.Remove(beneficio);
+                // Já foi apagado. Redireciona para o Index.
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            // --- Verificação de Associação (antes de tentar apagar) ---
+            var hasAssociations = await _context.TipoExercicioBeneficio
+                .AnyAsync(tb => tb.BeneficioId == id);
+
+            if (hasAssociations)
+            {
+                // Redireciona de volta para o GET do Delete para exibir a mensagem.
+                return RedirectToAction(nameof(Delete), new { id = id });
+            }
+            // ------------------------------------
+
+            try
+            {
+                _context.Beneficio.Remove(beneficio);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Ocorreu um erro de concorrência (alguém editou/apagou antes).
+                if (!BeneficioExists(id))
+                {
+                    // Não existe mais, foi apagado por outro
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    // Houve alteração, mas o registro ainda existe
+                    return RedirectToAction(nameof(Delete), new { id = id, concurrencyError = true });
+                }
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

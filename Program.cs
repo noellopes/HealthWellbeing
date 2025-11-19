@@ -103,10 +103,11 @@ using (var scope = app.Services.CreateScope())
     // Migrar e popular HealthWellbeingDbContext (exercícios)
     var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
     healthContext.Database.Migrate();
-    SeedDataExercicio.Populate(healthContext);
-    SeedDataTipoExercicio.Populate(healthContext);
-    SeedDataProblemaSaude.Populate(healthContext);
-    SeedDataGr.Populate(healthContext);
+    //SeedDataExercicio.Populate(healthContext);
+    //SeedDataTipoExercicio.Populate(healthContext);
+    //SeedDataProblemaSaude.Populate(healthContext);
+    //SeedDataGr.Populate(healthContext);
+    SeedData.Populate(healthContext);
 }
 
 app.UseHttpsRedirection();

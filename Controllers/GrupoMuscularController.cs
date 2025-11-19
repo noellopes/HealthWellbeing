@@ -46,7 +46,7 @@ namespace HealthWellbeing.Controllers
 
             // Paginação
             int totalItems = await query.CountAsync();
-            var paginated = new PaginationInfoExercicios<GrupoMuscular>(page, totalItems);
+            var paginated = new PaginationInfo<GrupoMuscular>(page, totalItems);
             paginated.Items = await query
                 .OrderBy(g => g.GrupoMuscularNome)
                 .Skip(paginated.ItemsToSkip)
