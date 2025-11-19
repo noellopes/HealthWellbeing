@@ -58,7 +58,7 @@ namespace HealthWellbeing.Controllers
 
             int totalItems = await query.CountAsync();
 
-            var pagination = new PaginationInfoExercicios<ProblemaSaude>(page, totalItems, pageSize);
+            var pagination = new PaginationInfo<ProblemaSaude>(page, totalItems, pageSize);
 
             pagination.Items = await query
                 .OrderBy(p => p.ProblemaNome)

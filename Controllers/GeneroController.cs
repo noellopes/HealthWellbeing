@@ -30,7 +30,7 @@ namespace HealthWellbeing.Controllers
             int totalGeneros = await generosQuery.CountAsync();
 
             // Criar objeto de paginação
-            var generosInfo = new PaginationInfoExercicios<Genero>(page, totalGeneros);
+            var generosInfo = new PaginationInfo<Genero>(page, totalGeneros);
 
             // Buscar os itens da página atual
             generosInfo.Items = await generosQuery
@@ -78,7 +78,13 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(genero);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = genero.GeneroId,
+                        SuccessMessage = "Genero criado com sucesso"
+                    }
+                );
             }
             return View(genero);
         }
@@ -126,7 +132,12 @@ namespace HealthWellbeing.Controllers
                     _context.Entry(generoExistente).CurrentValues.SetValues(genero);
 
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Details),
+                        new
+                        {
+                            id = genero.GeneroId,
+                            SuccessMessage = "Genero editado com sucesso"
+                        });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -144,7 +155,7 @@ namespace HealthWellbeing.Controllers
             return View(genero);
         }
 
-        // GET: Genero/Delete/
+        // GET: Genero/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,28 +163,57 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
+            // 1. Carregar o género INCLUINDO a lista de exercícios associados
             var genero = await _context.Genero
+                .Include(g => g.ExercicioGeneros) // Importante: Carregar a relação
                 .FirstOrDefaultAsync(m => m.GeneroId == id);
+
             if (genero == null)
             {
-                return NotFound();
+                TempData["SuccessMessage"] = "Este gênero já foi eliminado.";
+                return RedirectToAction(nameof(Index));
             }
+
+            // 2. Verificar quantos exercícios usam este género
+            int numExercicios = genero.ExercicioGeneros.Count;
+
+            // 3. Passar essa informação para a View
+            ViewBag.NumExercicios = numExercicios;
+            ViewBag.PodeEliminar = numExercicios == 0;
 
             return View(genero);
         }
 
-        // POST: Genero/Delete/5
+        // POST: Genero/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var genero = await _context.Genero.FindAsync(id);
+            // 1. Carregar novamente com a relação para garantir segurança no Back-end
+            var genero = await _context.Genero
+                .Include(g => g.ExercicioGeneros)
+                .FirstOrDefaultAsync(m => m.GeneroId == id);
+
             if (genero != null)
             {
+                // 2. Verificação de Segurança Final
+                if (genero.ExercicioGeneros.Any())
+                {
+                    // Se alguém tentar forçar a eliminação via código malicioso ou URL
+                    TempData["ErrorMessage"] = "Não é possível eliminar este gênero porque existem exercícios associados.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 _context.Genero.Remove(genero);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Gênero foi apagado com sucesso.";
+            }
+            else
+            {
+                // Caso o género já não exista
+                TempData["SuccessMessage"] = "Este gênero já tinha sido eliminado.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

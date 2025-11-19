@@ -1,12 +1,24 @@
-﻿@model HealthWellbeing.ViewModels.PaginationInfoExercicios<HealthWellbeing.Models.Genero>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Genero>
 
 @{
     ViewData["Title"] = "Gêneros";
+    var successMessage = TempData["SuccessMessage"];
 }
 
 <div class="container mt-4">
     <h2 class="mb-3 text-primary"><i class="bi bi-person-badge"></i> Gêneros</h2>
     <p class="text-muted">Lista dos gêneros registados no sistema:</p>
+
+    @if (successMessage != null)
+    {
+        <div class="container py-4">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
 
     @if (Model?.Items?.Any() == true)
     {
@@ -61,8 +73,7 @@
                                 <a asp-action="Edit" asp-route-id="@genero.GeneroId" class="btn btn-warning btn-sm me-1">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@genero.GeneroId" class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Tem a certeza que deseja apagar este gênero?');">
+                                <a asp-action="Delete" asp-route-id="@genero.GeneroId" class="btn btn-danger btn-sm">
                                     <i class="fas fa-trash-alt"></i> Apagar
                                 </a>
                             </td>

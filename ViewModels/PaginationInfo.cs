@@ -1,10 +1,10 @@
 ﻿namespace HealthWellbeing.ViewModels
 {
-    public class PaginationInfoExercicios<T>
+    public class PaginationInfo<T>
     {
         public const int NUMBER_PAGES_SHOW_BEFORE_AFTER = 5;
 
-        public PaginationInfoExercicios(int currentPage, int totalItems, int itemsPerPage = 10)
+        public PaginationInfo(int currentPage, int totalItems, int itemsPerPage = 10)
         {
             TotalItems = totalItems;
             ItemsPerPage = itemsPerPage;
