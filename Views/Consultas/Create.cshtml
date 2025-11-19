@@ -47,7 +47,31 @@
                         </label>
                         <input asp-for="HoraFim" type="time" class="form-control rounded-3 shadow-sm" />
                         <span asp-validation-for="HoraFim" class="text-danger small"></span>
-                    </div
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdMedico" class="form-label fw-semibold">
+                            Médico
+                        </label>
+                        <select asp-for="IdMedico"
+                                class="form-select rounded-3 shadow-sm"
+                                asp-items="ViewBag.IdMedico">
+                            <option value="">-- Selecione o médico --</option>
+                        </select>
+                        <span asp-validation-for="IdMedico" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdEspecialidade" class="form-label fw-semibold">
+                            Especialidade
+                        </label>
+                        <select asp-for="IdEspecialidade"
+                                class="form-select rounded-3 shadow-sm"
+                                asp-items="ViewBag.IdEspecialidade">
+                            <option value="">-- Selecione a especialidade --</option>
+                        </select>
+                        <span asp-validation-for="IdEspecialidade" class="text-danger small"></span>
+                    </div>
                 </div>
 
                 <div class="mt-4 d-flex justify-content-between">

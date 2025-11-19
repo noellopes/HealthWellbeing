@@ -97,8 +97,9 @@ namespace HealthWellbeing.Controllers
         // GET: Consultas/Create
         public IActionResult Create()
         {
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Nome");
-            ViewData["IdEspecialidade"] = new SelectList(_context.Specialities, "IdEspecialidade", "Nome");
+            
+            ViewData["IdMedico"] = new SelectList(_context.Set<Doctor>(), "IdMedico", "Nome");
+            ViewData["IdEspecialidade"] = new SelectList(_context.Set<Specialities>(), "IdEspecialidade", "Nome");
 
             return View();
         }
@@ -108,17 +109,28 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdConsulta,DataMarcacao,DataConsulta,DataCancelamento,HoraInicio,HoraFim")] Consulta consulta)
+        public async Task<IActionResult> Create([Bind("IdConsulta,DataMarcacao,DataConsulta,DataCancelamento,HoraInicio,HoraFim,IdMedico,IdEspecialidade")] Consulta consulta)
         {
+
+            Console.WriteLine("IdMedico enviado: " + consulta.IdMedico);
+            Console.WriteLine("IdEspecialidade enviada: " + consulta.IdEspecialidade);
+            
+
             if (ModelState.IsValid)
             {
                 _context.Add(consulta);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index),
+                new
+                {
+                    id = consulta.IdConsulta,
+                    SuccessMessage = "Consulta criada com sucesso."
+                }
+                );
             }
 
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Nome", consulta.IdMedico);
-            ViewData["IdEspecialidade"] = new SelectList(_context.Specialities, "IdEspecialidade", "Nome", consulta.IdEspecialidade);
+            ViewData["IdMedico"] = new SelectList(_context.Set<Doctor>(), "IdMedico", "Nome", consulta.IdMedico);
+            ViewData["IdEspecialidade"] = new SelectList(_context.Set<Specialities>(), "IdEspecialidade", "Nome", consulta.IdEspecialidade);
 
             return View(consulta);
         }
