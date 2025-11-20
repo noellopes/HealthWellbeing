@@ -55,10 +55,12 @@ else
                 </div>
                 <div class="col-md-4">
                     <label for="searchType" class="form-label">Event Type</label>
-                    <input id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-control" placeholder="Search by type" type="search" />
+                    <select id="searchType" name="searchType" class="form-select" asp-items="ViewBag.EventTypesList">
+                        <option value="">All Types</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="searchStatus" class="form-label">Estado</label>
+                    <label for="searchStatus" class="form-label">Status</label>
                     <select id="searchStatus" name="searchStatus" class="form-select" asp-items="ViewBag.StatusList"></select>
                 </div>
 
@@ -91,11 +93,11 @@ else
                     <tr>
                         <th>Event Name</th>
                         <th>Type</th>
-                        <th>Início</th>
-                        <th>Fim</th>
+                        <th>Start</th>
+                        <th>End</th>
                         <th>Status</th>
-                        <th>Nível Mín.</th>
-                        <th>Pontos</th>
+                        <th>Min Level</th>
+                        <th>Points</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -114,9 +116,9 @@ else
                                 }
                                 else if (item.Status == HealthWellbeing.Models.EventStatus.Adecorrer)
                                 {
-                                    <span class="badge bg-success">@item.Status</span>
+                                    <span class="badge bg-success">A decorrer</span>
                                 }
-                                else
+                                else if (item.Status == HealthWellbeing.Models.EventStatus.Realizado)
                                 {
                                     <span class="badge bg-secondary">@item.Status</span>
                                 }

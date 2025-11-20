@@ -19,7 +19,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string searchName, string searchType, string searchStatus, int page = 1)
+        public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int page = 1)
         {
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
@@ -27,9 +27,9 @@ namespace HealthWellbeing.Controllers
 
             var statusList = new List<SelectListItem>
             {
-                new SelectListItem { Value = "", Text = "Todos os Estados" },
+                new SelectListItem { Value = "", Text = "All Statuses" },
                 new SelectListItem { Value = "Agendado", Text = "Agendado" },
-                new SelectListItem { Value = "Adecorrer", Text = "A Decorrer" },
+                new SelectListItem { Value = "Adecorrer", Text = "A decorrer" },
                 new SelectListItem { Value = "Realizado", Text = "Realizado" }
             };
 
@@ -40,16 +40,19 @@ namespace HealthWellbeing.Controllers
             }
             ViewBag.StatusList = statusList;
 
-            var events = _context.Event.Include(e => e.EventType).Select(e => e);
+            var eventTypes = _context.EventType.OrderBy(t => t.EventTypeName);
+            ViewBag.EventTypesList = new SelectList(eventTypes, "EventTypeId", "EventTypeName", searchType);
+
+            var events = _context.Event.Include(e => e.EventType).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchName))
             {
                 events = events.Where(e => e.EventName.Contains(searchName));
             }
 
-            if (!string.IsNullOrEmpty(searchType))
+            if (searchType.HasValue)
             {
-                events = events.Where(e => e.EventType != null && e.EventType.EventTypeName.Contains(searchType));
+                events = events.Where(e => e.EventTypeId == searchType);
             }
 
             if (!string.IsNullOrEmpty(searchStatus))

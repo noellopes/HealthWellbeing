@@ -1,0 +1,60 @@
+﻿@model HealthWellbeing.Models.Plan
+
+@{
+    ViewData["Title"] = "Edit Plan";
+}
+
+<h1 class="display-4 text-primary mb-4">Edit Plan</h1>
+
+<h4 class="mb-3">Plan Details</h4>
+<hr class="mb-4" />
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg p-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="PlanId" />
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label fw-bold"></label>
+                    <input asp-for="Price" type="number" step="0.01" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DurationDays" class="form-label fw-bold"></label>
+                    <input asp-for="DurationDays" type="number" class="form-control" />
+                    <span asp-validation-for="DurationDays" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 d-flex justify-content-between pt-2">
+                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
+
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

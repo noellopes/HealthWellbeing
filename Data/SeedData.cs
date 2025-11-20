@@ -1,20 +1,37 @@
-﻿using HealthWellbeing.Models;
+using HealthWellbeing.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HealthWellbeing.Data
 {
-    internal class SeedData {
-        internal static void Populate(HealthWellbeingDbContext? dbContext) {
+    internal class SeedData
+    {
+        internal static void Populate(HealthWellbeingDbContext? dbContext)
+        {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+
+            dbContext.Database.EnsureCreated();
+
+            // Add seed data here
+            var clients = PopulateClients(dbContext);
+            PopulateMember(dbContext, clients);
+            PopulateTrainingType(dbContext);
+            PopulatePlan(dbContext);
+
+            // --- ALTERAÇÃO AQUI: Capturamos a lista de Trainers ---
+            var trainers = PopulateTrainer(dbContext);
+
+            // --- NOVO MÉTODO: Povoamento dos Treinos Agendados ---
+            PopulateTraining(dbContext, trainers);
 
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
             PopulateLevels(dbContext);
         }
 
-        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
+        private static void PopulateEventTypes(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.EventType.Any()) return;
 
             dbContext.EventType.AddRange(new List<EventType>() {
@@ -78,7 +95,8 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateEvents(HealthWellbeingDbContext dbContext) {
+        private static void PopulateEvents(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.Event.Any()) return;
 
             var eventTypes = dbContext.EventType.ToList();
@@ -134,52 +152,584 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateLevels(HealthWellbeingDbContext dbContext) {
+        private static void PopulateLevels(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.Level.Any()) return;
 
             dbContext.Level.AddRange(new List<Level>() {
-                new Level { LevelAtual = 1, LevelCategory = "Iniciante", Description = "Primeiros passos na jornada de saúde" },
-                new Level { LevelAtual = 2, LevelCategory = "Iniciante", Description = "Começando a criar rotinas saudáveis" },
-                new Level { LevelAtual = 3, LevelCategory = "Iniciante", Description = "Ganhando consistência nos exercícios" },
-                new Level { LevelAtual = 4, LevelCategory = "Iniciante", Description = "Progresso constante na saúde" },
-                new Level { LevelAtual = 5, LevelCategory = "Iniciante", Description = "Final da fase inicial - bons hábitos estabelecidos" },
-                new Level { LevelAtual = 6, LevelCategory = "Intermediário", Description = "Entrando na fase intermediária" },
-                new Level { LevelAtual = 7, LevelCategory = "Intermediário", Description = "Desenvolvendo resistência física" },
-                new Level { LevelAtual = 8, LevelCategory = "Intermediário", Description = "Melhorando performance geral" },
-                new Level { LevelAtual = 9, LevelCategory = "Intermediário", Description = "Consolidação de técnicas avançadas" },
-                new Level { LevelAtual = 10, LevelCategory = "Intermediário", Description = "Pronto para desafios maiores" },
-                new Level { LevelAtual = 11, LevelCategory = "Avançado", Description = "Início da jornada avançada" },
-                new Level { LevelAtual = 12, LevelCategory = "Avançado", Description = "Domínio de exercícios complexos" },
-                new Level { LevelAtual = 13, LevelCategory = "Avançado", Description = "Excelência em treino cardiovascular" },
-                new Level { LevelAtual = 14, LevelCategory = "Avançado", Description = "Especialização em força e resistência" },
-                new Level { LevelAtual = 15, LevelCategory = "Avançado", Description = "Atleta completo em formação" },
-                new Level { LevelAtual = 16, LevelCategory = "Especialista", Description = "Primeiro nível de especialista" },
-                new Level { LevelAtual = 17, LevelCategory = "Especialista", Description = "Técnicas avançadas de condicionamento" },
-                new Level { LevelAtual = 18, LevelCategory = "Especialista", Description = "Mestre em rotinas personalizadas" },
-                new Level { LevelAtual = 19, LevelCategory = "Especialista", Description = "Referência na comunidade fitness" },
-                new Level { LevelAtual = 20, LevelCategory = "Especialista", Description = "Especialista consolidado" },
-                new Level { LevelAtual = 21, LevelCategory = "Mestre", Description = "Iniciando o caminho de mestre" },
-                new Level { LevelAtual = 22, LevelCategory = "Mestre", Description = "Domínio completo de múltiplas modalidades" },
-                new Level { LevelAtual = 23, LevelCategory = "Mestre", Description = "Liderança natural em treinos em grupo" },
-                new Level { LevelAtual = 24, LevelCategory = "Mestre", Description = "Inspiração para outros utilizadores" },
-                new Level { LevelAtual = 25, LevelCategory = "Mestre", Description = "Mestre em saúde e bem-estar" },
-                new Level { LevelAtual = 26, LevelCategory = "Grão-Mestre", Description = "Primeiro nível de grão-mestre" },
-                new Level { LevelAtual = 27, LevelCategory = "Grão-Mestre", Description = "Excelência em todos os aspectos do fitness" },
-                new Level { LevelAtual = 28, LevelCategory = "Grão-Mestre", Description = "Conhecimento profundo de nutrição e exercício" },
-                new Level { LevelAtual = 29, LevelCategory = "Grão-Mestre", Description = "Lenda em formação na aplicação" },
-                new Level { LevelAtual = 30, LevelCategory = "Grão-Mestre", Description = "Grão-mestre consolidado" },
-                new Level { LevelAtual = 31, LevelCategory = "Lendário", Description = "Entrada no hall lendário" },
-                new Level { LevelAtual = 32, LevelCategory = "Lendário", Description = "Consistência lendária nos treinos" },
-                new Level { LevelAtual = 33, LevelCategory = "Lendário", Description = "Performance excecional continuada" },
-                new Level { LevelAtual = 34, LevelCategory = "Lendário", Description = "Ícone da aplicação" },
-                new Level { LevelAtual = 35, LevelCategory = "Lendário", Description = "Lenda viva do fitness" },
-                new Level { LevelAtual = 36, LevelCategory = "Mítico", Description = "Alcançando status mítico" },
-                new Level { LevelAtual = 37, LevelCategory = "Mítico", Description = "Força e determinação sobre-humanas" },
-                new Level { LevelAtual = 38, LevelCategory = "Mítico", Description = "Lenda entre lendas" },
-                new Level { LevelAtual = 39, LevelCategory = "Mítico", Description = "Próximo do nível máximo" },
-                new Level { LevelAtual = 40, LevelCategory = "Mítico", Description = "Nível máximo - Mito vivo da aplicação" }
+                new Level { LevelCurrent = 1, LevelCategory = "Beginner", Description = "First steps in the health journey" },
+                new Level { LevelCurrent = 2, LevelCategory = "Beginner", Description = "Starting to build healthy routines" },
+                new Level { LevelCurrent = 3, LevelCategory = "Beginner", Description = "Gaining consistency in workouts" },
+                new Level { LevelCurrent = 4, LevelCategory = "Beginner", Description = "Steady progress in your well-being" },
+                new Level { LevelCurrent = 5, LevelCategory = "Beginner", Description = "End of beginner phase – solid habits established" },
+
+                new Level { LevelCurrent = 6, LevelCategory = "Intermediate", Description = "Entering the intermediate stage" },
+                new Level { LevelCurrent = 7, LevelCategory = "Intermediate", Description = "Developing physical endurance" },
+                new Level { LevelCurrent = 8, LevelCategory = "Intermediate", Description = "Improving overall performance" },
+                new Level { LevelCurrent = 9, LevelCategory = "Intermediate", Description = "Consolidating advanced techniques" },
+                new Level { LevelCurrent = 10, LevelCategory = "Intermediate", Description = "Ready for tougher challenges" },
+
+                new Level { LevelCurrent = 11, LevelCategory = "Advanced", Description = "Beginning the advanced journey" },
+                new Level { LevelCurrent = 12, LevelCategory = "Advanced", Description = "Mastering complex exercises" },
+                new Level { LevelCurrent = 13, LevelCategory = "Advanced", Description = "Excellence in cardiovascular training" },
+                new Level { LevelCurrent = 14, LevelCategory = "Advanced", Description = "Specializing in strength and endurance" },
+                new Level { LevelCurrent = 15, LevelCategory = "Advanced", Description = "Forming a complete athlete" },
+
+                new Level { LevelCurrent = 16, LevelCategory = "Expert", Description = "First expert-level achievement" },
+                new Level { LevelCurrent = 17, LevelCategory = "Expert", Description = "Advanced conditioning techniques" },
+                new Level { LevelCurrent = 18, LevelCategory = "Expert", Description = "Master of personalized routines" },
+                new Level { LevelCurrent = 19, LevelCategory = "Expert", Description = "A reference within the fitness community" },
+                new Level { LevelCurrent = 20, LevelCategory = "Expert", Description = "Established expert" },
+
+                new Level { LevelCurrent = 21, LevelCategory = "Master", Description = "Beginning the path of a master" },
+                new Level { LevelCurrent = 22, LevelCategory = "Master", Description = "Complete mastery across multiple disciplines" },
+                new Level { LevelCurrent = 23, LevelCategory = "Master", Description = "Natural leader in group workouts" },
+                new Level { LevelCurrent = 24, LevelCategory = "Master", Description = "An inspiration to other users" },
+                new Level { LevelCurrent = 25, LevelCategory = "Master", Description = "Recognized master in health and wellness" },
+
+                new Level { LevelCurrent = 26, LevelCategory = "Grandmaster", Description = "First grandmaster level" },
+                new Level { LevelCurrent = 27, LevelCategory = "Grandmaster", Description = "Excellence in all aspects of fitness" },
+                new Level { LevelCurrent = 28, LevelCategory = "Grandmaster", Description = "Deep knowledge of nutrition and exercise" },
+                new Level { LevelCurrent = 29, LevelCategory = "Grandmaster", Description = "A legend in the making" },
+                new Level { LevelCurrent = 30, LevelCategory = "Grandmaster", Description = "A fully established grandmaster" },
+
+                new Level { LevelCurrent = 31, LevelCategory = "Legendary", Description = "Entering the legendary hall" },
+                new Level { LevelCurrent = 32, LevelCategory = "Legendary", Description = "Legendary consistency in training" },
+                new Level { LevelCurrent = 33, LevelCategory = "Legendary", Description = "Outstanding long-term performance" },
+                new Level { LevelCurrent = 34, LevelCategory = "Legendary", Description = "A true icon of the app" },
+                new Level { LevelCurrent = 35, LevelCategory = "Legendary", Description = "A living fitness legend" },
+
+                new Level { LevelCurrent = 36, LevelCategory = "Mythic", Description = "Achieving mythic status" },
+                new Level { LevelCurrent = 37, LevelCategory = "Mythic", Description = "Superhuman strength and determination" },
+                new Level { LevelCurrent = 38, LevelCategory = "Mythic", Description = "A legend among legends" },
+                new Level { LevelCurrent = 39, LevelCategory = "Mythic", Description = "Close to the maximum level" },
+                new Level { LevelCurrent = 40, LevelCategory = "Mythic", Description = "Maximum level – A living myth of the app" }
+
             });
             dbContext.SaveChanges();
+        }
+
+        private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
+        {
+            // Verifica se já existem clientes para não duplicar
+            if (dbContext.Client.Any())
+            {
+                return dbContext.Client.ToList();
+            }
+
+            // Lista com 25 clientes
+            var clients = new List<Client>()
+            {
+                // Os seus 5 clientes originais
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Alice Wonderland",
+                    Email = "alice.w@example.com",
+                    Phone = "555-1234567",
+                    Address = "10 Downing St, London",
+                    BirthDate = new DateTime(1990, 5, 15),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-30)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Bob The Builder",
+                    Email = "bob.builder@work.net",
+                    Phone = "555-9876543",
+                    Address = "Construction Site 5A",
+                    BirthDate = new DateTime(1985, 10, 20),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-15),
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Charlie Brown",
+                    Email = "charlie.b@peanuts.com",
+                    Phone = "555-4567890",
+                    Address = "123 Comic Strip Ave",
+                    BirthDate = new DateTime(2000, 1, 1),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-5)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "David Copperfield",
+                    Email = "david.c@magic.com",
+                    Phone = "555-9001002",
+                    Address = "Las Vegas Strip",
+                    BirthDate = new DateTime(1960, 9, 16),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-25)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Eve Harrington",
+                    Email = "eve.h@stage.net",
+                    Phone = "555-3330009",
+                    Address = "Broadway St",
+                    BirthDate = new DateTime(1995, 2, 28),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-10)
+                },
+        
+                // Mais 20 clientes para teste
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Frank Castle",
+                    Email = "frank.c@punisher.com",
+                    Phone = "555-1110001",
+                    Address = "Hells Kitchen, NY",
+                    BirthDate = new DateTime(1978, 3, 16),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-40)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Grace Hopper",
+                    Email = "grace.h@navy.mil",
+                    Phone = "555-2220002",
+                    Address = "Arlington, VA",
+                    BirthDate = new DateTime(1906, 12, 9),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-100)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Harry Potter",
+                    Email = "harry.p@hogwarts.wiz",
+                    Phone = "555-3330003",
+                    Address = "4 Privet Drive, Surrey",
+                    BirthDate = new DateTime(1980, 7, 31),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-12)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Ivy Poison",
+                    Email = "ivy.p@gotham.bio",
+                    Phone = "555-4440004",
+                    Address = "Gotham Gardens",
+                    BirthDate = new DateTime(1988, 11, 2),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-3)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Jack Sparrow",
+                    Email = "jack.s@pirate.sea",
+                    Phone = "555-5550005",
+                    Address = "Tortuga",
+                    BirthDate = new DateTime(1700, 4, 1),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-8)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Kara Danvers",
+                    Email = "kara.d@catco.com",
+                    Phone = "555-6660006",
+                    Address = "National City",
+                    BirthDate = new DateTime(1993, 9, 22),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-22)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Luke Skywalker",
+                    Email = "luke.s@jedi.org",
+                    Phone = "555-7770007",
+                    Address = "Tatooine",
+                    BirthDate = new DateTime(1977, 5, 25),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-18)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Mona Lisa",
+                    Email = "mona.l@art.com",
+                    Phone = "555-8880008",
+                    Address = "The Louvre, Paris",
+                    BirthDate = new DateTime(1503, 6, 15),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-50)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Neo Anderson",
+                    Email = "neo.a@matrix.com",
+                    Phone = "555-9990009",
+                    Address = "Zion",
+                    BirthDate = new DateTime(1971, 9, 13),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-2)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Olivia Pope",
+                    Email = "olivia.p@gladiator.com",
+                    Phone = "555-1010010",
+                    Address = "Washington D.C.",
+                    BirthDate = new DateTime(1977, 4, 2),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-60)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Peter Parker",
+                    Email = "peter.p@bugle.com",
+                    Phone = "555-2020011",
+                    Address = "Queens, NY",
+                    BirthDate = new DateTime(2001, 8, 10),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-7)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Quinn Fabray",
+                    Email = "quinn.f@glee.com",
+                    Phone = "555-3030012",
+                    Address = "Lima, Ohio",
+                    BirthDate = new DateTime(1994, 7, 19),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-33)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Rachel Green",
+                    Email = "rachel.g@friends.com",
+                    Phone = "555-4040013",
+                    Address = "Central Perk, NY",
+                    BirthDate = new DateTime(1970, 5, 5),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-45)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Steve Rogers",
+                    Email = "steve.r@avengers.com",
+                    Phone = "555-5050014",
+                    Address = "Brooklyn, NY",
+                    BirthDate = new DateTime(1918, 7, 4),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-11)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Tony Stark",
+                    Email = "tony.s@stark.com",
+                    Phone = "555-6060015",
+                    Address = "Malibu Point, CA",
+                    BirthDate = new DateTime(1970, 5, 29),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-90)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Ursula Buffay",
+                    Email = "ursula.b@friends.tv",
+                    Phone = "555-7070016",
+                    Address = "Riff's Bar, NY",
+                    BirthDate = new DateTime(1968, 2, 22),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-14)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Victor Frankenstein",
+                    Email = "victor.f@science.ch",
+                    Phone = "555-8080017",
+                    Address = "Geneva, Switzerland",
+                    BirthDate = new DateTime(1790, 10, 10),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-200)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Walter White",
+                    Email = "walter.w@heisenberg.com",
+                    Phone = "555-9090018",
+                    Address = "Albuquerque, NM",
+                    BirthDate = new DateTime(1958, 9, 7),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-28)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Xena Warrior",
+                    Email = "xena.w@myth.gr",
+                    Phone = "555-0100019",
+                    Address = "Amphipolis, Greece",
+                    BirthDate = new DateTime(1968, 3, 29),
+                    Gender = "Female",
+                    RegistrationDate = DateTime.Now.AddDays(-1)
+                },
+                new Client
+                {
+                    ClientId = Guid.NewGuid().ToString("N"),
+                    Name = "Yoda Master",
+                    Email = "yoda.m@jedi.org",
+                    Phone = "555-1210020",
+                    Address = "Dagobah System",
+                    BirthDate = new DateTime(1000, 1, 1),
+                    Gender = "Male",
+                    RegistrationDate = DateTime.Now.AddDays(-500)
+                }
+            };
+
+            // Adiciona todos os clientes à base de dados
+            dbContext.Client.AddRange(clients);
+            dbContext.SaveChanges();
+
+            return clients;
+        }
+
+        private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
+        {
+            if (dbContext.Member.Any()) return;
+
+            var clientNamesToMakeMembers = new List<string> { "Alice Wonderland", "Charlie Brown", "David Copperfield" };
+
+            var members = clients
+                .Where(c => clientNamesToMakeMembers.Contains(c.Name))
+                .Select(c => new Member
+                {
+                    ClientId = c.ClientId,
+                })
+                .ToList();
+
+            if (members.Any())
+            {
+                dbContext.Member.AddRange(members);
+                dbContext.SaveChanges();
+            }
+        }
+
+        private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)
+        {
+            // Check if the TrainingType table already contains data
+            if (dbContext.TrainingType.Any()) return;
+
+            dbContext.TrainingType.AddRange(new List<TrainingType>()
+            {
+                new TrainingType
+                {
+                    Name = "Yoga Basics",
+                    Description = "A gentle introduction to yoga, focusing on flexibility, balance, and relaxation.",
+                    DurationMinutes = 60,
+                    IsActive = true
+                },
+                new TrainingType
+                {
+                    Name = "HIIT (High Intensity Interval Training)",
+                    Description = "A fast-paced training session combining cardio and strength exercises for maximum calorie burn.",
+                    DurationMinutes = 45,
+                    IsActive = true
+                },
+                new TrainingType
+                {
+                    Name = "Pilates Core Strength",
+                    Description = "Focus on core muscle strength, flexibility, and posture improvement.",
+                    DurationMinutes = 50,
+                    IsActive = true
+                },
+                new TrainingType
+                {
+                    Name = "Zumba Dance",
+                    Description = "Fun and energetic dance workout set to upbeat Latin music.",
+                    DurationMinutes = 55,
+                    IsActive = true
+                },
+                new TrainingType
+                {
+                    Name = "Strength Training",
+                    Description = "Weight-based training for building muscle mass and endurance.",
+                    DurationMinutes = 120,
+                    IsActive = true
+                }
+            });
+
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulatePlan(HealthWellbeingDbContext dbContext)
+        {
+            // Check if the Plan table already contains data
+            if (dbContext.Plan.Any()) return;
+
+            dbContext.Plan.AddRange(new List<Plan>()
+            {
+                new Plan
+                {
+                    Name = "Basic Wellness Plan",
+                    Description = "A beginner-friendly plan including 3 workouts per week focused on flexibility and general health.",
+                    Price = 29.99m,
+                    DurationDays = 30
+                },
+                new Plan
+                {
+                    Name = "Advanced Fitness Plan",
+                    Description = "An intensive 6-week plan designed for strength, endurance, and fat loss.",
+                    Price = 59.99m,
+                    DurationDays = 45
+                },
+                new Plan
+                {
+                    Name = "Mind & Body Balance",
+                    Description = "A 2-month program combining yoga, meditation, and Pilates for mental and physical harmony.",
+                    Price = 79.99m,
+                    DurationDays = 60
+                },
+                new Plan
+                {
+                    Name = "Ultimate Transformation Plan",
+                    Description = "A 3-month premium plan featuring personal coaching, nutrition guidance, and high-intensity training.",
+                    Price = 99.99m,
+                    DurationDays = 90
+                },
+                new Plan
+                {
+                    Name = "Corporate Health Boost",
+                    Description = "A 1-month team-focused plan to improve workplace wellness, stress management, and physical activity.",
+                    Price = 49.99m,
+                    DurationDays = 30
+                }
+            });
+
+            dbContext.SaveChanges();
+        }
+
+        // --- ALTERAÇÃO AQUI: O método agora retorna List<Trainer> ---
+        private static List<Trainer> PopulateTrainer(HealthWellbeingDbContext dbContext)
+        {
+            // Check if Trainers already exist
+            if (dbContext.Trainer.Any()) return dbContext.Trainer.ToList(); // Retorna se existirem
+
+            dbContext.Trainer.AddRange(new List<Trainer>()
+            {
+                new Trainer
+                {
+                    Name = "John Smith",
+                    Speciality = "HIIT (High Intensity Interval Training)",
+                    Email = "john.smith@fitnesspro.com",
+                    Phone = "555-1112233",
+                    BirthDate = new DateTime(1988, 7, 10),
+                    Gender = "Male"
+                },
+                new Trainer
+                {
+                    Name = "Emma Johnson",
+                    Speciality = "Strength Training",
+                    Email = "emma.johnson@strongfit.net",
+                    Phone = "555-2223344",
+                    BirthDate = new DateTime(1992, 11, 25),
+                    Gender = "Female"
+                },
+                new Trainer
+                {
+                    Name = "Carlos Mendes",
+                    Speciality = "Yoga Basics",
+                    Email = "carlos.mendes@yogabalance.org",
+                    Phone = "555-3334455",
+                    BirthDate = new DateTime(1975, 4, 1),
+                    Gender = "Male"
+                },
+                new Trainer
+                {
+                    Name = "Sophie Lee",
+                    Speciality = "Pilates Core Strength",
+                    Email = "sophie.lee@corewellness.com",
+                    Phone = "555-4445566",
+                    BirthDate = new DateTime(1996, 2, 14),
+                    Gender = "Female"
+                },
+                new Trainer
+                {
+                    Name = "Maria Rodriguez",
+                    Speciality = "Zumba Dance",
+                    Email = "maria.rodriguez@zumbafit.com",
+                    Phone = "555-5557788",
+                    BirthDate = new DateTime(1985, 9, 30),
+                    Gender = "Female"
+                }
+            });
+
+            dbContext.SaveChanges();
+            return dbContext.Trainer.ToList();
+        }
+
+        private static void PopulateTraining(HealthWellbeingDbContext dbContext, List<Trainer> trainers)
+        {
+            if (dbContext.Training.Any()) return;
+
+            var yogaTypeId = dbContext.TrainingType.FirstOrDefault(t => t.Name == "Yoga Basics")?.TrainingTypeId;
+            var hiitTypeId = dbContext.TrainingType.FirstOrDefault(t => t.Name == "HIIT (High Intensity Interval Training)")?.TrainingTypeId;
+
+            var carlosId = trainers.FirstOrDefault(t => t.Name == "Carlos Mendes")?.TrainerId;
+            var johnId = trainers.FirstOrDefault(t => t.Name == "John Smith")?.TrainerId;
+
+
+            if (yogaTypeId.HasValue && hiitTypeId.HasValue && carlosId.HasValue && johnId.HasValue)
+            {
+                dbContext.Training.AddRange(new List<Training>()
+                {
+                    new Training
+                    {
+                        TrainingTypeId = yogaTypeId.Value,
+                        TrainerId = carlosId.Value,
+                        Name = "Morning Yoga",
+                        Duration = 60,
+                        DayOfWeek = "Monday",
+                        StartTime = new TimeSpan(10, 0, 0),
+                        MaxParticipants = 15
+                    },
+                    new Training
+                    {
+                        TrainingTypeId = hiitTypeId.Value,
+                        TrainerId = johnId.Value,
+                        Name = "Intense Cardio HIT",
+                        Duration = 45,
+                        DayOfWeek = "Wednesday",
+                        StartTime = new TimeSpan(18, 30, 0),
+                        MaxParticipants = 20
+                    },
+                     new Training
+                    {
+                        TrainingTypeId = hiitTypeId.Value,
+                        TrainerId = johnId.Value,
+                        Name = "Strength Training",
+                        Duration = 120,
+                        DayOfWeek = "Friday",
+                        StartTime = new TimeSpan(16, 0, 0),
+                        MaxParticipants = 8
+                    }
+                });
+
+                dbContext.SaveChanges();
+            }
         }
     }
 }
