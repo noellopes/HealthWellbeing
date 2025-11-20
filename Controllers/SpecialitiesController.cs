@@ -21,7 +21,7 @@ namespace HealthWellbeing.Controllers
         // GET: Specialities
         public async Task<IActionResult> Index(string? q, int page = 1)
         {
-            // Base da query
+            
             var query = _context.Specialities.AsQueryable();
 
             // Filtro de pesquisa
@@ -32,7 +32,7 @@ namespace HealthWellbeing.Controllers
                     s.Descricao.Contains(q));
             }
 
-            // Total de registos após o filtro
+            
             var totalItems = await query.CountAsync();
 
             // Objeto de paginação (5 itens por página)
@@ -42,7 +42,7 @@ namespace HealthWellbeing.Controllers
                 itemsPerPage: 5
             );
 
-            // Itens da página atual
+            
             var items = await query
                 .OrderBy(s => s.Nome)
                 .Skip(pagination.ItemsToSkip)
@@ -51,7 +51,7 @@ namespace HealthWellbeing.Controllers
 
             pagination.Items = items;
 
-            // Para a View voltar a preencher a caixa de pesquisa
+            
             ViewBag.SearchQuery = q;
 
             return View(pagination);

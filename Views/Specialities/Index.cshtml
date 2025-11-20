@@ -48,7 +48,7 @@
                             <th>
                                 @Html.DisplayNameFor(m => m.Items.First().Descricao)
                             </th>
-                            <th class="text-end" style="width: 220px;">Ações</th>
+                            <th class="text-end" style="width: 260px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,19 +62,23 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    
-                                        
-
-                                        <a asp-action="Details" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-primary">
+                                    <div class="btn-group btn-group-sm" role="group" style="white-space: nowrap;">
+                                        <a asp-action="Details"
+                                           asp-route-id="@item.IdEspecialidade"
+                                           class="btn btn-primary">
                                             <i class="bi bi-info-circle"></i> Detalhes
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-warning text-white">
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.IdEspecialidade"
+                                           class="btn btn-warning text-white">
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </a>
-                                        <a asp-action="Delete" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-danger">
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.IdEspecialidade"
+                                           class="btn btn-danger">
                                             <i class="bi bi-trash"></i> Eliminar
                                         </a>
-                                    
+                                    </div>
                                 </td>
                             </tr>
                         }
