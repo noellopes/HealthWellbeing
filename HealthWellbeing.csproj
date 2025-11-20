@@ -12,6 +12,10 @@
     <Content Remove="Views\UtenteSaude\Images\**" />
     <EmbeddedResource Remove="Views\UtenteSaude\Images\**" />
     <None Remove="Views\UtenteSaude\Images\**" />
+    <Compile Remove="Data\Migrations\**" />
+    <Content Remove="Data\Migrations\**" />
+    <EmbeddedResource Remove="Data\Migrations\**" />
+    <None Remove="Data\Migrations\**" />
   </ItemGroup>
 
   <ItemGroup>

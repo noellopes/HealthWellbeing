@@ -1,0 +1,58 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Training>
+
+@{
+    ViewData["Title"] = "Training Session Management";
+}
+
+<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-circle"></i> Create New Training Session
+    </a>
+</p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Trainer)</th>
+                <th>@Html.DisplayNameFor(model => model.TrainingType)</th>
+
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+                <th class="d-none d-md-table-cell">@Html.DisplayNameFor(model => model.Duration)</th>
+                <th>@Html.DisplayNameFor(model => model.DayOfWeek)</th>
+                <th>@Html.DisplayNameFor(model => model.StartTime)</th>
+                <th>@Html.DisplayNameFor(model => model.MaxParticipants)</th>
+
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@Html.DisplayFor(modelItem => item.Trainer.Name)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.TrainingType.Name)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+
+                    <td class="d-none d-md-table-cell">@Html.DisplayFor(modelItem => item.Duration) min</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.DayOfWeek)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.StartTime)</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.MaxParticipants)</td>
+
+                    <td class="text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-info me-1">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
