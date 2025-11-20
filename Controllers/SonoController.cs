@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels; // Necessário para PaginationInfo
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -59,13 +59,23 @@ namespace HealthWellbeing.Controllers
 
             if (sono == null) return NotFound();
 
+            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
+
             return View(sono);
         }
 
         // GET: Sono/Create
         public IActionResult Create()
         {
-            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id");
+            // ALTERAÇÃO AQUI:
+            // Mudei o terceiro parâmetro de "UtenteGrupo7Id" para "Nome".
+            // Adicionei .OrderBy(u => u.Nome) para a lista ficar ordenada alfabeticamente.
+            ViewData["UtenteGrupo7Id"] = new SelectList(
+                _context.UtenteGrupo7.OrderBy(u => u.Nome),
+                "UtenteGrupo7Id",
+                "Nome"
+            );
+
             return View();
         }
 
@@ -78,7 +88,6 @@ namespace HealthWellbeing.Controllers
             ModelState.Remove("UtenteGrupo7");
 
             // VALIDAÇÃO DE DUPLICADOS:
-            // Impede criar dois registos para o mesmo Utente na mesma Data
             bool existeRegisto = await _context.Sono
                 .AnyAsync(s => s.UtenteGrupo7Id == sono.UtenteGrupo7Id && s.Data == sono.Data);
 
@@ -98,7 +107,6 @@ namespace HealthWellbeing.Controllers
                 }
                 sono.HorasSono = diferenca;
 
-
                 _context.Add(sono);
                 await _context.SaveChangesAsync();
 
@@ -106,11 +114,19 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Details), new { id = sono.SonoId, SuccessMessage = "Registo de sono criado com sucesso" });
             }
 
-            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", sono.UtenteGrupo7Id);
+            // ALTERAÇÃO AQUI TAMBÉM (Caso haja erro e a página recarregue):
+            // É necessário recriar a lista com "Nome" para o dropdown não "partir" ou voltar a mostrar IDs
+            ViewData["UtenteGrupo7Id"] = new SelectList(
+                _context.UtenteGrupo7.OrderBy(u => u.Nome),
+                "UtenteGrupo7Id",
+                "Nome",
+                sono.UtenteGrupo7Id
+            );
+
             return View(sono);
         }
 
-        // GET: Sono/Edit/5
+        // GET: Sono/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -118,11 +134,16 @@ namespace HealthWellbeing.Controllers
             var sono = await _context.Sono.FindAsync(id);
             if (sono == null) return NotFound();
 
-            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", sono.UtenteGrupo7Id);
+            ViewData["UtenteGrupo7Id"] = new SelectList(
+                _context.UtenteGrupo7.OrderBy(u => u.Nome),
+                "UtenteGrupo7Id",
+                "Nome",
+                sono.UtenteGrupo7Id
+            );
             return View(sono);
         }
 
-        // POST: Sono/Edit/5
+        // POST: Sono/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SonoId,Data,HoraDeitar,HoraLevantar,HorasSono,UtenteGrupo7Id")] Sono sono)
@@ -167,7 +188,6 @@ namespace HealthWellbeing.Controllers
                         diferenca = diferenca.Add(new TimeSpan(24, 0, 0));
                     }
                     sono.HorasSono = diferenca;
-                    // -------------------------------------
 
                     // Atualizar valores
                     _context.Entry(sonoExistente).CurrentValues.SetValues(sono);
@@ -187,11 +207,16 @@ namespace HealthWellbeing.Controllers
                     }
                 }
             }
-            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", sono.UtenteGrupo7Id);
+            ViewData["UtenteGrupo7Id"] = new SelectList(
+                _context.UtenteGrupo7.OrderBy(u => u.Nome),
+                "UtenteGrupo7Id",
+                "Nome",
+                sono.UtenteGrupo7Id
+            );
             return View(sono);
         }
 
-        // GET: Sono/Delete/5
+        // GET: Sono/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -206,10 +231,12 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
+
             return View(sono);
         }
 
-        // POST: Sono/Delete/5
+        // POST: Sono/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

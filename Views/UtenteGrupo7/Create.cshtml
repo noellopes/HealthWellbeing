@@ -1,33 +1,46 @@
 ﻿@model HealthWellbeing.Models.UtenteGrupo7
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Utente";
 }
 
-<h1>Create</h1>
+<div class="container mt-4">
+    <h2 class="mb-4 text-success"><i class="fas fa-plus-circle"></i> @ViewData["Title"]</h2>
 
-<h4>UtenteGrupo7</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="All" class="text-danger small"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nome" class="form-label fw-bold">Nome do Utente *</label>
+            <input asp-for="Nome" class="form-control" placeholder="Ex: João Silva, Maria Santos, Ana Pereira" />
+            <span asp-validation-for="Nome" class="text-danger small"></span>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success me-2">
+                <i class="fas fa-save"></i> Criar Utente
+            </button>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

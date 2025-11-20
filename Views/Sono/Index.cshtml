@@ -95,17 +95,17 @@
                             </td>
                             <td>
                                 @* Se tiveres acesso ao nome do utente via navegação, usa item.UtenteGrupo7.Nome *@
-                                <span class="text-muted">#@item.UtenteGrupo7Id</span>
+                                <span class="">@item.UtenteGrupo7.Nome</span>
                             </td>
                             <td class="text-center">
                                 <a asp-action="Details" asp-route-id="@item.SonoId" class="btn btn-primary btn-sm me-1" title="Ver Detalhes">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye"></i> Ver
                                 </a>
                                 <a asp-action="Edit" asp-route-id="@item.SonoId" class="btn btn-warning btn-sm me-1" title="Editar">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-edit"></i> Editar
                                 </a>
                                 <a asp-action="Delete" asp-route-id="@item.SonoId" class="btn btn-danger btn-sm" title="Apagar">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="fas fa-trash-alt"></i> Apagar
                                 </a>
                             </td>
                         </tr>

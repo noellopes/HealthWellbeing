@@ -109,7 +109,7 @@ namespace HealthWellbeing.Controllers
             return View(genero);
         }
 
-        // GET: Genero/Edit/5
+        // GET: Genero/Edit/
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
