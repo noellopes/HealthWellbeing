@@ -2,7 +2,7 @@
 @model TypeMaterial
 
 @{
-    ViewData["Title"] = "Detalhes do Tipo de Material";
+    ViewData["Title"] = "Detalhes do Tipo de Dispósitivo Médico";
     string? successMessage = Context.Request.Query["SuccessMessage"];
 }
 @if (TempData["SuccessMessage"] != null)
@@ -30,15 +30,12 @@
 <div class="card shadow-sm">
     <div class="card-header bg-info text-black">
         <h4 class="mb-0">
-            <i class="bi bi-box-seam me-2"></i> Informações do Tipo de Material
+            <i class="bi bi-box-seam me-2"></i> Informações
         </h4>
     </div>
 
     <div class="card-body">
         <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.TypeMaterialID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.TypeMaterialID)</dd>
-
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
             <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 

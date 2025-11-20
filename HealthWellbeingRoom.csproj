@@ -8,9 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\**" />
     <Compile Remove="Views\TipoMaterial - Cópia\**" />
+    <Content Remove="Migrations\**" />
     <Content Remove="Views\TipoMaterial - Cópia\**" />
+    <EmbeddedResource Remove="Migrations\**" />
     <EmbeddedResource Remove="Views\TipoMaterial - Cópia\**" />
+    <None Remove="Migrations\**" />
     <None Remove="Views\TipoMaterial - Cópia\**" />
   </ItemGroup>
 
