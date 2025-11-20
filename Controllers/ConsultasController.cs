@@ -25,9 +25,15 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(int page = 1, string searchTerm = "")
         {
 
+            var hoje = DateTime.Today;
+
             var consultasQuery = _context.Consulta
                 .Include(c => c.Doctor)
                 .Include(c => c.Speciality)
+                .Where(c =>
+                    !c.DataCancelamento.HasValue &&        
+                    c.DataConsulta.Date >= hoje           
+                )
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -111,13 +117,27 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdConsulta,DataMarcacao,DataConsulta,DataCancelamento,HoraInicio,HoraFim,IdMedico,IdEspecialidade")] Consulta consulta)
         {
+            var dataHoraConsulta = consulta.DataConsulta.Date + consulta.HoraInicio.ToTimeSpan();
 
-            Console.WriteLine("IdMedico enviado: " + consulta.IdMedico);
-            Console.WriteLine("IdEspecialidade enviada: " + consulta.IdEspecialidade);
             
+            if (dataHoraConsulta < DateTime.Now)
+            {
+                ModelState.AddModelError("DataConsulta",
+                    "A data e hora da consulta não podem ser anteriores à data e hora atual.");
+            }
+
+            
+            var dataHoraFim = consulta.DataConsulta.Date + consulta.HoraFim.ToTimeSpan();
+            if (dataHoraFim <= dataHoraConsulta)
+            {
+                ModelState.AddModelError("HoraFim",
+                    "A hora de fim tem de ser posterior à hora de início.");
+            }
 
             if (ModelState.IsValid)
             {
+                consulta.DataMarcacao = DateTime.Now;
+
                 _context.Add(consulta);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index),

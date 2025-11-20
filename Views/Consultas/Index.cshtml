@@ -110,8 +110,8 @@ else
                 @foreach (var consulta in Model.Items)
                 {
                     <tr class="text-center">
-                        <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@consulta.DataConsulta.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy")</td>
+                        <td>@consulta.DataConsulta.ToString("dd/MM/yyyy")</td>
                         <td>@consulta.Doctor?.Nome</td>
                         <td>@consulta.Speciality?.Nome</td>
                         

@@ -3,44 +3,59 @@
 @{
     ViewData["Title"] = "Detalhes da Consulta";
 
-    // Estado calculado (usa isto mesmo que não tenhas a prop Estado no modelo)
-    var hoje = DateTime.Today;
-    var data = Model.DataConsulta.Date;
-    var estado = Model.DataCancelamento.HasValue
-        ? "Cancelada"
-        : (data < hoje) ? "Expirada"
-        : (data == hoje) ? "Hoje"
-        : "Agendada";
+    // Usa o Estado já calculado na própria classe Consulta
+    var estado = Model.Estado;
 
-    string Badge(string e) => e switch
+    // Escolhe a classe CSS para o badge com if/else clássico (compatível com C# antigos)
+    string badgeClass;
+    if (estado == "Cancelada")
     {
-        "Cancelada" => "badge bg-danger",
-        "Expirada" => "badge bg-secondary",
-        "Hoje" => "badge bg-warning text-dark",
-        _ => "badge bg-success"
-    };
+        badgeClass = "badge bg-danger";
+    }
+    else if (estado == "Expirada")
+    {
+        badgeClass = "badge bg-secondary";
+    }
+    else if (estado == "Hoje")
+    {
+        badgeClass = "badge bg-warning text-dark";
+    }
+    else
+    {
+        badgeClass = "badge bg-success";
+    }
 }
 
 <div class="container py-5">
     <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
         <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-            <h2 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta</h2>
-            <span class="@Badge(estado) fs-6 px-3 py-2">@estado</span>
+            <h2 class="mb-0">
+                <i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta
+            </h2>
+            <span class="@badgeClass fs-6 px-3 py-2">@estado</span>
         </div>
 
         <div class="card-body bg-light px-5 py-4">
             <dl class="row mb-0">
                 <dt class="col-sm-4 fw-semibold text-secondary">Data de Marcação</dt>
-                <dd class="col-sm-8">@Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dd class="col-sm-8">
+                    @Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm")
+                </dd>
 
                 <dt class="col-sm-4 fw-semibold text-secondary">Data da Consulta</dt>
-                <dd class="col-sm-8">@Model.DataConsulta.ToString("dd/MM/yyyy HH:mm")</dd>
+                <dd class="col-sm-8">
+                    @Model.DataConsulta.ToString("dd/MM/yyyy HH:mm")
+                </dd>
 
                 <dt class="col-sm-4 fw-semibold text-secondary">Hora de Início</dt>
-                <dd class="col-sm-8">@Model.HoraInicio.ToString("HH\\:mm")</dd>
+                <dd class="col-sm-8">
+                    @Model.HoraInicio.ToString("HH\\:mm")
+                </dd>
 
                 <dt class="col-sm-4 fw-semibold text-secondary">Hora de Fim</dt>
-                <dd class="col-sm-8">@Model.HoraFim.ToString("HH\\:mm")</dd>
+                <dd class="col-sm-8">
+                    @Model.HoraFim.ToString("HH\\:mm")
+                </dd>
 
                 <dt class="col-sm-4 fw-semibold text-secondary">Data de Cancelamento</dt>
                 <dd class="col-sm-8">
@@ -48,14 +63,16 @@
                                         ? Model.DataCancelamento.Value.ToString("dd/MM/yyyy HH:mm")
                                         : "—")
                 </dd>
-                <div class="mb-3">
-                    <label class="fw-bold">ID da Consulta:</label>
-                    <span>@Model.Estado</span>
-                </div>
-                <div class="mb-3">
-                    <label class="fw-bold">ID da Consulta:</label>
-                    <span>@Model.IdConsulta</span>
-                </div>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">Estado da Consulta</dt>
+                <dd class="col-sm-8">
+                    @Model.Estado
+                </dd>
+
+                <dt class="col-sm-4 fw-semibold text-secondary">ID da Consulta</dt>
+                <dd class="col-sm-8">
+                    @Model.IdConsulta
+                </dd>
             </dl>
 
             <hr class="my-4" />
