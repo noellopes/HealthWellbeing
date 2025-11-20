@@ -1,5 +1,4 @@
 ﻿using HealthWellbeingRoom.Models;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,57 +6,47 @@ namespace HealthWellbeing.Models
 {
     public class Room
     {
-        // Chave primária
         [Key]
         public int RoomId { get; set; }
 
-        // ID formatado com 3 dígitos (ex: 001)
+        [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
+        public int RoomTypeId { get; set; }
+
+        // Propriedade de navegação anulável
+        public RoomType? RoomType { get; set; }
+
         [NotMapped]
         public string FormattedRoomId => RoomId.ToString("D3");
 
-
-        // Especialidade médica
         [Required(ErrorMessage = "A especialidade é obrigatória.")]
-        [StringLength(100, ErrorMessage = "A especialidade não pode exceder 100 caracteres.")]
-        public string Specialty { get; set; }
+        [StringLength(100)]
+        public string Specialty { get; set; } = string.Empty;
 
-        // Nome da sala
         [Required(ErrorMessage = "O nome da sala é obrigatório.")]
-        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
+        [StringLength(100)]
+
         public string Name { get; set; }
 
-        // Localização física
         [Required(ErrorMessage = "A localização é obrigatória.")]
-        public string Location { get; set; }
+        public int RoomLocationId { get; set; }
 
-        // Horário de funcionamento
-        [Required(ErrorMessage = "O horário de funcionamento é obrigatório.")]
-        public string OperatingHours { get; set; }
+        public RoomLocation? RoomLocation { get; set; }
 
-        // Enum para estado da sala
-        public enum RoomStatus
-        {
-            [Display(Name = "Criado")]
-            Criado,
-            [Display(Name = "Disponível")]
-            Disponivel,
-            [Display(Name = "Indisponível")]
-            Indisponivel,
-            [Display(Name = "Em Limpeza")]
-            Limpeza,
-            [Display(Name = "Em Manutenção")]
-            Manutencao,
-            [Display(Name = "Fora de serviço")]
-            ForaDeServico
-        }
+        [Required(ErrorMessage = "A hora de abertura é obrigatória.")]
+        [DataType(DataType.Time)]
+        public TimeSpan OpeningTime { get; set; }
 
-        public RoomStatus Status { get; set; } = RoomStatus.Criado;
+        [Required(ErrorMessage = "A hora de encerramento é obrigatória.")]
+        [DataType(DataType.Time)]
+        public TimeSpan ClosingTime { get; set; }
 
-        // Observações
+        public int RoomStatusId { get; set; }
+
+        public RoomStatus? RoomStatus { get; set; }
+
         public string? Notes { get; set; }
 
-        // Relação com tabela intermediária
-        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
-        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
+        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; }
+        public ICollection<Equipment> Equipments { get; set; }
     }
 }

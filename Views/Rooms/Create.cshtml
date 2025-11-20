@@ -4,18 +4,43 @@
     ViewData["Title"] = "Criar sala";
 }
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-warning">
+        O modelo não é válido. Verifique os campos obrigatórios.
+    </div>
+
+    <ul class="text-danger">
+        @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <li>@modelError.ErrorMessage</li>
+        }
+    </ul>
+}
+
 <h1 class="mb-4 text-primary"><i class="bi bi-door-open-fill"></i> Criar Sala</h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <!-- Linha 1: Especialidade e Nome -->
+            <!-- Tipo de Sala e Especialidade -->
             <div class="row">
                 <div class="col-md-6 mb-3">
+                    <label asp-for="RoomTypeId" class="form-label fw-bold">Tipo de Sala</label>
+                    <select asp-for="RoomTypeId" class="form-select" asp-items="ViewBag.RoomTypes" required>
+                        <option value="">Selecione o tipo...</option>
+                    </select>
+                    <span asp-validation-for="RoomTypeId" class="text-danger small"></span>
+                </div>
+                <!--Serao alterado posteriormente-->
+                <div class="col-md-6 mb-3">
                     <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
-                    <select asp-for="Specialty" class="form-select">
+                    <select asp-for="Specialty" class="form-select" required>
                         <option value="">Selecione a especialidade...</option>
                         <option value="Cardiologia">Cardiologia</option>
                         <option value="Dermatologia">Dermatologia</option>
@@ -33,38 +58,50 @@
                         <option value="Nefrologia">Nefrologia</option>
                         <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
                     </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Name" class="form-label fw-bold">Nome</label>
-                    <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" />
-                    <span asp-validation-for="Name" class="text-danger small"></span>
+                    <span asp-validation-for="Specialty" class="text-danger small"></span>
                 </div>
             </div>
 
-            <!-- Linha 2: Localização e Horário de Funcionamento -->
+            <!-- Nome e Localização -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Location" class="form-label fw-bold">Localização</label>
-                    <input asp-for="Location" class="form-control" placeholder="Ex: Piso 2, Ala B" />
-                    <span asp-validation-for="Location" class="text-danger small"></span>
+                    <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                    <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" required />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
-                    <input asp-for="OperatingHours" class="form-control" placeholder="Ex: 08:00 - 18:00" />
-                    <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                    <label asp-for="RoomLocationId" class="form-label fw-bold">Localização</label>
+                    <select asp-for="RoomLocationId" class="form-select" asp-items="ViewBag.RoomLocations" required>
+                        <option value="">Selecione a localização...</option>
+                    </select>
+                    <span asp-validation-for="RoomLocationId" class="text-danger small"></span>
                 </div>
             </div>
 
-            <!-- Linha 3: Observação -->
-            <div class="mb-3">
+            <!-- Horário de Funcionamento -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OpeningTime" class="form-label fw-bold">Hora de Abertura</label>
+                    <input asp-for="OpeningTime" type="time" class="form-control" required />
+                    <span asp-validation-for="OpeningTime" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ClosingTime" class="form-label fw-bold">Hora de Encerramento</label>
+                    <input asp-for="ClosingTime" type="time" class="form-control" required />
+                    <span asp-validation-for="ClosingTime" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Observação -->
+            <div class="row">
                 <label asp-for="Notes" class="form-label fw-bold">Observação</label>
                 <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
                 <span asp-validation-for="Notes" class="text-danger small"></span>
             </div>
 
-            <!-- Botões lado a lado com mesma largura e botão cinza -->
+            <!-- Botões -->
             <div class="d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-success flex-fill">
                     <i class="bi bi-check-circle-fill"></i> Criar Sala

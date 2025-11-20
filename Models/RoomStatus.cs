@@ -8,10 +8,7 @@ namespace HealthWellbeingRoom.Models
     {
         [Key]
         public int RoomStatusId { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string Name { get; set; }
+        public required string Name { get; set; }//precisa permitir nulos
 
         public string? Description { get; set; }
 
