@@ -1,26 +1,24 @@
-﻿@model HealthWellbeing.Models.Genero
+﻿@model HealthWellbeing.Models.UtenteGrupo7
 
 @{
-    ViewData["Title"] = "Editar Gênero";
+    ViewData["Title"] = "Editar Utente";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4 text-warning"><i class="fas fa-edit"></i> Editar Gênero</h2>
+    <h2 class="mb-4 text-warning"><i class="fas fa-edit"></i> Editar Utente</h2>
 
     <form asp-action="Edit" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="GeneroId" />
+        <input type="hidden" asp-for="UtenteGrupo7Id" />
 
         <div asp-validation-summary="All" class="text-danger small"></div>
 
-        <!-- Nome do Gênero -->
         <div class="mb-3">
-            <label asp-for="NomeGenero" class="form-label">Nome do Gênero *</label>
-            <input asp-for="NomeGenero" class="form-control" placeholder="Ex: Masculino, Feminino, Infantil">
-            <span asp-validation-for="NomeGenero" class="text-danger small"></span>
+            <label asp-for="Nome" class="form-label">Nome do Utente *</label>
+            <input asp-for="Nome" class="form-control" placeholder="Insira o nome do utente">
+            <span asp-validation-for="Nome" class="text-danger small"></span>
         </div>
 
-        <!-- Botões -->
         <div class="mt-4">
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save"></i> Guardar Alterações

@@ -1,0 +1,60 @@
+﻿@model HealthWellbeing.Models.UtenteGrupo7
+
+@{
+    ViewData["Title"] = "Detalhes do Utente";
+    // Captura a mensagem enviada via Query String (padrão usado no controlador)
+    string? successMessage = Context.Request.Query["SuccessMessage"];
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>@ViewData["Title"]</h1>
+        <div>
+            <a asp-action="Index" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.UtenteGrupo7Id" class="btn btn-warning me-2">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.UtenteGrupo7Id" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Apagar
+            </a>
+        </div>
+    </div>
+
+    @if (successMessage != null)
+    {
+        <div class="container py-4">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-person-circle me-2"></i>@Model.Nome</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <h5 class="fw-bold text-primary border-bottom pb-2">Informações Pessoais</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="text-secondary" style="width: 20%;">ID do Utente:</th>
+                            <td>
+                                <span class="badge bg-secondary">#@Model.UtenteGrupo7Id</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Nome Completo:</th>
+                            <td class="fw-bold fs-5">@Model.Nome</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

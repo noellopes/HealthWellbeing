@@ -1,0 +1,67 @@
+﻿@model HealthWellbeing.Models.Sono
+
+@{
+    ViewData["Title"] = "Registar Sono";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger small"></div>
+
+    <div class="mb-3">
+        <label asp-for="UtenteGrupo7Id" class="form-label fw-bold">Utente Associado *</label>
+        <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
+        <span asp-validation-for="UtenteGrupo7Id" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Data" class="form-label fw-bold">Data do Registo *</label>
+        <input asp-for="Data" class="form-control" type="date" />
+        <span asp-validation-for="Data" class="text-danger small"></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="HoraDeitar" class="form-label fw-bold">Hora de Deitar *</label>
+            <input asp-for="HoraDeitar" class="form-control" type="time" />
+            <span asp-validation-for="HoraDeitar" class="text-danger small"></span>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="HoraLevantar" class="form-label fw-bold">Hora de Levantar *</label>
+            <input asp-for="HoraLevantar" class="form-control" type="time" />
+            <span asp-validation-for="HoraLevantar" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="alert alert-info py-2 mb-3">
+        <i class="bi bi-info-circle me-2"></i>
+        <small>O total de horas de sono será calculado automaticamente ao guardar.</small>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success me-2">
+            <i class="fas fa-save"></i> Criar Registo
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

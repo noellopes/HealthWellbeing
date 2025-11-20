@@ -85,6 +85,15 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("GeneroId,NomeGenero")] Genero genero)
         {
+            bool existeExercicio = await _context.Genero
+            .AnyAsync(e => e.NomeGenero.ToLower() == genero.NomeGenero.ToLower());
+
+            if (existeExercicio)
+            {
+                // Adiciona um erro específico ao campo "ExercicioNome"
+                ModelState.AddModelError("NomeGenero", "Já existe um Genero com este nome.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(genero);
@@ -100,7 +109,7 @@ namespace HealthWellbeing.Controllers
             return View(genero);
         }
 
-        // GET: Genero/Edit/5
+        // GET: Genero/Edit/
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -124,6 +133,15 @@ namespace HealthWellbeing.Controllers
             if (id != genero.GeneroId)
             {
                 return NotFound();
+            }
+
+            // Verifica se já existe outro género com o mesmo nome (ignorando maiúsculas/minúsculas)
+            bool existeOutro = await _context.Genero
+            .AnyAsync(e => e.NomeGenero.ToLower() == genero.NomeGenero.ToLower() && e.GeneroId != id);
+
+            if (existeOutro)
+            {
+                ModelState.AddModelError("NomeGenero", "Já existe outro Genero com este nome.");
             }
 
             if (ModelState.IsValid)

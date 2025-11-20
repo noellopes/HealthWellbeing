@@ -110,5 +110,7 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(eg => eg.EquipamentoId);
 
         }
+        public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
     }
 }
