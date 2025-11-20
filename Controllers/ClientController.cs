@@ -61,7 +61,7 @@ namespace HealthWellbeing.Controllers
 
             int numberClients = await clientsQuery.CountAsync();
 
-            var clientsInfo = new PaginationInfo<Client>(page, numberClients, 5);
+            var clientsInfo = new ViewModels.PaginationInfo<Client>(page, numberClients, 5);
 
             clientsInfo.Items = await clientsQuery
                 .OrderBy(c => c.Name)

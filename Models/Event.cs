@@ -1,66 +1,113 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
-    public class Event
+    public class Event : IValidatableObject
     {
         public int EventId { get; set; }
 
-        [Required(ErrorMessage = "O nome do evento é obrigatório.")]
-        [StringLength(100, ErrorMessage = "O nome do evento não pode exceder 100 caracteres.")]
+        [Required(ErrorMessage = "Event Name is required.")]
+        [StringLength(100, ErrorMessage = "Event Name cannot exceed 100 characters.")]
+        [Display(Name = "Event Name")]
+        [RegularExpression(@"^[A-ZÀ-Ÿ][a-zA-Z0-9À-ÿ\s]*$", ErrorMessage = "Name must start with a capital letter and contain only letters and numbers.")]
         public string EventName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A descrição do evento é obrigatória.")]
-        [StringLength(500, ErrorMessage = "A descrição do evento não pode exceder 500 caracteres.")]
+        [Required(ErrorMessage = "Event Description is required.")]
+        [StringLength(500, ErrorMessage = "Event Description cannot exceed 500 characters.")]
+        [Display(Name = "Event Description")]
+        [RegularExpression(@"^[a-zA-Z0-9À-ÿ\s.,!?:;\-']*$", ErrorMessage = "Description contains invalid characters (letters, numbers and basic punctuation allowed).")]
         public string EventDescription { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O tipo de evento é obrigatório.")]
-        [Display(Name = "Tipo de Evento")]
+        [Required(ErrorMessage = "Event Type is required.")]
+        [Display(Name = "Event Type")]
         public int EventTypeId { get; set; }
 
         public virtual EventType? EventType { get; set; }
 
-        [Required(ErrorMessage = "A data de início é obrigatória.")]
-        [Display(Name = "Início do Evento")]
+        [Required(ErrorMessage = "Start Date is required.")]
+        [Display(Name = "Event Start")]
         [DataType(DataType.DateTime)]
         public DateTime EventStart { get; set; }
 
-        [Required(ErrorMessage = "A data de fim é obrigatória.")]
-        [Display(Name = "Fim do Evento")]
+        [Required(ErrorMessage = "End Date is required.")]
+        [Display(Name = "Event End")]
         [DataType(DataType.DateTime)]
         public DateTime EventEnd { get; set; }
 
-        [Required(ErrorMessage = "Os pontos do evento são obrigatórios.")]
-        [Display(Name = "Pontos")]
-        [Range(0, 10000, ErrorMessage = "Os pontos devem estar entre 0 e 10000.")]
+        [Required(ErrorMessage = "Points are required.")]
+        [Display(Name = "Points")]
+        [Range(0, 10000, ErrorMessage = "Points must be between 0 and 10000.")]
         public int EventPoints { get; set; }
 
-        [Required(ErrorMessage = "O nível mínimo é obrigatório.")]
-        [Display(Name = "Nível Mínimo")]
-        [Range(1, 100, ErrorMessage = "O nível deve estar entre 1 e 100.")]
+        [Required(ErrorMessage = "Minimum Level is required.")]
+        [Display(Name = "Minimum Level")]
+        [Range(1, 100, ErrorMessage = "Level must be between 1 and 100.")]
         public int MinLevel { get; set; }
 
         [NotMapped]
-        [Display(Name = "Estado")]
+        [Display(Name = "Status")]
         public EventStatus Status
         {
             get
             {
                 var now = DateTime.Now;
-
-                if (now > EventEnd)
-                {
-                    return EventStatus.Realizado;
-                }
-
-                if (now >= EventStart && now <= EventEnd)
-                {
-                    return EventStatus.Adecorrer;
-                }
-
+                if (now > EventEnd) return EventStatus.Realizado;
+                if (now >= EventStart && now <= EventEnd) return EventStatus.Adecorrer;
                 return EventStatus.Agendado;
+            }
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (EventEnd <= EventStart)
+            {
+                yield return new ValidationResult(
+                    "End date must be later than start date.",
+                    new[] { nameof(EventEnd) }
+                );
+            }
+
+            if (EventId == 0 && EventStart < DateTime.Now)
+            {
+                yield return new ValidationResult(
+                    "For new events, start date cannot be in the past.",
+                    new[] { nameof(EventStart) }
+                );
+            }
+
+            if (EventStart > DateTime.Now.AddYears(2))
+            {
+                yield return new ValidationResult(
+                    "Events cannot be scheduled more than 2 years in advance.",
+                    new[] { nameof(EventStart) }
+                );
+            }
+
+            if ((EventEnd - EventStart).TotalMinutes < 15)
+            {
+                yield return new ValidationResult(
+                    "The event must last at least 15 minutes.",
+                    new[] { nameof(EventEnd) }
+                );
+            }
+
+            if (EventStart.Hour < 6 || EventStart.Hour >= 23)
+            {
+                yield return new ValidationResult(
+                    "The event must occur during operating hours (06:00 - 23:00).",
+                    new[] { nameof(EventStart) }
+                );
+            }
+
+            if (MinLevel <= 5 && EventPoints > 1000)
+            {
+                yield return new ValidationResult(
+                    "Low level events (1-5) cannot exceed 1000 points.",
+                    new[] { nameof(EventPoints) }
+                );
             }
         }
     }
