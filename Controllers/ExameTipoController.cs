@@ -208,7 +208,23 @@ namespace HealthWellbeing.Controllers
             var exameTipo = await _context.ExameTipo.FindAsync(id);
             if (exameTipo != null)
             {
+               
+                // Checar se existem exames (na tabela 'Exames') que referenciam este ExameTipoId
+                int numExamesAssociados = await _context.Exames
+                    .CountAsync(e => e.ExameTipoId == id); // Usa a FK ExameTipoId
+
+                if (numExamesAssociados > 0)
+                {
+                    // mensagem de ERRO
+                    TempData["ErrorMessage"] = $"Não é possível apagar o tipo de exame '{exameTipo.Nome}'. Existem {numExamesAssociados} exames registados que utilizam este tipo.";
+
+                    // Retornamos à View Index sem apagar
+                    return RedirectToAction(nameof(Index));
+                }
+
+                //Se não houver associações, proceder à exclusão
                 _context.ExameTipo.Remove(exameTipo);
+                await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi apagado com sucesso!";
             }
 
