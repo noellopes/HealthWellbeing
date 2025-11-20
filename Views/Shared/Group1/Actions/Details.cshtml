@@ -1,0 +1,48 @@
+﻿@model dynamic
+
+@{
+    /*
+     * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+     * DON'T MODIFY — Instead, copy into your own folder
+     * Pass Model, ViewBag.ModelType, and ViewBag.Properties (list of property names)
+     */
+
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+
+    var configAlertModel = Tuple.Create("danger", "bi bi-exclamation-circle", "Configuration error: Model type or properties list not provided.");
+    var noDataAlertModel = Tuple.Create("warning", "bi bi-exclamation-triangle", "No data found.");
+}
+
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+
+@if (noConfig)
+{
+    <partial name="Group1/Partials/Alert" model="configAlertModel" />
+}
+else
+{
+    <div class="card shadow-sm">
+        @if (Model == null)
+        {
+            <partial name="Group1/Partials/Alert" model="noDataAlertModel" />
+        }
+        else
+        {
+            <div class="card-body">
+                <dl class="row">
+                    @foreach (var prop in properties)
+                    {
+                        <dt>@HealthWellbeing.Utils.Group1.Functions.GetDisplayName(modelType, prop.Split('.')[0])</dt>
+                        <dd>@HealthWellbeing.Utils.Group1.Functions.GetNestedPropertyValue(Model, prop)</dd>
+                    }
+                </dl>
+            </div>
+            <div class="card-footer text-right">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-sm btn-outline-primary mr-2"><i class="bi bi-pencil-square"></i> Editar</a>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista</a>
+            </div>
+        }
+    </div>
+}

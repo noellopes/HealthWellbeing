@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.TreatmentRecord
+
+<h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Schedule">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="TreatmentTypeId" class="control-label"></label>
+                <select asp-for="TreatmentTypeId" class="form-control" asp-items="ViewBag.TreatmentId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="PathologyId" class="control-label"></label>
+                <select asp-for="PathologyId" class="form-control" asp-items="ViewBag.PathologyId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="TreatmentDate" class="control-label"></label>
+                <input asp-for="TreatmentDate" class="form-control" />
+                <span asp-validation-for="TreatmentDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AdditionalNotes" class="control-label"></label>
+                <textarea asp-for="AdditionalNotes" class="form-control"></textarea>
+                <span asp-validation-for="AdditionalNotes" class="text-danger"></span>
+            </div>
+            <div class="border-top mt-4 form-group text-right">
+                <button type="submit" class="btn btn-sm btn-outline-primary mt-4 mr-2">
+                    <i class="bi bi-check-circle me-1"></i> Guardar
+                </button>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-4"><i class="bi bi-arrow-left-circle me-1"></i> Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

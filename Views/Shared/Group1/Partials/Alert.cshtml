@@ -1,0 +1,25 @@
+﻿@model HealthWellbeing.Utils.Group1.Models.AlertItem
+
+@{
+    /*
+    * THIS VIEW WAS CREATED BY GROUP 1 FOR SHARED REUSABILITY
+    * DON'T MODIFY, Instead you can copy into your own folder
+    */
+
+    var dismissible = (Model.Dismissible == true) ? "alert-dismissible" : "";
+}
+
+<div class="alert alert-@Model.AlertType @dismissible d-flex flex-column flex-sm-row align-items-center justify-content-center text-center fs-5 py-3" role="alert" style="min-height: 80px; gap: 0.5rem;">
+    @if (!string.IsNullOrWhiteSpace(Model.IconClass))
+    {
+        <span class="d-inline-block" style="font-size: 1.8rem; line-height: 1;">
+            <i class="@Model.IconClass" aria-hidden="true"></i>
+            <span class="visually-hidden">Icon</span>
+        </span>
+    }
+    <span class="flex-fill">@Model.Message</span>
+    @if (dismissible != "")
+    {
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    }
+</div>
