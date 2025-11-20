@@ -10,7 +10,7 @@ namespace HealthWellbeing.Models
         public int Id { get; set; }
 
         // Relacionado com a tabela Stock
-        [Required]
+        [Required(ErrorMessage = "Selecione um consumível.")]
         public int StockId { get; set; }
 
         [ForeignKey("StockId")]
@@ -21,8 +21,7 @@ namespace HealthWellbeing.Models
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser maior que zero.")]
         public int Quantidade { get; set; }
 
-        // "Entrada" ou "Saida"
-        [Required]
+        // Tipo do movimento - definido no Controller (NÃO pode ser Required)
         [StringLength(20)]
         public string Tipo { get; set; } = "Entrada";
 
@@ -34,4 +33,3 @@ namespace HealthWellbeing.Models
         public string? Descricao { get; set; }
     }
 }
-

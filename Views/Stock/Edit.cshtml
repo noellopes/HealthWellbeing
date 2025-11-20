@@ -12,17 +12,22 @@
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="StockId" />
 
+        <!-- CAMPOS IMPORTANTES QUE ESTAVAM A FALTAR -->
+        <input type="hidden" asp-for="ConsumivelID" />
+        <input type="hidden" asp-for="ZonaID" />
+
         <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <dl class="row mb-0">
+
                     <dt class="col-sm-3">Consumível</dt>
                     <dd class="col-sm-9">
-                        <input asp-for="Consumivel.Nome" class="form-control" disabled />
+                        <input value="@Model.Consumivel?.Nome" class="form-control" disabled />
                     </dd>
 
                     <dt class="col-sm-3">Zona</dt>
                     <dd class="col-sm-9">
-                        <input asp-for="Zona.Nome" class="form-control" disabled />
+                        <input value="@Model.Zona?.Nome" class="form-control" disabled />
                     </dd>
 
                     <dt class="col-sm-3">Quantidade Atual</dt>
@@ -32,17 +37,20 @@
                         {
                             <span class="badge bg-danger ms-2">Baixo</span>
                         }
+                        <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
                     </dd>
 
                     <dt class="col-sm-3">Quantidade Mínima</dt>
                     <dd class="col-sm-9">
                         <input asp-for="QuantidadeMinima" class="form-control" />
+                        <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
                     </dd>
 
                     <dt class="col-sm-3">Última Atualização</dt>
                     <dd class="col-sm-9">
                         <input asp-for="DataUltimaAtualizacao" class="form-control" type="date" />
                     </dd>
+
                 </dl>
             </div>
         </div>
@@ -63,4 +71,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

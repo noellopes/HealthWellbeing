@@ -212,9 +212,40 @@ namespace HealthWellbeing.Controllers
             if (original == null)
                 return NotFound();
 
+            // ==========================
+            //   VALIDACOES IMPORTANTES
+            // ==========================
+
+            if (stock.QuantidadeAtual < 0)
+            {
+                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser negativa.");
+            }
+
+            if (stock.QuantidadeMaxima < stock.QuantidadeMinima)
+            {
+                ModelState.AddModelError("QuantidadeMaxima", "A quantidade máxima não pode ser menor que a mínima.");
+            }
+
+            if (stock.QuantidadeAtual > stock.QuantidadeMaxima)
+            {
+                ModelState.AddModelError("QuantidadeAtual",
+                    "A quantidade atual não pode ser maior que a quantidade máxima.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Consumiveis = _context.Consumivel.ToList();
+                ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
+                return View(stock);
+            }
+
+            // ==========================
+            //   SALVAR ALTERACOES
+            // ==========================
+
             original.QuantidadeAtual = stock.QuantidadeAtual;
             original.QuantidadeMinima = stock.QuantidadeMinima;
-            original.QuantidadeMaxima = stock.QuantidadeMaxima; // <-- AGORA FICA CERTO
+            original.QuantidadeMaxima = stock.QuantidadeMaxima;
             original.DataUltimaAtualizacao = DateTime.Now;
 
             _context.SaveChanges();
@@ -222,6 +253,7 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Stock atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
 
 
         // ===========================
