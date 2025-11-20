@@ -25,7 +25,7 @@ namespace HealthWellbeing.Controllers
             if (!consumiveis.Any() || !zonas.Any())
                 return;
 
-            var zonaDefault = zonas.First();
+            int totalZonas = zonas.Count;
 
             foreach (var c in consumiveis)
             {
@@ -33,16 +33,45 @@ namespace HealthWellbeing.Controllers
 
                 if (!existeStock)
                 {
+                    // Atribui uma zona diferente para cada consumível (em ciclo)
+                    var zonaEscolhida = zonas[(c.ConsumivelId - 1) % totalZonas];
+
                     _context.Stock.Add(new Stock
                     {
                         ConsumivelID = c.ConsumivelId,
-                        ZonaID = zonaDefault.Id,
+                        ZonaID = zonaEscolhida.Id,
                         QuantidadeAtual = 0,
                         QuantidadeMinima = 5,
-                        QuantidadeMaxima = 100,
+                        QuantidadeMaxima = (int)zonaEscolhida.CapacidadeMaxima,
                         DataUltimaAtualizacao = DateTime.Now
                     });
                 }
+            }
+
+            _context.SaveChanges();
+        }
+
+        private void CorrigirZonasExistentes()
+        {
+            var stocks = _context.Stock.ToList();
+            var zonas = _context.ZonaArmazenamento.ToList();
+
+            if (!stocks.Any() || !zonas.Any())
+                return;
+
+            int totalZonas = zonas.Count;
+
+            for (int i = 0; i < stocks.Count; i++)
+            {
+                var stock = stocks[i];
+
+                // Distribuir zonas sequencialmente
+                stock.ZonaID = zonas[i % totalZonas].Id;
+
+                // Opcional: atualizar quantidade máxima com base na nova zona
+                stock.QuantidadeMaxima = (int)zonas[i % totalZonas].CapacidadeMaxima;
+
+                stock.DataUltimaAtualizacao = DateTime.Now;
             }
 
             _context.SaveChanges();
@@ -54,6 +83,8 @@ namespace HealthWellbeing.Controllers
         public IActionResult Index(string searchNome = "", string searchZona = "", bool stockCritico = false)
         {
             GarantirStockBase();
+            
+
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
