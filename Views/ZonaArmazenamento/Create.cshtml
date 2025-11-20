@@ -1,0 +1,89 @@
+﻿@model HealthWellbeing.Models.ZonaArmazenamento
+
+@{
+    ViewData["Title"] = "Criar Nova Zona de Armazenamento";
+}
+
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #198754; /* verde bootstrap */
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="create-container">
+    <div class="card">
+        <div class="card-header">
+            ➕ Criar Nova Zona de Armazenamento
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label"></label>
+                    <input asp-for="Nome" class="form-control" placeholder="Ex: Armazém Central" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Descricao" class="form-label"></label>
+                    <input asp-for="Descricao" class="form-control" placeholder="Descrição breve da zona" />
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Localizacao" class="form-label"></label>
+                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Bloco A - Piso 0" />
+                    <span asp-validation-for="Localizacao" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CapacidadeMaxima" class="form-label"></label>
+                    <input asp-for="CapacidadeMaxima" class="form-control" placeholder="Ex: 5000" />
+                    <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-4">
+                    <input class="form-check-input" asp-for="Ativa" id="ativaCheck" />
+                    <label class="form-check-label" for="ativaCheck">
+                        @Html.DisplayNameFor(model => model.Ativa)
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success btn-spacing">Criar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

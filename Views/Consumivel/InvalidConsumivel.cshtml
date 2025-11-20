@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Consumível Inválido";
+}
+
+<h1 class="mb-4 text-warning">Consumível Inválido</h1>
+
+<div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm">
+    <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+    <div>
+        <h4>O consumível selecionado já não existe.</h4>
+        <p>Pode ter sido removido por outro utilizador.</p>
+    </div>
+</div>
+
+<div class="mt-4 text-end">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista
+    </a>
+</div>

@@ -45,5 +45,11 @@ namespace HealthWellbeing.Data
             var condition = Expression.Equal(prop, Expression.Constant(false));
             return Expression.Lambda(condition, param);
         }
+        public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ConsumivelFornecedor> ConsumivelFornecedor { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Consumivel> Consumivel { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Stock> Stock { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.AuditoriaConsumivel> AuditoriaConsumivel { get; set; } = default!;
     }
 }

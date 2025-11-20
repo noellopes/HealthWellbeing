@@ -1,0 +1,86 @@
+﻿@model HealthWellbeing.Models.ZonaArmazenamento
+
+@{
+    ViewData["Title"] = "Detalhes da Zona de Armazenamento";
+}
+
+<style>
+    .details-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+</style>
+
+<div class="details-container">
+    <div class="card">
+        <div class="card-header">
+            📄 Detalhes da Zona de Armazenamento
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Localizacao)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Localizacao)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.CapacidadeMaxima)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
+                <dd class="col-sm-8 details-value">
+                    @if (Model.Ativa)
+                    {
+                        <span class="badge bg-success">Ativa</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inativa</span>
+                    }
+                </dd>
+            </dl>
+
+            <div class="d-flex justify-content-end">
+                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning text-white me-2">
+                    ✏️ Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    ⬅️ Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
