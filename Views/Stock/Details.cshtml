@@ -12,11 +12,16 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <dl class="row mb-0">
+
                 <dt class="col-sm-3">Consumível</dt>
-                <dd class="col-sm-9">@Model.Consumivel?.Nome ?? "Desconhecido"</dd>
+                <dd class="col-sm-9">
+                    @Model.Consumivel?.Nome
+                </dd>
 
                 <dt class="col-sm-3">Zona</dt>
-                <dd class="col-sm-9">@Model.Zona?.Nome ?? "Desconhecido"</dd>
+                <dd class="col-sm-9">
+                    @Model.Zona?.Nome
+                </dd>
 
                 <dt class="col-sm-3">Quantidade Atual</dt>
                 <dd class="col-sm-9">
@@ -28,10 +33,15 @@
                 </dd>
 
                 <dt class="col-sm-3">Quantidade Mínima</dt>
-                <dd class="col-sm-9">@Model.QuantidadeMinima</dd>
+                <dd class="col-sm-9">
+                    @Model.QuantidadeMinima
+                </dd>
 
                 <dt class="col-sm-3">Última Atualização</dt>
-                <dd class="col-sm-9">@Model.DataUltimaAtualizacao.ToShortDateString()</dd>
+                <dd class="col-sm-9">
+                    @Model.DataUltimaAtualizacao.ToString("dd/MM/yyyy")
+                </dd>
+
             </dl>
         </div>
     </div>
@@ -45,5 +55,6 @@
         </a>
     </div>
 </div>
+
 
 
