@@ -386,109 +386,109 @@ namespace HealthWellBeingRoom.Data
 
 
             var typeMaterials = new[]
-            {
+{
                 new TypeMaterial
                 {
-                    Name = "Monitorização",
-                    Description = "Acompanha sinais vitais e parâmetros fisiológicos."
+                    Name = "Monitor Multiparamétrico Móvel",
+                    Description = "Monitoriza sinais vitais em mobilidade."
                 },
                 new TypeMaterial
                 {
-                    Name = "Infusão",
-                    Description = "Administra líquidos e medicamentos."
+                    Name = "Bomba de Infusão Portátil",
+                    Description = "Administra medicamentos de forma móvel."
                 },
                 new TypeMaterial
                 {
-                    Name = "Ventilação",
-                    Description = "Auxilia a respiração do paciente."
+                    Name = "Ventilador Portátil",
+                    Description = "Auxilia a respiração em transporte."
                 },
                 new TypeMaterial
                 {
-                    Name = "Aspiração",
-                    Description = "Remove secreções e fluidos corporais."
+                    Name = "Aspirador Cirúrgico Portátil",
+                    Description = "Remove secreções e fluidos."
                 },
                 new TypeMaterial
                 {
-                    Name = "Diagnóstico",
-                    Description = "Permite identificar doenças e condições clínicas."
+                    Name = "ECG Portátil",
+                    Description = "Regista atividade elétrica cardíaca."
                 },
                 new TypeMaterial
                 {
-                    Name = "Imagem Médica",
-                    Description = "Captura imagens internas do corpo humano."
+                    Name = "Ecógrafo Portátil",
+                    Description = "Realiza exames de ultrassom móvel."
                 },
                 new TypeMaterial
                 {
-                    Name = "Terapia",
-                    Description = "Utilizado em tratamentos e reabilitação."
+                    Name = "Glicosímetro",
+                    Description = "Mede níveis de glicose."
                 },
                 new TypeMaterial
                 {
-                    Name = "Anestesia",
-                    Description = "Administra e controla agentes anestésicos."
+                    Name = "Oxímetro de Pulso Portátil",
+                    Description = "Mede saturação de oxigénio."
                 },
                 new TypeMaterial
                 {
-                    Name = "Suporte Vital",
-                    Description = "Mantém funções vitais de pacientes críticos."
+                    Name = "Nebulizador Portátil",
+                    Description = "Administra medicação em aerossol."
                 },
                 new TypeMaterial
                 {
-                    Name = "Comunicação Médica",
-                    Description = "Transmite dados clínicos e alertas."
+                    Name = "Desfibrilhador Automático Externo (AED)",
+                    Description = "Reverte paragem cardíaca."
                 },
                 new TypeMaterial
                 {
-                    Name = "Laboratorial",
-                    Description = "Usado em análises e testes clínicos."
+                    Name = "Bomba de Seringa Portátil",
+                    Description = "Faz infusões precisas via seringa."
                 },
                 new TypeMaterial
                 {
-                    Name = "Reabilitação",
-                    Description = "Apoia a recuperação funcional e motora."
+                    Name = "Otoscópio Portátil",
+                    Description = "Examina o ouvido externamente."
                 },
                 new TypeMaterial
                 {
-                    Name = "Esterilização",
-                    Description = "Garante a assepsia de instrumentos e materiais."
+                    Name = "Retinógrafo Portátil",
+                    Description = "Capta imagens da retina."
                 },
                 new TypeMaterial
                 {
-                    Name = "Cirúrgico",
-                    Description = "Empregado em procedimentos invasivos."
+                    Name = "Medidor de Pressão Portátil",
+                    Description = "Mede pressão arterial."
                 },
                 new TypeMaterial
                 {
-                    Name = "Emergência",
-                    Description = "Usado em situações críticas e urgentes."
+                    Name = "Capnógrafo Portátil",
+                    Description = "Mede CO₂ exalado."
                 },
                 new TypeMaterial
                 {
-                    Name = "Óptico",
-                    Description = "Amplia e ilumina áreas de observação médica."
+                    Name = "Monitor Holter",
+                    Description = "Regista ECG contínuo."
                 },
                 new TypeMaterial
                 {
-                    Name = "Audiológico",
-                    Description = "Destinado a exames e terapias auditivas."
+                    Name = "Termómetro Clínico Portátil",
+                    Description = "Mede temperatura corporal."
                 },
                 new TypeMaterial
                 {
-                    Name = "Mobilidade",
-                    Description = "Facilita o transporte e posicionamento de pacientes."
+                    Name = "Ventilação Não Invasiva Portátil",
+                    Description = "Fornece suporte respiratório."
                 },
                 new TypeMaterial
                 {
-                    Name = "Desinfeção",
-                    Description = "Usado na limpeza e descontaminação."
+                    Name = "Telemetria Médica Portátil",
+                    Description = "Transmite sinais vitais."
                 },
                 new TypeMaterial
                 {
-                    Name = "Medição Clínica",
-                    Description = "Realiza medições fisiológicas e biomédicas."
+                    Name = "Dispositivo Portátil de Desinfeção UV",
+                    Description = "Desinfeta superfícies com UV."
                 }
-
             };
+
 
 
             foreach (var tm in typeMaterials)
