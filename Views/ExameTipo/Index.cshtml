@@ -8,11 +8,19 @@
 }
 
 <div class="container mt-4">
-
+    @* Bloco de Exibição de Mensagens de Sucesso *@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Sucesso!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @* Bloco de Exibição de Mensagens de Erro *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Erro de Exclusão!</strong> @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -60,7 +68,7 @@
             <thead class="table-dark">
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Nome)</th>
-                    <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>
+                    <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>   
                     <th>@Html.DisplayNameFor(model => model.Items.First().Especialidade!.Nome)</th>
                     <th class="text-center" style="width: 250px;">Ações</th>
                 </tr>

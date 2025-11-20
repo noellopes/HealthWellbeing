@@ -12,6 +12,7 @@ namespace HealthWellbeing.Models
         public string Nome { get; set; } 
 
         [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
+        [Display(Name = "Descrição")]// Alteração do nome do cabeçalho na View
         public string Descricao { get; set; }
 
 
@@ -19,6 +20,9 @@ namespace HealthWellbeing.Models
         // A validação de tamanho de string é REMOVIDA para o tipo INT.
         public int EspecialidadeId { get; set; } // FK
         public Especialidade? Especialidade { get; set; } // Propriedade de Navegação
+
+        // NOVO: Propriedade de Navegação para M:N
+        public ICollection<ExameTipoRecurso>? ExameTipoRecursos { get; set; }
 
 
 

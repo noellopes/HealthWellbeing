@@ -24,6 +24,7 @@ namespace HealthWellbeing.Data // <<-- Corrigido o namespace se necessário
 
             if (dbContext.MaterialEquipamentoAssociado.Any()) return;
 
+
             var materialEquipamentoAssociado = new[]
             {
                 // 1

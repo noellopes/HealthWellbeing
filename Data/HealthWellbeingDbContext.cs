@@ -24,6 +24,7 @@ namespace HealthWellbeing.Data
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
         public DbSet<MaterialEquipamentoAssociado> MaterialEquipamentoAssociado { get; set; } = default!;
         public DbSet<Especialidade> Especialidades { get; set; } = default!;
+        public DbSet<ExameTipoRecurso> ExameTipoRecursos { get; set; } = default!;
 
         public DbSet<Funcao> Funcoes { get; set; }
 
@@ -31,12 +32,25 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // ========================================================
+            // CONFIGURAÇÃO M:N (ExameTipo <-> Recurso)
+            // ========================================================
 
-            modelBuilder.Entity<ProfissionalExecutante>()
-                .HasOne(p => p.Funcao)
-                .WithMany()
-                .HasForeignKey(p => p.FuncaoId)
-    .           OnDelete(DeleteBehavior.Restrict);
+            // 1. Definir Chave Primária Composta
+            modelBuilder.Entity<ExameTipoRecurso>()
+                .HasKey(etr => new { etr.ExameTipoId, etr.MaterialEquipamentoAssociadoId });
+
+            // 2. Configurar Relação com ExameTipo
+            modelBuilder.Entity<ExameTipoRecurso>()
+                .HasOne(etr => etr.ExameTipo)
+                .WithMany(et => et.ExameTipoRecursos)
+                .HasForeignKey(etr => etr.ExameTipoId);
+
+            // 3. Configurar Relação com MaterialEquipamentoAssociado
+            modelBuilder.Entity<ExameTipoRecurso>()
+                .HasOne(etr => etr.Recurso)
+                .WithMany(m => m.ExameTipoRecursos)
+                .HasForeignKey(etr => etr.MaterialEquipamentoAssociadoId);
 
             modelBuilder.Entity<ExameTipo>()
                 .HasOne(et => et.Especialidade)      // Um TipoExame tem uma Especialidade

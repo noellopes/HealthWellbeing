@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251120155318_MapeamentoRecursosMN")]
+    partial class MapeamentoRecursosMN
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -513,11 +516,10 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int>("FuncaoId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("FuncaoId1")
-                        .HasColumnType("int");
+                    b.Property<string>("Funcao")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -530,10 +532,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(15)");
 
                     b.HasKey("ProfissionalExecutanteId");
-
-                    b.HasIndex("FuncaoId");
-
-                    b.HasIndex("FuncaoId1");
 
                     b.ToTable("ProfissionalExecutante");
                 });
