@@ -51,8 +51,6 @@ else
             <thead class="table-light">
                 <tr>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Gender</th>
                     <th class="text-center" style="width: 180px;">Actions</th>
                 </tr>
             </thead>
@@ -61,8 +59,6 @@ else
                 {
                     <tr>
                         <td>@item.Name</td>
-                        <td>@item.Email</td>
-                        <td>@item.Gender</td>
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@item.NutritionistId"
                                class="btn btn-sm btn-info text-white me-1">

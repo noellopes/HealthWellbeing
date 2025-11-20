@@ -452,7 +452,7 @@ internal static class SeedData
             }
         }
 
-        // Exemplo: distribuir os foods pelos planos
+        // Distribute foods across plans to be able to visualize and use the app
         if (plans.Count >= 1)
             AddFoodsToPlan(plans[0], 0, 4);   // Plan 1 → 4 foods (0..3)
 
@@ -462,7 +462,6 @@ internal static class SeedData
         if (plans.Count >= 3)
             AddFoodsToPlan(plans[2], 9, 3);   // Plan 3 → 3 foods (9..11)
 
-        // Se tiveres mais planos e mais foods, podes continuar o padrão
         // if (plans.Count >= 4) AddFoodsToPlan(plans[3], 12, 4); etc.
 
         db.FoodPlan.AddRange(foodPlans);
