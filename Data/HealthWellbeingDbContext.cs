@@ -109,8 +109,21 @@ namespace HealthWellbeing.Data
                 .WithMany(g => g.ExercicioEquipamentos)
                 .HasForeignKey(eg => eg.EquipamentoId);
 
+            modelBuilder.Entity<ObjetivoTipoExercicio>()
+                .HasKey(ot => new { ot.ObjetivoFisicoId, ot.TipoExercicioId });
+
+            modelBuilder.Entity<ObjetivoTipoExercicio>()
+                .HasOne(ot => ot.ObjetivoFisico)
+                .WithMany(o => o.ObjetivoTipoExercicio)
+                .HasForeignKey(ot => ot.ObjetivoFisicoId);
+
+            modelBuilder.Entity<ObjetivoTipoExercicio>()
+                .HasOne(ot => ot.TipoExercicio)
+                .WithMany(t => t.ObjetivoTipoExercicio)
+                .HasForeignKey(ot => ot.TipoExercicioId);
         }
         public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ObjetivoFisico> ObjetivoFisico { get; set; } = default!;
     }
 }
