@@ -21,8 +21,7 @@ public class ProfissionalExecutantesController : Controller
         IQueryable<ProfissionalExecutante> profissionaisQuery =
             _context.ProfissionalExecutante
             .Include(p => p.Funcao)
-            .OrderBy(p => p.Nome)
-            .AsQueryable();
+            .OrderBy(p => p.Nome);
 
         if (!string.IsNullOrEmpty(searchNome))
             profissionaisQuery = profissionaisQuery.Where(p => p.Nome.Contains(searchNome));
@@ -106,15 +105,31 @@ public class ProfissionalExecutantesController : Controller
         return View(profissionalExecutante);
     }
 
+    // GET opcional apenas para confirmação, pode remover se não precisar
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var profissional = await _context.ProfissionalExecutante
+            .Include(p => p.Funcao)
+            .FirstOrDefaultAsync(p => p.ProfissionalExecutanteId == id);
+
+        if (profissional == null) return NotFound();
+
+        return View(profissional); // se tiver view de confirmação
+    }
+
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var profissional = await _context.ProfissionalExecutante.FindAsync(id);
         if (profissional != null)
+        {
             _context.ProfissionalExecutante.Remove(profissional);
+            await _context.SaveChangesAsync();
+        }
 
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 }
