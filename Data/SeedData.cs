@@ -16,7 +16,8 @@ namespace HealthWellbeing.Data
             dbContext.Database.EnsureCreated();
 
             PopulateSpecialities(dbContext);
-            PopulateConsultas(dbContext);
+            // PopulateConsultas IS NOT WORKING
+            // PopulateConsultas(dbContext);
             PopulateDoctor(dbContext);
             PopulateUtenteSaude(dbContext);
 
