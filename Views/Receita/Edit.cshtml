@@ -128,7 +128,7 @@
                         <div class="form-check-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                             @if (ViewBag.ComponentesReceita != null)
                             {
-                                var selectedComponents = Model.ComponentesReceitaId ?? new List<int>();
+                                var selectedComponents = Model.ReceitaComponentes?.Select(rc => rc.ComponenteReceitaId).ToList() ?? new List<int>();
                                 @foreach (var item in (MultiSelectList)ViewBag.ComponentesReceita)
                                 {
                                     var isChecked = selectedComponents.Contains(int.Parse(item.Value));
@@ -149,7 +149,6 @@
                                 }
                             }
                         </div>
-                        <span asp-validation-for="ComponentesReceitaId" class="text-danger small"></span>
                     </div>
                 </div>
             </div>

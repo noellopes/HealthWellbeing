@@ -42,19 +42,16 @@ namespace HealthWellbeing.Models
 
         [StringLength(300, ErrorMessage = "A descrição deve ter no máximo 300 caracteres.")]
         [Display(Name = "Descrição")]
-        public string? Descricao { get; set; } // Motivo ou regra da restrição
+        public string? Descricao { get; set; }
 
-        // ## == Relação opcional com alimentos específicos
-        [Display(Name = "Alimento Associado")]
-        public int? AlimentoId { get; set; }
-        public Alimento? Alimento { get; set; }
+        // === NOVA RELAÇÃO N:N COM ALIMENTOS ===
+        public ICollection<RestricaoAlimentarAlimento>? AlimentosAssociados { get; set; }
 
-        // ## == Relação opcional com receitas
+        // Relação opcional com receitas (continua igual)
         [Display(Name = "Receitas Afetadas")]
         public ICollection<Receita>? Receitas { get; set; }
 
-        // ## == Possibilidade de armazenar substitutos específicos para essa restrição
+        // Relação opcional com substitutos
         public ICollection<AlimentoSubstituto>? Substitutos { get; set; }
     }
 }
-

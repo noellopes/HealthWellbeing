@@ -38,6 +38,7 @@ namespace HealthWellbeing.Models
 
         [Range(0, 1, ErrorMessage = "O fator de similaridade deve estar entre 0 e 1.")]
         [Display(Name = "Fator de Similaridade")]
+        [DisplayFormat(DataFormatString = "{0:P0}", ApplyFormatInEditMode = false)]
         public double? FatorSimilaridade { get; set; } = 0.5;
     }
 }

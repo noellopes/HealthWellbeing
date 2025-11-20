@@ -13,14 +13,19 @@ namespace HealthWellbeing.Data
         // Tabelas
         public DbSet<Alergia> Alergia { get; set; } = default!;
         public DbSet<Alimento> Alimentos { get; set; } = default!;
+
+        public DbSet<AlergiaAlimento> AlergiaAlimento { get; set; }
         public DbSet<AlimentoSubstituto> AlimentoSubstitutos { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<RestricaoAlimentarAlimento> RestricaoAlimentarAlimento { get; set; }
+
         public DbSet<ComponenteReceita> ComponenteReceita { get; set; } = default!;
 
         public DbSet<CategoriaAlimento> CategoriaAlimento { get; set; } = default!;
 
-
         public DbSet<Receita> Receita { get; set; } = default!;
+
+        public DbSet<ReceitaComponente> ReceitaComponente { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +44,52 @@ namespace HealthWellbeing.Data
                 .WithMany(a => a.SubstituidoPor)
                 .HasForeignKey(a => a.AlimentoSubstitutoRefId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasKey(aa => new { aa.AlergiaId, aa.AlimentoId });
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasOne(aa => aa.Alergia)
+                .WithMany(a => a.AlimentosAssociados)
+                .HasForeignKey(aa => aa.AlergiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AlergiaAlimento>()
+                .HasOne(aa => aa.Alimento)
+                .WithMany(al => al.AlergiaRelacionadas)
+                .HasForeignKey(aa => aa.AlimentoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            // N:N RestricaoAlimentar ↔ Alimento
+            modelBuilder.Entity<RestricaoAlimentarAlimento>()
+                .HasKey(ra => new { ra.RestricaoAlimentarId, ra.AlimentoId });
+
+            modelBuilder.Entity<RestricaoAlimentarAlimento>()
+                .HasOne(ra => ra.RestricaoAlimentar)
+                .WithMany(r => r.AlimentosAssociados)
+                .HasForeignKey(ra => ra.RestricaoAlimentarId);
+
+            modelBuilder.Entity<RestricaoAlimentarAlimento>()
+                .HasOne(ra => ra.Alimento)
+                .WithMany(a => a.RestricoesAssociadas)
+                .HasForeignKey(ra => ra.AlimentoId);
+
+            // N:N Receita ↔ ComponenteReceita
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasKey(rc => new { rc.ReceitaId, rc.ComponenteReceitaId });
+
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasOne(rc => rc.Receita)
+                .WithMany(r => r.ReceitaComponentes)
+                .HasForeignKey(rc => rc.ReceitaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReceitaComponente>()
+                .HasOne(rc => rc.ComponenteReceita)
+                .WithMany(c => c.ReceitaComponentes)
+                .HasForeignKey(rc => rc.ComponenteReceitaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

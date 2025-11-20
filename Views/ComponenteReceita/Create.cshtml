@@ -4,47 +4,70 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<h4>ComponenteReceita</h4>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Novo Componente da Receita</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
+</div>
+
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="AlimentoId" class="control-label">Alimento</label>
-                <select asp-for="AlimentoId" class="form-control" asp-items="ViewBag.AlimentoId"></select>
-            </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                    <div class="mb-3">
+                        <label asp-for="AlimentoId" class="form-label">Alimento</label>
+                        <select asp-for="AlimentoId" class="form-select" asp-items="ViewBag.AlimentoId"></select>
+                        <span asp-validation-for="AlimentoId" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="UnidadeMedida" class="control-label"></label>
-                <select asp-for="UnidadeMedida" class="form-control"
-                    asp-items="Html.GetEnumSelectList<UnidadeMedidaEnum>()">
-                    <option value="">-- Selecione a Unidade Medida --</option>
-                </select>
-                <span asp-validation-for="UnidadeMedida" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="UnidadeMedida" class="form-label"></label>
+                        <select asp-for="UnidadeMedida" class="form-select"
+                            asp-items="Html.GetEnumSelectList<UnidadeMedidaEnum>()">
+                            <option value="">-- Selecione a Unidade Medida --</option>
+                        </select>
+                        <span asp-validation-for="UnidadeMedida" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Quantidade" class="control-label"></label>
-                <input asp-for="Quantidade" class="form-control" />
-                <span asp-validation-for="Quantidade" class="text-danger"></span>
+                    <div class="mb-3">
+                        <label asp-for="Quantidade" class="form-label"></label>
+                        <input asp-for="Quantidade" class="form-control" />
+                        <span asp-validation-for="Quantidade" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IsOpcional" class="form-label"></label>
+                        <select asp-for="IsOpcional" class="form-select">
+                            <option value="true">Sim</option>
+                            <option value="false" selected>Não</option>
+                        </select>
+                        <span asp-validation-for="IsOpcional" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <input type="submit" value="Criar" class="btn btn-primary me-2" />
+                        <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+                    </div>
+                </form>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsOpcional" /> @Html.DisplayNameFor(model =>
-                                        model.IsOpcional)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

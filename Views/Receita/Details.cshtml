@@ -90,14 +90,14 @@
                     </div>
                 </div>
             }
-            else if (Model.ComponentesReceitaId != null && Model.ComponentesReceitaId.Any())
+            else if (Model.ReceitaComponentes != null && Model.ReceitaComponentes.Any())
             {
                 <div class="card mb-4">
                     <div class="card-header bg-warning">
                         <h5 class="mb-0"><i class="bi bi-basket"></i> Ingredientes</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted">Componentes (IDs): @string.Join(", ", Model.ComponentesReceitaId)</p>
+                        <p class="text-muted">Nenhum detalhe de componente disponível.</p>
                     </div>
                 </div>
             }

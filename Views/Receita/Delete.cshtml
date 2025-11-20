@@ -66,10 +66,17 @@
             @Html.DisplayFor(model => model.Gorduras)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ComponentesReceitaId)
+            Componentes da Receita
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ComponentesReceitaId)
+            @if (Model.ReceitaComponentes != null && Model.ReceitaComponentes.Any())
+            {
+                <text>@Model.ReceitaComponentes.Count componente(s)</text>
+            }
+            else
+            {
+                <text>Nenhum componente</text>
+            }
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.RestricoesAlimentarId)

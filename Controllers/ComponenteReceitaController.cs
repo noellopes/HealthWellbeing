@@ -20,10 +20,51 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ComponenteReceita
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string alimentoName, string opcional, int page = 1, int pageSize = 10)
         {
-            var healthWellbeingDbContext = _context.ComponenteReceita.Include(c => c.Alimento);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            // Monta query base incluindo Alimento
+            var query = _context.ComponenteReceita.Include(c => c.Alimento).AsQueryable();
+
+            // Filtra por nome do alimento (se informado)
+            if (!string.IsNullOrWhiteSpace(alimentoName))
+            {
+                var term = alimentoName.Trim().ToLower();
+                query = query.Where(c => c.Alimento.Name.ToLower().Contains(term));
+            }
+
+            // Filtra por opcional (se informado: "true"/"false")
+            if (!string.IsNullOrWhiteSpace(opcional))
+            {
+                if (bool.TryParse(opcional, out bool opc))
+                {
+                    query = query.Where(c => c.IsOpcional == opc);
+                }
+            }
+
+            // Total antes da paginação
+            var totalCount = await query.CountAsync();
+
+            // Calcula páginas
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            if (totalPages < 1) totalPages = 1;
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            var items = await query
+                .OrderBy(c => c.ComponenteReceitaId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Passa informações para a view
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.SearchAlimentoName = alimentoName ?? string.Empty;
+            ViewBag.SearchOpcional = opcional ?? string.Empty;
+
+            return View(items);
         }
 
         // GET: ComponenteReceita/Details/5
@@ -63,6 +104,11 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(componenteReceita);
                 await _context.SaveChangesAsync();
+
+                // Mensagem de sucesso em português
+                TempData["AlertMessage"] = "Componente criado com sucesso.";
+                TempData["AlertType"] = "success";
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
@@ -104,6 +150,9 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(componenteReceita);
                     await _context.SaveChangesAsync();
+
+                    TempData["AlertMessage"] = "Componente atualizado com sucesso.";
+                    TempData["AlertType"] = "success";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -150,6 +199,8 @@ namespace HealthWellbeing.Controllers
             if (componenteReceita != null)
             {
                 _context.ComponenteReceita.Remove(componenteReceita);
+                TempData["AlertMessage"] = "Componente apagado com sucesso.";
+                TempData["AlertType"] = "warning";
             }
 
             await _context.SaveChangesAsync();
