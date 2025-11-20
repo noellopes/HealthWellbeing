@@ -17,21 +17,21 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
             <div class="mb-3">
-                <label asp-for="EventTypeName" class="form-label fw-bold"></label>
+                <label asp-for="EventTypeName" class="form-label fw-bold">Event Type Name</label>
                 <input asp-for="EventTypeName" class="form-control" />
                 <span asp-validation-for="EventTypeName" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="EventTypeScoringMode" class="form-label fw-bold"></label>
+                <label asp-for="EventTypeScoringMode" class="form-label fw-bold">Scoring Mode</label>
                 <select asp-for="EventTypeScoringMode" class="form-select" asp-items="ViewBag.ScoringModes">
-                    <option value="">-- Selecione um Modo --</option>
+                    <option value="">-- Select a Mode --</option>
                 </select>
                 <span asp-validation-for="EventTypeScoringMode" class="text-danger small"></span>
             </div>
 
             <div class="mb-4">
-                <label asp-for="EventTypeMultiplier" class="form-label fw-bold"></label>
+                <label asp-for="EventTypeMultiplier" class="form-label fw-bold">Multiplier</label>
                 <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.1" min="0" />
                 <span asp-validation-for="EventTypeMultiplier" class="text-danger small"></span>
             </div>
