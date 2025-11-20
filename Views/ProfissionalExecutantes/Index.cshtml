@@ -74,7 +74,7 @@ else
             <thead class="table-light">
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Nome)</th>
-                    <th>@Html.DisplayNameFor(model => model.Items.First().Funcao)</th>
+                    <th>Função</th>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Telefone)</th>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Email)</th>
                     <th class="text-end">Ações</th>
@@ -85,7 +85,7 @@ else
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => item.Nome)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Funcao)</td>
+                        <td>@item.Funcao?.NomeFuncao</td>
                         <td>@Html.DisplayFor(modelItem => item.Telefone)</td>
                         <td>@Html.DisplayFor(modelItem => item.Email)</td>
                         <td class="text-end">

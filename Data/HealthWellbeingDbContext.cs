@@ -31,6 +31,13 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            modelBuilder.Entity<ProfissionalExecutante>()
+                .HasOne(p => p.Funcao)
+                .WithMany()
+                .HasForeignKey(p => p.FuncaoId)
+    .           OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<ExameTipo>()
                 .HasOne(et => et.Especialidade)      // Um TipoExame tem uma Especialidade
                 .WithMany(e => e.TiposExame)         // Uma Especialidade tem muitos TiposExame

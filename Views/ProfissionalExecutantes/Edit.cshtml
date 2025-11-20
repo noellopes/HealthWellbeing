@@ -25,9 +25,9 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Funcao" class="form-label"></label>
-                        <input asp-for="Funcao" class="form-control" />
-                        <span asp-validation-for="Funcao" class="text-danger"></span>
+                        <label asp-for="FuncaoId" class="form-label"></label>
+                        <select asp-for="FuncaoId" class="form-control" asp-items="ViewBag.FuncaoId"></select>
+                        <span asp-validation-for="FuncaoId" class="text-danger"></span>
                     </div>
 
                     <div class="form-group mb-3">
