@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251118121135_EntidadeEspecialidade")]
-    partial class EntidadeEspecialidade
+    [Migration("20251120162244_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -255,7 +255,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("EspecialidadeId")
-                        .HasMaxLength(100)
                         .HasColumnType("int");
 
                     b.Property<string>("Nome")
@@ -433,6 +432,24 @@ namespace HealthWellbeing.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
+                {
+                    b.Property<int>("FuncaoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FuncaoId"));
+
+                    b.Property<string>("NomeFuncao")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("FuncaoId");
+
+                    b.ToTable("Funcoes");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
                 {
                     b.Property<int>("MaterialEquipamentoAssociadoId")
@@ -507,6 +524,9 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
+                    b.Property<int?>("FuncaoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -518,6 +538,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(15)");
 
                     b.HasKey("ProfissionalExecutanteId");
+
+                    b.HasIndex("FuncaoId");
 
                     b.ToTable("ProfissionalExecutante");
                 });
@@ -598,6 +620,13 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Especialidade");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Funcao", null)
+                        .WithMany("ProfissionaisExecutantes")
+                        .HasForeignKey("FuncaoId");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Especialidade", b =>
                 {
                     b.Navigation("TiposExame");
@@ -606,6 +635,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellBeing.Models.Utente", b =>
                 {
                     b.Navigation("Exames");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
+                {
+                    b.Navigation("ProfissionaisExecutantes");
                 });
 #pragma warning restore 612, 618
         }

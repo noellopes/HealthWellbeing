@@ -25,6 +25,8 @@ namespace HealthWellbeing.Data
         public DbSet<MaterialEquipamentoAssociado> MaterialEquipamentoAssociado { get; set; } = default!;
         public DbSet<Especialidade> Especialidades { get; set; } = default!;
 
+        public DbSet<Funcao> Funcoes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
