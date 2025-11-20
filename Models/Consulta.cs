@@ -5,7 +5,6 @@ namespace HealthWellbeing.Models
 {
     public class Consulta
     {
-        [Required(ErrorMessage = "Por favor introduza o id da consulta")]
         [Key] public int IdConsulta { get; set; }
         [Required(ErrorMessage = "Por favor introduza a data de marcação da consulta")]
         public DateTime DataMarcacao { get; set; }

@@ -19,6 +19,7 @@ namespace HealthWellbeing.Models{
         public string Email { get; set; } = default!;
 
         public ICollection<Consulta>? Consultas { get; set; }
+        public ICollection<AgendaMedica>? AgendaMedica { get; set; }
 
     }
 }
