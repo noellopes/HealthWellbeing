@@ -18,8 +18,9 @@ namespace HealthWellbeing.Models
         [StringLength(150, ErrorMessage = "A localização não pode ter mais de 150 caracteres.")]
         public string Localizacao { get; set; }
 
-        [Range(0, 10000, ErrorMessage = "A capacidade máxima deve estar entre 0 e 10.000.")]
-        [Display(Name = "Capacidade Máxima")]
+        [Required(ErrorMessage = "A capacidade máxima é obrigatória.")]
+        [Range(1, 10000, ErrorMessage = "A capacidade deve estar entre 1 e 10.000 m³.")]
+        [Display(Name = "Capacidade (m³)")]
         public double CapacidadeMaxima { get; set; }
 
         [Display(Name = "Zona Ativa")]

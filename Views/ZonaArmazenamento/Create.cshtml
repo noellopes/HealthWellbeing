@@ -62,7 +62,12 @@
 
                 <div class="mb-3">
                     <label asp-for="CapacidadeMaxima" class="form-label"></label>
-                    <input asp-for="CapacidadeMaxima" class="form-control" placeholder="Ex: 5000" />
+                    <input asp-for="CapacidadeMaxima"
+                           class="form-control"
+                           type="number"
+                           min="1" max="10000"
+                           step="0.1"
+                           placeholder="Ex: 5000 (m³)" />
                     <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
                 </div>
 

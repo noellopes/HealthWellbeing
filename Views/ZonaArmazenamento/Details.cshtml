@@ -48,6 +48,7 @@
 
         <div class="card-body">
             <dl class="row mb-4">
+
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
 
@@ -58,7 +59,9 @@
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Localizacao)</dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.CapacidadeMaxima)</dd>
+                <dd class="col-sm-8 details-value">
+                    @Model.CapacidadeMaxima m³
+                </dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
                 <dd class="col-sm-8 details-value">
@@ -71,6 +74,7 @@
                         <span class="badge bg-secondary">Inativa</span>
                     }
                 </dd>
+
             </dl>
 
             <div class="d-flex justify-content-end">
