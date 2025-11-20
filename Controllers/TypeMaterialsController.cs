@@ -85,7 +85,8 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Tipo de material criado com sucesso!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
+
             }
 
             return View(typeMaterial);
