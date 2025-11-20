@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.ExameTipo
+﻿@model HealthWellbeing.ViewModels.TipoExameRecursosViewModel
 
 @{
     ViewData["Title"] = "Editar Tipo de Exame";
@@ -7,42 +7,74 @@
 <div class="container mt-4">
 
     <h1 class="display-6 mb-3">Editar Tipo de Exame</h1>
-    <p class="text-muted">ID: @Model.ExameTipoId - Modificando: <span class="fw-bold">@Model.Nome</span></p>
+    <p class="text-muted">ID: @Model.ExameTipoId</p>
 
     <hr />
 
     <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+        <div class="col-lg-8 col-md-10">
             <div class="card shadow-lg p-3">
                 <div class="card-body">
 
                     <form asp-action="Edit">
-
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                         <input type="hidden" asp-for="ExameTipoId" />
 
+                        @* --- Campos Normais --- *@
                         <div class="mb-3">
-                            <label asp-for="Nome" class="form-label"></label>
-                            <input asp-for="Nome" class="form-control" />
-                            <span asp-validation-for="Nome" class="text-danger"></span>
+                            <label asp-for="NomeExame" class="form-label">Nome</label>
+                            <input asp-for="NomeExame" class="form-control" />
+                            <span asp-validation-for="NomeExame" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Descricao" class="form-label"></label>
-                            <textarea asp-for="Descricao" class="form-control" rows="4"></textarea>
+                            <label asp-for="Descricao" class="form-label">Descrição</label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
                             <span asp-validation-for="Descricao" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="EspecialidadeId" class="form-label">Especialidade</label>
-
                             <select asp-for="EspecialidadeId" class="form-select" asp-items="@(ViewData["EspecialidadeId"] as SelectList)">
                                 <option value="">-- Selecione a Especialidade --</option>
                             </select>
-
                             <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
                         </div>
+
+                        @* --- BLOCO DE RECURSOS M:N (CHECKBOXES) --- *@
+                        <div class="card mt-4 border-secondary">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0 fs-6"><i class="bi bi-tools me-2"></i>Recursos e Equipamentos Necessários</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                @if (Model.Recursos.Any())
+                                {
+                                    <div class="row">
+                                        @for (int i = 0; i < Model.Recursos.Count; i++)
+                                        {
+                                            <div class="col-md-6">
+                                                <div class="form-check mb-2">
+                                                    @* Hidden inputs são obrigatórios para o Model Binding funcionar no POST *@
+                                                    <input type="hidden" asp-for="@Model.Recursos[i].Id" />
+                                                    <input type="hidden" asp-for="@Model.Recursos[i].Nome" />
+
+                                                    <input class="form-check-input" type="checkbox" asp-for="@Model.Recursos[i].IsSelected" />
+                                                    <label class="form-check-label" asp-for="@Model.Recursos[i].IsSelected">
+                                                        @Model.Recursos[i].Nome
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="text-muted mb-0">Não existem recursos registados no sistema para associar.</p>
+                                }
+                            </div>
+                        </div>
+                        @* --- FIM BLOCO M:N --- *@
 
                         <div class="d-flex justify-content-between mt-4">
                             <button type="submit" value="Save" class="btn btn-primary shadow-sm">
@@ -54,6 +86,7 @@
                             </a>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
