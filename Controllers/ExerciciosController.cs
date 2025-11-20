@@ -114,6 +114,16 @@ namespace HealthWellbeing.Controllers
             ModelState.Remove("ExercicioGrupoMusculares");
             ModelState.Remove("ExercicioEquipamentos");
 
+            // Verificar se já existe um exercício com o mesmo nome (ignorar maiúsculas/minúsculas)
+            bool existeExercicio = await _context.Exercicio
+            .AnyAsync(e => e.ExercicioNome.ToLower() == exercicio.ExercicioNome.ToLower());
+
+            if (existeExercicio)
+            {
+                // Adiciona um erro específico ao campo "ExercicioNome"
+                ModelState.AddModelError("ExercicioNome", "Já existe um exercício com este nome.");
+            }
+
             if (ModelState.IsValid)
             {
                 // 1. Associar Gêneros
@@ -201,6 +211,15 @@ namespace HealthWellbeing.Controllers
             ModelState.Remove("ExercicioGeneros");
             ModelState.Remove("ExercicioGrupoMusculares");
             ModelState.Remove("ExercicioEquipamentos");
+
+            // Verificar se já existe outro exercício com o mesmo nome (ignorar maiúsculas/minúsculas)
+            bool existeOutro = await _context.Exercicio
+            .AnyAsync(e => e.ExercicioNome.ToLower() == exercicio.ExercicioNome.ToLower() && e.ExercicioId != id);
+
+            if (existeOutro)
+            {
+                ModelState.AddModelError("ExercicioNome", "Já existe outro exercício com este nome.");
+            }
 
             if (ModelState.IsValid)
             {
