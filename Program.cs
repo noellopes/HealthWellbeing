@@ -55,6 +55,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     SeedDataGroup1.SeedRoles(roleManager);
 
+
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
     SeedDataGroup1.SeedDefaultAdmin(userManager);
 
@@ -75,7 +76,9 @@ using (var scope = app.Services.CreateScope())
        
         SeedDataGroup1.SeedUsers(userManager);
         SeedDataGroup1.Populate(DataContext);
-        SeedDataGroup1.Populate(DataContext);
+
+        SeedDataGroup2.Populate(DataContext);
+
     }
 }
 
