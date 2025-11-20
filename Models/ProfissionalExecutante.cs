@@ -18,10 +18,12 @@ namespace HealthWellbeing.Models
 
 
         [Required(ErrorMessage = "O numero é obrigatório")]
+        [Phone(ErrorMessage = "Formato de telefone inválido.")]
         [StringLength(15)]
         public string Telefone { get; set; }
 
         [Required(ErrorMessage = "O email é obrigatório")]
+        [EmailAddress(ErrorMessage = "Formato de e-mail inválido.")]
         [StringLength(250)]
         public string Email { get; set; }
 
