@@ -62,11 +62,19 @@
                                     </div>
                                 </td>
                                 <td class="text-end">
-                                    <div class="btn-group" role="group">
-                                        <a asp-action="Details" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-secondary">Detalhes</a>
-                                        <a asp-action="Edit" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-primary">Editar</a>
-                                        <a asp-action="Delete" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-outline-danger">Apagar</a>
-                                    </div>
+                                    
+                                        
+
+                                        <a asp-action="Details" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-info-circle"></i> Detalhes
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-warning text-white">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    
                                 </td>
                             </tr>
                         }

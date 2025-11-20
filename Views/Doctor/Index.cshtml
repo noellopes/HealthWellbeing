@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Doctor>
+﻿@model PaginationInfo<Doctor>
 
 @{
     ViewData["Title"] = "Médicos";
@@ -7,41 +7,62 @@
 <h1>Médicos</h1>
 
 <p>
-    <a asp-action="Create">Criar Perfil</a>
+    <a asp-action="Create" class="btn btn-sm btn-primary text-white">Criar Perfil</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telemovel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
+                Nome
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Items) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Nome)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telemovel)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdMedico">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdMedico">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdMedico">Delete</a>
+                    <a asp-action="Details" class="btn btn-sm btn-primary text-white" asp-route-id="@item.IdMedico">Detalhes</a> |
+                    <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.IdMedico">Editar</a> |
+                    <a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.IdMedico">Eliminar</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+<nav aria-label="Doctors page">
+    <ul class="pagination">
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+        }
+        else
+        {
+            <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+        }
+
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+            }
+            else
+            {
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+            }
+        }
+
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled"><a class="page-link">Última</a></li>
+        }
+        else
+        {
+            <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+        }
+    </ul>
+</nav>

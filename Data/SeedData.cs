@@ -163,6 +163,10 @@ namespace HealthWellbeing.Data
 
         private static void PopulateDoctor(HealthWellbeingDbContext db)
         {
+            if (db.Doctor.Any())
+            {
+                return;
+            }
             var doctor = new[]
             {
                 new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },

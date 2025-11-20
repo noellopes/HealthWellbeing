@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,14 +20,48 @@ namespace HealthWellbeing.Controllers
         // URL: /UtenteSaude
         // View: Views/UtenteSaude/Index.cshtml
         // ================================
-        public async Task<IActionResult> Index()
+        // GET: UtenteSaude
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchNome = "",
+            string searchNif = "")
         {
-            var lista = await _db.UtenteSaude
-                                 .AsNoTracking()
-                                 .OrderBy(u => u.NomeCompleto)
-                                 .ToListAsync();
-            return View(lista);
+            // 1) Começamos com um IQueryable
+            var utentesQuery = _db.UtenteSaude
+                .AsQueryable();
+
+            // 2) Aplicar filtros se tiverem valor
+            if (!string.IsNullOrWhiteSpace(searchNome))
+            {
+                utentesQuery = utentesQuery
+                    .Where(u => u.NomeCompleto.Contains(searchNome));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchNif))
+            {
+                utentesQuery = utentesQuery
+                    .Where(u => u.Nif.Contains(searchNif));
+            }
+
+            // 3) Guardar valores para a View (inputs ficam preenchidos)
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+
+            // 4) Paginação
+            int numberUtentes = await utentesQuery.CountAsync();
+
+            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            utentesInfo.Items = await utentesQuery
+                .OrderBy(u => u.NomeCompleto)
+                .Skip(utentesInfo.ItemsToSkip)
+                .Take(utentesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(utentesInfo);
         }
+
+
 
         // ================================
         // DETALHES
@@ -167,4 +202,5 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
+
 }
