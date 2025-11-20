@@ -15,9 +15,5 @@ namespace HealthWellbeing.Models
 
         public virtual ICollection<ProblemaSaude> ProblemasSaude { get; set; }
 
-        public ProfissionalExecutante()
-        {
-            ProblemasSaude = new HashSet<ProblemaSaude>();
-        }
     }
 }

@@ -2,12 +2,6 @@
 
 @{
     ViewData["Title"] = "Editar Problema de Saúde";
-
-    // ✅ 1. Obter a lista COMPLETA de profissionais
-    var allProfissionais = ViewData["Profissionais"] as List<ProfissionalExecutante> ?? new List<ProfissionalExecutante>();
-
-    // ✅ 2. Obter a lista de IDs que já estão SELECIONADOS para este problema
-    var selectedProfissionais = ViewData["SelectedProfissionais"] as List<int> ?? new List<int>();
 }
 
 <div class="container py-5">
@@ -39,30 +33,6 @@
                     <span asp-validation-for="ZonaAtingida" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold text-secondary">Profissionais de Apoio</label>
-                    <div class="card p-3" style="max-height: 200px; overflow-y: auto; background-color: #f8f9fa;">
-
-                        @foreach (var prof in allProfissionais)
-                        {
-                            // Lógica para pré-selecionar a checkbox
-                            var isChecked = selectedProfissionais.Contains(prof.ProfissionalExecutanteId);
-
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       name="selectedProfissionais"
-                                       value="@prof.ProfissionalExecutanteId"
-                                       id="prof_@prof.ProfissionalExecutanteId"
-                                       @(isChecked ? "checked" : "") />
-
-                                <label class="form-check-label" for="prof_@prof.ProfissionalExecutanteId">
-                                    @prof.Nome (@prof.Funcao)
-                                </label>
-                            </div>
-                        }
-                    </div>
-                </div>
                 <div class="mb-4">
                     <label asp-for="Gravidade" class="form-label fw-semibold text-secondary"></label>
                     <input asp-for="Gravidade" type="number" min="1" max="10" class="form-control rounded-3 shadow-sm" />
@@ -113,4 +83,3 @@
             box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
         }
 </style>
-

@@ -23,9 +23,5 @@ namespace HealthWellbeing.Models
         [Range(1, 10, ErrorMessage = "A gravidade deve estar entre 1 e 10")]
         public int Gravidade { get; set; }
 
-        public ProblemaSaude()
-        {
-            ProfissionalExecutante = new HashSet<ProfissionalExecutante>();
-        }
     }
 }

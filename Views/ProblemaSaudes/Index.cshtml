@@ -6,6 +6,15 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+<!-- AQUI ESTÁ A MENSAGEM DE SUCESSO -->
+@if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @ViewBag.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Lista</h2>
     <div>
@@ -21,32 +30,22 @@
 <div class="collapse mb-3" id="searchForm">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-3 align-items-end">
-
             <div class="col-md-4">
                 <label for="categoria" class="form-label">Categoria</label>
                 <input id="categoria" name="categoria" value="@ViewBag.Categoria" class="form-control" placeholder="Procurar por categoria" />
             </div>
-
             <div class="col-md-4">
                 <label for="nome" class="form-label">Nome</label>
                 <input id="nome" name="nome" value="@ViewBag.Nome" class="form-control" placeholder="Procurar por nome" />
             </div>
-
             <div class="col-md-4">
                 <label for="zona" class="form-label">Zona Atingida</label>
                 <input id="zona" name="zona" value="@ViewBag.Zona" class="form-control" placeholder="Procurar por zona" />
             </div>
-
-            <div class="col-md-4">
-                <label for="profissional" class="form-label">Profissional</label>
-                <input id="profissional" name="profissional" value="@ViewBag.Profissional" class="form-control" placeholder="Procurar por profissional" />
-            </div>
-
             <div class="col-md-2">
                 <label for="gravidade" class="form-label">Gravidade</label>
                 <input id="gravidade" name="gravidade" type="number" min="1" max="10" value="@ViewBag.Gravidade" class="form-control" />
             </div>
-
             <div class="col-12 mt-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-search me-1"></i> Procurar
@@ -70,7 +69,6 @@ else
                     <th>Categoria</th>
                     <th>Nome</th>
                     <th>Zona Atingida</th>
-                    <th>Profissional</th>
                     <th>Gravidade</th>
                     <th>Ações</th>
                 </tr>
@@ -82,27 +80,7 @@ else
                         <td>@item.ProblemaCategoria</td>
                         <td>@item.ProblemaNome</td>
                         <td>@item.ZonaAtingida</td>
-
-                        <td>
-                            @if (item.ProfissionalExecutante?.Any() ?? false)
-                            {
-                                @foreach (var prof in item.ProfissionalExecutante.Take(3))
-                                {
-                                    <span class="badge bg-primary me-1 mb-1">@prof.Nome</span>
-                                }
-                                @if (item.ProfissionalExecutante.Count > 3)
-                                {
-                                    <span class="badge bg-secondary">+@(item.ProfissionalExecutante.Count - 3) mais</span>
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">Nenhum</span>
-                            }
-                        </td>
-                        <td>
-                            @item.Gravidade / 10
-                        </td>
+                        <td>@item.Gravidade / 10</td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.ProblemaSaudeId" class="btn btn-sm btn-warning">Editar</a>
                             <a asp-action="Details" asp-route-id="@item.ProblemaSaudeId" class="btn btn-sm btn-info">Detalhes</a>
@@ -124,26 +102,19 @@ else
                     <li class="page-item">
                         <a class="page-link" asp-action="Index" asp-route-page="1"
                            asp-route-categoria="@ViewBag.Categoria" asp-route-nome="@ViewBag.Nome"
-                           asp-route-zona="@ViewBag.Zona" asp-route-profissional="@ViewBag.Profissional"
+                           asp-route-zona="@ViewBag.Zona"
                            asp-route-gravidade="@ViewBag.Gravidade">Primeira</a>
                     </li>
                 }
 
                 @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                 {
-                    if (p == Model.CurrentPage)
-                    {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
-                    }
-                    else
-                    {
-                        <li class="page-item">
-                            <a class="page-link" asp-action="Index" asp-route-page="@p"
-                               asp-route-categoria="@ViewBag.Categoria" asp-route-nome="@ViewBag.Nome"
-                               asp-route-zona="@ViewBag.Zona" asp-route-profissional="@ViewBag.Profissional"
-                               asp-route-gravidade="@ViewBag.Gravidade">@p</a>
-                        </li>
-                    }
+                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@p"
+                           asp-route-categoria="@ViewBag.Categoria" asp-route-nome="@ViewBag.Nome"
+                           asp-route-zona="@ViewBag.Zona"
+                           asp-route-gravidade="@ViewBag.Gravidade">@p</a>
+                    </li>
                 }
 
                 @if (Model.CurrentPage == Model.TotalPages)
@@ -155,7 +126,7 @@ else
                     <li class="page-item">
                         <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
                            asp-route-categoria="@ViewBag.Categoria" asp-route-nome="@ViewBag.Nome"
-                           asp-route-zona="@ViewBag.Zona" asp-route-profissional="@ViewBag.Profissional"
+                           asp-route-zona="@ViewBag.Zona"
                            asp-route-gravidade="@ViewBag.Gravidade">Última</a>
                     </li>
                 }

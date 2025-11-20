@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -25,17 +24,14 @@ namespace HealthWellbeing.Controllers
             string categoria,
             string nome,
             string zona,
-            string profissional, // Termo de pesquisa para Profissional
             string gravidade,
-            int page = 1)
+            int page = 1,
+            string SuccessMessage = "")
         {
             int pageSize = 10;
+            var query = _context.ProblemaSaude.AsQueryable();
 
-            // Inclui a tabela relacionada para poder filtrar
-            var query = _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .AsQueryable();
-
+            // --- Filtros ---
             if (!string.IsNullOrWhiteSpace(categoria))
                 query = query.Where(p => p.ProblemaCategoria.ToLower().Contains(categoria.ToLower()));
 
@@ -45,32 +41,33 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(zona))
                 query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
 
-            // Filtro na tabela relacionada (Muitos-para-Muitos)
-            if (!string.IsNullOrWhiteSpace(profissional))
-            {
-                query = query.Where(p => p.ProfissionalExecutante.Any(
-                    prof => prof.Nome.ToLower().Contains(profissional.ToLower())
-                ));
-            }
-
             if (!string.IsNullOrWhiteSpace(gravidade))
                 query = query.Where(p => p.Gravidade.ToString() == gravidade);
 
-            int totalItems = await query.CountAsync();
-
-            var pagination = new PaginationInfo<ProblemaSaude>(page, totalItems, pageSize);
-
-            pagination.Items = await query
-                .OrderBy(p => p.ProblemaNome)
-                .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage)
-                .ToListAsync();
-
+            // Guardar filtros
             ViewBag.Categoria = categoria;
             ViewBag.Nome = nome;
             ViewBag.Zona = zona;
-            ViewBag.Profissional = profissional;
             ViewBag.Gravidade = gravidade;
+
+            ViewBag.SuccessMessage = SuccessMessage;
+
+            // --- Paginação ---
+            int totalItems = await query.CountAsync();
+            var pagination = new PaginationInfo<ProblemaSaude>(page, totalItems, pageSize);
+
+            if (totalItems > 0)
+            {
+                pagination.Items = await query
+                    .OrderBy(p => p.ProblemaNome)
+                    .Skip(pagination.ItemsToSkip)
+                    .Take(pagination.ItemsPerPage)
+                    .ToListAsync();
+            }
+            else
+            {
+                pagination.Items = new List<ProblemaSaude>();
+            }
 
             return View(pagination);
         }
@@ -78,19 +75,15 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return View("Invalido"); // ID nulo mostra página de erro
 
-            // Inclui os profissionais para mostrar nos detalhes
             var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
             {
-                return NotFound();
+                // CORREÇÃO: Se não existe, mostra a view Invalido em vez de erro 404
+                return View("Invalido");
             }
 
             return View(problemaSaude);
@@ -99,8 +92,6 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Create
         public IActionResult Create()
         {
-            // Carrega todos os profissionais para mostrar nas checkboxes
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
             return View();
         }
 
@@ -108,59 +99,38 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude,
-            int[] selectedProfissionais) // Recebe os IDs dos profissionais selecionados
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
         {
-            if (ModelState.IsValid)
-            {
-                // Lógica para associar os profissionais selecionados
-                if (selectedProfissionais != null && selectedProfissionais.Any())
-                {
-                    problemaSaude.ProfissionalExecutante = new List<ProfissionalExecutante>();
-                    foreach (var profId in selectedProfissionais)
-                    {
-                        var profissional = await _context.ProfissionalExecutante.FindAsync(profId);
-                        if (profissional != null)
-                        {
-                            problemaSaude.ProfissionalExecutante.Add(profissional);
-                        }
-                    }
-                }
+            // Validação de Duplicados
+            bool nomeExiste = await _context.ProblemaSaude
+                .AnyAsync(p => p.ProblemaNome.ToLower() == problemaSaude.ProblemaNome.ToLower());
 
-                _context.Add(problemaSaude);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            if (nomeExiste)
+            {
+                ModelState.AddModelError("ProblemaNome", "Já existe um problema de saúde com este nome.");
             }
 
-            // Se o modelo falhar, recarrega a lista de profissionais
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
+            if (ModelState.IsValid)
+            {
+                _context.Add(problemaSaude);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index), new { SuccessMessage = "Criado com sucesso!" });
+            }
             return View(problemaSaude);
         }
 
         // GET: ProblemaSaudes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return View("Invalido");
 
-            // Carrega o problema de saúde E os profissionais já associados
-            var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
+            var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
 
             if (problemaSaude == null)
             {
-                return NotFound();
+                // CORREÇÃO: Se tentas editar e não existe (ex: ID 9), mostra a página Invalido
+                return View("Invalido");
             }
-
-            // Carrega a lista completa de profissionais para as checkboxes
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
-
-            // Carrega os IDs dos profissionais que já estão selecionados
-            ViewData["SelectedProfissionais"] = problemaSaude.ProfissionalExecutante
-                .Select(p => p.ProfissionalExecutanteId).ToList();
 
             return View(problemaSaude);
         }
@@ -170,89 +140,72 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude,
-            int[] selectedProfissionais)
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
         {
-            if (id != problemaSaude.ProblemaSaudeId)
+            if (id != problemaSaude.ProblemaSaudeId) return View("Invalido");
+
+            // Validação de Duplicados
+            bool nomeExiste = await _context.ProblemaSaude
+                .AnyAsync(p => p.ProblemaNome.ToLower() == problemaSaude.ProblemaNome.ToLower()
+                               && p.ProblemaSaudeId != id);
+
+            if (nomeExiste)
             {
-                return NotFound();
+                ModelState.AddModelError("ProblemaNome", "Já existe outro problema de saúde com este nome.");
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Lógica correta para atualizar Muitos-para-Muitos:
-                    // 1. Carregar a entidade existente do BD
                     var problemaSaudeExistente = await _context.ProblemaSaude
-                        .Include(p => p.ProfissionalExecutante)
                         .FirstOrDefaultAsync(p => p.ProblemaSaudeId == id);
 
                     if (problemaSaudeExistente == null)
                     {
-                        return NotFound();
+                        // CORREÇÃO (Concorrência): Se foi apagado enquanto editavas, 
+                        // manda os dados para a view Invalido para o utilizador poder recuperar/recriar.
+                        return View("Invalido", problemaSaude);
                     }
 
-                    // 2. Atualizar propriedades simples
                     problemaSaudeExistente.ProblemaCategoria = problemaSaude.ProblemaCategoria;
                     problemaSaudeExistente.ProblemaNome = problemaSaude.ProblemaNome;
                     problemaSaudeExistente.ZonaAtingida = problemaSaude.ZonaAtingida;
                     problemaSaudeExistente.Gravidade = problemaSaude.Gravidade;
 
-                    // 3. Atualizar a coleção de profissionais
-                    problemaSaudeExistente.ProfissionalExecutante?.Clear();
-                    if (selectedProfissionais != null && selectedProfissionais.Any())
-                    {
-                        problemaSaudeExistente.ProfissionalExecutante ??= new List<ProfissionalExecutante>();
-                        foreach (var profId in selectedProfissionais)
-                        {
-                            var profissional = await _context.ProfissionalExecutante.FindAsync(profId);
-                            if (profissional != null)
-                            {
-                                problemaSaudeExistente.ProfissionalExecutante.Add(profissional);
-                            }
-                        }
-                    }
-
                     _context.Update(problemaSaudeExistente);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index), new { SuccessMessage = "Editado com sucesso!" });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ProblemaSaudeExists(problemaSaude.ProblemaSaudeId))
                     {
-                        return NotFound();
+                        // Se o erro foi de concorrência e o registo desapareceu
+                        return View("Invalido", problemaSaude);
                     }
                     else
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, recarrega os dados para a View
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
-            ViewData["SelectedProfissionais"] = selectedProfissionais?.ToList() ?? new List<int>();
             return View(problemaSaude);
         }
 
         // GET: ProblemaSaudes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return View("Invalido");
 
-            // Inclui profissionais para mostrar o que está associado
             var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
             {
-                return NotFound();
+                // No Delete, também podes mostrar a página Invalido
+                return View("Invalido");
             }
 
             return View(problemaSaude);
@@ -267,10 +220,10 @@ namespace HealthWellbeing.Controllers
             if (problemaSaude != null)
             {
                 _context.ProblemaSaude.Remove(problemaSaude);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { SuccessMessage = "Eliminado com sucesso!" });
         }
 
         private bool ProblemaSaudeExists(int id)
