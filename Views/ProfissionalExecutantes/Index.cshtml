@@ -1,76 +1,153 @@
-﻿@model IEnumerable<HealthWellbeing.Models.ProfissionalExecutante>
+﻿@using HealthWellbeing.ViewModels
+@model PaginationInfo<HealthWellbeing.Models.ProfissionalExecutante>
 
 @{
     ViewData["Title"] = "Lista de Profissionais";
+    var successMessage = TempData["SuccessMessage"];
 }
 
-<div class="container p-4">
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-    <div class="row pt-4">
-        <div class="col-6">
-            <h2 class="text-primary">Lista de Profissionais Executantes</h2>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-circle-fill"></i> &nbsp; Create New
-            </a>
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
+}
 
-    <br />
-
-    <table class="table table-bordered table-striped" style="width:100%">
-        <thead class="table-dark">
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Nome)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Funcao)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Telefone)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Email)
-                </th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Nome)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Funcao)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Telefone)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td>
-                        <div class="w-75 btn-group" role="group">
-
-                            <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-warning mx-1">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-
-                            <a asp-action="Details" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-info mx-1">
-                                <i class="bi bi-info-circle-fill"></i> Details
-                            </a>
-
-                            <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-danger mx-1">
-                                <i class="bi bi-trash-fill"></i> Delete
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Profissionais Executantes</h2>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#profissionalSearch" aria-expanded="false" aria-controls="profissionalSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+        </a>
+    </div>
 </div>
+
+<div class="collapse mt-2 mb-2" id="profissionalSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchNome" class="form-label">Nome</label>
+                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Pesquisar por nome" type="search" />
+            </div>
+            <div class="col-md-4">
+                <label for="searchFuncao" class="form-label">Função</label>
+                <input id="searchFuncao" name="searchFuncao" value="@ViewBag.SearchFuncao" class="form-control" placeholder="Pesquisar por função" type="search" />
+            </div>
+            <div class="col-md-4">
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Nenhum Profissional Encontrado</h4>
+            <p>Não há profissionais executantes correspondentes aos seus critérios.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Items.First().Nome)</th>
+                    <th>@Html.DisplayNameFor(model => model.Items.First().Funcao)</th>
+                    <th>@Html.DisplayNameFor(model => model.Items.First().Telefone)</th>
+                    <th>@Html.DisplayNameFor(model => model.Items.First().Email)</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Funcao)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Telefone)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Detalhes
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Profissionais page">
+            <ul class="pagination">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-searchNome="@ViewBag.SearchNome"
+                           asp-route-searchFuncao="@ViewBag.SearchFuncao">Primeira</a>
+                    </li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@p"
+                               asp-route-searchNome="@ViewBag.SearchNome"
+                               asp-route-searchFuncao="@ViewBag.SearchFuncao">@p</a>
+                        </li>
+                    }
+                }
+
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                           asp-route-searchNome="@ViewBag.SearchNome"
+                           asp-route-searchFuncao="@ViewBag.SearchFuncao">Última</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
