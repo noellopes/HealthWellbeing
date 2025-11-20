@@ -20,14 +20,7 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
             <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="MedicalDeviceID" class="form-label fw-bold"></label>
-                        <select asp-for="MedicalDeviceID" class="form-control" asp-items="ViewBag.MedicalDeviceID">
-                            <option value="">-- Selecione o dispositivo --</option>
-                        </select>
-                        <span asp-validation-for="MedicalDeviceID" class="text-danger small"></span>
-                    </div> 
+                <div class="col-md-6">                    
                     <div class="mb-3">
                         <label asp-for="RoomId" class="form-label fw-bold"></label>
                         <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId">
@@ -35,15 +28,7 @@
                         </select>
                         <span asp-validation-for="RoomId" class="text-danger small"></span>
                     </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="InitialDate" class="form-label fw-bold"></label>
-                        <input asp-for="InitialDate" type="date" class="form-control">
-                        <span asp-validation-for="InitialDate" class="text-danger small"></span>
-                    </div>
-                </div>
+                </div>               
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">

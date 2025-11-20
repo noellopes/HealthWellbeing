@@ -35,6 +35,7 @@
                         <input asp-for="SerialNumber" class="form-control" placeholder="Ex: A1B2C3D4">
                         <span asp-validation-for="SerialNumber" class="text-danger small"></span>
                     </div>
+             
 
                 </div>
 
@@ -47,6 +48,7 @@
                         </select>
                         <span asp-validation-for="TypeMaterialID" class="text-danger small"></span>
                     </div>
+
 
                     <div class="mb-3">
                         <label asp-for="Observation" class="form-label fw-bold"></label>
@@ -61,6 +63,9 @@
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+                <button type="button" class="btn btn-success">
+                    Adicionar a localização
+                </button>
                 <button type="submit" class="btn btn-success">
                     <i class="bi bi-check-circle me-1"></i> Submeter Registo
                 </button>
@@ -68,6 +73,7 @@
                     <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
                 </a>
             </div>
+           
 
         </form>
 
