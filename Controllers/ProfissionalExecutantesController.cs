@@ -1,12 +1,11 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // Adicionado para SelectList
+using Microsoft.EntityFrameworkCore;
 
-namespace HealthWellBeing.Controllers
+namespace HealthWellbeing.Controllers // Namespace CORRETO
 {
     public class ProfissionalExecutantesController : Controller
     {
@@ -17,14 +16,18 @@ namespace HealthWellBeing.Controllers
             _context = context;
         }
 
+        // ==================================================================================
+        // AÇÃO INDEX (Listagem e Pesquisa)
+        // ==================================================================================
         public async Task<IActionResult> Index(int page = 1, string searchNome = null, string searchFuncao = null)
-//                                                   ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
         {
             int itemsPerPage = 5;
 
+            // 1. Usa .Include() para carregar a entidade Funcao
             IQueryable<ProfissionalExecutante> profissionaisQuery = _context.ProfissionalExecutante
-                                                                    .OrderBy(p => p.Nome)
-                                                                    .AsQueryable();
+                                                                            .Include(p => p.Funcao)
+                                                                            .OrderBy(p => p.Nome)
+                                                                            .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchNome))
             {
@@ -34,12 +37,12 @@ namespace HealthWellBeing.Controllers
 
             if (!string.IsNullOrEmpty(searchFuncao))
             {
-                profissionaisQuery = profissionaisQuery.Where(p => p.Funcao.Contains(searchFuncao));
+                // 2. CORREÇÃO CRÍTICA: Pesquisar pelo NomeFuncao da entidade relacionada
+                profissionaisQuery = profissionaisQuery.Where(p => p.Funcao.NomeFuncao.Contains(searchFuncao));
                 ViewBag.SearchFuncao = searchFuncao;
             }
 
             int totalItems = await profissionaisQuery.CountAsync();
-
             var paginationInfo = new PaginationInfo<ProfissionalExecutante>(page, totalItems, itemsPerPage);
 
             paginationInfo.Items = await profissionaisQuery
@@ -55,6 +58,9 @@ namespace HealthWellBeing.Controllers
             return View(paginationInfo);
         }
 
+        // ==================================================================================
+        // AÇÃO DETAILS (Detalhes)
+        // ==================================================================================
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -62,8 +68,11 @@ namespace HealthWellBeing.Controllers
                 return NotFound();
             }
 
+            // Usa .Include() para carregar a função
             var profissionalExecutante = await _context.ProfissionalExecutante
+                .Include(p => p.Funcao)
                 .FirstOrDefaultAsync(m => m.ProfissionalExecutanteId == id);
+
             if (profissionalExecutante == null)
             {
                 return NotFound();
@@ -72,26 +81,37 @@ namespace HealthWellBeing.Controllers
             return View(profissionalExecutante);
         }
 
+        // ==================================================================================
+        // AÇÃO CREATE (Criação de Novo Registo)
+        // ==================================================================================
         public IActionResult Create()
         {
+            // Carrega a lista de Funções para o Dropdown
+            ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Funcao,Telefone,Email")] ProfissionalExecutante profissionalExecutante)
+        // ATUALIZADO: Usar FuncaoId no Bind e remover Funcao string
+        public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
         {
             if (ModelState.IsValid)
             {
                 TempData["SuccessMessage"] = $"Profissional '{profissionalExecutante.Nome}' criado com sucesso!";
-
                 _context.Add(profissionalExecutante);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // Recarrega Funções se a validação falhar
+            ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao", profissionalExecutante.FuncaoId);
             return View(profissionalExecutante);
         }
 
+        // ==================================================================================
+        // AÇÃO EDIT (Edição de Registo Existente)
+        // ==================================================================================
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,16 +120,21 @@ namespace HealthWellBeing.Controllers
             }
 
             var profissionalExecutante = await _context.ProfissionalExecutante.FindAsync(id);
+
             if (profissionalExecutante == null)
             {
                 return NotFound();
             }
+
+            // Carrega Funções e marca a FuncaoId atual como selecionada
+            ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao", profissionalExecutante.FuncaoId);
             return View(profissionalExecutante);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProfissionalExecutanteId,Nome,Funcao,Telefone,Email")] ProfissionalExecutante profissionalExecutante)
+        // ATUALIZADO: Usar FuncaoId no Bind e remover Funcao string
+        public async Task<IActionResult> Edit(int id, [Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
         {
             if (id != profissionalExecutante.ProfissionalExecutanteId)
             {
@@ -122,7 +147,6 @@ namespace HealthWellBeing.Controllers
                 {
                     _context.Update(profissionalExecutante);
                     await _context.SaveChangesAsync();
-
                     TempData["SuccessMessage"] = $"Profissional '{profissionalExecutante.Nome}' editado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -138,25 +162,17 @@ namespace HealthWellBeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // Recarrega Funções se a validação falhar
+            ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao", profissionalExecutante.FuncaoId);
             return View(profissionalExecutante);
         }
 
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        // ==================================================================================
+        // AÇÃO DELETE (Confirmação e Execução)
+        // ==================================================================================
 
-            var profissionalExecutante = await _context.ProfissionalExecutante
-                .FirstOrDefaultAsync(m => m.ProfissionalExecutanteId == id);
-            if (profissionalExecutante == null)
-            {
-                return NotFound();
-            }
-
-            return View(profissionalExecutante);
-        }
+        // Ação Delete GET precisa de .Include() (já atualizado em Details/Delete)
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

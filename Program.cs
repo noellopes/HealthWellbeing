@@ -42,7 +42,7 @@ internal class Program
             context.Database.Migrate();
             var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
             SeedDataMaterialEquipamentoAssociado.Populate(healthContext);
-            /*SeedDataProfissionalExecutante.Populate(healthContext);*/
+            SeedDataProfissionalExecutante.Populate(healthContext);
         }
 
         app.UseHttpsRedirection();
