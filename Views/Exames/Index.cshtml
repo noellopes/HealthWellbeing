@@ -1,83 +1,109 @@
 ﻿@model IEnumerable<HealthWellBeing.Models.Exame>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Marcação de Exames";
+    string? successMessage = TempData["SuccessMessage"] as string;
 }
 
-<h1>Index</h1>
+<h1>Marcação de Exames</h1>
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Sucesso!</strong> @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn"
+       style="background-color: green; color: white;">
+        Criar
+    </a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DataHoraMarcacao)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Data
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Estado
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notas)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Notas
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Utente)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Utente
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ExameTipo)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Tipo de Exame
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MedicoId)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Médico
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SalaDeExame)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Sala
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProfissionalExecutante)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Profissional
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MaterialEquipamentoAssociado)
+            <th style="background-color: #212529; color: white; white-space: nowrap; border-right: 1px solid #6c757d;">
+                Material
             </th>
-            <th></th>
+            <th style="background-color: #212529; color: white; white-space: nowrap;">Ações</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataHoraMarcacao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notas)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Utente.Nif)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExameTipo.Especialidade)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MedicoId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SalaDeExame.TipoSala)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProfissionalExecutante.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.EstadoComponente)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ExameId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ExameId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ExameId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.DataHoraMarcacao)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.Estado)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.Notas)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.Utente.Nif)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.ExameTipo.Especialidade)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.MedicoId)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.SalaDeExame.TipoSala)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.ProfissionalExecutante.Email)
+                </td>
+                <td style="white-space: nowrap; border-right: 1px solid #6c757d;">
+                    @Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.EstadoComponente)
+                </td>
+
+                <td style="white-space: nowrap;">
+                    <div class="d-flex gap-1">
+                        <a asp-action="Edit" asp-route-id="@item.ExameId" class="btn btn-sm"
+                           style="background-color: orange; color: white;">
+                            Editar
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.ExameId" class="btn btn-sm"
+                           style="background-color: #00bcd4; color: white;">
+                            Detalhes
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.ExameId" class="btn btn-sm"
+                           style="background-color: red; color: white;">
+                            Apagar
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

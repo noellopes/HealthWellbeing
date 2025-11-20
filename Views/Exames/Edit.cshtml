@@ -1,74 +1,111 @@
 ﻿@model HealthWellBeing.Models.Exame
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar";
 }
 
-<h1>Edit</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Editar</h1>
 
-<h4>Exame</h4>
+    <a id="btnVoltar" class="btn"
+       style="background-color: red; color: white; margin-top: 1.5rem;">
+        Voltar
+    </a>
+</div>
+
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ExameId" />
+
             <div class="form-group">
-                <label asp-for="DataHoraMarcacao" class="control-label"></label>
+                <label asp-for="DataHoraMarcacao" class="control-label">Data e Hora</label>
                 <input asp-for="DataHoraMarcacao" class="form-control" />
                 <span asp-validation-for="DataHoraMarcacao" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <select asp-for="Estado" class="form-control"></select>
+                <label asp-for="Estado" class="control-label">Estado</label>
+                <select asp-for="Estado" class="form-control"
+                        asp-items="@(ViewData["Estado"] as SelectList)">
+                </select>
                 <span asp-validation-for="Estado" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Notas" class="control-label"></label>
+                <label asp-for="Notas" class="control-label">Notas</label>
                 <input asp-for="Notas" class="form-control" />
                 <span asp-validation-for="Notas" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="UtenteId" class="control-label"></label>
-                <select asp-for="UtenteId" class="form-control" asp-items="ViewBag.UtenteId"></select>
+                <label asp-for="UtenteId" class="control-label">Utente</label>
+                <select asp-for="UtenteId" class="form-control" asp-items="@(ViewData["UtenteId"] as SelectList)">
+                    <option value="">-- Selecione o Utente --</option>
+                </select>
                 <span asp-validation-for="UtenteId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="ExameTipoId" class="control-label"></label>
-                <select asp-for="ExameTipoId" class="form-control" asp-items="ViewBag.ExameTipoId"></select>
+                <label asp-for="ExameTipoId" class="control-label">Tipo de Exame</label>
+                <select asp-for="ExameTipoId" class="form-control" asp-items="@(ViewData["ExameTipoId"] as SelectList)">
+                    <option value="">-- Selecione o Tipo de Exame --</option>
+                </select>
                 <span asp-validation-for="ExameTipoId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="MedicoId" class="control-label"></label>
+                <label asp-for="MedicoId" class="control-label">Médico</label>
                 <input asp-for="MedicoId" class="form-control" />
                 <span asp-validation-for="MedicoId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="SalaDeExameId" class="control-label"></label>
-                <select asp-for="SalaDeExameId" class="form-control" asp-items="ViewBag.SalaDeExameId"></select>
-                <span asp-validation-for="SalaDeExameId" class="text-danger"></span>
+                <label asp-for="SalaDeExameId" class="control-label">Sala do Exame</label>
+                <select asp-for="SalaDeExameId" class="form-control" asp-items="@(ViewData["SalaDeExameId"] as SelectList)">
+                    <option value="">-- Selecione a Sala --</option>
+                </select>
+                <span asp-validation-for="SalaDeExame" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="ProfissionalExecutanteId" class="control-label"></label>
-                <select asp-for="ProfissionalExecutanteId" class="form-control" asp-items="ViewBag.ProfissionalExecutanteId"></select>
+                <label asp-for="ProfissionalExecutanteId" class="control-label">Profissional Executante</label>
+                <select asp-for="ProfissionalExecutanteId" class="form-control" asp-items="@(ViewData["ProfissionalExecutanteId"] as SelectList)">
+                    <option value="">-- Selecione o Profissional Executante --</option>
+                </select>
                 <span asp-validation-for="ProfissionalExecutanteId" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="MaterialEquipamentoAssociadoId" class="control-label"></label>
-                <select asp-for="MaterialEquipamentoAssociadoId" class="form-control" asp-items="ViewBag.MaterialEquipamentoAssociadoId"></select>
-                <span asp-validation-for="MaterialEquipamentoAssociadoId" class="text-danger"></span>
+                <label asp-for="MaterialEquipamentoAssociadoId" class="control-label">Material Associado</label>
+                <select asp-for="MaterialEquipamentoAssociadoId" class="form-control" asp-items="@(ViewData["MaterialEquipamentoAssociadoId"] as SelectList)">
+                    <option value="">-- Selecione o Material --</option>
+                </select>
+                <span asp-validation-for="MaterialEquipamentoAssociado" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Guardar" class="btn"
+                       style="background-color: green; color: white;" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $("#btnVoltar").click(function (e) {
+                e.preventDefault();
+                $('#confirmModal').modal('show');
+            });
+        });
+    </script>
 }

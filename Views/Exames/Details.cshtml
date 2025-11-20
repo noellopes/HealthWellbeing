@@ -1,72 +1,73 @@
 ﻿@model HealthWellBeing.Models.Exame
 
 @{
-    ViewData["Title"] = "Details";
+    // Título da página
+    ViewData["Title"] = "Detalhes do Exame";
+
+    // Variáveis para compor o cabeçalho azul
+    var dataHora = Model.DataHoraMarcacao.ToString("dd/MM/yyyy HH:mm:ss");
+    var sala = Model.SalaDeExame?.TipoSala ?? "N/A"; // Obtém o TipoSala ou "N/A" se for nulo
 }
 
-<h1>Details</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Detalhes do Exame</h1>
 
-<div>
-    <h4>Exame</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataHoraMarcacao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataHoraMarcacao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Notas)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Notas)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Utente)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Utente.Nif)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ExameTipo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ExameTipo.Especialidade)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MedicoId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MedicoId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SalaDeExame)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SalaDeExame.TipoSala)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProfissionalExecutante)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProfissionalExecutante.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MaterialEquipamentoAssociado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaterialEquipamentoAssociado.EstadoComponente)
-        </dd>
-    </dl>
+    <a asp-action="Index" class="btn btn-secondary"
+       style="background-color: #6c757d; color: white; margin-top: 1.5rem;">
+        Voltar para a Lista
+    </a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ExameId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-lg">
+
+            <div class="card-header text-white bg-primary">
+                <h5 class="my-0">Data: @dataHora | Sala: @sala</h5>
+            </div>
+
+            <div class="card-body">
+
+                <dl class="row">
+
+                    <dt class="col-sm-4">Estado</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Estado)</dd>
+
+                    <dt class="col-sm-4">Notas</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Notas)</dd>
+
+                    <dt class="col-sm-4">Utente</dt>
+                    <dd class="col-sm-8">@(Model.Utente != null ? Model.Utente.Nif : "Não Associado")</dd>
+
+                    <dt class="col-sm-4">Tipo de Exame</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.ExameTipo.Especialidade)</dd>
+
+                    <dt class="col-sm-4">Médico (ID)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.MedicoId)</dd>
+
+                    <dt class="col-sm-4">Profissional Executante</dt>
+                    <dd class="col-sm-8">@(Model.ProfissionalExecutante != null ? Model.ProfissionalExecutante.Email : "N/A")</dd>
+
+                    <dt class="col-sm-4">Material Associado</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.MaterialEquipamentoAssociado.EstadoComponente)</dd>
+                </dl>
+
+                <hr />
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.ExameId" class="btn btn-sm"
+                       style="background-color: orange; color: white;">
+                        Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-sm"
+                       style="background-color: #6c757d; color: white;">
+                        Voltar para a Lista
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
