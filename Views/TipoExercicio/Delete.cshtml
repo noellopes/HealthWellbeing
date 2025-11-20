@@ -34,28 +34,47 @@
             Benefícios Associados
         </dt>
         <dd class="col-sm-10">
-
             @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
             {
                 <ul class="list-unstyled">
                     @foreach (var item in Model.TipoExercicioBeneficios)
                     {
-                        <li>
-
-                            <a href="@Url.Action("Details", "Beneficio", new { id = item.BeneficioId })"
-                               target="_blank"
-                               class="text-decoration-none"
-                               title="Ver detalhes do benefício">
-
-                                📌 @(item.Beneficio?.NomeBeneficio ?? "Benefício não encontrado")
-                            </a>
-                        </li>
+                        if (item.Beneficio != null)
+                        {
+                            <li class="mb-1">
+                                <span class="badge bg-primary">@item.Beneficio.NomeBeneficio</span>
+                            </li>
+                        }
                     }
                 </ul>
             }
             else
             {
                 <span class="text-muted">Nenhum benefício associado</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2 text-danger">
+            Contraindicações
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Contraindicacao != null && Model.Contraindicacao.Any())
+            {
+                <ul class="list-unstyled">
+                    @foreach (var item in Model.Contraindicacao)
+                    {
+                        if (item.ProblemaSaude != null)
+                        {
+                            <li class="mb-1">
+                                <span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span>
+                            </li>
+                        }
+                    }
+                </ul>
+            }
+            else
+            {
+                <span class="text-muted">Nenhuma contraindicação registada</span>
             }
         </dd>
     </dl>

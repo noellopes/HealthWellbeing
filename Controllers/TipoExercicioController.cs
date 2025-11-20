@@ -1,9 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,9 +28,10 @@ namespace HealthWellBeing.Controllers
         {
             var query = _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
-                .ThenInclude(tb => tb.Beneficio)
+                    .ThenInclude(tb => tb.Beneficio)
+                .Include(t => t.Contraindicacao)
+                    .ThenInclude(tp => tp.ProblemaSaude)
                 .AsQueryable();
-
 
             if (!string.IsNullOrEmpty(searchNome))
             {
@@ -84,6 +82,8 @@ namespace HealthWellBeing.Controllers
             var tipoExercicio = await _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
                     .ThenInclude(tb => tb.Beneficio)
+                .Include(t => t.Contraindicacao)
+                    .ThenInclude(tp => tp.ProblemaSaude)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
             if (tipoExercicio == null)
@@ -98,6 +98,7 @@ namespace HealthWellBeing.Controllers
         public IActionResult Create()
         {
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+            ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
             return View();
         }
 
@@ -107,30 +108,33 @@ namespace HealthWellBeing.Controllers
         public async Task<IActionResult> Create(
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
             TipoExercicio tipoExercicio,
-            int[] selectedBeneficios)
+            int[] selectedBeneficios,
+            int[] selectedProblemasSaude)
         {
-
             var existingTipoExercicio = await _context.TipoExercicio
                 .FirstOrDefaultAsync(t => t.NomeTipoExercicios.ToLower() == tipoExercicio.NomeTipoExercicios.ToLower());
 
             if (existingTipoExercicio != null)
             {
-                
+
                 TempData["StatusMessage"] = $"Erro: O Tipo de Exercício '{tipoExercicio.NomeTipoExercicios}' já existe no sistema.";
 
-
                 ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+                ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
+
                 ViewData["SelectedBeneficios"] = selectedBeneficios != null
                     ? selectedBeneficios.ToList()
+                    : new List<int>();
+
+                ViewData["SelectedProblemasSaude"] = selectedProblemasSaude != null
+                    ? selectedProblemasSaude.ToList()
                     : new List<int>();
 
                 return View(tipoExercicio);
             }
 
-
             if (ModelState.IsValid)
             {
-
                 if (selectedBeneficios != null && selectedBeneficios.Any())
                 {
                     tipoExercicio.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
@@ -143,17 +147,28 @@ namespace HealthWellBeing.Controllers
                     }
                 }
 
+                if (selectedProblemasSaude != null && selectedProblemasSaude.Any())
+                {
+                    tipoExercicio.Contraindicacao = new List<TipoExercicioProblemaSaude>();
+                    foreach (var problemaId in selectedProblemasSaude)
+                    {
+                        tipoExercicio.Contraindicacao.Add(new TipoExercicioProblemaSaude
+                        {
+                            ProblemaSaudeId = problemaId
+                        });
+                    }
+                }
+
                 _context.Add(tipoExercicio);
                 await _context.SaveChangesAsync();
-
 
                 TempData["StatusMessage"] = $"Sucesso: O Tipo de Exercício '{tipoExercicio.NomeTipoExercicios}' foi criado com sucesso.";
 
                 return RedirectToAction(nameof(Index));
             }
 
-
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+            ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
             return View(tipoExercicio);
         }
 
@@ -164,6 +179,7 @@ namespace HealthWellBeing.Controllers
 
             var tipoExercicio = await _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
+                .Include(t => t.Contraindicacao)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
             if (tipoExercicio == null)
@@ -173,9 +189,13 @@ namespace HealthWellBeing.Controllers
             }
 
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+            ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
 
             ViewData["SelectedBeneficios"] = tipoExercicio.TipoExercicioBeneficios?
                 .Select(tb => tb.BeneficioId).ToList() ?? new List<int>();
+
+            ViewData["SelectedProblemasSaude"] = tipoExercicio.Contraindicacao?
+                .Select(tp => tp.ProblemaSaudeId).ToList() ?? new List<int>();
 
             return View(tipoExercicio);
         }
@@ -187,10 +207,10 @@ namespace HealthWellBeing.Controllers
             int id,
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
             TipoExercicio tipoExercicio,
-            int[] selectedBeneficios)
+            int[] selectedBeneficios,
+            int[] selectedProblemasSaude)
         {
             if (id != tipoExercicio.TipoExercicioId) return NotFound();
-
 
             var existingTipoExercicioWithSameName = await _context.TipoExercicio
                 .FirstOrDefaultAsync(t =>
@@ -199,18 +219,22 @@ namespace HealthWellBeing.Controllers
 
             if (existingTipoExercicioWithSameName != null)
             {
-                
+
                 ViewData["StatusMessage"] = $"Erro: O Tipo de Exercício '{tipoExercicio.NomeTipoExercicios}' já existe para outro registo.";
 
-
                 ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+                ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
+
                 ViewData["SelectedBeneficios"] = selectedBeneficios != null
                     ? selectedBeneficios.ToList()
                     : new List<int>();
 
+                ViewData["SelectedProblemasSaude"] = selectedProblemasSaude != null
+                    ? selectedProblemasSaude.ToList()
+                    : new List<int>();
+
                 return View(tipoExercicio);
             }
-
 
             if (ModelState.IsValid)
             {
@@ -218,8 +242,8 @@ namespace HealthWellBeing.Controllers
                 {
                     var tipoExercicioExistente = await _context.TipoExercicio
                         .Include(t => t.TipoExercicioBeneficios)
+                        .Include(t => t.Contraindicacao)
                         .FirstOrDefaultAsync(t => t.TipoExercicioId == id);
-
 
                     if (tipoExercicioExistente == null)
                     {
@@ -227,11 +251,9 @@ namespace HealthWellBeing.Controllers
                         return RedirectToAction(nameof(Index));
                     }
 
-
                     tipoExercicioExistente.NomeTipoExercicios = tipoExercicio.NomeTipoExercicios;
                     tipoExercicioExistente.DescricaoTipoExercicios = tipoExercicio.DescricaoTipoExercicios;
                     tipoExercicioExistente.CaracteristicasTipoExercicios = tipoExercicio.CaracteristicasTipoExercicios;
-
 
                     if (tipoExercicioExistente.TipoExercicioBeneficios != null)
                     {
@@ -242,7 +264,6 @@ namespace HealthWellBeing.Controllers
                         tipoExercicioExistente.TipoExercicioBeneficios = new List<TipoExercicioBeneficio>();
                     }
 
-
                     if (selectedBeneficios != null)
                     {
                         foreach (var beneficioId in selectedBeneficios)
@@ -251,6 +272,27 @@ namespace HealthWellBeing.Controllers
                             {
                                 TipoExercicioId = id,
                                 BeneficioId = beneficioId
+                            });
+                        }
+                    }
+
+                    if (tipoExercicioExistente.Contraindicacao != null)
+                    {
+                        tipoExercicioExistente.Contraindicacao.Clear();
+                    }
+                    else
+                    {
+                        tipoExercicioExistente.Contraindicacao = new List<TipoExercicioProblemaSaude>();
+                    }
+
+                    if (selectedProblemasSaude != null)
+                    {
+                        foreach (var problemaId in selectedProblemasSaude)
+                        {
+                            tipoExercicioExistente.Contraindicacao.Add(new TipoExercicioProblemaSaude
+                            {
+                                TipoExercicioId = id,
+                                ProblemaSaudeId = problemaId
                             });
                         }
                     }
@@ -276,8 +318,14 @@ namespace HealthWellBeing.Controllers
             }
 
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
+            ViewData["ProblemasSaude"] = _context.ProblemaSaude.OrderBy(p => p.ProblemaNome).ToList();
+
             ViewData["SelectedBeneficios"] = selectedBeneficios != null
                 ? selectedBeneficios.ToList()
+                : new List<int>();
+
+            ViewData["SelectedProblemasSaude"] = selectedProblemasSaude != null
+                ? selectedProblemasSaude.ToList()
                 : new List<int>();
 
             return View(tipoExercicio);
@@ -290,7 +338,9 @@ namespace HealthWellBeing.Controllers
 
             var tipoExercicio = await _context.TipoExercicio
                 .Include(t => t.TipoExercicioBeneficios)
-                .ThenInclude(tb => tb.Beneficio)
+                    .ThenInclude(tb => tb.Beneficio)
+                .Include(t => t.Contraindicacao)
+                    .ThenInclude(tp => tp.ProblemaSaude)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
             if (tipoExercicio == null)

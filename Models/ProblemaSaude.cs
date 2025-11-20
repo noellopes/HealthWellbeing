@@ -27,5 +27,7 @@ namespace HealthWellbeing.Models
         {
             ProfissionalExecutante = new HashSet<ProfissionalExecutante>();
         }
+
+        public ICollection<TipoExercicioProblemaSaude>? TipoExercicioAfetado { get; set; }
     }
 }
