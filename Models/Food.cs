@@ -9,17 +9,15 @@ namespace HealthWellbeing.Models
         [Key]
         public int FoodId { get; set; }
 
-        [Required, StringLength(120)]
+        [Required(ErrorMessage = "Category is required.")]
+        public int CategoryId { get; set; }
+
+        [Required(ErrorMessage = "Food name is required.")]
+        [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(300)]
-        public string? Description { get; set; }
-
-        [Required]
-        public int FoodCategoryId { get; set; }
-        public FoodCategory? FoodCategory { get; set; }
-
-        public ICollection<FoodNutrient>? FoodNutrients { get; set; }
+        public FoodCategory? Category { get; set; }
+        public ICollection<FoodNutritionalComponent>? FoodNutritionalComponents { get; set; }
         public ICollection<FoodPlan>? FoodPlans { get; set; }
     }
 }

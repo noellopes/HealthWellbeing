@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
@@ -17,242 +19,163 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: /FoodCategory
-        public async Task<IActionResult> Index()
+        // GET: FoodCategories
+        public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
-            var categories = await _context.FoodCategory
-                .Include(c => c.ParentCategory)
-                .AsNoTracking()
-                .OrderBy(c => c.Name)
+            var query = _context.FoodCategory.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
+
+                query = query.Where(fc =>
+                    fc.Category.ToLower().Contains(search) ||
+                    (!string.IsNullOrEmpty(fc.Description) && fc.Description.ToLower().Contains(search)));
+            }
+
+            int totalItems = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(fc => fc.Category)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
 
-            return View(categories);
+            var model = new PaginationInfo<FoodCategory>(items, totalItems, page, itemsPerPage);
+
+            ViewBag.Search = search;
+
+            return View(model);
         }
 
-        // GET: /FoodCategory/Details/5
+
+        // GET: FoodCategories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var category = await _context.FoodCategory
-                .Include(c => c.ParentCategory)
-                .Include(c => c.SubCategory)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.FoodCategoryId == id);
+            var foodCategory = await _context.FoodCategory
+                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            if (foodCategory == null)
+            {
+                return NotFound();
+            }
 
-            if (category == null) return NotFound();
-
-            return View(category);
+            return View(foodCategory);
         }
 
-        // GET: /FoodCategory/Create
-        public async Task<IActionResult> Create()
+        // GET: FoodCategories/Create
+        public IActionResult Create()
         {
-            await PopulateParentCategoriesDropDownList();
             return View();
         }
 
-        // POST: /FoodCategory/Create
+        // POST: FoodCategories/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,ParentCategoryId")] FoodCategory category)
+        public async Task<IActionResult> Create([Bind("CategoryId,Category,Description")] FoodCategory foodCategory)
         {
-            // Server-side uniqueness check
             if (ModelState.IsValid)
             {
-                bool nameExists = await _context.FoodCategory
-                    .AnyAsync(c => c.Name.ToLower().Trim() == category.Name.ToLower().Trim());
-                if (nameExists)
-                    ModelState.AddModelError(nameof(FoodCategory.Name), "A category with this name already exists.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await PopulateParentCategoriesDropDownList(category.ParentCategoryId);
-                TempData["Error"] = "Please fix the validation errors.";
-                return View(category);
-            }
-
-            try
-            {
-                category.Name = category.Name.Trim();
-                category.Description = category.Description?.Trim();
-                _context.Add(category);
+                _context.Add(foodCategory);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Category created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateException ex)
-            {
-                ModelState.AddModelError(string.Empty, $"Could not save changes: {ex.GetBaseException().Message}");
-                TempData["Error"] = "An error occurred while creating the category.";
-                await PopulateParentCategoriesDropDownList(category.ParentCategoryId);
-                return View(category);
-            }
+            return View(foodCategory);
         }
 
-        // GET: /FoodCategory/Edit/5
+        // GET: FoodCategories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var category = await _context.FoodCategory.FindAsync(id);
-            if (category == null) return NotFound();
-
-            await PopulateParentCategoriesDropDownList(category.ParentCategoryId, excludeId: category.FoodCategoryId);
-            return View(category);
+            var foodCategory = await _context.FoodCategory.FindAsync(id);
+            if (foodCategory == null)
+            {
+                return NotFound();
+            }
+            return View(foodCategory);
         }
 
-        // POST: /FoodCategory/Edit/5
+        // POST: FoodCategories/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FoodCategoryId,Name,Description,ParentCategoryId")] FoodCategory category)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Category,Description")] FoodCategory foodCategory)
         {
-            if (id != category.FoodCategoryId) return NotFound();
-
-            // Hierarchy rules
-            if (category.ParentCategoryId == category.FoodCategoryId)
+            if (id != foodCategory.CategoryId)
             {
-                ModelState.AddModelError(nameof(FoodCategory.ParentCategoryId),
-                    "A category cannot be parent of itself.");
-            }
-            else if (category.ParentCategoryId.HasValue)
-            {
-                bool createsCycle = await IsDescendantAsync(category.ParentCategoryId.Value, category.FoodCategoryId);
-                if (createsCycle)
-                {
-                    ModelState.AddModelError(nameof(FoodCategory.ParentCategoryId),
-                        "Invalid parent: this assignment would create a cycle in the hierarchy.");
-                }
+                return NotFound();
             }
 
-            // Uniqueness
             if (ModelState.IsValid)
             {
-                bool nameExists = await _context.FoodCategory
-                    .AnyAsync(c => c.FoodCategoryId != category.FoodCategoryId &&
-                                   c.Name.ToLower().Trim() == category.Name.ToLower().Trim());
-                if (nameExists)
-                    ModelState.AddModelError(nameof(FoodCategory.Name), "A category with this name already exists.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                await PopulateParentCategoriesDropDownList(category.ParentCategoryId, excludeId: category.FoodCategoryId);
-                TempData["Error"] = "Please fix the validation errors.";
-                return View(category);
-            }
-
-            try
-            {
-                var existing = await _context.FoodCategory.FirstAsync(c => c.FoodCategoryId == id);
-                existing.Name = category.Name.Trim();
-                existing.Description = category.Description?.Trim();
-                existing.ParentCategoryId = category.ParentCategoryId;
-
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Category updated successfully.";
+                try
+                {
+                    _context.Update(foodCategory);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FoodCategoryExists(foodCategory.CategoryId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.FoodCategory.AnyAsync(e => e.FoodCategoryId == category.FoodCategoryId))
-                    return NotFound();
-
-                ModelState.AddModelError(string.Empty, "Concurrency error. Please try again.");
-            }
-            catch (DbUpdateException ex)
-            {
-                ModelState.AddModelError(string.Empty, $"Could not save changes: {ex.GetBaseException().Message}");
-            }
-
-            await PopulateParentCategoriesDropDownList(category.ParentCategoryId, excludeId: category.FoodCategoryId);
-            TempData["Error"] = "An error occurred while updating the category.";
-            return View(category);
+            return View(foodCategory);
         }
 
-        // GET: /FoodCategory/Delete/5
+        // GET: FoodCategories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var category = await _context.FoodCategory
-                .Include(c => c.ParentCategory)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.FoodCategoryId == id);
+            var foodCategory = await _context.FoodCategory
+                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            if (foodCategory == null)
+            {
+                return NotFound();
+            }
 
-            if (category == null) return NotFound();
-
-            return View(category);
+            return View(foodCategory);
         }
 
-        // POST: /FoodCategory/Delete/5
+        // POST: FoodCategories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.FoodCategory
-                .Include(c => c.SubCategory)
-                .FirstOrDefaultAsync(c => c.FoodCategoryId == id);
-
-            if (category == null) return NotFound();
-
-            if (category.SubCategory.Any())
+            var foodCategory = await _context.FoodCategory.FindAsync(id);
+            if (foodCategory != null)
             {
-                TempData["Error"] = "You cannot delete a category that still has subcategories. Move or delete them first.";
-                return RedirectToAction(nameof(Delete), new { id });
+                _context.FoodCategory.Remove(foodCategory);
             }
 
-            try
-            {
-                _context.FoodCategory.Remove(category);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Category deleted successfully.";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Delete failed: {ex.GetBaseException().Message}";
-                return RedirectToAction(nameof(Delete), new { id });
-            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // -------- Helpers --------
-
-        private async Task PopulateParentCategoriesDropDownList(int? selectedId = null, int? excludeId = null)
+        private bool FoodCategoryExists(int id)
         {
-            var query = _context.FoodCategory.AsNoTracking().OrderBy(c => c.Name).AsQueryable();
-            if (excludeId.HasValue)
-            {
-                // exclude self and descendants
-                var descendants = await _context.FoodCategory
-                    .Where(c => c.FoodCategoryId == excludeId.Value)
-                    .SelectMany(c => c.SubCategory)
-                    .Select(c => c.FoodCategoryId)
-                    .ToListAsync();
-
-                query = query.Where(c => c.FoodCategoryId != excludeId.Value && !descendants.Contains(c.FoodCategoryId));
-            }
-
-            ViewData["ParentCategoryId"] = new SelectList(await query.ToListAsync(), "FoodCategoryId", "Name", selectedId);
-        }
-
-        // Returns true if candidateParentId is a descendant of currentId (which would create a cycle)
-        private async Task<bool> IsDescendantAsync(int candidateParentId, int currentId)
-        {
-            if (candidateParentId == currentId) return true;
-
-            var children = await _context.FoodCategory
-                .Where(c => c.ParentCategoryId == currentId)
-                .Select(c => c.FoodCategoryId)
-                .ToListAsync();
-
-            foreach (var childId in children)
-            {
-                if (candidateParentId == childId) return true;
-                if (await IsDescendantAsync(candidateParentId, childId)) return true;
-            }
-            return false;
+            return _context.FoodCategory.Any(e => e.CategoryId == id);
         }
     }
 }

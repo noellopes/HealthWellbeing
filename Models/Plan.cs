@@ -7,23 +7,17 @@ namespace HealthWellbeing.Models
         [Key]
         public int PlanId { get; set; }
 
-        [Required]
-        public int GoalId { get; set; }
-        public Goal? Goal { get; set; }
+        [Required(ErrorMessage = "Starting date is required.")]
+        [DataType(DataType.Date)]
+        public DateTime StartingDate { get; set; }
 
-        [Required]
-        public int PatientId { get; set; }  // FK to UtenteSaude
+        [Required(ErrorMessage = "Ending date is required.")]
+        [DataType(DataType.Date)]
+        public DateTime EndingDate { get; set; }
 
-        [Required]
-        public int FoodId { get; set; }
-        public Food? Food { get; set; }
+        public bool Done { get; set; }
 
-        [StringLength(300)]
-        public string? Description { get; set; }
-
-        public int Quantity { get; set; }
-
-        public int? NutritionistId { get; set; }
-        public Nutritionist? Nutritionist { get; set; }
+        public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
+        public ICollection<FoodPlan>? FoodPlans { get; set; }
     }
 }
