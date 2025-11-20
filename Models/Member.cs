@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -6,7 +7,9 @@ namespace HealthWellbeing.Models
     {   
         public int MemberId { get; set; } = default!;
 
-        public string ClientId { get; set; } = string.Empty;
-        public Client? Client { get; set; } = default;
+        [Key, ForeignKey("Client")]
+        public int ClientId { get; set; }
+
+        public Client Client { get; set; } = null!;
     }
 }

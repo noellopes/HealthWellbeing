@@ -1,9 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
@@ -16,135 +19,164 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: /Nutritionist
-        public async Task<IActionResult> Index()
+        // GET: Nutritionists
+        public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
-            var list = await _context.Nutritionist
-                .AsNoTracking()
+            var query = _context.Nutritionist.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
+
+                query = query.Where(n =>
+                    n.Name.ToLower().Contains(search) ||
+                    (!string.IsNullOrEmpty(n.Email) && n.Email.ToLower().Contains(search)) ||
+                    (!string.IsNullOrEmpty(n.Gender) && n.Gender.ToLower().Contains(search)));
+            }
+
+            int totalItems = await query.CountAsync();
+
+            var items = await query
                 .OrderBy(n => n.Name)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
 
-            return View(list);
+            var model = new PaginationInfo<Nutritionist>(items, totalItems, page, itemsPerPage);
+
+            ViewBag.Search = search;
+
+            return View(model);
         }
 
-        // GET: /Nutritionist/Details/5
+
+        // GET: Nutritionists/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var item = await _context.Nutritionist
-                .AsNoTracking()
-                .FirstOrDefaultAsync(n => n.NutritionistId == id);
+            var nutritionist = await _context.Nutritionist
+                .FirstOrDefaultAsync(m => m.NutritionistId == id);
+            if (nutritionist == null)
+            {
+                return NotFound();
+            }
 
-            if (item == null) return NotFound();
-            return View(item);
+            return View(nutritionist);
         }
 
-        // GET: /Nutritionist/Create
-        public IActionResult Create() => View();
+        // GET: Nutritionists/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
 
-        // POST: /Nutritionist/Create
+        // POST: Nutritionists/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name")] Nutritionist model)
+        public async Task<IActionResult> Create([Bind("NutritionistId,Name,Gender,Email")] Nutritionist nutritionist)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            try
+            if (ModelState.IsValid)
             {
-                model.Name = model.Name.Trim();
-                _context.Add(model);
+                _context.Add(nutritionist);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Nutritionist created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Could not create: {ex.GetBaseException().Message}";
-                return View(model);
-            }
+            return View(nutritionist);
         }
 
-        // GET: /Nutritionist/Edit/5
+        // GET: Nutritionists/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
-            var model = await _context.Nutritionist.FindAsync(id);
-            if (model == null) return NotFound();
-            return View(model);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var nutritionist = await _context.Nutritionist.FindAsync(id);
+            if (nutritionist == null)
+            {
+                return NotFound();
+            }
+            return View(nutritionist);
         }
 
-        // POST: /Nutritionist/Edit/5
+        // POST: Nutritionists/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NutritionistId,Name")] Nutritionist model)
+        public async Task<IActionResult> Edit(int id, [Bind("NutritionistId,Name,Gender,Email")] Nutritionist nutritionist)
         {
-            if (id != model.NutritionistId) return NotFound();
-            if (!ModelState.IsValid) return View(model);
-
-            try
+            if (id != nutritionist.NutritionistId)
             {
-                var existing = await _context.Nutritionist
-                    .FirstOrDefaultAsync(n => n.NutritionistId == id);
+                return NotFound();
+            }
 
-                if (existing == null) return NotFound();
-
-                existing.Name = model.Name.Trim();
-                await _context.SaveChangesAsync();
-
-                TempData["Success"] = "Nutritionist updated successfully.";
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(nutritionist);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!NutritionistExists(nutritionist.NutritionistId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.Nutritionist.AnyAsync(n => n.NutritionistId == id))
-                    return NotFound();
-
-                TempData["Error"] = "Concurrency error. Reload and try again.";
-                return View(model);
-            }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Could not save changes: {ex.GetBaseException().Message}";
-                return View(model);
-            }
+            return View(nutritionist);
         }
 
-        // GET: /Nutritionist/Delete/5
+        // GET: Nutritionists/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            var model = await _context.Nutritionist
-                .AsNoTracking()
-                .FirstOrDefaultAsync(n => n.NutritionistId == id);
+            var nutritionist = await _context.Nutritionist
+                .FirstOrDefaultAsync(m => m.NutritionistId == id);
+            if (nutritionist == null)
+            {
+                return NotFound();
+            }
 
-            if (model == null) return NotFound();
-            return View(model);
+            return View(nutritionist);
         }
 
-        // POST: /Nutritionist/Delete/5
+        // POST: Nutritionists/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var entity = await _context.Nutritionist
-                .FirstOrDefaultAsync(n => n.NutritionistId == id);
-
-            if (entity == null) return NotFound();
-
-            try
+            var nutritionist = await _context.Nutritionist.FindAsync(id);
+            if (nutritionist != null)
             {
-                _context.Nutritionist.Remove(entity);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Nutritionist deleted successfully.";
-            }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Could not delete: {ex.GetBaseException().Message}";
+                _context.Nutritionist.Remove(nutritionist);
             }
 
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        private bool NutritionistExists(int id)
+        {
+            return _context.Nutritionist.Any(e => e.NutritionistId == id);
         }
     }
 }

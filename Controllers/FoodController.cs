@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -17,138 +19,147 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        private void LoadCategories(object? selected = null)
-            => ViewBag.FoodCategoryId = new SelectList(_context.FoodCategory.AsNoTracking().OrderBy(c => c.Name), "FoodCategoryId", "Name", selected);
-
         // GET: Food
-        public async Task<IActionResult> Index(string? search, int page = 1)
+        public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
             var query = _context.Food
-                .Include(f => f.FoodCategory)
-                .AsNoTracking()
-                .OrderBy(f => f.Name)
-                .AsQueryable();
+                                .Include(f => f.Category)
+                                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(f =>
                     f.Name.Contains(search) ||
-                    (f.FoodCategory != null && f.FoodCategory.Name.Contains(search))
-                );
+                    f.Category.Category.Contains(search));
             }
 
-            var totalItems = await query.CountAsync();
-            var pageSize = 10;
-            var totalPages = (int)System.Math.Ceiling(totalItems / (double)pageSize);
+            int totalItems = await query.CountAsync();
 
-            var foods = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            var items = await query
+                .OrderBy(f => f.Name)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
 
-            ViewBag.Search = search;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
+            var model = new PaginationInfo<Food>(items, totalItems, page, itemsPerPage);
 
-            return View(foods);
+            ViewBag.Search = search;
+
+            return View(model);
         }
 
         // GET: Food/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var food = await _context.Food
-                .Include(f => f.FoodCategory)
-                .AsNoTracking()
+                .Include(f => f.Category)
                 .FirstOrDefaultAsync(m => m.FoodId == id);
+            if (food == null)
+            {
+                return NotFound();
+            }
 
-            if (food == null) return NotFound();
             return View(food);
         }
 
         // GET: Food/Create
         public IActionResult Create()
         {
-            LoadCategories();
-            return View(new Food());
+            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category");
+            return View();
         }
 
         // POST: Food/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Food food)
+        public async Task<IActionResult> Create([Bind("FoodId,CategoryId,Name")] Food food)
         {
-            // Uniqueness: Name within Category
-            if (await _context.Food.AnyAsync(f => f.Name == food.Name && f.FoodCategoryId == food.FoodCategoryId))
-                ModelState.AddModelError(nameof(Food.Name), "A food with this name already exists in the selected category.");
-
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                LoadCategories(food.FoodCategoryId);
-                return View(food);
+                _context.Add(food);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            _context.Add(food);
-            await _context.SaveChangesAsync();
-            TempData["Success"] = "Food created successfully.";
-            return RedirectToAction(nameof(Index));
+            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
+            return View(food);
         }
 
         // GET: Food/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var food = await _context.Food.FindAsync(id);
-            if (food == null) return NotFound();
-
-            LoadCategories(food.FoodCategoryId);
+            if (food == null)
+            {
+                return NotFound();
+            }
+            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
             return View(food);
         }
 
         // POST: Food/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Food food)
+        public async Task<IActionResult> Edit(int id, [Bind("FoodId,CategoryId,Name")] Food food)
         {
-            if (id != food.FoodId) return NotFound();
-
-            if (await _context.Food.AnyAsync(f => f.FoodId != id && f.Name == food.Name && f.FoodCategoryId == food.FoodCategoryId))
-                ModelState.AddModelError(nameof(Food.Name), "A food with this name already exists in the selected category.");
-
-            if (!ModelState.IsValid)
+            if (id != food.FoodId)
             {
-                LoadCategories(food.FoodCategoryId);
-                return View(food);
+                return NotFound();
             }
 
-            try
+            if (ModelState.IsValid)
             {
-                _context.Update(food);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Food updated successfully.";
+                try
+                {
+                    _context.Update(food);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FoodExists(food.FoodId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.Food.AnyAsync(e => e.FoodId == id)) return NotFound();
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
+            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
+            return View(food);
         }
 
         // GET: Food/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var food = await _context.Food
-                .Include(f => f.FoodCategory)
-                .AsNoTracking()
+                .Include(f => f.Category)
                 .FirstOrDefaultAsync(m => m.FoodId == id);
+            if (food == null)
+            {
+                return NotFound();
+            }
 
-            if (food == null) return NotFound();
             return View(food);
         }
 
@@ -161,22 +172,15 @@ namespace HealthWellbeing.Controllers
             if (food != null)
             {
                 _context.Food.Remove(food);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Food deleted successfully.";
             }
+
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        // ===== Remote Validation =====
-        [AcceptVerbs("Get", "Post")]
-        public async Task<IActionResult> CheckNameUnique(string name, int? foodCategoryId, int? foodId)
+        private bool FoodExists(int id)
         {
-            var exists = await _context.Food.AnyAsync(f =>
-                f.Name == name &&
-                f.FoodCategoryId == foodCategoryId &&
-                f.FoodId != (foodId ?? 0));
-
-            return Json(!exists); // true => valid
+            return _context.Food.Any(e => e.FoodId == id);
         }
     }
 }

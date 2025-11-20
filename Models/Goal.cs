@@ -8,38 +8,34 @@ namespace HealthWellbeing.Models
         [Key]
         public int GoalId { get; set; }
 
-        // Ligação ao Cliente (substitui Patient)
-        [Required]
-        [Display(Name = "Client")]
-        public string ClientId { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Client is required.")]
+        public int ClientId { get; set; }
+
+        [Required(ErrorMessage = "Goal name is required.")]
+        [StringLength(200)]
+        public string GoalName { get; set; } = string.Empty;
+
+        [Range(0, 20000, ErrorMessage = "Daily calories must be a positive value.")]
+        public int DailyCalories { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily protein must be a positive value.")]
+        public int DailyProtein { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily fat must be a positive value.")]
+        public int DailyFat { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily hydrates must be a positive value.")]
+        public int DailyHydrates { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily vitamins must be a positive value.")]
+        public int DailyVitamins { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily minerals must be a positive value.")]
+        public int DailyMinerals { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily fibers must be a positive value.")]
+        public int DailyFibers { get; set; }
+
         public Client? Client { get; set; }
-
-        [Required, StringLength(60)]
-        [Display(Name = "Goal Type")]
-        public string GoalType { get; set; } = string.Empty;
-
-        [Display(Name = "Daily Calories (kcal)")]
-        public int? DailyCalories { get; set; }
-
-        [Display(Name = "Daily Protein (g)")]
-        public int? DailyProtein { get; set; }
-
-        [Display(Name = "Daily Fat (g)")]
-        public int? DailyFat { get; set; }
-
-        [Display(Name = "Daily Carbohydrates (g)")]
-        public int? DailyCarbs { get; set; }
-
-        [Display(Name = "Daily Fiber (g)")]
-        public int? DailyFiber { get; set; }
-
-        [Display(Name = "Daily Vitamins (mg)")]
-        public int? DailyVitamins { get; set; }
-
-        [Display(Name = "Daily Minerals (mg)")]
-        public int? DailyMinerals { get; set; }
-
-        // Planos alimentares associados a este objetivo
-        public ICollection<FoodPlan>? FoodPlans { get; set; }
     }
 }

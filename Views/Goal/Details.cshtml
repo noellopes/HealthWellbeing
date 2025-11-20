@@ -1,50 +1,63 @@
 ﻿@model HealthWellbeing.Models.Goal
+
 @{
     ViewData["Title"] = "Goal Details";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
-}
-<h1>@ViewData["Title"]</h1>
-
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
 }
 
-<dl class="row">
-    <dt class="col-sm-3">Client</dt>
-    <dd class="col-sm-9">@Model.Client?.Name</dd>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <h1 class="h4 mb-0">
+            <i class="bi bi-info-circle-fill me-2 text-info"></i>
+            Goal Details
+        </h1>
+    </div>
 
-    <dt class="col-sm-3">Goal Type</dt>
-    <dd class="col-sm-9">@Model.GoalType</dd>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to list
+    </a>
+</div>
 
-    <dt class="col-sm-3">Calories</dt>
-    <dd class="col-sm-9">@Model.DailyCalories</dd>
+<hr />
 
-    <dt class="col-sm-3">Protein</dt>
-    <dd class="col-sm-9">@Model.DailyProtein</dd>
+<div class="row">
+    <div class="col-md-7">
+        <dl class="row">
+            <dt class="col-sm-4">Client</dt>
+            <dd class="col-sm-8">@Model.Client?.Name</dd>
 
-    <dt class="col-sm-3">Carbs</dt>
-    <dd class="col-sm-9">@Model.DailyCarbs</dd>
+            <dt class="col-sm-4">Goal</dt>
+            <dd class="col-sm-8">@Model.GoalName</dd>
 
-    <dt class="col-sm-3">Fat</dt>
-    <dd class="col-sm-9">@Model.DailyFat</dd>
+            <dt class="col-sm-4">Daily Calories</dt>
+            <dd class="col-sm-8">@Model.DailyCalories</dd>
 
-    <dt class="col-sm-3">Fiber</dt>
-    <dd class="col-sm-9">@Model.DailyFiber</dd>
+            <dt class="col-sm-4">Daily Protein</dt>
+            <dd class="col-sm-8">@Model.DailyProtein g</dd>
 
-    <dt class="col-sm-3">Vitamins</dt>
-    <dd class="col-sm-9">@Model.DailyVitamins</dd>
+            <dt class="col-sm-4">Daily Fat</dt>
+            <dd class="col-sm-8">@Model.DailyFat g</dd>
 
-    <dt class="col-sm-3">Minerals</dt>
-    <dd class="col-sm-9">@Model.DailyMinerals</dd>
-</dl>
+            <dt class="col-sm-4">Daily Hydrates</dt>
+            <dd class="col-sm-8">@Model.DailyHydrates g</dd>
 
-<div class="mt-3">
-    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.GoalId">Edit</a>
-    <a class="btn btn-outline-secondary" asp-action="Index">Back</a>
+            <dt class="col-sm-4">Daily Vitamins</dt>
+            <dd class="col-sm-8">@Model.DailyVitamins</dd>
+
+            <dt class="col-sm-4">Daily Minerals</dt>
+            <dd class="col-sm-8">@Model.DailyMinerals</dd>
+
+            <dt class="col-sm-4">Daily Fibers</dt>
+            <dd class="col-sm-8">@Model.DailyFibers g</dd>
+        </dl>
+
+        <div class="mt-3 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.GoalId"
+               class="btn btn-warning text-white">
+                <i class="bi bi-pencil-square me-1"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
 </div>
