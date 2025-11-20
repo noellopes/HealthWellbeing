@@ -1,4 +1,5 @@
-﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Exercicio>
+﻿﻿
+@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Exercicio>
 
 @{
     ViewData["Title"] = "Exercícios";
@@ -54,6 +55,10 @@
                     <div class="col-md-3">
                         <label for="searchGrupoMuscular" class="form-label">Grupo Muscular</label>
                         <input id="searchGrupoMuscular" name="searchGrupoMuscular" value="@ViewBag.SearchGrupoMuscular" class="form-control" placeholder="Procurar por grupo muscular" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchEquipamento" class="form-label">Equipamento</label>
+                        <input id="searchEquipamento" name="searchEquipamento" value="@ViewBag.searchEquipamento" class="form-control" placeholder="Procurar por grupo Esquipamento" />
                     </div>
 
                     <div class="col-12 mt-2 d-flex gap-2">
@@ -125,7 +130,8 @@
                                asp-route-searchNome="@ViewBag.SearchNome"
                                asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                asp-route-searchGenero="@ViewBag.SearchGenero"
-                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">Início</a>
+                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
+                               asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">Início</a>
                         </li>
                     }
 
@@ -144,7 +150,8 @@
                                    asp-route-searchNome="@ViewBag.SearchNome"
                                    asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                    asp-route-searchGenero="@ViewBag.SearchGenero"
-                                   asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">@p</a>
+                                   asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
+                                   asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">@p</a>
                             </li>
                         }
                     }
@@ -162,7 +169,8 @@
                                asp-route-searchNome="@ViewBag.SearchNome"
                                asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                asp-route-searchGenero="@ViewBag.SearchGenero"
-                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular">Fim</a>
+                               asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
+                               asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">Fim</a>
                         </li>
                     }
                 </ul>

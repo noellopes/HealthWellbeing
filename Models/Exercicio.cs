@@ -29,9 +29,6 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "As instruções são obrigatórias.")]
         public string Instrucoes { get; set; }
 
-        [Required(ErrorMessage = "O equipamento necessário é obrigatório.")]
-        public string EquipamentoNecessario { get; set; }
-
         [Required(ErrorMessage = "As repetições são obrigatórias.")]
         [Range(1, 1000, ErrorMessage = "As repetições devem ser entre 1 e 1000.")]
         public int Repeticoes { get; set; }
@@ -42,5 +39,6 @@ namespace HealthWellbeing.Models
 
         public ICollection<ExercicioGenero>? ExercicioGeneros { get; set; }
         public ICollection<ExercicioGrupoMuscular>? ExercicioGrupoMusculares { get; set; }
+        public ICollection<ExercicioEquipamento>? ExercicioEquipamentos { get; set; }
     }
 }

@@ -24,11 +24,24 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
+
+        public DbSet<HealthWellbeing.Models.Equipamento> Equipamento { get; set; }
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Chave primária do GrupoMuscular
+            modelBuilder.Entity<GrupoMuscular>()
+                .HasKey(g => g.GrupoMuscularId);
+
+            // Relação Musculo → GrupoMuscular
+            modelBuilder.Entity<Musculo>()
+                .HasOne(m => m.GrupoMuscular)
+                .WithMany(g => g.Musculos)
+                .HasForeignKey(m => m.GrupoMuscularId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoExercicioBeneficio>()
                 .HasKey(tb => new { tb.TipoExercicioId, tb.BeneficioId });
@@ -68,6 +81,19 @@ namespace HealthWellbeing.Data
                 .HasOne(egm => egm.GrupoMuscular)
                 .WithMany(gm => gm.ExercicioGrupoMusculares)
                 .HasForeignKey(egm => egm.GrupoMuscularId);
+
+            modelBuilder.Entity<ExercicioEquipamento>()
+                .HasKey(eg => new { eg.ExercicioId, eg.EquipamentoId });
+
+            modelBuilder.Entity<ExercicioEquipamento>()
+                .HasOne(eg => eg.Exercicio)
+                .WithMany(e => e.ExercicioEquipamentos)
+                .HasForeignKey(eg => eg.ExercicioId);
+
+            modelBuilder.Entity<ExercicioEquipamento>()
+                .HasOne(eg => eg.Equipamento)
+                .WithMany(g => g.ExercicioEquipamentos)
+                .HasForeignKey(eg => eg.EquipamentoId);
 
         }
     }

@@ -22,35 +22,40 @@ namespace HealthWellbeing.Controllers
 
         // GET: Exercicios
         public async Task<IActionResult> Index(
-        int page = 1,
-        string searchNome = "",
-        string searchDescricao = "",
-        string searchGenero = "",
-        string searchGrupoMuscular = "")
+            int page = 1,
+            string searchNome = "",
+            string searchDescricao = "",
+            string searchGenero = "",
+            string searchGrupoMuscular = "",
+            string searchEquipamento = "")
         {
-            // CORREÇÃO: Include com ThenInclude conforme PDF
+            // Consulta base com todos os Includes necessários para as "Badges" da View
             var query = _context.Exercicio
-                .Include(e => e.ExercicioGeneros)
-                    .ThenInclude(eg => eg.Genero)
-                .Include(e => e.ExercicioGrupoMusculares)
-                    .ThenInclude(gm => gm.GrupoMuscular)
+                .Include(e => e.ExercicioGeneros).ThenInclude(eg => eg.Genero)
+                .Include(e => e.ExercicioGrupoMusculares).ThenInclude(gm => gm.GrupoMuscular)
+                .Include(e => e.ExercicioEquipamentos).ThenInclude(eq => eq.Equipamento)
                 .AsQueryable();
 
+            // Filtros de Texto Simples
             if (!string.IsNullOrEmpty(searchNome))
                 query = query.Where(e => e.ExercicioNome.Contains(searchNome));
 
             if (!string.IsNullOrEmpty(searchDescricao))
                 query = query.Where(e => e.Descricao.Contains(searchDescricao));
 
-            // CORREÇÃO: Filtrar através da tabela de junção
+            // Filtros de Relação (Many-to-Many)
             if (!string.IsNullOrEmpty(searchGenero))
                 query = query.Where(e => e.ExercicioGeneros.Any(eg => eg.Genero.NomeGenero.Contains(searchGenero)));
 
             if (!string.IsNullOrEmpty(searchGrupoMuscular))
                 query = query.Where(e => e.ExercicioGrupoMusculares.Any(gm => gm.GrupoMuscular.GrupoMuscularNome.Contains(searchGrupoMuscular)));
 
-            int totalItems = await query.CountAsync();
+            // CORREÇÃO: Filtro de Equipamento corrigido (estava a filtrar por descrição)
+            if (!string.IsNullOrEmpty(searchEquipamento))
+                query = query.Where(e => e.ExercicioEquipamentos.Any(eq => eq.Equipamento.NomeEquipamento.Contains(searchEquipamento)));
 
+            // Paginação
+            int totalItems = await query.CountAsync();
             var pagination = new PaginationInfo<Exercicio>(page, totalItems);
 
             pagination.Items = await query
@@ -59,10 +64,12 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
+            // Manter os valores de pesquisa na View
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchDescricao = searchDescricao;
             ViewBag.SearchGenero = searchGenero;
             ViewBag.SearchGrupoMuscular = searchGrupoMuscular;
+            ViewBag.SearchEquipamento = searchEquipamento;
 
             return View(pagination);
         }
@@ -72,10 +79,10 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            // CORREÇÃO: Carregamento dos dados relacionados via tabelas intermédias
             var exercicio = await _context.Exercicio
                 .Include(e => e.ExercicioGeneros).ThenInclude(eg => eg.Genero)
                 .Include(e => e.ExercicioGrupoMusculares).ThenInclude(egm => egm.GrupoMuscular)
+                .Include(e => e.ExercicioEquipamentos).ThenInclude(eeq => eeq.Equipamento)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
 
             if (exercicio == null) return NotFound();
@@ -86,8 +93,10 @@ namespace HealthWellbeing.Controllers
         // GET: Exercicios/Create
         public IActionResult Create()
         {
+            // Carregar listas para as checkboxes
             ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
             ViewBag.GruposMusculares = new SelectList(_context.GrupoMuscular, "GrupoMuscularId", "GrupoMuscularNome");
+            ViewBag.Equipamentos = new SelectList(_context.Equipamento, "EquipamentoId", "NomeEquipamento");
             return View();
         }
 
@@ -95,18 +104,19 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")]
-            Exercicio exercicio,
+            [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,Repeticoes,Series")] Exercicio exercicio,
             int[] generosIds,
-            int[] GrupoMuscularIds)
+            int[] GrupoMuscularIds,
+            int[] equipamentosIds) // Recebe array de IDs para equipamentos
         {
-            // Removemos as validações das coleções para evitar erros de ModelState
+            // Remover validação das propriedades de navegação
             ModelState.Remove("ExercicioGeneros");
             ModelState.Remove("ExercicioGrupoMusculares");
+            ModelState.Remove("ExercicioEquipamentos");
 
             if (ModelState.IsValid)
             {
-                // CORREÇÃO: Criar explicitamente as entradas na tabela de junção
+                // 1. Associar Gêneros
                 if (generosIds != null)
                 {
                     exercicio.ExercicioGeneros = new List<ExercicioGenero>();
@@ -116,6 +126,7 @@ namespace HealthWellbeing.Controllers
                     }
                 }
 
+                // 2. Associar Grupos Musculares
                 if (GrupoMuscularIds != null)
                 {
                     exercicio.ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>();
@@ -125,19 +136,27 @@ namespace HealthWellbeing.Controllers
                     }
                 }
 
+                // 3. Associar Equipamentos (NOVO)
+                if (equipamentosIds != null)
+                {
+                    exercicio.ExercicioEquipamentos = new List<ExercicioEquipamento>();
+                    foreach (var id in equipamentosIds)
+                    {
+                        exercicio.ExercicioEquipamentos.Add(new ExercicioEquipamento { EquipamentoId = id });
+                    }
+                }
+
                 _context.Add(exercicio);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Details),
-                    new
-                    {
-                        id = exercicio.ExercicioId,
-                        SuccessMessage = "Exercicio criado com sucesso"
-                    }
-                );
+
+                return RedirectToAction(nameof(Details), new { id = exercicio.ExercicioId, SuccessMessage = "Exercicio criado com sucesso" });
             }
 
+            // Recarregar listas em caso de erro
             ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
             ViewBag.GruposMusculares = new SelectList(_context.GrupoMuscular, "GrupoMuscularId", "GrupoMuscularNome");
+            ViewBag.Equipamentos = new SelectList(_context.Equipamento, "EquipamentoId", "NomeEquipamento");
+
             return View(exercicio);
         }
 
@@ -146,20 +165,23 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            // Carregar o exercício com as relações existentes
             var exercicio = await _context.Exercicio
                 .Include(e => e.ExercicioGeneros)
                 .Include(e => e.ExercicioGrupoMusculares)
+                .Include(e => e.ExercicioEquipamentos)
                 .FirstOrDefaultAsync(e => e.ExercicioId == id);
 
             if (exercicio == null) return NotFound();
 
+            // Carregar todas as opções disponíveis
             ViewBag.Generos = _context.Genero.ToList();
             ViewBag.GruposMusculares = _context.GrupoMuscular.ToList();
+            ViewBag.Equipamentos = _context.Equipamento.ToList();
 
-            // Enviar IDs selecionados para a View (Select)
+            // Identificar quais estão selecionados (para marcar as checkboxes)
             ViewBag.GenerosSelecionados = exercicio.ExercicioGeneros?.Select(g => g.GeneroId).ToList() ?? new List<int>();
             ViewBag.GruposSelecionados = exercicio.ExercicioGrupoMusculares?.Select(g => g.GrupoMuscularId).ToList() ?? new List<int>();
+            ViewBag.EquipamentosSelecionados = exercicio.ExercicioEquipamentos?.Select(e => e.EquipamentoId).ToList() ?? new List<int>();
 
             return View(exercicio);
         }
@@ -169,51 +191,45 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,EquipamentoNecessario,Repeticoes,Series")]
-            Exercicio exercicio,
+            [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,Repeticoes,Series")] Exercicio exercicio,
             int[] generosIds,
-            int[] gruposMuscularesIds)
+            int[] gruposMuscularesIds,
+            int[] equipamentosIds)
         {
             if (id != exercicio.ExercicioId) return NotFound();
 
-            // Remover validação das propriedades de navegação
             ModelState.Remove("ExercicioGeneros");
             ModelState.Remove("ExercicioGrupoMusculares");
+            ModelState.Remove("ExercicioEquipamentos");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Tentamos carregar o exercício existente da BD
                     var exercicioExistente = await _context.Exercicio
                         .Include(e => e.ExercicioGeneros)
                         .Include(e => e.ExercicioGrupoMusculares)
+                        .Include(e => e.ExercicioEquipamentos)
                         .FirstOrDefaultAsync(e => e.ExercicioId == id);
 
-                    // SE O EXERCÍCIO FOI APAGADO (é null), mostramos a página de recuperação
                     if (exercicioExistente == null)
                     {
-                        // Passamos os IDs selecionados para a View recuperar as checkboxes
+                        // Passar IDs para a View de recuperação
                         ViewData["GenerosIds"] = generosIds ?? new int[0];
                         ViewData["GruposMuscularesIds"] = gruposMuscularesIds ?? new int[0];
-
-                        // Retorna a View especial que criaste
+                        ViewData["EquipamentosIds"] = equipamentosIds ?? new int[0];
                         return View("InvalidExercicio", exercicio);
                     }
 
-                    // --- ATUALIZAÇÃO DOS DADOS (Se o exercício existir) ---
-
-                    // 1. Atualizar valores simples
+                    // 1. Atualizar dados simples
                     _context.Entry(exercicioExistente).CurrentValues.SetValues(exercicio);
 
-                    // 2. Atualizar Gêneros
+                    // 2. Atualizar Géneros
                     exercicioExistente.ExercicioGeneros.Clear();
                     if (generosIds != null)
                     {
                         foreach (var gId in generosIds)
-                        {
                             exercicioExistente.ExercicioGeneros.Add(new ExercicioGenero { ExercicioId = id, GeneroId = gId });
-                        }
                     }
 
                     // 3. Atualizar Grupos Musculares
@@ -221,26 +237,27 @@ namespace HealthWellbeing.Controllers
                     if (gruposMuscularesIds != null)
                     {
                         foreach (var gmId in gruposMuscularesIds)
-                        {
                             exercicioExistente.ExercicioGrupoMusculares.Add(new ExercicioGrupoMuscular { ExercicioId = id, GrupoMuscularId = gmId });
-                        }
+                    }
+
+                    // 4. Atualizar Equipamentos (NOVO)
+                    exercicioExistente.ExercicioEquipamentos.Clear();
+                    if (equipamentosIds != null)
+                    {
+                        foreach (var eqId in equipamentosIds)
+                            exercicioExistente.ExercicioEquipamentos.Add(new ExercicioEquipamento { ExercicioId = id, EquipamentoId = eqId });
                     }
 
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Details),
-                        new
-                        {
-                            id = exercicio.ExercicioId,
-                            SuccessMessage = "Exercicio editado com sucesso"
-                        });
+                    return RedirectToAction(nameof(Details), new { id = exercicio.ExercicioId, SuccessMessage = "Exercicio editado com sucesso" });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    // Proteção extra para concorrência (se for apagado durante o SaveChanges)
                     if (!ExercicioExists(exercicio.ExercicioId))
                     {
                         ViewData["GenerosIds"] = generosIds ?? new int[0];
                         ViewData["GruposMuscularesIds"] = gruposMuscularesIds ?? new int[0];
+                        ViewData["EquipamentosIds"] = equipamentosIds ?? new int[0];
                         return View("ExercicioDeleted", exercicio);
                     }
                     else
@@ -250,9 +267,9 @@ namespace HealthWellbeing.Controllers
                 }
             }
 
-            // Se houver erro de validação, recarregar listas para a View Edit normal
             ViewBag.Generos = _context.Genero.ToList();
             ViewBag.GruposMusculares = _context.GrupoMuscular.ToList();
+            ViewBag.Equipamentos = _context.Equipamento.ToList();
             return View(exercicio);
         }
 
@@ -264,11 +281,12 @@ namespace HealthWellbeing.Controllers
             var exercicio = await _context.Exercicio
                 .Include(e => e.ExercicioGeneros).ThenInclude(eg => eg.Genero)
                 .Include(e => e.ExercicioGrupoMusculares).ThenInclude(gm => gm.GrupoMuscular)
+                .Include(e => e.ExercicioEquipamentos).ThenInclude(eq => eq.Equipamento)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
 
             if (exercicio == null)
             {
-                TempData["SuccessMessage"] = "Este exercicio ja foi eliminado";
+                TempData["SuccessMessage"] = "Este exercicio já foi eliminado";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -283,17 +301,20 @@ namespace HealthWellbeing.Controllers
             var exercicio = await _context.Exercicio
                 .Include(e => e.ExercicioGeneros)
                 .Include(e => e.ExercicioGrupoMusculares)
+                .Include(e => e.ExercicioEquipamentos)
                 .FirstOrDefaultAsync(e => e.ExercicioId == id);
 
             if (exercicio != null)
             {
-                // Opcional: Se o DeleteBehavior for Cascade (ver PDF página 9), isto acontece automaticamente,
-                // mas limpar manualmente é mais seguro se a configuração mudar.
                 _context.Exercicio.Remove(exercicio);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Exercicio foi apagado com sucesso";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Este exercicio já tinha sido eliminado";
             }
 
-            TempData["SuccessMessage"] = "Exercicio foi apagado com sucesso";
             return RedirectToAction(nameof(Index));
         }
 

@@ -31,8 +31,22 @@
                 <dt class="col-sm-3">Calorias Gastas</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.CaloriasGastas)</dd>
 
-                <dt class="col-sm-3">Equipamento Necessário</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.EquipamentoNecessario)</dd>
+                <dt class="col-sm-3">Equipamentos Associados</dt>
+                <dd class="col-sm-9">
+                    @if (Model.ExercicioEquipamentos != null && Model.ExercicioEquipamentos.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.ExercicioEquipamentos)
+                            {
+                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.Equipamento.NomeEquipamento</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum equipamento associado.</span>
+                    }
+                </dd>
 
                 <dt class="col-sm-3">Repetições</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.Repeticoes)</dd>
@@ -50,7 +64,7 @@
                         <ul class="list-unstyled mb-0">
                             @foreach (var item in Model.ExercicioGeneros)
                             {
-                                <li>@item.Genero.NomeGenero</li>
+                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.Genero.NomeGenero</li>
                             }
                         </ul>
                     }
@@ -67,7 +81,7 @@
                         <ul class="list-unstyled mb-0">
                             @foreach (var item in Model.ExercicioGrupoMusculares)
                             {
-                                <li>@item.GrupoMuscular.GrupoMuscularNome</li>
+                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.GrupoMuscular.GrupoMuscularNome</li>
                             }
                         </ul>
                     }
