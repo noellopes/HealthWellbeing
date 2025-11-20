@@ -1,0 +1,173 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Sono>
+
+@{
+    ViewData["Title"] = "Registos de Sono";
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3 text-primary"><i class="bi bi-moon-stars-fill"></i> Registos de Sono</h2>
+    <p class="text-muted">Histórico de sono dos utentes:</p>
+
+    @* Mensagens de Sucesso *@
+    @if (successMessage != null)
+    {
+        <div class="container py-2">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    @* Mensagens de Erro *@
+    @if (errorMessage != null)
+    {
+        <div class="container py-2">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @errorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    @* Barra de Ferramentas (Pesquisa e Botões) *@
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <div>
+            <a class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+                <i class="bi bi-search me-1"></i> Pesquisa
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Novo Registo
+            </a>
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-home me-1"></i> Início
+            </a>
+        </div>
+    </div>
+
+    @* Formulário de Pesquisa (Expandível) *@
+    <div class="collapse mb-3" id="searchForm">
+        <div class="card card-body bg-light">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label for="searchData" class="form-label fw-bold">Filtrar por Data</label>
+                    <input type="date" id="searchData" name="searchData" value="@ViewBag.SearchData" class="form-control" />
+                </div>
+                <div class="col-md-8 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Pesquisar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar Filtros</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model?.Items?.Any() == true)
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Data</th>
+                        <th>Hora Deitar</th>
+                        <th>Hora Levantar</th>
+                        <th>Total Horas</th>
+                        <th>Utente (ID)</th>
+                        <th class="text-center" style="width: 220px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-bold">@item.Data.ToString("dd/MM/yyyy")</td>
+                            <td>@item.HoraDeitar.ToString(@"hh\:mm")</td>
+                            <td>@item.HoraLevantar.ToString(@"hh\:mm")</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    @item.HorasSono.ToString(@"hh\:mm")
+                                </span>
+                            </td>
+                            <td>
+                                @* Se tiveres acesso ao nome do utente via navegação, usa item.UtenteGrupo7.Nome *@
+                                <span class="text-muted">#@item.UtenteGrupo7Id</span>
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.SonoId" class="btn btn-primary btn-sm me-1" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.SonoId" class="btn btn-warning btn-sm me-1" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.SonoId" class="btn btn-danger btn-sm" title="Apagar">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <nav aria-label="Navegação de páginas">
+                <ul class="pagination justify-content-center my-3">
+                    @* Botão Início *@
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Início</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchData="@ViewBag.SearchData">Início</a>
+                        </li>
+                    }
+
+                    @* Números das Páginas *@
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><span class="page-link">@p</span></li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchData="@ViewBag.SearchData">@p</a>
+                            </li>
+                        }
+                    }
+
+                    @* Botão Fim *@
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Fim</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchData="@ViewBag.SearchData">Fim</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3 d-flex align-items-center">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            <div>
+                Nenhum registo de sono encontrado.
+                @if (!string.IsNullOrEmpty(ViewBag.SearchData))
+                {
+                    <span>Tente alterar a data da pesquisa.</span>
+                }
+            </div>
+        </div>
+    }
+</div>
