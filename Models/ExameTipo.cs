@@ -12,6 +12,7 @@ namespace HealthWellbeing.Models
         public string Nome { get; set; } 
 
         [StringLength(500, ErrorMessage = "A descrição não pode ter mais de 500 caracteres.")]
+        [Display(Name = "Descrição")]// Alteração do nome do cabeçalho na View
         public string Descricao { get; set; }
 
 
