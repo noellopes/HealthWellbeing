@@ -20,3 +20,374 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* ========================================
+   HEALTHCARE THEME - PATIENT MANAGEMENT
+   ======================================== */
+
+/* Color Variables */
+:root {
+    --primary-blue: #0d6efd;
+    --primary-teal: #17a2b8;
+    --success-green: #28a745;
+    --danger-red: #dc3545;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+}
+
+/* Stats Cards */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+.card-active {
+    border-left: 4px solid var(--success-green);
+}
+
+.card-inactive {
+    border-left: 4px solid var(--danger-red);
+}
+
+.stat-icon {
+    font-size: 3rem;
+    margin-right: 20px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--light-bg);
+}
+
+.card-active .stat-icon {
+    color: var(--success-green);
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.card-inactive .stat-icon {
+    color: var(--danger-red);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.stat-info h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--dark-text);
+}
+
+.stat-info p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* Patient Table Styling */
+.patient-table thead th {
+    font-weight: 600;
+    color: var(--dark-text);
+    border-bottom: 2px solid #dee2e6;
+    padding: 15px;
+}
+
+.patient-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+    .patient-table tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+.patient-table td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+/* Patient Avatar */
+.patient-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.patient-avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+.status-active {
+    background-color: rgba(40, 167, 69, 0.15);
+    color: var(--success-green);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status-inactive {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: var(--danger-red);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.status-badge-large {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+}
+
+/* Detail Items (for Details page) */
+.detail-item {
+    margin-bottom: 20px;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    color: var(--dark-text);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Card Enhancements */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+/* Button Enhancements */
+.btn {
+    transition: all 0.3s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+.btn-group .btn {
+    transform: none;
+}
+
+    .btn-group .btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Form Improvements */
+.form-floating label {
+    color: #6c757d;
+}
+
+.form-floating input:focus ~ label {
+    color: var(--primary-blue);
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Form Switch Enhancement */
+.form-check-input:checked {
+    background-color: var(--success-green);
+    border-color: var(--success-green);
+}
+
+/* ========================================
+   DELETE PAGE ENHANCEMENTS
+   ======================================== */
+
+/* Delete Warning Alert */
+.alert-danger {
+    border-left: 5px solid #dc3545;
+}
+
+.alert-warning {
+    border-left: 4px solid #ffc107;
+}
+
+/* Delete Form Animation */
+.delete-form {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Delete Button with Shake Effect on Hover */
+.delete-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+    .delete-button:hover {
+        animation: shake 0.5s;
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Card Border for Delete Page */
+.card.border-danger {
+    border: 2px solid rgba(220, 53, 69, 0.3);
+}
+
+    .card.border-danger:hover {
+        border-color: rgba(220, 53, 69, 0.6);
+        transform: none; /* Override default card hover */
+    }
+
+/* Pulse Animation for Warning Icon */
+.alert-danger .fa-exclamation-triangle {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Enhanced Detail Labels for Delete Page */
+.delete-form + .text-center {
+    animation: fadeIn 0.8s ease-in 0.3s both;
+}
+
+/* Focus States for Delete Page */
+.delete-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.5);
+}
+
+/* Responsive Delete Page */
+@media (max-width: 768px) {
+    .delete-form .d-flex {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+        .delete-form .d-flex > div:last-child {
+            flex-direction: column;
+            width: 100%;
+        }
+
+    .delete-form .btn {
+        width: 100%;
+    }
+}
+
+/* Card Footer Enhancement */
+.card-footer.bg-light {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Alternative Action Box */
+.text-center.mt-4 {
+    padding: 20px;
+    background: rgba(13, 110, 253, 0.03);
+    border-radius: 10px;
+    border: 1px dashed #0d6efd;
+}
+
+.text-center.mt-4 .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .stat-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .patient-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 0.75rem;
+    }
+}

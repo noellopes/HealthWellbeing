@@ -1,78 +1,201 @@
 ﻿@model HealthWellbeing.Models.Patient
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Patient Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <a asp-action="Index" class="btn btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-user-circle me-2"></i>Patient Details
+            </h1>
+        </div>
+    </div>
 
-<div>
-    <h4>Patient</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateOfBirth)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EmergencyContact)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmergencyContact)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EmergencyPhone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmergencyPhone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RegistrationDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RegistrationDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PatientId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="row">
+        <!-- Main Info Card -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-id-card me-2"></i>Personal Information
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-user text-primary me-2"></i>First Name
+                                </label>
+                                <p class="detail-value">@Model.FirstName</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-user text-primary me-2"></i>Last Name
+                                </label>
+                                <p class="detail-value">@Model.LastName</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-birthday-cake text-primary me-2"></i>Date of Birth
+                                </label>
+                                <p class="detail-value">@Model.DateOfBirth.ToString("MMMM dd, yyyy")</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-calendar text-primary me-2"></i>Age
+                                </label>
+                                <p class="detail-value">
+                                    <span class="badge bg-info fs-6">@Model.Age years old</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-envelope text-primary me-2"></i>Email
+                                </label>
+                                <p class="detail-value">
+                                    <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-phone text-primary me-2"></i>Phone
+                                </label>
+                                <p class="detail-value">
+                                    @if (!string.IsNullOrEmpty(Model.Phone))
+                                    {
+                                        <a href="tel:@Model.Phone" class="text-decoration-none">@Model.Phone</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not provided</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contact Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Emergency Contact
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-user-shield text-danger me-2"></i>Contact Name
+                                </label>
+                                <p class="detail-value">
+                                    @(Model.EmergencyContact ?? "Not provided")
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-item">
+                                <label class="detail-label">
+                                    <i class="fas fa-phone-alt text-danger me-2"></i>Emergency Phone
+                                </label>
+                                <p class="detail-value">
+                                    @if (!string.IsNullOrEmpty(Model.EmergencyPhone))
+                                    {
+                                        <a href="tel:@Model.EmergencyPhone" class="text-decoration-none text-danger">@Model.EmergencyPhone</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not provided</span>
+                                    }
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <!-- Status Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center p-4">
+                    <div class="patient-avatar-large mx-auto mb-3">
+                        @Model.FirstName.Substring(0, 1)@Model.LastName.Substring(0, 1)
+                    </div>
+                    <h4 class="mb-3">@Model.FullName</h4>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge status-badge-large status-active">
+                            <i class="fas fa-check-circle me-2"></i>Active Patient
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge status-badge-large status-inactive">
+                            <i class="fas fa-times-circle me-2"></i>Inactive Patient
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <!-- Registration Info Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Registration Info
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="detail-item">
+                        <label class="detail-label">Registration Date</label>
+                        <p class="detail-value">@Model.RegistrationDate.ToString("MMMM dd, yyyy")</p>
+                    </div>
+                    <div class="detail-item">
+                        <label class="detail-label">Patient ID</label>
+                        <p class="detail-value">
+                            <span class="badge bg-secondary">#@Model.PatientId</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.PatientId" class="btn btn-primary btn-lg">
+                    <i class="fas fa-edit me-2"></i>Edit Patient
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model.PatientId" class="btn btn-outline-danger btn-lg">
+                    <i class="fas fa-trash me-2"></i>Delete Patient
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

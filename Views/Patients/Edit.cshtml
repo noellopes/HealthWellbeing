@@ -1,79 +1,171 @@
 ﻿@model HealthWellbeing.Models.Patient
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Patient";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary mb-3">
+                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                </a>
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="fas fa-user-edit me-2"></i>Edit Patient
+                </h1>
+                <p class="text-muted">Update patient information</p>
+            </div>
 
-<h4>Patient</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="PatientId" />
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <input asp-for="UserId" class="form-control" />
-                <span asp-validation-for="UserId" class="text-danger"></span>
+            <!-- Form Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-medical me-2"></i>Patient Information Form
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                        <input type="hidden" asp-for="PatientId" />
+                        <input type="hidden" asp-for="RegistrationDate" />
+
+                        <!-- Patient ID Display -->
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Editing Patient ID: <strong>#@Model.PatientId</strong> |
+                            Registered: <strong>@Model.RegistrationDate.ToString("MMM dd, yyyy")</strong>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <h5 class="text-primary mb-3 border-bottom pb-2">
+                            <i class="fas fa-user me-2"></i>Personal Information
+                        </h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FirstName" class="form-control" placeholder="First Name" />
+                                    <label asp-for="FirstName" class="form-label">
+                                        <i class="fas fa-user me-2"></i>First Name
+                                    </label>
+                                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="LastName" class="form-control" placeholder="Last Name" />
+                                    <label asp-for="LastName" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Last Name
+                                    </label>
+                                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-floating">
+                                <input asp-for="DateOfBirth" class="form-control" type="date" placeholder="Date of Birth" />
+                                <label asp-for="DateOfBirth" class="form-label">
+                                    <i class="fas fa-birthday-cake me-2"></i>Date of Birth
+                                </label>
+                                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                <small class="text-muted">Current Age: <strong>@Model.Age years</strong></small>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information Section -->
+                        <h5 class="text-primary mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-address-book me-2"></i>Contact Information
+                        </h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" class="form-control" placeholder="Email" />
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email
+                                    </label>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Phone" class="form-control" placeholder="Phone" />
+                                    <label asp-for="Phone" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>Phone (Optional)
+                                    </label>
+                                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact Section -->
+                        <h5 class="text-danger mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Emergency Contact
+                        </h5>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="EmergencyContact" class="form-control" placeholder="Emergency Contact" />
+                                    <label asp-for="EmergencyContact" class="form-label">
+                                        <i class="fas fa-user-shield me-2"></i>Contact Name (Optional)
+                                    </label>
+                                    <span asp-validation-for="EmergencyContact" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="EmergencyPhone" class="form-control" placeholder="Emergency Phone" />
+                                    <label asp-for="EmergencyPhone" class="form-label">
+                                        <i class="fas fa-phone-alt me-2"></i>Emergency Phone (Optional)
+                                    </label>
+                                    <span asp-validation-for="EmergencyPhone" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Section -->
+                        <h5 class="text-primary mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-toggle-on me-2"></i>Status
+                        </h5>
+
+                        <div class="form-check form-switch mb-4">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" id="isActiveSwitch" />
+                            <label class="form-check-label" for="isActiveSwitch">
+                                <strong>Active Patient</strong>
+                                <small class="text-muted d-block">Toggle to set patient as active or inactive</small>
+                            </label>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+
+            <!-- Delete Section -->
+            <div class="mt-3">
+                <a asp-action="Delete" asp-route-id="@Model.PatientId" class="btn btn-outline-danger">
+                    <i class="fas fa-trash me-2"></i>Delete Patient
+                </a>
             </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DateOfBirth" class="control-label"></label>
-                <input asp-for="DateOfBirth" class="form-control" />
-                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmergencyContact" class="control-label"></label>
-                <input asp-for="EmergencyContact" class="form-control" />
-                <span asp-validation-for="EmergencyContact" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EmergencyPhone" class="control-label"></label>
-                <input asp-for="EmergencyPhone" class="form-control" />
-                <span asp-validation-for="EmergencyPhone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RegistrationDate" class="control-label"></label>
-                <input asp-for="RegistrationDate" class="form-control" />
-                <span asp-validation-for="RegistrationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

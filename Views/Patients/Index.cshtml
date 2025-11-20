@@ -1,89 +1,153 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Patient>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Patient Management";
 }
 
-<h1>Index</h1>
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-users me-2"></i>Patient Management
+            </h1>
+            <p class="text-muted">Manage and monitor patient information</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Create" class="btn btn-primary btn-lg shadow-sm">
+                <i class="fas fa-user-plus me-2"></i>Add New Patient
+            </a>
+        </div>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UserId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfBirth)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmergencyContact)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmergencyPhone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RegistrationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfBirth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmergencyContact)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmergencyPhone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RegistrationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PatientId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PatientId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PatientId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="stat-card card-active">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>@Model.Count(p => p.IsActive)</h3>
+                    <p>Active Patients</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stat-card card-inactive">
+                <div class="stat-icon">
+                    <i class="fas fa-user-times"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>@Model.Count(p => !p.IsActive)</h3>
+                    <p>Inactive Patients</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patients Table Card -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 text-primary">
+                <i class="fas fa-list me-2"></i>All Patients
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 patient-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">
+                                <i class="fas fa-user me-2"></i>Name
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar me-2"></i>Age
+                            </th>
+                            <th>
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </th>
+                            <th>
+                                <i class="fas fa-phone me-2"></i>Phone
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-plus me-2"></i>Registration
+                            </th>
+                            <th>
+                                <i class="fas fa-toggle-on me-2"></i>Status
+                            </th>
+                            <th class="text-center">
+                                <i class="fas fa-cog me-2"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var patient in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="patient-avatar me-3">
+                                            @patient.FirstName.Substring(0, 1)@patient.LastName.Substring(0, 1)
+                                        </div>
+                                        <div>
+                                            <strong>@patient.FullName</strong>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">@patient.Age years</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@patient.Email</small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@(patient.Phone ?? "N/A")</small>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@patient.RegistrationDate.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td>
+                                    @if (patient.IsActive)
+                                    {
+                                        <span class="badge status-badge status-active">
+                                            <i class="fas fa-check-circle me-1"></i>Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge status-badge status-inactive">
+                                            <i class="fas fa-times-circle me-1"></i>Inactive
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="Details" asp-route-id="@patient.PatientId"
+                                           class="btn btn-outline-info" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@patient.PatientId"
+                                           class="btn btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@patient.PatientId"
+                                           class="btn btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                Total: <strong>@Model.Count()</strong> patients
+            </small>
+        </div>
+    </div>
+</div>
