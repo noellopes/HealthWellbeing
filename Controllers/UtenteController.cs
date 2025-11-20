@@ -1,17 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using HealthWellbeing.Models;
+﻿using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
     public class UtentesController : Controller
     {
-        public IActionResult Index()
-        {
-            var lista = UtenteService.GetAll();
-            return View(lista);
-        }
 
-        public IActionResult Details(int id)
+       public IActionResult Index(int page = 1)
+    {
+        var lista = UtenteService.GetAll();
+        int total = lista.Count;
+
+        var vm = new Paginacao<UtenteBalneario>(page, total);
+        vm.Items = lista
+            .OrderBy(u => u.NomeCompleto)
+            .Skip(vm.ItemsToSkip)
+            .Take(vm.ItemsPerPage)
+            .ToList();
+
+        return View(vm);
+    }
+
+    public IActionResult Details(int id)
         {
             var utente = UtenteService.GetById(id);
             if (utente == null) return NotFound();
@@ -75,6 +87,10 @@ namespace HealthWellbeing.Controllers
             UtenteService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
+
+        
     }
+
+
 }
 //teste
