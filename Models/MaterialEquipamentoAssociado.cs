@@ -18,6 +18,9 @@ namespace HealthWellbeing.Models
         [StringLength(50)]
         public string EstadoComponente { get; set; } = string.Empty;
 
-        
+        // NOVO: Propriedade de Navegação para M:N
+        public ICollection<ExameTipoRecurso>? ExameTipoRecursos { get; set; }
+
+
     }
 }

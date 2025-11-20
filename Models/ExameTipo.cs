@@ -21,6 +21,9 @@ namespace HealthWellbeing.Models
         public int EspecialidadeId { get; set; } // FK
         public Especialidade? Especialidade { get; set; } // Propriedade de Navegação
 
+        // NOVO: Propriedade de Navegação para M:N
+        public ICollection<ExameTipoRecurso>? ExameTipoRecursos { get; set; }
+
 
 
 
