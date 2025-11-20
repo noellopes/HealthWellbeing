@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251120163543_InitialCreate")]
+    [Migration("20251120194120_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -642,7 +642,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.GrupoMuscular", "GrupoMuscular")
                         .WithMany("Musculos")
                         .HasForeignKey("GrupoMuscularId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("GrupoMuscular");

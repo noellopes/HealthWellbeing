@@ -313,8 +313,7 @@ namespace HealthWellbeing.Migrations
                         name: "FK_Musculo_GrupoMuscular_GrupoMuscularId",
                         column: x => x.GrupoMuscularId,
                         principalTable: "GrupoMuscular",
-                        principalColumn: "GrupoMuscularId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "GrupoMuscularId");
                 });
 
             migrationBuilder.CreateTable(

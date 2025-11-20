@@ -639,7 +639,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.GrupoMuscular", "GrupoMuscular")
                         .WithMany("Musculos")
                         .HasForeignKey("GrupoMuscularId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("GrupoMuscular");
