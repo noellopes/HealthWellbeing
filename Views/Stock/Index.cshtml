@@ -55,7 +55,9 @@
                     <input class="form-check-input"
                            type="checkbox"
                            name="stockCritico"
-                           @(ViewBag.StockCritico ? "checked" : "") />
+                           value="true"
+                           @(ViewBag.StockCritico == true ? "checked" : "") />
+
 
                     <label class="form-check-label">
                         ⚠️ Só stock crítico
