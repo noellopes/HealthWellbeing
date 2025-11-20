@@ -1,38 +1,160 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Beneficio>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Beneficio>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Benefícios";
 }
 
-<h1>Index</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">Create New</a>
-</p>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NomeBeneficio)
-            </th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.BeneficioId" class="text-decoration-none fw-bold">
-                        @Html.DisplayFor(modelItem => item.NomeBeneficio)
-                    </a>
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-info">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    string alertClass = "alert-info";
+
+    if (statusMessage.StartsWith("Sucesso:"))
+    {
+        alertClass = "alert-success";
+    }
+    else if (statusMessage.StartsWith("Aviso:"))
+    {
+        alertClass = "alert-warning";
+    }
+    else if (statusMessage.StartsWith("Erro:"))
+    {
+        alertClass = "alert-danger";
+    }
+
+
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @statusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista</h2>
+    <div>
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+            <i class="bi bi-search me-1"></i> Pesquisa
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+        </a>
+    </div>
+</div>
+
+
+<div class="collapse mb-3" id="searchForm">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+            <div class="col-md-6">
+                <label for="searchNome" class="form-label">Nome</label>
+                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchDescricao" class="form-label">Descrição</label>
+                <input id="searchDescricao" name="searchDescricao" value="@ViewBag.SearchDescricao" class="form-control" placeholder="Procurar na descrição" />
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Procurar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning">Nenhum benefício encontrado.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.NomeBeneficio</td>
+                        
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.DescricaoBeneficio))
+                            {
+                                @item.DescricaoBeneficio
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Sem descrição</span>
+                            }
+                        </td>
+
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-warning">Editar</a>
+                            <a asp-action="Details" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-info">Detalhes</a>
+                            <a asp-action="Delete" asp-route-id="@item.BeneficioId" class="btn btn-sm btn-danger">Apagar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        
+        <nav>
+            <ul class="pagination">
+                @{
+                    var routeData = new Dictionary<string, string>
+                    {
+                        { "searchNome", ViewBag.SearchNome },
+                        { "searchDescricao", ViewBag.SearchDescricao }
+                    };
+                }
+
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    { routeData["page"] = "1"; }
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        { routeData["page"] = p.ToString(); }
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a></li>
+                    }
+                }
+
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    { routeData["page"] = Model.TotalPages.ToString(); }
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Última</a></li>
+                }
+            </ul>
+        </nav>
+    </div>
+}

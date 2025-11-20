@@ -1,14 +1,32 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar";
     var beneficios = ViewData["Beneficios"] as List<Beneficio> ?? new List<Beneficio>();
     var selectedBeneficios = ViewData["SelectedBeneficios"] as List<int> ?? new List<int>();
 }
 
-<h1>Edit</h1>
+<h1>Editar</h1>
 
-<h4>TipoExercicio</h4>
+<h4>Tipo de Exercício</h4>
+
+@if (ViewData["StatusMessage"] is string statusMessage)
+{
+    
+    string alertClass = "alert-info";
+
+    if (statusMessage.StartsWith("Erro:", StringComparison.OrdinalIgnoreCase))
+    {
+        alertClass = "alert-danger";
+    }
+
+
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @statusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
 <hr />
 <div class="row">
     <div class="col-md-8">
@@ -17,27 +35,26 @@
             <input type="hidden" asp-for="TipoExercicioId" />
 
             <div class="form-group mb-3">
-                <label asp-for="NomeTipoExercicios" class="control-label"></label>
+                <label asp-for="NomeTipoExercicios" class="control-label">Nome do Tipo de Exercício</label>
                 <input asp-for="NomeTipoExercicios" class="form-control" />
                 <span asp-validation-for="NomeTipoExercicios" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="DescricaoTipoExercicios" class="control-label"></label>
+                <label asp-for="DescricaoTipoExercicios" class="control-label">Descrição</label>
                 <textarea asp-for="DescricaoTipoExercicios" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="DescricaoTipoExercicios" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
-                <label asp-for="CaracteristicasTipoExercicios" class="control-label"></label>
+                <label asp-for="CaracteristicasTipoExercicios" class="control-label">Características Principais</label>
                 <textarea asp-for="CaracteristicasTipoExercicios" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="CaracteristicasTipoExercicios" class="text-danger"></span>
             </div>
 
-            <!-- ✅ ADICIONADO: Checkboxes para Benefícios -->
             <div class="form-group mb-4">
                 <label class="control-label fw-bold">Benefícios Associados</label>
-                <small class="form-text text-muted d-block">Selecione os benefícios associados a este tipo de exercício</small>
+                <small class="form-text text-muted d-block">Selecione ou desmarque os benefícios associados a este tipo de exercício</small>
                 <div class="border p-3 rounded mt-2">
                     @if (beneficios.Any())
                     {
@@ -77,15 +94,11 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <input type="submit" value="Guardar" class="btn btn-success" /> 
+                <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

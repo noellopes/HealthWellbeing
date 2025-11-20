@@ -94,6 +94,14 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MusculoId,Nome_Musculo,GrupoMuscularId")] Musculo musculo)
         {
+            bool musculoJaExistente = await _context.Musculo.AnyAsync(g => g.Nome_Musculo.ToLower() == musculo.Nome_Musculo.ToLower());
+
+            if (musculoJaExistente)
+            {
+                ViewBag.MensagemErro = "Já existe um musculo com este nome.";
+                return View(musculo);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(musculo);

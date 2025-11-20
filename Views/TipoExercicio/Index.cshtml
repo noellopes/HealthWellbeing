@@ -6,6 +6,32 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    string alertClass = "alert-info"; 
+
+    if (statusMessage.StartsWith("Sucesso:"))
+    {
+        alertClass = "alert-success"; 
+    }
+    else if (statusMessage.StartsWith("Aviso:"))
+    {
+        alertClass = "alert-warning"; 
+    }
+    else if (statusMessage.StartsWith("Erro:"))
+    {
+        alertClass = "alert-danger"; 
+    }
+
+    
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        @statusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Lista</h2>
     <div>
@@ -21,17 +47,17 @@
 <div class="collapse mb-3" id="searchForm">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-4">
+
+           
+
+            <div class="col-md-6">
                 <label for="searchNome" class="form-label">Nome</label>
                 <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
             </div>
 
-            <div class="col-md-4">
-                <label for="searchDescricao" class="form-label">Descrição</label>
-                <input id="searchDescricao" name="searchDescricao" value="@ViewBag.SearchDescricao" class="form-control" placeholder="Procurar por descrição" />
-            </div>
+            
 
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <label for="searchBeneficio" class="form-label">Benefício</label>
                 <input id="searchBeneficio" name="searchBeneficio" value="@ViewBag.SearchBeneficio" class="form-control" placeholder="Procurar por benefício" />
             </div>
@@ -58,7 +84,6 @@ else
             <thead>
                 <tr>
                     <th>Nome</th>
-                    <th>Descrição</th>
                     <th>Benefícios</th>
                     <th>Ações</th>
                 </tr>
@@ -68,13 +93,13 @@ else
                 {
                     <tr>
                         <td>@item.NomeTipoExercicios</td>
-                        <td>@item.DescricaoTipoExercicios</td>
+
                         <td>
                             @if (item.TipoExercicioBeneficios != null && item.TipoExercicioBeneficios.Any())
                             {
                                 @foreach (var tb in item.TipoExercicioBeneficios.Take(3))
                                 {
-                                    
+
                                     if (tb.Beneficio != null)
                                     {
                                         <span class="badge bg-primary me-1 mb-1">@tb.Beneficio.NomeBeneficio</span>
@@ -91,6 +116,7 @@ else
                                 <span class="text-muted">Nenhum</span>
                             }
                         </td>
+
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-warning">Editar</a>
                             <a asp-action="Details" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-info">Detalhes</a>

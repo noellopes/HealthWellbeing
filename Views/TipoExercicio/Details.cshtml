@@ -1,13 +1,13 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes";
 }
 
-<h1>Details</h1>
+<h1>Detalhes</h1>
 
 <div>
-    <h4>TipoExercicio</h4>
+    <h4>Tipo de Exercício</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -43,7 +43,8 @@
                             <li>
                                 <a href="@Url.Action("Details", "Beneficio", new { id = item.BeneficioId })"
                                    target="_blank"
-                                   class="text-decoration-none">
+                                   class="text-decoration-none"
+                                   title="Ver detalhes do benefício">
                                     📌 @item.Beneficio.NomeBeneficio
                                 </a>
 
@@ -66,6 +67,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.TipoExercicioId" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.TipoExercicioId" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
 </div>
