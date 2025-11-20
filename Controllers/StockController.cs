@@ -127,6 +127,10 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stock stock)
         {
+            ModelState.Remove("Consumivel");
+            ModelState.Remove("Zona");
+            ModelState.Remove("DataUltimaAtualizacao");
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Consumiveis = _context.Consumivel.ToList();
@@ -134,19 +138,6 @@ namespace HealthWellbeing.Controllers
                 return View(stock);
             }
 
-            // Buscar zona selecionada
-            var zona = _context.ZonaArmazenamento.FirstOrDefault(z => z.Id == stock.ZonaID);
-
-            if (zona == null)
-            {
-                ModelState.AddModelError("", "A zona selecionada não existe.");
-                ViewBag.Consumiveis = _context.Consumivel.ToList();
-                ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
-                return View(stock);
-            }
-
-            // Atribui automaticamente a capacidade máxima da zona ao stock
-            stock.QuantidadeMaxima = (int)zona.CapacidadeMaxima;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
             _context.Stock.Add(stock);
@@ -155,6 +146,8 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Stock criado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
+
 
         // ===========================
         // DETAILS
@@ -204,12 +197,8 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Stock stock)
         {
-            // Os campos complexos (Consumivel/Zona/DataUltimaAtualizacao/QuantidadeMaxima)
-            // não são enviados no form quando estão disabled. Removemos a validação
-            // para esses campos para que o ModelState não bloqueie o POST.
             ModelState.Remove("Consumivel");
             ModelState.Remove("Zona");
-            ModelState.Remove("QuantidadeMaxima");
             ModelState.Remove("DataUltimaAtualizacao");
 
             if (!ModelState.IsValid)
@@ -223,21 +212,17 @@ namespace HealthWellbeing.Controllers
             if (original == null)
                 return NotFound();
 
-            // Atualizar apenas os campos editáveis
             original.QuantidadeAtual = stock.QuantidadeAtual;
             original.QuantidadeMinima = stock.QuantidadeMinima;
+            original.QuantidadeMaxima = stock.QuantidadeMaxima; // <-- AGORA FICA CERTO
             original.DataUltimaAtualizacao = DateTime.Now;
-
-            // Atualiza QuantidadeMaxima com base na zona actual guardada
-            var zona = _context.ZonaArmazenamento.FirstOrDefault(z => z.Id == original.ZonaID);
-            if (zona != null)
-                original.QuantidadeMaxima = (int)zona.CapacidadeMaxima;
 
             _context.SaveChanges();
 
             TempData["Success"] = "Stock atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
 
         // ===========================
         // DELETE GET
