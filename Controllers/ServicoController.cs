@@ -28,6 +28,11 @@ namespace HealthWellbeing.Controllers
             return View(await _context.Servicos.ToListAsync());
         }
 
+        private IActionResult View(object value)
+        {
+            throw new NotImplementedException();
+        }
+
         // GET: Servico/Details/5
         public async Task<IActionResult> Details(int? id)
         {
