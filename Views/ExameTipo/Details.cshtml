@@ -47,6 +47,28 @@
                                 @Html.DisplayFor(model => model.Descricao)
                             </p>
                         </dd>
+                        <dt class="col-sm-3 text-muted mt-3">
+                            <i class="bi bi-tools me-1"></i> Recursos Necessários
+                        </dt>
+                        <dd class="col-sm-9 mt-3">
+                            @if (Model.ExameTipoRecursos != null && Model.ExameTipoRecursos.Any())
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var item in Model.ExameTipoRecursos)
+                                    {
+                                        <li class="list-group-item px-0 py-1">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            @item.Recurso!.NomeEquipamento
+                                            <span class="badge bg-secondary ms-2">Qtd: @item.Recurso.Quantidade</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Nenhum equipamento ou material associado a este exame.</span>
+                            }
+                        </dd>
 
                     </dl>
                 </div>
