@@ -560,6 +560,25 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("SalaDeExame");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
+            {
+                b.Property<int>("FuncaoId")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
+
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FuncaoId"));
+
+                b.Property<string>("NomeFuncao")
+                    .IsRequired()
+                    .HasMaxLength(150)
+                    .HasColumnType("nvarchar(150)");
+
+                b.HasKey("FuncaoId");
+
+                b.ToTable("Funcoes");
+            });
+
+
             modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ExameTipo", "ExameTipo")

@@ -28,6 +28,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<Funcao> Funcoes { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -56,6 +57,15 @@ namespace HealthWellbeing.Data
                 .HasOne(et => et.Especialidade)      // Um TipoExame tem uma Especialidade
                 .WithMany(e => e.TiposExame)         // Uma Especialidade tem muitos TiposExame
                 .HasForeignKey(et => et.EspecialidadeId); // Usando a FK definida
+
+
+            modelBuilder.Entity<ProfissionalExecutante>()
+                .HasOne(p => p.Funcao)
+                .WithMany()
+                .HasForeignKey(p => p.FuncaoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
 
             // SEEDING NOVO: Especialidades 
             modelBuilder.Entity<Especialidade>().HasData(
