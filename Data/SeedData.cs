@@ -15,10 +15,10 @@ namespace HealthWellbeing.Data
 
             dbContext.Database.EnsureCreated();
 
-            PopulateSpecialities(db);
-            PopulateConsultas(db);
-            PopulateDoctor(db);
-            PopulateUtenteSaude(db);
+            PopulateSpecialities(dbContext);
+            PopulateConsultas(dbContext);
+            PopulateDoctor(dbContext);
+            PopulateUtenteSaude(dbContext);
 
             var clients = PopulateClients(dbContext);
             PopulateMember(dbContext, clients);
