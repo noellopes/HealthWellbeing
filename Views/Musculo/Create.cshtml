@@ -5,6 +5,14 @@
 }
 
 <div class="container mt-4">
+
+    @if (ViewBag.MensagemErro != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.MensagemErro
+        </div>
+    }
+
     <h2 class="mb-4 text-success"><i class="fas fa-plus-circle"></i> @ViewData["Title"]</h2>
 
     <form asp-action="Create" method="post">
