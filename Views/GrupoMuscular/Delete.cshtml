@@ -5,6 +5,13 @@
 }
 
 <div class="container mt-4">
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.Error
+        </div>
+    }
+    
     <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
     <p class="lead">Tem a certeza que deseja eliminar este grupo muscular? Esta ação não pode ser desfeita.</p>
