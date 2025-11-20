@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -16,18 +17,38 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string? clientId)
+        // INDEX COM PESQUISA E PAGINAÇÃO SIMPLES
+        public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
+            int pageSize = 10; // nº de registos por página
+
             var query = _context.Goal
                 .Include(g => g.Client)
                 .AsNoTracking()
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(clientId))
-                query = query.Where(g => g.ClientId == clientId);
+            // filtro de pesquisa: por Client ou GoalType
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(g =>
+                    (g.Client != null && g.Client.Name.Contains(searchString)) ||
+                    g.GoalType.Contains(searchString));
+            }
 
-            ViewBag.ClientId = clientId;
-            return View(await query.OrderBy(g => g.GoalType).ToListAsync());
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var list = await query
+                .OrderBy(g => g.GoalType)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.SearchString = searchString;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(list);
         }
 
         public async Task<IActionResult> Details(int? id)

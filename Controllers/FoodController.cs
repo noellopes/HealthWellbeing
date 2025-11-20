@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,13 +21,34 @@ namespace HealthWellbeing.Controllers
             => ViewBag.FoodCategoryId = new SelectList(_context.FoodCategory.AsNoTracking().OrderBy(c => c.Name), "FoodCategoryId", "Name", selected);
 
         // GET: Food
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, int page = 1)
         {
-            var foods = await _context.Food
+            var query = _context.Food
                 .Include(f => f.FoodCategory)
                 .AsNoTracking()
                 .OrderBy(f => f.Name)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(f =>
+                    f.Name.Contains(search) ||
+                    (f.FoodCategory != null && f.FoodCategory.Name.Contains(search))
+                );
+            }
+
+            var totalItems = await query.CountAsync();
+            var pageSize = 10;
+            var totalPages = (int)System.Math.Ceiling(totalItems / (double)pageSize);
+
+            var foods = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.Search = search;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(foods);
         }
@@ -68,6 +91,7 @@ namespace HealthWellbeing.Controllers
 
             _context.Add(food);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Food created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -103,6 +127,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Update(food);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Food updated successfully.";
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -137,6 +162,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Food.Remove(food);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Food deleted successfully.";
             }
             return RedirectToAction(nameof(Index));
         }

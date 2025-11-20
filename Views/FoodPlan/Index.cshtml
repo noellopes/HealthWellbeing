@@ -1,47 +1,95 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.FoodPlan>
+
 @{
     ViewData["Title"] = "Food Plans";
 }
 
-<h1 class="mb-3">Food Plans</h1>
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
-@if (TempData["Success"] != null)
+@if (!string.IsNullOrWhiteSpace(TempData["Success"] as string))
 {
     <div class="alert alert-success">@TempData["Success"]</div>
 }
-@if (TempData["Error"] != null)
+@if (!string.IsNullOrWhiteSpace(TempData["Error"] as string))
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<p>
+<!-- Linha Create New Plan + Pesquisa -->
+<div class="d-flex justify-content-between align-items-center mb-3">
     <a asp-action="Create" class="btn btn-primary">Create New Plan</a>
-</p>
 
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>Goal</th>
-            
-            
-            <th>Nutritionist</th>
-            <th style="width:190px;"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <form method="get" asp-action="Index" class="d-flex">
+        <input type="text"
+               name="searchString"
+               value="@ViewBag.SearchString"
+               class="form-control me-2"
+               placeholder="Pesquisar..." />
+        <button class="btn btn-primary me-2" type="submit">Pesquisar</button>
+        <a class="btn btn-secondary" asp-action="Index">Limpar</a>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No food plans found.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
             <tr>
-                <td>@item.Goal?.GoalType</td>
-                
-                
-                <td>@item.Nutritionist?.Name</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-secondary">Details</a>
-                    <a asp-action="Edit" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
+                <th>Client</th>
+                <th>Goal</th>
+                <th>Food</th>
+                <th>Nutritionist</th>
+                <th style="width:190px;"></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Client?.Name</td>
+                    <td>@item.Goal?.GoalType</td>
+                    <td>@item.Food?.Name</td>
+                    <td>@item.Nutritionist?.Name</td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.FoodPlanId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Paginação simples -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage - 1)"
+                   asp-route-searchString="@ViewBag.SearchString">Previous</a>
+            </li>
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-searchString="@ViewBag.SearchString">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(ViewBag.CurrentPage + 1)"
+                   asp-route-searchString="@ViewBag.SearchString">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

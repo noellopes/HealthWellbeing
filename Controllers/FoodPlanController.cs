@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -24,7 +25,6 @@ namespace HealthWellbeing.Controllers
                 "ClientId", "Name", clientId
             );
 
-            // Goals (filtra pelo cliente se existir)
             var goalsQuery = _context.Goal.AsNoTracking().OrderBy(g => g.GoalType).AsQueryable();
             if (!string.IsNullOrWhiteSpace(clientId))
                 goalsQuery = goalsQuery.Where(g => g.ClientId == clientId);
@@ -45,16 +45,41 @@ namespace HealthWellbeing.Controllers
             );
         }
 
-        public async Task<IActionResult> Index()
+        // INDEX COM PESQUISA E PAGINAÇÃO
+        public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
-            var list = await _context.FoodPlan
+            int pageSize = 10;
+
+            var query = _context.FoodPlan
                 .Include(p => p.Client)
                 .Include(p => p.Goal)
                 .Include(p => p.Food)
                 .Include(p => p.Nutritionist)
                 .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                query = query.Where(p =>
+                    (p.Client != null && p.Client.Name.Contains(searchString)) ||
+                    (p.Goal != null && p.Goal.GoalType.Contains(searchString)) ||
+                    (p.Food != null && p.Food.Name.Contains(searchString)) ||
+                    (p.Nutritionist != null && p.Nutritionist.Name.Contains(searchString))
+                );
+            }
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var list = await query
                 .OrderByDescending(p => p.FoodPlanId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.SearchString = searchString;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(list);
         }
@@ -118,6 +143,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
+
             var model = await _context.FoodPlan.FindAsync(id);
             if (model == null) return NotFound();
 
@@ -178,7 +204,6 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-      
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -214,18 +239,6 @@ namespace HealthWellbeing.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GoalsByClient(string clientId)
-        {
-            var data = await _context.Goal
-                .Where(g => g.ClientId == clientId)
-                .OrderBy(g => g.GoalType)
-                .Select(g => new { g.GoalId, g.GoalType })
-                .ToListAsync();
-
-            return Json(data);
         }
     }
 }

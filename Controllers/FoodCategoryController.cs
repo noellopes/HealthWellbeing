@@ -18,15 +18,22 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: /FoodCategory
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString)
         {
-            var categories = await _context.FoodCategory
+            var categories = _context.FoodCategory
                 .Include(c => c.ParentCategory)
                 .AsNoTracking()
-                .OrderBy(c => c.Name)
-                .ToListAsync();
+                .AsQueryable();
 
-            return View(categories);
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                searchString = searchString.Trim().ToLower();
+                categories = categories.Where(c => c.Name.ToLower().Contains(searchString)
+                                                || (c.ParentCategory != null && c.ParentCategory.Name.ToLower().Contains(searchString)));
+            }
+
+            var list = await categories.OrderBy(c => c.Name).ToListAsync();
+            return View(list);
         }
 
         // GET: /FoodCategory/Details/5
@@ -57,7 +64,6 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,ParentCategoryId")] FoodCategory category)
         {
-            // Server-side uniqueness check
             if (ModelState.IsValid)
             {
                 bool nameExists = await _context.FoodCategory
@@ -120,10 +126,8 @@ namespace HealthWellbeing.Controllers
             {
                 bool createsCycle = await IsDescendantAsync(category.ParentCategoryId.Value, category.FoodCategoryId);
                 if (createsCycle)
-                {
                     ModelState.AddModelError(nameof(FoodCategory.ParentCategoryId),
                         "Invalid parent: this assignment would create a cycle in the hierarchy.");
-                }
             }
 
             // Uniqueness
@@ -224,7 +228,6 @@ namespace HealthWellbeing.Controllers
             var query = _context.FoodCategory.AsNoTracking().OrderBy(c => c.Name).AsQueryable();
             if (excludeId.HasValue)
             {
-                // exclude self and descendants
                 var descendants = await _context.FoodCategory
                     .Where(c => c.FoodCategoryId == excludeId.Value)
                     .SelectMany(c => c.SubCategory)
@@ -237,7 +240,6 @@ namespace HealthWellbeing.Controllers
             ViewData["ParentCategoryId"] = new SelectList(await query.ToListAsync(), "FoodCategoryId", "Name", selectedId);
         }
 
-        // Returns true if candidateParentId is a descendant of currentId (which would create a cycle)
         private async Task<bool> IsDescendantAsync(int candidateParentId, int currentId)
         {
             if (candidateParentId == currentId) return true;

@@ -17,15 +17,46 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        // INDEX COM PESQUISA E PAGINAÇÃO
+        public async Task<IActionResult> Index(string? searchString, int page = 1)
         {
-            var list = await _context.UserFoodRegistration
+            int pageSize = 10; // nº de registros por página
+
+            var query = _context.UserFoodRegistration
                 .Include(r => r.Client)
                 .Include(r => r.Food)
                 .Include(r => r.FoodPortion)
                 .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                // tenta converter searchString em data
+                bool isDate = DateTime.TryParse(searchString, out DateTime searchDate);
+
+                query = query.Where(r =>
+                    (isDate && r.MealDateTime.Date == searchDate.Date) ||      // pesquisa por data exata
+                    r.Client!.Name.Contains(searchString) ||
+                    r.Food!.Name.Contains(searchString) ||
+                    r.FoodPortion!.Label.Contains(searchString) ||
+                    r.PortionsCount.ToString().Contains(searchString) ||
+                    r.MealType.Contains(searchString) ||
+                    (r.EstimatedEnergyKcal.HasValue && r.EstimatedEnergyKcal.Value.ToString().Contains(searchString))
+                );
+            }
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var list = await query
                 .OrderByDescending(r => r.MealDateTime)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            ViewBag.SearchString = searchString;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(list);
         }
@@ -64,7 +95,6 @@ namespace HealthWellbeing.Controllers
 
             try
             {
-                // calcular energia estimada
                 model.EstimatedEnergyKcal = await CalculateEnergyAsync(model.FoodId, model.FoodPortionId, model.PortionsCount);
 
                 _context.Add(model);
@@ -80,10 +110,8 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
-
             var model = await _context.UserFoodRegistration.FindAsync(id);
             if (model == null) return NotFound();
 
@@ -130,10 +158,8 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
-
             var model = await _context.UserFoodRegistration
                 .Include(r => r.Client)
                 .Include(r => r.Food)
@@ -195,7 +221,6 @@ namespace HealthWellbeing.Controllers
 
             if (portion == null || nutrient == null) return null;
 
-            // energia = valor * (pesoPorção / 100) * nº porções
             return Math.Round(((nutrient.Value / 100m) * portion.AmountGramsMl * portionsCount), 2);
         }
     }
