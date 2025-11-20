@@ -175,15 +175,42 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var grupoMuscular = await _context.GrupoMuscular.FindAsync(id);
-            if (grupoMuscular != null)
+            var grupoMuscular = await _context.GrupoMuscular
+                .FirstOrDefaultAsync(g => g.GrupoMuscularId == id);
+
+            if (grupoMuscular == null)
             {
-                _context.GrupoMuscular.Remove(grupoMuscular);
+                ViewBag.Error = "Grupo muscular não encontrado.";
+                return View();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.GrupoMuscular.Remove(grupoMuscular);
+                await _context.SaveChangesAsync();
+
+                
+                TempData["SuccessMessage"] = $"Grupo muscular '{grupoMuscular.GrupoMuscularNome}' eliminado com sucesso.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception)
+            {
+                int numberMusculos = await _context.Musculo.Where(m => m.GrupoMuscularId == id).CountAsync();
+
+                if (numberMusculos > 0)
+                {
+                    ViewBag.Error = $"Não é possível eliminar este grupo muscular porque está associado a {numberMusculos} músculos. Elimine primeiro esses músculos.";
+                }
+                else
+                {
+                    ViewBag.Error = "Ocorreu um erro ao eliminar o grupo muscular. Tente novamente ou contacte o suporte.";
+                }
+
+                return View(grupoMuscular);
+            }
         }
+
+
 
         private bool GrupoMuscularExists(int id)
         {

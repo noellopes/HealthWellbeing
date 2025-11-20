@@ -32,6 +32,17 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Chave primária do GrupoMuscular
+            modelBuilder.Entity<GrupoMuscular>()
+                .HasKey(g => g.GrupoMuscularId);
+
+            // Relação Musculo → GrupoMuscular
+            modelBuilder.Entity<Musculo>()
+                .HasOne(m => m.GrupoMuscular)
+                .WithMany(g => g.Musculos)
+                .HasForeignKey(m => m.GrupoMuscularId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<TipoExercicioBeneficio>()
                 .HasKey(tb => new { tb.TipoExercicioId, tb.BeneficioId });
 
