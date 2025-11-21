@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1.Services;
+using HealthWellbeing.Utils.Group1.Interfaces;
 
 namespace HealthWellbeing.Data
 {
@@ -39,13 +38,43 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        // GROUP 1
+        public DbSet<HealthWellbeing.Models.Nurse> Nurse { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Pathology> Pathology { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TreatmentType> TreatmentType { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TreatmentRecord> TreatmentRecord { get; set; } = default!;
+
+
+        // Adiciona capacidade de "Soft Delete" ao contexto
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Regista um filtro nas query dos modelos que implementam ISoftDeletable
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                if (typeof(ISoftDeletableEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    var method = typeof(ModelBuilder).GetMethods()
+                        .First(m => m.Name == "Entity" && m.IsGenericMethod);
+                    var genericMethod = method.MakeGenericMethod(entityType.ClrType);
+                    dynamic entityBuilder = genericMethod.Invoke(modelBuilder, null);
+                    entityBuilder.HasQueryFilter(CreateIsDeletedFilter(entityType.ClrType));
+                }
+            }
 
             modelBuilder.Entity<Event>()
-                .HasOne(e => e.EventType)
-                .WithMany()
-                .HasForeignKey(e => e.EventTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
+               .HasOne(e => e.EventType)
+               .WithMany()
+               .HasForeignKey(e => e.EventTypeId)
+               .OnDelete(DeleteBehavior.NoAction);
+        }
+        private static LambdaExpression CreateIsDeletedFilter(Type entityType)
+        {
+            var param = Expression.Parameter(entityType, "x");
+            var prop = Expression.Property(param, "IsDeleted");
+            var condition = Expression.Equal(prop, Expression.Constant(false));
+            return Expression.Lambda(condition, param);
         }
     }
 }

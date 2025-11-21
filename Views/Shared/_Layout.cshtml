@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
@@ -19,9 +20,21 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <!-- GROUP 1 -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Gestão de Tratamentos</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Nurses" asp-action="Index">Enfermeiros</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Pathologies" asp-action="Index">Patologias</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TreatmentTypes" asp-action="Index">Tipos de Tratamento</a></li>
+                                <hr class="dropdown-divider" />
+                                <li class="p-2">Tratamentos</li>
+                                <hr class="dropdown-divider" />
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TreatmentRecords" asp-action="Index">Lista de Tratamentos</a></li>
+                            </ul>
                         </li>
 
                         <li class="nav-item dropdown">
