@@ -3,14 +3,95 @@
 
 @{
     ViewData["Title"] = "Levels";
+    var successMessage = TempData["SuccessMessage"] as string;
 }
 
+<style>
+    /* Slightly larger, more visible toast */
+    #successToast {
+        min-width: 28rem;
+        max-width: 40rem;
+        border-radius: .75rem;
+        /* subtle green glow outline + stronger drop shadow */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(16,185,129,0.06);
+        font-size: 1.02rem;
+    }
+
+    #successToast .toast-body {
+        padding: 1rem 1.25rem;
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    #successToast .toast-body .bi {
+        font-size: 1.5rem;
+        opacity: .95;
+    }
+</style>
+
 <div class="container py-4">
+
+    <!-- Toast container (top-center) -->
+    <div class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index:1080;">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="polite" aria-atomic="true" data-bs-delay="4000" data-bs-autohide="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-check-circle-fill text-white" aria-hidden="true"></i>
+                        <div class="flex-grow-1">@successMessage</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        }
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Levels</h1>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New Level
-        </a>
+
+        <div class="d-flex align-items-center">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#levelSearch" aria-expanded="false" aria-controls="levelSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New Level
+            </a>
+        </div>
+    </div>
+
+    <div class="collapse mt-2 mb-3 @( (ViewBag.SearchNumber != null || ViewBag.SearchCategory != null || ViewBag.SearchDescription != null) ? "show" : "")" id="levelSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="searchNumber" class="form-label">Level Number</label>
+                    <input id="searchNumber"
+                           name="searchNumber"
+                           value="@(ViewBag.SearchNumber ?? "")"
+                           class="form-control"
+                           type="number"
+                           min="1" max="100" step="1"
+                           placeholder="Exact number (1–100)" />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchCategory" class="form-label">Category</label>
+                    <input id="searchCategory" name="searchCategory" value="@(ViewBag.SearchCategory ?? "")" class="form-control" placeholder="Contains..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchDescription" class="form-label">Description</label>
+                    <input id="searchDescription" name="searchDescription" value="@(ViewBag.SearchDescription ?? "")" class="form-control" placeholder="Contains..." />
+                </div>
+
+                <div class="col-12 mt-1 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="card shadow-sm">
@@ -36,9 +117,26 @@
                                     <td>@Html.DisplayFor(modelItem => item.Description)</td>
                                     <td class="text-end">
                                         <div class="btn-group" role="group" aria-label="Actions">
-                                            <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-info">Details</a>
-                                            <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-warning">Edit</a>
-                                            <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-danger">Delete</a>
+                                            <a asp-action="Details" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                                               asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                                               asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")"
+                                               class="btn btn-sm btn-outline-info">Details</a>
+
+                                            <a asp-action="Edit" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                                               asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                                               asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")"
+                                               class="btn btn-sm btn-outline-warning">Edit</a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                                               asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                                               asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")"
+                                               class="btn btn-sm btn-outline-danger">Delete</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -57,8 +155,7 @@
 
         <div class="card-footer d-flex align-items-center justify-content-between">
             @{
-
-                var page = Model.CurrentPage;
+                var page = Model.CurrentPage;           
                 var pageSize = Model.PageSize;
                 var startItem = Model.TotalItems == 0 ? 0 : ((page - 1) * pageSize + 1);
                 var endItem = Math.Min(Model.TotalItems, page * pageSize);
@@ -71,21 +168,42 @@
             <nav aria-label="Levels page">
                 <ul class="pagination mb-0">
                     <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="1">First</a>
+                        <a class="page-link" asp-action="Index" asp-route-page="1"
+                           asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                           asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                           asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")">First</a>
                     </li>
 
                     @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                     {
                         <li class="page-item @(p == Model.CurrentPage ? "active" : "")" aria-current="@(p == Model.CurrentPage ? "page" : null)">
-                            <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                            <a class="page-link" asp-action="Index" asp-route-page="@p"
+                               asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                               asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                               asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")">@p</a>
                         </li>
                     }
 
                     <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Last</a>
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                           asp-route-searchNumber="@(ViewBag.SearchNumber ?? "")"
+                           asp-route-searchCategory="@(ViewBag.SearchCategory ?? "")"
+                           asp-route-searchDescription="@(ViewBag.SearchDescription ?? "")">Last</a>
                     </li>
                 </ul>
             </nav>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastEl = document.getElementById('successToast');
+            if (toastEl && typeof bootstrap !== 'undefined') {
+                var toast = bootstrap.Toast.getOrCreateInstance ? bootstrap.Toast.getOrCreateInstance(toastEl) : new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        });
+    </script>
+}

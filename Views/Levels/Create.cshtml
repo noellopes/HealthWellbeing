@@ -17,21 +17,21 @@
                     {
                         <div class="alert alert-danger" role="alert">
                             <strong>Please fix the errors below.</strong>
-                            <div asp-validation-summary="ModelOnly" class="mb-0"></div>
+                            <div asp-validation-summary="All" class="mb-0"></div>
                         </div>
                     }
 
-                    <form asp-action="Create" method="post" novalidate>
+                    <form asp-action="Create" method="post">
                         @Html.AntiForgeryToken()
 
                         <div class="form-floating mb-3">
                             <input asp-for="LevelNumber"
+                                   type="number"
+                                   min="1" max="100" step="1"
                                    class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                    placeholder="Level number" />
                             <label asp-for="LevelNumber">Level number</label>
-                            <div class="invalid-feedback">
-                                <span asp-validation-for="LevelNumber"></span>
-                            </div>
+                            <span asp-validation-for="LevelNumber" class="invalid-feedback"></span>
                         </div>
 
                         <div class="form-floating mb-3">
@@ -39,9 +39,7 @@
                                    class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                    placeholder="Category" />
                             <label asp-for="LevelCategory">Category</label>
-                            <div class="invalid-feedback">
-                                <span asp-validation-for="LevelCategory"></span>
-                            </div>
+                            <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
                         </div>
 
                         <div class="form-floating mb-3">
@@ -49,9 +47,7 @@
                                       class="form-control @(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                       placeholder="Description" style="height: 120px"></textarea>
                             <label asp-for="Description">Description</label>
-                            <div class="invalid-feedback">
-                                <span asp-validation-for="Description"></span>
-                            </div>
+                            <span asp-validation-for="Description" class="invalid-feedback"></span>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
@@ -73,5 +69,45 @@
 </div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }    
+
+    <script>
+        (function ($) {
+            if (typeof $.validator === 'undefined') return;
+
+            $.validator.setDefaults({
+                highlight: function (element) {
+                    $(element).addClass('is-invalid').removeClass('is-valid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid').addClass('is-valid');
+                },
+                errorElement: 'div',
+                errorClass: 'invalid-feedback',
+                errorPlacement: function (error, element) {
+                    var name = element.attr('name');
+                    var $msg = $('[data-valmsg-for="' + name + '"]');
+                    if ($msg.length) {
+                        $msg.removeClass('field-validation-valid').addClass('field-validation-error d-block').html(error);
+                    } else {
+                        if (element.closest('.input-group').length) {
+                            error.insertAfter(element.closest('.input-group'));
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+                }
+            });
+
+            $(function () {
+                $('form').each(function () {
+                    var $f = $(this);
+                    // ensure unobtrusive parser runs for this form
+                    if (!$f.data('validator')) {
+                        $.validator.unobtrusive.parse($f);
+                    }
+                });
+            });
+        })(jQuery);
+    </script>
 }
