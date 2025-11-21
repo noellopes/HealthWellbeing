@@ -4,44 +4,45 @@
     ViewData["Title"] = "Levels";
 }
 
-<h1>Levels</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Levels</h1>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New Level
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.LevelCurrent)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LevelCategory)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LevelCurrent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LevelCategory)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-info">Details</a>
-                <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-warning">Edit</a> 
-                <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.LevelNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.LevelCategory)</th>
+                            <th>@Html.DisplayNameFor(model => model.Description)</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.LevelNumber)</td>
+                                <td>@Html.DisplayFor(modelItem => item.LevelCategory)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                <td class="text-end">
+                                    <div class="btn-group" role="group" aria-label="Actions">
+                                        <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-info">Details</a>
+                                        <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

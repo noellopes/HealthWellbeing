@@ -54,7 +54,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
+        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategory,Description")] Level level)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategory,Description")] Level level)
         {
             if (id != level.LevelId)
             {

@@ -4,41 +4,68 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Edit Level</h5>
+                </div>
 
-<h4>Level</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="LevelId" />
-            <div class="form-group">
-                <label asp-for="LevelCurrent" class="control-label"></label>
-                <input asp-for="LevelCurrent" class="form-control" />
-                <span asp-validation-for="LevelCurrent" class="text-danger"></span>
+                <div class="card-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Please fix the errors below.</strong>
+                            <div asp-validation-summary="ModelOnly" class="mb-0"></div>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="LevelId" />
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="LevelNumber"
+                                   class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                   placeholder="Level number" />
+                            <label asp-for="LevelNumber">Level number</label>
+                            <div class="invalid-feedback">
+                                <span asp-validation-for="LevelNumber"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="LevelCategory"
+                                   class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                   placeholder="Category" />
+                            <label asp-for="LevelCategory">Category</label>
+                            <div class="invalid-feedback">
+                                <span asp-validation-for="LevelCategory"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Description"
+                                      class="form-control @(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                      placeholder="Description" style="height:120px"></textarea>
+                            <label asp-for="Description">Description</label>
+                            <div class="invalid-feedback">
+                                <span asp-validation-for="Description"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="LevelCategory" class="control-label"></label>
-                <input asp-for="LevelCategory" class="form-control" />
-                <span asp-validation-for="LevelCategory" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

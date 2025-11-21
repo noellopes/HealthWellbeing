@@ -6,7 +6,7 @@ namespace HealthWellbeing.Models
     {
         public int LevelId { get; set; } // Primary Key
         [Range(1, 100, ErrorMessage = "Level must be 1-100")]
-        public int LevelCurrent { get; set; } // Level number 1-100
+        public int LevelNumber { get; set; } // Level number 1-100
         //[ValidateNever]
         //public string LevelPoints { get; set; } // Total points of the level
         [ValidateNever]
