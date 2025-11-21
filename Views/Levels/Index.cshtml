@@ -1,4 +1,5 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Level>
+﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.Level>
+@using System.Linq
 
 @{
     ViewData["Title"] = "Levels";
@@ -18,31 +19,73 @@
                 <table class="table table-striped table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>@Html.DisplayNameFor(model => model.LevelNumber)</th>
-                            <th>@Html.DisplayNameFor(model => model.LevelCategory)</th>
-                            <th>@Html.DisplayNameFor(model => model.Description)</th>
+                            <th>@Html.DisplayNameFor(model => model.Items.First().LevelNumber)</th>
+                            <th>@Html.DisplayNameFor(model => model.Items.First().LevelCategory)</th>
+                            <th>@Html.DisplayNameFor(model => model.Items.First().Description)</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model)
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.LevelNumber)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.LevelCategory)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                    <td class="text-end">
+                                        <div class="btn-group" role="group" aria-label="Actions">
+                                            <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-info">Details</a>
+                                            <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-warning">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-danger">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td>@Html.DisplayFor(modelItem => item.LevelNumber)</td>
-                                <td>@Html.DisplayFor(modelItem => item.LevelCategory)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                                <td class="text-end">
-                                    <div class="btn-group" role="group" aria-label="Actions">
-                                        <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-info">Details</a>
-                                        <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-warning">Edit</a>
-                                        <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-sm btn-outline-danger">Delete</a>
-                                    </div>
-                                </td>
+                                <td colspan="4" class="text-center text-muted py-4">No levels to display.</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <div class="card-footer d-flex align-items-center justify-content-between">
+            @{
+
+                var page = Model.CurrentPage;
+                var pageSize = Model.PageSize;
+                var startItem = Model.TotalItems == 0 ? 0 : ((page - 1) * pageSize + 1);
+                var endItem = Math.Min(Model.TotalItems, page * pageSize);
+            }
+
+            <div class="small text-muted">
+                Showing @startItem - @endItem of @Model.TotalItems
+            </div>
+
+            <nav aria-label="Levels page">
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="1">First</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")" aria-current="@(p == Model.CurrentPage ? "page" : null)">
+                            <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Last</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

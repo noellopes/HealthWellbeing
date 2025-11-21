@@ -20,9 +20,27 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Levels
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            return View(await _context.Level.ToListAsync());
+            const int pageSize = 5;
+
+            var totalItems = await _context.Level.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (totalPages == 0) totalPages = 1;
+
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            var levels = await _context.Level
+                .OrderBy(l => l.LevelNumber)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Use the existing PaginationInfo<T> in the Models namespace
+            var vm = new PaginationInfo<Level>(levels, totalItems, pageSize, page);
+
+            return View(vm);
         }
 
         // GET: Levels/Details/5
