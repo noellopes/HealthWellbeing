@@ -17,6 +17,14 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        // Helper to render the InvalidLevel view and set 404 status code.
+        // Accepts an optional attempted Level so the view can offer "Create with these values".
+        private IActionResult InvalidLevelView(Level? attempted = null)
+        {
+            Response.StatusCode = 404;
+            return View("InvalidLevel", attempted);
+        }
+
         // GET: Levels
         public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
@@ -71,7 +79,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var level = await _context.Level.FirstOrDefaultAsync(m => m.LevelId == id);
-            if (level == null) return NotFound();
+            if (level == null) return InvalidLevelView();
 
             ViewBag.Page = page;
             ViewBag.SearchNumber = searchNumber;
@@ -82,7 +90,22 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Levels/Create
-        public IActionResult Create() => View();
+        // Optional parameters allow pre-populating the Create form (used when recreating a deleted level).
+        public IActionResult Create(int? levelNumber = null, string? levelCategory = null, string? description = null)
+        {
+            var model = new Level
+            {
+                LevelCategory = levelCategory ?? string.Empty,
+                Description = description ?? string.Empty
+            };
+
+            if (levelNumber.HasValue)
+            {
+                model.LevelNumber = levelNumber.Value;
+            }
+
+            return View(model);
+        }
 
         // POST: Levels/Create
         [HttpPost]
@@ -93,10 +116,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(level);
                 await _context.SaveChangesAsync();
-
-                // revert to simple message (no category appended)
                 TempData["SuccessMessage"] = $"Level {level.LevelNumber} created.";
-
                 return RedirectToAction(nameof(Index));
             }
             return View(level);
@@ -108,7 +128,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var level = await _context.Level.FindAsync(id);
-            if (level == null) return NotFound();
+            if (level == null) return InvalidLevelView();
 
             ViewBag.Page = page;
             ViewBag.SearchNumber = searchNumber;
@@ -126,17 +146,24 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
+                // Check existence first — if the level was deleted meanwhile, offer recreate option.
+                var exists = await _context.Level.AnyAsync(l => l.LevelId == level.LevelId);
+                if (!exists)
+                {
+                    return InvalidLevelView(level);
+                }
+
                 try
                 {
                     _context.Update(level);
                     await _context.SaveChangesAsync();
 
-                    // revert to simple message (no category appended)
                     TempData["SuccessMessage"] = $"Level {level.LevelNumber} updated successfully.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LevelExists(level.LevelId)) return NotFound();
+                    // If record was removed by another user, show InvalidLevel and offer recreate
+                    if (!LevelExists(level.LevelId)) return InvalidLevelView(level);
                     throw;
                 }
 
@@ -158,7 +185,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var level = await _context.Level.FirstOrDefaultAsync(m => m.LevelId == id);
-            if (level == null) return NotFound();
+            if (level == null) return InvalidLevelView();
 
             ViewBag.Page = page;
             ViewBag.SearchNumber = searchNumber;
@@ -173,14 +200,16 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
             var level = await _context.Level.FindAsync(id);
-            if (level != null)
+            if (level == null)
             {
-                _context.Level.Remove(level);
-                await _context.SaveChangesAsync();
-
-                // revert to simple message (no category appended)
-                TempData["SuccessMessage"] = $"Level {level.LevelNumber} deleted.";
+                // Show the InvalidLevel page if the level is already gone
+                return InvalidLevelView();
             }
+
+            _context.Level.Remove(level);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Level {level.LevelNumber} deleted.";
 
             // Redirect back to the same index page + filters
             return RedirectToAction(nameof(Index), new { page, searchNumber, searchCategory, searchDescription });

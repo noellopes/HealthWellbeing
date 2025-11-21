@@ -2,6 +2,17 @@
 
 @{
     ViewData["Title"] = "Create";
+
+    // Prefer any attempted ModelState value (POST back), otherwise show model value only if > 0.
+    var levelNumberValue = "";
+    if (ViewData.ModelState.TryGetValue("LevelNumber", out var ms) && ms?.AttemptedValue != null)
+    {
+        levelNumberValue = ms.AttemptedValue;
+    }
+    else if (Model?.LevelNumber > 0)
+    {
+        levelNumberValue = Model.LevelNumber.ToString();
+    }
 }
 
 <div class="container py-4">
@@ -28,10 +39,11 @@
                             <input asp-for="LevelNumber"
                                    type="number"
                                    min="1" max="100" step="1"
+                                   value="@(levelNumberValue)"
                                    class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                    placeholder="Level number" />
                             <label asp-for="LevelNumber">Level number</label>
-                            <span asp-validation-for="LevelNumber" class="invalid-feedback"></span>
+                            <span asp-validation-for="LevelNumber" class="invalid-feedback" data-valmsg-summary="false"></span>
                         </div>
 
                         <div class="form-floating mb-3">
@@ -39,7 +51,7 @@
                                    class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                    placeholder="Category" />
                             <label asp-for="LevelCategory">Category</label>
-                            <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
+                            <span asp-validation-for="LevelCategory" class="invalid-feedback" data-valmsg-summary="false"></span>
                         </div>
 
                         <div class="form-floating mb-3">
@@ -47,7 +59,7 @@
                                       class="form-control @(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                       placeholder="Description" style="height: 120px"></textarea>
                             <label asp-for="Description">Description</label>
-                            <span asp-validation-for="Description" class="invalid-feedback"></span>
+                            <span asp-validation-for="Description" class="invalid-feedback" data-valmsg-summary="false"></span>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
@@ -69,12 +81,14 @@
 </div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }    
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 
     <script>
         (function ($) {
-            if (typeof $.validator === 'undefined') return;
+            // Ensure jquery.validate and unobtrusive are loaded
+            if (typeof $.validator === 'undefined' || typeof $.validator.unobtrusive === 'undefined') return;
 
+            // Apply Bootstrap-friendly defaults and place errors into the asp-validation-for spans
             $.validator.setDefaults({
                 highlight: function (element) {
                     $(element).addClass('is-invalid').removeClass('is-valid');
@@ -99,10 +113,10 @@
                 }
             });
 
+            // Parse unobtrusive for this page (in case it's not already parsed)
             $(function () {
                 $('form').each(function () {
                     var $f = $(this);
-                    // ensure unobtrusive parser runs for this form
                     if (!$f.data('validator')) {
                         $.validator.unobtrusive.parse($f);
                     }
