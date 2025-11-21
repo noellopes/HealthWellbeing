@@ -1,4 +1,5 @@
-﻿using HealthWellbeing.Data;
+﻿using System.Globalization;
+using HealthWellbeing.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,7 @@ else
         SeedDataProblemaSaude.Populate(dbContext);
 	}
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

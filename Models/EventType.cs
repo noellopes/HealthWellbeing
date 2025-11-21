@@ -14,10 +14,12 @@ namespace HealthWellbeing.Models {
         [StringLength(50, ErrorMessage = "Scoring Mode cannot exceed {1} characters.")]
         public string EventTypeScoringMode { get; set; }
 
+        [Display(Name = "Multiplier")]
         [Required(ErrorMessage = "Please enter a multiplier.")]
-        [RegularExpression(@"^[0-9]{1,2}([.,][0-9])?$",
-    ErrorMessage = "Enter a number with up to 2 digits, optionally followed by a comma or dot and 1 decimal (e.g., 1.1 or 1,1).")]
-        public float EventTypeMultiplier { get; set; }
+        [Range(1, 3, ErrorMessage = "Multiplier must be between {1} and {2}.")]
+        [RegularExpression(@"^[0-9]{1,3}([.,][0-9]{1,2})?$",
+        ErrorMessage = "Enter a number with up to 3 digits, optionally followed by a comma or dot and 2 decimal (e.g., 1.15 or 1,15).")]
+        public decimal EventTypeMultiplier { get; set; }
 
 
     }
