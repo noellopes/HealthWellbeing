@@ -11,8 +11,6 @@
 
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="StockId" />
-
-        <!-- CAMPOS IMPORTANTES QUE ESTAVAM A FALTAR -->
         <input type="hidden" asp-for="ConsumivelID" />
         <input type="hidden" asp-for="ZonaID" />
 
@@ -20,35 +18,43 @@
             <div class="card-body">
                 <dl class="row mb-0">
 
+                    <!-- Nome do Consumível -->
                     <dt class="col-sm-3">Consumível</dt>
                     <dd class="col-sm-9">
                         <input value="@Model.Consumivel?.Nome" class="form-control" disabled />
                     </dd>
 
+                    <!-- Zona -->
                     <dt class="col-sm-3">Zona</dt>
                     <dd class="col-sm-9">
                         <input value="@Model.Zona?.Nome" class="form-control" disabled />
                     </dd>
 
+                    <!-- Quantidade Atual (READ-ONLY) -->
                     <dt class="col-sm-3">Quantidade Atual</dt>
                     <dd class="col-sm-9">
-                        <input asp-for="QuantidadeAtual" class="form-control" />
-                        @if (Model.QuantidadeAtual < Model.QuantidadeMinima)
-                        {
-                            <span class="badge bg-danger ms-2">Baixo</span>
-                        }
+                        <input value="@Model.QuantidadeAtual" class="form-control" disabled />
                         <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
                     </dd>
 
+                    <!-- Quantidade Mínima -->
                     <dt class="col-sm-3">Quantidade Mínima</dt>
                     <dd class="col-sm-9">
                         <input asp-for="QuantidadeMinima" class="form-control" />
                         <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
                     </dd>
 
+                    <!-- Quantidade Máxima -->
+                    <dt class="col-sm-3">Quantidade Máxima</dt>
+                    <dd class="col-sm-9">
+                        <input asp-for="QuantidadeMaxima" class="form-control" />
+                        <span asp-validation-for="QuantidadeMaxima" class="text-danger"></span>
+                    </dd>
+
+                    <!-- Última Atualização (READ-ONLY) -->
                     <dt class="col-sm-3">Última Atualização</dt>
                     <dd class="col-sm-9">
-                        <input asp-for="DataUltimaAtualizacao" class="form-control" type="date" />
+                        <input asp-for="DataUltimaAtualizacao" class="form-control" type="date" disabled />
                     </dd>
 
                 </dl>
