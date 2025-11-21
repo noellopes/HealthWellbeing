@@ -70,6 +70,22 @@ namespace HealthWellbeing.Controllers
             _context.SaveChanges();
         }
 
+        private void CorrigirQuantidadeAtual()
+        {
+            var stocks = _context.Stock.ToList();
+
+            foreach (var s in stocks)
+            {
+                s.QuantidadeAtual = 0;   // Reset
+                s.QuantidadeMinima = 50; // Ou outro valor base que queres
+                s.QuantidadeMaxima = 150;
+                s.DataUltimaAtualizacao = DateTime.Now;
+            }
+
+            _context.SaveChanges();
+        }
+
+
 
         // ============================
         // INDEX
@@ -78,6 +94,7 @@ namespace HealthWellbeing.Controllers
         {
             GarantirStockBase();
             
+
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
