@@ -6,12 +6,14 @@
 
 @if (!ViewData.ModelState.IsValid)
 {
-    <div class="alert alert-warning">
-        O modelo não é válido. Verifique todos os campos.
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>O modelo não é válido.</strong> Verifique os campos abaixo.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
     </div>
 
     <ul class="text-danger">
-        @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors).DistinctBy(e => e.ErrorMessage))
         {
             <li>@modelError.ErrorMessage</li>
         }
@@ -24,9 +26,6 @@
     <div class="card-body">
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
-            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
             <!-- Tipo de Sala e Especialidade -->
             <div class="row">
@@ -37,26 +36,19 @@
                     </select>
                     <span asp-validation-for="RoomTypeId" class="text-danger small"></span>
                 </div>
-                <!--Serao alterado posteriormente-->
+
                 <div class="col-md-6 mb-3">
                     <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
                     <select asp-for="Specialty" class="form-select" required>
                         <option value="">Selecione a especialidade...</option>
-                        <option value="Cardiologia">Cardiologia</option>
-                        <option value="Dermatologia">Dermatologia</option>
-                        <option value="Pediatria">Pediatria</option>
-                        <option value="Ginecologia">Ginecologia</option>
-                        <option value="Urologia">Urologia</option>
-                        <option value="Neurologia">Neurologia</option>
-                        <option value="Psiquiatria">Psiquiatria</option>
-                        <option value="Oftalmologia">Oftalmologia</option>
-                        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-                        <option value="Endocrinologia">Endocrinologia</option>
-                        <option value="Reumatologia">Reumatologia</option>
-                        <option value="Gastroenterologia">Gastroenterologia</option>
-                        <option value="Pneumologia">Pneumologia</option>
-                        <option value="Nefrologia">Nefrologia</option>
-                        <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
+                        @foreach (var item in new[] {
+                                                "Cardiologia", "Dermatologia", "Pediatria", "Ginecologia", "Urologia", "Neurologia",
+                                                "Psiquiatria", "Oftalmologia", "Otorrinolaringologia", "Endocrinologia", "Reumatologia",
+                                                "Gastroenterologia", "Pneumologia", "Nefrologia", "Medicina Geral e Familiar"
+                                                })
+                        {
+                            <option value="@item">@item</option>
+                        }
                     </select>
                     <span asp-validation-for="Specialty" class="text-danger small"></span>
                 </div>

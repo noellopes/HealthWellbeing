@@ -193,42 +193,45 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken] // Protege contra ataques CSRF, validando o token antifalsificação
         public async Task<IActionResult> Create(Room room) // Método assíncrono que recebe um objeto Room como parâmetro
         {
-            if (room == null) return NotFound();// Se o objeto recebido for nulo, retorna erro 404 (não encontrado)
-            //Console.WriteLine("Valor recebido para Name: " + room.Name);// Escreve no console o valor recebido para o campo Name (debug/log)
-            if (!ModelState.IsValid)// Verifica se o modelo recebido é válido (validações de DataAnnotations, etc.)
+            if (room == null) return NotFound(); // Se o objeto recebido for nulo, retorna erro 404
+
+            // Validação: Abertura < Fecho
+            if (room.OpeningTime >= room.ClosingTime)
             {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                    Console.WriteLine(error.ErrorMessage); // Caso inválido, imprime no console todas as mensagens de erro de validação
-                await PreencherDropdowns();// Chama método auxiliar para preencher dropdowns 
-                return View(room);// Retorna a mesma View com o objeto Room, permitindo ao usuário corrigir os erros
+                ModelState.AddModelError(string.Empty, "A hora de abertura deve ser menor que a hora de encerramento.");
             }
 
-            var nomeNormalizado = room.Name?.Trim().ToLower() ?? string.Empty;// Normaliza o nome da sala: remove espaços extras e converte para minúsculas
-            var salaExistente = await _context.Room.AnyAsync(r => (r.Name ?? "").Trim().ToLower() == nomeNormalizado);// Verifica no banco se já existe uma sala com o mesmo nome normalizado
+            // Validação: Nome duplicado
+            var nomeNormalizado = room.Name?.Trim().ToLower() ?? string.Empty;
+            var salaExistente = await _context.Room.AnyAsync(r => (r.Name ?? "").Trim().ToLower() == nomeNormalizado);
             if (salaExistente)
             {
-                ModelState.AddModelError("Name", "Já existe uma sala com este nome, por favor insira outro nome.");// Se já existir, adiciona erro ao ModelState para o campo Name
-                await PreencherDropdowns();// Preenche novamente os dropdowns
-                return View(room);// Retorna a View com o erro para o usuário corrigir
+                ModelState.AddModelError(nameof(room.Name), "Já existe uma sala com este nome, por favor insira outro nome.");
             }
 
-            // BUSCA O STATUS "CRIADO" no banco
-            var statusCriado = await _context.RoomStatus.FirstOrDefaultAsync(s => s.Name == "Criado");// Procura no banco o status "Criado"
-            if (statusCriado != null)
+            // Validação: Status "Criado" existe
+            var statusCriado = await _context.RoomStatus.FirstOrDefaultAsync(s => s.Name == "Criado");
+            if (statusCriado == null)
             {
-                room.RoomStatusId = statusCriado.RoomStatusId;// Se encontrado, atribui o ID do status "Criado" ao objeto Room
-            }
-            else
-            {
-                ModelState.AddModelError("RoomStatusId", "Não foi possível atribuir o status inicial. Verifique se existe o status \"Criado\".");// Caso não exista, adiciona erro ao ModelState
-                await PreencherDropdowns();// Preenche novamente os dropdowns
-                return View(room);// Retorna a View com o erro
+                ModelState.AddModelError(nameof(room.RoomStatusId), "Não foi possível atribuir o status inicial. Verifique se existe o status \"Criado\".");
             }
 
-            _context.Add(room); // Adiciona o objeto Room ao contexto (prepara para inserção no banco)
-            await _context.SaveChangesAsync();// Salva as alterações no banco de dados (executa o INSERT)
-            TempData["SuccessMessage"] = "Sala criada com sucesso!";// Define uma mensagem de sucesso que será exibida na próxima requisição
-            return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });// Redireciona para a ação Details, passando o ID da sala criada e um flag indicando que veio da criação
+            // Se houver qualquer erro de validação, retorna à View com os dropdowns preenchidos
+            if (!ModelState.IsValid)
+            {
+                await PreencherDropdowns();
+                return View(room);
+            }
+
+            // Atribui o status "Criado"
+            room.RoomStatusId = statusCriado.RoomStatusId;
+
+            // Salva no banco
+            _context.Add(room);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Sala criada com sucesso!";
+            return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
         }
 
         //----------------------------------------------------------EDIT---------------------------------------------------------------------------------
