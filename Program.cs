@@ -32,9 +32,11 @@ else
 {
     using (var serviceScope = app.Services.CreateScope())
     {
-        var dbcontext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
+        var dbcontext = serviceScope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
+        //Aplica todas as migracoes pendentes
+        //dbcontext.Database.Migrate();
 
-        //Chama o Populate
+        //Chama o Seeding
         SeedData.Populate(dbcontext);//aplica apenas migracoes relevantes
     }
 }

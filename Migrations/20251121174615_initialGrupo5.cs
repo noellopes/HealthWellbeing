@@ -105,21 +105,44 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Room",
+                name: "RoomLocation",
                 columns: table => new
                 {
-                    RoomId = table.Column<int>(type: "int", nullable: false)
+                    RoomLocationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Specialty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OperatingHours = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Room", x => x.RoomId);
+                    table.PrimaryKey("PK_RoomLocation", x => x.RoomLocationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoomStatus",
+                columns: table => new
+                {
+                    RoomStatusId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomStatus", x => x.RoomStatusId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoomType",
+                columns: table => new
+                {
+                    RoomTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomType", x => x.RoomTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -163,46 +186,40 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Equipment",
+                name: "Room",
                 columns: table => new
                 {
-                    EquipmentId = table.Column<int>(type: "int", nullable: false)
+                    RoomId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    RoomTypeId = table.Column<int>(type: "int", nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: false),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ManufacturerId = table.Column<int>(type: "int", nullable: false),
-                    EquipmentTypeId = table.Column<int>(type: "int", nullable: false),
-                    EquipmentStatusId = table.Column<int>(type: "int", nullable: false)
+                    RoomLocationId = table.Column<int>(type: "int", nullable: false),
+                    OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    ClosingTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    RoomStatusId = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipment", x => x.EquipmentId);
+                    table.PrimaryKey("PK_Room", x => x.RoomId);
                     table.ForeignKey(
-                        name: "FK_Equipment_EquipmentStatus_EquipmentStatusId",
-                        column: x => x.EquipmentStatusId,
-                        principalTable: "EquipmentStatus",
-                        principalColumn: "EquipmentStatusId",
+                        name: "FK_Room_RoomLocation_RoomLocationId",
+                        column: x => x.RoomLocationId,
+                        principalTable: "RoomLocation",
+                        principalColumn: "RoomLocationId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Equipment_EquipmentType_EquipmentTypeId",
-                        column: x => x.EquipmentTypeId,
-                        principalTable: "EquipmentType",
-                        principalColumn: "EquipmentTypeId",
+                        name: "FK_Room_RoomStatus_RoomStatusId",
+                        column: x => x.RoomStatusId,
+                        principalTable: "RoomStatus",
+                        principalColumn: "RoomStatusId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Equipment_Manufacturer_ManufacturerId",
-                        column: x => x.ManufacturerId,
-                        principalTable: "Manufacturer",
-                        principalColumn: "ManufacturerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Equipment_Room_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Room",
-                        principalColumn: "RoomId",
+                        name: "FK_Room_RoomType_RoomTypeId",
+                        column: x => x.RoomTypeId,
+                        principalTable: "RoomType",
+                        principalColumn: "RoomTypeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -250,6 +267,50 @@ namespace HealthWellbeingRoom.Migrations
                         column: x => x.AlimentoId,
                         principalTable: "Alimento",
                         principalColumn: "AlimentoId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Equipment",
+                columns: table => new
+                {
+                    EquipmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ManufacturerId = table.Column<int>(type: "int", nullable: false),
+                    EquipmentTypeId = table.Column<int>(type: "int", nullable: false),
+                    EquipmentStatusId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Equipment", x => x.EquipmentId);
+                    table.ForeignKey(
+                        name: "FK_Equipment_EquipmentStatus_EquipmentStatusId",
+                        column: x => x.EquipmentStatusId,
+                        principalTable: "EquipmentStatus",
+                        principalColumn: "EquipmentStatusId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Equipment_EquipmentType_EquipmentTypeId",
+                        column: x => x.EquipmentTypeId,
+                        principalTable: "EquipmentType",
+                        principalColumn: "EquipmentTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Equipment_Manufacturer_ManufacturerId",
+                        column: x => x.ManufacturerId,
+                        principalTable: "Manufacturer",
+                        principalColumn: "ManufacturerId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Equipment_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -368,6 +429,21 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_MedicalDevices_TypeMaterialID",
                 table: "MedicalDevices",
                 column: "TypeMaterialID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_RoomLocationId",
+                table: "Room",
+                column: "RoomLocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_RoomStatusId",
+                table: "Room",
+                column: "RoomStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_RoomTypeId",
+                table: "Room",
+                column: "RoomTypeId");
         }
 
         /// <inheritdoc />
@@ -414,6 +490,15 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "TypeMaterial");
+
+            migrationBuilder.DropTable(
+                name: "RoomLocation");
+
+            migrationBuilder.DropTable(
+                name: "RoomStatus");
+
+            migrationBuilder.DropTable(
+                name: "RoomType");
         }
     }
 }

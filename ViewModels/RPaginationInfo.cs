@@ -12,7 +12,7 @@
             CurrentPage = Math.Clamp(currentPage, 1, TotalPages);
         }
 
-        public IEnumerable<T>? Items { get; set; } = null;
+        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();//garante que Items nunca será nulo, mesmo que não seja atribuído no controlador.
 
         public int TotalItems { get; private set; }
 

@@ -15,18 +15,22 @@ namespace HealthWellbeing.Data
         {
         }
 
-        public DbSet<HealthWellbeing.Models.TypeMaterial> TypeMaterial { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.LocationMedDevice> LocationMedDevice { get; set; } = default!;
-        public DbSet<HealthWellbeingRoom.Models.EquipmentType> EquipmentType { get; set; } = default!;
-        public DbSet<HealthWellbeingRoom.Models.EquipmentStatus> EquipmentStatus { get; set; } = default!;
-        public DbSet<HealthWellbeingRoom.Models.Manufacturer> Manufacturer { get; set; } = default!;
-        public DbSet<HealthWellbeingRoom.Models.Equipment> Equipment { get; set; } = default!;
+        public DbSet<TypeMaterial> TypeMaterial { get; set; } = default!;
+        public DbSet<LocationMedDevice> LocationMedDevice { get; set; } = default!;
+        public DbSet<EquipmentType> EquipmentType { get; set; } = default!;
+        public DbSet<EquipmentStatus> EquipmentStatus { get; set; } = default!;
+        public DbSet<Manufacturer> Manufacturer { get; set; } = default!;
+        public DbSet<Equipment> Equipment { get; set; } = default!;
         public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
         public DbSet<LocalizacaoDispMovel_temporario> LocalizacaoDispMovel_temporario { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Room> Room { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
+        public DbSet<Room> Room { get; set; } = default!;
+        public DbSet<Alergia> Alergia { get; set; } = default!;
+        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<Receita> Receita { get; set; } = default!;
 
+        // Novos DbSets
+        public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
+        public DbSet<RoomType> RoomType { get; set; } = default!;
+        public DbSet<RoomLocation> RoomLocation { get; set; }
     }
 }

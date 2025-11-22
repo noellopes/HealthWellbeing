@@ -18,14 +18,24 @@
     </div>
 
     <div class="card-body">
-        <form asp-action="Edit">
-            @Html.AntiForgeryToken()
+
+        <form asp-action="Edit" method="post">
+
+            @* @Html.AntiForgeryToken() *@
             <input type="hidden" asp-for="RoomId" />
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-            <!--Especialidade e Nome -->
+            <!-- Tipo e Especialidade -->
             <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="RoomTypeId" class="form-label fw-bold">Tipo de Sala</label>
+                    <select asp-for="RoomTypeId" class="form-select" asp-items="ViewBag.RoomTypes">
+                        <option value="">Selecione o tipo...</option>
+                    </select>
+                    <span asp-validation-for="RoomTypeId" class="text-danger small"></span>
+                </div>
+
                 <div class="col-md-6 mb-3">
                     <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
                     <select asp-for="Specialty" class="form-select">
@@ -48,59 +58,47 @@
                     </select>
                     <span asp-validation-for="Specialty" class="text-danger small"></span>
                 </div>
+            </div>
 
+            <!-- Nome e Localização -->
+            <div class="row">
                 <div class="col-md-6 mb-3">
                     <label asp-for="Name" class="form-label fw-bold">Nome</label>
                     <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="RoomLocationId" class="form-label fw-bold">Localização</label>
+                    <select asp-for="RoomLocationId" class="form-select" asp-items="ViewBag.RoomLocations">
+                        <option value="">Selecione a localização...</option>
+                    </select>
+                    <span asp-validation-for="RoomLocationId" class="text-danger small"></span>
+                </div>
             </div>
 
-            <!--Localização e Horário -->
+            <!-- Horário de Funcionamento -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Location" class="form-label fw-bold">Localização</label>
-                    <input asp-for="Location" class="form-control" />
-                    <span asp-validation-for="Location" class="text-danger small"></span>
+                    <label asp-for="OpeningTime" class="form-label fw-bold">Horario de inicio</label>
+                    <input asp-for="OpeningTime" type="time" class="form-control" />
+                    <span asp-validation-for="OpeningTime" class="text-danger small"></span>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="OperatingHours" class="form-label fw-bold">Horário de Funcionamento</label>
-                    <input asp-for="OperatingHours" class="form-control" />
-                    <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                    <label asp-for="ClosingTime" class="form-label fw-bold">Horario de fim</label>
+                    <input asp-for="ClosingTime" type="time" class="form-control" />
+                    <span asp-validation-for="ClosingTime" class="text-danger small"></span>
                 </div>
             </div>
 
-            <!--Estado -->
+            <!-- Estado -->
             <div class="mb-3">
-                <label class="form-label fw-bold">Estado</label>
-                <div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="Criado" />
-                        <label class="form-check-label">Criado</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="Disponivel" />
-                        <label class="form-check-label">Disponível</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="Indisponivel" />
-                        <label class="form-check-label">Indisponível</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="Limpeza" />
-                        <label class="form-check-label">Limpeza</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="Manutencao" />
-                        <label class="form-check-label">Manutenção</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" asp-for="Status" value="ForaDeServico" />
-                        <label class="form-check-label">Fora de Serviço</label>
-                    </div>
-                </div>
-                <span asp-validation-for="Status" class="text-danger small"></span>
+                <label asp-for="RoomStatusId" class="form-label fw-bold">Estado</label>
+                <select asp-for="RoomStatusId" class="form-select" asp-items="ViewBag.RoomStatuses">
+                    <option value="">Selecione o estado...</option>
+                </select>
+                <span asp-validation-for="RoomStatusId" class="text-danger small"></span>
             </div>
 
             <!-- Observação -->
@@ -122,3 +120,9 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -9,9 +9,7 @@ namespace HealthWellbeingRoom.Models
         [Key]
         public int RoomTypeId { get; set; }
 
-        [Required(ErrorMessage = "O nome do tipo de sala é obrigatório.")]
-        [StringLength(100, ErrorMessage = "O nome do tipo de sala não pode exceder 100 caracteres.")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public string? Description { get; set; }
 

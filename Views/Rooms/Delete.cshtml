@@ -1,6 +1,5 @@
 ﻿@model HealthWellbeing.Models.Room
 
-
 @{
     ViewData["Title"] = "Eliminar Sala";
 }
@@ -10,7 +9,6 @@
     @ViewData["Title"]
 </h1>
 
-@* Mensagem de alerta que a sala nao pode ser eliminada por ter um equipamento *@
 @if (TempData["errorMessageDelete"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -20,7 +18,6 @@
     </div>
 }
 
-@* Mensagem de alerta que a sala nao pode ser eliminada por ter um dispositivo medico *@
 @if (TempData["errorMessageDeleteDispositivo"] != null)
 {
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -30,9 +27,7 @@
     </div>
 }
 
-
 <div class="card shadow-sm">
-
     <div class="card-header bg-danger text-white">
         <h4 class="mb-0">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -41,38 +36,36 @@
     </div>
 
     <div class="card-body">
-
         <p class="lead text-muted">Tem a certeza que deseja eliminar esta sala? Esta ação é irreversível.</p>
 
         <dl class="row mb-0 mt-4">
-
             <dt class="col-sm-3 fw-bold text-muted">Id</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.FormattedRoomId)</dd>
+            <dd class="col-sm-9">@Model.FormattedRoomId</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
+            <dd class="col-sm-9">@Model.RoomType?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty)</dd>
+            <dd class="col-sm-9">@Model.Specialty</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
-            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
+            <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Location)</dd>
+            <dd class="col-sm-9">@Model.RoomLocation?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Horário de Funcionamento</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.OperatingHours)</dd>
+            <dd class="col-sm-9">@Model.OpeningTime.ToString(@"hh\:mm") - @Model.ClosingTime.ToString(@"hh\:mm")</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+            <dd class="col-sm-9">@Model.RoomStatus?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
-
+            <dd class="col-sm-9">@Model.Notes</dd>
         </dl>
-
     </div>
 
     <div class="card-footer d-flex justify-content-end gap-2">
-
         <form asp-action="Delete" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="RoomId" />
@@ -85,6 +78,5 @@
                 <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
             </a>
         </form>
-
     </div>
 </div>

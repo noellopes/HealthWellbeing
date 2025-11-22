@@ -2,15 +2,7 @@
 
 @{
     ViewData["Title"] = "Detalhes da sala";
-}
-
-@*  interpretar fromCreation *@
-@{
-    bool fromCreation = false;
-    if (ViewContext.RouteData.Values["fromCreation"]?.ToString() == "true")
-    {
-        fromCreation = true;
-    }
+    bool fromCreation = Context.Request.Query["fromCreation"] == "true";
 }
 
 <h1 class="mb-4 text-info">
@@ -18,7 +10,6 @@
     @ViewData["Title"]
 </h1>
 
-@* Bloco para exibir a mensagem de sucesso, apenas apos a criacao *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -38,22 +29,25 @@
     <div class="card-body">
         <dl class="row mb-0 mt-4">
             <dt class="col-sm-3 fw-bold text-muted">Id</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.FormattedRoomId)</dd>
+            <dd class="col-sm-9">@Model.FormattedRoomId</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
+            <dd class="col-sm-9">@Model.RoomType?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty)</dd>
+            <dd class="col-sm-9">@Model.Specialty</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Location)</dd>
+            <dd class="col-sm-9">@Model.RoomLocation?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Horário de Funcionamento</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.OperatingHours)</dd>
+            <dd class="col-sm-9">@Model.OpeningTime.ToString(@"hh\:mm") - @Model.ClosingTime.ToString(@"hh\:mm")</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+            <dd class="col-sm-9">@Model.RoomStatus?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+            <dd class="col-sm-9">@Model.Notes</dd>
         </dl>
     </div>
 
@@ -66,7 +60,6 @@
             <i class="bi bi-trash me-1"></i> Eliminar
         </a>
 
-@*A logica nao funciona ainda *@
         @if (fromCreation)
         {
             <a asp-action="Index" class="btn btn-success">
