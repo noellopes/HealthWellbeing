@@ -21,6 +21,7 @@
     };
 }
 
+
 <h1 class="mb-4 text-primary">
     <i class="bi bi-hospital"></i> Listas de Salas
 </h1>
@@ -89,18 +90,33 @@
                 <input id="searchLocation" name="searchLocation" value="@ViewBag.SearchLocation" class="form-control" placeholder="Pesquisar pela localização" type="search" />
             </div>
 
-            <!-- Grupo: Horário de Funcionamento -->
-            <div class="col-12">
-                <div class="border rounded p-3">
-                    <h5 class="text-center mb-4">Horário de Funcionamento</h5>
-                    <div class="row justify-content-center g-4">
-                        <div class="col-md-4 text-center">
-                            <label for="searchOpeningTime" class="form-label fw-semibold">Início</label>
-                            <input id="searchOpeningTime" name="searchOpeningTime" value="@ViewBag.SearchOpeningTime" class="form-control text-center" type="time" />
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <label for="searchClosingTime" class="form-label fw-semibold">Fim</label>
-                            <input id="searchClosingTime" name="searchClosingTime" value="@ViewBag.SearchClosingTime" class="form-control text-center" type="time" />
+            <!-- Terceira linha: Tipo de Sala e Horário de Funcionamento -->
+            <div class="row g-3 align-items-start">
+                <!-- Tipo de Sala -->
+                <div class="col-md-6">
+                    <label for="searchRoomType" class="form-label">Tipo de Sala</label>
+                    <input id="searchRoomType" name="searchRoomType" value="@ViewBag.SearchRoomType"
+                           class="form-control" placeholder="Pesquisar tipo de sala" type="search" />
+                </div>
+
+                <!-- Horário de Funcionamento -->
+                <div class="col-md-6">
+                    <div class="border rounded p-3">
+                        <h6 class="text-center mb-3">Horário de Funcionamento</h6>
+                        <div class="row justify-content-center align-items-center g-2">
+                            <!-- Início -->
+                            <div class="col-auto d-flex align-items-center">
+                                <label for="searchOpeningTime" class="form-label mb-0 me-2 fw-semibold">Início</label>
+                                <input id="searchOpeningTime" name="searchOpeningTime" value="@ViewBag.SearchOpeningTime"
+                                       class="form-control form-control-sm text-center" type="time" style="width: 100px;" />
+                            </div>
+
+                            <!-- Fim -->
+                            <div class="col-auto d-flex align-items-center">
+                                <label for="searchClosingTime" class="form-label mb-0 me-2 fw-semibold">Fim</label>
+                                <input id="searchClosingTime" name="searchClosingTime" value="@ViewBag.SearchClosingTime"
+                                       class="form-control form-control-sm text-center" type="time" style="width: 100px;" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -187,6 +203,14 @@
                 }
             </tbody>
         </table>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-warning text-center">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
 </div>
 
 <!-- PAGINAÇÃO AO FINAL -->
