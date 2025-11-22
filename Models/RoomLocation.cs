@@ -10,7 +10,7 @@ namespace HealthWellbeingRoom.Models
         [Key]
         public int RoomLocationId { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         // Relação com salas
         public ICollection<Room> Rooms { get; set; } = new List<Room>();

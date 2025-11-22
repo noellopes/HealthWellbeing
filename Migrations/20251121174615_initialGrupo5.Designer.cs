@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251121174615_initialGrupo5")]
+    partial class initialGrupo5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,7 +262,7 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomLocationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RoomStatusId")
+                    b.Property<int>("RoomStatusId")
                         .HasColumnType("int");
 
                     b.Property<int>("RoomTypeId")
@@ -478,6 +481,7 @@ namespace HealthWellbeingRoom.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomLocationId"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoomLocationId");
@@ -497,6 +501,7 @@ namespace HealthWellbeingRoom.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoomStatusId");
@@ -516,6 +521,7 @@ namespace HealthWellbeingRoom.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("RoomTypeId");
@@ -572,7 +578,9 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasOne("HealthWellbeingRoom.Models.RoomStatus", "RoomStatus")
                         .WithMany("Rooms")
-                        .HasForeignKey("RoomStatusId");
+                        .HasForeignKey("RoomStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeingRoom.Models.RoomType", "RoomType")
                         .WithMany("Rooms")

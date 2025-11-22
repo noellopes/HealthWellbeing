@@ -93,47 +93,90 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.FromCreation = fromCreation;
             return View(room);
         }
-
+        //------------------------------------------------------CREATE-------------------------------------------------------------------------------------
         public async Task<IActionResult> Create()
         {
             await PreencherDropdowns();
             return View();
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Room room)
+        //--------------------------------------------------------CREATE POST-----------------------------------------------------------------------------------
+        [HttpPost] // Indica que este método responde a requisições HTTP POST
+        [ValidateAntiForgeryToken] // Protege contra ataques CSRF, validando o token antifalsificação
+        public async Task<IActionResult> Create(Room room) // Método assíncrono que recebe um objeto Room como parâmetro
         {
             if (room == null) return NotFound();
+            // Se o objeto recebido for nulo, retorna erro 404 (não encontrado)
 
             Console.WriteLine("Valor recebido para Name: " + room.Name);
+            // Escreve no console o valor recebido para o campo Name (debug/log)
 
             if (!ModelState.IsValid)
+            // Verifica se o modelo recebido é válido (validações de DataAnnotations, etc.)
             {
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                     Console.WriteLine(error.ErrorMessage);
+                // Caso inválido, imprime no console todas as mensagens de erro de validação
 
                 await PreencherDropdowns();
+                // Chama método auxiliar para preencher dropdowns (provavelmente dados para selects na View)
+
                 return View(room);
+                // Retorna a mesma View com o objeto Room, permitindo ao usuário corrigir os erros
             }
 
             var nomeNormalizado = room.Name?.Trim().ToLower() ?? string.Empty;
+            // Normaliza o nome da sala: remove espaços extras e converte para minúsculas
+
             var salaExistente = await _context.Room.AnyAsync(r => (r.Name ?? "").Trim().ToLower() == nomeNormalizado);
+            // Verifica no banco se já existe uma sala com o mesmo nome normalizado
 
             if (salaExistente)
             {
                 ModelState.AddModelError("Name", "Já existe uma sala com este nome, por favor insira outro nome.");
+                // Se já existir, adiciona erro ao ModelState para o campo Name
+
                 await PreencherDropdowns();
+                // Preenche novamente os dropdowns
+
                 return View(room);
+                // Retorna a View com o erro para o usuário corrigir
+            }
+
+            // BUSCA O STATUS "CRIADO" no banco
+            var statusCriado = await _context.RoomStatus.FirstOrDefaultAsync(s => s.Name == "Criado");
+            // Procura no banco o status "Criado"
+
+            if (statusCriado != null)
+            {
+                room.RoomStatusId = statusCriado.RoomStatusId;
+                // Se encontrado, atribui o ID do status "Criado" ao objeto Room
+            }
+            else
+            {
+                ModelState.AddModelError("RoomStatusId", "Não foi possível atribuir o status inicial. Verifique se existe o status \"Criado\".");
+                // Caso não exista, adiciona erro ao ModelState
+
+                await PreencherDropdowns();
+                // Preenche novamente os dropdowns
+
+                return View(room);
+                // Retorna a View com o erro
             }
 
             _context.Add(room);
+            // Adiciona o objeto Room ao contexto (prepara para inserção no banco)
+
             await _context.SaveChangesAsync();
+            // Salva as alterações no banco de dados (executa o INSERT)
 
             TempData["SuccessMessage"] = "Sala criada com sucesso!";
+            // Define uma mensagem de sucesso que será exibida na próxima requisição
+
             return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
+            // Redireciona para a ação Details, passando o ID da sala criada e um flag indicando que veio da criação
         }
 
+        //-------------------------------------------------------------------------------------------------------------------------------------------
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -160,28 +203,9 @@ namespace HealthWellbeingRoom.Controllers
                 return View(room);
             }
 
-            //try
-            //{
-            //    _context.Update(room);
-            //    await _context.SaveChangesAsync();
-            //    TempData["SuccessMessageEdit"] = $"Sala \"{room.Name ?? "(sem nome)"}\" atualizada com sucesso!";
-            //}
-
             try
             {
-                var roomInDb = await _context.Room.FindAsync(room.RoomId);
-                if (roomInDb == null) return NotFound();
-
-                // Atualiza apenas os campos editáveis
-                roomInDb.Name = room.Name;
-                roomInDb.Specialty = room.Specialty;
-                roomInDb.Notes = room.Notes;
-                roomInDb.OpeningTime = room.OpeningTime;
-                roomInDb.ClosingTime = room.ClosingTime;
-                roomInDb.RoomTypeId = room.RoomTypeId;
-                roomInDb.RoomLocationId = room.RoomLocationId;
-                roomInDb.RoomStatusId = room.RoomStatusId;
-
+                _context.Update(room);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessageEdit"] = $"Sala \"{room.Name ?? "(sem nome)"}\" atualizada com sucesso!";
             }
@@ -194,8 +218,6 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
 
         public async Task<IActionResult> Delete(int? id)
         {

@@ -10,7 +10,7 @@ namespace HealthWellbeing.Models
         public int RoomId { get; set; }
 
         [Required(ErrorMessage = "O tipo de sala é obrigatório.")]
-        public int RoomTypeId { get; set; }
+        public int? RoomTypeId { get; set; }
 
         // Propriedade de navegação anulável
         public RoomType? RoomType { get; set; }
@@ -40,13 +40,13 @@ namespace HealthWellbeing.Models
         [DataType(DataType.Time)]
         public TimeSpan ClosingTime { get; set; }
 
-        public int RoomStatusId { get; set; }
+        public int? RoomStatusId  { get; set; }
 
         public RoomStatus? RoomStatus { get; set; }
 
         public string? Notes { get; set; }
 
-        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; }
-        public ICollection<Equipment> Equipments { get; set; }
+        public ICollection<LocationMedDevice>? LocalizacaoDispMedicoMovel { get; set; }
+        public ICollection<Equipment>? Equipments { get; set; }
     }
 }
