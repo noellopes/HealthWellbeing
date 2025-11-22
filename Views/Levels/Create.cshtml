@@ -1,9 +1,13 @@
 ﻿@model HealthWellbeing.Models.Level
+@using System
+@using System.Linq
 
 @{
     ViewData["Title"] = "Create";
 
-    // Prefer any attempted ModelState value (POST back), otherwise show model value only if > 0.
+    var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
+
+    // LevelNumber prefill (avoid showing 0)
     var levelNumberValue = "";
     if (ViewData.ModelState.TryGetValue("LevelNumber", out var ms) && ms?.AttemptedValue != null)
     {
@@ -13,6 +17,20 @@
     {
         levelNumberValue = Model.LevelNumber.ToString();
     }
+
+    // Category prefill (preserve attempted value on validation error)
+    var categoryValue = "";
+    if (ViewData.ModelState.TryGetValue("LevelCategory", out var cms) && cms?.AttemptedValue != null)
+    {
+        categoryValue = cms.AttemptedValue;
+    }
+    else if (!string.IsNullOrWhiteSpace(Model?.LevelCategory))
+    {
+        categoryValue = Model.LevelCategory;
+    }
+
+    var categoryInList = cats.Any(c => string.Equals(c, categoryValue, StringComparison.OrdinalIgnoreCase));
+    var showNewBox = true;
 }
 
 <div class="container py-4">
@@ -24,15 +42,9 @@
                 </div>
 
                 <div class="card-body">
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            <strong>Please fix the errors below.</strong>
-                            <div asp-validation-summary="All" class="mb-0"></div>
-                        </div>
-                    }
+                    @* Pretty validation summary (shows server & client errors) *@
 
-                    <form asp-action="Create" method="post">
+                    <form asp-action="Create" method="post" id="createLevelForm" novalidate>
                         @Html.AntiForgeryToken()
 
                         <div class="form-floating mb-3">
@@ -43,35 +55,53 @@
                                    class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Count > 0 ? "is-invalid" : "")"
                                    placeholder="Level number" />
                             <label asp-for="LevelNumber">Level number</label>
-                            <span asp-validation-for="LevelNumber" class="invalid-feedback" data-valmsg-summary="false"></span>
+                            <span asp-validation-for="LevelNumber" class="invalid-feedback"></span>
                         </div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="LevelCategory"
-                                   class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                                   placeholder="Category" />
-                            <label asp-for="LevelCategory">Category</label>
-                            <span asp-validation-for="LevelCategory" class="invalid-feedback" data-valmsg-summary="false"></span>
+                        <div class="mb-3">
+                            <label for="categorySelect" class="form-label">Category</label>
+                            <div class="d-flex gap-2 align-items-start">
+                                <!-- select is the bound element (client validation works against this) -->
+                                <select asp-for="LevelCategory" id="categorySelect" class="form-select bg-white @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")" aria-label="Category selector">
+                                    @foreach (var c in cats)
+                                    {
+                                        <option value="@c">@c</option>
+                                    }
+
+                                    @if (showNewBox)
+                                    {
+                                        <option value="__new" selected>-- New category --</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="__new">-- New category --</option>
+                                    }
+                                </select>
+
+                                <!-- free text box for new category (not bound) -->
+                                <input id="categoryNew"
+                                       name="categoryNew"
+                                       type="text"
+                                       class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                       placeholder="Type new category"
+                                       value="@(showNewBox? categoryValue : "")"
+                                       style="min-width:220px;@(showNewBox ? "" : "display:none;")" />
+                            </div>
+
+                            <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
                         </div>
 
                         <div class="form-floating mb-3">
                             <textarea asp-for="Description"
                                       class="form-control @(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "is-invalid" : "")"
-                                      placeholder="Description" style="height: 120px"></textarea>
+                                      placeholder="Description" style="height:120px"></textarea>
                             <label asp-for="Description">Description</label>
-                            <span asp-validation-for="Description" class="invalid-feedback" data-valmsg-summary="false"></span>
+                            <span asp-validation-for="Description" class="invalid-feedback"></span>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a asp-action="Index" class="btn btn-outline-secondary">
-                                Cancel
-                            </a>
-
-                            <div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Create Level
-                                </button>
-                            </div>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Level</button>
                         </div>
                     </form>
                 </div>
@@ -81,47 +111,166 @@
 </div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <style>
+        /* Small polish for validation visuals */
+        .invalid-feedback {
+            display: block;
+        }
+
+        #validationSummary ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+
+        .form-control.is-invalid, .form-select.is-invalid {
+            box-shadow: 0 0 0 0.15rem rgba(220,53,69,.08);
+            border-color: #dc3545;
+        }
+    </style>
 
     <script>
-        (function ($) {
-            // Ensure jquery.validate and unobtrusive are loaded
-            if (typeof $.validator === 'undefined' || typeof $.validator.unobtrusive === 'undefined') return;
+        document.addEventListener('DOMContentLoaded', function () {
+            var select = document.getElementById('categorySelect');
+            var newInput = document.getElementById('categoryNew');
 
-            // Apply Bootstrap-friendly defaults and place errors into the asp-validation-for spans
-            $.validator.setDefaults({
-                highlight: function (element) {
-                    $(element).addClass('is-invalid').removeClass('is-valid');
-                },
-                unhighlight: function (element) {
-                    $(element).removeClass('is-invalid').addClass('is-valid');
-                },
-                errorElement: 'div',
-                errorClass: 'invalid-feedback',
-                errorPlacement: function (error, element) {
-                    var name = element.attr('name');
-                    var $msg = $('[data-valmsg-for="' + name + '"]');
-                    if ($msg.length) {
-                        $msg.removeClass('field-validation-valid').addClass('field-validation-error d-block').html(error);
+            function setNewVisibility(show) {
+                newInput.style.display = show ? '' : 'none';
+                if (show) newInput.focus();
+            }
+
+            function ensureOptionAndSelect(value) {
+                // Apenas usa a caixa de texto, nunca adiciona ao dropdown
+                if (select.value === "__new") {
+                    return; 
+                }
+            }
+
+
+            // initial visibility is already server-rendered; keep JS in sync
+            setNewVisibility(select.value === "__new");
+
+            select.addEventListener('change', function () {
+                setNewVisibility(this.value === "__new");
+                // update validation display when user changes select
+                toggleValidationForElement(select);
+            });
+
+            // create final option only on blur or Enter to avoid incremental prefixes
+            if (newInput) {
+                newInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        var v = this.value.trim();
+                        if (v.length > 0) ensureOptionAndSelect(v);
+                        this.blur();
+                    }
+                });
+
+                newInput.addEventListener('blur', function () {
+                    var v = this.value.trim();
+                    if (v.length > 0) ensureOptionAndSelect(v);
+                });
+
+                newInput.addEventListener('input', function () {
+                    // mirror live validation state for the new text box
+                    toggleValidationForElement(newInput);
+                });
+            }
+
+            // Before submit fix __new
+            var form = document.getElementById('createLevelForm');
+
+            form.addEventListener('submit', function (e) {
+
+                if (select.value === "__new") {
+
+                    const typed = newInput.value.trim();
+
+                    if (typed.length > 0) {
+                        const option = document.createElement('option');
+                        option.value = typed;
+                        option.textContent = typed;
+                        select.appendChild(option);
+
+                        select.value = typed;
                     } else {
-                        if (element.closest('.input-group').length) {
-                            error.insertAfter(element.closest('.input-group'));
-                        } else {
-                            error.insertAfter(element);
-                        }
+                        select.value = "";
                     }
                 }
             });
 
-            // Parse unobtrusive for this page (in case it's not already parsed)
-            $(function () {
-                $('form').each(function () {
-                    var $f = $(this);
-                    if (!$f.data('validator')) {
-                        $.validator.unobtrusive.parse($f);
+
+            // helper to toggle is-invalid class on an element based on validation message presence
+            function toggleValidationForElement(el) {
+                if (!el) return;
+                // find the validation message node that corresponds to the bound name
+                var name = el.name || el.getAttribute('asp-for') || el.id;
+                var message = document.querySelector('[data-valmsg-for="' + (name || '') + '"]');
+                if (message && message.innerText.trim().length > 0) {
+                    el.classList.add('is-invalid');
+                } else {
+                    el.classList.remove('is-invalid');
+                }
+            }
+
+            // ensure unobtrusive validator parsing if necessary and wire pretty client-side handlers
+            if (typeof jQuery !== 'undefined' && typeof jQuery.validator !== 'undefined' && typeof jQuery.validator.unobtrusive !== 'undefined') {
+                var $form = $('#createLevelForm');
+                if (!$form.data('validator')) {
+                    $.validator.unobtrusive.parse($form);
+                }
+
+                // update summary & field classes when client validation runs
+                $form.on('invalid-form.validate', function (e, validator) {
+                    var summary = $('#validationSummary');
+                    if (validator.numberOfInvalids()) {
+                        var list = $('<ul/>');
+                        $.each(validator.errorList, function () {
+                            list.append($('<li/>').text(this.message));
+                        });
+                        summary.html(list).removeClass('d-none');
+                    } else {
+                        summary.addClass('d-none').empty();
+                    }
+
+                    // mark inputs with errors
+                    $form.find('.is-invalid').removeClass('is-invalid');
+                    $.each(validator.errorList, function () {
+                        $(this.element).addClass('is-invalid');
+                    });
+                });
+
+                // when fields become valid, remove error styles
+                $form.on('keyup change', 'input, select, textarea', function () {
+                    var $el = $(this);
+                    var name = $el.attr('name');
+                    var message = $('[data-valmsg-for="' + name + '"]');
+                    if (message && message.text().trim().length === 0) {
+                        $el.removeClass('is-invalid');
                     }
                 });
+            } else {
+                // non-jQuery fallback: reflect server-side validation state already rendered
+                // and keep newInput in sync when user types
+                if (newInput) {
+                    newInput.addEventListener('input', function () {
+                        toggleValidationForElement(newInput);
+                    });
+                }
+            }
+
+            // initial pass to mark server-side invalid fields
+            Array.from(document.querySelectorAll('[data-valmsg-for]')).forEach(function (msg) {
+                var elName = msg.getAttribute('data-valmsg-for');
+                var field = document.querySelector('[name="' + elName + '"]') || document.getElementById(elName);
+                if (msg.innerText.trim().length > 0 && field) {
+                    field.classList.add('is-invalid');
+                }
             });
-        })(jQuery);
+        });
     </script>
 }

@@ -25,10 +25,25 @@ namespace HealthWellbeing.Controllers
             return View("InvalidLevel", attempted);
         }
 
+        // Populate distinct categories into ViewBag.CategoriesList
+        private async Task PopulateCategoriesAsync()
+        {
+            var categories = await _context.Level
+                .Where(l => !string.IsNullOrWhiteSpace(l.LevelCategory))
+                .Select(l => l.LevelCategory!.Trim())
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            ViewBag.CategoriesList = categories;
+        }
+
         // GET: Levels
         public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
-            const int pageSize = 5;
+            const int pageSize = 10; // show 10 rows per page
+
+            await PopulateCategoriesAsync();
 
             var query = _context.Level.AsQueryable();
 
@@ -42,12 +57,15 @@ namespace HealthWellbeing.Controllers
 
             if (!string.IsNullOrWhiteSpace(searchCategory))
             {
-                query = query.Where(l => l.LevelCategory != null && l.LevelCategory.Contains(searchCategory));
+                // exact match (case-insensitive) — prevents "Master" matching "Grandmaster"
+                var cat = searchCategory!.Trim().ToLower();
+                query = query.Where(l => l.LevelCategory != null && l.LevelCategory.ToLower() == cat);
             }
 
             if (!string.IsNullOrWhiteSpace(searchDescription))
             {
-                query = query.Where(l => l.Description != null && l.Description.Contains(searchDescription));
+                var desc = searchDescription.Trim();
+                query = query.Where(l => l.Description != null && l.Description.Contains(desc));
             }
 
             var totalItems = await query.CountAsync();
@@ -91,8 +109,10 @@ namespace HealthWellbeing.Controllers
 
         // GET: Levels/Create
         // Optional parameters allow pre-populating the Create form (used when recreating a deleted level).
-        public IActionResult Create(int? levelNumber = null, string? levelCategory = null, string? description = null)
+        public async Task<IActionResult> Create(int? levelNumber = null, string? levelCategory = null, string? description = null)
         {
+            await PopulateCategoriesAsync();
+
             var model = new Level
             {
                 LevelCategory = levelCategory ?? string.Empty,
@@ -119,6 +139,9 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = $"Level {level.LevelNumber} created.";
                 return RedirectToAction(nameof(Index));
             }
+
+            // repopulate categories when returning view due to validation errors
+            await PopulateCategoriesAsync();
             return View(level);
         }
 
@@ -129,6 +152,8 @@ namespace HealthWellbeing.Controllers
 
             var level = await _context.Level.FindAsync(id);
             if (level == null) return InvalidLevelView();
+
+            await PopulateCategoriesAsync();
 
             ViewBag.Page = page;
             ViewBag.SearchNumber = searchNumber;
@@ -172,6 +197,7 @@ namespace HealthWellbeing.Controllers
             }
 
             // If validation fails, preserve the routing values so the form can re-post them
+            await PopulateCategoriesAsync();
             ViewBag.Page = page;
             ViewBag.SearchNumber = searchNumber;
             ViewBag.SearchCategory = searchCategory;

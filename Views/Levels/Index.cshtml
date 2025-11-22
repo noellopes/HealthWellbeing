@@ -75,10 +75,23 @@
                            min="1" max="100" step="1"
                            placeholder="Exact number (1–100)" />
                 </div>
+
                 <div class="col-md-4">
                     <label for="searchCategory" class="form-label">Category</label>
-                    <input id="searchCategory" name="searchCategory" value="@(ViewBag.SearchCategory ?? "")" class="form-control" placeholder="Contains..." />
+                    <select id="searchCategory" name="searchCategory" class="form-select">
+                        <option value="">All Categories</option>
+                        @{
+                            // ViewBag.CategoriesList is set in the controller as IEnumerable<string>
+                            var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
+                            var selectedCat = (ViewBag.SearchCategory as string) ?? "";
+                        }
+                        @foreach (var c in cats)
+                        {
+                            <option value="@c" selected="@(c == selectedCat ? "selected" : null)">@c</option>
+                        }
+                    </select>
                 </div>
+
                 <div class="col-md-4">
                     <label for="searchDescription" class="form-label">Description</label>
                     <input id="searchDescription" name="searchDescription" value="@(ViewBag.SearchDescription ?? "")" class="form-control" placeholder="Contains..." />
@@ -142,7 +155,7 @@
                                 </tr>
                             }
                         }
-                        else
+                            else
                         {
                             <tr>
                                 <td colspan="4" class="text-center text-muted py-4">No levels to display.</td>
@@ -155,7 +168,8 @@
 
         <div class="card-footer d-flex align-items-center justify-content-between">
             @{
-                var page = Model.CurrentPage;           
+
+                var page = Model.CurrentPage;
                 var pageSize = Model.PageSize;
                 var startItem = Model.TotalItems == 0 ? 0 : ((page - 1) * pageSize + 1);
                 var endItem = Math.Min(Model.TotalItems, page * pageSize);
