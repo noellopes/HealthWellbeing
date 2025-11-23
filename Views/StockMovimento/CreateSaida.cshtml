@@ -1,16 +1,16 @@
 ﻿@model HealthWellbeing.Models.StockMovimento
 
 @{
-    ViewData["Title"] = "Nova Compra";
+    ViewData["Title"] = "Nova Saída";
 }
 
 <div class="container mt-4">
 
     <h2 class="fw-bold text-primary mb-4">
-        📥 Nova Compra de Consumível
+        🛒 Nova Saída de Consumível
     </h2>
 
-    <form asp-action="CreateEntrada" asp-controller="StockMovimento" method="post">
+    <form asp-action="CreateSaida" method="post">
         @Html.AntiForgeryToken()
 
         <div class="card shadow-sm">
@@ -50,12 +50,12 @@
         </div>
 
         <div class="mt-4 d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-secondary px-4">
+            <a asp-action="Index" asp-controller="Stock" class="btn btn-secondary px-4">
                 ❮ Voltar
             </a>
 
-            <button type="submit" class="btn btn-success px-5">
-                ✔ Confirmar Compra
+            <button type="submit" class="btn btn-danger px-5">
+                🛒 Confirmar Saída
             </button>
         </div>
 
@@ -63,4 +63,8 @@
 
 </div>
 
-@section Scripts { }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
