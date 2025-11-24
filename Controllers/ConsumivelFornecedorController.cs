@@ -61,7 +61,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ConsumivelFornecedor
-        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchTelefone = "")
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "")
         {
 
             var fornecedoresQuery = _context.ConsumivelFornecedor.AsQueryable();
@@ -70,12 +70,8 @@ namespace HealthWellbeing.Controllers
                 fornecedoresQuery = fornecedoresQuery
                     .Where(f => f.NomeEmpresa.Contains(searchNome));
 
-            if (!string.IsNullOrEmpty(searchTelefone))
-                fornecedoresQuery = fornecedoresQuery
-                    .Where(f => f.Telefone.Contains(searchTelefone));
 
             ViewBag.SearchNome = searchNome;
-            ViewBag.SearchContato = searchTelefone;
 
             int totalFornecedores = await fornecedoresQuery.CountAsync();
 
