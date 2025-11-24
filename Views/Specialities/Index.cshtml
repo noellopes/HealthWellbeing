@@ -1,0 +1,126 @@
+﻿@model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.Specialities>
+
+@{
+    ViewData["Title"] = "Especialidades";
+    var q = ViewBag.SearchQuery as string ?? "";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">
+        + Nova Especialidade
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <form asp-action="Index" method="get" class="d-flex gap-2">
+            <input type="text"
+                   name="q"
+                   value="@q"
+                   class="form-control"
+                   placeholder="Procurar por nome ou descrição..." />
+            <button type="submit" class="btn btn-outline-secondary">Pesquisar</button>
+            @if (!string.IsNullOrWhiteSpace(q))
+            {
+                <a asp-action="Index" class="btn btn-outline-light border">Limpar</a>
+            }
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <div class="p-4 text-center text-muted">
+                <div class="mb-2 fw-semibold">Sem especialidades para mostrar.</div>
+                <a asp-action="Create" class="btn btn-sm btn-primary">Criar a primeira</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 25%">
+                                @Html.DisplayNameFor(m => m.Items.First().Nome)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Items.First().Descricao)
+                            </th>
+                            <th class="text-end" style="width: 220px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.Nome</td>
+                                <td>
+                                    <div class="text-truncate" style="max-width: 640px;">
+                                        @item.Descricao
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    
+                                        
+
+                                        <a asp-action="Details" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-info-circle"></i> Detalhes
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-warning text-white">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.IdEspecialidade" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @* PAGINAÇÃO *@
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Navegação de páginas" class="p-3">
+                    <ul class="pagination justify-content-center mb-0">
+
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)"
+                               asp-route-q="@q">
+                                Anterior
+                            </a>
+                        </li>
+
+                        @for (var p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link"
+                                   asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-q="@q">
+                                    @p
+                                </a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)"
+                               asp-route-q="@q">
+                                Seguinte
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
+</div>
