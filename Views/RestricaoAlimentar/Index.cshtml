@@ -1,3 +1,4 @@
+
 @model IEnumerable<HealthWellbeing.Models.RestricaoAlimentar>
 
 @{
@@ -63,6 +64,49 @@
     </div>
 </div>
 
+@{
+    // Verifica se algum filtro está ativo
+    bool hasActiveFilter = !string.IsNullOrEmpty(searchNome) || !string.IsNullOrEmpty(searchTipo);
+}
+
+@if (hasActiveFilter)
+{
+    <div class="alert alert-info py-2 d-flex align-items-center mb-3">
+        <span class="me-2">Filtros Ativos:</span>
+
+        <div class="d-flex flex-wrap gap-2">
+
+            @if (!string.IsNullOrEmpty(searchNome))
+            {
+                <span class="badge bg-primary d-flex align-items-center">
+                    Nome: <strong>@searchNome</strong>
+                    <a asp-action="Index"
+                       asp-route-nome=""
+                       asp-route-tipo="@searchTipo"
+                       class="btn-close btn-close-white ms-1"
+                       aria-label="Remover filtro Nome">
+                    </a>
+                </span>
+            }
+
+            @if (!string.IsNullOrEmpty(searchTipo))
+            {
+                <span class="badge bg-primary d-flex align-items-center">
+                    Tipo: <strong>@searchTipo</strong>
+                    <a asp-action="Index"
+                       asp-route-nome="@searchNome"
+                       asp-route-tipo=""
+                       class="btn-close btn-close-white ms-1"
+                       aria-label="Remover filtro Tipo">
+                    </a>
+                </span>
+            }
+
+            <a asp-action="Index" class="btn btn-sm btn-outline-info ms-2">Limpar Todos</a>
+        </div>
+    </div>
+}
+
 <div class="mb-2 text-muted">
     <small>Mostrando <strong>@startItem</strong> a <strong>@endItem</strong> de <strong>@totalCount</strong> itens</small>
 </div>
@@ -73,7 +117,6 @@
             <th>Nome</th>
             <th>Tipo</th>
             <th>Gravidade</th>
-            <th>Descrição</th>
             <th>Alimentos Relacionados</th>
             <th></th>
         </tr>
@@ -84,9 +127,9 @@
         {
             string rowClass = item.Gravidade switch
             {
-                GravidadeRestricao.Leve => "table-success",      // verde
-                GravidadeRestricao.Moderada => "table-warning",  // amarelo
-                GravidadeRestricao.Grave => "table-danger",      // vermelho
+                GravidadeRestricao.Leve => "table-success",
+                GravidadeRestricao.Moderada => "table-warning",
+                GravidadeRestricao.Grave => "table-danger",
                 _ => ""
             };
             <tr class="@rowClass">
@@ -103,18 +146,6 @@
                         };
                     }
                     <span class="@gravidadeBadgeClass">@item.Gravidade</span>
-                </td>
-                <td>
-                    @if (!string.IsNullOrEmpty(item.Descricao))
-                    {
-                        <span title="@item.Descricao">
-                            @(item.Descricao.Length > 50 ? item.Descricao.Substring(0, 50) + "..." : item.Descricao)
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="text-muted">—</span>
-                    }
                 </td>
                 <td>
                     @if (item.AlimentosAssociados?.Any() == true)
@@ -137,9 +168,9 @@
                 </td>
                 <td class="text-end">
                     <div class="d-flex gap-2 justify-content-end">
-                    <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.RestricaoAlimentarId">Ver</a>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId">Editar</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId">Excluir</a>
+                        <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.RestricaoAlimentarId">Ver</a>
+                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId">Editar</a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId">Excluir</a>
                     </div>
                 </td>
             </tr>
@@ -179,5 +210,3 @@
         </ul>
     </nav>
 }
-
-
