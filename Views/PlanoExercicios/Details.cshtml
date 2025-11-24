@@ -1,0 +1,34 @@
+﻿@model HealthWellbeing.Models.PlanoExercicios
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Utente: @Model.UtenteGrupo7?.Nome</h4>
+</div>
+
+<div>
+    <h4>Exercícios:</h4>
+    <ul>
+        @if (Model.Exercicios != null && Model.Exercicios.Any())
+        {
+            foreach (var ex in Model.Exercicios)
+            {
+                <li>@ex.ExercicioNome</li>
+            }
+        }
+        else
+        {
+            <li>Não há exercícios associados a este plano.</li>
+        }
+    </ul>
+</div>
+
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.PlanoExerciciosId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

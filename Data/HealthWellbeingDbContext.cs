@@ -26,6 +26,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
 
+        public DbSet<HealthWellbeing.Models.PlanoExercicios> PlanoExercicios { get; set; } = default!;
+
         public DbSet<HealthWellbeing.Models.Equipamento> Equipamento { get; set; }
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
 
@@ -109,8 +111,15 @@ namespace HealthWellbeing.Data
                 .WithMany(g => g.ExercicioEquipamentos)
                 .HasForeignKey(eg => eg.EquipamentoId);
 
+            modelBuilder.Entity<PlanoExercicios>()
+                .HasMany(p => p.Exercicios)
+                .WithMany(e => e.PlanoExercicios)
+                .UsingEntity(j => j.ToTable("PlanoExerciciosExercicio"));
+
         }
         public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
+        
+
     }
 }

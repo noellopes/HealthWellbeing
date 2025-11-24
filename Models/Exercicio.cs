@@ -40,5 +40,6 @@ namespace HealthWellbeing.Models
         public ICollection<ExercicioGenero>? ExercicioGeneros { get; set; }
         public ICollection<ExercicioGrupoMuscular>? ExercicioGrupoMusculares { get; set; }
         public ICollection<ExercicioEquipamento>? ExercicioEquipamentos { get; set; }
+        public ICollection<PlanoExercicios>? PlanoExercicios { get; set; }
     }
 }
