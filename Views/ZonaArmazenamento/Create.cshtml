@@ -54,10 +54,17 @@
                     <span asp-validation-for="Descricao" class="text-danger"></span>
                 </div>
 
+                <!-- 🔽 CAMPO ALTERADO PARA DROPDOWN -->
                 <div class="mb-3">
-                    <label asp-for="Localizacao" class="form-label"></label>
-                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Bloco A - Piso 0" />
-                    <span asp-validation-for="Localizacao" class="text-danger"></span>
+                    <label asp-for="LocalizacaoZonaArmazenamentoId" class="form-label"></label>
+
+                    <select asp-for="LocalizacaoZonaArmazenamentoId"
+                            class="form-select"
+                            asp-items="ViewBag.Localizacoes">
+                        <option value="">-- Selecionar Localização --</option>
+                    </select>
+
+                    <span asp-validation-for="LocalizacaoZonaArmazenamentoId" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">

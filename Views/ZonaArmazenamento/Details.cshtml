@@ -55,8 +55,11 @@
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Localizacao)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Localizacao)</dd>
+
+                <dt class="col-sm-4 details-label">Localização</dt>
+                <dd class="col-sm-8 details-value">
+                    @Model.LocalizacaoZonaArmazenamento?.Nome
+                </dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
                 <dd class="col-sm-8 details-value">

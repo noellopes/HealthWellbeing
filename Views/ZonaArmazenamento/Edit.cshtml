@@ -56,9 +56,14 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Localizacao" class="form-label"></label>
-                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Bloco A - Piso 0" />
-                    <span asp-validation-for="Localizacao" class="text-danger"></span>
+                    <label asp-for="LocalizacaoZonaArmazenamentoId" class="form-label"></label>
+
+                    <select asp-for="LocalizacaoZonaArmazenamentoId"
+                            class="form-select"
+                            asp-items="ViewBag.Localizacoes">
+                    </select>
+
+                    <span asp-validation-for="LocalizacaoZonaArmazenamentoId" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -71,7 +76,6 @@
                            placeholder="Ex: 5000 (m³)" />
                     <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
                 </div>
-
 
                 <div class="form-check mb-3">
                     <input class="form-check-input" asp-for="Ativa" id="ativaCheck" />

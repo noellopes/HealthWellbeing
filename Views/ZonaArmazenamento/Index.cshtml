@@ -95,8 +95,11 @@
                     {
                         <tr>
                             <td class="fw-semibold">@item.Nome</td>
-                            <td>@item.Localizacao</td>
+
+                            <td>@item.LocalizacaoZonaArmazenamento?.Nome</td>
+
                             <td>@item.CapacidadeMaxima m³</td>
+
                             <td>
                                 @if (item.Ativa)
                                 {
@@ -107,6 +110,7 @@
                                     <span class="badge bg-secondary">Inativa</span>
                                 }
                             </td>
+
                             <td class="text-center">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
