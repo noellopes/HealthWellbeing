@@ -5,14 +5,14 @@
     var currentPage = (int)(ViewBag.CurrentPage ?? 1);
     var totalPages = (int)(ViewBag.TotalPages ?? 1);
     var pageSize = (int)(ViewBag.PageSize ?? 10);
-    var totalCount = (int)(ViewBag.TotalCount ?? 0); // agora total de ALIMENTOS ORIGINAIS
+    var totalCount = (int)(ViewBag.TotalCount ?? 0);
 
-    // usa os valores calculados no controller (StartItem/EndItem) para refletir paginação por ALIMENTOS ORIGINAIS
+
     var startItem = (int)(ViewBag.StartItem ?? (totalCount == 0 ? 0 : 1));
     var endItem = (int)(ViewBag.EndItem ?? (startItem == 0 ? 0 : startItem + Model.GroupBy(m =>
     m.AlimentoOriginal?.Name).Count() - 1));
 
-    // Valores de busca vindos do controller
+
     var searchOriginal = (string)ViewBag.SearchOriginalName ?? string.Empty;
     var searchSubstituto = (string)ViewBag.SearchSubstitutoName ?? string.Empty;
     var searchFactorOp = (string)ViewBag.SearchFactorOp ?? "gt";
@@ -31,7 +31,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Alimento Substituto</h1>
     <div class="d-flex">
-        <!-- botão que agora abre/fecha o painel de busca inline -->
+
         <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#searchPanel" role="button"
             aria-expanded="false" aria-controls="searchPanel">
             Pesquisar
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<!-- Painel de Busca inline (substitui o modal) -->
+
 <div class="collapse mt-2 mb-3" id="searchPanel">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-3 align-items-end">
@@ -59,7 +59,7 @@
             <div class="col-md-2">
                 <label for="factorOp" class="form-label">Comparador</label>
                 <select class="form-select" id="factorOp" name="factorOp">
-                    @* Evita C# dentro do atributo <option> usando blocos condicionalmente *@
+
                     @if (searchFactorOp == "gt")
                     {
                         <option value="gt" selected>Maior que</option>

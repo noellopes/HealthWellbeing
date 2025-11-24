@@ -458,14 +458,14 @@ internal class SeedData
         }
 
         context.AlimentoSubstitutos.AddRange(
-            // Seeds existentes (mantidos)
+
             new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 2, Motivo = "Alternativa para alergia.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.8 },
             new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 4, Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.9 },
             new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 1, Motivo = "Alternativa para dieta vegana.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.7 },
             new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 3, Motivo = "Alternativa para restrição alimentar.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.85 },
             new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 5, Motivo = "Alternativa para alergia ao leite.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.75 },
 
-            // +15 novos exemplos (garantindo múltiplos substitutos para os originais 1..5)
+
             // Substitutos para Maçã (1)
             new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 6, Motivo = "Opção doce e similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Boa troca em vitaminas e bolos.", FatorSimilaridade = 0.78 },
             new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 8, Motivo = "Substituto em pratos assados.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, sabor complementar.", FatorSimilaridade = 0.55 },
@@ -490,8 +490,6 @@ internal class SeedData
             new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 9, Motivo = "Opção vegetal rica em proteína.", ProporcaoEquivalente = 1, Observacoes = "Boa para dietas vegetarianas.", FatorSimilaridade = 0.6 },
             new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 14, Motivo = "Peixe rico em ômega-3 como alternativa.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, alto valor nutritivo.", FatorSimilaridade = 0.7 },
             new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 11, Motivo = "Fonte proteica vegetal.", ProporcaoEquivalente = 1, Observacoes = "Ótimo em ensopados e saladas.", FatorSimilaridade = 0.5 },
-
-            // Novos: garantir que originais 6..15 tenham substitutos (mais de 10 originais no total)
             // 6 - Banana
             new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 1, Motivo = "Fruta similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Troca comum em vitaminas.", FatorSimilaridade = 0.7 },
             new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 15, Motivo = "Alternativa energética.", ProporcaoEquivalente = 1, Observacoes = "Boa para bolos e purês.", FatorSimilaridade = 0.6 },
