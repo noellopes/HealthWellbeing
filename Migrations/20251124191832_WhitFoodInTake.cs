@@ -6,16 +6,30 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class freshstart : Migration
+    public partial class WhitFoodInTake : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Alergy",
+                columns: table => new
+                {
+                    AlergyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AlergyName = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Alergy", x => x.AlergyId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Client",
                 columns: table => new
                 {
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
@@ -23,68 +37,56 @@ namespace HealthWellbeing.Migrations
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateMember = table.Column<bool>(type: "bit", nullable: true),
-                    ClientId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CreateMember = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Client", x => x.ClientId);
-                    table.ForeignKey(
-                        name: "FK_Client_Client_ClientId1",
-                        column: x => x.ClientId1,
-                        principalTable: "Client",
-                        principalColumn: "ClientId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "FoodCategory",
                 columns: table => new
                 {
-                    FoodCategoryId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ParentCategoryId = table.Column<int>(type: "int", nullable: true)
+                    Category = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodCategory", x => x.FoodCategoryId);
-                    table.ForeignKey(
-                        name: "FK_FoodCategory_FoodCategory_ParentCategoryId",
-                        column: x => x.ParentCategoryId,
-                        principalTable: "FoodCategory",
-                        principalColumn: "FoodCategoryId");
+                    table.PrimaryKey("PK_FoodCategory", x => x.CategoryId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FoodComponent",
+                name: "FoodInTake",
                 columns: table => new
                 {
-                    FoodComponentId = table.Column<int>(type: "int", nullable: false)
+                    FoodInTakeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    FoodId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Eaten = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodComponent", x => x.FoodComponentId);
+                    table.PrimaryKey("PK_FoodInTake", x => x.FoodInTakeId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "NutrientComponent",
+                name: "NutritionalComponent",
                 columns: table => new
                 {
-                    NutrientComponentId = table.Column<int>(type: "int", nullable: false)
+                    NutritionalComponentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
-                    DefaultUnit = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Code = table.Column<string>(type: "nvarchar(24)", maxLength: 24, nullable: true),
-                    IsMacro = table.Column<bool>(type: "bit", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Basis = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NutrientComponent", x => x.NutrientComponentId);
+                    table.PrimaryKey("PK_NutritionalComponent", x => x.NutritionalComponentId);
                 });
 
             migrationBuilder.CreateTable(
@@ -94,12 +96,25 @@ namespace HealthWellbeing.Migrations
                     NutritionistId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true)
+                    Gender = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Nutritionist", x => x.NutritionistId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Portion",
+                columns: table => new
+                {
+                    PortionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PortionName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Portion", x => x.PortionId);
                 });
 
             migrationBuilder.CreateTable(
@@ -143,20 +158,46 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClientAlergy",
+                columns: table => new
+                {
+                    ClientAlergyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    AlergyId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientAlergy", x => x.ClientAlergyId);
+                    table.ForeignKey(
+                        name: "FK_ClientAlergy_Alergy_AlergyId",
+                        column: x => x.AlergyId,
+                        principalTable: "Alergy",
+                        principalColumn: "AlergyId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClientAlergy_Client_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Client",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Goal",
                 columns: table => new
                 {
                     GoalId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    GoalType = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
-                    DailyCalories = table.Column<int>(type: "int", nullable: true),
-                    DailyProtein = table.Column<int>(type: "int", nullable: true),
-                    DailyFat = table.Column<int>(type: "int", nullable: true),
-                    DailyCarbs = table.Column<int>(type: "int", nullable: true),
-                    DailyFiber = table.Column<int>(type: "int", nullable: true),
-                    DailyVitamins = table.Column<int>(type: "int", nullable: true),
-                    DailyMinerals = table.Column<int>(type: "int", nullable: true)
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    GoalName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    DailyCalories = table.Column<int>(type: "int", nullable: false),
+                    DailyProtein = table.Column<int>(type: "int", nullable: false),
+                    DailyFat = table.Column<int>(type: "int", nullable: false),
+                    DailyHydrates = table.Column<int>(type: "int", nullable: false),
+                    DailyVitamins = table.Column<int>(type: "int", nullable: false),
+                    DailyMinerals = table.Column<int>(type: "int", nullable: false),
+                    DailyFibers = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,13 +214,12 @@ namespace HealthWellbeing.Migrations
                 name: "Member",
                 columns: table => new
                 {
+                    ClientId = table.Column<int>(type: "int", nullable: false),
                     MemberId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Member", x => x.MemberId);
+                    table.PrimaryKey("PK_Member", x => x.ClientId);
                     table.ForeignKey(
                         name: "FK_Member_Client_ClientId",
                         column: x => x.ClientId,
@@ -194,19 +234,45 @@ namespace HealthWellbeing.Migrations
                 {
                     FoodId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
-                    FoodCategoryId = table.Column<int>(type: "int", nullable: false)
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    FoodInTakeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Food", x => x.FoodId);
                     table.ForeignKey(
-                        name: "FK_Food_FoodCategory_FoodCategoryId",
-                        column: x => x.FoodCategoryId,
+                        name: "FK_Food_FoodCategory_CategoryId",
+                        column: x => x.CategoryId,
                         principalTable: "FoodCategory",
-                        principalColumn: "FoodCategoryId",
+                        principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Food_FoodInTake_FoodInTakeId",
+                        column: x => x.FoodInTakeId,
+                        principalTable: "FoodInTake",
+                        principalColumn: "FoodInTakeId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Plan",
+                columns: table => new
+                {
+                    PlanId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Done = table.Column<bool>(type: "bit", nullable: false),
+                    FoodInTakeId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Plan", x => x.PlanId);
+                    table.ForeignKey(
+                        name: "FK_Plan_FoodInTake_FoodInTakeId",
+                        column: x => x.FoodInTakeId,
+                        principalTable: "FoodInTake",
+                        principalColumn: "FoodInTakeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -232,31 +298,29 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FoodNutrient",
+                name: "FoodNutritionalComponent",
                 columns: table => new
                 {
-                    FoodNutrientId = table.Column<int>(type: "int", nullable: false)
+                    FoodNutritionalComponentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    NutritionalComponentId = table.Column<int>(type: "int", nullable: false),
                     FoodId = table.Column<int>(type: "int", nullable: false),
-                    NutrientComponentId = table.Column<int>(type: "int", nullable: false),
-                    Value = table.Column<decimal>(type: "decimal(9,3)", nullable: false),
-                    Unit = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
-                    Basis = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: true)
+                    Value = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodNutrient", x => x.FoodNutrientId);
+                    table.PrimaryKey("PK_FoodNutritionalComponent", x => x.FoodNutritionalComponentId);
                     table.ForeignKey(
-                        name: "FK_FoodNutrient_Food_FoodId",
+                        name: "FK_FoodNutritionalComponent_Food_FoodId",
                         column: x => x.FoodId,
                         principalTable: "Food",
                         principalColumn: "FoodId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_FoodNutrient_NutrientComponent_NutrientComponentId",
-                        column: x => x.NutrientComponentId,
-                        principalTable: "NutrientComponent",
-                        principalColumn: "NutrientComponentId",
+                        name: "FK_FoodNutritionalComponent_NutritionalComponent_NutritionalComponentId",
+                        column: x => x.NutritionalComponentId,
+                        principalTable: "NutritionalComponent",
+                        principalColumn: "NutritionalComponentId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -264,24 +328,15 @@ namespace HealthWellbeing.Migrations
                 name: "FoodPlan",
                 columns: table => new
                 {
-                    FoodPlanId = table.Column<int>(type: "int", nullable: false)
+                    PlanFoodId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    GoalId = table.Column<int>(type: "int", nullable: false),
-                    FoodId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(9,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    NutritionistId = table.Column<int>(type: "int", nullable: true)
+                    PortionId = table.Column<int>(type: "int", nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    FoodId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FoodPlan", x => x.FoodPlanId);
-                    table.ForeignKey(
-                        name: "FK_FoodPlan_Client_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Client",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_FoodPlan", x => x.PlanFoodId);
                     table.ForeignKey(
                         name: "FK_FoodPlan_Food_FoodId",
                         column: x => x.FoodId,
@@ -289,74 +344,49 @@ namespace HealthWellbeing.Migrations
                         principalColumn: "FoodId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_FoodPlan_Goal_GoalId",
-                        column: x => x.GoalId,
-                        principalTable: "Goal",
-                        principalColumn: "GoalId",
+                        name: "FK_FoodPlan_Plan_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plan",
+                        principalColumn: "PlanId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_FoodPlan_Nutritionist_NutritionistId",
-                        column: x => x.NutritionistId,
-                        principalTable: "Nutritionist",
-                        principalColumn: "NutritionistId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FoodPortion",
-                columns: table => new
-                {
-                    FoodPortionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FoodId = table.Column<int>(type: "int", nullable: false),
-                    Label = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false),
-                    AmountGramsMl = table.Column<decimal>(type: "decimal(9,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FoodPortion", x => x.FoodPortionId);
-                    table.ForeignKey(
-                        name: "FK_FoodPortion_Food_FoodId",
-                        column: x => x.FoodId,
-                        principalTable: "Food",
-                        principalColumn: "FoodId",
+                        name: "FK_FoodPlan_Portion_PortionId",
+                        column: x => x.PortionId,
+                        principalTable: "Portion",
+                        principalColumn: "PortionId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserFoodRegistration",
+                name: "NutritionistClientPlan",
                 columns: table => new
                 {
-                    UserFoodRegistrationId = table.Column<int>(type: "int", nullable: false)
+                    PlanClientId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FoodId = table.Column<int>(type: "int", nullable: false),
-                    FoodPortionId = table.Column<int>(type: "int", nullable: false),
-                    PortionsCount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MealType = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    MealDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EstimatedEnergyKcal = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    PlanId = table.Column<int>(type: "int", nullable: false),
+                    NutritionistId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFoodRegistration", x => x.UserFoodRegistrationId);
+                    table.PrimaryKey("PK_NutritionistClientPlan", x => x.PlanClientId);
                     table.ForeignKey(
-                        name: "FK_UserFoodRegistration_Client_ClientId",
+                        name: "FK_NutritionistClientPlan_Client_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Client",
                         principalColumn: "ClientId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserFoodRegistration_FoodPortion_FoodPortionId",
-                        column: x => x.FoodPortionId,
-                        principalTable: "FoodPortion",
-                        principalColumn: "FoodPortionId",
+                        name: "FK_NutritionistClientPlan_Nutritionist_NutritionistId",
+                        column: x => x.NutritionistId,
+                        principalTable: "Nutritionist",
+                        principalColumn: "NutritionistId",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_UserFoodRegistration_Food_FoodId",
-                        column: x => x.FoodId,
-                        principalTable: "Food",
-                        principalColumn: "FoodId",
+                        name: "FK_NutritionistClientPlan_Plan_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plan",
+                        principalColumn: "PlanId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -366,34 +396,34 @@ namespace HealthWellbeing.Migrations
                 column: "FoodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Client_ClientId1",
-                table: "Client",
-                column: "ClientId1");
+                name: "IX_ClientAlergy_AlergyId",
+                table: "ClientAlergy",
+                column: "AlergyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Food_FoodCategoryId",
+                name: "IX_ClientAlergy_ClientId",
+                table: "ClientAlergy",
+                column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Food_CategoryId",
                 table: "Food",
-                column: "FoodCategoryId");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodCategory_ParentCategoryId",
-                table: "FoodCategory",
-                column: "ParentCategoryId");
+                name: "IX_Food_FoodInTakeId",
+                table: "Food",
+                column: "FoodInTakeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodNutrient_FoodId",
-                table: "FoodNutrient",
+                name: "IX_FoodNutritionalComponent_FoodId",
+                table: "FoodNutritionalComponent",
                 column: "FoodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodNutrient_NutrientComponentId",
-                table: "FoodNutrient",
-                column: "NutrientComponentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FoodPlan_ClientId",
-                table: "FoodPlan",
-                column: "ClientId");
+                name: "IX_FoodNutritionalComponent_NutritionalComponentId",
+                table: "FoodNutritionalComponent",
+                column: "NutritionalComponentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FoodPlan_FoodId",
@@ -401,19 +431,14 @@ namespace HealthWellbeing.Migrations
                 column: "FoodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodPlan_GoalId",
+                name: "IX_FoodPlan_PlanId",
                 table: "FoodPlan",
-                column: "GoalId");
+                column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FoodPlan_NutritionistId",
+                name: "IX_FoodPlan_PortionId",
                 table: "FoodPlan",
-                column: "NutritionistId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FoodPortion_FoodId",
-                table: "FoodPortion",
-                column: "FoodId");
+                column: "PortionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Goal_ClientId",
@@ -421,24 +446,24 @@ namespace HealthWellbeing.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Member_ClientId",
-                table: "Member",
+                name: "IX_NutritionistClientPlan_ClientId",
+                table: "NutritionistClientPlan",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFoodRegistration_ClientId",
-                table: "UserFoodRegistration",
-                column: "ClientId");
+                name: "IX_NutritionistClientPlan_NutritionistId",
+                table: "NutritionistClientPlan",
+                column: "NutritionistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFoodRegistration_FoodId",
-                table: "UserFoodRegistration",
-                column: "FoodId");
+                name: "IX_NutritionistClientPlan_PlanId",
+                table: "NutritionistClientPlan",
+                column: "PlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFoodRegistration_FoodPortionId",
-                table: "UserFoodRegistration",
-                column: "FoodPortionId");
+                name: "IX_Plan_FoodInTakeId",
+                table: "Plan",
+                column: "FoodInTakeId");
         }
 
         /// <inheritdoc />
@@ -448,16 +473,22 @@ namespace HealthWellbeing.Migrations
                 name: "Alergia");
 
             migrationBuilder.DropTable(
-                name: "FoodComponent");
+                name: "ClientAlergy");
 
             migrationBuilder.DropTable(
-                name: "FoodNutrient");
+                name: "FoodNutritionalComponent");
 
             migrationBuilder.DropTable(
                 name: "FoodPlan");
 
             migrationBuilder.DropTable(
+                name: "Goal");
+
+            migrationBuilder.DropTable(
                 name: "Member");
+
+            migrationBuilder.DropTable(
+                name: "NutritionistClientPlan");
 
             migrationBuilder.DropTable(
                 name: "Receita");
@@ -466,28 +497,31 @@ namespace HealthWellbeing.Migrations
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
-                name: "UserFoodRegistration");
+                name: "Alergy");
 
             migrationBuilder.DropTable(
-                name: "NutrientComponent");
-
-            migrationBuilder.DropTable(
-                name: "Goal");
-
-            migrationBuilder.DropTable(
-                name: "Nutritionist");
-
-            migrationBuilder.DropTable(
-                name: "FoodPortion");
-
-            migrationBuilder.DropTable(
-                name: "Client");
+                name: "NutritionalComponent");
 
             migrationBuilder.DropTable(
                 name: "Food");
 
             migrationBuilder.DropTable(
+                name: "Portion");
+
+            migrationBuilder.DropTable(
+                name: "Client");
+
+            migrationBuilder.DropTable(
+                name: "Nutritionist");
+
+            migrationBuilder.DropTable(
+                name: "Plan");
+
+            migrationBuilder.DropTable(
                 name: "FoodCategory");
+
+            migrationBuilder.DropTable(
+                name: "FoodInTake");
         }
     }
 }

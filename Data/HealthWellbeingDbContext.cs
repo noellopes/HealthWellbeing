@@ -28,6 +28,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Alergy> Alergy { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ClientAlergy> ClientAlergy { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.NutritionistClientPlan> NutritionistClientPlan { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.FoodIntake> FoodIntake { get; set; } = default!;
 
 
 
