@@ -145,7 +145,7 @@ namespace HealthWellBeingRoom.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' Registado com sucesso!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
             }
 
             // Recarregar ViewBags em caso de falha (seja por SerialNumber ou outra validação)
