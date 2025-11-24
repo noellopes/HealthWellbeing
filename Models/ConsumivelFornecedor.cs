@@ -24,7 +24,7 @@ namespace HealthWellbeing.Models
         public string Telefone { get; set; }
 
         [Required(ErrorMessage = "O Email é obrigatório.")]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "O Email deve conter um formato válido (ex: nome@exemplo.pt).")]
+        [EmailAddress(ErrorMessage = "O Email deve conter um formato válido.")]
         public string Email { get; set; }
 
     }
