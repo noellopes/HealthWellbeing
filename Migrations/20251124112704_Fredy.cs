@@ -5,7 +5,7 @@
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class novotest : Migration
+    public partial class Fredy : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
