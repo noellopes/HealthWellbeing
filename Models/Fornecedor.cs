@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Models
 {
-    public class ConsumivelFornecedor
+    public class Fornecedor
     {
         [Key]
         public int FornecedorId { get; set; }
