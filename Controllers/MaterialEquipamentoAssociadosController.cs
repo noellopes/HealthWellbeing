@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using HealthWellBeing.Models; // Ensure all necessary namespaces are present
+using HealthWellbeing.ViewModels; // Assuming this contains PaginationInfo
+using Microsoft.AspNetCore.Mvc.Rendering; // Needed for SelectList
 
 namespace HealthWellBeing.Controllers
 {
@@ -19,25 +21,40 @@ namespace HealthWellBeing.Controllers
             _context = context;
         }
 
+        // Helper method to load status options for dropdowns (Select Lists)
+        private void LoadEstadoMaterialOptions(object selectedId = null)
+        {
+            var estados = _context.EstadosMaterial.OrderBy(e => e.Nome).AsNoTracking().ToList();
+            ViewData["MaterialStatusId"] = new SelectList(estados, "MaterialStatusId", "Nome", selectedId);
+        }
+
         // GET: MaterialEquipamentoAssociados
         public async Task<IActionResult> Index(
             int page = 1,
             string searchNome = "",
-            string searchEstado = "")
+            string searchEstado = "") // searchEstado is now the Status Name
         {
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchEstado = searchEstado;
 
-            var materialQuery = _context.MaterialEquipamentoAssociado.AsQueryable();
+            // 1. Eager Load the Material Status (EstadoMaterial)
+            var materialQuery = _context.MaterialEquipamentoAssociado
+                .Include(m => m.EstadoMaterial) // MUST include to access the status name
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchNome))
             {
                 materialQuery = materialQuery.Where(m => m.NomeEquipamento.Contains(searchNome));
             }
 
+            // 2. Filter by Status Name (EstadoMaterial.Nome)
             if (!string.IsNullOrEmpty(searchEstado))
             {
-                materialQuery = materialQuery.Where(m => m.EstadoComponente.Contains(searchEstado));
+                // We use the navigation property to filter by the related entity's name
+                materialQuery = materialQuery.Where(m =>
+                    m.EstadoMaterial != null &&
+                    m.EstadoMaterial.Nome.Contains(searchEstado)
+                );
             }
 
             int totalMateriais = await materialQuery.CountAsync();
@@ -61,8 +78,11 @@ namespace HealthWellBeing.Controllers
                 return NotFound();
             }
 
+            // Eager Load the Material Status
             var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado
+                .Include(m => m.EstadoMaterial) // Include the status for display
                 .FirstOrDefaultAsync(m => m.MaterialEquipamentoAssociadoId == id);
+
             if (materialEquipamentoAssociado == null)
             {
                 return NotFound();
@@ -74,22 +94,28 @@ namespace HealthWellBeing.Controllers
         // GET: MaterialEquipamentoAssociados/Create
         public IActionResult Create()
         {
+            LoadEstadoMaterialOptions(); // Load options for the dropdown
             return View();
         }
 
         // POST: MaterialEquipamentoAssociados/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,EstadoComponente")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
+        // BIND: Removed 'EstadoComponente' and added the Foreign Key 'MaterialStatusId'
+        public async Task<IActionResult> Create([Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,MaterialStatusId")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
         {
+            // Note: Since MaterialStatusId is a simple integer, ModelState.IsValid should be true 
+            // if the user selected a valid ID (which comes from the ViewData SelectList).
             if (ModelState.IsValid)
             {
                 _context.Add(materialEquipamentoAssociado);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
+
+            // If model is invalid, reload the dropdown options before returning to the view
+            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
             return View(materialEquipamentoAssociado);
         }
 
@@ -106,15 +132,17 @@ namespace HealthWellBeing.Controllers
             {
                 return NotFound();
             }
+
+            // Load the options for the dropdown, selecting the current status ID
+            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
             return View(materialEquipamentoAssociado);
         }
 
         // POST: MaterialEquipamentoAssociados/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,EstadoComponente")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
+        // BIND: Removed 'EstadoComponente' and added the Foreign Key 'MaterialStatusId'
+        public async Task<IActionResult> Edit(int id, [Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,MaterialStatusId")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
         {
             if (id != materialEquipamentoAssociado.MaterialEquipamentoAssociadoId)
             {
@@ -142,6 +170,9 @@ namespace HealthWellBeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            // If model is invalid, reload the dropdown options before returning to the view
+            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
             return View(materialEquipamentoAssociado);
         }
 
@@ -153,8 +184,11 @@ namespace HealthWellBeing.Controllers
                 return NotFound();
             }
 
+            // Eager Load the Material Status for display on the Delete confirmation page
             var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado
+                .Include(m => m.EstadoMaterial)
                 .FirstOrDefaultAsync(m => m.MaterialEquipamentoAssociadoId == id);
+
             if (materialEquipamentoAssociado == null)
             {
                 return NotFound();

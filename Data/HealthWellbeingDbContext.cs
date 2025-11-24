@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Models;
 using HealthWellBeing.Models;
 using Microsoft.EntityFrameworkCore;
+using NuGet.ContentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace HealthWellbeing.Data
         public DbSet<ExameTipoRecurso> ExameTipoRecursos { get; set; } = default!;
 
         public DbSet<Funcao> Funcoes { get; set; }
-
+        public DbSet<EstadoMaterial> EstadosMaterial{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
