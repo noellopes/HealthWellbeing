@@ -87,7 +87,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        // Ajusta jQuery Validate para aceitar vírgula como separador decimal e converte para ponto antes da validação
+
         (function () {
             if (window.jQuery && jQuery.validator) {
                 jQuery.validator.methods.number = function (value, element) {
