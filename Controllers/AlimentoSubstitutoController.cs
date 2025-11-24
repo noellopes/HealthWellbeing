@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: AlimentoSubstituto
         public async Task<IActionResult> Index(string originalName, string substitutoName, string factorOp, decimal? factorValue, int? page)
         {
-            int pageSize = 10; // agora representa número de ALIMENTOS ORIGINAIS por página
+            int pageSize = 10;
             int pageNumber = page ?? 1;
 
             var query = _context.AlimentoSubstitutos
@@ -68,21 +68,20 @@ namespace HealthWellbeing.Controllers
                 }
             }
 
-            // Ordenação base (mantida)
+           
             query = query.OrderBy(a => a.AlimentoOriginal!.Name).ThenBy(a => a.AlimentoSubstitutoRef!.Name).ThenBy(a => a.AlimentoSubstitutoId);
 
-            // obter todos os itens filtrados (agruparemos por AlimentoOriginal)
+           
             var allItems = await query.ToListAsync();
 
-            // agrupa por alimento original
             var groups = allItems
                 .GroupBy(a => a.AlimentoOriginal != null ? a.AlimentoOriginal.Name : "(Sem Nome)")
                 .OrderBy(g => g.Key)
                 .ToList();
 
-            int totalOriginals = groups.Count; // TOTAL agora é o número de alimentos originais
+            int totalOriginals = groups.Count;
 
-            // paginar por grupos (cada "page" tem até pageSize grupos)
+           
             int totalPages = Math.Max(1, (int)Math.Ceiling((double)totalOriginals / pageSize));
 
             if (pageNumber < 1) pageNumber = 1;
@@ -90,12 +89,12 @@ namespace HealthWellbeing.Controllers
 
             var groupsForPage = groups.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-            // items mostrados na página = todos os substitutos dos grupos selecionados
+           
             var items = groupsForPage
                 .SelectMany(g => g.OrderBy(a => a.AlimentoSubstitutoRef!.Name).ThenBy(a => a.AlimentoSubstitutoId))
                 .ToList();
 
-            // índices de grupos (alimentos originais) mostrados
+           
             int skippedGroups = (pageNumber - 1) * pageSize;
             int startOriginalIndex = totalOriginals == 0 ? 0 : skippedGroups + 1;
             int endOriginalIndex = totalOriginals == 0 ? 0 : skippedGroups + groupsForPage.Count;
@@ -103,9 +102,9 @@ namespace HealthWellbeing.Controllers
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = pageSize;
-            ViewBag.TotalCount = totalOriginals; // agora representa total de alimentos originais
+            ViewBag.TotalCount = totalOriginals;
 
-            ViewBag.StartItem = startOriginalIndex; // start em termos de alimentos originais
+            ViewBag.StartItem = startOriginalIndex; 
             ViewBag.EndItem = endOriginalIndex;
 
             ViewBag.SearchOriginalName = originalName;
