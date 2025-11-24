@@ -19,23 +19,6 @@ namespace HealthWellbeing.Controllers
         // INDEX COM PAGINAÇÃO + PESQUISA
         public async Task<IActionResult> Index(string? searchNome, string? searchCategoria, int page = 1)
         {
-            if (!_context.Consumivel.Any())
-            {
-                var categorias = _context.CategoriaConsumivel.ToList();
-
-                var consumiveis = new List<Consumivel>
-    {
-        new Consumivel { Nome = "Luvas Cirúrgicas Pequenas", Descricao = "Pacote de luvas pequenas", CategoriaId = categorias.First(c => c.Nome == "Luvas").CategoriaId, QuantidadeMaxima = 100, QuantidadeAtual = 50, QuantidadeMinima = 10 },
-        new Consumivel { Nome = "Máscara N95", Descricao = "Máscara respiratória N95", CategoriaId = categorias.First(c => c.Nome == "Máscaras").CategoriaId, QuantidadeMaxima = 200, QuantidadeAtual = 150, QuantidadeMinima = 20 },
-        new Consumivel { Nome = "Seringa 5ml", Descricao = "Seringa descartável de 5ml", CategoriaId = categorias.First(c => c.Nome == "Seringas e Agulhas").CategoriaId, QuantidadeMaxima = 300, QuantidadeAtual = 200, QuantidadeMinima = 30 },
-        new Consumivel { Nome = "Compressa Estéril", Descricao = "Pacote de compressas estéreis", CategoriaId = categorias.First(c => c.Nome == "Compressas").CategoriaId, QuantidadeMaxima = 150, QuantidadeAtual = 100, QuantidadeMinima = 15 },
-        new Consumivel { Nome = "Gaze Esterilizada", Descricao = "Pacote de gazes estéreis", CategoriaId = categorias.First(c => c.Nome == "Gazes").CategoriaId, QuantidadeMaxima = 200, QuantidadeAtual = 120, QuantidadeMinima = 20 },
-        new Consumivel { Nome = "Álcool 70%", Descricao = "Frasco de álcool 70%", CategoriaId = categorias.First(c => c.Nome == "Desinfetantes").CategoriaId, QuantidadeMaxima = 50, QuantidadeAtual = 30, QuantidadeMinima = 5 }
-    };
-
-                _context.Consumivel.AddRange(consumiveis);
-                await _context.SaveChangesAsync();
-            }
 
             var query = _context.Consumivel.Include(c => c.CategoriaConsumivel).AsQueryable();
 
