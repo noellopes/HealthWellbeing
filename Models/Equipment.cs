@@ -17,6 +17,7 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "Número de Série é obrigatório.")]
         public required string SerialNumber { get; set; }
 
+        [Required(ErrorMessage = "Sala é obrigatório.")]
         public int RoomId { get; set; }
 
         public Room? Room { get; set; }
@@ -24,14 +25,17 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "Data de compra é obrigatório.")]
         public required DateTime PurchaseDate { get; set; }
 
+        [Required(ErrorMessage = "Fabricante é obrigatório.")]
         public int ManufacturerId { get; set; }
 
         public Manufacturer? Manufacturer { get; set; }
 
+        [Required(ErrorMessage = "Tipo de Equipamento é obrigatório.")]
         public int EquipmentTypeId { get; set; }
 
         public EquipmentType? EquipmentType { get; set; }
 
+        [Required(ErrorMessage = "Estado é obrigatório.")]
         public int EquipmentStatusId { get; set; }
 
         public EquipmentStatus? EquipmentStatus { get; set; }

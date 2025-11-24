@@ -29,7 +29,9 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="RoomId" class="form-label fw-bold">Sala</label>
-                        <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId"></select>
+                        <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId">
+                            <option value="">-- Selecione a Sala --</option>
+                        </select>
                         <span asp-validation-for="RoomId" class="text-danger small"></span>
                     </div>
                 </div>
@@ -39,7 +41,9 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="EquipmentTypeId" class="form-label fw-bold">Tipo de Equipamento</label>
-                        <select asp-for="EquipmentTypeId" class="form-select" asp-items="ViewBag.EquipmentTypeId"></select>
+                        <select asp-for="EquipmentTypeId" class="form-select" asp-items="ViewBag.EquipmentTypeId">
+                            <option value="">-- Selecione o Tipo de Equipamento --</option>
+                        </select>
                         <span asp-validation-for="EquipmentTypeId" class="text-danger small"></span>
                     </div>
                 </div>
@@ -47,7 +51,9 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="EquipmentStatusId" class="form-label fw-bold">Estado</label>
-                        <select asp-for="EquipmentStatusId" class="form-select" asp-items="ViewBag.EquipmentStatusId"></select>
+                        <select asp-for="EquipmentStatusId" class="form-select" asp-items="ViewBag.EquipmentStatusId">
+                            <option value="">-- Selecione o Estado --</option>
+                        </select>
                         <span asp-validation-for="EquipmentStatusId" class="text-danger small"></span>
                     </div>
                 </div>
@@ -57,7 +63,9 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label asp-for="ManufacturerId" class="form-label fw-bold">Fabricante</label>
-                        <select asp-for="ManufacturerId" class="form-select" asp-items="ViewBag.ManufacturerId"></select>
+                        <select asp-for="ManufacturerId" class="form-select" asp-items="ViewBag.ManufacturerId">
+                            <option value="">-- Selecione o Fabricante --</option>
+                        </select>
                         <span asp-validation-for="ManufacturerId" class="text-danger small"></span>
                     </div>
                 </div>
