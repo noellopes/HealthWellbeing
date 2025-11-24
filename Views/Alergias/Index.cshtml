@@ -58,6 +58,49 @@
     </div>
 </div>
 
+
+@{
+    // Verifica se algum filtro está ativo
+    bool hasActiveFilter = !string.IsNullOrEmpty(searchNome) || !string.IsNullOrEmpty(searchAlimento);
+}
+
+@if (hasActiveFilter)
+{
+    <div class="alert alert-info py-2 d-flex align-items-center mb-3">
+        <span class="me-2">Filtros Ativos:</span>
+
+        <div class="d-flex flex-wrap gap-2">
+            @if (!string.IsNullOrEmpty(searchNome))
+            {
+                <span class="badge bg-primary d-flex align-items-center">
+                    Nome: **@searchNome**
+                    <a asp-action="Index"
+                       asp-route-alimento="@searchAlimento"
+                       asp-route-nome=""
+                       class="btn-close btn-close-white ms-1"
+                       aria-label="Remover filtro Nome">
+                    </a>
+                </span>
+            }
+
+            @if (!string.IsNullOrEmpty(searchAlimento))
+            {
+                <span class="badge bg-primary d-flex align-items-center">
+                    Alimento: **@searchAlimento**
+                    <a asp-action="Index"
+                       asp-route-nome="@searchNome"
+                       asp-route-alimento=""
+                       class="btn-close btn-close-white ms-1"
+                       aria-label="Remover filtro Alimento">
+                    </a>
+                </span>
+            }
+
+            <a asp-action="Index" class="btn btn-sm btn-outline-info ms-2">Limpar Todos</a>
+        </div>
+    </div>
+}
+
 <div class="mb-2 text-muted">
     <small>Mostrando <strong>@startItem</strong> a <strong>@endItem</strong> de <strong>@totalCount</strong> itens</small>
 </div>
@@ -66,7 +109,7 @@
     <thead class="table-light">
         <tr>
             <th>Nome</th>
-            <th>Descrição</th>
+            @*<th>Descrição</th>*@
             <th>Gravidade</th>
             <th>Sintomas</th>
             @* <th>Alimentos Relacionados</th>*@
@@ -86,7 +129,7 @@
             };
             <tr class="@rowClass">
                 <td>@item.Nome</td>
-                <td>@item.Descricao</td>
+                @* <td>@item.Descricao</td>*@
                 <td>
                     @{
                         var gravidadeBadgeClass = item.Gravidade switch
