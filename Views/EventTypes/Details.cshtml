@@ -47,10 +47,34 @@
                 Multiplier
             </dt>
             <dd class="col-sm-9">
-                <span class="fw-bold @(Model.EventTypeMultiplier > 2.0 ? "text-success" : Model.EventTypeMultiplier > 1.0 ? "text-primary" : "text-muted")">
-                    @Model.EventTypeMultiplier.ToString("F1")x
+                @{
+                    var multiplier = Model.EventTypeMultiplier;
+                    string multiplierClass;
+
+
+                    //  <= 1.0  -> (warning)
+                    //  1.0–1.5 -> (secondary)
+                    //  1.5–2.0 -> (info)
+                    //  > 2.0   -> (primary)
+                    if (multiplier <= 1.0m) {
+                        multiplierClass = "badge bg-warning";
+                    }
+                    else if (multiplier <= 1.5m) {
+                        multiplierClass = "badge bg-secondary";
+                    }
+                    else if (multiplier <= 2.0m) {
+                        multiplierClass = "badge bg-info";
+                    }
+                    else {
+                        multiplierClass = "badge bg-primary";
+                    }
+                }
+
+                <span class="@multiplierClass fw-semibold">
+                    @multiplier.ToString("0.##")x
                 </span>
             </dd>
+
         </dl>
     </div>
 </div>

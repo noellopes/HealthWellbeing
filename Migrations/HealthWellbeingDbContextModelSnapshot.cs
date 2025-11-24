@@ -311,8 +311,8 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventTypeId"));
 
-                    b.Property<float>("EventTypeMultiplier")
-                        .HasColumnType("real");
+                    b.Property<decimal>("EventTypeMultiplier")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("EventTypeName")
                         .IsRequired()
@@ -430,7 +430,7 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelNumber")
+                    b.Property<int>("LevelCurrent")
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");
