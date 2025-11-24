@@ -25,34 +25,40 @@ namespace HealthWellbeing.Controllers
             int pageSize = 10;
             int pageNumber = page ?? 1;
 
-            // Query ordered so paging is deterministic
+
             var query = _context.AlimentoSubstitutos
                 .Include(a => a.AlimentoOriginal)
                 .Include(a => a.AlimentoSubstitutoRef)
-                .OrderBy(a => a.AlimentoSubstitutoId)
                 .AsQueryable();
 
-            // Aplicar filtros de busca (antes da paginação)
+
             if (!string.IsNullOrWhiteSpace(originalName))
             {
-                query = query.Where(a => a.AlimentoOriginal != null && a.AlimentoOriginal.Name.Contains(originalName));
+                var pattern = $"%{originalName}%";
+
+                query = query.Where(a =>
+                    a.AlimentoOriginal != null &&
+                    EF.Functions.Like(EF.Functions.Collate(a.AlimentoOriginal.Name, "Latin1_General_CI_AI"), pattern));
             }
 
             if (!string.IsNullOrWhiteSpace(substitutoName))
             {
-                query = query.Where(a => a.AlimentoSubstitutoRef != null && a.AlimentoSubstitutoRef.Name.Contains(substitutoName));
+                var pattern = $"%{substitutoName}%";
+                query = query.Where(a =>
+                    a.AlimentoSubstitutoRef != null &&
+                    EF.Functions.Like(EF.Functions.Collate(a.AlimentoSubstitutoRef.Name, "Latin1_General_CI_AI"), pattern));
             }
 
             if (factorValue.HasValue)
             {
-                // factorOp: "gt" (maior que), "eq" (igual), "lt" (menor que)
+
                 switch (factorOp)
                 {
                     case "gt":
                         query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value > (double)factorValue.Value);
                         break;
                     case "eq":
-                        // igualdade com tolerância fina
+
                         query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value == (double)factorValue.Value);
                         break;
                     case "lt":
@@ -62,6 +68,8 @@ namespace HealthWellbeing.Controllers
                         break;
                 }
             }
+
+            query = query.OrderBy(a => a.AlimentoOriginal!.Name).ThenBy(a => a.AlimentoSubstitutoRef!.Name).ThenBy(a => a.AlimentoSubstitutoId);
 
             int totalCount = await query.CountAsync();
             var items = await query
@@ -74,7 +82,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.PageSize = pageSize;
             ViewBag.TotalCount = totalCount;
 
-            // Preservar valores de busca na View
+
             ViewBag.SearchOriginalName = originalName;
             ViewBag.SearchSubstitutoName = substitutoName;
             ViewBag.SearchFactorOp = factorOp;
@@ -124,7 +132,8 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 TempData["AlertMessage"] = "Registro criado com sucesso.";
                 TempData["AlertType"] = "success";
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details), new { id = alimentoSubstituto.AlimentoSubstitutoId });
             }
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
             ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
@@ -181,7 +190,8 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details), new { id = alimentoSubstituto.AlimentoSubstitutoId });
             }
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
             ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
