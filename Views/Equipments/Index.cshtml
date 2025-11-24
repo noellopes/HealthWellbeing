@@ -37,25 +37,29 @@
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
             <div class="col-md-4">
-                <label for="searchName" class="form-label">Nome</label>
+                <label for="searchName" class="form-label fw-bold">Nome</label>
                 <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
             </div>
 
             <div class="col-md-4">
-                <label for="searchType" class="form-label">Tipo</label>
+                <label for="searchSerie" class="form-label fw-bold">Nº de Série</label>
+                <input id="searchSerie" name="searchSerie" value="@ViewBag.SearchSerie" class="form-control" placeholder="Pesquisar pelo Nº de Série" type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchType" class="form-label fw-bold">Tipo</label>
                 <select id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-select" asp-items="ViewBag.Types"></select>
             </div>
 
             <div class="col-md-4">
-                <label for="searchStatus" class="form-label">Estado</label>
-                <select id="searchStatus" name="searchStatus" value="@ViewBag.SearchStatus" class="form-select" asp-items="ViewBag.Status"></select>
-            </div>
-
-            <div class="col-md-4">
-                <label for="searchRoom" class="form-label">Sala</label>
+                <label for="searchRoom" class="form-label fw-bold">Sala</label>
                 <select id="searchRoom" name="searchRoom" class="form-select" asp-items="ViewBag.Rooms"></select>
             </div>
 
+            <div class="col-md-4">
+                <label for="searchStatus" class="form-label fw-bold">Estado</label>
+                <select id="searchStatus" name="searchStatus" value="@ViewBag.SearchStatus" class="form-select" asp-items="ViewBag.Status"></select>
+            </div>
 
             <div class="col-12 mt-2 d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-primary">
@@ -86,6 +90,7 @@
             <thead class="table-light">
                 <tr>
                     <th scope="col">Nome</th>
+                    <th scope="col">Nº Série</th>
                     <th scope="col">Tipo</th>
                     <th scope="col">Sala</th>
                     <th scope="col">Estado</th>
@@ -97,9 +102,15 @@
                 {
                     <tr>
                         <td>@Html.DisplayFor(modelItem => equip.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => equip.SerialNumber)</td>
                         <td>@Html.DisplayFor(modelItem => equip.EquipmentType.Name)</td>
                         <td>@Html.DisplayFor(modelItem => equip.Room.Name)</td>
-                        <td>@Html.DisplayFor(modelItem => equip.EquipmentStatus.Name)</td>
+                        <td>
+                            <span class="rounded-circle d-inline-block bg-@(
+                                     equip.EquipmentStatusId == 1 ? "success" : equip.EquipmentStatusId == 2 ? "warning" : "danger")"
+                                  style="width:10px; height:10px;"></span>
+                            @Html.DisplayFor(modelItem => equip.EquipmentStatus.Name)
+                        </td>
 
                         <td class="text-end">
                             <a asp-action="Edit" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-warning me-1">

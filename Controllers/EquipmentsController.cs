@@ -5,6 +5,7 @@ using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -23,7 +24,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchSerie = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
             // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
@@ -36,6 +37,11 @@ namespace HealthWellbeingRoom.Controllers
             if (!string.IsNullOrEmpty(searchName))
             {
                 equipmentQuery = equipmentQuery.Where(e => e.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchSerie))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.SerialNumber.Contains(searchSerie));
             }
 
             if (searchType > 0)
@@ -55,6 +61,7 @@ namespace HealthWellbeingRoom.Controllers
 
             // Manter os valores de pesquisa na ViewBag para uso na View
             ViewBag.SearchName = searchName;
+            ViewBag.SearchSerie = searchSerie;
             ViewBag.SearchType = searchType;
             ViewBag.SearchStatus = searchStatus;
             ViewBag.SearchRoom = searchRoom;
