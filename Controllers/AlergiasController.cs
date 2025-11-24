@@ -29,31 +29,26 @@ namespace HealthWellbeing.Controllers
                     .ThenInclude(aa => aa.Alimento)
                 .AsQueryable();
 
-            // Normaliza os termos de busca para minúsculas
-            // Usamos ToLower() simples aqui para garantir que o SQL seja gerado
             var searchNome = nome?.ToLower();
             var searchAlimento = alimento?.ToLower();
 
 
             // FILTRO POR NOME DA ALERGIA
             if (!string.IsNullOrEmpty(searchNome))
-                // CORREÇÃO: Usar .ToLower() em vez de .ToLowerInvariant()
-                // Isso garante que o EF Core traduza para a função SQL LOWER()
                 query = query.Where(a =>
-    EF.Functions.Collate(a.Nome, "SQL_Latin1_General_CP1_CI_AI")
-        .Contains(searchNome)
-);
+                    EF.Functions.Collate(a.Nome, "SQL_Latin1_General_CP1_CI_AI")
+                        .Contains(searchNome)
+                );
 
 
             // FILTRO POR NOME DO ALIMENTO
             if (!string.IsNullOrEmpty(searchAlimento))
                 query = query.Where(a => a.AlimentosAssociados
-    .Any(aa =>
-        EF.Functions.Collate(aa.Alimento.Name, "SQL_Latin1_General_CP1_CI_AI")
-            .Contains(searchAlimento)
-    )
-);
-
+                    .Any(aa =>
+                        EF.Functions.Collate(aa.Alimento.Name, "SQL_Latin1_General_CP1_CI_AI")
+                            .Contains(searchAlimento)
+                    )
+                );
 
             // CONTAGEM TOTAL
             int totalCount = await query.CountAsync();
@@ -66,13 +61,11 @@ namespace HealthWellbeing.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Passando filtros e metadados para a View
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalCount = totalCount;
 
-            // Passar os termos originais (ou nulos) para a View
             ViewBag.SearchNome = nome;
             ViewBag.SearchAlimento = alimento;
 
