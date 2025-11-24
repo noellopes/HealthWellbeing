@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.ComponenteReceita
+@inject HealthWellbeing.Data.HealthWellbeingDbContext _context
 
 @{
     ViewData["Title"] = "Details";
@@ -23,9 +24,17 @@
     <div class="card-body">
         <h5 class="card-title mb-3">Informações</h5>
 
+        @{
+            var alimentoNome = Model.Alimento?.Name ?? _context.Alimentos.Find(Model.AlimentoId)?.Name ?? "-";
+            var receitaNome = Model.Receita?.Nome ?? _context.Receita.Find(Model.ReceitaId)?.Nome ?? "-";
+        }
+
         <dl class="row">
             <dt class="col-sm-4">Alimento</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.Alimento.Name)</dd>
+            <dd class="col-sm-8">@alimentoNome</dd>
+
+            <dt class="col-sm-4">Receita</dt>
+            <dd class="col-sm-8">@receitaNome</dd>
 
             <dt class="col-sm-4">@Html.DisplayNameFor(model => model.UnidadeMedida)</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.UnidadeMedida)</dd>

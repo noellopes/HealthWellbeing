@@ -24,6 +24,11 @@ namespace HealthWellbeing.Models
         public Alimento? Alimento { get; set; }
 
         [Required]
+        [Display(Name = "Receita")]
+        public int ReceitaId { get; set; }
+        public Receita? Receita { get; set; }
+
+        [Required]
         [Display(Name = "Unidade")]
         public UnidadeMedidaEnum UnidadeMedida { get; set; }
 
@@ -33,8 +38,5 @@ namespace HealthWellbeing.Models
 
         [Display(Name = "É opcional?")]
         public bool IsOpcional { get; set; } = false;
-
-        // N:N relationship with Receita through ReceitaComponente
-        public ICollection<ReceitaComponente> ReceitaComponentes { get; set; } = new List<ReceitaComponente>();
     }
 }

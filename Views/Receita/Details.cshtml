@@ -70,7 +70,16 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div class="ms-2 me-auto">
                                         <div class="fw-bold">
-                                            <i class="bi bi-dot"></i> @comp.AlimentoNome
+                                            <i class="bi bi-dot"></i>
+                                            @if (comp.ComponenteReceitaId != null)
+                                            {
+                                                <a asp-controller="ComponenteReceita" asp-action="Details"
+                                                    asp-route-id="@comp.ComponenteReceitaId">@comp.AlimentoNome</a>
+                                            }
+                                            else
+                                            {
+                                                @comp.AlimentoNome
+                                            }
                                         </div>
                                         <small class="text-muted">
                                             Quantidade: @comp.Quantidade @comp.Unidade
@@ -90,7 +99,7 @@
                     </div>
                 </div>
             }
-            else if (Model.ReceitaComponentes != null && Model.ReceitaComponentes.Any())
+            else if (Model.Componentes != null && Model.Componentes.Any())
             {
                 <div class="card mb-4">
                     <div class="card-header bg-warning">

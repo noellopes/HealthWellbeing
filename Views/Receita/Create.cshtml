@@ -137,24 +137,65 @@
                         <h5 class="mb-0"><i class="bi bi-list-check"></i> Componentes da Receita</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small mb-3">Selecione todos os ingredientes necessários:</p>
-                        <div class="form-check-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                            @if (ViewBag.ComponentesReceita != null)
-                            {
-                                @foreach (var item in (MultiSelectList)ViewBag.ComponentesReceita)
-                                {
-                                    <div class="form-check mb-2 p-2 hover-highlight">
-                                        <input class="form-check-input component-checkbox" type="checkbox" 
-                                               name="ComponentesReceitaId" 
-                                               value="@item.Value" 
-                                               id="comp_@item.Value" />
-                                        <label class="form-check-label w-100" for="comp_@item.Value">
-                                            <strong>@item.Text</strong>
-                                        </label>
-                                    </div>
-                                }
-                            }
+                        <p class="text-muted small mb-3">Adicione os ingredientes da receita abaixo:</p>
+
+                        <div class="row g-2 mb-3 align-items-end">
+                            <div class="col-12 col-md-3">
+                                <label class="form-label">Alimento</label>
+                                <select id="compAlimento" class="form-select">
+                                    <option value="">-- selecione --</option>
+                                    @if (ViewBag.Alimentos != null)
+                                    {
+                                        foreach (var a in (SelectList)ViewBag.Alimentos)
+                                        {
+                                            <option value="@a.Value">@a.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <label class="form-label">Unidade</label>
+                                <select id="compUnidade" class="form-select">
+                                    <option value="">-- selecione --</option>
+                                    @foreach (var u in
+                                                                        Html.GetEnumSelectList<HealthWellbeing.Models.UnidadeMedidaEnum>())
+                                    {
+                                        <option value="@u.Value">@u.Text</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-6 col-md-2">
+                                <label class="form-label">Qtd</label>
+                                <input id="compQuantidade" type="number" min="1" class="form-control" />
+                            </div>
+
+                            <div class="col-6 col-md-2 d-flex align-items-center">
+                                <div class="form-check d-flex align-items-center">
+                                    <input class="form-check-input" type="checkbox" id="compOpcional" />
+                                    <label class="form-check-label ms-2 mb-0 text-nowrap"
+                                        for="compOpcional">Opcional</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-2 d-flex align-items-end">
+                                <button id="btnAddComp" type="button"
+                                    class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                                    aria-label="Adicionar componente">
+                                    <span>Adicionar</span>
+                                </button>
+                            </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Componentes adicionados</label>
+                            <ul id="pendingComponentsList" class="list-group mb-2"></ul>
+                            <input type="hidden" id="PendingComponentesJson" name="PendingComponentesJson" />
+                        </div>
+
+                        <small class="text-muted">Os componentes adicionados serão criados como ComponenteReceita após
+                            salvar a receita.</small>
                     </div>
                 </div>
             </div>
@@ -207,4 +248,56 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        (function () {
+            const pending = [];
+            const listEl = document.getElementById('pendingComponentsList');
+            const btnAdd = document.getElementById('btnAddComp');
+            const inputAlimento = document.getElementById('compAlimento');
+            const inputUnidade = document.getElementById('compUnidade');
+            const inputQuantidade = document.getElementById('compQuantidade');
+            const inputOpcional = document.getElementById('compOpcional');
+            const hiddenField = document.getElementById('PendingComponentesJson');
+
+            function render() {
+                listEl.innerHTML = '';
+                pending.forEach((c, i) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    li.innerHTML = `<div><strong>${c.alimentoNome}</strong><br/><small class="text-muted">${c.quantidade} ${c.unidade} ${c.isOpcional ? '(Opcional)' : ''}</small></div>
+                                                                        <div><button type="button" class="btn btn-sm btn-danger btn-remove" data-index="${i}">Remover</button></div>`;
+                    listEl.appendChild(li);
+                });
+                hiddenField.value = JSON.stringify(pending.map(p => ({ AlimentoId: p.alimentoId, UnidadeMedida: p.unidade, Quantidade: p.quantidade, IsOpcional: p.isOpcional })));
+            }
+
+            btnAdd.addEventListener('click', function () {
+                const alimentoId = inputAlimento.value;
+                const alimentoNome = inputAlimento.options[inputAlimento.selectedIndex]?.text || '';
+                const unidade = inputUnidade.value;
+                const unidadeText = inputUnidade.options[inputUnidade.selectedIndex]?.text || unidade;
+                const quantidade = parseInt(inputQuantidade.value, 10);
+                const opcionalChecked = inputOpcional ? inputOpcional.checked : false;
+                if (!alimentoId || !unidade || !quantidade || quantidade <= 0) {
+                    alert('Preencha Alimento, Unidade e Quantidade válidos.');
+                    return;
+                }
+                pending.push({ alimentoId: parseInt(alimentoId, 10), alimentoNome: alimentoNome, unidade: unidade, quantidade: quantidade, isOpcional: opcionalChecked });
+                inputQuantidade.value = '';
+                inputUnidade.value = '';
+                inputAlimento.value = '';
+                if (inputOpcional) inputOpcional.checked = false;
+                render();
+            });
+
+            listEl.addEventListener('click', function (e) {
+                if (e.target.matches('.btn-remove')) {
+                    const idx = parseInt(e.target.getAttribute('data-index'), 10);
+                    pending.splice(idx, 1);
+                    render();
+                }
+            });
+        })();
+    </script>
 }
