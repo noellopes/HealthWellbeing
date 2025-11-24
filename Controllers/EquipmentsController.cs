@@ -126,6 +126,14 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
+            // Verificar se já existe um equipamento com o mesmo número de série e tipo de equipamento (evtando duplicados)
+            bool exists = _context.Equipment.Any(e => e.SerialNumber == equipment.SerialNumber && e.EquipmentTypeId == equipment.EquipmentTypeId);
+
+            if(exists)
+            {
+                ModelState.AddModelError("SerialNumber", "Já existe um equipamento com este número de série para o mesmo Tipo de Equipamento.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(equipment);
@@ -176,6 +184,15 @@ namespace HealthWellbeingRoom.Controllers
             {
                 /* Retornar para minha page do not found */
                 return View("NotFound");
+            }
+
+            // Verificar se já existe um equipamento com o mesmo número de série e tipo de equipamento (evitando duplicados)
+            bool exists = _context.Equipment.Any(e => e.SerialNumber == equipment.SerialNumber 
+            && e.EquipmentTypeId == equipment.EquipmentTypeId && e.EquipmentId != equipment.EquipmentId);
+
+            if (exists)
+            {
+                ModelState.AddModelError("SerialNumber", "Já existe um Equipamento com este número de série para o mesmo Tipo de Equipamento.");
             }
 
             if (ModelState.IsValid)
