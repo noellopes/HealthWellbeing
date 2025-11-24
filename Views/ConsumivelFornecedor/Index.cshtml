@@ -33,13 +33,9 @@
 
     <form asp-action="Index" method="get" class="mb-4">
         <div class="row g-2">
-            <div class="col-md-5">
+            <div class="col-md-10">
                 <input type="text" name="searchNome" value="@ViewBag.SearchNome" class="form-control shadow-sm"
                        placeholder="Procurar por nome..." />
-            </div>
-            <div class="col-md-5">
-                <input type="text" name="searchTelefone" value="@ViewBag.SearchContato" class="form-control shadow-sm"
-                       placeholder="Procurar por telefone..." />
             </div>
             <div class="col-md-2 d-flex">
                 <button type="submit" class="btn btn-primary w-50 me-2">Pesquisar</button>
@@ -68,7 +64,7 @@
     @if (!Model.Items.Any())
     {
         <div class="alert alert-info text-center shadow-sm">
-            @if (string.IsNullOrEmpty(ViewBag.SearchNome as string) && string.IsNullOrEmpty(ViewBag.SearchContato as string))
+            @if (string.IsNullOrEmpty(ViewBag.SearchNome as string))
             {
                 <span>Nenhum fornecedor registado.</span>
             }
@@ -86,7 +82,6 @@
                 <thead class="table-primary">
                     <tr>
                         <th>Nome da Empresa</th>
-                        <th>Morada</th>
                         <th>Telefone</th>
                         <th>Email</th>
                         <th class="text-center" style="width: 230px;">Ações</th>
@@ -97,7 +92,6 @@
                     {
                         <tr>
                             <td class="fw-semibold">@item.NomeEmpresa</td>
-                            <td>@item.Morada</td>
                             <td>@item.Telefone</td>
                             <td>@item.Email</td>
                             <td class="text-center">
@@ -124,8 +118,7 @@
                 <a class="page-link"
                    asp-action="Index"
                    asp-route-page="@(Model.CurrentPage - 1)"
-                   asp-route-searchNome="@ViewBag.SearchNome"
-                   asp-route-searchTelefone="@ViewBag.SearchContato">
+                   asp-route-searchNome="@ViewBag.SearchNome">
                     Anterior
                 </a>
             </li>
@@ -137,8 +130,7 @@
                     <a class="page-link"
                        asp-action="Index"
                        asp-route-page="@i"
-                       asp-route-searchNome="@ViewBag.SearchNome"
-                       asp-route-searchTelefone="@ViewBag.SearchContato">
+                       asp-route-searchNome="@ViewBag.SearchNome">
                         @i
                     </a>
                 </li>
@@ -148,8 +140,7 @@
                 <a class="page-link"
                    asp-action="Index"
                    asp-route-page="@(Model.CurrentPage + 1)"
-                   asp-route-searchNome="@ViewBag.SearchNome"
-                   asp-route-searchTelefone="@ViewBag.SearchContato">
+                   asp-route-searchNome="@ViewBag.SearchNome">
                     Seguinte
                 </a>
             </li>
