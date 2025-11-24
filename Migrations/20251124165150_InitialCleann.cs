@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.cs
-    public partial class InitialClean : Migration
-========
-    public partial class FixDataMigration : Migration
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.cs
+    public partial class InitialCleann : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -87,11 +83,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventTypeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EventTypeScoringMode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.cs
-                    EventTypeMultiplier = table.Column<float>(type: "real", nullable: false)
-========
                     EventTypeMultiplier = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.cs
                 },
                 constraints: table =>
                 {
@@ -152,11 +144,7 @@ namespace HealthWellbeing.Migrations
                 {
                     LevelId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.cs
                     LevelNumber = table.Column<int>(type: "int", nullable: false),
-========
-                    LevelCurrent = table.Column<int>(type: "int", nullable: false),
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.cs
                     LevelCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },

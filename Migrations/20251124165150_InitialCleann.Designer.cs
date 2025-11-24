@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.Designer.cs
-    [Migration("20251121012043_InitialClean")]
-    partial class InitialClean
-========
-    [Migration("20251121094823_FixDataMigration")]
-    partial class FixDataMigration
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.Designer.cs
+    [Migration("20251124165150_InitialCleann")]
+    partial class InitialCleann
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,13 +314,8 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventTypeId"));
 
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.Designer.cs
-                    b.Property<float>("EventTypeMultiplier")
-                        .HasColumnType("real");
-========
                     b.Property<decimal>("EventTypeMultiplier")
                         .HasColumnType("decimal(18,2)");
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.Designer.cs
 
                     b.Property<string>("EventTypeName")
                         .IsRequired()
@@ -443,11 +433,7 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<<< HEAD:Migrations/20251121012043_InitialClean.Designer.cs
                     b.Property<int>("LevelNumber")
-========
-                    b.Property<int>("LevelCurrent")
->>>>>>>> Grupo-8:Migrations/20251121094823_FixDataMigration.Designer.cs
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");
