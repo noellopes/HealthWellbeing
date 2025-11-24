@@ -136,10 +136,10 @@ namespace HealthWellbeing.Migrations
                     ProfissionalExecutanteId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Funcao = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    FuncaoId = table.Column<int>(type: "int", nullable: false),
                     Telefone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
-                    FuncaoId = table.Column<int>(type: "int", nullable: true)
+                    FuncaoId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -148,7 +148,37 @@ namespace HealthWellbeing.Migrations
                         name: "FK_ProfissionalExecutante_Funcoes_FuncaoId",
                         column: x => x.FuncaoId,
                         principalTable: "Funcoes",
+                        principalColumn: "FuncaoId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProfissionalExecutante_Funcoes_FuncaoId1",
+                        column: x => x.FuncaoId1,
+                        principalTable: "Funcoes",
                         principalColumn: "FuncaoId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExameTipoRecursos",
+                columns: table => new
+                {
+                    ExameTipoId = table.Column<int>(type: "int", nullable: false),
+                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExameTipoRecursos", x => new { x.ExameTipoId, x.MaterialEquipamentoAssociadoId });
+                    table.ForeignKey(
+                        name: "FK_ExameTipoRecursos_ExameTipo_ExameTipoId",
+                        column: x => x.ExameTipoId,
+                        principalTable: "ExameTipo",
+                        principalColumn: "ExameTipoId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExameTipoRecursos_MaterialEquipamentoAssociado_MaterialEquipamentoAssociadoId",
+                        column: x => x.MaterialEquipamentoAssociadoId,
+                        principalTable: "MaterialEquipamentoAssociado",
+                        principalColumn: "MaterialEquipamentoAssociadoId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -294,9 +324,19 @@ namespace HealthWellbeing.Migrations
                 column: "EspecialidadeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExameTipoRecursos_MaterialEquipamentoAssociadoId",
+                table: "ExameTipoRecursos",
+                column: "MaterialEquipamentoAssociadoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProfissionalExecutante_FuncaoId",
                 table: "ProfissionalExecutante",
                 column: "FuncaoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfissionalExecutante_FuncaoId1",
+                table: "ProfissionalExecutante",
+                column: "FuncaoId1");
         }
 
         /// <inheritdoc />
@@ -306,10 +346,7 @@ namespace HealthWellbeing.Migrations
                 name: "Exames");
 
             migrationBuilder.DropTable(
-                name: "ExameTipo");
-
-            migrationBuilder.DropTable(
-                name: "MaterialEquipamentoAssociado");
+                name: "ExameTipoRecursos");
 
             migrationBuilder.DropTable(
                 name: "Medicos");
@@ -324,10 +361,16 @@ namespace HealthWellbeing.Migrations
                 name: "Utentes");
 
             migrationBuilder.DropTable(
-                name: "Especialidades");
+                name: "ExameTipo");
+
+            migrationBuilder.DropTable(
+                name: "MaterialEquipamentoAssociado");
 
             migrationBuilder.DropTable(
                 name: "Funcoes");
+
+            migrationBuilder.DropTable(
+                name: "Especialidades");
         }
     }
 }

@@ -444,6 +444,24 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ExameTipoRecursos");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
+                {
+                    b.Property<int>("FuncaoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FuncaoId"));
+
+                    b.Property<string>("NomeFuncao")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("FuncaoId");
+
+                    b.ToTable("Funcoes");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
                 {
                     b.Property<int>("MaterialEquipamentoAssociadoId")
@@ -560,25 +578,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("SalaDeExame");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
-            {
-                b.Property<int>("FuncaoId")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FuncaoId"));
-
-                b.Property<string>("NomeFuncao")
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnType("nvarchar(150)");
-
-                b.HasKey("FuncaoId");
-
-                b.ToTable("Funcoes");
-            });
-
-
             modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ExameTipo", "ExameTipo")
@@ -652,6 +651,21 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Recurso");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Funcao", "Funcao")
+                        .WithMany()
+                        .HasForeignKey("FuncaoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Funcao", null)
+                        .WithMany("ProfissionaisExecutantes")
+                        .HasForeignKey("FuncaoId1");
+
+                    b.Navigation("Funcao");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Especialidade", b =>
                 {
                     b.Navigation("TiposExame");
@@ -665,6 +679,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.ExameTipo", b =>
                 {
                     b.Navigation("ExameTipoRecursos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Funcao", b =>
+                {
+                    b.Navigation("ProfissionaisExecutantes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
