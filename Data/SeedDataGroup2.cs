@@ -26,7 +26,7 @@ namespace HealthWellbeing.Data
                 new() { Nome = "Seringas e Agulhas", Descricao = "Seringas descartáveis e agulhas." },
                 new() { Nome = "Compressas", Descricao = "Compressas estéreis e não estéreis." },
                 new() { Nome = "Gazes", Descricao = "Gazes e pensos diversos." },
-                new() { Nome = "Desinfetantes", Descricao = "Álcool, clorexidina, gel, etc." }
+                new() { Nome = "Desinfetantes", Descricao = "Álcool, clorexidina, gel, etc." },
                 new() { Nome = "Bandagens", Descricao = "Faixas e ligaduras elásticas ou de imobilização." },
                 new() { Nome = "Adesivos Médicos", Descricao = "Fitas adesivas, micropores e esparadrapos." },
                 new() { Nome = "Soluções de Soro", Descricao = "Soro fisiológico, glicosado e soluções intravenosas." },
