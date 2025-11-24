@@ -85,6 +85,31 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserApplicaçao",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserApplicaçao", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Utentes",
                 columns: table => new
                 {
@@ -137,6 +162,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     FuncaoId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Telefone = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     FuncaoId1 = table.Column<int>(type: "int", nullable: true)
@@ -155,6 +181,12 @@ namespace HealthWellbeing.Migrations
                         column: x => x.FuncaoId1,
                         principalTable: "Funcoes",
                         principalColumn: "FuncaoId");
+                    table.ForeignKey(
+                        name: "FK_ProfissionalExecutante_UserApplicaçao_UserId",
+                        column: x => x.UserId,
+                        principalTable: "UserApplicaçao",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -337,6 +369,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_ProfissionalExecutante_FuncaoId1",
                 table: "ProfissionalExecutante",
                 column: "FuncaoId1");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfissionalExecutante_UserId",
+                table: "ProfissionalExecutante",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -368,6 +405,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Funcoes");
+
+            migrationBuilder.DropTable(
+                name: "UserApplicaçao");
 
             migrationBuilder.DropTable(
                 name: "Especialidades");

@@ -25,7 +25,6 @@ namespace HealthWellbeing.Data
         public DbSet<MaterialEquipamentoAssociado> MaterialEquipamentoAssociado { get; set; } = default!;
         public DbSet<Especialidade> Especialidades { get; set; } = default!;
         public DbSet<ExameTipoRecurso> ExameTipoRecursos { get; set; } = default!;
-
         public DbSet<Funcao> Funcoes { get; set; }
 
 
@@ -65,6 +64,12 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(p => p.FuncaoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+
+            modelBuilder.Entity<ProfissionalExecutante>()
+                .HasOne(p => p.User) // A propriedade de navegação User (UserApplicaçao)
+                .WithMany() // UserApplicaçao não precisa de coleção reversa
+                .HasForeignKey(p => p.UserId) // A chave estrangeira que criamos
+                .OnDelete(DeleteBehavior.Restrict); // Evita a exclusão acidental do utilizador
 
 
             // SEEDING NOVO: Especialidades 

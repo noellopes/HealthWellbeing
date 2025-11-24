@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic; // Adicionar se necessário para coleções (embora não usado aqui)
+using System.Collections.Generic;
+using HealthWellBeing.Models; // Adicionar se necessário para coleções (embora não usado aqui)
 
 namespace HealthWellbeing.Models
 {
@@ -19,6 +20,11 @@ namespace HealthWellbeing.Models
 
         // 2. Propriedade de Navegação para a entidade Funcao
         public Funcao Funcao { get; set; }
+
+        public string? UserId { get; set; }
+
+        // 2. Propriedade de Navegação para a entidade UserApplicaçao
+        public UserApplicaçao User { get; set; }
 
         // ------------------------------------------------------------------
 
