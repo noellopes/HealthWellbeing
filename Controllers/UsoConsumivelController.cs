@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: UsoConsumivel
         public async Task<IActionResult> Index()
         {
-            var healthWellbeingDbContext = _context.AuditoriaConsumivel.Include(u => u.Consumivel).Include(u => u.TreatmentRecord);
+            var healthWellbeingDbContext = _context.UsoConsumivel.Include(u => u.Consumivel).Include(u => u.TreatmentRecord);
             return View(await healthWellbeingDbContext.ToListAsync());
         }
 
@@ -34,7 +34,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var usoConsumivel = await _context.AuditoriaConsumivel
+            var usoConsumivel = await _context.UsoConsumivel
                 .Include(u => u.Consumivel)
                 .Include(u => u.TreatmentRecord)
                 .FirstOrDefaultAsync(m => m.AuditoriaConsumivelId == id);
@@ -80,7 +80,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var usoConsumivel = await _context.AuditoriaConsumivel.FindAsync(id);
+            var usoConsumivel = await _context.UsoConsumivel.FindAsync(id);
             if (usoConsumivel == null)
             {
                 return NotFound();
@@ -135,7 +135,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var usoConsumivel = await _context.AuditoriaConsumivel
+            var usoConsumivel = await _context.UsoConsumivel
                 .Include(u => u.Consumivel)
                 .Include(u => u.TreatmentRecord)
                 .FirstOrDefaultAsync(m => m.AuditoriaConsumivelId == id);
@@ -152,10 +152,10 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var usoConsumivel = await _context.AuditoriaConsumivel.FindAsync(id);
+            var usoConsumivel = await _context.UsoConsumivel.FindAsync(id);
             if (usoConsumivel != null)
             {
-                _context.AuditoriaConsumivel.Remove(usoConsumivel);
+                _context.UsoConsumivel.Remove(usoConsumivel);
             }
 
             await _context.SaveChangesAsync();
@@ -164,7 +164,7 @@ namespace HealthWellbeing.Controllers
 
         private bool UsoConsumivelExists(int id)
         {
-            return _context.AuditoriaConsumivel.Any(e => e.AuditoriaConsumivelId == id);
+            return _context.UsoConsumivel.Any(e => e.AuditoriaConsumivelId == id);
         }
     }
 }
