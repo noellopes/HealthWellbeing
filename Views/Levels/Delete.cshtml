@@ -30,7 +30,13 @@
                         </div>
 
                         <div class="w-100">
-                            <h5 class="mb-1">@Html.DisplayFor(m => m.LevelCategory)</h5>
+                            <h5 class="mb-1">
+                                @Html.DisplayFor(m => m.LevelCategory)
+                                <!-- NOVO: Badge com os pontos -->
+                                <span class="badge bg-secondary ms-2 fw-normal" style="font-size: 0.8rem;">
+                                    Limit: @Html.DisplayFor(m => m.LevelPointsLimit) pts
+                                </span>
+                            </h5>
                             <p class="text-muted mb-0">@Html.DisplayFor(m => m.Description)</p>
                         </div>
                     </div>
@@ -39,7 +45,7 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="LevelId" />
 
-                        @* preserve pager/search state so DeleteConfirmed can redirect back to same page *@
+                        @* preserve pager/search state *@
                         <input type="hidden" name="page" value="@(ViewBag.Page ?? 1)" />
                         <input type="hidden" name="searchNumber" value="@(ViewBag.SearchNumber ?? "")" />
                         <input type="hidden" name="searchCategory" value="@(ViewBag.SearchCategory ?? "")" />

@@ -433,6 +433,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("LevelNumber")
                         .HasColumnType("int");
 
+                    b.Property<int>("LevelPointsLimit")
+                        .HasColumnType("int");
+
                     b.HasKey("LevelId");
 
                     b.ToTable("Level");

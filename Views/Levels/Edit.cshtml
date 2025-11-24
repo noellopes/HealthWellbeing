@@ -6,11 +6,9 @@
     ViewData["Title"] = "Edit";
     var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
 
-    // Attempted value → Model value
     var categoryValue = "";
     if (ViewData.ModelState.TryGetValue("LevelCategory", out var cms) && cms?.AttemptedValue != null)
     {
-        // Prioritize attempted value from ModelState on validation failure
         categoryValue = cms.AttemptedValue;
     }
     else if (!string.IsNullOrWhiteSpace(Model?.LevelCategory))
@@ -18,25 +16,19 @@
         categoryValue = Model.LevelCategory;
     }
 
-    // Determine if the current category is an existing one or a 'new' typed value
     var categoryInList = cats.Any(c => string.Equals(c, categoryValue, StringComparison.OrdinalIgnoreCase));
-    // showNewBox should be true if the attempted value is NOT in the list, 
-    // or if the attempted value is the special "__new" value.
     var showNewBox = !categoryInList && categoryValue != "__new";
     if (ViewData.ModelState.ContainsKey("LevelCategory") && categoryValue == "__new")
     {
-        // Special case: if validation fails, and the select was on "__new", we assume the new box should show.
         showNewBox = true;
     }
-    
-    // Fallback: If categoryValue is empty and there's an error, assume it needs the new box if it's not present in the select
+
     if (string.IsNullOrWhiteSpace(categoryValue) && ViewData.ModelState["LevelCategory"]?.Errors.Any() == true && !cats.Any())
     {
         showNewBox = true;
     }
     else if (categoryInList)
     {
-        // If it is in the list, we don't show the new box, and we select the existing one.
         showNewBox = false;
     }
 }
@@ -51,8 +43,7 @@
                 </div>
 
                 <div class="card-body">
-                    
-                    @* Added validation summary *@
+
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" id="validationSummary"></div>
 
                     <form asp-action="Edit" method="post" id="editLevelForm" novalidate>
@@ -66,10 +57,10 @@
 
                         <div class="form-floating mb-3">
                             <input asp-for="LevelNumber"
-                                       type="number"
-                                       min="1" max="100"
-                                       class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Any() == true ? "is-invalid" : "")"
-                                       placeholder="Level number" />
+                                   type="number"
+                                   min="1" max="100"
+                                   class="form-control @(ViewData.ModelState["LevelNumber"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                   placeholder="Level number" />
                             <label asp-for="LevelNumber"></label>
                             <span asp-validation-for="LevelNumber" class="invalid-feedback"></span>
                         </div>
@@ -96,22 +87,34 @@
                                 </select>
 
                                 <input id="categoryNew"
-                                           name="categoryNew" @* Name attribute added for model binding on new category *@
-                                           type="text"
-                                           class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Any() == true && showNewBox ? "is-invalid" : "")"
-                                           value="@(showNewBox ? categoryValue : "")"
-                                           placeholder="Type new category"
-                                           style="min-width:220px; @(showNewBox ? "" : "display:none;")" />
+                                       name="categoryNew"
+                                       type="text"
+                                       class="form-control @(ViewData.ModelState["LevelCategory"]?.Errors.Any() == true && showNewBox ? "is-invalid" : "")"
+                                       value="@(showNewBox? categoryValue : "")"
+                                       placeholder="Type new category"
+                                       style="min-width:220px; @(showNewBox ? "" : "display:none;")" />
                             </div>
 
                             <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
                         </div>
 
+                        <!-- NOVO CAMPO: Points Limit -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="LevelPointsLimit"
+                                   type="number"
+                                   min="0"
+                                   class="form-control @(ViewData.ModelState["LevelPointsLimit"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                   placeholder="Points Limit" />
+                            <label asp-for="LevelPointsLimit">Points Limit</label>
+                            <span asp-validation-for="LevelPointsLimit" class="invalid-feedback"></span>
+                        </div>
+                        <!-- FIM -->
+
                         <div class="form-floating mb-3">
                             <textarea asp-for="Description"
-                                            class="form-control @(ViewData.ModelState["Description"]?.Errors.Any() == true ? "is-invalid" : "")"
-                                            style="height:120px"
-                                            placeholder="Description"></textarea>
+                                      class="form-control @(ViewData.ModelState["Description"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                      style="height:120px"
+                                      placeholder="Description"></textarea>
                             <label asp-for="Description"></label>
                             <span asp-validation-for="Description" class="invalid-feedback"></span>
                         </div>
@@ -140,9 +143,8 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
+    @* JavaScript mantido igual *@
     <style>
-        /* Small polish for validation visuals */
         .invalid-feedback {
             display: block;
         }
@@ -157,38 +159,24 @@
             border-color: #dc3545;
         }
     </style>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var select = document.getElementById('categorySelect');
             var newInput = document.getElementById('categoryNew');
-            // Correct form ID for the Edit page
-            var form = document.getElementById('editLevelForm'); 
+            var form = document.getElementById('editLevelForm');
 
             function setNewVisibility(show) {
                 newInput.style.display = show ? '' : 'none';
                 if (show) newInput.focus();
             }
-
             function ensureOptionAndSelect(value) {
-                // Keep this logic minimal/unchanged as per original intention, 
-                // just ensure it doesn't try to add to dropdown if "__new" is selected.
-                if (select.value === "__new") {
-                    return; 
-                }
+                if (select.value === "__new") { return; }
             }
-
-
-            // initial visibility is already server-rendered; keep JS in sync
             setNewVisibility(select.value === "__new");
-
             select.addEventListener('change', function () {
                 setNewVisibility(this.value === "__new");
-                // update validation display when user changes select
                 toggleValidationForElement(select);
             });
-
-            // create final option only on blur or Enter to avoid incremental prefixes
             if (newInput) {
                 newInput.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter') {
@@ -198,52 +186,32 @@
                         this.blur();
                     }
                 });
-
                 newInput.addEventListener('blur', function () {
                     var v = this.value.trim();
                     if (v.length > 0) ensureOptionAndSelect(v);
                 });
-
                 newInput.addEventListener('input', function () {
-                    // mirror live validation state for the new text box
                     toggleValidationForElement(newInput);
                 });
             }
-
-            // Before submit fix __new
             form.addEventListener('submit', function (e) {
-
                 if (select.value === "__new") {
-
                     const typed = newInput.value.trim();
-
                     if (typed.length > 0) {
-                        // Create a temporary option so the model binder picks up the typed category
                         const option = document.createElement('option');
                         option.value = typed;
                         option.textContent = typed;
                         select.appendChild(option);
-
                         select.value = typed;
                     } else {
-                        // If "__new" is selected but nothing is typed, set the bound select value to empty
-                        // to trigger required field validation if applicable.
                         select.value = "";
                     }
                 }
             });
-
-
-            // helper to toggle is-invalid class on an element based on validation message presence
             function toggleValidationForElement(el) {
                 if (!el) return;
-                // find the validation message node that corresponds to the bound name
                 var name = el.name || el.getAttribute('asp-for') || el.id;
-                // Note: categoryNew is NOT bound to LevelCategory, so we must check against LevelCategory
-                if (el.id === 'categoryNew') {
-                    name = 'LevelCategory';
-                }
-
+                if (el.id === 'categoryNew') { name = 'LevelCategory'; }
                 var message = document.querySelector('[data-valmsg-for="' + (name || '') + '"]');
                 if (message && message.innerText.trim().length > 0) {
                     el.classList.add('is-invalid');
@@ -251,81 +219,43 @@
                     el.classList.remove('is-invalid');
                 }
             }
-
-            // ensure unobtrusive validator parsing if necessary and wire pretty client-side handlers
             if (typeof jQuery !== 'undefined' && typeof jQuery.validator !== 'undefined' && typeof jQuery.validator.unobtrusive !== 'undefined') {
-                // Correct form ID:
                 var $form = $('#editLevelForm');
-                if (!$form.data('validator')) {
-                    $.validator.unobtrusive.parse($form);
-                }
-
-                // update summary & field classes when client validation runs
+                if (!$form.data('validator')) { $.validator.unobtrusive.parse($form); }
                 $form.on('invalid-form.validate', function (e, validator) {
-                    // Correct: Show summary errors
                     var summary = $('#validationSummary');
                     if (validator.numberOfInvalids()) {
                         var list = $('<ul/>');
-                        $.each(validator.errorList, function () {
-                            list.append($('<li/>').text(this.message));
-                        });
+                        $.each(validator.errorList, function () { list.append($('<li/>').text(this.message)); });
                         summary.html(list).removeClass('d-none').addClass('alert-danger');
                     } else {
                         summary.addClass('d-none').removeClass('alert-danger').empty();
                     }
-
-                    // mark inputs with errors
                     $form.find('.is-invalid').removeClass('is-invalid');
-                    $.each(validator.errorList, function () {
-                        $(this.element).addClass('is-invalid');
-                    });
-                    
-                    // Manually handle the categoryNew box error class 
-                    if (validator.errorMap.LevelCategory && select.value === "__new") {
-                        $(newInput).addClass('is-invalid');
-                    }
+                    $.each(validator.errorList, function () { $(this.element).addClass('is-invalid'); });
+                    if (validator.errorMap.LevelCategory && select.value === "__new") { $(newInput).addClass('is-invalid'); }
                 });
-
-                // when fields become valid, remove error styles
                 $form.on('keyup change', 'input, select, textarea', function () {
                     var $el = $(this);
                     var name = $el.attr('name');
-                    
-                    if ($el.attr('id') === 'categoryNew') {
-                        name = 'LevelCategory';
-                    }
-
+                    if ($el.attr('id') === 'categoryNew') { name = 'LevelCategory'; }
                     var message = $('[data-valmsg-for="' + name + '"]');
-                    if (message && message.text().trim().length === 0) {
-                        $el.removeClass('is-invalid');
-                    }
+                    if (message && message.text().trim().length === 0) { $el.removeClass('is-invalid'); }
                 });
             } else {
-                // non-jQuery fallback: reflect server-side validation state already rendered
                 if (newInput) {
-                    newInput.addEventListener('input', function () {
-                        toggleValidationForElement(newInput);
-                    });
+                    newInput.addEventListener('input', function () { toggleValidationForElement(newInput); });
                 }
             }
-
-            // initial pass to mark server-side invalid fields
             Array.from(document.querySelectorAll('[data-valmsg-for]')).forEach(function (msg) {
                 var elName = msg.getAttribute('data-valmsg-for');
                 var field = document.querySelector('[name="' + elName + '"]') || document.getElementById(elName);
                 if (msg.innerText.trim().length > 0 && field) {
                     field.classList.add('is-invalid');
-                    
-                    // Manually add the invalid class to categoryNew if appropriate
-                    if (elName === 'LevelCategory' && select.value === '__new') {
-                        newInput.classList.add('is-invalid');
-                    }
+                    if (elName === 'LevelCategory' && select.value === '__new') { newInput.classList.add('is-invalid'); }
                 }
             });
-            
-            // Initial check for the validation summary visibility
             if (form.querySelector('.is-invalid')) {
-                // Show the validation summary if there are any server-side errors
                 var errors = form.querySelectorAll('.invalid-feedback');
                 var list = document.createElement('ul');
                 let hasErrors = false;
@@ -337,12 +267,8 @@
                         hasErrors = true;
                     }
                 });
-
                 var summary = document.getElementById('validationSummary');
-                if (hasErrors) {
-                    summary.appendChild(list);
-                    summary.classList.remove('d-none');
-                }
+                if (hasErrors) { summary.appendChild(list); summary.classList.remove('d-none'); }
             }
         });
     </script>

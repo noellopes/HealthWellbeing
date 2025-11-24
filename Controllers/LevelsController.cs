@@ -127,10 +127,42 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
+
+        // GET: Levels/CalculateLevel
+        [HttpGet]
+        public async Task<IActionResult> CalculateLevel(int? points)
+        {
+            if (points == null || points < 0)
+                return Json(new { level = "-", remaining = points });
+
+            var levels = await _context.Level
+                .OrderBy(l => l.LevelNumber)
+                .ToListAsync();
+
+            int remaining = points.Value;
+            int level = 0;
+
+            foreach (var l in levels)
+            {
+                if (remaining >= l.LevelPointsLimit)
+                {
+                    remaining -= l.LevelPointsLimit;
+                    level = l.LevelNumber;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return Json(new { level, remaining });
+        }
+
+
         // POST: Levels/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategory,Description")] Level level)
+        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategory,LevelPointsLimit,Description")] Level level)
         {
             if (ModelState.IsValid)
             {
@@ -165,7 +197,7 @@ namespace HealthWellbeing.Controllers
         // POST: Levels/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategory,Description")] Level level, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategory,LevelPointsLimit,Description")] Level level, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
             if (id != level.LevelId) return NotFound();
 

@@ -7,7 +7,7 @@
 
     var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
 
-    // LevelNumber prefill (avoid showing 0)
+    // --- LÓGICA DO LEVEL NUMBER (JÁ EXISTIA) ---
     var levelNumberValue = "";
     if (ViewData.ModelState.TryGetValue("LevelNumber", out var ms) && ms?.AttemptedValue != null)
     {
@@ -18,7 +18,20 @@
         levelNumberValue = Model.LevelNumber.ToString();
     }
 
-    // Category prefill (preserve attempted value on validation error)
+    // --- NOVA LÓGICA PARA O POINTS LIMIT (PARA NÃO MOSTRAR 0) ---
+    var pointsLimitValue = "";
+    // 1. Se houve erro de validação, mantém o que o utilizador escreveu
+    if (ViewData.ModelState.TryGetValue("LevelPointsLimit", out var pms) && pms?.AttemptedValue != null)
+    {
+        pointsLimitValue = pms.AttemptedValue;
+    }
+    // 2. Se o modelo tem valor > 0, mostra-o. Se for 0, fica vazio.
+    else if (Model?.LevelPointsLimit > 0)
+    {
+        pointsLimitValue = Model.LevelPointsLimit.ToString();
+    }
+
+    // --- LÓGICA DA CATEGORIA ---
     var categoryValue = "";
     if (ViewData.ModelState.TryGetValue("LevelCategory", out var cms) && cms?.AttemptedValue != null)
     {
@@ -42,8 +55,6 @@
                 </div>
 
                 <div class="card-body">
-                    @* Pretty validation summary (shows server & client errors) *@
-
                     <form asp-action="Create" method="post" id="createLevelForm" novalidate>
                         @Html.AntiForgeryToken()
 
@@ -61,7 +72,6 @@
                         <div class="mb-3">
                             <label for="categorySelect" class="form-label">Category</label>
                             <div class="d-flex gap-2 align-items-start">
-                                <!-- select is the bound element (client validation works against this) -->
                                 <select asp-for="LevelCategory" id="categorySelect" class="form-select bg-white @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")" aria-label="Category selector">
                                     @foreach (var c in cats)
                                     {
@@ -78,7 +88,6 @@
                                     }
                                 </select>
 
-                                <!-- free text box for new category (not bound) -->
                                 <input id="categoryNew"
                                        name="categoryNew"
                                        type="text"
@@ -89,6 +98,19 @@
                             </div>
 
                             <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
+                        </div>
+
+                        <!-- CAMPO POINTS LIMIT ALTERADO -->
+                        <div class="form-floating mb-3">
+                            <!-- Adicionei value="@(pointsLimitValue)" para controlar o valor manualmente -->
+                            <input asp-for="LevelPointsLimit"
+                                   type="number"
+                                   min="0"
+                                   value="@(pointsLimitValue)"
+                                   class="form-control @(ViewData.ModelState["LevelPointsLimit"]?.Errors.Count > 0 ? "is-invalid" : "")"
+                                   placeholder="Points Limit" />
+                            <label asp-for="LevelPointsLimit">Points Limit</label>
+                            <span asp-validation-for="LevelPointsLimit" class="invalid-feedback"></span>
                         </div>
 
                         <div class="form-floating mb-3">
@@ -116,7 +138,6 @@
     }
 
     <style>
-        /* Small polish for validation visuals */
         .invalid-feedback {
             display: block;
         }
@@ -136,30 +157,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             var select = document.getElementById('categorySelect');
             var newInput = document.getElementById('categoryNew');
-
             function setNewVisibility(show) {
                 newInput.style.display = show ? '' : 'none';
                 if (show) newInput.focus();
             }
-
             function ensureOptionAndSelect(value) {
-                // Apenas usa a caixa de texto, nunca adiciona ao dropdown
-                if (select.value === "__new") {
-                    return; 
-                }
+                if (select.value === "__new") { return; }
             }
-
-
-            // initial visibility is already server-rendered; keep JS in sync
             setNewVisibility(select.value === "__new");
-
             select.addEventListener('change', function () {
                 setNewVisibility(this.value === "__new");
-                // update validation display when user changes select
                 toggleValidationForElement(select);
             });
-
-            // create final option only on blur or Enter to avoid incremental prefixes
             if (newInput) {
                 newInput.addEventListener('keydown', function (e) {
                     if (e.key === 'Enter') {
@@ -169,45 +178,31 @@
                         this.blur();
                     }
                 });
-
                 newInput.addEventListener('blur', function () {
                     var v = this.value.trim();
                     if (v.length > 0) ensureOptionAndSelect(v);
                 });
-
                 newInput.addEventListener('input', function () {
-                    // mirror live validation state for the new text box
                     toggleValidationForElement(newInput);
                 });
             }
-
-            // Before submit fix __new
             var form = document.getElementById('createLevelForm');
-
             form.addEventListener('submit', function (e) {
-
                 if (select.value === "__new") {
-
                     const typed = newInput.value.trim();
-
                     if (typed.length > 0) {
                         const option = document.createElement('option');
                         option.value = typed;
                         option.textContent = typed;
                         select.appendChild(option);
-
                         select.value = typed;
                     } else {
                         select.value = "";
                     }
                 }
             });
-
-
-            // helper to toggle is-invalid class on an element based on validation message presence
             function toggleValidationForElement(el) {
                 if (!el) return;
-                // find the validation message node that corresponds to the bound name
                 var name = el.name || el.getAttribute('asp-for') || el.id;
                 var message = document.querySelector('[data-valmsg-for="' + (name || '') + '"]');
                 if (message && message.innerText.trim().length > 0) {
@@ -216,60 +211,38 @@
                     el.classList.remove('is-invalid');
                 }
             }
-
-            // ensure unobtrusive validator parsing if necessary and wire pretty client-side handlers
             if (typeof jQuery !== 'undefined' && typeof jQuery.validator !== 'undefined' && typeof jQuery.validator.unobtrusive !== 'undefined') {
                 var $form = $('#createLevelForm');
                 if (!$form.data('validator')) {
                     $.validator.unobtrusive.parse($form);
                 }
-
-                // update summary & field classes when client validation runs
                 $form.on('invalid-form.validate', function (e, validator) {
                     var summary = $('#validationSummary');
                     if (validator.numberOfInvalids()) {
                         var list = $('<ul/>');
-                        $.each(validator.errorList, function () {
-                            list.append($('<li/>').text(this.message));
-                        });
+                        $.each(validator.errorList, function () { list.append($('<li/>').text(this.message)); });
                         summary.html(list).removeClass('d-none');
                     } else {
                         summary.addClass('d-none').empty();
                     }
-
-                    // mark inputs with errors
                     $form.find('.is-invalid').removeClass('is-invalid');
-                    $.each(validator.errorList, function () {
-                        $(this.element).addClass('is-invalid');
-                    });
+                    $.each(validator.errorList, function () { $(this.element).addClass('is-invalid'); });
                 });
-
-                // when fields become valid, remove error styles
                 $form.on('keyup change', 'input, select, textarea', function () {
                     var $el = $(this);
                     var name = $el.attr('name');
                     var message = $('[data-valmsg-for="' + name + '"]');
-                    if (message && message.text().trim().length === 0) {
-                        $el.removeClass('is-invalid');
-                    }
+                    if (message && message.text().trim().length === 0) { $el.removeClass('is-invalid'); }
                 });
             } else {
-                // non-jQuery fallback: reflect server-side validation state already rendered
-                // and keep newInput in sync when user types
                 if (newInput) {
-                    newInput.addEventListener('input', function () {
-                        toggleValidationForElement(newInput);
-                    });
+                    newInput.addEventListener('input', function () { toggleValidationForElement(newInput); });
                 }
             }
-
-            // initial pass to mark server-side invalid fields
             Array.from(document.querySelectorAll('[data-valmsg-for]')).forEach(function (msg) {
                 var elName = msg.getAttribute('data-valmsg-for');
                 var field = document.querySelector('[name="' + elName + '"]') || document.getElementById(elName);
-                if (msg.innerText.trim().length > 0 && field) {
-                    field.classList.add('is-invalid');
-                }
+                if (msg.innerText.trim().length > 0 && field) { field.classList.add('is-invalid'); }
             });
         });
     </script>

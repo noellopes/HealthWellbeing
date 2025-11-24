@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251124165150_InitialCleann")]
-    partial class InitialCleann
+    [Migration("20251124183108_InitialClean1")]
+    partial class InitialClean1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -434,6 +434,9 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LevelNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LevelPointsLimit")
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");

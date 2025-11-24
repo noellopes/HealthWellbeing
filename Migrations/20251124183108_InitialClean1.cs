@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCleann : Migration
+    public partial class InitialClean1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -146,6 +146,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     LevelNumber = table.Column<int>(type: "int", nullable: false),
                     LevelCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LevelPointsLimit = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
