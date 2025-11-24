@@ -1,46 +1,51 @@
-﻿@model HealthWellbeing.Models.UsoConsumivel
+﻿@model List<HealthWellbeing.Models.UsoConsumivel>
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Adicionar Consumos";
 }
 
-<h1>Create</h1>
+<h2>Adicionar Consumo(s)</h2>
 
-<h4>UsoConsumivel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TreatmentRecordId" class="control-label"></label>
-                <select asp-for="TreatmentRecordId" class ="form-control" asp-items="ViewBag.TreatmentRecordId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConsumivelID" class="control-label"></label>
-                <select asp-for="ConsumivelID" class ="form-control" asp-items="ViewBag.ConsumivelID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeUsada" class="control-label"></label>
-                <input asp-for="QuantidadeUsada" class="form-control" />
-                <span asp-validation-for="QuantidadeUsada" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataConsumo" class="control-label"></label>
-                <input asp-for="DataConsumo" class="form-control" />
-                <span asp-validation-for="DataConsumo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<form asp-action="CreateMultiple" method="post">
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <input type="hidden" name="treatmentRecordId" value="@ViewBag.TreatmentRecordId" />
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Consumível</th>
+                <th>Quantidade</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="rows">
+            <tr>
+                <td>
+                    <select name="ConsumivelID" class="form-control">
+                        @foreach (var item in (SelectList)ViewData["ConsumivelID"])
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input name="QuantidadeUsada" class="form-control" />
+                </td>
+                <td>
+                    <input name="DataConsumo" type="date" class="form-control" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary" onclick="addRow()">+ Adicionar Linha</button>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+
+<script>
+    function addRow() {
+        const row = document.querySelector("#rows tr").cloneNode(true);
+        document.querySelector("#rows").appendChild(row);
+    }
+</script>

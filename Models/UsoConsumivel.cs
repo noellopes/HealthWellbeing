@@ -7,7 +7,7 @@ namespace HealthWellbeing.Models
     public class UsoConsumivel
     {
         [Key]
-        public int AuditoriaConsumivelId { get; set; }
+        public int UsoConsumivelId { get; set; }
 
         // FK para TreatmentRecord (novo)
         [Required(ErrorMessage = "É necessário associar o registo de tratamento.")]
