@@ -11,9 +11,54 @@ namespace HealthWellbeing.Data
 
             db.Database.EnsureCreated();
 
+            PopulateLocalizacoes(db);
             PopulateCategorias(db);
             PopulateConsumiveis(db);
+            PopulateZonasArmazenamento(db);
         }
+
+        private static void PopulateLocalizacoes(HealthWellbeingDbContext db)
+        {
+            if (db.LocalizacaoZonaArmazenamento.Any()) return;
+
+            var localizacoes = new List<LocalizacaoZonaArmazenamento>
+                {
+                    new() { Nome = "Bloco A - Piso 0" },
+                    new() { Nome = "Bloco A - Piso 1" },
+                    new() { Nome = "Bloco B - Subsolo" },
+                    new() { Nome = "Armazém Central" },
+                    new() { Nome = "Armazém Secundário" },
+                    new() { Nome = "Sala de Suprimentos" },
+                    new() { Nome = "Edifício Técnico - Piso 2" }
+                };
+
+            db.LocalizacaoZonaArmazenamento.AddRange(localizacoes);
+            db.SaveChanges();
+        }
+
+        private static void PopulateZonasArmazenamento(HealthWellbeingDbContext db)
+        {
+            if (db.ZonaArmazenamento.Any()) return;
+
+            var localizacoes = db.LocalizacaoZonaArmazenamento.ToList();
+            int Loc(string nome) => localizacoes.First(l => l.Nome == nome).Id;
+
+            var zonas = new List<ZonaArmazenamento>
+                {
+                    new() { Nome = "Armazém Central - Zona 1", Descricao = "Zona principal para armazenamento geral.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Central"), CapacidadeMaxima = 950, Ativa = true },
+                    new() { Nome = "Armazém Central - Zona Refrigerada", Descricao = "Área refrigerada para materiais sensíveis.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Central"), CapacidadeMaxima = 600, Ativa = true },
+                    new() { Nome = "Depósito Técnico A", Descricao = "Materiais técnicos e manutenção.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Técnico - Piso 2"), CapacidadeMaxima = 400, Ativa = true },
+                    new() { Nome = "Sala de Suprimentos - Armazenamento Secundário", Descricao = "Armazenamento adicional para uso rápido.", LocalizacaoZonaArmazenamentoId = Loc("Sala de Suprimentos"), CapacidadeMaxima = 300, Ativa = true },
+                    new() { Nome = "Bloco A - Stock de Emergência", Descricao = "Material de emergência e primeiros socorros.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 1"), CapacidadeMaxima = 200, Ativa = true },
+                    new() { Nome = "Bloco B - Subsolo - Armazenamento Geral", Descricao = "Armazenamento geral em zona subterrânea.", LocalizacaoZonaArmazenamentoId = Loc("Bloco B - Subsolo"), CapacidadeMaxima = 500, Ativa = true }
+                };
+
+            db.ZonaArmazenamento.AddRange(zonas);
+            db.SaveChanges();
+        }
+
+
+
 
         private static void PopulateCategorias(HealthWellbeingDbContext db)
         {
