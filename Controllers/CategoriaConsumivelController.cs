@@ -22,8 +22,6 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(string searchString, int page = 1)
         {
             int pageSize = 10;
-
-            // Inserção automática de categorias se estiver vazio
             
 
             // Consulta base
