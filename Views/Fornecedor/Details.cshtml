@@ -1,10 +1,10 @@
-﻿@model HealthWellbeing.Models.ConsumivelFornecedor
+﻿@model HealthWellbeing.Models.Fornecedor
 
 @{
-    ViewData["Title"] = "Eliminar Fornecedor";
+    ViewData["Title"] = "Detalhes";
 }
 <style>
-    .delete-container {
+    .details-container {
         max-width: 650px;
         margin: 40px auto;
     }
@@ -15,7 +15,7 @@
     }
 
     .card-header {
-        background-color: #dc3545;
+        background-color: #0d6efd;
         color: white;
         font-weight: 600;
         font-size: 1.25rem;
@@ -33,33 +33,19 @@
         font-size: 1.05rem;
     }
 
-    .confirm-text {
-        background-color: #fff3cd;
-        border: 1px solid #ffeeba;
-        color: #856404;
-        padding: 12px 15px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        font-weight: 500;
-    }
-
     .badge {
         font-size: 0.9rem;
         padding: 6px 10px;
     }
 </style>
 
-<div class="delete-container">
+<div class="details-container">
     <div class="card">
         <div class="card-header">
-            🗑️ Eliminar Fornecedor
+            📄 Detalhes do Fornecedor
         </div>
 
         <div class="card-body">
-            <div class="confirm-text">
-                ⚠️ Tens a certeza que queres eliminar este fornecedor? Esta ação não pode ser desfeita.
-            </div>
-
             <dl class="row mb-4">
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.NomeEmpresa)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.NomeEmpresa)</dd>
@@ -75,14 +61,16 @@
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Email)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Email)</dd>
-
             </dl>
 
-            <form asp-action="Delete" class="d-flex justify-content-end mt-3">
-                <input type="hidden" asp-for="FornecedorId" />
-                <button type="submit" class="btn btn-danger me-2">Eliminar</button>
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-            </form>
+            <div class="d-flex justify-content-end">
+                <a asp-action="Edit" asp-route-id="@Model.FornecedorId" class="btn btn-warning text-white me-2">
+                    ✏️ Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    ⬅️ Voltar
+                </a>
+            </div>
         </div>
     </div>
 </div>
