@@ -6,29 +6,48 @@
 
 <div class="container mt-4">
 
-    <h2 class="fw-bold text-primary mb-4">
-        📥 Nova Compra de Consumível
-    </h2>
+    <h2 class="fw-bold text-primary mb-4">📥 Nova Compra de Consumível</h2>
 
     <form asp-action="CreateEntrada" asp-controller="StockMovimento" method="post">
         @Html.AntiForgeryToken()
 
+        <!-- Mostrar erros do ModelState -->
+        <div style="color:red">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+
         <div class="card shadow-sm">
             <div class="card-body">
 
-                <!-- Seleção do Stock (Consumível + Zona) -->
+                <!-- Seleção do Stock -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Consumível</label>
-                    <select asp-for="StockId" class="form-select" required>
+
+                    <select asp-for="StockId" class="form-select">
                         <option value="">-- Selecione um Consumível --</option>
 
                         @foreach (var s in ViewBag.Stocks)
                         {
-                            <option value="@s.StockId">
-                                @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
-                            </option>
+                            bool isSelected = (Model != null && Model.StockId == s.StockId);
+
+                            if (isSelected)
+                            {
+                                <option value="@s.StockId" selected="selected">
+                                    @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@s.StockId">
+                                    @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
+                                </option>
+                            }
                         }
                     </select>
+
                     <span asp-validation-for="StockId" class="text-danger"></span>
                 </div>
 
@@ -50,17 +69,14 @@
         </div>
 
         <div class="mt-4 d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-secondary px-4">
-                ❮ Voltar
-            </a>
+            <a asp-action="Index" class="btn btn-secondary px-4">❮ Voltar</a>
 
-            <button type="submit" class="btn btn-success px-5">
-                ✔ Confirmar Compra
-            </button>
+            <button type="submit" class="btn btn-success px-5">✔ Confirmar Compra</button>
         </div>
 
     </form>
-
 </div>
 
-@section Scripts { }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

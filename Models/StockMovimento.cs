@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,6 +15,7 @@ namespace HealthWellbeing.Models
         public int StockId { get; set; }
 
         [ForeignKey("StockId")]
+        [ValidateNever]
         public Stock Stock { get; set; }
 
         // Quantidade movimentada (compra/entrada)
