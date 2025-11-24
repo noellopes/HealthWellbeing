@@ -6,16 +6,23 @@
 
 <div class="container mt-4">
 
-    <!-- TÍTULO + BOTÃO -->
+    <!-- TÍTULO + BOTÕES -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">
             🏭 Gestão de Stock
         </h2>
 
-        <a asp-action="Create" class="btn btn-success px-4">
-            ➕ Adicionar Stock
-        </a>
+        <div class="d-flex gap-2">
+            <a asp-controller="StockMovimento" asp-action="CreateEntrada" class="btn btn-success px-4">
+                📥 Fazer Compra
+            </a>
+
+            <a asp-action="Create" class="btn btn-success px-4">
+                ➕ Adicionar Stock
+            </a>
+        </div>
     </div>
+
 
     <!-- ======================= -->
     <!-- BARRA DE PESQUISA       -->

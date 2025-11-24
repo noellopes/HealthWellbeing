@@ -11,14 +11,6 @@
     <form asp-action="CreateEntrada" asp-controller="StockMovimento" method="post">
         @Html.AntiForgeryToken()
 
-        <!-- Mostrar erros do ModelState -->
-        <div style="color:red">
-            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-            {
-                <p>@error.ErrorMessage</p>
-            }
-        </div>
-
         <div class="card shadow-sm">
             <div class="card-body">
 
