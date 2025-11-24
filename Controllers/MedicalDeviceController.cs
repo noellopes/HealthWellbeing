@@ -91,26 +91,24 @@ namespace HealthWellBeingRoom.Controllers
         {
             if (id == null)
             {
-                // Se não houver ID, tratamos como NotFound
                 return View("NotFound");
             }
 
             var dispositivo = await _context.MedicalDevices
                 .Include(m => m.TypeMaterial)
-                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
-                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
-                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
+
+                // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
+                .Include(md => md.LocalizacaoDispMedicoMovel
+                     .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
                 )
-                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
+                .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
                 .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (dispositivo == null)
             {
-                // Se não encontrar, mostra o NotFound
                 return View("NotFound");
             }
 
-            // CORRIGIDO: Se encontrar, retorna a View padrão (Details.cshtml)
             return View(dispositivo);
         }
 
@@ -233,11 +231,13 @@ namespace HealthWellBeingRoom.Controllers
 
             var medicalDevices = await _context.MedicalDevices
                 .Include(m => m.TypeMaterial)
-                //Incluir a coleção da Localização, filtrando SÓ o registo ativo (IsCurrent = true)
-                .Include(md => md.LocalizacaoDispMedicoMovel //carrega a tabela localização
-                    .Where(loc => loc.IsCurrent == true) //garante que só trazemos o registo de localização que é o **atual**
+
+                //Usar a lógica temporal EndDate == null para carregar SÓ o registo ATIVO
+                .Include(md => md.LocalizacaoDispMedicoMovel // carrega a tabela localização
+                     .Where(loc => loc.EndDate == null) // A localização ativa é aquela que não foi encerrada
                 )
-                .ThenInclude(loc => loc.Room) //para ter acesso ao nome da sala
+
+                .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
                 .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
             if (medicalDevices == null)
