@@ -29,14 +29,31 @@ namespace HealthWellbeing.Controllers
                     .ThenInclude(aa => aa.Alimento)
                 .AsQueryable();
 
+            // Normaliza os termos de busca para minúsculas
+            // Usamos ToLower() simples aqui para garantir que o SQL seja gerado
+            var searchNome = nome?.ToLower();
+            var searchAlimento = alimento?.ToLower();
+
+
             // FILTRO POR NOME DA ALERGIA
-            if (!string.IsNullOrEmpty(nome))
-                query = query.Where(a => a.Nome.Contains(nome));
+            if (!string.IsNullOrEmpty(searchNome))
+                // CORREÇÃO: Usar .ToLower() em vez de .ToLowerInvariant()
+                // Isso garante que o EF Core traduza para a função SQL LOWER()
+                query = query.Where(a =>
+    EF.Functions.Collate(a.Nome, "SQL_Latin1_General_CP1_CI_AI")
+        .Contains(searchNome)
+);
+
 
             // FILTRO POR NOME DO ALIMENTO
-            if (!string.IsNullOrEmpty(alimento))
+            if (!string.IsNullOrEmpty(searchAlimento))
                 query = query.Where(a => a.AlimentosAssociados
-                    .Any(aa => aa.Alimento.Name.Contains(alimento)));
+    .Any(aa =>
+        EF.Functions.Collate(aa.Alimento.Name, "SQL_Latin1_General_CP1_CI_AI")
+            .Contains(searchAlimento)
+    )
+);
+
 
             // CONTAGEM TOTAL
             int totalCount = await query.CountAsync();
@@ -55,6 +72,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.PageSize = pageSize;
             ViewBag.TotalCount = totalCount;
 
+            // Passar os termos originais (ou nulos) para a View
             ViewBag.SearchNome = nome;
             ViewBag.SearchAlimento = alimento;
 
@@ -129,7 +147,7 @@ namespace HealthWellbeing.Controllers
                 TempData["AlertType"] = "success";
                 TempData["AlertMessage"] = "Alergia criada com sucesso!";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = alergia.AlergiaId });
             }
 
             return View(alergia);
@@ -218,7 +236,7 @@ namespace HealthWellbeing.Controllers
                 TempData["AlertType"] = "success";
                 TempData["AlertMessage"] = "Alergia atualizada com sucesso!";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = id });
             }
 
             // Recarrega dados caso ModelState não seja válido
