@@ -117,7 +117,7 @@ namespace HealthWellbeing.Data
             EnsureUserIsCreatedAsync(userManager, "maria@group1.com", "Secret123$", ["Nurse"]).Wait();
 
             // Normal User / Patient
-            EnsureUserIsCreatedAsync(userManager, "paulo@group1.com", "Secret123$", []).Wait();
+            EnsureUserIsCreatedAsync(userManager, "paulo@group1.com", "Secret123$", ["Patient"]).Wait();
         }
 
         internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -125,6 +125,7 @@ namespace HealthWellbeing.Data
             EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "TreatmentOfficeManager").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Nurse").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Patient").Wait();
         }
 
         private static async Task EnsureUserIsCreatedAsync(UserManager<IdentityUser> userManager, string username, string password, string[] roles)

@@ -17,6 +17,8 @@
         var alertModel = alertJson == null ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<AlertItem>(alertJson);
         <partial name="Group1/Partials/Alert" model="alertModel" />
     }
+
+    var currentSort = ViewBag.CurrentSort?.ToString() ?? "";
 }
 
 <h1 class="mb-4 text-primary font-weight-bold">@ViewData["Title"]</h1>
@@ -48,21 +50,11 @@ else
                     <tr>
                         @foreach (var prop in properties)
                         {
-                            var currentSort = ViewBag.CurrentSort?.ToString() ?? "";
-                            string sortOrder;
-
-                            if (currentSort == prop)
-                            {
-                                sortOrder = prop + "_desc";
-                            }
-                            else if (currentSort == prop + "_desc")
-                            {
-                                sortOrder = "";
-                            }
-                            else
-                            {
-                                sortOrder = prop;
-                            }
+                            string sortOrder = currentSort switch {
+                                var sort when sort == prop => prop + "_desc",
+                                var sort when sort == prop + "_desc" => "",
+                                _ => prop
+                            };
 
                             var isActiveSort = (currentSort == prop || currentSort == prop + "_desc");
                             var isDescending = currentSort.EndsWith("_desc");
@@ -100,6 +92,7 @@ else
                             {
                                 <td>@Functions.GetNestedPropertyValue(item, prop)</td>
                             }
+                            
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-2"><i class="bi bi-info-circle"></i> Detalhes</a>
                             </td>

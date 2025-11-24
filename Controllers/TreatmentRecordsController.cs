@@ -1,7 +1,5 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.Utils.Group1;
-using HealthWellbeing.Utils.Group1.DTOs;
 using HealthWellbeing.Utils.Group1.Models;
 using HealthWellbeing.Utils.Group1.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +23,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TreatmentRecords
-        //[Authorize]
+        [Authorize(Roles = "Patient, Nurse, TreatmentOfficeManager, Administrator")]
         public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
             var treatments = await _repository.GetPagedTreatmentRecordsAsync(User, searchBy, searchString, sortOrder, page);
@@ -44,19 +42,11 @@ namespace HealthWellbeing.Controllers
             return View(treatments.Data);
         }
 
-        // GET: TreatmentRecords/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        // GET: TreatmentRecords/Details/<GUID>
+        [Authorize(Roles = "Patient, Nurse, TreatmentOfficeManager, Administrator")]
+        public async Task<IActionResult> Details(Guid id)
         {
-            if (id == null)
-            {
-                return View("~/Views/Shared/Group1/NotFound.cshtml");
-            }
-
-            var treatmentRecord = await _context.TreatmentRecord
-                .Include(t => t.Nurse)
-                .Include(t => t.Pathology)
-                .Include(t => t.TreatmentType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
             if (treatmentRecord == null)
             {
                 return View("~/Views/Shared/Group1/NotFound.cshtml");
@@ -70,7 +60,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TreatmentRecords/Schedule
-        //[Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Patient")]
         public IActionResult Schedule()
         {
             ViewData["Title"] = "Marcação de tratamento";
@@ -82,6 +72,7 @@ namespace HealthWellbeing.Controllers
         // POST: TreatmentRecords/Schedule
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Patient")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Schedule([Bind("Id,TreatmentTypeId,PathologyId,TreatmentDate")] TreatmentRecord treatmentRecord)
@@ -90,8 +81,8 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                //treatmentRecord.CreatedAt = DateTime.Now;
                 treatmentRecord.NurseId = Random.Shared.Next(1, 21);
+                treatmentRecord.EstimatedDuration = Random.Shared.Next(1, 121);
                 _context.Add(treatmentRecord);
                 await _context.SaveChangesAsync();
                 TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O pedido de agendamento de tratamento foi registado com sucesso", true);
@@ -103,14 +94,10 @@ namespace HealthWellbeing.Controllers
             return View(treatmentRecord);
         }
 
-        // GET: TreatmentRecords/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: TreatmentRecords/Edit/<GUID>
+        [Authorize(Roles = "Patient, Nurse, TreatmentOfficeManager, Administrator")]
+        public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var treatmentRecord = await _context.TreatmentRecord.FindAsync(id);
             if (treatmentRecord == null)
             {
@@ -123,11 +110,12 @@ namespace HealthWellbeing.Controllers
             return View("Request", treatmentRecord);
         }
 
-        // POST: TreatmentRecords/Edit/5
+        // POST: TreatmentRecords/Edit/<GUID>
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Patient, Nurse, TreatmentOfficeManager")]
         public async Task<IActionResult> Edit(Guid id, [Bind("Id,AdditionalNotes,Status")] TreatmentRecord treatmentRecord)
         {
             if (id != treatmentRecord.Id)
@@ -146,7 +134,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TreatmentRecordExists(treatmentRecord.Id))
+                    if (!_repository.TreatmentRecordExists(treatmentRecord.Id))
                     {
                         return NotFound();
                     }
@@ -166,18 +154,10 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TreatmentRecords/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        [Authorize(Roles = "TreatmentOfficeManager, Administrator")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var treatmentRecord = await _context.TreatmentRecord
-                .Include(t => t.Nurse)
-                .Include(t => t.Pathology)
-                .Include(t => t.TreatmentType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
             if (treatmentRecord == null)
             {
                 return NotFound();
@@ -192,27 +172,28 @@ namespace HealthWellbeing.Controllers
         // POST: TreatmentRecords/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "TreatmentOfficeManager, Administrator")]
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var treatmentRecord = await _context.TreatmentRecord.FindAsync(id);
-            if (treatmentRecord != null)
+            var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
+            if (treatmentRecord == null)
+            {
+                return NotFound();
+            }
+            else
             {
                 // Soft Delete
                 _context.TreatmentRecord.Remove(treatmentRecord);
 
                 // Hard Delete
                 //await Functions.HardDeleteByIdAsync<TreatmentRecord>(_context, treatmentRecord.Id);
+
+                await _context.SaveChangesAsync();
+
+                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O registo do tratamento foi removido com sucesso", true);
+                return RedirectToAction(nameof(Index));
             }
-
-            await _context.SaveChangesAsync();
-
-            TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O registo do tratamento foi removido com sucesso", true);
-            return RedirectToAction(nameof(Index));
         }
 
-        private bool TreatmentRecordExists(Guid id)
-        {
-            return _context.TreatmentRecord.Any(e => e.Id == id);
-        }
     }
 }

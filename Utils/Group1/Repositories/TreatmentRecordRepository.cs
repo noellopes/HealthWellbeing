@@ -4,6 +4,7 @@ using HealthWellbeing.Utils.Group1.DTOs;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Claims;
 
 namespace HealthWellbeing.Utils.Group1.Repositories
@@ -11,6 +12,10 @@ namespace HealthWellbeing.Utils.Group1.Repositories
     public interface ITreatmentRecordRepository
     {
         IReadOnlyList<string> GetSearchableProperties();
+
+        bool TreatmentRecordExists(Guid id);
+
+        Task<TreatmentRecord?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id);
 
         Task<Group1DataResponseObject<TreatmentRecord, TreatmentRecordListDTO>> GetPagedTreatmentRecordsAsync(
             ClaimsPrincipal user,
@@ -36,6 +41,38 @@ namespace HealthWellbeing.Utils.Group1.Repositories
 
         public IReadOnlyList<string> GetSearchableProperties() => _filterService.SearchableProperties;
 
+        public bool TreatmentRecordExists(Guid id)
+        {
+            return _context.TreatmentRecord.Any(e => e.Id == id);
+        }
+
+        public async Task<TreatmentRecord?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id)
+        {
+            if (TreatmentRecordExists(id))
+            {
+                IQueryable<TreatmentRecord> baseQuery = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType).AsNoTracking();
+                switch (user)
+                {
+                    case var currentUser when currentUser.IsInRole("Nurse"):
+                        // Filtra os proximos tratamentos agendados atribuídos para o(a) enfermeiro(a)
+                        //var nurseId = GetNurseIdFromUser(user);
+                        var nurseId = Random.Shared.Next(1, 21);
+                        return await baseQuery.Where(t => t.NurseId == nurseId).FirstOrDefaultAsync(m => m.Id == id);
+                        break;
+                    case var currentUser when currentUser.IsInRole("Administrator") || currentUser.IsInRole("TreatmentOfficeManager"):
+                        return await baseQuery.FirstOrDefaultAsync(m => m.Id == id);
+                        break;
+                    default:
+                        // Utilizadores (Utentes)
+                        //var patientId = Random.Shared.Next(1, 21);
+                        return await baseQuery.FirstOrDefaultAsync(m => m.Id == id);
+                        break;
+                }
+            }
+
+            return null;
+        }
+
         public async Task<Group1DataResponseObject<TreatmentRecord, TreatmentRecordListDTO>> GetPagedTreatmentRecordsAsync(ClaimsPrincipal user, string searchBy, string searchString, string sortOrder, int page)
         {
             // Query base para otimizar consultas
@@ -50,7 +87,7 @@ namespace HealthWellbeing.Utils.Group1.Repositories
                 Nurse = t.Nurse.Name,
                 TreatmentType = t.TreatmentType.Name,
                 Pathology = t.Pathology.Name,
-                TreatmentDate = t.TreatmentDate,
+                TreatmentDate = t.TreatmentDate.ToShortDateString(),
                 CompletedDuration = t.CompletedDuration
             }, [
                 nameof(TreatmentRecordListDTO.Nurse),
@@ -60,60 +97,82 @@ namespace HealthWellbeing.Utils.Group1.Repositories
                 nameof(TreatmentRecordListDTO.CompletedDuration)
             ]);
 
-            if (user.IsInRole("Nurse"))
+            switch (user)
             {
-                // Filtra os proximos tratamentos agendados atribuídos para o(a) enfermeiro(a)
-                //var nurseId = GetNurseIdFromUser(user);
-                var nurseId = Random.Shared.Next(1, 21);
+                case var currentUser when currentUser.IsInRole("Nurse"):
+                    // Filtra os proximos tratamentos agendados atribuídos para o(a) enfermeiro(a)
+                    //var nurseId = GetNurseIdFromUser(user);
+                    var nurseId = Random.Shared.Next(1, 21);
+                    baseQuery = baseQuery
+                        .Where(t => t.NurseId == nurseId)
+                        .Include(t => t.Nurse)
+                        .Include(t => t.Pathology)
+                        .Include(t => t.TreatmentType)
+                        .AsNoTracking();
 
-                baseQuery = _context.TreatmentRecord
-                    .Where(t => t.NurseId == nurseId)
-                    .Include(t => t.Nurse)
-                    .Include(t => t.Pathology)
-                    .Include(t => t.TreatmentType)
-                    .AsNoTracking();
-            }
-            else if (new[] { "Administrator", "TreatmentOfficeManager" }.Any(r => user.IsInRole(r)))
-            {
-                // Admins
-                baseQuery = _context.TreatmentRecord
-                    .Include(t => t.Nurse)
-                    .Include(t => t.Pathology)
-                    .Include(t => t.TreatmentType)
-                    .AsNoTracking();
+                    selector = new(t => new TreatmentRecordListDTO
+                    {
+                        Id = t.Id,
+                        Nurse = t.Nurse.Name,
+                        TreatmentType = t.TreatmentType.Name,
+                        Pathology = t.Pathology.Name,
+                        TreatmentDate = t.TreatmentDate.ToShortDateString(),
+                        AdditionalNotes = t.AdditionalNotes,
+                        EstimatedDuration = t.EstimatedDuration,
+                        Status = Functions.GetEnumDisplayName(t.Status),
+                        CreatedAt = t.CreatedAt
+                    }, [
+                       nameof(TreatmentRecordListDTO.Nurse),
+                       nameof(TreatmentRecordListDTO.TreatmentType),
+                       nameof(TreatmentRecordListDTO.Pathology),
+                       nameof(TreatmentRecordListDTO.TreatmentDate),
+                       nameof(TreatmentRecordListDTO.AdditionalNotes),
+                       nameof(TreatmentRecordListDTO.EstimatedDuration),
+                       nameof(TreatmentRecordListDTO.Status),
+                       nameof(TreatmentRecordListDTO.CreatedAt)
+                       ]);
+                    break;
+                case var currentUser when currentUser.IsInRole("Administrator") || currentUser.IsInRole("TreatmentOfficeManager"):
+                    baseQuery = baseQuery
+                        .Include(t => t.Nurse)
+                        .Include(t => t.Pathology)
+                        .Include(t => t.TreatmentType)
+                        .AsNoTracking();
 
-                selector = new(t => new TreatmentRecordListDTO
-                {
-                    Id = t.Id,
-                    Nurse = t.Nurse.Name,
-                    TreatmentType = t.TreatmentType.Name,
-                    Pathology = t.Pathology.Name,
-                    TreatmentDate = t.TreatmentDate,
-                    CompletedDuration = t.CompletedDuration,
-                    Observations = t.Observations ?? "-",
-                    AdditionalNotes = t.AdditionalNotes ?? "-",
-                    Status = Functions.GetEnumDisplayName(t.Status),
-                    CreatedAt = t.CreatedAt
-                }, [
-                   nameof(TreatmentRecordListDTO.Nurse),
-                    nameof(TreatmentRecordListDTO.TreatmentType),
-                    nameof(TreatmentRecordListDTO.Pathology),
-                    nameof(TreatmentRecordListDTO.TreatmentDate),
-                    nameof(TreatmentRecordListDTO.CompletedDuration),
-                    nameof(TreatmentRecordListDTO.Observations),
-                    nameof(TreatmentRecordListDTO.AdditionalNotes),
-                    nameof(TreatmentRecordListDTO.Status),
-                    nameof(TreatmentRecordListDTO.CreatedAt)
-               ]);
-            }
-            else
-            {
-                // Utilizadores (Utentes)
-                baseQuery = _context.TreatmentRecord
-                    .Include(t => t.Nurse)
-                    .Include(t => t.Pathology)
-                    .Include(t => t.TreatmentType)
-                    .AsNoTracking();
+                    selector = new(t => new TreatmentRecordListDTO
+                    {
+                        Id = t.Id,
+                        Nurse = t.Nurse.Name,
+                        TreatmentType = t.TreatmentType.Name,
+                        Pathology = t.Pathology.Name,
+                        TreatmentDate = t.TreatmentDate.ToShortDateString(),
+                        AdditionalNotes = t.AdditionalNotes,
+                        EstimatedDuration = t.EstimatedDuration,
+                        Observations = t.Observations,
+                        Status = Functions.GetEnumDisplayName(t.Status),
+                        CompletedDuration = t.CompletedDuration,
+                        CreatedAt = t.CreatedAt
+                    }, [
+                       nameof(TreatmentRecordListDTO.Nurse),
+                       nameof(TreatmentRecordListDTO.TreatmentType),
+                       nameof(TreatmentRecordListDTO.Pathology),
+                       nameof(TreatmentRecordListDTO.TreatmentDate),
+                       nameof(TreatmentRecordListDTO.AdditionalNotes),
+                       nameof(TreatmentRecordListDTO.EstimatedDuration),
+                       nameof(TreatmentRecordListDTO.Observations),
+                       nameof(TreatmentRecordListDTO.Status),
+                       nameof(TreatmentRecordListDTO.CompletedDuration),
+                       nameof(TreatmentRecordListDTO.CreatedAt)
+                       ]);
+                    break;
+                default:
+                    // Utilizadores (Utentes)
+                    baseQuery = baseQuery
+                        .Include(t => t.Nurse)
+                        .Include(t => t.Pathology)
+                        .Include(t => t.TreatmentType)
+                        .AsNoTracking();
+                    break;
             }
 
             // Aplica filtragem com os parametros atuais
