@@ -50,6 +50,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.ConsumivelFornecedor> ConsumivelFornecedor { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Consumivel> Consumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Stock> Stock { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.UsoConsumivel> AuditoriaConsumivel { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.AuditoriaConsumivel> AuditoriaConsumivel { get; set; } = default!;
+        public DbSet<LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; }
+
     }
 }

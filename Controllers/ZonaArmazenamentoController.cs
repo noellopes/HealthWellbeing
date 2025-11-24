@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
@@ -22,21 +22,23 @@ namespace HealthWellbeing.Controllers
         // GET: ZonaArmazenamento
         public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchLocalizacao = "")
         {
-            var zonasQuery = _context.ZonaArmazenamento.AsQueryable();
+            var zonasQuery = _context.ZonaArmazenamento
+                .Include(z => z.LocalizacaoZonaArmazenamento)
+                .AsQueryable();
 
-            // Pesquisa
+            // Pesquisa por nome
             if (!string.IsNullOrEmpty(searchNome))
                 zonasQuery = zonasQuery.Where(z => z.Nome.Contains(searchNome));
 
+            // Pesquisa por localização (Nome da localização)
             if (!string.IsNullOrEmpty(searchLocalizacao))
-                zonasQuery = zonasQuery.Where(z => z.Localizacao.Contains(searchLocalizacao));
+                zonasQuery = zonasQuery.Where(z => z.LocalizacaoZonaArmazenamento.Nome.Contains(searchLocalizacao));
 
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
 
             // Paginação
             int totalZonas = await zonasQuery.CountAsync();
-
             var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 10);
 
             pagination.Items = await zonasQuery
@@ -48,13 +50,16 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // GET: ZonaArmazenamento/Details/5
+        // GET: Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
                 return NotFound();
 
-            var zona = await _context.ZonaArmazenamento.FirstOrDefaultAsync(m => m.Id == id);
+            var zona = await _context.ZonaArmazenamento
+                .Include(z => z.LocalizacaoZonaArmazenamento)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (zona == null)
                 return NotFound();
 
@@ -62,12 +67,16 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Create
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome");
+            return View();
+        }
 
         // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,Localizacao,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,LocalizacaoZonaArmazenamentoId,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
         {
             if (ModelState.IsValid)
             {
@@ -77,6 +86,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
             TempData["ErrorMessage"] = "❌ Erro ao criar a zona.";
             return View(zona);
         }
@@ -91,13 +101,14 @@ namespace HealthWellbeing.Controllers
             if (zona == null)
                 return NotFound();
 
+            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
             return View(zona);
         }
 
         // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,Localizacao,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,LocalizacaoZonaArmazenamentoId,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
         {
             if (id != zona.Id)
                 return NotFound();
@@ -121,6 +132,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
             TempData["ErrorMessage"] = "❌ Erro ao editar a zona.";
             return View(zona);
         }
@@ -131,7 +143,10 @@ namespace HealthWellbeing.Controllers
             if (id == null)
                 return NotFound();
 
-            var zona = await _context.ZonaArmazenamento.FirstOrDefaultAsync(m => m.Id == id);
+            var zona = await _context.ZonaArmazenamento
+                .Include(z => z.LocalizacaoZonaArmazenamento)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (zona == null)
                 return NotFound();
 
