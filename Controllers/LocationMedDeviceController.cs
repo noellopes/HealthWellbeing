@@ -92,43 +92,94 @@ namespace HealthWellbeingRoom.Controllers
             return View(location);
         }
 
-        // GET: LocationMedDevice/Create
-        public IActionResult Create()
+        // GET: LocationMedDevice/Create/16
+        // O parâmetro 'id' é o ID do dispositivo que está a ser movido.
+        public async Task<IActionResult> Create(int? id)
         {
-            ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name");
+            if (id == null)
+            {
+                // Se a chamada for genérica (sem ID), carrega a lista completa
+                ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name");
+            }
+            else
+            {
+                // 1. Encontra o dispositivo para garantir que existe e obter o nome
+                var dispositivo = await _context.MedicalDevices.FindAsync(id.Value);
+
+                if (dispositivo == null)
+                {
+                    return NotFound();
+                }
+
+                // 2. Passa o ID e o Nome do dispositivo para a View.
+                // O ID é passado no Model/ViewBag. O utilizador NÃO PODE ESCOLHER OUTRO DISPOSITIVO.
+                ViewBag.DispositivoMedicoID = id.Value;
+                ViewBag.DeviceName = dispositivo.Name;
+
+                // 3. Cria um SelectList com APENAS o dispositivo atual (opcional, mas claro)
+                ViewBag.MedicalDeviceID = new SelectList(
+                    new List<MedicalDevice> { dispositivo }, // Lista de 1 item
+                    "MedicalDeviceID",
+                    "Name",
+                    id.Value
+                );
+            }
+
+            // Carrega a lista de Salas (Rooms)
             ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name");
-            return View(new LocationMedDevice());
+
+            // Retorna a View
+            return View(new LocationMedDevice { MedicalDeviceID = id.GetValueOrDefault() });
         }
 
         // POST: LocationMedDevice/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MedicalDeviceID,RoomId,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
+        public async Task<IActionResult> Create([Bind("MedicalDeviceID,RoomId")] LocationMedDevice locationMedDevice)
         {
             if (ModelState.IsValid)
             {
-                locationMedDevice.IsCurrent = true;
+                // 1. Encerrar o registo anterior (UPDATE LocationMedDevice)
+                var registoAnterior = await _context.LocationMedDevice
+                    .FirstOrDefaultAsync(l => l.MedicalDeviceID == locationMedDevice.MedicalDeviceID && l.EndDate == null);
 
-                var device = await _context.MedicalDevices
-                    .Include(d => d.LocalizacaoDispMedicoMovel)
-                    .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
-
-                if (device != null)
+                if (registoAnterior != null)
                 {
-                    var currentLocations = device.LocalizacaoDispMedicoMovel
-                        .Where(l => l.IsCurrent)
-                        .ToList();
-
-                    foreach (var loc in currentLocations)
-                        loc.IsCurrent = false;
+                    registoAnterior.EndDate = DateTime.Now;
+                    _context.Update(registoAnterior);
                 }
 
+                // 2. Criar o novo registo ATIVO (INSERT LocationMedDevice)
+                locationMedDevice.InitialDate = DateTime.Now;
+                locationMedDevice.EndDate = null;
+                locationMedDevice.IsCurrent = true; // Mantemos a propriedade do seu colega, se necessária
+
                 _context.Add(locationMedDevice);
+
+                // 3. 🎯 CORREÇÃO: Atualizar o Status do Dispositivo Médico (UPDATE MedicalDevice)
+                var dispositivo = await _context.MedicalDevices
+                    .FirstOrDefaultAsync(d => d.MedicalDeviceID == locationMedDevice.MedicalDeviceID);
+
+                if (dispositivo != null)
+                {
+                    if (dispositivo.IsUnderMaintenance)
+                    {
+                        dispositivo.IsUnderMaintenance = false; // Tira da manutenção para poder ser alocado/movido
+                        _context.Update(dispositivo);
+                    }
+                    _context.Update(dispositivo);
+                }
+
+                // 4. Salvar todas as alterações (Antiga Localização, Nova Localização e Status do Dispositivo)
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = $"Dispositivo '{dispositivo.Name}' movido com sucesso para a Sala {locationMedDevice.RoomId}!";
+
+                // Redireciona para os Detalhes do Dispositivo (para ver o novo estado)
+                return RedirectToAction("Details", "MedicalDevice", new { id = locationMedDevice.MedicalDeviceID });
             }
 
+            // Recarregar ViewBags em caso de falha
             ViewBag.MedicalDeviceID = new SelectList(_context.MedicalDevices, "MedicalDeviceID", "Name", locationMedDevice.MedicalDeviceID);
             ViewBag.RoomId = new SelectList(_context.Room, "RoomId", "Name", locationMedDevice.RoomId);
 
