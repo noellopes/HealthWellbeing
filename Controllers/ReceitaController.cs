@@ -24,8 +24,8 @@ namespace HealthWellbeing.Controllers
         {
             // Base query
             var query = _context.Receita
-                .Include(r => r.ReceitaComponentes)
-                    .ThenInclude(rc => rc.ComponenteReceita)
+                .Include(r => r.Componentes)
+                    .ThenInclude(c => c.Alimento)
                 .AsQueryable();
 
             // Filter by name (if provided)
@@ -83,9 +83,8 @@ namespace HealthWellbeing.Controllers
             }
 
             var receita = await _context.Receita
-                .Include(r => r.ReceitaComponentes)
-                    .ThenInclude(rc => rc.ComponenteReceita!)
-                        .ThenInclude(c => c.Alimento)
+                .Include(r => r.Componentes)
+                    .ThenInclude(c => c.Alimento)
                 .FirstOrDefaultAsync(m => m.ReceitaId == id);
             
             if (receita == null)
@@ -94,13 +93,13 @@ namespace HealthWellbeing.Controllers
             }
 
             // Carregar componentes relacionados com detalhes do alimento
-            var componentesDetalhados = receita.ReceitaComponentes
-                .Select(rc => new {
-                    rc.ComponenteReceita!.ComponenteReceitaId,
-                    AlimentoNome = rc.ComponenteReceita.Alimento!.Name,
-                    rc.ComponenteReceita.Quantidade,
-                    Unidade = rc.ComponenteReceita.UnidadeMedida.ToString(),
-                    rc.ComponenteReceita.IsOpcional
+            var componentesDetalhados = receita.Componentes
+                .Select(c => new {
+                    c.ComponenteReceitaId,
+                    AlimentoNome = c.Alimento!.Name,
+                    c.Quantidade,
+                    Unidade = c.UnidadeMedida.ToString(),
+                    c.IsOpcional
                 })
                 .ToList<dynamic>();
             
@@ -129,16 +128,6 @@ namespace HealthWellbeing.Controllers
         // GET: Receita/Create
         public IActionResult Create()
         {
-            // Carregar componentes com informações do alimento
-            var componentes = _context.ComponenteReceita
-                .Include(c => c.Alimento)
-                .Select(c => new {
-                    c.ComponenteReceitaId,
-                    Display = $"{c.Alimento!.Name} - {c.Quantidade} {c.UnidadeMedida}" + 
-                              (c.IsOpcional ? " (Opcional)" : "")
-                })
-                .ToList();
-            
             // Carregar restrições com tipo e gravidade
             var restricoes = _context.RestricaoAlimentar
                 .Select(r => new {
@@ -147,7 +136,6 @@ namespace HealthWellbeing.Controllers
                 })
                 .ToList();
            
-            ViewData["ComponentesReceita"] = new MultiSelectList(componentes, "ComponenteReceitaId", "Display");
             ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display");
             return View();
         }
@@ -157,27 +145,12 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita, int[] ComponentesReceitaId)
+        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(receita);
                 await _context.SaveChangesAsync();
-
-                // Add the N:N relationships for componentes
-                if (ComponentesReceitaId != null && ComponentesReceitaId.Length > 0)
-                {
-                    foreach (var componenteId in ComponentesReceitaId)
-                    {
-                        var receitaComponente = new ReceitaComponente
-                        {
-                            ReceitaId = receita.ReceitaId,
-                            ComponenteReceitaId = componenteId
-                        };
-                        _context.ReceitaComponente.Add(receitaComponente);
-                    }
-                    await _context.SaveChangesAsync();
-                }
 
                 TempData["AlertMessage"] = $"Receita '{receita.Nome}' criada com sucesso!";
                 TempData["AlertType"] = "success";
@@ -196,7 +169,8 @@ namespace HealthWellbeing.Controllers
             }
 
             var receita = await _context.Receita
-                .Include(r => r.ReceitaComponentes)
+                .Include(r => r.Componentes)
+                    .ThenInclude(c => c.Alimento)
                 .FirstOrDefaultAsync(r => r.ReceitaId == id);
             
             if (receita == null)
@@ -208,16 +182,6 @@ namespace HealthWellbeing.Controllers
             {
                 return Problem("Required data is missing in the database.");
             }
-
-            // Carregar componentes com informações do alimento
-            var componentes = _context.ComponenteReceita
-                .Include(c => c.Alimento)
-                .Select(c => new {
-                    c.ComponenteReceitaId,
-                    Display = $"{c.Alimento!.Name} - {c.Quantidade} {c.UnidadeMedida}" + 
-                              (c.IsOpcional ? " (Opcional)" : "")
-                })
-                .ToList();
             
             // Carregar restrições com tipo e gravidade
             var restricoes = _context.RestricaoAlimentar
@@ -226,13 +190,6 @@ namespace HealthWellbeing.Controllers
                     Display = $"{r.Nome} - {r.Tipo} ({r.Gravidade})"
                 })
                 .ToList();
-
-            // Get currently selected component IDs
-            var selectedComponentes = receita.ReceitaComponentes
-                .Select(rc => rc.ComponenteReceitaId)
-                .ToList();
-
-            ViewData["ComponentesReceita"] = new MultiSelectList(componentes, "ComponenteReceitaId", "Display", selectedComponentes);
             ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display", receita.RestricoesAlimentarId);
             return View(receita);
         }
@@ -242,7 +199,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita, int[] ComponentesReceitaId)
+        public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita)
         {
             if (id != receita.ReceitaId)
             {
@@ -254,26 +211,6 @@ namespace HealthWellbeing.Controllers
                 try
                 {
                     _context.Update(receita);
-                    
-                    // Remove existing component relationships
-                    var existingComponentes = await _context.ReceitaComponente
-                        .Where(rc => rc.ReceitaId == receita.ReceitaId)
-                        .ToListAsync();
-                    _context.ReceitaComponente.RemoveRange(existingComponentes);
-
-                    // Add new component relationships
-                    if (ComponentesReceitaId != null && ComponentesReceitaId.Length > 0)
-                    {
-                        foreach (var componenteId in ComponentesReceitaId)
-                        {
-                            var receitaComponente = new ReceitaComponente
-                            {
-                                ReceitaId = receita.ReceitaId,
-                                ComponenteReceitaId = componenteId
-                            };
-                            _context.ReceitaComponente.Add(receitaComponente);
-                        }
-                    }
 
                     await _context.SaveChangesAsync();
 
@@ -305,6 +242,8 @@ namespace HealthWellbeing.Controllers
             }
 
             var receita = await _context.Receita
+                .Include(r => r.Componentes)
+                    .ThenInclude(c => c.Alimento)
                 .FirstOrDefaultAsync(m => m.ReceitaId == id);
             if (receita == null)
             {

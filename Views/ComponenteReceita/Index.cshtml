@@ -91,6 +91,7 @@
     <thead class="table-light">
         <tr>
             <th>Alimento</th>
+            <th>Receita</th>
             <th>@Html.DisplayNameFor(model => model.UnidadeMedida)</th>
             <th>@Html.DisplayNameFor(model => model.Quantidade)</th>
             <th>@Html.DisplayNameFor(model => model.IsOpcional)</th>
@@ -100,7 +101,8 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-                <td>@Html.DisplayFor(modelItem => item.Alimento.Name)</td>
+                <td>@(item.Alimento?.Name ?? "-")</td>
+                <td>@(item.Receita?.Nome ?? "-")</td>
                 <td>@Html.DisplayFor(modelItem => item.UnidadeMedida)</td>
                 <td>@Html.DisplayFor(modelItem => item.Quantidade)</td>
                 <td>@(item.IsOpcional ? "Sim" : "Não")</td>

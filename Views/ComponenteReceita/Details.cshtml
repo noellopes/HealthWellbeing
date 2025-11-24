@@ -27,6 +27,9 @@
             <dt class="col-sm-4">Alimento</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.Alimento.Name)</dd>
 
+            <dt class="col-sm-4">Receita</dt>
+            <dd class="col-sm-8">@(Model.Receita?.Nome ?? "-")</dd>
+
             <dt class="col-sm-4">@Html.DisplayNameFor(model => model.UnidadeMedida)</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.UnidadeMedida)</dd>
 
