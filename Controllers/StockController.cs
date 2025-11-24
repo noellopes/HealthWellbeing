@@ -93,8 +93,8 @@ namespace HealthWellbeing.Controllers
         public IActionResult Index(string searchNome = "", string searchZona = "", bool stockCritico = false)
         {
             GarantirStockBase();
-            
 
+            
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
