@@ -28,7 +28,6 @@ namespace HealthWellbeingRoom.Controllers
             // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .AsQueryable();
@@ -99,7 +98,6 @@ namespace HealthWellbeingRoom.Controllers
 
             var equipment = await _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
@@ -116,7 +114,6 @@ namespace HealthWellbeingRoom.Controllers
         public IActionResult Create()
         {
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View();
@@ -127,7 +124,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
+        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (ModelState.IsValid)
             {
@@ -142,7 +139,6 @@ namespace HealthWellbeingRoom.Controllers
                 );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -164,7 +160,6 @@ namespace HealthWellbeingRoom.Controllers
                 return View("NotFound");
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -175,7 +170,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
             {
@@ -213,7 +208,6 @@ namespace HealthWellbeingRoom.Controllers
                 );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -230,7 +224,6 @@ namespace HealthWellbeingRoom.Controllers
 
             var equipment = await _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);

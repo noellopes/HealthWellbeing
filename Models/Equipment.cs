@@ -25,11 +25,6 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "Data de compra é obrigatório.")]
         public required DateTime PurchaseDate { get; set; }
 
-        [Required(ErrorMessage = "Fabricante é obrigatório.")]
-        public int ManufacturerId { get; set; }
-
-        public Manufacturer? Manufacturer { get; set; }
-
         [Required(ErrorMessage = "Tipo de Equipamento é obrigatório.")]
         public int EquipmentTypeId { get; set; }
 

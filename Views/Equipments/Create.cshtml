@@ -61,25 +61,13 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <div class="form-group mb-3">
-                        <label asp-for="ManufacturerId" class="form-label fw-bold">Fabricante</label>
-                        <select asp-for="ManufacturerId" class="form-select" asp-items="ViewBag.ManufacturerId">
-                            <option value="">-- Selecione o Fabricante --</option>
-                        </select>
-                        <span asp-validation-for="ManufacturerId" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="SerialNumber" class="form-label fw-bold">Nº de Série</label>
                         <input asp-for="SerialNumber" class="form-control" placeholder="Ex: SXR-04937" />
                         <span asp-validation-for="SerialNumber" class="text-danger small"></span>
                     </div>
                 </div>
-            </div>
 
-            <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label asp-for="PurchaseDate" class="form-label fw-bold">Data Compra</label>
@@ -87,8 +75,10 @@
                         <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-6">
+            <div class="row mb-3">
+                <div class="col-md-12">
                     <div class="form-group">
                         <label asp-for="Description" class="form-label fw-bold">Descrição</label>
                         <textarea asp-for="Description" rows="4" class="form-control"></textarea>

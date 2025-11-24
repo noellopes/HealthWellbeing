@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,19 +36,6 @@ namespace HealthWellbeingRoom.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EquipmentStatus", x => x.EquipmentStatusId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EquipmentType",
-                columns: table => new
-                {
-                    EquipmentTypeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EquipmentType", x => x.EquipmentTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -186,6 +173,26 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EquipmentType",
+                columns: table => new
+                {
+                    EquipmentTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ManufacturerId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EquipmentType", x => x.EquipmentTypeId);
+                    table.ForeignKey(
+                        name: "FK_EquipmentType_Manufacturer_ManufacturerId",
+                        column: x => x.ManufacturerId,
+                        principalTable: "Manufacturer",
+                        principalColumn: "ManufacturerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Room",
                 columns: table => new
                 {
@@ -279,7 +286,6 @@ namespace HealthWellbeingRoom.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ManufacturerId = table.Column<int>(type: "int", nullable: false),
                     EquipmentTypeId = table.Column<int>(type: "int", nullable: false),
                     EquipmentStatusId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -297,12 +303,6 @@ namespace HealthWellbeingRoom.Migrations
                         column: x => x.EquipmentTypeId,
                         principalTable: "EquipmentType",
                         principalColumn: "EquipmentTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Equipment_Manufacturer_ManufacturerId",
-                        column: x => x.ManufacturerId,
-                        principalTable: "Manufacturer",
-                        principalColumn: "ManufacturerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Equipment_Room_RoomId",
@@ -389,14 +389,14 @@ namespace HealthWellbeingRoom.Migrations
                 column: "EquipmentTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Equipment_ManufacturerId",
-                table: "Equipment",
-                column: "ManufacturerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Equipment_RoomId",
                 table: "Equipment",
                 column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EquipmentType_ManufacturerId",
+                table: "EquipmentType",
+                column: "ManufacturerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocalizacaoDispMovel_temporario_MedicalDeviceID",
@@ -476,9 +476,6 @@ namespace HealthWellbeingRoom.Migrations
                 name: "EquipmentType");
 
             migrationBuilder.DropTable(
-                name: "Manufacturer");
-
-            migrationBuilder.DropTable(
                 name: "MedicalDevices");
 
             migrationBuilder.DropTable(
@@ -486,6 +483,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
+
+            migrationBuilder.DropTable(
+                name: "Manufacturer");
 
             migrationBuilder.DropTable(
                 name: "TypeMaterial");
