@@ -365,6 +365,42 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AvaliacaoFisica",
+                columns: table => new
+                {
+                    AvaliacaoFisicaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DataMedicao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Peso = table.Column<float>(type: "real", nullable: false),
+                    Altura = table.Column<float>(type: "real", nullable: false),
+                    GorduraCorporal = table.Column<float>(type: "real", nullable: false),
+                    MassaMuscular = table.Column<float>(type: "real", nullable: false),
+                    Pescoco = table.Column<float>(type: "real", nullable: true),
+                    Ombros = table.Column<float>(type: "real", nullable: true),
+                    Peitoral = table.Column<float>(type: "real", nullable: true),
+                    BracoDireito = table.Column<float>(type: "real", nullable: true),
+                    BracoEsquerdo = table.Column<float>(type: "real", nullable: true),
+                    Cintura = table.Column<float>(type: "real", nullable: true),
+                    Abdomen = table.Column<float>(type: "real", nullable: true),
+                    Anca = table.Column<float>(type: "real", nullable: true),
+                    CoxaDireita = table.Column<float>(type: "real", nullable: true),
+                    CoxaEsquerda = table.Column<float>(type: "real", nullable: true),
+                    GemeoDireito = table.Column<float>(type: "real", nullable: true),
+                    GemeoEsquerdo = table.Column<float>(type: "real", nullable: true),
+                    UtenteGrupo7Id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AvaliacaoFisica", x => x.AvaliacaoFisicaId);
+                    table.ForeignKey(
+                        name: "FK_AvaliacaoFisica_UtenteGrupo7_UtenteGrupo7Id",
+                        column: x => x.UtenteGrupo7Id,
+                        principalTable: "UtenteGrupo7",
+                        principalColumn: "UtenteGrupo7Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sono",
                 columns: table => new
                 {
@@ -420,6 +456,11 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaAlimentoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AvaliacaoFisica_UtenteGrupo7Id",
+                table: "AvaliacaoFisica",
+                column: "UtenteGrupo7Id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExercicioEquipamento_EquipamentoId",
                 table: "ExercicioEquipamento",
                 column: "EquipamentoId");
@@ -460,6 +501,9 @@ namespace HealthWellbeing.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Alergia");
+
+            migrationBuilder.DropTable(
+                name: "AvaliacaoFisica");
 
             migrationBuilder.DropTable(
                 name: "ExercicioEquipamento");

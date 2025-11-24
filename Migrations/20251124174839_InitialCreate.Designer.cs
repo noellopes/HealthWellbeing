@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251120194120_InitialCreate")]
+    [Migration("20251124174839_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -101,6 +101,75 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("CategoriaAlimentoId");
 
                     b.ToTable("Alimento");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.AvaliacaoFisica", b =>
+                {
+                    b.Property<int>("AvaliacaoFisicaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AvaliacaoFisicaId"));
+
+                    b.Property<float?>("Abdomen")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Altura")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Anca")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("BracoDireito")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("BracoEsquerdo")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Cintura")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("CoxaDireita")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("CoxaEsquerda")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("DataMedicao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<float?>("GemeoDireito")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("GemeoEsquerdo")
+                        .HasColumnType("real");
+
+                    b.Property<float>("GorduraCorporal")
+                        .HasColumnType("real");
+
+                    b.Property<float>("MassaMuscular")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Ombros")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Peitoral")
+                        .HasColumnType("real");
+
+                    b.Property<float?>("Pescoco")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Peso")
+                        .HasColumnType("real");
+
+                    b.Property<int>("UtenteGrupo7Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("AvaliacaoFisicaId");
+
+                    b.HasIndex("UtenteGrupo7Id");
+
+                    b.ToTable("AvaliacaoFisica");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Beneficio", b =>
@@ -578,6 +647,17 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.AvaliacaoFisica", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.UtenteGrupo7", "UtenteGrupo7")
+                        .WithMany()
+                        .HasForeignKey("UtenteGrupo7Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UtenteGrupo7");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ExercicioEquipamento", b =>

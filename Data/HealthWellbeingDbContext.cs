@@ -98,5 +98,6 @@ namespace HealthWellbeing.Data
         }
         public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
+        public DbSet<AvaliacaoFisica> AvaliacaoFisica { get; set; } = default!;
     }
 }
