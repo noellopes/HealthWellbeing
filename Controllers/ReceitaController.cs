@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using System.Text.Json;
 
 namespace HealthWellbeing.Controllers
 {
@@ -137,30 +138,67 @@ namespace HealthWellbeing.Controllers
                 .ToList();
            
             ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display");
+
+            ViewBag.Alimentos = new SelectList(_context.Alimentos.OrderBy(a => a.Name).ToList(), "AlimentoId", "Name");
             return View();
         }
 
         // POST: Receita/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita)
+        public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita, string? PendingComponentesJson)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(receita);
                 await _context.SaveChangesAsync();
 
+                if (!string.IsNullOrWhiteSpace(PendingComponentesJson))
+                {
+                    try
+                    {
+                        var comps = JsonSerializer.Deserialize<List<PendingCompDto>>(PendingComponentesJson);
+                        if (comps != null && comps.Any())
+                        {
+                            var toAdd = comps.Select(pc => new ComponenteReceita
+                            {
+                                AlimentoId = pc.AlimentoId,
+                                ReceitaId = receita.ReceitaId,
+                                UnidadeMedida = Enum.Parse<UnidadeMedidaEnum>(pc.UnidadeMedida),
+                                Quantidade = pc.Quantidade,
+                                IsOpcional = pc.IsOpcional
+                            }).ToList();
+
+                            _context.ComponenteReceita.AddRange(toAdd);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    catch
+                    {
+                        // Não interrompe a criação da receita
+                    }
+                }
+
                 TempData["AlertMessage"] = $"Receita '{receita.Nome}' criada com sucesso!";
                 TempData["AlertType"] = "success";
 
                 return RedirectToAction(nameof(Index));
             }
+
+            var restricoes = _context.RestricaoAlimentar
+                .Select(r => new
+                {
+                    r.RestricaoAlimentarId,
+                    Display = $"{r.Nome} - {r.Tipo} ({r.Gravidade})"
+                })
+                .ToList();
+            ViewData["RestricoesAlimentares"] = new MultiSelectList(restricoes, "RestricaoAlimentarId", "Display");
+            ViewBag.Alimentos = new SelectList(_context.Alimentos.OrderBy(a => a.Name).ToList(), "AlimentoId", "Name");
             return View(receita);
         }
 
-        // GET: Receita/Edit/5
+        private record PendingCompDto(int AlimentoId, string UnidadeMedida, int Quantidade, bool IsOpcional);
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

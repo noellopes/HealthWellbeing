@@ -61,7 +61,8 @@ namespace HealthWellbeing.Controllers
             if (page > totalPages) page = totalPages;
 
             var items = await query
-                .OrderBy(c => c.ComponenteReceitaId)
+                .OrderBy(c => c.Alimento != null ? c.Alimento.Name : string.Empty)
+                .ThenBy(c => c.ComponenteReceitaId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
