@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251120125555_FullRebuildFoodHabits")]
-    partial class FullRebuildFoodHabits
+    [Migration("20251124191832_WhitFoodInTake")]
+    partial class WhitFoodInTake
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,6 +161,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FoodInTakeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -169,6 +172,8 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("FoodId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("FoodInTakeId");
 
                     b.ToTable("Food");
                 });
@@ -192,6 +197,31 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("FoodCategory");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodInTake", b =>
+                {
+                    b.Property<int>("FoodInTakeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FoodInTakeId"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Eaten")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("FoodId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FoodInTakeId");
+
+                    b.ToTable("FoodInTake");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.FoodNutritionalComponent", b =>
@@ -403,10 +433,15 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("EndingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("FoodInTakeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartingDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("PlanId");
+
+                    b.HasIndex("FoodInTakeId");
 
                     b.ToTable("Plan");
                 });
@@ -545,6 +580,10 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeing.Models.FoodInTake", null)
+                        .WithMany("Foods")
+                        .HasForeignKey("FoodInTakeId");
+
                     b.Navigation("Category");
                 });
 
@@ -643,6 +682,13 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Plan");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.FoodInTake", null)
+                        .WithMany("Plans")
+                        .HasForeignKey("FoodInTakeId");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergy", b =>
                 {
                     b.Navigation("ClientAlergies");
@@ -669,6 +715,13 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.FoodCategory", b =>
                 {
                     b.Navigation("Foods");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.FoodInTake", b =>
+                {
+                    b.Navigation("Foods");
+
+                    b.Navigation("Plans");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.NutritionalComponent", b =>

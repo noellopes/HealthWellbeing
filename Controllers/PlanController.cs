@@ -96,6 +96,25 @@ namespace HealthWellbeing.Controllers
                 ViewBag.ClientGoals = new List<Goal>();
             }
 
+            //var Plan = await _context.Plan
+            //    .Include(p => p.FoodPlans)
+            //    .ThenInclude(fp => fp.Food)
+            //    .Include(p => p.FoodPlans)
+            //    .ThenInclude(fp => fp.Portion)
+            //    .FirstOrDefaultAsync(p => p.PlanId == id);
+
+            //if (plan == null) return NotFound();
+
+            var start = plan.StartingDate.Date;
+            var end = plan.EndingDate.Date;
+
+            var intakes = await _context.FoodIntake
+                .Where(fi => fi.PlanId == plan.PlanId &&
+                             fi.Date >= start && fi.Date <= end)
+                .ToListAsync();
+
+            ViewBag.Intakes = intakes;
+
             return View(plan);
         }
 
