@@ -1,57 +1,56 @@
 ﻿@model HealthWellbeing.Models.StockMovimento
-
 @{
     ViewData["Title"] = "Detalhes da Compra";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="container mt-4">
 
-<div class="card shadow-sm">
-    <div class="card-header bg-success text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-cart-fill me-2"></i> Detalhes da Compra de Consumível
-        </h4>
+    <h2 class="fw-bold mb-4">🧾 Detalhes da Compra</h2>
+
+    <!-- Cartão suave e elegante -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light text-dark py-3" style="border-bottom: 2px solid #e6e6e6;">
+            <h5 class="mb-0">🛒 Informação da Entrada de Consumível</h5>
+        </div>
+
+        <div class="card-body p-4">
+
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-semibold">Consumível</div>
+                <div class="col-sm-8">
+                    @Model.Stock?.Consumivel?.Nome
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-semibold">Zona de Armazenamento</div>
+                <div class="col-sm-8">
+                    @Model.Stock?.Zona?.Nome
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-4 fw-semibold">Quantidade Comprada</div>
+                <div class="col-sm-8">
+                    @Model.Quantidade
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-sm-4 fw-semibold">Data</div>
+                <div class="col-sm-8">
+                    @Model.Data.ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <div class="card-body">
-        <dl class="row mb-0">
-
-            <dt class="col-sm-4 fw-bold text-muted">Consumível</dt>
-            <dd class="col-sm-8">
-                @Model.Stock?.Consumivel?.Nome ?? "<i class='text-muted'>Não disponível</i>"
-            </dd>
-
-            <dt class="col-sm-4 fw-bold text-muted">Zona de Armazenamento</dt>
-            <dd class="col-sm-8">
-                @Model.Stock?.Zona?.Nome ?? "<i class='text-muted'>Não disponível</i>"
-            </dd>
-
-            <dt class="col-sm-4 fw-bold text-muted">Quantidade Comprada</dt>
-            <dd class="col-sm-8">@Model.Quantidade</dd>
-
-            <dt class="col-sm-4 fw-bold text-muted">Tipo</dt>
-            <dd class="col-sm-8">@Model.Tipo</dd>
-
-            <dt class="col-sm-4 fw-bold text-muted">Data</dt>
-            <dd class="col-sm-8">@Model.Data.ToString("dd/MM/yyyy HH:mm")</dd>
-
-            <dt class="col-sm-4 fw-bold text-muted">Descrição</dt>
-            <dd class="col-sm-8">
-                @(!string.IsNullOrWhiteSpace(Model.Descricao)
-                                ? Model.Descricao
-                                : "<i class='text-muted'>Sem descrição</i>")
-            </dd>
-
-        </dl>
+    <!-- Botão único -->
+    <div class="d-flex justify-content-end mt-3">
+        <a asp-action="Index" class="btn btn-secondary px-4">
+            ← Voltar à Lista
+        </a>
     </div>
-</div>
 
-<div class="mt-4 d-flex justify-content-end gap-2">
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
-    </a>
-
-    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-        <i class="bi bi-trash me-1"></i> Eliminar Registo
-    </a>
 </div>

@@ -6,10 +6,19 @@
 
 <div class="container mt-4">
 
+    <!-- Mensagem de sucesso (quando uma compra é apagada) -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <!-- Cabeçalho com botões -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">
-            📥 Compras de Consumíveis
+            📥 Histórico de Compras de Consumíveis
         </h2>
 
         <div>
@@ -31,7 +40,7 @@
     @if (!compras.Any())
     {
         <!-- ALERTA QUANDO NÃO EXISTEM COMPRAS -->
-        <div class="alert alert-warning text-center py-4">
+        <div class="alert alert-warning text-center py-4 shadow-sm">
             <h4 class="fw-bold">Nenhuma compra registada</h4>
             <p>Ainda não existem entradas de stock registadas.</p>
 
@@ -44,8 +53,8 @@
     {
         <!-- TABELA DAS COMPRAS -->
         <div class="table-responsive">
-            <table class="table table-bordered table-striped shadow-sm">
-                <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
+            <table class="table table-bordered table-striped shadow-sm align-middle">
+                <thead style="background-color: #e8f1ff;" class="fw-bold text-center">
                     <tr>
                         <th>Consumível</th>
                         <th>Zona</th>

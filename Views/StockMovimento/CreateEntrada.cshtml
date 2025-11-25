@@ -4,6 +4,7 @@
     ViewData["Title"] = "Nova Compra";
 }
 
+/* Layout / estilos já usados no teu projeto */
 <div class="container mt-4">
 
     <h2 class="fw-bold text-primary mb-4">📥 Nova Compra de Consumível</h2>
@@ -14,17 +15,25 @@
         <div class="card shadow-sm">
             <div class="card-body">
 
-                <!-- Consumível -->
+                <!-- Seleção do Stock (apenas nome do consumível no texto) -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Consumível</label>
 
-                    <select asp-for="StockId" class="form-select">
+                    <select id="stockSelect" asp-for="StockId" class="form-select">
                         <option value="">-- Selecione um Consumível --</option>
 
+                        @* Cada option inclui atributos data- para o JS preencher os campos *@
                         @foreach (var s in ViewBag.Stocks)
                         {
-                            <option value="@s.StockId">
-                                @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
+                            var consumivelNome = s.Consumivel?.Nome ?? "—";
+                            var atual = (s.QuantidadeAtual).ToString();
+                            var minima = (s.QuantidadeMinima).ToString();
+                            var maxima = (s.QuantidadeMaxima).ToString();
+                            <option value="@s.StockId"
+                                    data-quantidade-atual="@atual"
+                                    data-quantidade-minima="@minima"
+                                    data-quantidade-maxima="@maxima">
+                                @consumivelNome
                             </option>
                         }
                     </select>
@@ -32,18 +41,41 @@
                     <span asp-validation-for="StockId" class="text-danger"></span>
                 </div>
 
-                <!-- Quantidade -->
+                <!-- Informações do stock (somente leitura) -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Quantidade Atual</label>
+                        <input id="quantidadeAtual" class="form-control" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Quantidade Mínima</label>
+                        <input id="quantidadeMinima" class="form-control" readonly />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Quantidade Máxima</label>
+                        <input id="quantidadeMaxima" class="form-control" readonly />
+                    </div>
+                </div>
+
+                <!-- Quantidade a comprar (sugerida pelo JS) -->
                 <div class="mb-3">
-                    <label asp-for="Quantidade" class="form-label fw-bold">Quantidade</label>
-                    <input asp-for="Quantidade" class="form-control" />
+                    <label asp-for="Quantidade" class="form-label fw-bold">Quantidade a Comprar</label>
+                    <input asp-for="Quantidade" id="quantidadeComprar" class="form-control" />
+                    <small id="sugestaoHelp" class="form-text text-muted">Será preenchido automaticamente quando escolheres o consumível.</small>
                     <span asp-validation-for="Quantidade" class="text-danger"></span>
                 </div>
+
+                @* Removemos o campo Descrição conforme pedido *@
+
             </div>
         </div>
 
         <div class="mt-4 d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-secondary px-4">❮ Voltar</a>
-            <button type="submit" class="btn btn-success px-5">✔ Confirmar Compra</button>
+
+            <button type="submit" class="btn btn-success px-5">✔ Aceitar Compra</button>
         </div>
 
     </form>
@@ -51,4 +83,58 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const stockSelect = document.getElementById('stockSelect');
+            const qAtual = document.getElementById('quantidadeAtual');
+            const qMin = document.getElementById('quantidadeMinima');
+            const qMax = document.getElementById('quantidadeMaxima');
+            const qComprar = document.getElementById('quantidadeComprar');
+            const sugestaoHelp = document.getElementById('sugestaoHelp');
+
+            function limparCampos() {
+                qAtual.value = '';
+                qMin.value = '';
+                qMax.value = '';
+                qComprar.value = '';
+                sugestaoHelp.textContent = 'Será preenchido automaticamente quando escolheres o consumível.';
+            }
+
+            function preencherCamposFromOption(opt) {
+                if (!opt || !opt.value) {
+                    limparCampos();
+                    return;
+                }
+
+                const atual = parseInt(opt.getAttribute('data-quantidade-atual') || '0', 10);
+                const minima = parseInt(opt.getAttribute('data-quantidade-minima') || '0', 10);
+                const maxima = parseInt(opt.getAttribute('data-quantidade-maxima') || '0', 10);
+
+                qAtual.value = atual;
+                qMin.value = minima;
+                qMax.value = maxima;
+
+                const sugerido = Math.max(0, maxima - atual); // o que falta para encher até max
+                qComprar.value = sugerido > 0 ? sugerido : 0;
+                sugestaoHelp.textContent = `Sugestão: comprar ${qComprar.value} (para atingir a quantidade máxima).`;
+
+                // define limite max para evitar que o utilizador peça mais que a capacidade
+                qComprar.max = sugerido;
+            }
+
+            // inicializa (caso haja um valor já selecionado no model)
+            if (stockSelect) {
+                stockSelect.addEventListener('change', function (e) {
+                    const opt = stockSelect.options[stockSelect.selectedIndex];
+                    preencherCamposFromOption(opt);
+                });
+
+                // se tiver objecto selecionado pelo servidor (ex: model), tenta preencher
+                if (stockSelect.selectedIndex > 0) {
+                    preencherCamposFromOption(stockSelect.options[stockSelect.selectedIndex]);
+                }
+            }
+        })();
+    </script>
 }
