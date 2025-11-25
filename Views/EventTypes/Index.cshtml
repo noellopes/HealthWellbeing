@@ -1,173 +1,222 @@
-﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.EventType>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.EventType>
 
 @{
     ViewData["Title"] = "Event Types";
     var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 @if (successMessage != null) {
     <div class="container py-4">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @successMessage
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+@if (errorMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4">Event Type List</h2>
-    <div class="d-flex justify-content-end">
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#eventTypeSearch" aria-expanded="false" aria-controls="eventTypeSearch">
-            <i class="bi bi-search me-1"></i> Search
-        </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Create New
-        </a>
-    </div>
-</div>
-
-<div class="collapse mt-2 mb-2" id="eventTypeSearch">
-    <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-6">
-                <label for="searchName" class="form-label">Event Type Name</label>
-                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
-            </div>
-            <div class="col-md-6">
-                <label for="searchScoringMode" class="form-label">Scoring Mode</label>
-                <select id="searchScoringMode" name="searchScoringMode" class="form-select" asp-items="ViewBag.ScoringModeList">
-                    <option value="">All Scoring Modes</option>
-                </select>
-            </div>
-
-            <div class="col-12 mt-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Search
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    Clear
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if (!Model.Items.Any()) {
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && string.IsNullOrEmpty(Context.Request.Query["searchScoringStrategyId"])) {
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
         <div class="ps-3">
             <h4 class="alert-heading">No Event Types Found</h4>
-            <p>There are no event types matching your criteria.</p>
+            <p>No event types are currently available.</p>
         </div>
     </div>
+
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Create New Event Type
+    </a>
 }
 else {
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Event Type Name</th>
-                    <th>Scoring Mode</th>
-                    <th>Multiplier</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items) {
-                    <tr>
-                        <td>@Html.DisplayFor(modelItem => item.EventTypeName)</td>
-                        <td>
-                            @if (item.EventTypeScoringMode == "fixed") {
-                                <span class="badge bg-primary">Fixo</span>
-                            }
-                            else if (item.EventTypeScoringMode == "progressive") {
-                                <span class="badge bg-success">Progressivo</span>
-                            }
-                            else if (item.EventTypeScoringMode == "time_based") {
-                                <span class="badge bg-info">Baseado em Tempo</span>
-                            }
-                            else if (item.EventTypeScoringMode == "completion") {
-                                <span class="badge bg-secondary">Conclusão</span>
-                            }
-                            else if (item.EventTypeScoringMode == "binary") {
-                                <span class="badge bg-dark">Binário</span>
-                            }
-                            else {
-                                <span class="badge bg-light text-dark">@item.EventTypeScoringMode</span>
-                            }
-                        </td>
-                        <td>
-                            @{
-                                var multiplier = item.EventTypeMultiplier;
-                                string multiplierClass;
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 text-secondary">Overview</h2>
+        <div class="d-flex justify-content-end">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#eventTypeSearch" aria-expanded="false" aria-controls="eventTypeSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Create New
+            </a>
+        </div>
+    </div>
 
-                                //  <= 1.0  -> (warning)
-                                //  1.0–1.5 -> (secondary)
-                                //  1.5–2.0 -> (info)
-                                //  > 2.0   -> (primary)
-                                if (multiplier <= 1.0m) {
-                                    multiplierClass = "badge bg-warning";
-                                }
-                                else if (multiplier <= 1.5m) {
-                                    multiplierClass = "badge bg-secondary";
-                                }
-                                else if (multiplier <= 2.0m) {
-                                    multiplierClass = "badge bg-info";
+    <div class="collapse mt-2 mb-3" id="eventTypeSearch">
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchName" class="form-label">Event Type Name</label>
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+                </div>
+                <div class="col-md-6">
+                    <label for="searchScoringStrategyId" class="form-label">Scoring Strategy</label>
+                    <select id="searchScoringStrategyId" name="searchScoringStrategyId" class="form-select" asp-items="ViewBag.ScoringStrategies">
+                        <option value="">All Strategies</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!Model.Items.Any()) {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found for your search criteria.</h5>
+            </div>
+        </div>
+    }
+    else {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Scoring Strategy</th>
+                        <th class="text-center">Multiplier</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items) {
+                        <tr>
+                            <td class="fw-bold">@Html.DisplayFor(modelItem => item.EventTypeName)</td>
+
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.EventTypeDescription) && item.EventTypeDescription.Length > 50) {
+                                    <span title="@item.EventTypeDescription">@item.EventTypeDescription.Substring(0, 50)...</span>
                                 }
                                 else {
-                                    multiplierClass = "badge bg-primary";
+                                    @(string.IsNullOrEmpty(item.EventTypeDescription) ? "-" : item.EventTypeDescription)
                                 }
-                            }
+                            </td>
 
-                            <span class="@multiplierClass fw-semibold">
-                                @multiplier.ToString("0.##")x
-                            </span>
-                        </td>
+                            <td>
+                                @{
+                                    string styleStrategy;
+                                    string iconClass;
 
-                        <td class="text-end">
-                            <a asp-action="Edit" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-                            <a asp-action="Details" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle"></i> Details
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                    
+                                    switch (item.ScoringStrategy.ScoringStrategyCode) {
+                                        case "FIXED":
+                                            styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
+                                            iconClass = "bi-pin-angle-fill";
+                                            break;
+                                        case "PROGRESSIVE":
+                                            styleStrategy = "background-color: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4;";
+                                            iconClass = "bi-graph-up-arrow";
+                                            break;
+                                        case "TIME_BASED":
+                                            styleStrategy = "background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
+                                            iconClass = "bi-stopwatch";
+                                            break;
+                                        case "COMPLETION":
+                                            styleStrategy = "background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
+                                            iconClass = "bi-check-circle";
+                                            break;
+                                        case "BINARY":
+                                            styleStrategy = "background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;";
+                                            iconClass = "bi-toggle-on";
+                                            break;
+                                        default:
+                                            styleStrategy = "background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;";
+                                            iconClass = "bi-tag";
+                                            break;
+                                    }
+                                }
+                                <span class="badge rounded-pill d-inline-flex align-items-center justify-content-center"
+                                      style="@styleStrategy font-weight: 500; width: 150px; padding: 0.5em 0;">
+                                    <i class="bi @iconClass me-2"></i> @item.ScoringStrategy.ScoringStrategyName
+                                </span>
+                            </td>
 
-        <nav aria-label="Event Types page">
-            <ul class="pagination">
-                @if (Model.CurrentPage == 1) {
-                    <li class="page-item disabled"><a class="page-link">First</a></li>
-                }
-                else {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">First</a></li>
-                }
+                            <td class="text-center">
+                                @{
+                                    var m = item.EventTypeMultiplier;
+                                    string styleMulti;
 
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
-                    if (p == Model.CurrentPage) {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                                    if (m <= 1.0m) {
+                                        styleMulti = "background-color: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6;";
+                                    }
+                                    else if (m <= 1.25m) {
+                                        styleMulti = "background-color: #e7f1ff; color: #0d6efd; border: 1px solid #cce5ff;";
+                                    }
+                                    else if (m <= 1.5m) {
+                                        styleMulti = "background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;";
+                                    }
+                                    else if (m <= 2.0m) {
+                                        styleMulti = "background-color: #9ec5fe; color: #052c65; border: 1px solid #8ec0fc;";
+                                    }
+                                    else {
+                                        styleMulti = "background-color: #0d6efd; color: #fff; border: 1px solid #0d6efd;";
+                                    }
+                                }
+                                <span class="badge rounded-1" style="@styleMulti font-size: 0.9em; min-width: 55px;">
+                                    @m.ToString("0.##")x
+                                </span>
+                            </td>
+
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-info me-1">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.EventTypeId" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
                     }
-                    else {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">@p</a></li>
-                    }
-                }
+                </tbody>
+            </table>
 
-                @if (Model.CurrentPage == Model.TotalPages) {
-                    <li class="page-item disabled"><a class="page-link">Last</a></li>
-                }
-                else {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchName="@ViewBag.SearchName" asp-route-searchScoringMode="@ViewBag.SearchScoringMode">Last</a></li>
-                }
-            </ul>
-        </nav>
-    </div>
+            <nav aria-label="Event Types page">
+                <ul class="pagination">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">First</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">@p</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@Model.TotalPages"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
 }

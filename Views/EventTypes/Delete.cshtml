@@ -1,91 +1,129 @@
 ﻿@model HealthWellbeing.Models.EventType
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Delete Event Type";
 }
 
 <div class="container py-4">
-    <h1 class="mb-4">Delete Event Type</h1>
+    <h1 class="mb-4">@ViewData["Title"]</h1>
 
-    <div class="alert alert-danger d-flex align-items-center p-4 border border-danger rounded shadow-sm" role="alert">
-        <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
-        <div class="ps-4">
-            <h4 class="alert-heading mb-2">Are you sure you want to delete this event type?</h4>
-            <p class="mb-0">This action cannot be undone.</p>
+    @if (ViewBag.Error != null) {
+        <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+            <i class="bi bi-x-octagon-fill flex-shrink-0 me-3 fs-2"></i>
+            <div>
+                <h4 class="alert-heading h5">Unable to delete!</h4>
+                <p class="mb-0">@ViewBag.Error</p>
+            </div>
         </div>
-    </div>
+    }
+    else {
+        <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-3"></i>
+            <div>
+                <h4 class="alert-heading h5">Are you sure you want to delete this event type?</h4>
+                <p class="mb-0">This action cannot be undone.</p>
+            </div>
+        </div>
+    }
 
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-light">
-            <strong>Event Type Details</strong>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-trash3 me-2"></i>Event Type Details
+            </h5>
         </div>
         <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3">Event Type Name</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.EventTypeName)</dd>
+            <dl class="row gy-3 mb-0">
 
-                <dt class="col-sm-3">Scoring Mode</dt>
-                <dd class="col-sm-9">
-                    @if (Model.EventTypeScoringMode == "fixed") {
-                        <span class="badge bg-primary">Fixo</span>
-                    }
-                    else if (Model.EventTypeScoringMode == "progressive") {
-                        <span class="badge bg-success">Progressivo</span>
-                    }
-                    else if (Model.EventTypeScoringMode == "time_based") {
-                        <span class="badge bg-info">Baseado em Tempo</span>
-                    }
-                    else if (Model.EventTypeScoringMode == "completion") {
-                        <span class="badge bg-secondary">Conclusão</span>
-                    }
-                    else if (Model.EventTypeScoringMode == "binary") {
-                        <span class="badge bg-dark">Binário</span>
-                    }
-                    else {
-                        <span class="badge bg-light text-dark">@Model.EventTypeScoringMode</span>
-                    }
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    @Html.DisplayNameFor(model => model.EventTypeName)
+                </dt>
+                <dd class="col-sm-9 fs-5 fw-bold text-dark mb-0">
+                    @Html.DisplayFor(model => model.EventTypeName)
                 </dd>
 
-                <dt class="col-sm-3">Multiplier</dt>
-                <dd class="col-sm-9">
-                    @{
-                        var multiplier = Model.EventTypeMultiplier;
-                        string multiplierClass;
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    @Html.DisplayNameFor(model => model.EventTypeDescription)
+                </dt>
+                <dd class="col-sm-9 mb-0">
+                    @(string.IsNullOrEmpty(Model.EventTypeDescription) ? "-" : Model.EventTypeDescription)
+                </dd>
 
-                        //  <= 1.0  -> (warning)
-                        //  1.0–1.5 -> (secondary)
-                        //  1.5–2.0 -> (info)
-                        //  > 2.0   -> (primary)
-                        if (multiplier <= 1.0m) {
-                            multiplierClass = "badge bg-warning";
-                        }
-                        else if (multiplier <= 1.5m) {
-                            multiplierClass = "badge bg-secondary";
-                        }
-                        else if (multiplier <= 2.0m) {
-                            multiplierClass = "badge bg-info";
-                        }
-                        else {
-                            multiplierClass = "badge bg-primary";
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    @Html.DisplayNameFor(model => model.ScoringStrategy)
+                </dt>
+                <dd class="col-sm-9 mb-0">
+                    @{
+                        string styleStrategy;
+                        string iconClass;
+
+                        switch (Model.ScoringStrategy.ScoringStrategyCode) {
+                            case "FIXED":
+                                styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
+                                iconClass = "bi-pin-angle-fill";
+                                break;
+                            case "PROGRESSIVE":
+                                styleStrategy = "background-color: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4;";
+                                iconClass = "bi-graph-up-arrow";
+                                break;
+                            case "TIME_BASED":
+                                styleStrategy = "background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
+                                iconClass = "bi-stopwatch";
+                                break;
+                            case "COMPLETION":
+                                styleStrategy = "background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
+                                iconClass = "bi-check-circle";
+                                break;
+                            case "BINARY":
+                                styleStrategy = "background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;";
+                                iconClass = "bi-toggle-on";
+                                break;
+                            default:
+                                styleStrategy = "background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;";
+                                iconClass = "bi-tag";
+                                break;
                         }
                     }
-
-                    <span class="@multiplierClass fw-semibold">
-                        @multiplier.ToString("0.##")x
+                    <span class="badge rounded-pill d-inline-flex align-items-center justify-content-center"
+                          style="@styleStrategy font-weight: 500; width: 150px; padding: 0.5em 0;">
+                        <i class="bi @iconClass me-2"></i> @Html.DisplayFor(model => model.ScoringStrategy.ScoringStrategyName)
                     </span>
                 </dd>
 
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    @Html.DisplayNameFor(model => model.EventTypeMultiplier)
+                </dt>
+                <dd class="col-sm-9 mb-0">
+                    @{
+                        var m = Model.EventTypeMultiplier;
+                        string styleMulti;
+
+                        if (m <= 1.0m) { styleMulti = "background-color: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6;"; }
+                        else if (m <= 1.25m) { styleMulti = "background-color: #e7f1ff; color: #0d6efd; border: 1px solid #cce5ff;"; }
+                        else if (m <= 1.5m) { styleMulti = "background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;"; }
+                        else if (m <= 2.0m) { styleMulti = "background-color: #9ec5fe; color: #052c65; border: 1px solid #8ec0fc;"; }
+                        else { styleMulti = "background-color: #0d6efd; color: #fff; border: 1px solid #0d6efd;"; }
+                    }
+                    <span class="badge rounded-1 d-inline-flex align-items-center justify-content-center"
+                          style="@styleMulti font-size: 0.9em; width: 80px; padding: 0.5em 0;">
+                        @m.ToString("0.##")x
+                    </span>
+                </dd>
             </dl>
         </div>
     </div>
 
-    <form asp-action="Delete" class="d-flex gap-3">
+    <form asp-action="Delete" class="d-flex justify-content-end gap-2">
         <input type="hidden" asp-for="EventTypeId" />
-        <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash-fill"></i> Delete
-        </button>
+
         <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to List
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to List
         </a>
+
+        @if (ViewBag.Error == null) {
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill me-1"></i> Delete
+            </button>
+        }
     </form>
 </div>

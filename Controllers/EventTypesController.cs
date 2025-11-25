@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using System.Data;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers {
     public class EventTypesController : Controller {
@@ -18,140 +18,127 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: EventTypes
-        public async Task<IActionResult> Index(string searchName, string searchScoringMode, int page = 1) {
-            ViewBag.SearchName = searchName;
-            ViewBag.SearchScoringMode = searchScoringMode;
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", int? searchScoringStrategyId = null) {
+            // Preparar a Query base com o Include necessário
+            var eventTypesQuery = _context.EventType
+                .Include(e => e.ScoringStrategy)
+                .AsQueryable();
 
-            
-            var scoringModeList = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "fixed", Text = "Fixo" },
-                new SelectListItem { Value = "progressive", Text = "Progressivo" },
-                new SelectListItem { Value = "time_based", Text = "Baseado em Tempo" },
-                new SelectListItem { Value = "completion", Text = "Conclusão" },
-                new SelectListItem { Value = "binary", Text = "Binário" }
-            };
-
-            
-            var selectedScoringMode = scoringModeList.FirstOrDefault(s => s.Value == searchScoringMode);
-            if (selectedScoringMode != null) {
-                selectedScoringMode.Selected = true;
-            }
-            ViewBag.ScoringModeList = scoringModeList;
-
-            var eventTypes = from et in _context.EventType select et;
-
+            // Aplicar filtros se existirem
             if (!string.IsNullOrEmpty(searchName)) {
-                eventTypes = eventTypes.Where(et => et.EventTypeName.Contains(searchName));
+                eventTypesQuery = eventTypesQuery.Where(e => e.EventTypeName.Contains(searchName));
             }
 
-            if (!string.IsNullOrEmpty(searchScoringMode)) {
-                eventTypes = eventTypes.Where(et => et.EventTypeScoringMode == searchScoringMode);
+            if (searchScoringStrategyId.HasValue) {
+                eventTypesQuery = eventTypesQuery.Where(e => e.ScoringStrategyId == searchScoringStrategyId);
             }
 
-            int pageSize = 5;
-            int totalItems = await eventTypes.CountAsync();
+            // Guardar os valores de pesquisa na ViewBag para manter o formulário preenchido
+            ViewBag.SearchName = searchName;
 
-            var pagedEventTypes = await eventTypes
-                                    .OrderBy(et => et.EventTypeName)
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToListAsync();
+            // Carregar a lista de estratégias de classificação para o dropdown de pesquisa
+            ViewData["ScoringStrategies"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", searchScoringStrategyId);
 
-            var paginationInfo = new PaginationInfo<EventType>(pagedEventTypes, totalItems, pageSize, page);
+            // Paginação
+            int numberEventTypes = await eventTypesQuery.CountAsync();
+            var eventTypesInfo = new ViewModels.PaginationInfo<EventType>(page, numberEventTypes);
 
-            return View(paginationInfo);
+            eventTypesInfo.Items = await eventTypesQuery
+                .OrderBy(e => e.EventTypeName)
+                .Skip(eventTypesInfo.ItemsToSkip)
+                .Take(eventTypesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(eventTypesInfo);
         }
 
         // GET: EventTypes/Details/5
         public async Task<IActionResult> Details(int? id) {
-            if (id == null)
+            if (id == null) {
                 return NotFound();
+            }
 
-            var eventType = await _context.EventType.FirstOrDefaultAsync(m => m.EventTypeId == id);
-            if (eventType == null)
+            var eventType = await _context.EventType
+                .Include(e => e.ScoringStrategy)
+                .FirstOrDefaultAsync(m => m.EventTypeId == id);
+
+            if (eventType == null) {
+                
                 return View("InvalidEventType");
+            }
 
             return View(eventType);
         }
 
         // GET: EventTypes/Create
         public IActionResult Create() {
-            
-            ViewBag.ScoringModes = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "fixed", Text = "Fixo" },
-                new SelectListItem { Value = "progressive", Text = "Progressivo" },
-                new SelectListItem { Value = "time_based", Text = "Baseado em Tempo" },
-                new SelectListItem { Value = "completion", Text = "Conclusão" },
-                new SelectListItem { Value = "binary", Text = "Binário" }
-            };
-
+            // Dropdown para escolher a ScoringStrategy.
+            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName");
             return View();
         }
 
         // POST: EventTypes/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeScoringMode,EventTypeMultiplier")] EventType eventType) {
+        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeDescription,ScoringStrategyId,EventTypeMultiplier")] EventType eventType) {
             if (ModelState.IsValid) {
                 _context.Add(eventType);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Event type created successfully!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details),
+                    new {
+                        id = eventType.EventTypeId,
+                        // Feedback de sucesso
+                        SuccessMessage = "Event type created successfully."
+                    }
+                );
             }
 
-            
-            ViewBag.ScoringModes = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "fixed", Text = "Fixo" },
-                new SelectListItem { Value = "progressive", Text = "Progressivo" },
-                new SelectListItem { Value = "time_based", Text = "Baseado em Tempo" },
-                new SelectListItem { Value = "completion", Text = "Conclusão" },
-                new SelectListItem { Value = "binary", Text = "Binário" }
-            };
-
+            // Se falhar, recarregar o dropdown
+            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
         // GET: EventTypes/Edit/5
         public async Task<IActionResult> Edit(int? id) {
-            if (id == null)
+            if (id == null) {
                 return NotFound();
+            }
 
             var eventType = await _context.EventType.FindAsync(id);
-            if (eventType == null)
+            if (eventType == null) {
                 return View("InvalidEventType");
+            }
 
-            
-            ViewBag.ScoringModes = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "fixed", Text = "Fixo", Selected = eventType.EventTypeScoringMode == "fixed" },
-                new SelectListItem { Value = "progressive", Text = "Progressivo", Selected = eventType.EventTypeScoringMode == "progressive" },
-                new SelectListItem { Value = "time_based", Text = "Baseado em Tempo", Selected = eventType.EventTypeScoringMode == "time_based" },
-                new SelectListItem { Value = "completion", Text = "Conclusão", Selected = eventType.EventTypeScoringMode == "completion" },
-                new SelectListItem { Value = "binary", Text = "Binário", Selected = eventType.EventTypeScoringMode == "binary" }
-            };
-
+            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
         // POST: EventTypes/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeScoringMode,EventTypeMultiplier")] EventType eventType) {
-            if (id != eventType.EventTypeId)
+        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeDescription,ScoringStrategyId,EventTypeMultiplier")] EventType eventType) {
+            if (id != eventType.EventTypeId) {
                 return NotFound();
+            }
 
             if (ModelState.IsValid) {
                 try {
                     _context.Update(eventType);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Event type updated successfully!";
+                    return RedirectToAction(nameof(Details),
+                        new {
+                            id = eventType.EventTypeId,
+                            SuccessMessage = "Event Type updated successfully."
+                        }
+                    );
                 }
                 catch (DbUpdateConcurrencyException) {
                     if (!EventTypeExists(eventType.EventTypeId)) {
-                        return NotFound();
+                        ViewBag.EventTypeWasDeleted = true;
                     }
                     else {
                         throw;
@@ -160,30 +147,24 @@ namespace HealthWellbeing.Controllers {
                 return RedirectToAction(nameof(Index));
             }
 
-            
-            ViewBag.ScoringModes = new List<SelectListItem>
-            {
-                new SelectListItem { Value = "fixed", Text = "Fixo", Selected = eventType.EventTypeScoringMode == "fixed" },
-                new SelectListItem { Value = "progressive", Text = "Progressivo", Selected = eventType.EventTypeScoringMode == "progressive" },
-                new SelectListItem { Value = "time_based", Text = "Baseado em Tempo", Selected = eventType.EventTypeScoringMode == "time_based" },
-                new SelectListItem { Value = "completion", Text = "Conclusão", Selected = eventType.EventTypeScoringMode == "completion" },
-                new SelectListItem { Value = "binary", Text = "Binário", Selected = eventType.EventTypeScoringMode == "binary" }
-            };
-
+            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
         // GET: EventTypes/Delete/5
         public async Task<IActionResult> Delete(int? id) {
-            if (id == null)
-                return NotFound();
-
-            var eventType = await _context.EventType.FirstOrDefaultAsync(m => m.EventTypeId == id);
-            if (eventType == null) {
-                TempData["ErrorMessage"] = "This Event Type is no longer available, as it has already been removed.";
+            if (id == null) {
                 return NotFound();
             }
-                
+
+            var eventType = await _context.EventType
+                .Include(e => e.ScoringStrategy)
+                .FirstOrDefaultAsync(m => m.EventTypeId == id);
+
+            if (eventType == null) {
+                TempData["ErrorMessage"] = "The Event Type is no longer available.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(eventType);
         }
@@ -198,23 +179,29 @@ namespace HealthWellbeing.Controllers {
                 try {
                     _context.EventType.Remove(eventType);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Event type deleted successfully!";
+                    TempData["SuccessMessage"] = "Event Type deleted successfully.";
                 }
-                catch(Exception) {
+                catch (Exception) {
+                    // Verifica se existem Eventos associados a este Tipo antes de apagar
                     int numberEvents = await _context.Event.Where(e => e.EventTypeId == id).CountAsync();
 
                     if (numberEvents > 0) {
-                        ViewBag.Error = $"Unable to delete Event Type. This Event Type is associated with {numberEvents} Events. To proceed with deletion, please remove all Events linked to this Event Type first.";
+                        ViewBag.Error = $"Unable to delete Event Type. It is associated with {numberEvents} Events. Remove the events first.";
                     }
                     else {
-                        ViewBag.Error = "Could not delete this Event Type. An error occurred while deleting the Event Type.";
+                        ViewBag.Error = "An error occurred while deleting the Event Type.";
                     }
-                    return View("Delete", eventType);
 
+                    // Recarregar o objeto para a View não dar erro de NullReference
+                    var eventTypeForView = await _context.EventType
+                        .Include(e => e.ScoringStrategy)
+                        .FirstOrDefaultAsync(e => e.EventTypeId == id);
+
+                    return View(eventTypeForView);
                 }
             }
-            return RedirectToAction(nameof(Index));
 
+            return RedirectToAction(nameof(Index));
         }
 
         private bool EventTypeExists(int id) {
