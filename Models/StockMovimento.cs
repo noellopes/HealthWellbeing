@@ -23,6 +23,13 @@ namespace HealthWellbeing.Models
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser maior que zero.")]
         public int Quantidade { get; set; }
 
+        // Novo: Fornecedor opcional
+        public int? FornecedorId { get; set; }
+
+        [ForeignKey("FornecedorId")]
+        [ValidateNever]
+        public Fornecedor? Fornecedor { get; set; }
+
         // Tipo do movimento - definido no Controller (NÃO pode ser Required)
         [StringLength(20)]
         public string Tipo { get; set; } = "Entrada";

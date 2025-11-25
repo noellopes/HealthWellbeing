@@ -365,6 +365,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StockId = table.Column<int>(type: "int", nullable: false),
                     Quantidade = table.Column<int>(type: "int", nullable: false),
+                    FornecedorId = table.Column<int>(type: "int", nullable: true),
                     Tipo = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Data = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
@@ -372,6 +373,11 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_StockMovimento", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StockMovimento_Fornecedor_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedor",
+                        principalColumn: "FornecedorId");
                     table.ForeignKey(
                         name: "FK_StockMovimento_Stock_StockId",
                         column: x => x.StockId,
@@ -410,6 +416,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Stock_ZonaID",
                 table: "Stock",
                 column: "ZonaID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockMovimento_FornecedorId",
+                table: "StockMovimento",
+                column: "FornecedorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StockMovimento_StockId",
@@ -454,9 +465,6 @@ namespace HealthWellbeing.Migrations
                 name: "Alergia");
 
             migrationBuilder.DropTable(
-                name: "Fornecedor");
-
-            migrationBuilder.DropTable(
                 name: "Receita");
 
             migrationBuilder.DropTable(
@@ -470,6 +478,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Alimento");
+
+            migrationBuilder.DropTable(
+                name: "Fornecedor");
 
             migrationBuilder.DropTable(
                 name: "Stock");

@@ -14,7 +14,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
 
-                <!-- Seleção do Stock -->
+                <!-- Consumível -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Consumível</label>
 
@@ -23,20 +23,9 @@
 
                         @foreach (var s in ViewBag.Stocks)
                         {
-                            bool isSelected = (Model != null && Model.StockId == s.StockId);
-
-                            if (isSelected)
-                            {
-                                <option value="@s.StockId" selected="selected">
-                                    @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
-                                </option>
-                            }
-                            else
-                            {
-                                <option value="@s.StockId">
-                                    @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
-                                </option>
-                            }
+                            <option value="@s.StockId">
+                                @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
+                            </option>
                         }
                     </select>
 
@@ -45,24 +34,15 @@
 
                 <!-- Quantidade -->
                 <div class="mb-3">
-                    <label asp-for="Quantidade" class="form-label fw-bold"></label>
+                    <label asp-for="Quantidade" class="form-label fw-bold">Quantidade</label>
                     <input asp-for="Quantidade" class="form-control" />
                     <span asp-validation-for="Quantidade" class="text-danger"></span>
                 </div>
-
-                <!-- Descrição -->
-                <div class="mb-3">
-                    <label asp-for="Descricao" class="form-label fw-bold"></label>
-                    <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Descricao" class="text-danger"></span>
-                </div>
-
             </div>
         </div>
 
         <div class="mt-4 d-flex justify-content-between">
             <a asp-action="Index" class="btn btn-secondary px-4">❮ Voltar</a>
-
             <button type="submit" class="btn btn-success px-5">✔ Confirmar Compra</button>
         </div>
 
