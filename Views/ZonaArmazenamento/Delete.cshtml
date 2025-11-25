@@ -57,22 +57,27 @@
         </div>
 
         <div class="card-body">
+
             <div class="confirm-text">
                 ⚠️ Tens a certeza que queres eliminar esta zona? Esta ação não pode ser desfeita.
             </div>
 
             <dl class="row mb-4">
+
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Localizacao)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Localizacao)</dd>
+
+                <dt class="col-sm-4 details-label">Localização</dt>
+                <dd class="col-sm-8 details-value">
+                    @Model.LocalizacaoZonaArmazenamento?.Nome
+                </dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.CapacidadeMaxima)</dd>
+                <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima m³</dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
                 <dd class="col-sm-8 details-value">
@@ -85,10 +90,12 @@
                         <span class="badge bg-secondary">Inativa</span>
                     }
                 </dd>
+
             </dl>
 
             <form asp-action="Delete" class="d-flex justify-content-end mt-3">
                 <input type="hidden" asp-for="Id" />
+
                 <button type="submit" class="btn btn-danger me-2">
                     Eliminar
                 </button>
@@ -96,6 +103,7 @@
                     Cancelar
                 </a>
             </form>
+
         </div>
     </div>
 </div>

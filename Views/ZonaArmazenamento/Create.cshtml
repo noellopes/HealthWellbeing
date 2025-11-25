@@ -54,15 +54,27 @@
                     <span asp-validation-for="Descricao" class="text-danger"></span>
                 </div>
 
+                <!-- 🔽 CAMPO ALTERADO PARA DROPDOWN -->
                 <div class="mb-3">
-                    <label asp-for="Localizacao" class="form-label"></label>
-                    <input asp-for="Localizacao" class="form-control" placeholder="Ex: Bloco A - Piso 0" />
-                    <span asp-validation-for="Localizacao" class="text-danger"></span>
+                    <label asp-for="LocalizacaoZonaArmazenamentoId" class="form-label"></label>
+
+                    <select asp-for="LocalizacaoZonaArmazenamentoId"
+                            class="form-select"
+                            asp-items="ViewBag.Localizacoes">
+                        <option value="">-- Selecionar Localização --</option>
+                    </select>
+
+                    <span asp-validation-for="LocalizacaoZonaArmazenamentoId" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="CapacidadeMaxima" class="form-label"></label>
-                    <input asp-for="CapacidadeMaxima" class="form-control" placeholder="Ex: 5000" />
+                    <input asp-for="CapacidadeMaxima"
+                           class="form-control"
+                           type="number"
+                           min="1" max="10000"
+                           step="0.1"
+                           placeholder="Ex: 5000 (m³)" />
                     <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
                 </div>
 

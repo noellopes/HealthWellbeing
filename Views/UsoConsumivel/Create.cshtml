@@ -1,0 +1,51 @@
+﻿@model List<HealthWellbeing.Models.UsoConsumivel>
+
+@{
+    ViewData["Title"] = "Adicionar Consumos";
+}
+
+<h2>Adicionar Consumo(s)</h2>
+
+<form asp-action="CreateMultiple" method="post">
+
+    <input type="hidden" name="treatmentRecordId" value="@ViewBag.TreatmentRecordId" />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Consumível</th>
+                <th>Quantidade</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody id="rows">
+            <tr>
+                <td>
+                    <select name="ConsumivelID" class="form-control">
+                        @foreach (var item in (SelectList)ViewData["ConsumivelID"])
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input name="QuantidadeUsada" class="form-control" />
+                </td>
+                <td>
+                    <input name="DataConsumo" type="date" class="form-control" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary" onclick="addRow()">+ Adicionar Linha</button>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+</form>
+
+<script>
+    function addRow() {
+        const row = document.querySelector("#rows tr").cloneNode(true);
+        document.querySelector("#rows").appendChild(row);
+    }
+</script>

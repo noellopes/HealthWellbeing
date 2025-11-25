@@ -1,0 +1,141 @@
+﻿@using HealthWellbeing.Utils.Group1
+@using HealthWellbeing.Utils.Group1.Models
+@model PaginatedList<TreatmentType>
+
+@{
+    var modelType = ViewBag.ModelType as Type;
+    var properties = ViewBag.Properties as List<string>;
+    var noConfig = modelType == null || properties == null || properties.Count == 0;
+    var noData = Model == null || !Model.Any();
+
+    if (TempData["Alert"] != null)
+    {
+        var alertJson = TempData["Alert"] as string;
+        var alertModel = alertJson == null ? null : Newtonsoft.Json.JsonConvert.DeserializeObject<AlertItem>(alertJson);
+        <partial name="Group1/Partials/Alert" model="alertModel" />
+    }
+
+    var currentSort = ViewBag.CurrentSort?.ToString() ?? "";
+}
+
+<h1 class="mb-4 text-primary fw-bold border-bottom pb-2">
+    @ViewData["Title"]
+</h1>
+
+@if (noConfig)
+{
+    <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_CONFIG_ALERT" />
+}
+else
+{
+    <!-- Ações superiores -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div></div>
+
+        <div>
+            <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch">
+                <i class="bi bi-search me-1"></i> Pesquisar
+            </a>
+
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Criar
+            </a>
+        </div>
+    </div>
+
+    <partial name="Group1/Partials/Search" />
+
+    <div class="table-responsive shadow-sm rounded">
+        @if (noData)
+        {
+            <partial name="Group1/Partials/Alert" model="Constants.DEFAULT_NO_DATA_ALERT" />
+        }
+        else
+        {
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        @foreach (var prop in properties)
+                        {
+                            string sortOrder;
+
+                            if (currentSort == prop)
+                                sortOrder = prop + "_desc";
+                            else if (currentSort == prop + "_desc")
+                                sortOrder = "";
+                            else
+                                sortOrder = prop;
+
+                            var isActiveSort = (currentSort == prop || currentSort == prop + "_desc");
+                            var isDescending = currentSort.EndsWith("_desc");
+
+                            <th class="text-nowrap">
+                                <a asp-action="Index"
+                                   asp-route-sortOrder="@sortOrder"
+                                   asp-route-searchBy="@ViewBag.CurrentSearchBy"
+                                   asp-route-searchString="@ViewBag.CurrentSearchString"
+                                   asp-route-page="@ViewBag.CurrentPage"
+                                   class="text-decoration-none @(isActiveSort ? "fw-bold text-dark" : "text-secondary")">
+
+                                    @Functions.GetDisplayName(modelType, prop.Split('.')[0])
+
+                                    @if (isActiveSort)
+                                    {
+                                        <span class="ms-1">
+                                            @if (isDescending)
+                                            {
+                                                <i class="bi bi-caret-down-fill small"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-caret-up-fill small"></i>
+                                            }
+                                        </span>
+                                    }
+                                </a>
+                            </th>
+                        }
+
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@Html.DisplayFor(modelItem => item.Name)</td>
+                            <td class="text-muted">@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td>@Html.DisplayFor(modelItem => item.EstimatedDuration) min</td>
+                            <td>@Html.DisplayFor(modelItem => item.Priority)</td>
+
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info me-1">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="mt-3">
+            <partial name="Group1/Partials/Pagination" model="new PaginationProps {
+                CurrentPage = Model?.PageIndex ?? 1,
+                PrevDisabled = !Model.HasPreviousPage,
+                NextDisabled = !Model.HasNextPage,
+                TotalPages = Model.TotalPages
+            }" />
+        </div>
+    }
+}
