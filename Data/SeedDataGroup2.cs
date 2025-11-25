@@ -11,9 +11,94 @@ namespace HealthWellbeing.Data
 
             db.Database.EnsureCreated();
 
+            PopulateLocalizacoes(db);
             PopulateCategorias(db);
             PopulateConsumiveis(db);
+            PopulateZonasArmazenamento(db);
         }
+
+        private static void PopulateLocalizacoes(HealthWellbeingDbContext db)
+        {
+            if (db.LocalizacaoZonaArmazenamento.Any()) return;
+
+            var localizacoes = new List<LocalizacaoZonaArmazenamento>
+                {
+                    new() { Nome = "Bloco A - Piso 0" },
+                    new() { Nome = "Bloco A - Piso 1" },
+                    new() { Nome = "Bloco B - Subsolo" },
+                    new() { Nome = "Armazém Central" },
+                    new() { Nome = "Armazém Secundário" },
+                    new() { Nome = "Sala de Suprimentos" },
+                    new() { Nome = "Edifício Técnico - Piso 2" },
+                    new() { Nome = "Bloco C - Piso 0" },
+                    new() { Nome = "Bloco C - Piso 1" },
+                    new() { Nome = "Bloco C - Piso 2" },
+                    new() { Nome = "Armazém de Material Clínico" },
+                    new() { Nome = "Armazém de Equipamentos Pesados" },
+                    new() { Nome = "Zona Industrial - Setor 1" },
+                    new() { Nome = "Zona Industrial - Setor 2" },
+                    new() { Nome = "Edifício Logístico - Piso 0" },
+                    new() { Nome = "Edifício Logístico - Piso 1" },
+                    new() { Nome = "Depósito Exterior Coberto" }
+                };
+
+            db.LocalizacaoZonaArmazenamento.AddRange(localizacoes);
+            db.SaveChanges();
+        }
+
+        private static void PopulateZonasArmazenamento(HealthWellbeingDbContext db)
+        {
+            if (db.ZonaArmazenamento.Any()) return;
+
+            var localizacoes = db.LocalizacaoZonaArmazenamento.ToList();
+            int Loc(string nome) => localizacoes.First(l => l.Nome == nome).Id;
+
+            var zonas = new List<ZonaArmazenamento>
+                {
+                    new() { Nome = "Armazém Central - Zona 1", Descricao = "Zona principal para armazenamento geral.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Central"), CapacidadeMaxima = 950, Ativa = true },
+                    new() { Nome = "Armazém Central - Zona Refrigerada", Descricao = "Área refrigerada para materiais sensíveis.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Central"), CapacidadeMaxima = 600, Ativa = true },
+                    new() { Nome = "Depósito Técnico A", Descricao = "Materiais técnicos e manutenção.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Técnico - Piso 2"), CapacidadeMaxima = 400, Ativa = true },
+                    new() { Nome = "Sala de Suprimentos - Armazenamento Secundário", Descricao = "Armazenamento adicional para uso rápido.", LocalizacaoZonaArmazenamentoId = Loc("Sala de Suprimentos"), CapacidadeMaxima = 300, Ativa = true },
+                    new() { Nome = "Bloco A - Stock de Emergência", Descricao = "Material de emergência e primeiros socorros.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 1"), CapacidadeMaxima = 200, Ativa = true },
+                    new() { Nome = "Bloco B - Subsolo - Armazenamento Geral", Descricao = "Armazenamento geral em zona subterrânea.", LocalizacaoZonaArmazenamentoId = Loc("Bloco B - Subsolo"), CapacidadeMaxima = 500, Ativa = true },
+                    new() { Nome = "Bloco C - Armazenamento Geral 1", Descricao = "Zona ampla para armazenamento diversificado.", LocalizacaoZonaArmazenamentoId = Loc("Bloco C - Piso 0"), CapacidadeMaxima = 750, Ativa = true },
+                    new() { Nome = "Bloco C - Armazenamento Geral 2", Descricao = "Armazenamento de materiais não perecíveis.", LocalizacaoZonaArmazenamentoId = Loc("Bloco C - Piso 1"), CapacidadeMaxima = 620, Ativa = true },
+                    new() { Nome = "Bloco C - Armazém Técnico", Descricao = "Equipamentos técnicos e ferramentas.", LocalizacaoZonaArmazenamentoId = Loc("Bloco C - Piso 2"), CapacidadeMaxima = 540, Ativa = true },
+                    new() { Nome = "Material Clínico - Zona 1", Descricao = "Material clínico de uso rotineiro.", LocalizacaoZonaArmazenamentoId = Loc("Armazém de Material Clínico"), CapacidadeMaxima = 800, Ativa = true },
+                    new() { Nome = "Material Clínico - Frigorífico", Descricao = "Produtos sensíveis que requerem refrigeração.", LocalizacaoZonaArmazenamentoId = Loc("Armazém de Material Clínico"), CapacidadeMaxima = 300, Ativa = true },
+                    new() { Nome = "Equipamentos Pesados - Zona A", Descricao = "Armazenamento de equipamentos de grande porte.", LocalizacaoZonaArmazenamentoId = Loc("Armazém de Equipamentos Pesados"), CapacidadeMaxima = 1200, Ativa = true },
+                    new() { Nome = "Equipamentos Pesados - Zona B", Descricao = "Ferramentas e equipamentos mecânicos.", LocalizacaoZonaArmazenamentoId = Loc("Armazém de Equipamentos Pesados"), CapacidadeMaxima = 950, Ativa = true },
+                    new() { Nome = "Setor Industrial - Zona 1", Descricao = "Zona dedicada a armazenamento de peças industriais.", LocalizacaoZonaArmazenamentoId = Loc("Zona Industrial - Setor 1"), CapacidadeMaxima = 1000, Ativa = true },
+                    new() { Nome = "Setor Industrial - Zona 2", Descricao = "Armazenamento de matéria-prima geral.", LocalizacaoZonaArmazenamentoId = Loc("Zona Industrial - Setor 1"), CapacidadeMaxima = 750, Ativa = true },
+                    new() { Nome = "Setor Industrial - Zona 3", Descricao = "Componentes de reposição e acessórios.", LocalizacaoZonaArmazenamentoId = Loc("Zona Industrial - Setor 2"), CapacidadeMaxima = 400, Ativa = true },
+                    new() { Nome = "Logística - Zona 0", Descricao = "Área de receção de cargas.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Logístico - Piso 0"), CapacidadeMaxima = 1500, Ativa = true },
+                    new() { Nome = "Logística - Zona 1", Descricao = "Separação de produtos e embalamento.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Logístico - Piso 1"), CapacidadeMaxima = 1300, Ativa = true },
+                    new() { Nome = "Logística - Zona 2", Descricao = "Zona auxiliar para movimentos rápidos.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Logístico - Piso 1"), CapacidadeMaxima = 700, Ativa = true },
+                    new() { Nome = "Depósito Exterior - Zona A", Descricao = "Material resistente às condições exteriores.", LocalizacaoZonaArmazenamentoId = Loc("Depósito Exterior Coberto"), CapacidadeMaxima = 1000, Ativa = true },
+                    new() { Nome = "Depósito Exterior - Zona B", Descricao = "Paletes e grandes volumes.", LocalizacaoZonaArmazenamentoId = Loc("Depósito Exterior Coberto"), CapacidadeMaxima = 1400, Ativa = true },
+                    new() { Nome = "Armazém Secundário - Zona 2", Descricao = "Armazenamento adicional de média rotação.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Secundário"), CapacidadeMaxima = 450, Ativa = true },
+                    new() { Nome = "Armazém Secundário - Zona 3", Descricao = "Materiais não críticos.", LocalizacaoZonaArmazenamentoId = Loc("Armazém Secundário"), CapacidadeMaxima = 350, Ativa = true },
+                    new() { Nome = "Bloco A - Piso 0 - Zona A", Descricao = "Produtos de acesso rápido.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 0"), CapacidadeMaxima = 500, Ativa = true },
+                    new() { Nome = "Bloco A - Piso 0 - Zona B", Descricao = "Material de suporte.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 0"), CapacidadeMaxima = 300, Ativa = true },
+                    new() { Nome = "Bloco A - Piso 1 - Zona A", Descricao = "Material médico geral.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 1"), CapacidadeMaxima = 420, Ativa = true },
+                    new() { Nome = "Bloco A - Piso 1 - Zona B", Descricao = "Armazenamento de consumíveis diversos.", LocalizacaoZonaArmazenamentoId = Loc("Bloco A - Piso 1"), CapacidadeMaxima = 380, Ativa = true },
+                    new() { Nome = "Sala de Suprimentos - Zona 1", Descricao = "Consumíveis de alta rotação.", LocalizacaoZonaArmazenamentoId = Loc("Sala de Suprimentos"), CapacidadeMaxima = 250, Ativa = true },
+                    new() { Nome = "Sala de Suprimentos - Zona 2", Descricao = "Materiais de reposição rápida.", LocalizacaoZonaArmazenamentoId = Loc("Sala de Suprimentos"), CapacidadeMaxima = 270, Ativa = true },
+                    new() { Nome = "Sala de Suprimentos - Zona 3", Descricao = "Embalagens e acessórios.", LocalizacaoZonaArmazenamentoId = Loc("Sala de Suprimentos"), CapacidadeMaxima = 200, Ativa = true },
+                    new() { Nome = "Edifício Técnico - Piso 2 - Zona A", Descricao = "Servidores e equipamentos especializados.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Técnico - Piso 2"), CapacidadeMaxima = 380, Ativa = true },
+                    new() { Nome = "Edifício Técnico - Piso 2 - Zona B", Descricao = "Peças técnicas de alta precisão.", LocalizacaoZonaArmazenamentoId = Loc("Edifício Técnico - Piso 2"), CapacidadeMaxima = 260, Ativa = true },
+                    new() { Nome = "Bloco B - Subsolo - Zona A", Descricao = "Armazenamento de grandes volumes.", LocalizacaoZonaArmazenamentoId = Loc("Bloco B - Subsolo"), CapacidadeMaxima = 800, Ativa = true },
+                    new() { Nome = "Bloco B - Subsolo - Zona B", Descricao = "Material de baixa rotação.", LocalizacaoZonaArmazenamentoId = Loc("Bloco B - Subsolo"), CapacidadeMaxima = 600, Ativa = true },
+                    new() { Nome = "Bloco B - Subsolo - Zona C", Descricao = "Produtos de longa duração.", LocalizacaoZonaArmazenamentoId = Loc("Bloco B - Subsolo"), CapacidadeMaxima = 720, Ativa = true }
+
+                };
+
+            db.ZonaArmazenamento.AddRange(zonas);
+            db.SaveChanges();
+        }
+
+
+
 
         private static void PopulateCategorias(HealthWellbeingDbContext db)
         {
