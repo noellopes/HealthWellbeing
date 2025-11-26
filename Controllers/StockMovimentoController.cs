@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,33 +15,43 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // ===============================
-        // LISTA DE MOVIMENTOS DE ENTRADA
-        // ===============================
-        public IActionResult Index()
+        // =====================================================
+        // INDEX — Histórico de Compras com Paginação
+        // =====================================================
+        public IActionResult Index(int page = 1)
         {
-            var movimentos = _context.StockMovimento
+            int itemsPerPage = 10;
+
+            var query = _context.StockMovimento
                 .Where(m => m.Tipo == "Entrada")
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Consumivel)
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Zona)
+                .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock).ThenInclude(s => s.Zona)
                 .OrderByDescending(m => m.Data)
+                .AsQueryable();
+
+            int totalMovimentos = query.Count();
+
+            var movimentosPagina = query
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToList();
 
-            return View(movimentos);
+            var paginated = new PaginationInfo<StockMovimento>(page, totalMovimentos, itemsPerPage)
+            {
+                Items = movimentosPagina
+            };
+
+            return View(paginated);
         }
 
-        // ===============================
+        // =====================================================
         // DETALHES DE UM MOVIMENTO
-        // ===============================
+        // =====================================================
         public IActionResult Details(int id)
         {
             var movimento = _context.StockMovimento
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Consumivel)
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Zona)
+                .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock).ThenInclude(s => s.Zona)
                 .FirstOrDefault(m => m.Id == id);
 
             if (movimento == null)
@@ -49,16 +60,14 @@ namespace HealthWellbeing.Controllers
             return View(movimento);
         }
 
-        // ===============================
+        // =====================================================
         // CONFIRMAR REMOÇÃO (GET)
-        // ===============================
+        // =====================================================
         public IActionResult Delete(int id)
         {
             var movimento = _context.StockMovimento
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Consumivel)
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Zona)
+                .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock).ThenInclude(s => s.Zona)
                 .FirstOrDefault(m => m.Id == id);
 
             if (movimento == null)
@@ -67,24 +76,23 @@ namespace HealthWellbeing.Controllers
             return View(movimento);
         }
 
-        // ===============================
+        // =====================================================
         // REMOVER MOVIMENTO (POST)
-        // ===============================
+        // =====================================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             var movimento = _context.StockMovimento
-                .Include(m => m.Stock)
-                    .ThenInclude(s => s.Consumivel)
+                .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
                 .FirstOrDefault(m => m.Id == id);
 
             if (movimento == null)
                 return NotFound();
 
-            // Criar mensagem personalizada
+            // Mensagem visual para o utilizador
             TempData["Success"] =
-                $"Histórico da Compra de {movimento.Quantidade} unidades de '{movimento.Stock?.Consumivel?.Nome}' foi eliminado com sucesso!";
+                $"Registo da compra de {movimento.Quantidade} unidades de '{movimento.Stock?.Consumivel?.Nome}' foi eliminado com sucesso!";
 
             _context.StockMovimento.Remove(movimento);
             _context.SaveChanges();
@@ -93,9 +101,9 @@ namespace HealthWellbeing.Controllers
         }
 
 
-        // ===============================
+        // =====================================================
         // FORMULÁRIO DE ENTRADA (GET)
-        // ===============================
+        // =====================================================
         public IActionResult CreateEntrada()
         {
             ViewBag.Stocks = _context.Stock
@@ -106,9 +114,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // ===============================
+        // =====================================================
         // PROCESSAR ENTRADA (POST)
-        // ===============================
+        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateEntrada(StockMovimento movimento)
@@ -164,9 +172,10 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ===============================
+
+        // =====================================================
         // FORMULÁRIO DE SAÍDA (GET)
-        // ===============================
+        // =====================================================
         public IActionResult CreateSaida()
         {
             ViewBag.Stocks = _context.Stock
@@ -177,9 +186,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // ===============================
+        // =====================================================
         // PROCESSAR SAÍDA (POST)
-        // ===============================
+        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateSaida(StockMovimento movimento)

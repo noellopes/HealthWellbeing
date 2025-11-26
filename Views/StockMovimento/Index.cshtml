@@ -1,12 +1,11 @@
-﻿@model IEnumerable<HealthWellbeing.Models.StockMovimento>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.StockMovimento>
 
 @{
-    ViewData["Title"] = "Compras de Consumíveis";
+    ViewData["Title"] = "Histórico de Compras";
 }
 
 <div class="container mt-4">
 
-    <!-- Mensagem de sucesso (quando uma compra é apagada) -->
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm">
@@ -15,11 +14,8 @@
         </div>
     }
 
-    <!-- Cabeçalho com botões -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">
-            📥 Histórico de Compras de Consumíveis
-        </h2>
+        <h2 class="fw-bold text-primary">📥 Histórico de Compras de Consumíveis</h2>
 
         <div>
             <a asp-controller="Stock" asp-action="Index" class="btn btn-outline-primary me-2 px-4">
@@ -32,14 +28,9 @@
         </div>
     </div>
 
-    @{
-        var compras = Model?.Where(m => m.Tipo == "Entrada").ToList()
-        ?? new List<HealthWellbeing.Models.StockMovimento>();
-    }
 
-    @if (!compras.Any())
+    @if (Model.Items == null || !Model.Items.Any())
     {
-        <!-- ALERTA QUANDO NÃO EXISTEM COMPRAS -->
         <div class="alert alert-warning text-center py-4 shadow-sm">
             <h4 class="fw-bold">Nenhuma compra registada</h4>
             <p>Ainda não existem entradas de stock registadas.</p>
@@ -51,7 +42,6 @@
     }
     else
     {
-        <!-- TABELA DAS COMPRAS -->
         <div class="table-responsive">
             <table class="table table-bordered table-striped shadow-sm align-middle">
                 <thead style="background-color: #e8f1ff;" class="fw-bold text-center">
@@ -65,7 +55,7 @@
                 </thead>
 
                 <tbody>
-                    @foreach (var item in compras)
+                    @foreach (var item in Model.Items)
                     {
                         <tr class="text-center">
                             <td>@item.Stock?.Consumivel?.Nome</td>
@@ -75,19 +65,11 @@
 
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
+                                    <a asp-action="Details" asp-route-id="@item.Id"
+                                       class="btn btn-info btn-sm text-white px-3">Ver</a>
 
-                                    <a asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-info btn-sm text-white px-3">
-                                        Ver
-                                    </a>
-
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-danger btn-sm px-3">
-                                        Eliminar
-                                    </a>
-
+                                    <a asp-action="Delete" asp-route-id="@item.Id"
+                                       class="btn btn-danger btn-sm px-3">Eliminar</a>
                                 </div>
                             </td>
                         </tr>
@@ -96,4 +78,34 @@
             </table>
         </div>
     }
+
+
+    <!-- PAGINAÇÃO -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)">«</a>
+                </li>
+            }
+
+            @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)">»</a>
+                </li>
+            }
+
+        </ul>
+    </nav>
+
 </div>

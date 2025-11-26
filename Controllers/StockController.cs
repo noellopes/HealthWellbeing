@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,9 +15,9 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // ============================
-        // GARANTIR STOCK BASE
-        // ============================
+        // ==============================================
+        // GARANTIR QUE EXISTE STOCK PARA CADA CONSUMÍVEL
+        // ==============================================
         private void GarantirStockBase()
         {
             var consumiveis = _context.Consumivel.ToList();
@@ -39,9 +40,12 @@ namespace HealthWellbeing.Controllers
                     {
                         ConsumivelID = c.ConsumivelId,
                         ZonaID = zonaEscolhida.Id,
-                        QuantidadeAtual = 0,
-                        QuantidadeMinima = 5,
-                        QuantidadeMaxima = 100, // valor padrão, agora EDITÁVEL
+
+                        // Estes valores passam a vir do modelo Consumivel
+                        QuantidadeAtual = c.QuantidadeAtual,
+                        QuantidadeMinima = c.QuantidadeMinima,
+                        QuantidadeMaxima = c.QuantidadeMaxima,
+
                         DataUltimaAtualizacao = DateTime.Now
                     });
                 }
@@ -50,58 +54,24 @@ namespace HealthWellbeing.Controllers
             _context.SaveChanges();
         }
 
-        private void CorrigirStockBase()
-        {
-            var stocks = _context.Stock.ToList();
 
-            foreach (var s in stocks)
-            {
-                // Define os teus valores-base corretos
-                s.QuantidadeMinima = 50;
-                s.QuantidadeMaxima = 150;
-
-                // Se a quantidade atual for maior que a nova máxima, ajusta
-                if (s.QuantidadeAtual > s.QuantidadeMaxima)
-                    s.QuantidadeAtual = s.QuantidadeMaxima;
-
-                s.DataUltimaAtualizacao = DateTime.Now;
-            }
-
-            _context.SaveChanges();
-        }
-
-        private void CorrigirQuantidadeAtual()
-        {
-            var stocks = _context.Stock.ToList();
-
-            foreach (var s in stocks)
-            {
-                s.QuantidadeAtual = 0;   // Reset
-                s.QuantidadeMinima = 50; // Ou outro valor base que queres
-                s.QuantidadeMaxima = 150;
-                s.DataUltimaAtualizacao = DateTime.Now;
-            }
-
-            _context.SaveChanges();
-        }
-
-
-
-        // ============================
-        // INDEX
-        // ============================
-        public IActionResult Index(string searchNome = "", string searchZona = "", bool stockCritico = false)
+        // ==============================================
+        // INDEX COM PAGINAÇÃO
+        // ==============================================
+        public IActionResult Index(
+            int page = 1,
+            string searchNome = "",
+            string searchZona = "",
+            bool stockCritico = false)
         {
             GarantirStockBase();
-            
-
-
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
                 .Include(s => s.Zona)
                 .AsQueryable();
 
+            // FILTROS
             if (!string.IsNullOrWhiteSpace(searchNome))
                 query = query.Where(s => s.Consumivel.Nome.Contains(searchNome));
 
@@ -111,12 +81,24 @@ namespace HealthWellbeing.Controllers
             if (stockCritico)
                 query = query.Where(s => s.QuantidadeAtual < s.QuantidadeMinima);
 
-            return View(query.ToList());
+            // PAGINAÇÃO
+            int totalItems = query.Count();
+            var pagination = new PaginationInfo<Stock>(page, totalItems, itemsPerPage: 10);
+
+            pagination.Items = query
+                .OrderBy(s => s.Consumivel.Nome)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToList();
+
+            return View(pagination);
         }
 
-        // ============================
+
+
+        // ==============================================
         // CREATE GET
-        // ============================
+        // ==============================================
         public IActionResult Create()
         {
             ViewBag.Consumiveis = _context.Consumivel.ToList();
@@ -124,9 +106,11 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // ============================
+
+
+        // ==============================================
         // CREATE POST
-        // ============================
+        // ==============================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stock stock)
@@ -141,8 +125,12 @@ namespace HealthWellbeing.Controllers
                 return View(stock);
             }
 
-            stock.DataUltimaAtualizacao = DateTime.Now;
+            // Os limites vêm SEMPRE do consumível
+            var cons = _context.Consumivel.Find(stock.ConsumivelID);
+            stock.QuantidadeMinima = cons.QuantidadeMinima;
+            stock.QuantidadeMaxima = cons.QuantidadeMaxima;
 
+            stock.DataUltimaAtualizacao = DateTime.Now;
             _context.Stock.Add(stock);
             _context.SaveChanges();
 
@@ -150,9 +138,11 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================
+
+
+        // ==============================================
         // DETAILS
-        // ============================
+        // ==============================================
         public IActionResult Details(int id)
         {
             var stock = _context.Stock
@@ -169,9 +159,11 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-        // ============================
+
+
+        // ==============================================
         // EDIT GET
-        // ============================
+        // ==============================================
         public IActionResult Edit(int id)
         {
             var stock = _context.Stock
@@ -188,9 +180,11 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-        // ============================
+
+
+        // ==============================================
         // EDIT POST
-        // ============================
+        // ==============================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Stock stock)
@@ -209,27 +203,11 @@ namespace HealthWellbeing.Controllers
             if (original == null)
                 return RedirectToAction(nameof(Index));
 
-            // VALIDACOES
-            if (stock.QuantidadeMinima < 0)
-                ModelState.AddModelError("QuantidadeMinima", "A quantidade mínima não pode ser negativa.");
+            // Limites vêm sempre do Consumível
+            var cons = _context.Consumivel.Find(stock.ConsumivelID);
+            original.QuantidadeMinima = cons.QuantidadeMinima;
+            original.QuantidadeMaxima = cons.QuantidadeMaxima;
 
-            if (stock.QuantidadeMaxima < stock.QuantidadeMinima)
-                ModelState.AddModelError("QuantidadeMaxima", "A quantidade máxima não pode ser menor que a mínima.");
-
-            if (original.QuantidadeAtual > stock.QuantidadeMaxima)
-                ModelState.AddModelError("QuantidadeMaxima",
-                    "A quantidade atual é maior que a nova quantidade máxima.");
-
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Consumiveis = _context.Consumivel.ToList();
-                ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
-                return View(stock);
-            }
-
-            // SALVAR ALTERACOES
-            original.QuantidadeMinima = stock.QuantidadeMinima;
-            original.QuantidadeMaxima = stock.QuantidadeMaxima;
             original.DataUltimaAtualizacao = DateTime.Now;
 
             _context.SaveChanges();
@@ -238,9 +216,11 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ============================
+
+
+        // ==============================================
         // DELETE
-        // ============================
+        // ==============================================
         public IActionResult Delete(int id)
         {
             var stock = _context.Stock
