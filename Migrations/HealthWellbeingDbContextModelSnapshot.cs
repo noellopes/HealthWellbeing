@@ -434,7 +434,10 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelCurrent")
+                    b.Property<int>("LevelNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LevelPointsLimit")
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");

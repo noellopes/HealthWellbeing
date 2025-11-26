@@ -1,47 +1,335 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Level>
+﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.Level>
+@using System.Linq
 
 @{
     ViewData["Title"] = "Levels";
+    var successMessage = TempData["SuccessMessage"] as string;
 }
 
-<h1>Levels</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
-<table class="table">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.LevelCurrent)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LevelCategory)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.LevelCurrent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LevelCategory)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.LevelId" class="btn btn-info">Details</a>
-                <a asp-action="Edit" asp-route-id="@item.LevelId" class="btn btn-warning">Edit</a> 
-                <a asp-action="Delete" asp-route-id="@item.LevelId" class="btn btn-danger">Delete</a>
-            </td>
-        </tr>
+<style>
+    #successToast {
+        min-width: 28rem;
+        max-width: 40rem;
+        border-radius: .75rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(16,185,129,0.06);
+        font-size: 1.02rem;
     }
-    </tbody>
-</table>
+
+        #successToast .toast-body {
+            padding: 1rem 1.25rem;
+            display: flex;
+            gap: .75rem;
+            align-items: center;
+            font-weight: 600;
+        }
+
+            #successToast .toast-body .bi {
+                font-size: 1.5rem;
+                opacity: .95;
+            }
+</style>
+
+<div class="container py-4">
+
+    <!-- Toast -->
+    <div class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index:1080;">
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div id="successToast" class="toast align-items-center text-bg-success border-0"
+                 role="alert" aria-live="polite" aria-atomic="true"
+                 data-bs-delay="4000" data-bs-autohide="true">
+
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-check-circle-fill text-white"></i>
+                        <div class="flex-grow-1">@successMessage</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Levels</h1>
+
+        <div class="d-flex align-items-center">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse"
+               data-bs-target="#levelSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+
+            <a class="btn btn-info me-2" data-bs-toggle="collapse" data-bs-target="#calcLevelBox">
+                <i class="bi bi-calculator"></i> Calculate Level
+            </a>
+
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> New Level
+            </a>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="collapse mt-2 mb-3 @( (ViewBag.SearchNumber!=null || ViewBag.SearchCategory!=null || ViewBag.SearchDescription!=null) ? "show" : "")"
+         id="levelSearch">
+
+        <div class="card card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label">Level Number</label>
+                    <input id="searchNumber" name="searchNumber"
+                           value="@(ViewBag.SearchNumber ?? "")"
+                           class="form-control" type="number" min="1" max="100"
+                           placeholder="Exact number (1–100)" />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Category</label>
+                    <select id="searchCategory" name="searchCategory" class="form-select">
+                        <option value="">All Categories</option>
+
+                        @{
+                            var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
+                            var selectedCat = (ViewBag.SearchCategory as string) ?? "";
+                        }
+
+                        @foreach (var c in cats)
+                        {
+                            <option value="@c" selected="@(c == selectedCat ? "selected" : null)">@c</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Description</label>
+                    <input id="searchDescription" name="searchDescription"
+                           value="@(ViewBag.SearchDescription ?? "")"
+                           class="form-control" placeholder="Contains..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Points Limit</label>
+                    <input id="searchPoints" name="searchPoints"
+                           value="@(ViewBag.SearchPoints ?? "")"
+                           class="form-control" type="number" min="0"
+                           placeholder="Exact value" />
+                </div>
+
+                <div class="col-12 mt-1 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">Clear</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Calculate Level -->
+    <!-- Calculate Level -->
+    <div class="collapse mt-2 mb-3" id="calcLevelBox">
+        <div class="card card-body">
+
+            <label class="form-label fw-bold">Calculate Level</label>
+
+            <div class="row g-3 align-items-end">
+                <!-- 1. Entrada de Pontos -->
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Total Points</label>
+                    <input id="pointsInput"
+                           type="number"
+                           min="0"
+                           class="form-control"
+                           placeholder="Enter points..." />
+                </div>
+
+                <!-- 2. Botão -->
+                <div class="col-md-2">
+                    <button id="calcBtn" class="btn btn-primary w-100">
+                        Calculate
+                    </button>
+                </div>
+
+                <!-- 3. Resultado do Nível -->
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Result</label>
+                    <input id="calcResult"
+                           type="text"
+                           class="form-control fw-bold"
+                           readonly
+                           placeholder="Level..." />
+                </div>
+
+                <!-- 4. NOVO: Pontos Restantes -->
+                <div class="col-md-4">
+                    <label class="form-label small text-muted mb-1">Next Level Progress</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">Remaining</span>
+                        <input id="calcRemaining"
+                               type="text"
+                               class="form-control"
+                               readonly
+                               placeholder="Pts left over..." />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelNumber)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelCategory)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelPointsLimit)</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(_ => item.LevelNumber)</td>
+                                    <td>@Html.DisplayFor(_ => item.LevelCategory)</td>
+                                    <td>@Html.DisplayFor(_ => item.Description)</td>
+                                    <td>@Html.DisplayFor(_ => item.LevelPointsLimit)</td>
+
+                                    <td class="text-end">
+                                        <div class="btn-group">
+
+                                            <a asp-action="Details" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               class="btn btn-sm btn-outline-info">Details</a>
+
+                                            <a asp-action="Edit" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               class="btn btn-sm btn-outline-warning">Edit</a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.LevelId"
+                                               asp-route-page="@Model.CurrentPage"
+                                               class="btn btn-sm btn-outline-danger">Delete</a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No levels found.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pager -->
+        <div class="card-footer d-flex justify-content-between align-items-center">
+
+            @{
+                var p = Model.CurrentPage;
+                var size = Model.PageSize;
+                var start = Model.TotalItems == 0 ? 0 : ((p - 1) * size + 1);
+                var end = Math.Min(Model.TotalItems, p * size);
+            }
+
+            <div class="small text-muted">
+                Showing @start - @end of @Model.TotalItems
+            </div>
+
+            <nav>
+                <ul class="pagination mb-0">
+
+                    <li class="page-item @(p == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="1">First</a>
+                    </li>
+
+                    @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                    {
+                        <li class="page-item @(i == p ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(p == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Last</a>
+                    </li>
+
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const toastEl = document.getElementById('successToast');
+            if (toastEl && bootstrap?.Toast) {
+                bootstrap.Toast.getOrCreateInstance(toastEl).show();
+            }
+
+            // --- Lógica da Calculadora ---
+            const calcInput = document.getElementById("pointsInput");
+            const calcBtn = document.getElementById("calcBtn");
+            const calcResult = document.getElementById("calcResult");
+            const calcRemaining = document.getElementById("calcRemaining"); // <--- NOVO ELEMENTO
+
+            if (calcBtn) {
+                calcBtn.addEventListener("click", async () => {
+                    const points = calcInput.value;
+
+                    // Limpar resultados anteriores se a entrada for inválida
+                    if (!points || points < 0) {
+                        calcResult.value = "";
+                        calcRemaining.value = "";
+                        alert("Please enter a valid number of points.");
+                        return;
+                    }
+
+                    // Feedback visual de carregamento
+                    calcResult.value = "...";
+                    calcRemaining.value = "...";
+
+                    try {
+                        const url = '@Url.Action("CalculateLevel", "Levels")' + `?points=${points}`;
+                        const response = await fetch(url);
+
+                        if (!response.ok) throw new Error("Network error");
+
+                        const data = await response.json();
+
+                        // Atualiza as duas caixas
+                        calcResult.value = `Level ${data.level}`;
+                        calcRemaining.value = `${data.remaining} pts`; // <--- AQUI ESTÁ O VALOR RESTANTE
+
+                    } catch (error) {
+                        console.error("Error:", error);
+                        calcResult.value = "Error";
+                        calcRemaining.value = "-";
+                    }
+                });
+            }
+        });
+    </script>
+}
+

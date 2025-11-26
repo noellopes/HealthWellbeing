@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
+<<<<<<<< HEAD:Migrations/20251125195943_MigrationConfigUpdate.Designer.cs
     [Migration("20251125195943_MigrationConfigUpdate")]
     partial class MigrationConfigUpdate
+========
+    [Migration("20251124183108_InitialClean1")]
+    partial class InitialClean1
+>>>>>>>> Grupo-8:Migrations/20251124183108_InitialClean1.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -437,7 +442,10 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LevelCurrent")
+                    b.Property<int>("LevelNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LevelPointsLimit")
                         .HasColumnType("int");
 
                     b.HasKey("LevelId");

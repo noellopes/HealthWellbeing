@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -19,139 +17,262 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Levels
-        public async Task<IActionResult> Index()
+        // Helper to render the InvalidLevel view and set 404 status code.
+        // Accepts an optional attempted Level so the view can offer "Create with these values".
+        private IActionResult InvalidLevelView(Level? attempted = null)
         {
-            return View(await _context.Level.ToListAsync());
+            Response.StatusCode = 404;
+            return View("InvalidLevel", attempted);
+        }
+
+        // Populate distinct categories into ViewBag.CategoriesList
+        private async Task PopulateCategoriesAsync()
+        {
+            var categories = await _context.Level
+                .Where(l => !string.IsNullOrWhiteSpace(l.LevelCategory))
+                .Select(l => l.LevelCategory!.Trim())
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+
+            ViewBag.CategoriesList = categories;
+        }
+
+        // GET: Levels
+        public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
+        {
+            const int pageSize = 10; // show 10 rows per page
+
+            await PopulateCategoriesAsync();
+
+            var query = _context.Level.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchNumber))
+            {
+                if (int.TryParse(searchNumber, out var parsedNumber))
+                {
+                    query = query.Where(l => l.LevelNumber == parsedNumber);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchCategory))
+            {
+                // exact match (case-insensitive) — prevents "Master" matching "Grandmaster"
+                var cat = searchCategory!.Trim().ToLower();
+                query = query.Where(l => l.LevelCategory != null && l.LevelCategory.ToLower() == cat);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchDescription))
+            {
+                var desc = searchDescription.Trim();
+                query = query.Where(l => l.Description != null && l.Description.Contains(desc));
+            }
+
+            var totalItems = await query.CountAsync();
+
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (totalPages == 0) totalPages = 1;
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            var levels = await query
+                .OrderBy(l => l.LevelNumber)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var vm = new PaginationInfo<Level>(levels, totalItems, pageSize, page);
+
+            // Preserve search inputs for the view
+            ViewBag.SearchNumber = searchNumber;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchDescription = searchDescription;
+
+            return View(vm);
         }
 
         // GET: Levels/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var level = await _context.Level
-                .FirstOrDefaultAsync(m => m.LevelId == id);
-            if (level == null)
-            {
-                return NotFound();
-            }
+            var level = await _context.Level.FirstOrDefaultAsync(m => m.LevelId == id);
+            if (level == null) return InvalidLevelView();
+
+            ViewBag.Page = page;
+            ViewBag.SearchNumber = searchNumber;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchDescription = searchDescription;
 
             return View(level);
         }
 
         // GET: Levels/Create
-        public IActionResult Create()
+        // Optional parameters allow pre-populating the Create form (used when recreating a deleted level).
+        public async Task<IActionResult> Create(int? levelNumber = null, string? levelCategory = null, string? description = null)
         {
-            return View();
+            await PopulateCategoriesAsync();
+
+            var model = new Level
+            {
+                LevelCategory = levelCategory ?? string.Empty,
+                Description = description ?? string.Empty
+            };
+
+            if (levelNumber.HasValue)
+            {
+                model.LevelNumber = levelNumber.Value;
+            }
+
+            return View(model);
         }
 
+
+        // GET: Levels/CalculateLevel
+        [HttpGet]
+        public async Task<IActionResult> CalculateLevel(int? points)
+        {
+            if (points == null || points < 0)
+                return Json(new { level = "-", remaining = points });
+
+            var levels = await _context.Level
+                .OrderBy(l => l.LevelNumber)
+                .ToListAsync();
+
+            int remaining = points.Value;
+            int level = 0;
+
+            foreach (var l in levels)
+            {
+                if (remaining >= l.LevelPointsLimit)
+                {
+                    remaining -= l.LevelPointsLimit;
+                    level = l.LevelNumber;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return Json(new { level, remaining });
+        }
+
+
         // POST: Levels/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
+        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategory,LevelPointsLimit,Description")] Level level)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(level);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Level {level.LevelNumber} created.";
                 return RedirectToAction(nameof(Index));
             }
+
+            // repopulate categories when returning view due to validation errors
+            await PopulateCategoriesAsync();
             return View(level);
         }
 
         // GET: Levels/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var level = await _context.Level.FindAsync(id);
-            if (level == null)
-            {
-                return NotFound();
-            }
+            if (level == null) return InvalidLevelView();
+
+            await PopulateCategoriesAsync();
+
+            ViewBag.Page = page;
+            ViewBag.SearchNumber = searchNumber;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchDescription = searchDescription;
             return View(level);
         }
 
         // POST: Levels/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelAtual,LevelCategory,Description")] Level level)
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategory,LevelPointsLimit,Description")] Level level, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
-            if (id != level.LevelId)
-            {
-                return NotFound();
-            }
+            if (id != level.LevelId) return NotFound();
 
             if (ModelState.IsValid)
             {
+                // Check existence first — if the level was deleted meanwhile, offer recreate option.
+                var exists = await _context.Level.AnyAsync(l => l.LevelId == level.LevelId);
+                if (!exists)
+                {
+                    return InvalidLevelView(level);
+                }
+
                 try
                 {
                     _context.Update(level);
                     await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Level {level.LevelNumber} updated successfully.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LevelExists(level.LevelId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    // If record was removed by another user, show InvalidLevel and offer recreate
+                    if (!LevelExists(level.LevelId)) return InvalidLevelView(level);
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+
+                // Redirect back to the same index page + filters
+                return RedirectToAction(nameof(Index), new { page, searchNumber, searchCategory, searchDescription });
             }
+
+            // If validation fails, preserve the routing values so the form can re-post them
+            await PopulateCategoriesAsync();
+            ViewBag.Page = page;
+            ViewBag.SearchNumber = searchNumber;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchDescription = searchDescription;
             return View(level);
         }
 
         // GET: Levels/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var level = await _context.Level
-                .FirstOrDefaultAsync(m => m.LevelId == id);
-            if (level == null)
-            {
-                return NotFound();
-            }
+            var level = await _context.Level.FirstOrDefaultAsync(m => m.LevelId == id);
+            if (level == null) return InvalidLevelView();
 
+            ViewBag.Page = page;
+            ViewBag.SearchNumber = searchNumber;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchDescription = searchDescription;
             return View(level);
         }
 
         // POST: Levels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
         {
             var level = await _context.Level.FindAsync(id);
-            if (level != null)
+            if (level == null)
             {
-                _context.Level.Remove(level);
+                // Show the InvalidLevel page if the level is already gone
+                return InvalidLevelView();
             }
 
+            _context.Level.Remove(level);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            TempData["SuccessMessage"] = $"Level {level.LevelNumber} deleted.";
+
+            // Redirect back to the same index page + filters
+            return RedirectToAction(nameof(Index), new { page, searchNumber, searchCategory, searchDescription });
         }
 
-        private bool LevelExists(int id)
-        {
-            return _context.Level.Any(e => e.LevelId == id);
-        }
+        private bool LevelExists(int id) => _context.Level.Any(e => e.LevelId == id);
     }
 }

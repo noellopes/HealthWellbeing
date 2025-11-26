@@ -1,0 +1,55 @@
+﻿@model HealthWellbeing.Models.Level?
+
+@{
+    ViewData["Title"] = "Invalid Level";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
+    <div class="ps-4">
+        <h4 class="alert-heading mb-2">Invalid Level</h4>
+        <p class="mb-0">The selected level no longer exists. It may have been removed or deleted.</p>
+    </div>
+</div>
+
+@if (Model != null)
+{
+    <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Recreate the level you were editing?</h5>
+            <p class="mb-3 text-muted">The values you entered were preserved. Do you want to recreate this level using those values?</p>
+
+            <dl class="row">
+                <dt class="col-sm-4 text-muted">Level Number</dt>
+                <dd class="col-sm-8">@Model.LevelNumber</dd>
+
+                <dt class="col-sm-4 text-muted">Category</dt>
+                <dd class="col-sm-8">@Model.LevelCategory</dd>
+
+                <dt class="col-sm-4 text-muted">Description</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
+            </dl>
+
+            <div class="mt-3 text-end">
+                <a asp-action="Create"
+                   asp-route-levelNumber="@Model.LevelNumber"
+                   asp-route-levelCategory="@Model.LevelCategory"
+                   asp-route-description="@Model.Description"
+                   class="btn btn-success me-2">
+                    <i class="bi bi-plus-lg me-1"></i> Create with these values
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="mt-4 text-end">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+        </a>
+    </div>
+}
