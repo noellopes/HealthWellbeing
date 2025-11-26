@@ -47,16 +47,15 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
-            if (treatmentRecord == null)
+            if (treatmentRecord.Data == null)
             {
                 return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
-            IReadOnlyList<string> baseProperties = ["Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "AdditionalNotes", "Observations", "CompletedDuration", "Status", "CreatedAt"];
 
             ViewData["Title"] = "Detalhes do tratamento";
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = baseProperties.ToList();
-            return View("~/Views/Shared/Group1/Actions/Details.cshtml", treatmentRecord);
+            ViewBag.ModelType = treatmentRecord.DTOType;
+            ViewBag.Properties = treatmentRecord.Selector.DisplayFields.ToList();
+            return View("~/Views/Shared/Group1/Actions/Details.cshtml", treatmentRecord.Data);
         }
 
         // GET: TreatmentRecords/Schedule
@@ -158,15 +157,15 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
-            if (treatmentRecord == null)
+            if (treatmentRecord.Data == null)
             {
                 return NotFound();
             }
 
             ViewData["Title"] = "Remover tratamento";
-            ViewBag.ModelType = typeof(TreatmentRecord);
-            ViewBag.Properties = new List<string> { "Nurse.Name", "TreatmentType.Name", "Pathology.Name", "TreatmentDate", "DurationMinutes", "Remarks", "Result", "Status", "CreatedAt" };
-            return View("~/Views/Shared/Group1/Actions/Delete.cshtml", treatmentRecord);
+            ViewBag.ModelType = treatmentRecord.DTOType;
+            ViewBag.Properties = treatmentRecord.Selector.DisplayFields.ToList();
+            return View("~/Views/Shared/Group1/Actions/Delete.cshtml", treatmentRecord.Data);
         }
 
         // POST: TreatmentRecords/Delete/5
@@ -183,14 +182,20 @@ namespace HealthWellbeing.Controllers
             else
             {
                 // Soft Delete
-                _context.TreatmentRecord.Remove(treatmentRecord);
+                bool removed = await _repository.RemoveAsync(treatmentRecord.Data.Id);
+
+                if (removed)
+                {
+                    TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O registo do tratamento foi removido com sucesso", true);
+                }
+                else
+                {
+                    TempData["Alert"] = AlertItem.CreateAlert("warning", "bi bi-exclamation-triangle", "Não foi possivel remover o registo do tratamento", true);
+                }
 
                 // Hard Delete
                 //await Functions.HardDeleteByIdAsync<TreatmentRecord>(_context, treatmentRecord.Id);
 
-                await _context.SaveChangesAsync();
-
-                TempData["Alert"] = AlertItem.CreateAlert("success", "bi bi-check-circle", "O registo do tratamento foi removido com sucesso", true);
                 return RedirectToAction(nameof(Index));
             }
         }

@@ -4,6 +4,7 @@ using HealthWellbeing.Utils.Group1.DTOs;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Data;
 using System.Security.Claims;
 
@@ -15,7 +16,7 @@ namespace HealthWellbeing.Utils.Group1.Repositories
 
         bool TreatmentRecordExists(Guid id);
 
-        Task<TreatmentRecord?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id);
+        Task<Group1DataResponseObjectSingle<TreatmentRecord, TreatmentRecordListDTO>?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id);
 
         Task<Group1DataResponseObject<TreatmentRecord, TreatmentRecordListDTO>> GetPagedTreatmentRecordsAsync(
             ClaimsPrincipal user,
@@ -24,6 +25,8 @@ namespace HealthWellbeing.Utils.Group1.Repositories
             string sortOrder,
             int page
         );
+
+        Task<bool> RemoveAsync(Guid id);
     }
 
     public class TreatmentRecordRepository : ITreatmentRecordRepository
@@ -46,28 +49,50 @@ namespace HealthWellbeing.Utils.Group1.Repositories
             return _context.TreatmentRecord.Any(e => e.Id == id);
         }
 
-        public async Task<TreatmentRecord?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id)
+        public async Task<Group1DataResponseObjectSingle<TreatmentRecord, TreatmentRecordListDTO>?> GetSingleTreatmentRecordAsync(ClaimsPrincipal user, Guid id)
         {
             if (TreatmentRecordExists(id))
             {
                 IQueryable<TreatmentRecord> baseQuery = _context.TreatmentRecord.Include(t => t.Nurse).Include(t => t.Pathology).Include(t => t.TreatmentType).AsNoTracking();
+                DtoSelector<TreatmentRecord, TreatmentRecordListDTO> selector;
+
+                selector = new(t => new TreatmentRecordListDTO
+                {
+                    Id = t.Id,
+                    Nurse = t.Nurse.Name,
+                    TreatmentType = t.TreatmentType.Name,
+                    Pathology = t.Pathology.Name,
+                    TreatmentDate = t.TreatmentDate.ToShortDateString(),
+                    CompletedDuration = t.CompletedDuration
+                }, [
+                    nameof(TreatmentRecordListDTO.Nurse),
+                    nameof(TreatmentRecordListDTO.TreatmentType),
+                    nameof(TreatmentRecordListDTO.Pathology),
+                    nameof(TreatmentRecordListDTO.TreatmentDate),
+                    nameof(TreatmentRecordListDTO.CompletedDuration)
+                ]);
+
                 switch (user)
                 {
                     case var currentUser when currentUser.IsInRole("Nurse"):
                         // Filtra os proximos tratamentos agendados atribuídos para o(a) enfermeiro(a)
                         //var nurseId = GetNurseIdFromUser(user);
                         var nurseId = Random.Shared.Next(1, 21);
-                        return await baseQuery.Where(t => t.NurseId == nurseId).FirstOrDefaultAsync(m => m.Id == id);
+                        baseQuery = baseQuery.Where(t => t.NurseId == nurseId);
                         break;
                     case var currentUser when currentUser.IsInRole("Administrator") || currentUser.IsInRole("TreatmentOfficeManager"):
-                        return await baseQuery.FirstOrDefaultAsync(m => m.Id == id);
+                        //baseQuery = baseQuery.FirstOrDefaultAsync(m => m.Id == id);
                         break;
                     default:
                         // Utilizadores (Utentes)
                         //var patientId = Random.Shared.Next(1, 21);
-                        return await baseQuery.FirstOrDefaultAsync(m => m.Id == id);
+                        //baseQuery = baseQuery.FirstOrDefaultAsync(m => m.Id == id);
                         break;
                 }
+
+                var projected = await baseQuery.Select(selector.Params).FirstOrDefaultAsync(m => m.Id == id);
+
+                return new Group1DataResponseObjectSingle<TreatmentRecord, TreatmentRecordListDTO>(projected, selector);
             }
 
             return null;
@@ -183,6 +208,18 @@ namespace HealthWellbeing.Utils.Group1.Repositories
             var paginated = await PaginatedList<TreatmentRecordListDTO>.CreateAsync(projected, page, MAX_ITEMS_PER_PAGE);
 
             return new Group1DataResponseObject<TreatmentRecord, TreatmentRecordListDTO>(paginated, selector);
+        }
+
+        // Soft Delete
+        async Task<bool> ITreatmentRecordRepository.RemoveAsync(Guid id)
+        {
+            if (TreatmentRecordExists(id))
+            {
+                await _context.TreatmentRecord.Where(c => c.Id == id).ExecuteDeleteAsync();
+                return true;
+            }
+
+            return false;
         }
     }
 }
