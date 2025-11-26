@@ -40,12 +40,7 @@ namespace HealthWellbeing.Controllers
                     {
                         ConsumivelID = c.ConsumivelId,
                         ZonaID = zonaEscolhida.Id,
-
-                        // Estes valores passam a vir do modelo Consumivel
-                        QuantidadeAtual = c.QuantidadeAtual,
-                        QuantidadeMinima = c.QuantidadeMinima,
-                        QuantidadeMaxima = c.QuantidadeMaxima,
-
+                        QuantidadeAtual = 0, // apenas isto
                         DataUltimaAtualizacao = DateTime.Now
                     });
                 }
@@ -53,7 +48,6 @@ namespace HealthWellbeing.Controllers
 
             _context.SaveChanges();
         }
-
 
         // ==============================================
         // INDEX COM PAGINAÇÃO
@@ -78,8 +72,9 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(searchZona))
                 query = query.Where(s => s.Zona.Nome.Contains(searchZona));
 
+            // stock crítico → usa limites do Consumível
             if (stockCritico)
-                query = query.Where(s => s.QuantidadeAtual < s.QuantidadeMinima);
+                query = query.Where(s => s.QuantidadeAtual < s.Consumivel.QuantidadeMinima);
 
             // PAGINAÇÃO
             int totalItems = query.Count();
@@ -94,8 +89,6 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-
-
         // ==============================================
         // CREATE GET
         // ==============================================
@@ -105,8 +98,6 @@ namespace HealthWellbeing.Controllers
             ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
             return View();
         }
-
-
 
         // ==============================================
         // CREATE POST
@@ -125,11 +116,6 @@ namespace HealthWellbeing.Controllers
                 return View(stock);
             }
 
-            // Os limites vêm SEMPRE do consumível
-            var cons = _context.Consumivel.Find(stock.ConsumivelID);
-            stock.QuantidadeMinima = cons.QuantidadeMinima;
-            stock.QuantidadeMaxima = cons.QuantidadeMaxima;
-
             stock.DataUltimaAtualizacao = DateTime.Now;
             _context.Stock.Add(stock);
             _context.SaveChanges();
@@ -137,8 +123,6 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Stock criado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
-
-
 
         // ==============================================
         // DETAILS
@@ -159,8 +143,6 @@ namespace HealthWellbeing.Controllers
             return View(stock);
         }
 
-
-
         // ==============================================
         // EDIT GET
         // ==============================================
@@ -179,8 +161,6 @@ namespace HealthWellbeing.Controllers
 
             return View(stock);
         }
-
-
 
         // ==============================================
         // EDIT POST
@@ -203,11 +183,8 @@ namespace HealthWellbeing.Controllers
             if (original == null)
                 return RedirectToAction(nameof(Index));
 
-            // Limites vêm sempre do Consumível
-            var cons = _context.Consumivel.Find(stock.ConsumivelID);
-            original.QuantidadeMinima = cons.QuantidadeMinima;
-            original.QuantidadeMaxima = cons.QuantidadeMaxima;
-
+            // Apenas propriedades editáveis
+            original.ZonaID = stock.ZonaID;
             original.DataUltimaAtualizacao = DateTime.Now;
 
             _context.SaveChanges();
@@ -215,8 +192,6 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] = "Stock atualizado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
-
-
 
         // ==============================================
         // DELETE

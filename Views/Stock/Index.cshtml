@@ -85,17 +85,22 @@
                 {
                     foreach (var item in Model.Items)
                     {
+                        var min = item.Consumivel?.QuantidadeMinima ?? 0;
+                        var max = item.Consumivel?.QuantidadeMaxima ?? 0;
+
                         <tr class="text-center">
+
                             <td>@item.Consumivel?.Nome</td>
                             <td>@item.Zona?.Nome</td>
 
-                            <td class="fw-bold @(item.QuantidadeAtual < item.QuantidadeMinima ? "text-danger" : "")">
+                            <!-- STOCK CRÍTICO BASEADO NO CONSUMÍVEL -->
+                            <td class="fw-bold @(item.QuantidadeAtual < min ? "text-danger" : "")">
                                 @item.QuantidadeAtual
-                                @(item.QuantidadeAtual < item.QuantidadeMinima ? " ⚠️" : "")
+                                @(item.QuantidadeAtual < min ? " ⚠️" : "")
                             </td>
 
-                            <td>@item.QuantidadeMinima</td>
-                            <td>@item.QuantidadeMaxima</td>
+                            <td>@min</td>
+                            <td>@max</td>
                             <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
 
                             <td>
@@ -110,13 +115,13 @@
                                        class="btn btn-danger btn-sm px-3">Eliminar</a>
                                 </div>
                             </td>
+
                         </tr>
                     }
                 }
             </tbody>
         </table>
     </div>
-
 
     <!-- PAGINAÇÃO -->
     <nav class="mt-4">
