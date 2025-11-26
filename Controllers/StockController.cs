@@ -40,7 +40,9 @@ namespace HealthWellbeing.Controllers
                     {
                         ConsumivelID = c.ConsumivelId,
                         ZonaID = zonaEscolhida.Id,
-                        QuantidadeAtual = 0, // apenas isto
+
+                        // Agora o Stock NÃO tem limites próprios
+                        QuantidadeAtual = 0,
                         DataUltimaAtualizacao = DateTime.Now
                     });
                 }
@@ -48,6 +50,32 @@ namespace HealthWellbeing.Controllers
 
             _context.SaveChanges();
         }
+
+        private void SincronizarStockComConsumiveis()
+        {
+            var stocks = _context.Stock
+                .Include(s => s.Consumivel)
+                .ToList();
+
+            foreach (var s in stocks)
+            {
+                if (s.Consumivel == null)
+                    continue;
+
+                // aplicar limites do Consumível
+                int min = s.Consumivel.QuantidadeMinima;
+                int max = s.Consumivel.QuantidadeMaxima;
+
+                // corrigir valores
+                if (s.QuantidadeAtual > max)
+                    s.QuantidadeAtual = max;
+
+                s.DataUltimaAtualizacao = DateTime.Now;
+            }
+
+            _context.SaveChanges();
+        }
+
 
         // ==============================================
         // INDEX COM PAGINAÇÃO
@@ -59,6 +87,7 @@ namespace HealthWellbeing.Controllers
             bool stockCritico = false)
         {
             GarantirStockBase();
+            SincronizarStockComConsumiveis();
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
@@ -72,7 +101,7 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(searchZona))
                 query = query.Where(s => s.Zona.Nome.Contains(searchZona));
 
-            // stock crítico → usa limites do Consumível
+            // STOCK CRÍTICO → tem de comparar com limites do Consumível
             if (stockCritico)
                 query = query.Where(s => s.QuantidadeAtual < s.Consumivel.QuantidadeMinima);
 
@@ -117,6 +146,7 @@ namespace HealthWellbeing.Controllers
             }
 
             stock.DataUltimaAtualizacao = DateTime.Now;
+
             _context.Stock.Add(stock);
             _context.SaveChanges();
 
@@ -183,7 +213,7 @@ namespace HealthWellbeing.Controllers
             if (original == null)
                 return RedirectToAction(nameof(Index));
 
-            // Apenas propriedades editáveis
+            // Apenas propriedades editáveis (Zona)
             original.ZonaID = stock.ZonaID;
             original.DataUltimaAtualizacao = DateTime.Now;
 

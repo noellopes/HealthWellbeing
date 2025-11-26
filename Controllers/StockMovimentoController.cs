@@ -126,16 +126,12 @@ namespace HealthWellbeing.Controllers
                 .Include(s => s.Zona)
                 .ToList();
 
-            if (movimento.StockId <= 0)
-            {
-                ModelState.AddModelError("StockId", "Selecione um consumível.");
-                return View(movimento);
-            }
-
             if (!ModelState.IsValid)
                 return View(movimento);
 
-            var stock = _context.Stock.FirstOrDefault(s => s.StockId == movimento.StockId);
+            var stock = _context.Stock
+                .Include(s => s.Consumivel)
+                .FirstOrDefault(s => s.StockId == movimento.StockId);
 
             if (stock == null)
             {
@@ -143,22 +139,29 @@ namespace HealthWellbeing.Controllers
                 return View(movimento);
             }
 
-            if (movimento.Quantidade <= 0)
+            // 🔥 1 — Impedir compra quando já está no máximo
+            if (stock.QuantidadeAtual >= stock.Consumivel.QuantidadeMaxima)
             {
-                ModelState.AddModelError("Quantidade", "A quantidade deve ser maior que zero.");
+                ModelState.AddModelError("Quantidade",
+                    $"Não é possível realizar a compra. O consumível '{stock.Consumivel.Nome}' já atingiu a quantidade máxima ({stock.Consumivel.QuantidadeMaxima}).");
+
+                movimento.Quantidade = 0; // limpar input
                 return View(movimento);
             }
 
-            int capacidadeRestante = stock.QuantidadeMaxima - stock.QuantidadeAtual;
+            // 🔥 2 — Calcular capacidade restante
+            int capacidadeRestante = stock.Consumivel.QuantidadeMaxima - stock.QuantidadeAtual;
             if (capacidadeRestante < 0) capacidadeRestante = 0;
 
+            // 🔥 3 — Impedir compra maior que o permitido
             if (movimento.Quantidade > capacidadeRestante)
             {
                 ModelState.AddModelError("Quantidade",
-                    $"Só pode comprar até {capacidadeRestante} unidades (capacidade restante).");
+                    $"Só pode comprar até {capacidadeRestante} unidades (capacidade máxima atingida).");
                 return View(movimento);
             }
 
+            // 🟢 4 — Registrar compra
             movimento.Tipo = "Entrada";
             movimento.Data = DateTime.Now;
 
