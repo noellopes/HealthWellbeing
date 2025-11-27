@@ -25,7 +25,7 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "O nome da sala é obrigatório.")]
         [StringLength(100)]
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [Required(ErrorMessage = "A localização é obrigatória.")]
         public int RoomLocationId { get; set; }

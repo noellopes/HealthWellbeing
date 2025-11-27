@@ -83,7 +83,7 @@ namespace HealthWellbeingRoom.Controllers
                 if (!string.IsNullOrWhiteSpace(searchRoomType))
                     mensagens.Add($"tipo de sala \"{searchRoomType}\"");
 
-                ViewBag.ErrorMessage = $"Nenhuma sala encontrada com: {string.Join(", ", mensagens)}.";
+                ViewBag.ErrorMessage = $"Nenhuma sala encontrada com {string.Join(", ", mensagens)}.";
             }
 
             // Hora de Abertura
@@ -224,7 +224,7 @@ namespace HealthWellbeingRoom.Controllers
             }
 
             // Atribui o status "Criado"
-            room.RoomStatusId = statusCriado.RoomStatusId;
+            room.RoomStatusId = statusCriado!.RoomStatusId;
 
             // Salva no banco
             _context.Add(room);
@@ -245,6 +245,7 @@ namespace HealthWellbeingRoom.Controllers
             await PreencherDropdowns();
             return View(room);
         }
+        //----------------------------------------------------------EDIT POST---------------------------------------------------------------------------------
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -273,8 +274,8 @@ namespace HealthWellbeingRoom.Controllers
                 if (!RoomExists(room.RoomId)) return NotFound();
                 else throw;
             }
-
-            return RedirectToAction(nameof(Index));
+            // Redireciona para a ação Details após a edição bem-sucedida
+            return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true }); //
         }
         //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
 
