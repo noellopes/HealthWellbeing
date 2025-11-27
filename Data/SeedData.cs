@@ -130,13 +130,16 @@ namespace HealthWellBeingRoom.Data
             {
                 var roomsTypes = new List<RoomType>
                 {
-                new RoomType { Name = "Consultório", Description = "Sala para atendimento ambulatorial" },
-                new RoomType { Name = "UTI", Description = "Unidade de terapia intensiva" },
-                new RoomType { Name = "Centro Cirúrgico", Description = "Sala para procedimentos cirúrgicos" },
-                new RoomType { Name = "Sala de Exames", Description = "Espaço para exames clínicos ou de imagem" },
-                new RoomType { Name = "Laboratório", Description = "Sala para análises clínicas" },
-                new RoomType { Name = "Farmácia", Description = "Armazenamento e dispensação de medicamentos" },
-                new RoomType { Name = "Armazém", Description = "Espaço para armazenamento de materiais e insumos" }
+                new RoomType { Name = "Consultas", Description = "Sala para atendimento ambulatorial" },
+                new RoomType { Name = "Unidade de Terapia Intensiva (UTI)", Description = "Espaço para cuidados intensivos de pacientes críticos" },
+                new RoomType { Name = "Centro Cirúrgico", Description = "Sala destinada a procedimentos cirúrgicos" },
+                new RoomType { Name = "Exames", Description = "Espaço para exames clínicos e de imagem" },
+                new RoomType { Name = "Laboratório de A. Clínicas", Description = "Sala para realização de análises laboratoriais" },
+                new RoomType { Name = "Farmácia Hospitalar", Description = "Armazenamento e dispensação de medicamentos" },
+                new RoomType { Name = "Depósito Hospitalar", Description = "Espaço para armazenamento de materiais e insumos" },
+                new RoomType { Name = "Recuperação Pós-Operatória", Description = "Espaço para pacientes em pós-operatório imediato" },
+                new RoomType { Name = "Emergência", Description = "Área destinada ao atendimento rápido de casos críticos" },
+                new RoomType { Name = "Esterilização", Description = "Ambiente para higienização e esterilização de instrumentos médicos" }
                 };
                 dbContext.RoomType.AddRange(roomsTypes);
                 dbContext.SaveChanges();
@@ -149,31 +152,58 @@ namespace HealthWellBeingRoom.Data
             {
                 var roomsLocations = new List<RoomLocation>
                 {
-                new RoomLocation { Name = "BlocoA-Ala1-Z.A" },
-                new RoomLocation { Name = "BlocoA-Ala2-Z.V" },
-                new RoomLocation { Name = "BlocoA-Ala3-Z.VM" },
-                new RoomLocation { Name = "BlocoB-Ala1-Z.C" },
-                new RoomLocation { Name = "BlocoB-Ala2-Z.PO" },
-                new RoomLocation { Name = "BlocoB-Ala3-Z.R" },
-                new RoomLocation { Name = "BlocoC-Ala1-Z.I" },
-                new RoomLocation { Name = "BlocoC-Ala2-Z.E" },
-                new RoomLocation { Name = "BlocoC-Ala3-Z.D" },
-                new RoomLocation { Name = "BlocoD-Ala1-Z.AM" },
-                new RoomLocation { Name = "BlocoD-Ala2-Z.CS" },
-                new RoomLocation { Name = "BlocoD-Ala3-Z.ESP" },
-                new RoomLocation { Name = "BlocoE-Ala1-Z.CO" },
-                new RoomLocation { Name = "BlocoE-Ala2-Z.AC" },
-                new RoomLocation { Name = "BlocoE-Ala3-Z.BM" },
-                new RoomLocation { Name = "BlocoF-Ala1-Z.DI" },
-                new RoomLocation { Name = "BlocoF-Ala2-Z.AR" },
-                new RoomLocation { Name = "BlocoF-Ala3-Z.CE" },
-                new RoomLocation { Name = "BlocoG-Ala1-Z.N" },
-                new RoomLocation { Name = "BlocoG-Ala2-Z.F" },
-                new RoomLocation { Name = "BlocoG-Ala3-Z.TO" },
-                new RoomLocation { Name = "BlocoH-Ala1-Z.AU" },
-                new RoomLocation { Name = "BlocoH-Ala2-Z.OF" },
-                new RoomLocation { Name = "BlocoH-Ala3-Z.NEU" },
-                new RoomLocation { Name = "BlocoI-Ala1-Z.IS" }
+                // Bloco A
+                new RoomLocation { Name = "BlocoA-Ala1-Z.N" }, // Norte
+                new RoomLocation { Name = "BlocoA-Ala1-Z.S" }, // Sul
+                new RoomLocation { Name = "BlocoA-Ala1-Z.L" }, // Leste
+                new RoomLocation { Name = "BlocoA-Ala1-Z.O" }, // Oeste
+
+                new RoomLocation { Name = "BlocoA-Ala2-Z.N" },
+                new RoomLocation { Name = "BlocoA-Ala2-Z.S" },
+                new RoomLocation { Name = "BlocoA-Ala2-Z.L" },
+                new RoomLocation { Name = "BlocoA-Ala2-Z.O" },
+
+                new RoomLocation { Name = "BlocoA-Ala3-Z.N" },
+                new RoomLocation { Name = "BlocoA-Ala3-Z.S" },
+                new RoomLocation { Name = "BlocoA-Ala3-Z.L" },
+                new RoomLocation { Name = "BlocoA-Ala3-Z.O" },
+
+                // Bloco B
+                new RoomLocation { Name = "BlocoB-Ala1-Z.N" },
+                new RoomLocation { Name = "BlocoB-Ala1-Z.S" },
+                new RoomLocation { Name = "BlocoB-Ala1-Z.L" },
+                new RoomLocation { Name = "BlocoB-Ala1-Z.O" },
+
+                new RoomLocation { Name = "BlocoB-Ala2-Z.N" },
+                new RoomLocation { Name = "BlocoB-Ala2-Z.S" },
+                new RoomLocation { Name = "BlocoB-Ala2-Z.L" },
+                new RoomLocation { Name = "BlocoB-Ala2-Z.O" },
+
+                new RoomLocation { Name = "BlocoB-Ala3-Z.N" },
+                new RoomLocation { Name = "BlocoB-Ala3-Z.S" },
+                new RoomLocation { Name = "BlocoB-Ala3-Z.L" },
+                new RoomLocation { Name = "BlocoB-Ala3-Z.O" },
+
+                // Bloco C
+                new RoomLocation { Name = "BlocoC-Ala1-Z.N" },
+                new RoomLocation { Name = "BlocoC-Ala1-Z.S" },
+                new RoomLocation { Name = "BlocoC-Ala1-Z.L" },
+                new RoomLocation { Name = "BlocoC-Ala1-Z.O" },
+
+                new RoomLocation { Name = "BlocoC-Ala2-Z.N" },
+                new RoomLocation { Name = "BlocoC-Ala2-Z.S" },
+                new RoomLocation { Name = "BlocoC-Ala2-Z.L" },
+                new RoomLocation { Name = "BlocoC-Ala2-Z.O" },
+
+                new RoomLocation { Name = "BlocoC-Ala3-Z.N" },
+                new RoomLocation { Name = "BlocoC-Ala3-Z.S" },
+                new RoomLocation { Name = "BlocoC-Ala3-Z.L" },
+                new RoomLocation { Name = "BlocoC-Ala3-Z.O" },
+
+                new RoomLocation { Name = "BlocoC-Ala4-Z.N" },
+                new RoomLocation { Name = "BlocoC-Ala4-Z.S" },
+                new RoomLocation { Name = "BlocoC-Ala4-Z.L" },//Nao contem nenhuma sala ainda
+                new RoomLocation { Name = "BlocoC-Ala4-Z.O" }
                 };
                 dbContext.RoomLocation.AddRange(roomsLocations);
                 dbContext.SaveChanges();
@@ -195,24 +225,60 @@ namespace HealthWellBeingRoom.Data
 
                 var rooms = new List<Room>
                 {
-                    new Room { Name = "UTI 2", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["UTI"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.V"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Equipamentos de suporte vital." },
-                    new Room { Name = "Centro Cirúrgico 1", Specialty = "Cirurgia Geral", RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.C"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias de média complexidade." },
-                    new Room { Name = "Centro Cirúrgico 2", Specialty = "Ortopedia", RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.PO"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias ortopédicas." },
-                    new Room { Name = "Consultório 1", Specialty = "Pediatria", RoomTypeId = roomType["Consultório"], RoomLocationId = roomLocation["BlocoD-Ala1-Z.AM"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Atendimento infantil." },
-                    new Room { Name = "Consultório 2", Specialty = "Dermatologia", RoomTypeId = roomType["Consultório"], RoomLocationId = roomLocation["BlocoD-Ala2-Z.CS"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas dermatológicas." },
-                    new Room { Name = "Consultório 3", Specialty = "Cardiologia", RoomTypeId = roomType["Consultório"], RoomLocationId = roomLocation["BlocoD-Ala3-Z.ESP"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas cardíacas." },
-                    new Room { Name = "Sala de Exames 1", Specialty = "Radiologia", RoomTypeId = roomType["Sala de Exames"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.I"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Raio-X e tomografia." },
-                    new Room { Name = "Sala de Exames 2", Specialty = "Ultrassonografia", RoomTypeId = roomType["Sala de Exames"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.E"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Ultrassons diversos." },
-                    new Room { Name = "Laboratório 1", Specialty = "Análises Clínicas", RoomTypeId = roomType["Laboratório"], RoomLocationId = roomLocation["BlocoE-Ala1-Z.CO"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("15:00"), Notes = "Coleta e análise." },
-                    new Room { Name = "Laboratório 2", Specialty = "Biologia Molecular", RoomTypeId = roomType["Laboratório"], RoomLocationId = roomLocation["BlocoE-Ala3-Z.BM"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("15:00"), Notes = "PCR e genética." },
-                    new Room { Name = "Farmácia de Emergência", Specialty = "Farmácia", RoomTypeId = roomType["Farmácia"], RoomLocationId = roomLocation["BlocoF-Ala2-Z.AR"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Atendimento 24h." },
-                    new Room { Name = "Armazém 1", Specialty = "Logística", RoomTypeId = roomType["Armazém"], RoomLocationId = roomLocation["BlocoF-Ala3-Z.CE"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Estoque de insumos." },
-                    new Room { Name = "Armazém 2", Specialty = "Materiais Cirúrgicos", RoomTypeId = roomType["Armazém"], RoomLocationId = roomLocation["BlocoG-Ala1-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Instrumentos e EPIs." },
-                    new Room { Name = "Sala de Exames 3", Specialty = "Endoscopia", RoomTypeId = roomType["Sala de Exames"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.D"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Exames endoscópicos." },
-                    new Room { Name = "Consultório 4", Specialty = "Ginecologia", RoomTypeId = roomType["Consultório"], RoomLocationId = roomLocation["BlocoE-Ala2-Z.AC"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas ginecológicas." },
-                    new Room { Name = "Sala de Exames 4", Specialty = "Mamografia", RoomTypeId = roomType["Sala de Exames"], RoomLocationId = roomLocation["BlocoI-Ala1-Z.IS"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("14:00"), Notes = "Exames de mama." },
-                    new Room { Name = "UTI 3", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["UTI"], RoomLocationId = roomLocation["BlocoG-Ala2-Z.F"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Manutenção de equipamentos." },
-                    new Room { Name = "Consultório 5", Specialty = "Psiquiatria", RoomTypeId = roomType["Consultório"], RoomLocationId = roomLocation["BlocoH-Ala2-Z.OF"], RoomStatusId = roomStatus["Fora de Serviço"], OpeningTime = TimeSpan.Parse("09:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Atendimento suspenso temporariamente." }
+                    // Consultas
+                    new Room { Name = "Sala de Consultas 1", Specialty = "Atendimento Ambulatorial", RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas gerais." },
+                    new Room { Name = "Sala de Consultas 2", Specialty = "Atendimento Ambulatorial", RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Atendimento pediátrico." },
+                    new Room { Name = "Sala de Consultas 3", Specialty = "Atendimento Ambulatorial", RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("09:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas de especialidade." },
+                    new Room { Name = "Sala de Consultas 4", Specialty = "Atendimento Ambulatorial", RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas dermatológicas." },
+                    new Room { Name = "Sala de Consultas 5", Specialty = "Atendimento Ambulatorial", RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas ginecológicas." },
+
+                    // UTI
+                    new Room { Name = "UTI 1", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização contínua." },
+                    new Room { Name = "UTI 2", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Equipamentos de suporte vital." },
+                    new Room { Name = "UTI 3", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Isolamento de pacientes críticos." },
+                    new Room { Name = "UTI 4", Specialty = "Cuidados Intensivos", RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "UTI neonatal." },
+
+                    // Centro Cirúrgico
+                    new Room { Name = "Centro Cirúrgico 1", Specialty = "Procedimentos Cirúrgicos", RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias gerais." },
+                    new Room { Name = "Centro Cirúrgico 2", Specialty = "Procedimentos Cirúrgicos", RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias ortopédicas." },
+                    new Room { Name = "Centro Cirúrgico 3", Specialty = "Procedimentos Cirúrgicos", RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Preparação para cirurgia cardíaca." },
+
+                    // Sala de Exames
+                    new Room { Name = "Sala de Exames 1", Specialty = "Exames Clínicos", RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Exames laboratoriais básicos." },
+                    new Room { Name = "Sala de Exames 2", Specialty = "Exames de Imagem", RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Raio-X e ultrassonografia." },
+                    new Room { Name = "Sala de Exames 3", Specialty = "Exames Cardiológicos", RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Eletrocardiograma e ecocardiograma." },
+
+                    // Laboratórios
+                    new Room { Name = "Laboratório 1", Specialty = "Análises Clínicas", RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Bioquímica e hematologia." },
+                    new Room { Name = "Laboratório 2", Specialty = "Análises Clínicas", RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.N"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Microbiologia." },
+                    new Room { Name = "Laboratório 3", Specialty = "Análises Clínicas", RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Imunologia e patologia clínica." },
+                    new Room { Name = "Laboratório 4", Specialty = "Análises Clínicas", RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade laboratorial." },
+
+                    // Farmácia
+                    new Room { Name = "Farmácia 1", Specialty = "Gestão de Medicamentos", RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Dispensação de medicamentos." },
+                    new Room { Name = "Farmácia 2", Specialty = "Gestão de Medicamentos", RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Controle de estoque." },
+                    new Room { Name = "Farmácia 3", Specialty = "Gestão de Medicamentos", RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Medicamentos especiais." },
+
+                    // Depósito
+                    new Room { Name = "Depósito 1", Specialty = "Armazenamento", RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Materiais cirúrgicos." },
+                    new Room { Name = "Depósito 2", Specialty = "Armazenamento", RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.O"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de estoque." },
+                    new Room { Name = "Depósito 3", Specialty = "Armazenamento", RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Insumos hospitalares." },
+
+                    // Recuperação
+                    new Room { Name = "Sala de Recuperação 1", Specialty = "Pós-Operatório", RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.S"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização pós-cirúrgica." },
+                    new Room { Name = "Sala de Recuperação 2", Specialty = "Pós-Operatório", RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.L"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em observação." },
+                    new Room { Name = "Sala de Recuperação 3", Specialty = "Pós-Operatório", RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.O"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de equipamentos." },
+
+                    // Emergência
+                    new Room { Name = "Sala de Emergência 1", Specialty = "Atendimento Crítico", RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Atendimento imediato." },
+                    new Room { Name = "Sala de Emergência 2", Specialty = "Atendimento Crítico", RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em estado grave." },
+                    new Room { Name = "Sala de Emergência 3", Specialty = "Atendimento Crítico", RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Triagem de urgência." },
+
+                    // Esterilização
+                    new Room { Name = "Sala de Esterilização 1", Specialty = "Higienização de Instrumentos", RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Esterilização de instrumentos cirúrgicos." },
+                    new Room { Name = "Sala de Esterilização 2", Specialty = "Higienização de Instrumentos", RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Processamento de materiais." },
+                    new Room { Name = "Sala de Esterilização 3", Specialty = "Higienização de Instrumentos", RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade." }
+
                 };
                 dbContext.Room.AddRange(rooms);
                 dbContext.SaveChanges();
