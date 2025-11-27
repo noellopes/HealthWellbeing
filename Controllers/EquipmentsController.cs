@@ -5,6 +5,7 @@ using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
@@ -23,12 +24,11 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchSerie = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
             // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .AsQueryable();
@@ -37,6 +37,11 @@ namespace HealthWellbeingRoom.Controllers
             if (!string.IsNullOrEmpty(searchName))
             {
                 equipmentQuery = equipmentQuery.Where(e => e.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchSerie))
+            {
+                equipmentQuery = equipmentQuery.Where(e => e.SerialNumber.Contains(searchSerie));
             }
 
             if (searchType > 0)
@@ -56,6 +61,7 @@ namespace HealthWellbeingRoom.Controllers
 
             // Manter os valores de pesquisa na ViewBag para uso na View
             ViewBag.SearchName = searchName;
+            ViewBag.SearchSerie = searchSerie;
             ViewBag.SearchType = searchType;
             ViewBag.SearchStatus = searchStatus;
             ViewBag.SearchRoom = searchRoom;
@@ -99,7 +105,6 @@ namespace HealthWellbeingRoom.Controllers
 
             var equipment = await _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
@@ -116,7 +121,6 @@ namespace HealthWellbeingRoom.Controllers
         public IActionResult Create()
         {
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View();
@@ -127,8 +131,16 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
+        public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
+            // Verificar se já existe um equipamento com o mesmo número de série e tipo de equipamento (evtando duplicados)
+            bool exists = _context.Equipment.Any(e => e.SerialNumber == equipment.SerialNumber && e.EquipmentTypeId == equipment.EquipmentTypeId);
+
+            if(exists)
+            {
+                ModelState.AddModelError("SerialNumber", "Já existe um equipamento com este número de série para o mesmo Tipo de Equipamento.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(equipment);
@@ -142,7 +154,6 @@ namespace HealthWellbeingRoom.Controllers
                 );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -164,7 +175,6 @@ namespace HealthWellbeingRoom.Controllers
                 return View("NotFound");
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -175,12 +185,21 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,ManufacturerId,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
+        public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
             {
                 /* Retornar para minha page do not found */
                 return View("NotFound");
+            }
+
+            // Verificar se já existe um equipamento com o mesmo número de série e tipo de equipamento (evitando duplicados)
+            bool exists = _context.Equipment.Any(e => e.SerialNumber == equipment.SerialNumber 
+            && e.EquipmentTypeId == equipment.EquipmentTypeId && e.EquipmentId != equipment.EquipmentId);
+
+            if (exists)
+            {
+                ModelState.AddModelError("SerialNumber", "Já existe um Equipamento com este número de série para o mesmo Tipo de Equipamento.");
             }
 
             if (ModelState.IsValid)
@@ -213,7 +232,6 @@ namespace HealthWellbeingRoom.Controllers
                 );
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
-            ViewData["ManufacturerId"] = new SelectList(_context.Set<Manufacturer>(), "ManufacturerId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
             return View(equipment);
@@ -230,7 +248,6 @@ namespace HealthWellbeingRoom.Controllers
 
             var equipment = await _context.Equipment
                 .Include(r => r.Room)
-                .Include(m => m.Manufacturer)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);

@@ -40,28 +40,111 @@ namespace HealthWellBeingRoom.Data
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
             dbContext.Database.EnsureCreated();
             var typeMaterials = new[]
-            {
-                new TypeMaterial { Name = "Monitorização", Description = "Acompanha sinais vitais e parâmetros fisiológicos." },
-                new TypeMaterial { Name = "Infusão", Description = "Administra líquidos e medicamentos." },
-                new TypeMaterial { Name = "Ventilação", Description = "Auxilia a respiração do paciente." },
-                new TypeMaterial { Name = "Aspiração", Description = "Remove secreções e fluidos corporais." },
-                new TypeMaterial { Name = "Diagnóstico", Description = "Permite identificar doenças e condições clínicas." },
-                new TypeMaterial { Name = "Imagem Médica", Description = "Captura imagens internas do corpo humano." },
-                new TypeMaterial { Name = "Terapia", Description = "Utilizado em tratamentos e reabilitação." },
-                new TypeMaterial { Name = "Anestesia", Description = "Administra e controla agentes anestésicos." },
-                new TypeMaterial { Name = "Suporte Vital", Description = "Mantém funções vitais de pacientes críticos." },
-                new TypeMaterial { Name = "Comunicação Médica", Description = "Transmite dados clínicos e alertas." },
-                new TypeMaterial { Name = "Laboratorial", Description = "Usado em análises e testes clínicos." },
-                new TypeMaterial { Name = "Reabilitação", Description = "Apoia a recuperação funcional e motora." },
-                new TypeMaterial { Name = "Esterilização", Description = "Garante a assepsia de instrumentos e materiais." },
-                new TypeMaterial { Name = "Cirúrgico", Description = "Empregado em procedimentos invasivos." },
-                new TypeMaterial { Name = "Emergência", Description = "Usado em situações críticas e urgentes." },
-                new TypeMaterial { Name = "Óptico", Description = "Amplia e ilumina áreas de observação médica." },
-                new TypeMaterial { Name = "Audiológico", Description = "Destinado a exames e terapias auditivas." },
-                new TypeMaterial { Name = "Mobilidade", Description = "Facilita o transporte e posicionamento de pacientes." },
-                new TypeMaterial { Name = "Desinfeção", Description = "Usado na limpeza e descontaminação." },
-                new TypeMaterial { Name = "Medição Clínica", Description = "Realiza medições fisiológicas e biomédicas." }
+{
+                new TypeMaterial
+                {
+                    Name = "Monitor Multiparamétrico Móvel",
+                    Description = "Monitoriza sinais vitais em mobilidade."
+                },
+                new TypeMaterial
+                {
+                    Name = "Bomba de Infusão Portátil",
+                    Description = "Administra medicamentos de forma móvel."
+                },
+                new TypeMaterial
+                {
+                    Name = "Ventilador Portátil",
+                    Description = "Auxilia a respiração em transporte."
+                },
+                new TypeMaterial
+                {
+                    Name = "Aspirador Cirúrgico Portátil",
+                    Description = "Remove secreções e fluidos."
+                },
+                new TypeMaterial
+                {
+                    Name = "ECG Portátil",
+                    Description = "Regista atividade elétrica cardíaca."
+                },
+                new TypeMaterial
+                {
+                    Name = "Ecógrafo Portátil",
+                    Description = "Realiza exames de ultrassom móvel."
+                },
+                new TypeMaterial
+                {
+                    Name = "Glicosímetro",
+                    Description = "Mede níveis de glicose."
+                },
+                new TypeMaterial
+                {
+                    Name = "Oxímetro de Pulso Portátil",
+                    Description = "Mede saturação de oxigénio."
+                },
+                new TypeMaterial
+                {
+                    Name = "Nebulizador Portátil",
+                    Description = "Administra medicação em aerossol."
+                },
+                new TypeMaterial
+                {
+                    Name = "Desfibrilhador Automático Externo (AED)",
+                    Description = "Reverte paragem cardíaca."
+                },
+                new TypeMaterial
+                {
+                    Name = "Bomba de Seringa Portátil",
+                    Description = "Faz infusões precisas via seringa."
+                },
+                new TypeMaterial
+                {
+                    Name = "Otoscópio Portátil",
+                    Description = "Examina o ouvido externamente."
+                },
+                new TypeMaterial
+                {
+                    Name = "Retinógrafo Portátil",
+                    Description = "Capta imagens da retina."
+                },
+                new TypeMaterial
+                {
+                    Name = "Medidor de Pressão Portátil",
+                    Description = "Mede pressão arterial."
+                },
+                new TypeMaterial
+                {
+                    Name = "Capnógrafo Portátil",
+                    Description = "Mede CO₂ exalado."
+                },
+                new TypeMaterial
+                {
+                    Name = "Monitor Holter",
+                    Description = "Regista ECG contínuo."
+                },
+                new TypeMaterial
+                {
+                    Name = "Termómetro Clínico Portátil",
+                    Description = "Mede temperatura corporal."
+                },
+                new TypeMaterial
+                {
+                    Name = "Ventilação Não Invasiva Portátil",
+                    Description = "Fornece suporte respiratório."
+                },
+                new TypeMaterial
+                {
+                    Name = "Telemetria Médica Portátil",
+                    Description = "Transmite sinais vitais."
+                },
+                new TypeMaterial
+                {
+                    Name = "Dispositivo Portátil de Desinfeção UV",
+                    Description = "Desinfeta superfícies com UV."
+                }
             };
+
+
+
             foreach (var tm in typeMaterials)
             {
                 if (!dbContext.TypeMaterial.Any(x => x.Name == tm.Name))
@@ -69,6 +152,7 @@ namespace HealthWellBeingRoom.Data
                     dbContext.TypeMaterial.Add(tm);
                 }
             }
+
             dbContext.SaveChanges();
         }
 
@@ -81,8 +165,10 @@ namespace HealthWellBeingRoom.Data
                     new Manufacturer { Name = "GE Healthcare" },
                     new Manufacturer { Name = "Siemens Healthineers" },
                     new Manufacturer { Name = "Philips Healthcare" },
-                    new Manufacturer { Name = "Mindray" },
                     new Manufacturer { Name = "Dräger" },
+                    new Manufacturer { Name = "Mindray" },
+                    new Manufacturer { Name = "HP" },
+
                     new Manufacturer { Name = "Medtronic" },
                     new Manufacturer { Name = "Samsung Medison" },
                     new Manufacturer { Name = "Canon Medical Systems" },
@@ -96,8 +182,7 @@ namespace HealthWellBeingRoom.Data
                     new Manufacturer { Name = "Stryker" },
                     new Manufacturer { Name = "Roche" },
                     new Manufacturer { Name = "Edan Instruments" },
-                    new Manufacturer { Name = "Hospira" },
-                    new Manufacturer { Name = "Nihon Kohden" }
+                    new Manufacturer { Name = "Hospira" }
                 };
                 dbContext.Manufacturer.AddRange(manufacturers);
                 dbContext.SaveChanges();
@@ -226,36 +311,15 @@ namespace HealthWellBeingRoom.Data
             {
                 var equipmentTypes = new List<EquipmentType>
                 {
-                    new EquipmentType { Name = "Monitor de Sinais Vitais" },
-                    new EquipmentType { Name = "Eletrocardiógrafo (ECG)" },
-                    new EquipmentType { Name = "Ventilador Mecânico" },
-                    new EquipmentType { Name = "Bomba de Infusão" },
-                    new EquipmentType { Name = "Desfibrilador" },
-                    new EquipmentType { Name = "Ultrassom" },
-                    new EquipmentType { Name = "Raio-X Digital" },
-                    new EquipmentType { Name = "Tomógrafo" },
-                    new EquipmentType { Name = "Resonância Magnética" },
-                    new EquipmentType { Name = "Oxímetro de Pulso" },
-                    new EquipmentType { Name = "Equipamento de Anestesia" },
-                    new EquipmentType { Name = "Autoclave" },
-                    new EquipmentType { Name = "Centrífuga" },
-                    new EquipmentType { Name = "Microscópio" },
-                    new EquipmentType { Name = "Balança Hospitalar" },
-                    new EquipmentType { Name = "Lâmpada Cirúrgica" },
-                    new EquipmentType { Name = "Mesa Cirúrgica" },
-                    new EquipmentType { Name = "Cadeira de Rodas" },
-                    new EquipmentType { Name = "Esterilizador" },
-                    new EquipmentType { Name = "Incubadora Neonatal" },
-                    new EquipmentType { Name = "Aspirador Cirúrgico" },
-                    new EquipmentType { Name = "Monitor Fetal" },
-                    new EquipmentType { Name = "Equipamento de Hemodiálise" },
-                    new EquipmentType { Name = "Colposcópio" },
-                    new EquipmentType { Name = "Bisturi Elétrico" },
-                    new EquipmentType { Name = "Laringoscópio" },
-                    new EquipmentType { Name = "Câmera Endoscópica" },
-                    new EquipmentType { Name = "Mesa de Exames" },
-                    new EquipmentType { Name = "Negatoscópio" },
-                    new EquipmentType { Name = "Carrinho de Emergência" }
+                    new EquipmentType { Name = "Monitor de Sinais Vitais", ManufacturerId = 5 },
+                    new EquipmentType { Name = "Ventilador Mecânico", ManufacturerId = 4 },
+                    new EquipmentType { Name = "ECG Eletrocardiógrafo", ManufacturerId = 3 },
+                    new EquipmentType { Name = "Raio-X Digital", ManufacturerId = 1 },
+                    new EquipmentType { Name = "TAC / CT Scanner", ManufacturerId = 2 },
+                    new EquipmentType { Name = "Bomba de Infusão", ManufacturerId = 5 },
+                    new EquipmentType { Name = "Desfibrilhador", ManufacturerId = 3 },
+                    new EquipmentType { Name = "Telefone Fixo", ManufacturerId = 6 },
+
                 };
                 dbContext.EquipmentType.AddRange(equipmentTypes);
                 dbContext.SaveChanges();
@@ -283,30 +347,57 @@ namespace HealthWellBeingRoom.Data
             {
                 var equipment = new List<Equipment>
                 {
-                    new Equipment { Name = "Monitor Cardíaco GE Dash 4000", Description = "Monitor multiparamétrico para UTI", SerialNumber = "GE4000-UTI01", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 1, EquipmentTypeId = 1, EquipmentStatusId = 1, RoomId = 1 },
-                    new Equipment { Name = "Ventilador Mecânico Dräger Evita XL", Description = "Ventilador pulmonar para suporte respiratório", SerialNumber = "DRG-EVXL-01", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 5, EquipmentTypeId = 3, EquipmentStatusId = 1, RoomId = 1 },
-                    new Equipment { Name = "Bomba de Infusão B. Braun Infusomat Space", Description = "Controle preciso de infusões intravenosas", SerialNumber = "BBR-INF-002", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 13, EquipmentTypeId = 4, EquipmentStatusId = 1, RoomId = 1 },
-                    new Equipment { Name = "Oxímetro de Pulso Mindray PM-60", Description = "Medição de saturação de oxigênio", SerialNumber = "MND-PM60-03", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 4, EquipmentTypeId = 10, EquipmentStatusId = 1, RoomId = 1 },
-                    new Equipment { Name = "Desfibrilador Philips HeartStart XL", Description = "Desfibrilador com monitor ECG integrado", SerialNumber = "PHL-DFB-003", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 3, EquipmentTypeId = 5, EquipmentStatusId = 2, RoomId = 2 },
-                    new Equipment { Name = "Mesa Cirúrgica Stryker 1080", Description = "Mesa ajustável para procedimentos cirúrgicos", SerialNumber = "STR-1080-06", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 16, EquipmentTypeId = 17, EquipmentStatusId = 1, RoomId = 3 },
-                    new Equipment { Name = "Lâmpada Cirúrgica Dräger Polaris 100", Description = "Iluminação cirúrgica com controle de intensidade", SerialNumber = "DRG-PLS100-07", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 5, EquipmentTypeId = 16, EquipmentStatusId = 1, RoomId = 3 },
-                    new Equipment { Name = "Equipamento de Anestesia GE Aespire View", Description = "Sistema completo de anestesia inalatória", SerialNumber = "GE-ASP-08", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 1, EquipmentTypeId = 11, EquipmentStatusId = 1, RoomId = 3 },
-                    new Equipment { Name = "Bisturi Elétrico Valleylab Force FX", Description = "Corte e coagulação durante cirurgias", SerialNumber = "VLY-FX-09", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 15, EquipmentTypeId = 25, EquipmentStatusId = 1, RoomId = 4 },
-                    new Equipment { Name = "Aspirador Cirúrgico Schuco S330A", Description = "Aspiração de fluidos durante procedimentos", SerialNumber = "SCH-S330A-10", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 14, EquipmentTypeId = 21, EquipmentStatusId = 1, RoomId = 4 },
-                    new Equipment { Name = "Ultrassom Mindray DC-70", Description = "Equipamento para exames de imagem", SerialNumber = "MND-DC70-004", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 4, EquipmentTypeId = 6, EquipmentStatusId = 1, RoomId = 5 },
-                    new Equipment { Name = "Raio-X Siemens Multix Fusion", Description = "Sistema de radiografia digital", SerialNumber = "SMN-MULTIX-11", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 2, EquipmentTypeId = 7, EquipmentStatusId = 1, RoomId = 5 },
-                    new Equipment { Name = "Tomógrafo Philips Brilliance 64", Description = "Tomografia computadorizada de alta resolução", SerialNumber = "PHL-BR64-12", PurchaseDate = DateTime.Now.AddYears(-6), ManufacturerId = 3, EquipmentTypeId = 8, EquipmentStatusId = 2, RoomId = 5 },
-                    new Equipment { Name = "Monitor Fetal Edan F3", Description = "Monitorização de batimentos fetais", SerialNumber = "EDN-F3-13", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 18, EquipmentTypeId = 22, EquipmentStatusId = 1, RoomId = 5 },
-                    new Equipment { Name = "Eletrocardiógrafo Nihon Kohden ECG-1250", Description = "Registro de atividade elétrica cardíaca", SerialNumber = "NHK-ECG1250-14", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 20, EquipmentTypeId = 2, EquipmentStatusId = 1, RoomId = 7 },
-                    new Equipment { Name = "Balança Digital Filizola BP", Description = "Balança hospitalar com estadiômetro", SerialNumber = "FLZ-BP-15", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 10, EquipmentTypeId = 15, EquipmentStatusId = 1, RoomId = 6 },
-                    new Equipment { Name = "Mesa de Exames Arjo Alpha", Description = "Mesa ajustável para consultas clínicas", SerialNumber = "ARJ-ALPHA-16", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 15, EquipmentTypeId = 28, EquipmentStatusId = 1, RoomId = 6 },
-                    new Equipment { Name = "Estetoscópio Littmann Classic III", Description = "Auscultação cardíaca e pulmonar", SerialNumber = "LTT-CL3-17", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 14, EquipmentTypeId = 1, EquipmentStatusId = 1, RoomId = 7 },
-                    new Equipment { Name = "Centrífuga Fanem 206BL", Description = "Centrifugação de amostras biológicas", SerialNumber = "FNM-206-006", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 9, EquipmentTypeId = 13, EquipmentStatusId = 1, RoomId = 8 },
-                    new Equipment { Name = "Microscópio Olympus CX23", Description = "Análise microscópica de lâminas", SerialNumber = "OLY-CX23-007", PurchaseDate = DateTime.Now.AddYears(-4), ManufacturerId = 8, EquipmentTypeId = 14, EquipmentStatusId = 1, RoomId = 8 },
-                    new Equipment { Name = "Autoclave Phoenix 200L", Description = "Esterilização de materiais hospitalares", SerialNumber = "PHX-200-005", PurchaseDate = DateTime.Now.AddYears(-5), ManufacturerId = 10, EquipmentTypeId = 12, EquipmentStatusId = 1, RoomId = 8 },
-                    new Equipment { Name = "Esterilizador Cristófoli Vitale 12L", Description = "Esterilização rápida de instrumentos", SerialNumber = "CST-V12-19", PurchaseDate = DateTime.Now.AddYears(-2), ManufacturerId = 14, EquipmentTypeId = 19, EquipmentStatusId = 1, RoomId = 8 },
-                    new Equipment { Name = "Refrigerador Científico Consul BioCool", Description = "Armazenamento de vacinas e reagentes", SerialNumber = "CNS-BCOOL-20", PurchaseDate = DateTime.Now.AddYears(-3), ManufacturerId = 12, EquipmentTypeId = 27, EquipmentStatusId = 1, RoomId = 9 },
-                    new Equipment { Name = "Sistema de Controle de Temperatura Elitech RCW-800", Description = "Monitoramento contínuo de temperatura", SerialNumber = "ELT-RCW800-21", PurchaseDate = DateTime.Now.AddYears(-1), ManufacturerId = 19, EquipmentTypeId = 29, EquipmentStatusId = 1, RoomId = 9 }
+                    // --- MONITORES DE SINAIS VITAIS — Mindray BeneVision ---
+                    new Equipment { Name="BeneVision N12", SerialNumber="MD-MON-001", RoomId=1, PurchaseDate=new(2022,4,10), EquipmentTypeId=1, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneVision N12", SerialNumber="MD-MON-002", RoomId=3, PurchaseDate=new(2021,12,2), EquipmentTypeId=1, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneVision N15", SerialNumber="MD-MON-003", RoomId=2, PurchaseDate=new(2023,3,18), EquipmentTypeId=1, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneVision N17", SerialNumber="MD-MON-004", RoomId=5, PurchaseDate=new(2020,7,9), EquipmentTypeId=1, EquipmentStatusId=2 },
+                    new Equipment { Name="BeneVision N19", SerialNumber="MD-MON-005", RoomId=3, PurchaseDate=new(2019,11,28), EquipmentTypeId=1, EquipmentStatusId=1 },
+
+                    // --- VENTILADORES — Dräger Evita/Savina ---
+                    new Equipment { Name="Evita V600", SerialNumber="DR-VEN-001", RoomId=3, PurchaseDate=new(2023,1,12), EquipmentTypeId=2, EquipmentStatusId=1 },
+                    new Equipment { Name="Evita V800", SerialNumber="DR-VEN-002", RoomId=2, PurchaseDate=new(2022,6,8), EquipmentTypeId=2, EquipmentStatusId=1 },
+                    new Equipment { Name="Savina 300", SerialNumber="DR-VEN-003", RoomId=4, PurchaseDate=new(2021,5,16), EquipmentTypeId=2, EquipmentStatusId=2 },
+                    new Equipment { Name="Savina 300 Select", SerialNumber="DR-VEN-004", RoomId=4, PurchaseDate=new(2020,9,3), EquipmentTypeId=2, EquipmentStatusId=3 },
+                    new Equipment { Name="Evita Infinity V500", SerialNumber="DR-VEN-005", RoomId=5, PurchaseDate=new(2019,4,27), EquipmentTypeId=2, EquipmentStatusId=1 },
+
+                    // --- ECG — Philips TC Series ---
+                    new Equipment { Name="Philips TC70", SerialNumber="PH-ECG-001", RoomId=5, PurchaseDate=new(2023,2,14), EquipmentTypeId=3, EquipmentStatusId=1 },
+                    new Equipment { Name="Philips TC50", SerialNumber="PH-ECG-002", RoomId=6, PurchaseDate=new(2022,1,19), EquipmentTypeId=3, EquipmentStatusId=1 },
+                    new Equipment { Name="Philips TC30", SerialNumber="PH-ECG-003", RoomId=6, PurchaseDate=new(2021,11,8), EquipmentTypeId=3, EquipmentStatusId=2 },
+                    new Equipment { Name="Philips PageWriter TC70", SerialNumber="PH-ECG-004", RoomId=7, PurchaseDate=new(2020,5,21), EquipmentTypeId=3, EquipmentStatusId=1 },
+                    new Equipment { Name="Philips PageWriter TC50", SerialNumber="PH-ECG-005", RoomId=7, PurchaseDate=new(2019,9,29), EquipmentTypeId=3, EquipmentStatusId=1 },
+
+                    // --- RAIO-X DIGITAL — GE Optima / Definium ---
+                    new Equipment { Name="GE Optima XR240amx", SerialNumber="GE-RX-001", RoomId=8, PurchaseDate=new(2022,3,10), EquipmentTypeId=4, EquipmentStatusId=1 },
+                    new Equipment { Name="GE Optima XR220", SerialNumber="GE-RX_002", RoomId=8, PurchaseDate=new(2021,8,4), EquipmentTypeId=4, EquipmentStatusId=1 },
+                    new Equipment { Name="GE Definium 5000", SerialNumber="GE-RX-003", RoomId=9, PurchaseDate=new(2020,6,30), EquipmentTypeId=4, EquipmentStatusId=2 },
+                    new Equipment { Name="GE Definium 6000", SerialNumber="GE-RX-004", RoomId=9, PurchaseDate=new(2019,1,25), EquipmentTypeId=4, EquipmentStatusId=1 },
+                    new Equipment { Name="GE Optima XR646", SerialNumber="GE-RX-005", RoomId=10, PurchaseDate=new(2023,9,2), EquipmentTypeId=4, EquipmentStatusId=1 },
+
+                    // --- TAC / CT — Siemens SOMATOM ---
+                    new Equipment { Name="Siemens SOMATOM Go.Up", SerialNumber="SI-CT-001", RoomId=10, PurchaseDate=new(2022,10,15), EquipmentTypeId=5, EquipmentStatusId=1 },
+                    new Equipment { Name="Siemens SOMATOM Go.Top", SerialNumber="SI-CT-002", RoomId=10, PurchaseDate=new(2021,3,22), EquipmentTypeId=5, EquipmentStatusId=2 },
+                    new Equipment { Name="Siemens SOMATOM Definition AS", SerialNumber="SI-CT-003", RoomId=11, PurchaseDate=new(2020,1,9), EquipmentTypeId=5, EquipmentStatusId=3 },
+
+                    // --- BOMBAS DE INFUSÃO — Mindray BeneFusion ---
+                    new Equipment { Name="BeneFusion eSP", SerialNumber="MD-INF-001", RoomId=1, PurchaseDate=new(2023,7,14), EquipmentTypeId=6, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneFusion eVP", SerialNumber="MD-INF-002", RoomId=1, PurchaseDate=new(2022,5,18), EquipmentTypeId=6, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneFusion VP5", SerialNumber="MD-INF-003", RoomId=5, PurchaseDate=new(2021,4,11), EquipmentTypeId=6, EquipmentStatusId=2 },
+                    new Equipment { Name="BeneFusion VP1", SerialNumber="MD-INF-004", RoomId=5, PurchaseDate=new(2020,3,6), EquipmentTypeId=6, EquipmentStatusId=1 },
+                    new Equipment { Name="BeneFusion VP1", SerialNumber="MD-INF-005", RoomId=6, PurchaseDate=new(2019,10,23), EquipmentTypeId=6, EquipmentStatusId=1 },
+
+                    // --- DESFIBRILHADORES — Philips HeartStart ---
+                    new Equipment { Name="HeartStart XL", SerialNumber="PH-DES-001", RoomId=3, PurchaseDate=new(2023,2,28), EquipmentTypeId=7, EquipmentStatusId=1 },
+                    new Equipment { Name="HeartStart MRx", SerialNumber="PH-DES-002", RoomId=4, PurchaseDate=new(2022,9,16), EquipmentTypeId=7, EquipmentStatusId=1 },
+                    new Equipment { Name="HeartStart XL+", SerialNumber="PH-DES-003", RoomId=7, PurchaseDate=new(2021,1,20), EquipmentTypeId=7, EquipmentStatusId=2 },
+                    new Equipment { Name="HeartStart FR3", SerialNumber="PH-DES-004", RoomId=8, PurchaseDate=new(2020,11,30), EquipmentTypeId=7, EquipmentStatusId=1 },
+                    new Equipment { Name="HeartStart FRx", SerialNumber="PH-DES-005", RoomId=9, PurchaseDate=new(2019,8,14), EquipmentTypeId=7, EquipmentStatusId=1 },
+
+                    // EXTRA para passar os 30
+                    new Equipment { Name="BeneVision N15", SerialNumber="MD-MON-006", RoomId=2, PurchaseDate=new(2023,12,4), EquipmentTypeId=1, EquipmentStatusId=1 },
+                    new Equipment { Name="Evita V800", SerialNumber="DR-VEN-006", RoomId=3, PurchaseDate=new(2024,1,3), EquipmentTypeId=2, EquipmentStatusId=1 }
+
                 };
                 dbContext.Equipment.AddRange(equipment);
                 dbContext.SaveChanges();

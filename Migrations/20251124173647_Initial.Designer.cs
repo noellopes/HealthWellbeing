@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251124105404_Inicial")]
-    partial class Inicial
+    [Migration("20251124173647_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -324,9 +324,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("EquipmentTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ManufacturerId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -347,8 +344,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasIndex("EquipmentStatusId");
 
                     b.HasIndex("EquipmentTypeId");
-
-                    b.HasIndex("ManufacturerId");
 
                     b.HasIndex("RoomId");
 
@@ -380,11 +375,16 @@ namespace HealthWellbeingRoom.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentTypeId"));
 
+                    b.Property<int>("ManufacturerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EquipmentTypeId");
+
+                    b.HasIndex("ManufacturerId");
 
                     b.ToTable("EquipmentType");
                 });
@@ -604,12 +604,6 @@ namespace HealthWellbeingRoom.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeingRoom.Models.Manufacturer", "Manufacturer")
-                        .WithMany()
-                        .HasForeignKey("ManufacturerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("HealthWellbeing.Models.Room", "Room")
                         .WithMany("Equipments")
                         .HasForeignKey("RoomId")
@@ -620,9 +614,18 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.Navigation("EquipmentType");
 
-                    b.Navigation("Manufacturer");
-
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.EquipmentType", b =>
+                {
+                    b.HasOne("HealthWellbeingRoom.Models.Manufacturer", "Manufacturer")
+                        .WithMany()
+                        .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Manufacturer");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
