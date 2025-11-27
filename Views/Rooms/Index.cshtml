@@ -21,7 +21,6 @@
     };
 }
 
-
 <h1 class="mb-4 text-primary">
     <i class="bi bi-hospital"></i> Listas de Salas
 </h1>
@@ -49,7 +48,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Salas Registadas</h2>
     <div>
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+        <a class="btn btn-secondary me-2"
+           data-bs-toggle="collapse"
+           data-bs-target="#postSearch"
+           aria-expanded="false"
+           aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
         <a asp-action="Create" class="btn btn-success">
@@ -58,7 +61,7 @@
     </div>
 </div>
 
-<!-- FORMULÁRIO DE PESQUISA (melhorar paginacao a seguir)-- >
+<!-- FORMULÁRIO DE PESQUISA (melhorar paginação a seguir) -->
 <div class="collapse mt-2 mb-2" id="postSearch">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
@@ -66,37 +69,56 @@
             <!-- Primeira linha: Nome e Estado -->
             <div class="col-md-6">
                 <label for="searchName" class="form-label">Nome</label>
-                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+                <input id="searchName"
+                       name="searchName"
+                       value="@ViewBag.SearchName"
+                       class="form-control"
+                       placeholder="Pesquisar pelo nome"
+                       type="search" />
             </div>
 
             <div class="col-md-6">
                 <label for="searchStatus" class="form-label">Estado</label>
                 @Html.DropDownList(
-                    "searchStatus",
-                    new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
-                    "Pesquisar pelo estado",
-                    new { @class = "form-select ", @id= "searchStatus" }
-                )
+                "searchStatus",
+                                new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
+                                "Pesquisar pelo estado",
+                                new { @class = "form-select", @id = "searchStatus" }
+                                )
             </div>
 
             <!-- Segunda linha: Especialidade e Localização -->
             <div class="col-md-6">
                 <label for="searchSpecialty" class="form-label">Especialidade</label>
-                <input id="searchSpecialty" name="searchSpecialty" value="@ViewBag.SearchSpecialty" class="form-control" placeholder="Pesquisar pela especialidade" type="search" />
+                <input id="searchSpecialty"
+                       name="searchSpecialty"
+                       value="@ViewBag.SearchSpecialty"
+                       class="form-control"
+                       placeholder="Pesquisar pela especialidade"
+                       type="search" />
             </div>
 
             <div class="col-md-6">
                 <label for="searchLocation" class="form-label">Localização</label>
-                <input id="searchLocation" name="searchLocation" value="@ViewBag.SearchLocation" class="form-control" placeholder="Pesquisar pela localização" type="search" />
+                <input id="searchLocation"
+                       name="searchLocation"
+                       value="@ViewBag.SearchLocation"
+                       class="form-control"
+                       placeholder="Pesquisar pela localização"
+                       type="search" />
             </div>
 
             <!-- Terceira linha: Tipo de Sala e Horário de Funcionamento -->
-            <div class="row g-3 align-items-start">
+            <div class="row g-3 align-items-start mt-1">
                 <!-- Tipo de Sala -->
                 <div class="col-md-6">
                     <label for="searchRoomType" class="form-label">Tipo de Sala</label>
-                    <input id="searchRoomType" name="searchRoomType" value="@ViewBag.SearchRoomType"
-                           class="form-control" placeholder="Pesquisar tipo de sala" type="search" />
+                    <input id="searchRoomType"
+                           name="searchRoomType"
+                           value="@ViewBag.SearchRoomType"
+                           class="form-control"
+                           placeholder="Pesquisar tipo de sala"
+                           type="search" />
                 </div>
 
                 <!-- Horário de Funcionamento -->
@@ -106,36 +128,50 @@
                         <div class="row justify-content-center align-items-center g-2">
                             <!-- Início -->
                             <div class="col-auto d-flex align-items-center">
-                                <label for="searchOpeningTime" class="form-label mb-0 me-2 fw-semibold">Início</label>
-                                <input id="searchOpeningTime" name="searchOpeningTime" value="@ViewBag.SearchOpeningTime"
-                                       class="form-control form-control-sm text-center" type="time" style="width: 100px;" />
+                                <label for="searchOpeningTime"
+                                       class="form-label mb-0 me-2 fw-semibold">
+                                    Início
+                                </label>
+                                <input id="searchOpeningTime"
+                                       name="searchOpeningTime"
+                                       value="@ViewBag.SearchOpeningTime"
+                                       class="form-control form-control-sm text-center"
+                                       type="time"
+                                       style="width: 100px;" />
                             </div>
 
                             <!-- Fim -->
                             <div class="col-auto d-flex align-items-center">
-                                <label for="searchClosingTime" class="form-label mb-0 me-2 fw-semibold">Fim</label>
-                                <input id="searchClosingTime" name="searchClosingTime" value="@ViewBag.SearchClosingTime"
-                                       class="form-control form-control-sm text-center" type="time" style="width: 100px;" />
+                                <label for="searchClosingTime"
+                                       class="form-label mb-0 me-2 fw-semibold">
+                                    Fim
+                                </label>
+                                <input id="searchClosingTime"
+                                       name="searchClosingTime"
+                                       value="@ViewBag.SearchClosingTime"
+                                       class="form-control form-control-sm text-center"
+                                       type="time"
+                                       style="width: 100px;" />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botões alinhados à esquerda e com mesma largura -->
+            <!-- Botões -->
             <div class="col-12 mt-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="bi bi-search me-1"></i> Pesquisar
                 </button>
-                <a asp-action="Index" class="btn btn-secondary flex-fill">Limpar</a>
+                <a asp-action="Index" class="btn btn-secondary flex-fill">
+                    Limpar
+                </a>
             </div>
         </form>
 
         @* Script para retirar o aspeto text-muted quando um estado for selecionado *@
         <script>
-            // Aguarda o carregamento completo do DOM
             document.addEventListener("DOMContentLoaded", function () {
-                // Seleciona o elemento <select> pelo ID
                 const statusSelect = document.getElementById("searchStatus");
 
                 function updateStatusStyle() {
@@ -145,64 +181,73 @@
                         statusSelect.classList.remove("text-muted");
                     }
                 }
-                // Atualiza ao carregar e ao mudar
+
                 updateStatusStyle();
                 statusSelect.addEventListener("change", updateStatusStyle);
             });
         </script>
-
     </div>
 </div>
 
 <!-- TABELA DE SALAS -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Tipo</th>
-                    <th>Especialidade</th>
-                    <th>Nome</th>
-                    <th>Localização</th>
-                    <th>Horário</th>
-                    <th>Estado</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    var color = GetStatusColor(item.RoomStatus?.Name ?? "");
-                    var displayName = item.RoomStatus?.Name;
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Especialidade</th>
+                <th>Nome</th>
+                <th>Localização</th>
+                <th>Horário</th>
+                <th>Estado</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                var color = GetStatusColor(item.RoomStatus?.Name ?? "");
+                var displayName = item.RoomStatus?.Name;
 
-                    <tr>
-                        <td>@item.RoomType?.Name</td>
-                        <td>@item.Specialty</td>
-                        <td>@item.Name</td>
-                        <td>@item.RoomLocation?.Name</td>
-                        <td>
-                            @item.OpeningTime.ToString("hh\\:mm") - @item.ClosingTime.ToString("hh\\:mm")
-                        </td>
-                        <td>
-                            <span class="rounded-circle d-inline-block me-2 @color"
-                                  style="width:10px; height:10px;"
-                                  title="@displayName"></span>
-                            @displayName
-                        </td>
-                        <td class="text-center">
-                            <a asp-action="Edit" asp-route-id="@item.RoomId" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
-                            </a>
-                            <a asp-action="Details" asp-route-id="@item.RoomId" asp-route-fromCreation="false" class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.RoomId" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                <tr>
+                    <td>@item.RoomType?.Name</td>
+                    <td>@item.Specialty</td>
+                    <td>@item.Name</td>
+                    <td>@item.RoomLocation?.Name</td>
+                    <td>
+                        @item.OpeningTime.ToString(@"hh\:mm")
+                        -
+                        @item.ClosingTime.ToString(@"hh\:mm")
+                    </td>
+                    <td>
+                        <span class="rounded-circle d-inline-block me-2 @color"
+                              style="width:10px; height:10px;"
+                              title="@displayName">
+                        </span>
+                        @displayName
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Edit"
+                           asp-route-id="@item.RoomId"
+                           class="btn btn-sm btn-warning me-1">
+                            <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
+                        </a>
+                        <a asp-action="Details"
+                           asp-route-id="@item.RoomId"
+                           asp-route-fromCreation="false"
+                           class="btn btn-sm btn-info me-1">
+                            <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
+                        </a>
+                        <a asp-action="Delete"
+                           asp-route-id="@item.RoomId"
+                           class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
     @if (ViewBag.ErrorMessage != null)
     {
@@ -210,54 +255,74 @@
             @ViewBag.ErrorMessage
         </div>
     }
-
 </div>
 
 <!-- PAGINAÇÃO AO FINAL -->
-        <nav aria-label="Room page" class="d-flex justify-content-between align-items-center mt-4">
-            @if (Model.TotalItems > 0)
+<nav aria-label="Room page" class="d-flex justify-content-between align-items-center mt-4">
+    @if (Model.TotalItems > 0)
+    {
+        <span>
+            Mostrando
+            @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
+            -
+            @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
+            de @Model.TotalItems
+        </span>
+    }
+    else
+    {
+        <span>0 itens</span>
+    }
+
+    <ul class="pagination mb-0">
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Primeira</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index">Primeira</a>
+            </li>
+        }
+
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
             {
-                <span>
-                    Mostrando @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
-                    -
-                    @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
-                    de @Model.TotalItems
-                </span>
+                <li class="page-item active">
+                    <a class="page-link" href="#">@p</a>
+                </li>
             }
             else
             {
-                <span>0 itens</span>
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@p">
+                        @p
+                    </a>
+                </li>
             }
+        }
 
-            <ul class="pagination mb-0">
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
-                }
-
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
-                    {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
-                    }
-                    else
-                    {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
-                    }
-                }
-
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled"><a class="page-link">Última</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
-                }
-            </ul>
-        </nav>
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Última</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@Model.TotalPages">
+                    Última
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
