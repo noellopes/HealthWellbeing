@@ -265,10 +265,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomTypeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Specialty")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("SpecialtyId")
+                        .HasColumnType("int");
 
                     b.HasKey("RoomId");
 
@@ -277,6 +275,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasIndex("RoomStatusId");
 
                     b.HasIndex("RoomTypeId");
+
+                    b.HasIndex("SpecialtyId");
 
                     b.ToTable("Room");
                 });
@@ -523,6 +523,27 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("RoomType");
                 });
 
+            modelBuilder.Entity("HealthWellbeingRoom.Models.Specialty", b =>
+                {
+                    b.Property<int>("SpecialtyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpecialtyId"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("SpecialtyId");
+
+                    b.ToTable("Specialty");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
@@ -580,11 +601,19 @@ namespace HealthWellbeingRoom.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeingRoom.Models.Specialty", "Specialty")
+                        .WithMany("Rooms")
+                        .HasForeignKey("SpecialtyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("RoomLocation");
 
                     b.Navigation("RoomStatus");
 
                     b.Navigation("RoomType");
+
+                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
@@ -683,6 +712,11 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomType", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.Specialty", b =>
                 {
                     b.Navigation("Rooms");
                 });

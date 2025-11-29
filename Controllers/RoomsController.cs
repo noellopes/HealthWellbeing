@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using HealthWellbeingRoom.Models;
 using HealthWellbeingRoom.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,154 +17,166 @@ namespace HealthWellbeingRoom.Controllers
         {
             _context = context;
         }
+        //------------------------------------------------------PREENCHER DROPDOWNS-------------------------------------------------------------------------------------
 
         private async Task PreencherDropdowns()
         {
-            ViewBag.RoomTypes = new SelectList(await _context.RoomType.ToListAsync(), "RoomTypeId", "Name");
-            ViewBag.RoomLocations = new SelectList(await _context.RoomLocation.ToListAsync(), "RoomLocationId", "Name");
-            ViewBag.RoomStatuses = new SelectList(await _context.RoomStatus.ToListAsync(), "RoomStatusId", "Name");
+            // Tipos de Sala
+            ViewBag.RoomTypes = new SelectList(await _context.RoomType.ToListAsync(),"RoomTypeId", "Name");
+            // Localizações
+            ViewBag.RoomLocations = new SelectList(await _context.RoomLocation.ToListAsync(),"RoomLocationId", "Name");
+            // Status
+            ViewBag.RoomStatuses = new SelectList(await _context.RoomStatus.ToListAsync(),"RoomStatusId", "Name");
+            // Especialidades
+            ViewBag.RoomSpecialty = new SelectList(await _context.Specialty.ToListAsync(),"SpecialtyId", "Name");
         }
         //------------------------------------------------------INDEX / LIST-------------------------------------------------------------------------------------
-        public async Task<IActionResult> Index(string? searchName, string? searchStatus, string? searchSpecialty, string? searchLocation, string? searchRoomType, string searchOpeningTime, string? searchClosingTime, int page = 1)
+        public async Task<IActionResult> Index(
+            string? searchName,
+            string? searchStatus,
+            string? searchSpecialty,
+            string? searchLocation,
+            string? searchRoomType,
+            string? searchOpeningTime,
+            string? searchClosingTime,
+            int page = 1)
         {
+            // Carregamento inicial com Includes
             var allRooms = await _context.Room
+                .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
                 .Include(r => r.RoomType)
                 .ToListAsync();
-            // Aplicar filtros de pesquisa
-            // Nome
+
+            // Filtro por nome
             if (!string.IsNullOrWhiteSpace(searchName))
             {
-                var normalizedSearch = RemoveDiacritics.Normalize(searchName ?? string.Empty);
-                allRooms = allRooms.Where(r => RemoveDiacritics.Normalize(r.Name ?? "").Contains(normalizedSearch))
-                    .ToList();
-            }
-            // Status
-            if (!string.IsNullOrWhiteSpace(searchStatus) && int.TryParse(searchStatus, out var statusId))
-                allRooms = allRooms.Where(r => r.RoomStatusId == statusId)
-                    .ToList();
-            if (!string.IsNullOrWhiteSpace(searchSpecialty))
-            {
-                var normalizedSpecialty = RemoveDiacritics.Normalize(searchSpecialty ?? string.Empty);
+                var normalizedSearch = RemoveDiacritics.Normalize(searchName);
                 allRooms = allRooms
-                    .Where(r => RemoveDiacritics.Normalize(r.Specialty ?? "").Contains(normalizedSpecialty))
+                    .Where(r => RemoveDiacritics.Normalize(r.Name ?? "").Contains(normalizedSearch))
                     .ToList();
             }
+            // Filtro por status
+            if (!string.IsNullOrWhiteSpace(searchStatus) && int.TryParse(searchStatus, out var statusId))
+                allRooms = allRooms.Where(r => r.RoomStatusId == statusId).ToList();
 
+            // Filtro por especialidade
+            if (!string.IsNullOrWhiteSpace(searchSpecialty) && int.TryParse(searchSpecialty, out var specialtyId))
+                allRooms = allRooms.Where(r => r.SpecialtyId == specialtyId).ToList();
+
+            // Filtro por localização
             if (!string.IsNullOrWhiteSpace(searchLocation))
             {
-                var normalizedLocation = RemoveDiacritics.Normalize(searchLocation ?? string.Empty);
+                var normalizedLocation = RemoveDiacritics.Normalize(searchLocation.Trim().ToLower());
                 allRooms = allRooms
-                    .Where(r => r.RoomLocation != null && RemoveDiacritics.Normalize(r.RoomLocation.Name ?? "").Contains(normalizedLocation))
+                    .Where(r => RemoveDiacritics.Normalize(r.RoomLocation?.Name ?? "").ToLower().Contains(normalizedLocation))
                     .ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(searchRoomType))
+            // Filtro por tipo de sala
+            // Filtro por tipo de sala (comparação por Id)
+            if (!string.IsNullOrWhiteSpace(searchRoomType) && int.TryParse(searchRoomType, out int roomTypeId))
             {
-                var normalizedRoomType = RemoveDiacritics.Normalize(searchRoomType.Trim().ToLower());
                 allRooms = allRooms
-                    .Where(r => RemoveDiacritics.Normalize(r.RoomType?.Name ?? "").ToLower().Contains(normalizedRoomType))
+                    .Where(r => r.RoomTypeId == roomTypeId)
                     .ToList();
             }
 
-            // Verificar se a lista final está vazia
-            if (!allRooms.Any())
-            {
-                var mensagens = new List<string>();
-                if (!string.IsNullOrWhiteSpace(searchName))
-                    mensagens.Add($"nome \"{searchName}\"");
-
-                if (!string.IsNullOrWhiteSpace(searchSpecialty))
-                    mensagens.Add($"especialidade \"{searchSpecialty}\"");
-
-                if (!string.IsNullOrWhiteSpace(searchLocation))
-                    mensagens.Add($"localização \"{searchLocation}\"");
-
-                if (!string.IsNullOrWhiteSpace(searchRoomType))
-                    mensagens.Add($"tipo de sala \"{searchRoomType}\"");
-
-                ViewBag.ErrorMessage = $"Nenhuma sala encontrada com {string.Join(", ", mensagens)}.";
-            }
-
-            // Hora de Abertura
+            // Filtro por horário
             TimeSpan? openingTime = null;
-            if (!string.IsNullOrWhiteSpace(searchOpeningTime) && TimeSpan.TryParse(searchOpeningTime, out var parsedOpening))
-            {
-                openingTime = parsedOpening; //converte a string para TimeSpan se for válida
-            }
-
-            // Hora de Fecho
             TimeSpan? closingTime = null;
-            if (!string.IsNullOrWhiteSpace(searchClosingTime) && TimeSpan.TryParse(searchClosingTime, out var parsedClosing))
-            {
-                closingTime = parsedClosing; //idem para a hora de fecho
-            }
 
-            //Validação: abertura < fecho
+            if (!string.IsNullOrWhiteSpace(searchOpeningTime) && TimeSpan.TryParse(searchOpeningTime, out var parsedOpening))
+                openingTime = parsedOpening;
+
+            if (!string.IsNullOrWhiteSpace(searchClosingTime) && TimeSpan.TryParse(searchClosingTime, out var parsedClosing))
+                closingTime = parsedClosing;
+
             if (openingTime.HasValue && closingTime.HasValue)
             {
                 if (openingTime.Value >= closingTime.Value)
                 {
-                    //Caso inválido: abertura maior ou igual ao fecho
                     ViewBag.ErrorMessage = "A hora de abertura deve ser menor que a hora de fecho.";
-                    allRooms = new List<Room>(); // devolve lista vazia
+                    allRooms = new List<Room>();
                 }
                 else
                 {
-                    //Caso válido: aplica filtro combinado
                     allRooms = allRooms
                         .Where(r => r.OpeningTime == openingTime.Value && r.ClosingTime == closingTime.Value)
                         .ToList();
 
                     if (!allRooms.Any())
-                    {
-                        //Nenhuma sala encontrada com esse intervalo
                         ViewBag.ErrorMessage = $"Nenhuma sala encontrada com horário de {openingTime.Value:hh\\:mm} até {closingTime.Value:hh\\:mm}.";
-                    }
                 }
             }
             else
             {
-                //se só abertura foi fornecida
                 if (openingTime.HasValue)
                 {
                     allRooms = allRooms.Where(r => r.OpeningTime == openingTime.Value).ToList();
-
                     if (!allRooms.Any())
-                    {
                         ViewBag.ErrorMessage = $"Nenhuma sala encontrada com hora de abertura às {openingTime.Value:hh\\:mm}.";
-                    }
                 }
 
-                //Se só fecho foi fornecido
                 if (closingTime.HasValue)
                 {
                     allRooms = allRooms.Where(r => r.ClosingTime == closingTime.Value).ToList();
-
                     if (!allRooms.Any())
-                    {
                         ViewBag.ErrorMessage = $"Nenhuma sala encontrada com hora de fecho às {closingTime.Value:hh\\:mm}.";
-                    }
                 }
             }
 
+            // Mensagem se nenhum resultado
+            if (!allRooms.Any() && ViewBag.ErrorMessage == null)
+            {
+                var mensagens = new List<string>();
+                if (!string.IsNullOrWhiteSpace(searchName)) mensagens.Add($"nome \"{searchName}\"");
+                if (!string.IsNullOrWhiteSpace(searchSpecialty)) mensagens.Add($"especialidade \"{searchSpecialty}\"");
+                if (!string.IsNullOrWhiteSpace(searchLocation)) mensagens.Add($"localização \"{searchLocation}\"");
+                if (!string.IsNullOrWhiteSpace(searchRoomType)) mensagens.Add($"tipo de sala \"{searchRoomType}\"");
+
+                ViewBag.ErrorMessage = $"Nenhuma sala encontrada com {string.Join(", ", mensagens)}.";
+            }
+
             // Paginação
+            const int itemsPerPage = 10;
             var totalItems = allRooms.Count;
-            var pagination = new RPaginationInfo<Room>(page, totalItems);
-            pagination.Items = allRooms.OrderBy(r => r.Name ?? "").Skip(pagination.ItemsToSkip).Take(pagination.ItemsPerPage).ToList();
-            // Manter os parâmetros de pesquisa na View
+            var pagination = new RPaginationInfo<Room>(page, totalItems, itemsPerPage)
+            {
+                Items = allRooms
+                    .OrderBy(r => r.Name ?? "")
+                    .Skip((page - 1) * itemsPerPage)
+                    .Take(itemsPerPage)
+                    .ToList()
+            };
+
+            // Manter filtros na View
             ViewBag.SearchName = searchName;
             ViewBag.SearchStatus = searchStatus;
             ViewBag.SearchSpecialty = searchSpecialty;
             ViewBag.SearchLocation = searchLocation;
+            ViewBag.SearchRoomType = searchRoomType;
             ViewBag.SearchOpeningTime = searchOpeningTime;
             ViewBag.SearchClosingTime = searchClosingTime;
-            // Preencher o dropdown de Status
+
+            // Dropdowns
             ViewBag.Status = new SelectList(
                 _context.RoomStatus.Select(s => new { Value = s.RoomStatusId.ToString(), Text = s.Name }),
                 "Value", "Text", searchStatus);
-            // Retornar a View com os dados paginados
+
+            ViewBag.RoomSpecialty = new SelectList(
+                _context.Specialty.Select(s => new { Value = s.SpecialtyId.ToString(), Text = s.Name }),
+                "Value", "Text", searchSpecialty);
+
+            ViewBag.RoomTypes = new SelectList(
+                _context.RoomType.Select(t => new { Value = t.RoomTypeId.ToString(), Text = t.Name }),
+                "Value", "Text", searchRoomType);
+
+            ViewBag.RoomLocations = new SelectList(
+                _context.RoomLocation.Select(l => new { Value = l.RoomLocationId.ToString(), Text = l.Name }),
+                "Value", "Text", searchLocation);
+
             return View(pagination);
         }
         //------------------------------------------------------DETAILS-------------------------------------------------------------------------------------
@@ -172,6 +185,7 @@ namespace HealthWellbeingRoom.Controllers
             if (id == null) return NotFound();
 
             var room = await _context.Room
+                .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
                 .Include(r => r.RoomType)
@@ -230,7 +244,10 @@ namespace HealthWellbeingRoom.Controllers
             _context.Add(room);
             await _context.SaveChangesAsync();
 
+            // Mensagem de sucesso na criação
             TempData["SuccessMessage"] = "Sala criada com sucesso!";
+
+            // Redireciona para a ação Details após a criação bem-sucedida
             return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
         }
 
@@ -246,7 +263,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(room);
         }
         //----------------------------------------------------------EDIT POST---------------------------------------------------------------------------------
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Room room)
@@ -274,16 +290,20 @@ namespace HealthWellbeingRoom.Controllers
                 if (!RoomExists(room.RoomId)) return NotFound();
                 else throw;
             }
+
+            // Mensagem de sucesso na edicao
+            TempData["SuccessMessage"] = "Sala editada com sucesso!";
+
             // Redireciona para a ação Details após a edição bem-sucedida
             return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true }); //
         }
         //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
-
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var room = await _context.Room
+                .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
                 .Include(r => r.RoomType)
@@ -300,6 +320,7 @@ namespace HealthWellbeingRoom.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var room = await _context.Room
+                .Include(r => r.Specialty)
                 .Include(r => r.Equipments)
                 .Include(r => r.LocalizacaoDispMedicoMovel)
                 .FirstOrDefaultAsync(r => r.RoomId == id);

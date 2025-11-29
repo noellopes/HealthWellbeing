@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<!-- FORMULÁRIO DE PESQUISA (melhorar paginação a seguir) -->
+<!-- FORMULÁRIO DE PESQUISA -->
 <div class="collapse mt-2 mb-2" id="postSearch">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
@@ -81,7 +81,7 @@
                 <label for="searchStatus" class="form-label">Estado</label>
                 @Html.DropDownList(
                 "searchStatus",
-                                new SelectList(ViewBag.Status, "Value", "Text", ViewBag.SearchStatus),
+                                ViewBag.Status as SelectList,
                                 "Pesquisar pelo estado",
                                 new { @class = "form-select", @id = "searchStatus" }
                                 )
@@ -90,12 +90,12 @@
             <!-- Segunda linha: Especialidade e Localização -->
             <div class="col-md-6">
                 <label for="searchSpecialty" class="form-label">Especialidade</label>
-                <input id="searchSpecialty"
-                       name="searchSpecialty"
-                       value="@ViewBag.SearchSpecialty"
-                       class="form-control"
-                       placeholder="Pesquisar pela especialidade"
-                       type="search" />
+                @Html.DropDownList(
+                                "searchSpecialty",
+                                ViewBag.RoomSpecialty as SelectList,
+                                "Pesquisar pela especialidade",
+                                new { @class = "form-select", @id = "searchSpecialty" }
+                                )
             </div>
 
             <div class="col-md-6">
@@ -113,12 +113,12 @@
                 <!-- Tipo de Sala -->
                 <div class="col-md-6">
                     <label for="searchRoomType" class="form-label">Tipo de Sala</label>
-                    <input id="searchRoomType"
-                           name="searchRoomType"
-                           value="@ViewBag.SearchRoomType"
-                           class="form-control"
-                           placeholder="Pesquisar tipo de sala"
-                           type="search" />
+                    @Html.DropDownList(
+                                        "searchRoomType",
+                                        ViewBag.RoomTypes as SelectList,
+                                        "Pesquisar tipo de sala",
+                                        new { @class = "form-select", @id = "searchRoomType" }
+                                        )
                 </div>
 
                 <!-- Horário de Funcionamento -->
@@ -160,6 +160,8 @@
 
             <!-- Botões -->
             <div class="col-12 mt-2 d-flex gap-2">
+                <!-- Força page=1 ao pesquisar -->
+                <input type="hidden" name="page" value="1" />
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="bi bi-search me-1"></i> Pesquisar
                 </button>
@@ -211,7 +213,7 @@
 
                 <tr>
                     <td>@item.RoomType?.Name</td>
-                    <td>@item.Specialty</td>
+                    <td>@item.Specialty?.Name</td>
                     <td>@item.Name</td>
                     <td>@item.RoomLocation?.Name</td>
                     <td>
@@ -275,6 +277,7 @@
     }
 
     <ul class="pagination mb-0">
+        <!-- Primeira página -->
         @if (Model.CurrentPage == 1)
         {
             <li class="page-item disabled">
@@ -284,10 +287,22 @@
         else
         {
             <li class="page-item">
-                <a class="page-link" asp-action="Index">Primeira</a>
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-searchName="@ViewBag.SearchName"
+                   asp-route-searchStatus="@ViewBag.SearchStatus"
+                   asp-route-searchSpecialty="@ViewBag.SearchSpecialty"
+                   asp-route-searchLocation="@ViewBag.SearchLocation"
+                   asp-route-searchRoomType="@ViewBag.SearchRoomType"
+                   asp-route-searchOpeningTime="@ViewBag.SearchOpeningTime"
+                   asp-route-searchClosingTime="@ViewBag.SearchClosingTime">
+                    Primeira
+                </a>
             </li>
         }
 
+        <!-- Números de página -->
         @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
         {
             if (p == Model.CurrentPage)
@@ -301,13 +316,21 @@
                 <li class="page-item">
                     <a class="page-link"
                        asp-action="Index"
-                       asp-route-page="@p">
+                       asp-route-page="@p"
+                       asp-route-searchName="@ViewBag.SearchName"
+                       asp-route-searchStatus="@ViewBag.SearchStatus"
+                       asp-route-searchSpecialty="@ViewBag.SearchSpecialty"
+                       asp-route-searchLocation="@ViewBag.SearchLocation"
+                       asp-route-searchRoomType="@ViewBag.SearchRoomType"
+                       asp-route-searchOpeningTime="@ViewBag.SearchOpeningTime"
+                       asp-route-searchClosingTime="@ViewBag.SearchClosingTime">
                         @p
                     </a>
                 </li>
             }
         }
 
+        <!-- Última página -->
         @if (Model.CurrentPage == Model.TotalPages)
         {
             <li class="page-item disabled">
@@ -319,7 +342,14 @@
             <li class="page-item">
                 <a class="page-link"
                    asp-action="Index"
-                   asp-route-page="@Model.TotalPages">
+                   asp-route-page="@Model.TotalPages"
+                   asp-route-searchName="@ViewBag.SearchName"
+                   asp-route-searchStatus="@ViewBag.SearchStatus"
+                   asp-route-searchSpecialty="@ViewBag.SearchSpecialty"
+                   asp-route-searchLocation="@ViewBag.SearchLocation"
+                   asp-route-searchRoomType="@ViewBag.SearchRoomType"
+                   asp-route-searchOpeningTime="@ViewBag.SearchOpeningTime"
+                   asp-route-searchClosingTime="@ViewBag.SearchClosingTime">
                     Última
                 </a>
             </li>

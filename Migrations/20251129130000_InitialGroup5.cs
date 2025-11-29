@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialGroup5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -133,6 +133,20 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Specialty",
+                columns: table => new
+                {
+                    SpecialtyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Specialty", x => x.SpecialtyId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TypeMaterial",
                 columns: table => new
                 {
@@ -199,7 +213,7 @@ namespace HealthWellbeingRoom.Migrations
                     RoomId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomTypeId = table.Column<int>(type: "int", nullable: false),
-                    Specialty = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    SpecialtyId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     RoomLocationId = table.Column<int>(type: "int", nullable: false),
                     OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
@@ -226,6 +240,12 @@ namespace HealthWellbeingRoom.Migrations
                         column: x => x.RoomTypeId,
                         principalTable: "RoomType",
                         principalColumn: "RoomTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Room_Specialty_SpecialtyId",
+                        column: x => x.SpecialtyId,
+                        principalTable: "Specialty",
+                        principalColumn: "SpecialtyId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -443,6 +463,11 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_Room_RoomTypeId",
                 table: "Room",
                 column: "RoomTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Room_SpecialtyId",
+                table: "Room",
+                column: "SpecialtyId");
         }
 
         /// <inheritdoc />
@@ -498,6 +523,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoomType");
+
+            migrationBuilder.DropTable(
+                name: "Specialty");
         }
     }
 }

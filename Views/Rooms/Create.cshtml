@@ -38,19 +38,11 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
-                    <select asp-for="Specialty" class="form-select" required>
+                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
+                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty" required>
                         <option value="">Selecione a especialidade...</option>
-                        @foreach (var item in new[] {
-                                                "Cardiologia", "Dermatologia", "Pediatria", "Ginecologia", "Urologia", "Neurologia",
-                                                "Psiquiatria", "Oftalmologia", "Otorrinolaringologia", "Endocrinologia", "Reumatologia",
-                                                "Gastroenterologia", "Pneumologia", "Nefrologia", "Medicina Geral e Familiar"
-                                                })
-                        {
-                            <option value="@item">@item</option>
-                        }
                     </select>
-                    <span asp-validation-for="Specialty" class="text-danger small"></span>
+                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
                 </div>
             </div>
 

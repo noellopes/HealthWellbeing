@@ -6,13 +6,14 @@
 
         public RPaginationInfo(int currentPage, int totalItems, int itemsPerPage = 10)
         {
-            //Construtor
             TotalItems = totalItems;
             ItemsPerPage = itemsPerPage;
-            CurrentPage = Math.Clamp(currentPage, 1, TotalPages);
+
+            var totalPages = Math.Max(1, (int)Math.Ceiling((double)TotalItems / ItemsPerPage));
+            CurrentPage = Math.Clamp(currentPage, 1, totalPages);
         }
 
-        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();//garante que Items nunca será nulo, mesmo que não seja atribuído no controlador.
+        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
 
         public int TotalItems { get; private set; }
 

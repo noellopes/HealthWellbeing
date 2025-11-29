@@ -29,6 +29,7 @@ namespace HealthWellbeing.Data
         public DbSet<Receita> Receita { get; set; } = default!;
 
         // Novos DbSets
+        public DbSet<Specialty> Specialty { get; set; } = default!;
         public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
         public DbSet<RoomType> RoomType { get; set; } = default!;
         public DbSet<RoomLocation> RoomLocation { get; set; }

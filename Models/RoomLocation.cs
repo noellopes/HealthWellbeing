@@ -7,9 +7,11 @@ namespace HealthWellbeingRoom.Models
 {
     public class RoomLocation
     {
+        // Identificador único da localização da sala
         [Key]
         public int RoomLocationId { get; set; }
 
+        // Nome da localização
         public string? Name { get; set; }
 
         // Relação com salas

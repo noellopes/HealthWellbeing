@@ -37,26 +37,11 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Specialty" class="form-label fw-bold">Especialidade</label>
-                    <select asp-for="Specialty" class="form-select">
+                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
+                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty">
                         <option value="">Selecione a especialidade...</option>
-                        <option value="Cardiologia">Cardiologia</option>
-                        <option value="Dermatologia">Dermatologia</option>
-                        <option value="Pediatria">Pediatria</option>
-                        <option value="Ginecologia">Ginecologia</option>
-                        <option value="Urologia">Urologia</option>
-                        <option value="Neurologia">Neurologia</option>
-                        <option value="Psiquiatria">Psiquiatria</option>
-                        <option value="Oftalmologia">Oftalmologia</option>
-                        <option value="Otorrinolaringologia">Otorrinolaringologia</option>
-                        <option value="Endocrinologia">Endocrinologia</option>
-                        <option value="Reumatologia">Reumatologia</option>
-                        <option value="Gastroenterologia">Gastroenterologia</option>
-                        <option value="Pneumologia">Pneumologia</option>
-                        <option value="Nefrologia">Nefrologia</option>
-                        <option value="Medicina Geral e Familiar">Medicina Geral e Familiar</option>
                     </select>
-                    <span asp-validation-for="Specialty" class="text-danger small"></span>
+                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
                 </div>
             </div>
 
