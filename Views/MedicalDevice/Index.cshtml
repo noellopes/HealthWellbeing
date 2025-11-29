@@ -109,7 +109,7 @@ else
 
                         <td class="text-nowrap">
                             @* Exibir Status *@
-                            @if (status == "Disponível")
+                            @if (status == "Aguarda Localização")
                             {
                                 <span class="badge bg-success">@status</span>
                             }
@@ -117,7 +117,7 @@ else
                             {
                                 <span class="badge bg-warning text-dark">@status</span>
                             }
-                            else /* Indisponível (Alocado) */
+                            else /* Alocado */
                             {
                                 <span class="badge bg-danger">@status</span>
                             }
@@ -128,15 +128,15 @@ else
                                 // Tem atribuição, mostra o nome da sala
                                 <span class="fw-bold ms-2">na @localizacao.Room.Name</span>
                             }
-                            else if (status == "Disponível")
+                            else if (status == "Aguarda Localização")
                             {
                                 // Não tem atribuição (e não está em manutenção), está à espera
-                                <span class="text-muted small ms-2">Aguardando atribuição...</span>
+                                <span class="text-muted small ms-2">...</span>
                             }
                             else if (status == "Em Manutenção")
                             {
                                 // Se estiver em manutenção, não precisa de mostrar a localização da sala
-                                <span class="text-muted small ms-2">Consultar observações</span>
+                                <span class="text-muted small ms-2">...</span>
                             }
                         </td>
 

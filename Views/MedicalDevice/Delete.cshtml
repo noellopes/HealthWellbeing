@@ -56,13 +56,13 @@
                 {
                     <span class="badge bg-warning text-dark">@statusAtual</span>
                 }
-                else if (statusAtual.Contains("Indisponível"))
+                else if (statusAtual.Contains("Alocado"))
                 {
                     <span class="badge bg-danger">@statusAtual</span>
                 }
                 else
                 {
-                    @* "Disponível" *@
+                    @* "Aguarda Localização" *@
                     <span class="badge bg-success">@statusAtual</span>
                 }
             </dd>

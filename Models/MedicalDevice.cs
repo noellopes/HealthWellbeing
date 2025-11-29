@@ -58,14 +58,14 @@ namespace HealthWellbeingRoom.Models
                     return "Em Manutenção";
                 }
 
-                // 2. Segunda Prioridade: Alocação (Indisponível)
+                // 2. Segunda Prioridade: Alocação
                 if (LocalizacaoDispMedicoMovel != null && LocalizacaoDispMedicoMovel.Any(loc => loc.EndDate == null))
                 {
-                    return "Indisponível (Alocado)";
+                    return "Alocado";
                 }
 
-                // 3. Última Prioridade: Disponível
-                return "Disponível";
+                // 3. Última Prioridade: Aguarda Localização
+                return "Aguarda Localização";
             }
         }
     }
