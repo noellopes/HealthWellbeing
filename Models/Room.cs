@@ -37,7 +37,7 @@ namespace HealthWellbeing.Models
         public RoomLocation? RoomLocation { get; set; }
 
 
-        // Horário de funcionamento da sala
+        // Horário de abertura da sala
         [Required(ErrorMessage = "A hora de abertura é obrigatória.")]
         [DataType(DataType.Time)]
         public TimeSpan OpeningTime { get; set; }
