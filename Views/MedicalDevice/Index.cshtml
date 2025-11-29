@@ -141,11 +141,27 @@ else
                         </td>
 
                         <td class="text-end">
-                            <a asp-controller="LocationMedDevice" asp-action="Create"
-                               asp-route-id="@dispositivo.MedicalDeviceID"
-                               class="btn btn-sm btn-success me-1">
-                                <i class="bi bi-geo-alt"></i> Mover
-                            </a>
+                            @{
+                                // O botão Mover deve aparecer APENAS se o dispositivo NÃO estiver em Manutenção
+                                bool podeMover = dispositivo.CurrentStatus != "Em Manutenção";
+                            }
+
+                            @* Código do botão Mover *@
+                            @if (podeMover)
+                            {
+                                <a asp-controller="LocationMedDevice" asp-action="Create"
+                                   asp-route-id="@dispositivo.MedicalDeviceID"
+                                   class="btn btn-sm btn-success me-1">
+                                    <i class="bi bi-geo-alt"></i> Mover
+                                </a>
+                            }
+                            else
+                            {
+                                @* Mostra o botão desativado *@
+                                <span class="btn btn-sm btn-secondary me-1 disabled">
+                                    <i class="bi bi-x-octagon"></i> Mover
+                                </span>
+                            }
                             <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
