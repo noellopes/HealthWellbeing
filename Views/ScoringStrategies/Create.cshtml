@@ -1,43 +1,55 @@
 ﻿@model HealthWellbeing.Models.ScoringStrategy
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Scoring Strategy";
 }
 
-<h1>Create</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h4>ScoringStrategy</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i> New Scoring Strategy
+        </h4>
+    </div>
+    <div class="card-body">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ScoringStrategyName" class="control-label"></label>
-                <input asp-for="ScoringStrategyName" class="form-control" />
-                <span asp-validation-for="ScoringStrategyName" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            <div class="mb-3">
+                <label asp-for="ScoringStrategyName" class="form-label fw-bold"></label>
+                <input asp-for="ScoringStrategyName" class="form-control" placeholder="E.g., Fixed Score, Time Based..." />
+                <span asp-validation-for="ScoringStrategyName" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ScoringStrategyCode" class="control-label"></label>
-                <input asp-for="ScoringStrategyCode" class="form-control" />
-                <span asp-validation-for="ScoringStrategyCode" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="ScoringStrategyDescription" class="form-label fw-bold"></label>
+                <textarea asp-for="ScoringStrategyDescription" class="form-control" rows="3" placeholder="Briefly describe how points are calculated..."></textarea>
+                <span asp-validation-for="ScoringStrategyDescription" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ScoringStrategyDescription" class="control-label"></label>
-                <input asp-for="ScoringStrategyDescription" class="form-control" />
-                <span asp-validation-for="ScoringStrategyDescription" class="text-danger"></span>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="ScoringStrategyCode" class="form-label fw-bold"></label>
+                    <input asp-for="ScoringStrategyCode" class="form-control" placeholder="E.g., FIXED, TIME_BASED..." />
+                    <span asp-validation-for="ScoringStrategyCode" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Create
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

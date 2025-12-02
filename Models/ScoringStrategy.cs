@@ -4,7 +4,7 @@ namespace HealthWellbeing.Models {
     public class ScoringStrategy {
         public int ScoringStrategyId { get; set; }
 
-        [Display(Name = "Scoring Strategy Name")]
+        [Display(Name = "Name")]
         [Required(ErrorMessage = "Please enter the scoring strategy name.")]
         [StringLength(100, ErrorMessage = "Scoring strategy name cannot exceed {1} characters.")]
         [RegularExpression(@"^[a-zA-Z0-9À-ÿ\s\-_.!,?()&+:;""']+$",
@@ -17,7 +17,7 @@ namespace HealthWellbeing.Models {
         [RegularExpression(@"^[A-Z_]+$", ErrorMessage = "Use only uppercase letters and underscores (e.g. TIME_BASED).")]
         public required string ScoringStrategyCode { get; set; }
 
-        [Display(Name = "Scoring Strategy Description")]
+        [Display(Name = "Description")]
         [StringLength(300, ErrorMessage = "Scoring strategy description cannot exceed {1} characters.")]
         public string? ScoringStrategyDescription { get; set; }
         public virtual ICollection<EventType>? EventTypes { get; set; }
