@@ -1,7 +1,8 @@
-using HealthWellbeing.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Data
 {
@@ -689,8 +690,7 @@ namespace HealthWellbeing.Data
             return dbContext.Trainer.ToList();
         }
 
-        private static void PopulateTraining(HealthWellbeingDbContext dbContext, List<Trainer> trainers)
-        {
+        private static void PopulateTraining(HealthWellbeingDbContext dbContext, List<Trainer> trainers) {
             if (dbContext.Training.Any()) return;
 
             var yogaTypeId = dbContext.TrainingType.FirstOrDefault(t => t.Name == "Yoga Basics")?.TrainingTypeId;
@@ -700,8 +700,7 @@ namespace HealthWellbeing.Data
             var johnId = trainers.FirstOrDefault(t => t.Name == "John Smith")?.TrainerId;
 
 
-            if (yogaTypeId.HasValue && hiitTypeId.HasValue && carlosId.HasValue && johnId.HasValue)
-            {
+            if (yogaTypeId.HasValue && hiitTypeId.HasValue && carlosId.HasValue && johnId.HasValue) {
                 dbContext.Training.AddRange(new List<Training>()
                 {
                     new Training
@@ -737,6 +736,43 @@ namespace HealthWellbeing.Data
                 });
 
                 dbContext.SaveChanges();
+            }
+        }
+
+        internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager) {
+            EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Gestor"]).Wait();
+        }
+
+        private static async Task EnsureUserIsCreatedAsync(UserManager<IdentityUser> userManager, string username, string password, string[] roles) {
+            IdentityUser? user = await userManager.FindByNameAsync(username);
+
+            if (user == null) {
+                user = new IdentityUser(username);
+                await userManager.CreateAsync(user, password);
+            }
+
+            foreach (var role in roles) {
+                if (!await userManager.IsInRoleAsync(user, role)) {
+                    await userManager.AddToRoleAsync(user, role);
+                }
+            }
+        }
+
+        internal static void SeedUsers(UserManager<IdentityUser> userManager) {
+            EnsureUserIsCreatedAsync(userManager, "joao@ipg.pt", "Secret123$", ["Treinador"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "maria@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "paulo@ipg.pt", "Secret123$", ["Utente"]).Wait();
+        }
+
+        internal static void SeedRoles(RoleManager<IdentityRole> roleManager) {
+            EnsureRoleIsCreatedAsync(roleManager, "Gestor").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Treinador").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Utente").Wait();
+        }
+
+        private static async Task EnsureRoleIsCreatedAsync(RoleManager<IdentityRole> roleManager, string role) {
+            if (!await roleManager.RoleExistsAsync(role)) {
+                await roleManager.CreateAsync(new IdentityRole(role));
             }
         }
     }
