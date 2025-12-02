@@ -81,10 +81,10 @@ namespace HealthWellbeing.Controllers
         // INDEX COM PAGINAÇÃO
         // ==============================================
         public IActionResult Index(
-            int page = 1,
-            string searchNome = "",
-            string searchZona = "",
-            bool stockCritico = false)
+    int page = 1,
+    string searchNome = "",
+    string searchZona = "",
+    bool stockCritico = false)
         {
             GarantirStockBase();
             SincronizarStockComConsumiveis();
@@ -94,18 +94,47 @@ namespace HealthWellbeing.Controllers
                 .Include(s => s.Zona)
                 .AsQueryable();
 
-            // FILTROS
-            if (!string.IsNullOrWhiteSpace(searchNome))
-                query = query.Where(s => s.Consumivel.Nome.Contains(searchNome));
 
-            if (!string.IsNullOrWhiteSpace(searchZona))
-                query = query.Where(s => s.Zona.Nome.Contains(searchZona));
-
-            // STOCK CRÍTICO → tem de comparar com limites do Consumível
+            // ------------------------------
+            // FILTRO POR STOCK CRÍTICO
+            // ------------------------------
             if (stockCritico)
+            {
                 query = query.Where(s => s.QuantidadeAtual < s.Consumivel.QuantidadeMinima);
 
+                ViewBag.StockCritico = true;
+                ViewBag.FilterMessage = "⚠️ A mostrar apenas consumíveis com stock crítico.";
+            }
+            else
+            {
+                ViewBag.StockCritico = false;
+            }
+
+
+            // ------------------------------
+            // FILTRO POR NOME
+            // ------------------------------
+            if (!string.IsNullOrWhiteSpace(searchNome))
+            {
+                query = query.Where(s => s.Consumivel.Nome.Contains(searchNome));
+                ViewBag.SearchNome = searchNome;
+                ViewBag.FilterNomeMessage = $"🔍 A mostrar resultados para o nome: \"{searchNome}\"";
+            }
+
+            // ------------------------------
+            // FILTRO POR ZONA
+            // ------------------------------
+            if (!string.IsNullOrWhiteSpace(searchZona))
+            {
+                query = query.Where(s => s.Zona.Nome.Contains(searchZona));
+                ViewBag.SearchZona = searchZona;
+                ViewBag.FilterZonaMessage = $"📍 A mostrar resultados para a zona: \"{searchZona}\"";
+            }
+
+
+            // ------------------------------
             // PAGINAÇÃO
+            // ------------------------------
             int totalItems = query.Count();
             var pagination = new PaginationInfo<Stock>(page, totalItems, itemsPerPage: 10);
 
@@ -117,6 +146,7 @@ namespace HealthWellbeing.Controllers
 
             return View(pagination);
         }
+
 
         // ==============================================
         // CREATE GET

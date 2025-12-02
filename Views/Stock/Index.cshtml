@@ -21,9 +21,40 @@
     </div>
 
 
-    <!-- PESQUISA -->
+    <!-- =============================== -->
+    <!-- MENSAGENS DE FILTRO / PESQUISA -->
+    <!-- =============================== -->
+    @if (ViewBag.StockCritico == true)
+    {
+        <div class="alert alert-warning d-flex align-items-center shadow-sm mb-3">
+            ⚠️ A mostrar apenas consumíveis que estão abaixo da quantidade mínima.
+        </div>
+    }
+
+    @if (ViewBag.SearchNome != null && ViewBag.SearchNome != "")
+    {
+        <div class="alert alert-info shadow-sm mb-2">
+            🔍 A pesquisar por nome contendo: <strong>@ViewBag.SearchNome</strong>
+        </div>
+    }
+
+    @if (ViewBag.SearchZona != null && ViewBag.SearchZona != "")
+    {
+        <div class="alert alert-info shadow-sm mb-3">
+            📍 A pesquisar por zona contendo: <strong>@ViewBag.SearchZona</strong>
+        </div>
+    }
+
+
+
+    <!-- =============================== -->
+    <!-- FORMULÁRIO DE PESQUISA/OPÇÕES -->
+    <!-- =============================== -->
+
     <form method="get" asp-action="Index" class="mb-4">
         <div class="row g-3">
+
+            <!-- PESQUISAR NOME -->
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">🔍</span>
@@ -32,6 +63,7 @@
                 </div>
             </div>
 
+            <!-- PESQUISAR ZONA -->
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">📍</span>
@@ -40,24 +72,32 @@
                 </div>
             </div>
 
+            <!-- CHECKBOX STOCK CRÍTICO (MESMA LINHA) -->
             <div class="col-md-2 d-flex align-items-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="stockCritico"
-                           value="true" @(ViewBag.StockCritico == true ? "checked" : "") />
+                <input class="form-check-input me-2"
+                       type="checkbox"
+                       name="stockCritico"
+                       value="true"
+                       @(ViewBag.StockCritico == true ? "checked" : "")
+                       onchange="this.form.submit()" />
 
-                    <label class="form-check-label">⚠️ Só stock crítico</label>
-                </div>
+                <label class="form-check-label">⚠️ Só stock crítico</label>
             </div>
 
+            <!-- BOTÕES -->
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
                 <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpar</a>
             </div>
+
         </div>
     </form>
 
 
-    <!-- TABELA -->
+    <!-- =============================== -->
+    <!-- TABELA DE STOCK -->
+    <!-- =============================== -->
+
     <div class="table-responsive">
         <table class="table table-bordered table-striped shadow-sm">
             <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
@@ -123,7 +163,11 @@
         </table>
     </div>
 
+
+    <!-- =============================== -->
     <!-- PAGINAÇÃO -->
+    <!-- =============================== -->
+
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
 
@@ -150,5 +194,4 @@
 
         </ul>
     </nav>
-
 </div>
