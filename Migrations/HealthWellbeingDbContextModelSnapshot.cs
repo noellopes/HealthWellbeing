@@ -408,6 +408,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("QuantidadeMinima")
                         .HasColumnType("int");
 
+                    b.Property<bool>("UsaValoresDoConsumivel")
+                        .HasColumnType("bit");
+
                     b.Property<int>("ZonaID")
                         .HasColumnType("int");
 

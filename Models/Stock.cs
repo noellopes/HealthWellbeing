@@ -25,6 +25,8 @@ namespace HealthWellbeing.Models
         public int QuantidadeMinima { get; set; }
         public int QuantidadeMaxima { get; set; }
 
+        public bool UsaValoresDoConsumivel { get; set; } = true;
+
         public DateTime DataUltimaAtualizacao { get; set; } = DateTime.Now;
     }
 }

@@ -20,7 +20,6 @@
         </div>
     </div>
 
-
     <!-- =============================== -->
     <!-- MENSAGENS DE FILTRO / PESQUISA -->
     <!-- =============================== -->
@@ -31,14 +30,14 @@
         </div>
     }
 
-    @if (ViewBag.SearchNome != null && ViewBag.SearchNome != "")
+    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchNome))
     {
         <div class="alert alert-info shadow-sm mb-2">
             🔍 A pesquisar por nome contendo: <strong>@ViewBag.SearchNome</strong>
         </div>
     }
 
-    @if (ViewBag.SearchZona != null && ViewBag.SearchZona != "")
+    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchZona))
     {
         <div class="alert alert-info shadow-sm mb-3">
             📍 A pesquisar por zona contendo: <strong>@ViewBag.SearchZona</strong>
@@ -46,11 +45,9 @@
     }
 
 
-
     <!-- =============================== -->
     <!-- FORMULÁRIO DE PESQUISA/OPÇÕES -->
     <!-- =============================== -->
-
     <form method="get" asp-action="Index" class="mb-4">
         <div class="row g-3">
 
@@ -72,7 +69,7 @@
                 </div>
             </div>
 
-            <!-- CHECKBOX STOCK CRÍTICO (MESMA LINHA) -->
+            <!-- CHECKBOX STOCK CRÍTICO -->
             <div class="col-md-2 d-flex align-items-center">
                 <input class="form-check-input me-2"
                        type="checkbox"
@@ -97,7 +94,6 @@
     <!-- =============================== -->
     <!-- TABELA DE STOCK -->
     <!-- =============================== -->
-
     <div class="table-responsive">
         <table class="table table-bordered table-striped shadow-sm">
             <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
@@ -125,15 +121,21 @@
                 {
                     foreach (var item in Model.Items)
                     {
-                        var min = item.Consumivel?.QuantidadeMinima ?? 0;
-                        var max = item.Consumivel?.QuantidadeMaxima ?? 0;
+                        // Determinar Min/Max CORRETOS
+                        var min = item.UsaValoresDoConsumivel
+                        ? item.Consumivel?.QuantidadeMinima ?? 0
+                        : item.QuantidadeMinima;
+
+                        var max = item.UsaValoresDoConsumivel
+                        ? item.Consumivel?.QuantidadeMaxima ?? 0
+                        : item.QuantidadeMaxima;
 
                         <tr class="text-center">
 
                             <td>@item.Consumivel?.Nome</td>
                             <td>@item.Zona?.Nome</td>
 
-                            <!-- STOCK CRÍTICO BASEADO NO CONSUMÍVEL -->
+                            <!-- STOCK CRÍTICO COM O VALOR CERTO -->
                             <td class="fw-bold @(item.QuantidadeAtual < min ? "text-danger" : "")">
                                 @item.QuantidadeAtual
                                 @(item.QuantidadeAtual < min ? " ⚠️" : "")
@@ -141,6 +143,7 @@
 
                             <td>@min</td>
                             <td>@max</td>
+
                             <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
 
                             <td>
@@ -167,7 +170,6 @@
     <!-- =============================== -->
     <!-- PAGINAÇÃO -->
     <!-- =============================== -->
-
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
 

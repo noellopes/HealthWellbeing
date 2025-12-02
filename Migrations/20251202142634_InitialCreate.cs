@@ -310,6 +310,7 @@ namespace HealthWellbeing.Migrations
                     QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
                     QuantidadeMinima = table.Column<int>(type: "int", nullable: false),
                     QuantidadeMaxima = table.Column<int>(type: "int", nullable: false),
+                    UsaValoresDoConsumivel = table.Column<bool>(type: "bit", nullable: false),
                     DataUltimaAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

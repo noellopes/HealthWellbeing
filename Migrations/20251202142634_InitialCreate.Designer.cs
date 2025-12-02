@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251125200319_InitialCreate")]
+    [Migration("20251202142634_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -410,6 +410,9 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<int>("QuantidadeMinima")
                         .HasColumnType("int");
+
+                    b.Property<bool>("UsaValoresDoConsumivel")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ZonaID")
                         .HasColumnType("int");
