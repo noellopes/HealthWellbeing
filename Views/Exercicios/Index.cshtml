@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-md-3">
                         <label for="searchEquipamento" class="form-label">Equipamento</label>
-                        <input id="searchEquipamento" name="searchEquipamento" value="@ViewBag.searchEquipamento" class="form-control" placeholder="Procurar por grupo Esquipamento" />
+                        <input id="searchEquipamento" name="searchEquipamento" value="@ViewBag.SearchEquipamento" class="form-control" placeholder="Procurar por equipamento" />
                     </div>
 
                     <div class="col-12 mt-2 d-flex gap-2">
@@ -80,6 +80,7 @@
                         <th>Duração</th>
                         <th>Intensidade</th>
                         <th>Calorias</th>
+                        <th>Contraindicações</th>
                         <th class="text-center" style="width: 260px;">Ações</th>
                     </tr>
                 </thead>
@@ -98,19 +99,35 @@
                         <span class="badge bg-info">@exercicio.Intencidade / 10</span>
                     </td>
                     <td>@exercicio.CaloriasGastas kcal</td>
-                    <td class="text-center">
-                        <a asp-action="Details" asp-route-id="@exercicio.ExercicioId" class="btn btn-primary btn-sm me-1">
-                            <i class="fas fa-eye"></i> Ver
-                        </a>
-                        <a asp-action="Edit" asp-route-id="@exercicio.ExercicioId" class="btn btn-warning btn-sm me-1">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@exercicio.ExercicioId" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash-alt"></i> Apagar
-                        </a>
-                    </td>
-                </tr>
+                    <td>
+                        @if (exercicio.Contraindicacoes != null && exercicio.Contraindicacoes.Any())
+                                {
+                                    @foreach (var c in exercicio.Contraindicacoes.Take(3))
+                                    {
+                                        if (c.ProblemaSaude != null)
+                                        {
+                                            <span class="badge bg-danger me-1 mb-1">@c.ProblemaSaude.ProblemaNome</span>
+                                        }
+                                    }
                                 }
+                                else
+                                {
+                                    <span class="text-muted">Nenhuma</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@exercicio.ExercicioId" class="btn btn-primary btn-sm me-1">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@exercicio.ExercicioId" class="btn btn-warning btn-sm me-1">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@exercicio.ExercicioId" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i> Apagar
+                                </a>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
 
@@ -131,7 +148,7 @@
                                asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                asp-route-searchGenero="@ViewBag.SearchGenero"
                                asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
-                               asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">Início</a>
+                               asp-route-searchEquipamento="@ViewBag.SearchEquipamento">Início</a>
                         </li>
                     }
 
@@ -151,7 +168,7 @@
                                    asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                    asp-route-searchGenero="@ViewBag.SearchGenero"
                                    asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
-                                   asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">@p</a>
+                                   asp-route-searchEquipamento="@ViewBag.SearchEquipamento">@p</a>
                             </li>
                         }
                     }
@@ -170,7 +187,7 @@
                                asp-route-searchDescricao="@ViewBag.SearchDescricao"
                                asp-route-searchGenero="@ViewBag.SearchGenero"
                                asp-route-searchGrupoMuscular="@ViewBag.SearchGrupoMuscular"
-                               asp-route-SearchEquipamento="@ViewBag.SearchEquipamento">Fim</a>
+                               asp-route-searchEquipamento="@ViewBag.SearchEquipamento">Fim</a>
                         </li>
                     }
                 </ul>

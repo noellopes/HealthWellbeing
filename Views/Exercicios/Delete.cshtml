@@ -5,40 +5,55 @@
 }
 
 <div class="container mt-4">
-    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
+    <h1 class="text-danger mb-3">
+        <i class="fas fa-trash-alt"></i> @ViewData["Title"]
+    </h1>
 
-    <p class="lead">Tem a certeza que deseja eliminar o seguinte exercício? Esta ação não pode ser desfeita.</p>
+    <p class="lead">Tem a certeza que deseja eliminar este exercício? Esta ação é irreversível.</p>
 
     <div class="card mb-4 shadow-sm border-danger">
         <div class="card-header bg-danger text-white fw-bold">
             Dados do Exercício
         </div>
+
         <div class="card-body">
             <dl class="row mb-0">
 
                 <dt class="col-sm-3">Nome do Exercício</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.ExercicioNome)</dd>
+                <dd class="col-sm-9">@Model.ExercicioNome</dd>
 
                 <dt class="col-sm-3">Descrição</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
+                <dd class="col-sm-9">@Model.Descricao</dd>
 
                 <dt class="col-sm-3">Duração (min)</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Duracao)</dd>
+                <dd class="col-sm-9">@Model.Duracao</dd>
 
                 <dt class="col-sm-3">Intensidade</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Intencidade)</dd>
+                <dd class="col-sm-9">@Model.Intencidade</dd>
 
                 <dt class="col-sm-3">Calorias Gastas</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.CaloriasGastas)</dd>
+                <dd class="col-sm-9">@Model.CaloriasGastas</dd>
 
-                <dt class="col-sm-3">Equipamentos Associados</dt>
+                <dt class="col-sm-3">Repetições</dt>
+                <dd class="col-sm-9">@Model.Repeticoes</dd>
+
+                <dt class="col-sm-3">Séries</dt>
+                <dd class="col-sm-9">@Model.Series</dd>
+
+                <dt class="col-sm-3">Instruções</dt>
+                <dd class="col-sm-9">@Model.Instrucoes</dd>
+
+                <dt class="col-sm-3">Equipamentos</dt>
                 <dd class="col-sm-9">
                     @if (Model.ExercicioEquipamentos != null && Model.ExercicioEquipamentos.Any())
                     {
                         <ul class="list-unstyled mb-0">
                             @foreach (var item in Model.ExercicioEquipamentos)
                             {
-                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.Equipamento.NomeEquipamento</li>
+                                <li>
+                                    <i class="fas fa-angle-right text-danger me-1"></i>
+                                    @item.Equipamento.NomeEquipamento
+                                </li>
                             }
                         </ul>
                     }
@@ -48,46 +63,64 @@
                     }
                 </dd>
 
-                <dt class="col-sm-3">Repetições</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Repeticoes)</dd>
-
-                <dt class="col-sm-3">Séries</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Series)</dd>
-
-                <dt class="col-sm-3">Instruções</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Instrucoes)</dd>
-
-                <dt class="col-sm-3">Gêneros Associados</dt>
+                <dt class="col-sm-3">Géneros</dt>
                 <dd class="col-sm-9">
                     @if (Model.ExercicioGeneros != null && Model.ExercicioGeneros.Any())
                     {
                         <ul class="list-unstyled mb-0">
                             @foreach (var item in Model.ExercicioGeneros)
                             {
-                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.Genero.NomeGenero</li>
+                                <li>
+                                    <i class="fas fa-angle-right text-danger me-1"></i>
+                                    @item.Genero.NomeGenero
+                                </li>
                             }
                         </ul>
                     }
                     else
                     {
-                        <span class="text-muted">Nenhum gênero associado.</span>
+                        <span class="text-muted">Nenhum género associado.</span>
                     }
                 </dd>
 
-                <dt class="col-sm-3">Grupos Musculares Associados</dt>
+                <dt class="col-sm-3">Grupos Musculares</dt>
                 <dd class="col-sm-9">
                     @if (Model.ExercicioGrupoMusculares != null && Model.ExercicioGrupoMusculares.Any())
                     {
                         <ul class="list-unstyled mb-0">
                             @foreach (var item in Model.ExercicioGrupoMusculares)
                             {
-                                <li><i class="fas fa-angle-right text-danger me-1"></i> @item.GrupoMuscular.GrupoMuscularNome</li>
+                                <li>
+                                    <i class="fas fa-angle-right text-danger me-1"></i>
+                                    @item.GrupoMuscular.GrupoMuscularNome
+                                </li>
                             }
                         </ul>
                     }
                     else
                     {
                         <span class="text-muted">Nenhum grupo muscular associado.</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 text-danger">Contraindicações</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Contraindicacoes != null && Model.Contraindicacoes.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.Contraindicacoes)
+                            {
+                                <li>
+                                    <span class="badge bg-danger">
+                                        @item.ProblemaSaude?.ProblemaNome
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhuma contraindicação registada.</span>
                     }
                 </dd>
 

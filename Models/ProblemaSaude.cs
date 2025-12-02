@@ -29,5 +29,6 @@ namespace HealthWellbeing.Models
         }
 
         public ICollection<TipoExercicioProblemaSaude>? TipoExercicioAfetado { get; set; }
+        public ICollection<ExercicioProblemaSaude>? ExercicioAfetado { get; set; }
     }
 }

@@ -8,6 +8,7 @@
     var generosSel = ViewBag.GenerosSelecionados as List<int> ?? new List<int>();
     var gruposSel = ViewBag.GruposSelecionados as List<int> ?? new List<int>();
     var equipamentosSel = ViewBag.EquipamentosSelecionados as List<int> ?? new List<int>();
+    var problemasSel = ViewBag.ProblemasSelecionados as List<int> ?? new List<int>();
 }
 
 <div class="container mt-4">
@@ -171,6 +172,47 @@
             <textarea asp-for="Instrucoes" rows="3" class="form-control"></textarea>
             <span asp-validation-for="Instrucoes" class="text-danger small"></span>
         </div>
+
+        @{
+            var problemas = ViewBag.ProblemasSaude as IEnumerable<ProblemaSaude>;
+            var problemasSel = ViewBag.ProblemasSelecionados as List<int> ?? new List<int>();
+        }
+
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
+            <small class="form-text text-muted d-block">Selecione os problemas de saúde que contraindicam este exercício</small>
+
+            <div class="border p-3 rounded mt-2 bg-light">
+                @if (problemas != null && problemas.Any())
+                {
+                    <div class="row">
+                        @foreach (var problema in problemas)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="problemasSaudeIds"
+                                           value="@problema.ProblemaSaudeId"
+                                           id="prob_@problema.ProblemaSaudeId"
+                                           @(problemasSel.Contains(problema.ProblemaSaudeId) ? "checked" : "") />
+
+                                    <label class="form-check-label" for="prob_@problema.ProblemaSaudeId">
+                                        @problema.ProblemaNome
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted">Nenhum problema de saúde registado.</span>
+                }
+            </div>
+        </div>
+
+
 
         <div class="mt-4">
             <button type="submit" class="btn btn-success">
