@@ -83,15 +83,25 @@
                 </div>
             </div>
 
-            @* Colocar o dispositivo em manutenção ou não *@
+            @* Bloco de Controlo de Manutenção *@
             <div class="row">
                 <div class="col-md-12">
-                    <div class="form-check mt-3 mb-4">
-                        <input class="form-check-input" type="checkbox" asp-for="IsUnderMaintenance">
-                        <label class="form-check-label fw-bold text-danger" asp-for="IsUnderMaintenance">
-                            Ativar Modo **Em Manutenção**
+                    @* Borda e fundo leve para destacar esta zona *@
+                    <div class="form-check form-switch mt-3 mb-4 p-3 border rounded bg-light border-warning">
+
+                        @* Usei 'form-switch' para parecer um interruptor *@
+                        <input class="form-check-input" type="checkbox" role="switch" asp-for="IsUnderMaintenance" style="cursor: pointer;">
+
+                        <label class="form-check-label fw-bold text-danger ms-2" asp-for="IsUnderMaintenance">
+                            Estado: Em Manutenção
                         </label>
-                        <p class="small text-muted">Se ativado, o dispositivo será marcado como indisponível para uso.</p>
+
+                        <div class="small text-muted mt-2">
+                            <ul class="mb-0 ps-3">
+                                <li><strong>Ativar (Marcar):</strong> O dispositivo fica em manutenção e a localização atual é encerrada.</li>
+                                <li><strong>Desativar (Desmarcar):</strong> A manutenção termina e o dispositivo volta para um <u>Depósito</u>.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -31,9 +31,6 @@
 
         <dl class="row mb-0 mt-4">
 
-            <dt class="col-sm-3 fw-bold text-muted small">ID do Dispositivo</dt>
-            <dd class="col-sm-9 small">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
-
             <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
             <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
@@ -62,7 +59,7 @@
                 }
                 else
                 {
-                    @* "Aguarda Localização" *@
+                    @* "Em Armazenamento" *@
                     <span class="badge bg-success">@statusAtual</span>
                 }
             </dd>
