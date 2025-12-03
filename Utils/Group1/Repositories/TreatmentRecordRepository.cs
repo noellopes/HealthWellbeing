@@ -79,9 +79,53 @@ namespace HealthWellbeing.Utils.Group1.Repositories
                         //var nurseId = GetNurseIdFromUser(user);
                         var nurseId = Random.Shared.Next(1, 21);
                         baseQuery = baseQuery.Where(t => t.NurseId == nurseId);
+                        selector = new(t => new TreatmentRecordListDTO
+                        {
+                            Id = t.Id,
+                            Nurse = t.Nurse.Name,
+                            TreatmentType = t.TreatmentType.Name,
+                            Pathology = t.Pathology.Name,
+                            TreatmentDate = t.TreatmentDate.ToShortDateString(),
+                            AdditionalNotes = t.AdditionalNotes,
+                            EstimatedDuration = t.EstimatedDuration,
+                            Status = Functions.GetEnumDisplayName(t.Status),
+                        }, [
+                            nameof(TreatmentRecordListDTO.Nurse),
+                            nameof(TreatmentRecordListDTO.TreatmentType),
+                            nameof(TreatmentRecordListDTO.Pathology),
+                            nameof(TreatmentRecordListDTO.TreatmentDate),
+                            nameof(TreatmentRecordListDTO.AdditionalNotes),
+                            nameof(TreatmentRecordListDTO.EstimatedDuration),
+                            nameof(TreatmentRecordListDTO.Status),
+                            ]);
                         break;
                     case var currentUser when currentUser.IsInRole("Administrator") || currentUser.IsInRole("TreatmentOfficeManager"):
                         //baseQuery = baseQuery.FirstOrDefaultAsync(m => m.Id == id);
+                        selector = new(t => new TreatmentRecordListDTO
+                        {
+                            Id = t.Id,
+                            Nurse = t.Nurse.Name,
+                            TreatmentType = t.TreatmentType.Name,
+                            Pathology = t.Pathology.Name,
+                            TreatmentDate = t.TreatmentDate.ToShortDateString(),
+                            AdditionalNotes = t.AdditionalNotes,
+                            EstimatedDuration = t.EstimatedDuration,
+                            Observations = t.Observations,
+                            Status = Functions.GetEnumDisplayName(t.Status),
+                            CompletedDuration = t.CompletedDuration,
+                            CreatedAt = t.CreatedAt
+                        }, [
+                           nameof(TreatmentRecordListDTO.Nurse),
+                           nameof(TreatmentRecordListDTO.TreatmentType),
+                           nameof(TreatmentRecordListDTO.Pathology),
+                           nameof(TreatmentRecordListDTO.TreatmentDate),
+                           nameof(TreatmentRecordListDTO.AdditionalNotes),
+                           nameof(TreatmentRecordListDTO.EstimatedDuration),
+                           nameof(TreatmentRecordListDTO.Observations),
+                           nameof(TreatmentRecordListDTO.Status),
+                           nameof(TreatmentRecordListDTO.CompletedDuration),
+                           nameof(TreatmentRecordListDTO.CreatedAt)
+                           ]);
                         break;
                     default:
                         // Utilizadores (Utentes)
@@ -192,7 +236,7 @@ namespace HealthWellbeing.Utils.Group1.Repositories
                     break;
                 default:
                     // Utilizadores (Utentes)
-                    baseQuery = baseQuery
+                    baseQuery = _context.TreatmentRecord
                         .Include(t => t.Nurse)
                         .Include(t => t.Pathology)
                         .Include(t => t.TreatmentType)

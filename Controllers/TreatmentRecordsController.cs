@@ -47,8 +47,9 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
-            if (treatmentRecord.Data == null)
+            if (treatmentRecord == null || treatmentRecord.Data == null)
             {
+                Response.StatusCode = 404;
                 return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
@@ -74,7 +75,7 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Patient")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Schedule([Bind("Id,TreatmentTypeId,PathologyId,TreatmentDate")] TreatmentRecord treatmentRecord)
+        public async Task<IActionResult> Schedule([Bind("Id,TreatmentTypeId,PathologyId,TreatmentDate,AdditionalNotes")] TreatmentRecord treatmentRecord)
         {
             ViewData["Title"] = "Marcação de tratamento";
 
@@ -97,16 +98,17 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Patient, Nurse, TreatmentOfficeManager, Administrator")]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var treatmentRecord = await _context.TreatmentRecord.FindAsync(id);
-            if (treatmentRecord == null)
+            var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
+            if (treatmentRecord == null || treatmentRecord.Data == null)
             {
-                return NotFound();
+                Response.StatusCode = 404;
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
             ViewData["Title"] = "Editar marcação de tratamento";
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("Request", treatmentRecord);
+            return View("Request", treatmentRecord.Data);
         }
 
         // POST: TreatmentRecords/Edit/<GUID>
@@ -119,7 +121,8 @@ namespace HealthWellbeing.Controllers
         {
             if (id != treatmentRecord.Id)
             {
-                return NotFound();
+                Response.StatusCode = 404;
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
             ViewData["Title"] = "Editar marcação de tratamento";
@@ -157,9 +160,10 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
-            if (treatmentRecord.Data == null)
+            if (treatmentRecord == null || treatmentRecord.Data == null)
             {
-                return NotFound();
+                Response.StatusCode = 404;
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
 
             ViewData["Title"] = "Remover tratamento";
@@ -175,9 +179,10 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var treatmentRecord = await _repository.GetSingleTreatmentRecordAsync(User, id);
-            if (treatmentRecord == null)
+            if (treatmentRecord == null || treatmentRecord.Data == null)
             {
-                return NotFound();
+                Response.StatusCode = 404;
+                return View("~/Views/Shared/Group1/NotFound.cshtml");
             }
             else
             {

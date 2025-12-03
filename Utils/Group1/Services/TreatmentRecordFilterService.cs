@@ -30,7 +30,7 @@ namespace HealthWellbeing.Utils.Group1.Services
         {
             if (string.IsNullOrEmpty(sortOrder))
             {
-                sortOrder = "Nurse";
+                sortOrder = "TreatmentDate_desc";
             }
 
             bool descending = sortOrder.EndsWith("_desc", StringComparison.OrdinalIgnoreCase);
