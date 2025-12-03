@@ -52,20 +52,24 @@ namespace HealthWellbeingRoom.Models
         {
             get
             {
-                // 1. Prioridade Máxima: Manutenção
-                if (IsUnderMaintenance)
-                {
-                    return "Em Manutenção";
-                }
+                if (IsUnderMaintenance) return "Em Manutenção";
 
-                // 2. Segunda Prioridade: Alocação
-                if (LocalizacaoDispMedicoMovel != null && LocalizacaoDispMedicoMovel.Any(loc => loc.EndDate == null))
+                // Obtém a localização ativa
+                var locAtiva = LocalizacaoDispMedicoMovel.FirstOrDefault(l => l.EndDate == null);
+
+                if (locAtiva != null)
                 {
+                    // Se a sala for um Depósito, consideramos "Em Armazenamento"
+                    if (locAtiva.Room != null && locAtiva.Room.Name.Contains("Depósito"))
+                    {
+                        return "Em Armazenamento";
+                    }
+
+                    // Qualquer outra sala (Cirurgia, Enfermaria) é "Alocado"
                     return "Alocado";
                 }
 
-                // 3. Última Prioridade: Aguarda Localização
-                return "Aguarda Localização";
+                return "Em Armazenamento";
             }
         }
     }

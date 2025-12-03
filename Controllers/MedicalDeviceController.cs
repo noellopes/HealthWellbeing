@@ -5,6 +5,7 @@ using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NuGet.DependencyResolver;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -142,7 +143,34 @@ namespace HealthWellBeingRoom.Controllers
                 _context.Add(medicalDevices);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' Registado com sucesso!";
+                // Procura uma sala com o nome "Depósito" E que o estado da sala esteja "Disponível"
+                var salaDeposito = await _context.Room
+                .Include(r => r.RoomStatus) // Necessário para acessar as propriedades do Status
+                .Where(r => r.Name.Contains("Depósito") &&
+                            r.RoomStatus != null && // Segurança contra nulos
+                            r.RoomStatus.Name == "Disponível") // Verifica o NOME dentro do objeto RoomStatus
+                .FirstOrDefaultAsync();
+
+                if (salaDeposito != null)
+                {
+                    // Código de criação da localização ao criar novo dispositivo
+                    var novaLocalizacao = new LocationMedDevice
+                    {
+                        MedicalDeviceID = medicalDevices.MedicalDeviceID,
+                        RoomId = salaDeposito.RoomId,
+                        InitialDate = DateTime.Now,
+                        EndDate = null
+                    };
+                    _context.Add(novaLocalizacao);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' registado e alocado na sala {salaDeposito.Name}!";
+                }
+                else
+                {
+                    TempData["WarningMessage"] = $"Dispositivo '{medicalDevices.Name}' registado, mas não foi possível encontrar um Depósito disponível.";
+                }
+
                 return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
             }
 
@@ -174,9 +202,9 @@ namespace HealthWellBeingRoom.Controllers
             return View(medicalDevices);
         }
 
+        // POST: MedicalDevice/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // BIND: Inclui todos os campos editáveis e FKs.
         public async Task<IActionResult> Edit(int id, [Bind("MedicalDeviceID,Name,SerialNumber,RegistrationDate,Observation,TypeMaterialID,IsUnderMaintenance")] MedicalDevice medicalDevices)
         {
             if (id != medicalDevices.MedicalDeviceID)
@@ -188,31 +216,91 @@ namespace HealthWellBeingRoom.Controllers
             {
                 try
                 {
-                    _context.Update(medicalDevices);
-                    await _context.SaveChangesAsync(); 
-                    return RedirectToAction(nameof(Details),
-                        new
-                        {
-                            id = medicalDevices.MedicalDeviceID,
-                            SuccessMessage = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!"
-                        }
-                    );
+                    //busca a "Ficha Completa" original do dispositivo tal como está gravada na base de dados
+                    var dispositivoOriginal = await _context.MedicalDevices 
+                        .AsNoTracking() //para não bloquear o Entity Framework ao atualizar o objeto 'medicalDevices' depois.
+                        .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
+                    if (dispositivoOriginal == null) return View("NotFound");
+
+                    // Detetar Mudanças de Estado
+                    bool entrouEmManutencao = !dispositivoOriginal.IsUnderMaintenance && medicalDevices.IsUnderMaintenance;
+                    bool saiuDeManutencao = dispositivoOriginal.IsUnderMaintenance && !medicalDevices.IsUnderMaintenance;
+
+                    _context.Update(medicalDevices);
+
+                    //Entrou em Manutenção (Fecha a localização atual), deixa o dispositivo num limbo(como se não estivesse ali)
+                    if (entrouEmManutencao)
+                    {
+                        var localizacaoAtiva = await _context.LocationMedDevice
+                            .FirstOrDefaultAsync(l => l.MedicalDeviceID == id && l.EndDate == null);
+
+                        if (localizacaoAtiva != null)
+                        {
+                            localizacaoAtiva.EndDate = DateTime.Now;
+                            _context.Update(localizacaoAtiva);
+                        }
+                        TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' atualizado e colocado em Modo de Manutenção (Localização anterior encerrada).";
+                    }
+                    //Saiu de Manutenção (Procura o Depósito)
+                    else if (saiuDeManutencao)
+                    {
+                        // Procura Depósito Disponível (com base no RoomStatus)
+                        var salaDeposito = await _context.Room
+                            .Include(r => r.RoomStatus)
+                            .Where(r => r.Name.Contains("Depósito") &&
+                                        r.RoomStatus != null &&
+                                        r.RoomStatus.Name == "Disponível")
+                            .FirstOrDefaultAsync();
+
+                        if (salaDeposito != null)
+                        {
+                            // Garante que fecha registos antigos
+                            var locsAntigas = await _context.LocationMedDevice
+                                .Where(l => l.MedicalDeviceID == id && l.EndDate == null)
+                                .ToListAsync();
+
+                            locsAntigas.ForEach(l => l.EndDate = DateTime.Now);
+
+                            // Cria nova localização para o dispositivo(vai para o deposito)
+                            var novaLocalizacao = new LocationMedDevice
+                            {
+                                MedicalDeviceID = id,
+                                RoomId = salaDeposito.RoomId,
+                                InitialDate = DateTime.Now,
+                                EndDate = null
+                            };
+                            _context.Add(novaLocalizacao);
+
+                            TempData["SuccessMessage"] = $"Manutenção concluída!";
+                        }
+                        else
+                        {
+                            TempData["WarningMessage"] = $"Manutenção concluída, mas não foi possível alocar para o Depósito.";
+                        }
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!";
+                    }
+
+                    //SALVAR TUDO
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID))
                     {
                         ViewBag.MedDeviceWasDeleted = true;
-                        //return View("NotFound");
+                        return View("NotFound");
                     }
                     else
                     {
                         throw;
                     }
                 }
-                // Volta para Details para ver o resultado da edição
-                return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
             }
 
             // Recarregar ViewBags em caso de falha
