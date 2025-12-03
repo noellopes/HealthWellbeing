@@ -109,7 +109,7 @@ else
 
                         <td class="text-nowrap">
                             @* Exibir Status *@
-                            @if (status == "Aguarda Localização")
+                            @if (status == "Em Armazenamento")
                             {
                                 <span class="badge bg-success">@status</span>
                             }
@@ -128,7 +128,7 @@ else
                                 // Tem atribuição, mostra o nome da sala
                                 <span class="fw-bold ms-2">na @localizacao.Room.Name</span>
                             }
-                            else if (status == "Aguarda Localização")
+                            else if (status == "Em Armazenamento")
                             {
                                 // Não tem atribuição (e não está em manutenção), está à espera
                                 <span class="text-muted small ms-2">...</span>
@@ -142,11 +142,15 @@ else
 
                         <td class="text-end">
                             @{
-                                // O botão Mover deve aparecer APENAS se o dispositivo NÃO estiver em Manutenção
+                                //Pode mover se NÃO estiver em Manutenção
                                 bool podeMover = dispositivo.CurrentStatus != "Em Manutenção";
+
+                                //Só pode eliminar se estiver "Em Armazenamento"
+                                //(Ou seja: NÃO está em manutenção E NÃO está alocado)
+                                bool podeEliminar = dispositivo.CurrentStatus == "Em Armazenamento";
                             }
 
-                            @* Código do botão Mover *@
+                            @* --- BOTÃO MOVER --- *@
                             @if (podeMover)
                             {
                                 <a asp-controller="LocationMedDevice" asp-action="Create"
@@ -157,20 +161,34 @@ else
                             }
                             else
                             {
-                                @* Mostra o botão desativado *@
-                                <span class="btn btn-sm btn-secondary me-1 disabled">
+                                <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
                                     <i class="bi bi-x-octagon"></i> Mover
                                 </span>
                             }
+
+                            @* --- BOTÃO DETALHES --- *@
                             <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
+
+                            @* --- BOTÃO EDITAR --- *@
                             <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
                                 <i class="bi bi-pencil-square"></i> Editar
                             </a>
-                            <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
+
+                            @* --- BOTÃO ELIMINAR --- *@
+                            @if (podeEliminar)
+                            {
+                                <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </span>
+                            }
                         </td>
                     </tr>
                 }
