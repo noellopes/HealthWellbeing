@@ -39,10 +39,10 @@
 
                 <div class="col-md-6 mb-3">
                     <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
-                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty" required>
-                        <option value="">Selecione a especialidade...</option>
+                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty" @* required *@>
+                        <option value="">Sem especialidade</option>
                     </select>
-                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
+                    @* <span asp-validation-for="SpecialtyId" class="text-danger small"></span> *@
                 </div>
             </div>
 

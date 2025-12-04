@@ -20,7 +20,7 @@ namespace HealthWellbeing.Models
 
 
         // Especialidade associada à sala
-        public int SpecialtyId { get; set; }
+        public int? SpecialtyId { get; set; }
         public Specialty? Specialty { get; set; }
 
 
