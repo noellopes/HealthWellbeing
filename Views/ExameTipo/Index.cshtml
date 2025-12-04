@@ -10,6 +10,7 @@
 <div class="container mt-4">
     @* Bloco de Exibição de Mensagens de Sucesso *@
     @if (TempData["SuccessMessage"] != null)
+
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Sucesso!</strong> @TempData["SuccessMessage"]
@@ -38,7 +39,48 @@
             </a>
         </div>
     </div>
+    @* --- DASHBOARD DE ESTATÍSTICAS --- *@
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Total de Exames</h6>
+                        <h2 class="my-1 fw-bold">@ViewBag.TotalExames</h2>
+                        <small class="text-white-50">Tipos registados</small>
+                    </div>
+                    <i class="bi bi-file-medical fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-4">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Especialidades</h6>
+                        <h2 class="my-1 fw-bold">@ViewBag.TotalEspecialidades</h2>
+                        <small class="text-white-50">Áreas médicas ativas</small>
+                    </div>
+                    <i class="bi bi-heart-pulse fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-warning shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0 text-dark">Stock em Alerta</h6>
+                        <h2 class="my-1 fw-bold text-dark">@ViewBag.MateriaisBaixoStock</h2>
+                        <small class="text-dark-50">Materiais < 10 un.</small>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-1 text-dark-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* --- FIM DO DASHBOARD --- *@
     <div class="collapse mt-2 mb-4" id="postSearch">
         <div class="card card-body">
             <form asp-action="Index" method="get" class="row g-2 align-items-end">

@@ -44,6 +44,14 @@ namespace HealthWellbeing.Controllers
                 examesQuery = examesQuery.Where(et => et.Especialidade.Nome.Contains(searchEspecialidade));
             }
 
+            ViewBag.TotalExames = await _context.ExameTipo.CountAsync();
+
+            ViewBag.TotalEspecialidades = await _context.Especialidades.CountAsync();
+
+            // Conta materiais com stock abaixo de 10 unidades
+            ViewBag.MateriaisBaixoStock = await _context.MaterialEquipamentoAssociado
+                .CountAsync(m => m.Quantidade < 10);
+
 
             // 3. Contagem e Criação do ViewModel de Paginação
             int totalExames = await examesQuery.CountAsync();
