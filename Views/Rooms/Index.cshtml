@@ -197,7 +197,7 @@
         <thead>
             <tr>
                 <th>Tipo</th>
-                <th>Especialidade</th>
+                <th>Especialidade(Opcional)</th>
                 <th>Nome</th>
                 <th>Localização</th>
                 <th>Horário</th>
@@ -213,7 +213,7 @@
 
                 <tr>
                     <td>@item.RoomType?.Name</td>
-                    <td>@item.Specialty?.Name</td>
+                    <td>@(!string.IsNullOrWhiteSpace(item.Specialty?.Name) ? item.Specialty.Name : "--sem especialidade--")</td>
                     <td>@item.Name</td>
                     <td>@item.RoomLocation?.Name</td>
                     <td>

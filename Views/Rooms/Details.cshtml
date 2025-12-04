@@ -40,8 +40,8 @@
             <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
             <dd class="col-sm-9">@Model.RoomType?.Name</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
-            <dd class="col-sm-9">@Model.Specialty?.Name</dd>
+            <dt class="col-sm-3 fw-bold text-muted">Especialidade(Opcional)</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Specialty?.Name) ? Model.Specialty.Name : "--sem especialidade--")</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
             <dd class="col-sm-9">@Model.RoomLocation?.Name</dd>
@@ -53,7 +53,7 @@
             <dd class="col-sm-9">@Model.RoomStatus?.Name</dd>
 
             <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
-            <dd class="col-sm-9">@Model.Notes</dd>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Notes) ? Model.Notes : "--sem observações--")</dd>
         </dl>
     </div>
 

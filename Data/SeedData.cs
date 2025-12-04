@@ -244,15 +244,15 @@ namespace HealthWellBeingRoom.Data
             {
                 var roomsTypes = new List<RoomType>
                 {
-                new RoomType { Name = "Consultas", Description = "Sala para atendimento ambulatorial" },
-                new RoomType { Name = "Unidade de Terapia Intensiva (UTI)", Description = "Espaço para cuidados intensivos de pacientes críticos" },
-                new RoomType { Name = "Centro Cirúrgico", Description = "Sala destinada a procedimentos cirúrgicos" },
-                new RoomType { Name = "Exames", Description = "Espaço para exames clínicos e de imagem" },
+                new RoomType { Name = "Consultas", Description = "Sala para atendimento ambulatorial" },//Ter especialidade
+                new RoomType { Name = "Unidade de Terapia Intensiva (UTI)", Description = "Espaço para cuidados intensivos de pacientes críticos" },//Ter especialidade
+                new RoomType { Name = "Centro Cirúrgico", Description = "Sala destinada a procedimentos cirúrgicos" },//Ter especialidade
+                new RoomType { Name = "Exames", Description = "Espaço para exames clínicos e de imagem" },//Ter especialidade
                 new RoomType { Name = "Laboratório de A. Clínicas", Description = "Sala para realização de análises laboratoriais" },
                 new RoomType { Name = "Farmácia Hospitalar", Description = "Armazenamento e dispensação de medicamentos" },
                 new RoomType { Name = "Depósito Hospitalar", Description = "Espaço para armazenamento de materiais e insumos" },
-                new RoomType { Name = "Recuperação Pós-Operatória", Description = "Espaço para pacientes em pós-operatório imediato" },
-                new RoomType { Name = "Emergência", Description = "Área destinada ao atendimento rápido de casos críticos" },
+                new RoomType { Name = "Recuperação Pós-Operatória", Description = "Espaço para pacientes em pós-operatório imediato" },//Ter especialidade
+                new RoomType { Name = "Emergência", Description = "Área destinada ao atendimento rápido de casos críticos" },//Ter especialidade
                 new RoomType { Name = "Esterilização", Description = "Ambiente para higienização e esterilização de instrumentos médicos" },
                 };
                 dbContext.RoomType.AddRange(roomsTypes);
@@ -589,7 +589,7 @@ namespace HealthWellBeingRoom.Data
         //(Cria um admin por defeito)
         internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
         {
-            EnsureUserIsCreatedAsync(userManager, "admin@gse.pt", "Admin1234_", ["Administrator"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "admin@gsm.pt", "Admin1234_", ["Administrator"]).Wait();
         }
 
         //Recebe username passeword e lista de roles, verifica se o utilizador ja existe, senao cria-o
@@ -629,11 +629,11 @@ namespace HealthWellBeingRoom.Data
         //(Garante que esses utilizadores existem na base de dados e ja tem o papel correto atribuido)
         internal static void SeedUser(UserManager<IdentityUser> userManager)
         {
-            EnsureUserIsCreatedAsync(userManager, "nuno@gse.pt", "Nuno123_", ["logisticsTechnician"]).Wait();
-            EnsureUserIsCreatedAsync(userManager, "evanilson@gse.pt", "Evanilson123_", ["logisticsTechnician"]).Wait();
-            EnsureUserIsCreatedAsync(userManager, "vila@gse.pt", "Vila123_", ["logisticsTechnician"]).Wait();
-            EnsureUserIsCreatedAsync(userManager, "leonel@gse.pt", "Leonel123_", ["logisticsTechnician"]).Wait();
-            EnsureUserIsCreatedAsync(userManager, "marcel@gse.pt", "Marcel123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "nuno@gsm.pt", "Nuno123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "evanilson@gsm.pt", "Evanilson123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "vila@gsm.pt", "Vila123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "leonel@gsm.pt", "Leonel123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "marcel@gsm.pt", "Marcel123_", ["logisticsTechnician"]).Wait();
         }
 
         //Cria o papel logisticsTechnician se ainda n exisstir.

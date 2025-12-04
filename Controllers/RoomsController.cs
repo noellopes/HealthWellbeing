@@ -208,6 +208,7 @@ namespace HealthWellbeingRoom.Controllers
             await PreencherDropdowns();
             return View();
         }
+
         //--------------------------------------------------------CREATE POST-----------------------------------------------------------------------------------
         [HttpPost] // Indica que este método responde a requisições HTTP POST
         [ValidateAntiForgeryToken] // Protege contra ataques CSRF, validando o token antifalsificação
@@ -235,6 +236,26 @@ namespace HealthWellbeingRoom.Controllers
             if (statusCriado == null)
             {
                 ModelState.AddModelError(nameof(room.RoomStatusId), "Não foi possível atribuir o status inicial. Verifique se existe o status \"Criado\".");
+            }
+
+            // Validação: Especialidade obrigatória para certos tipos de sala
+            var tipoSala = await _context.RoomType.FindAsync(room.RoomTypeId);
+            if (tipoSala != null)
+            {
+                var tiposComEspecialidadeObrigatoria = new[]
+                {
+            "Consultas",
+            "Unidade de Terapia Intensiva (UTI)",
+            "Centro Cirúrgico",
+            "Exames",
+            "Recuperação Pós-Operatória",
+            "Emergência"
+        };
+
+                if (tiposComEspecialidadeObrigatoria.Contains(tipoSala.Name) && room.SpecialtyId == null)
+                {
+                    ModelState.AddModelError(nameof(room.SpecialtyId), "Este tipo de sala exige uma especialidade.");
+                }
             }
 
             // Se houver qualquer erro de validação, retorna à View com os dropdowns preenchidos
@@ -270,6 +291,7 @@ namespace HealthWellbeingRoom.Controllers
             await PreencherDropdowns();
             return View(room);
         }
+
         //----------------------------------------------------------EDIT POST---------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -277,6 +299,26 @@ namespace HealthWellbeingRoom.Controllers
         public async Task<IActionResult> Edit(int id, Room room)
         {
             if (id != room.RoomId) return NotFound();
+
+            // Validação: Especialidade obrigatória para certos tipos de sala
+            var tipoSala = await _context.RoomType.FindAsync(room.RoomTypeId);
+            if (tipoSala != null)
+            {
+                var tiposComEspecialidadeObrigatoria = new[]
+                {
+            "Consultas",
+            "Unidade de Terapia Intensiva (UTI)",
+            "Centro Cirúrgico",
+            "Exames",
+            "Recuperação Pós-Operatória",
+            "Emergência"
+        };
+
+                if (tiposComEspecialidadeObrigatoria.Contains(tipoSala.Name) && room.SpecialtyId == null)
+                {
+                    ModelState.AddModelError(nameof(room.SpecialtyId), "Este tipo de sala exige uma especialidade.");
+                }
+            }
 
             if (!ModelState.IsValid)
             {
@@ -293,18 +335,17 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessageEdit"] = $"Sala \"{room.Name ?? "(sem nome)"}\" atualizada com sucesso!";
             }
-
             catch (DbUpdateConcurrencyException)
             {
                 if (!RoomExists(room.RoomId)) return NotFound();
                 else throw;
             }
 
-            // Mensagem de sucesso na edicao
+            // Mensagem de sucesso na edição
             TempData["SuccessMessage"] = "Sala editada com sucesso!";
 
             // Redireciona para a ação Details após a edição bem-sucedida
-            return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true }); //
+            return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true });
         }
         //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
         [Authorize(Roles = "Administrator")]
