@@ -84,10 +84,30 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ExameTipoes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            // 1. Carregar todos os materiais/equipamentos da BD para as checkboxes
+            var todosMateriais = await _context.MaterialEquipamentoAssociado.ToListAsync();
+
+            // 2. Inicializar o ViewModel com a lista de recursos
+            var viewModel = new TipoExameRecursosViewModel
+            {
+                // Inicializa a lista de checkboxes
+                Recursos = todosMateriais.Select(m => new RecursoCheckBoxItem
+                {
+                    Id = m.MaterialEquipamentoAssociadoId,
+                    Nome = m.NomeEquipamento,
+                    IsSelected = false,       // Começa desmarcado
+                    Quantidade = 1,           // Quantidade mínima por defeito
+                    StockAtual = m.Quantidade // Passa o stock para a View (para o max="")
+                }).ToList()
+            };
+
+            // 3. Popular a dropdown de Especialidades
             ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades.OrderBy(e => e.Nome), "EspecialidadeId", "Nome");
-            return View();
+
+            // Retorna o ViewModel (não o ExameTipo vazio)
+            return View(viewModel);
         }
 
         // POST: ExameTipoes/Create
@@ -95,26 +115,69 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExameTipoId,Nome,Descricao,EspecialidadeId")] ExameTipo exameTipo)
+        public async Task<IActionResult> Create(TipoExameRecursosViewModel viewModel)
         {
-            // 1. Verificar se o nome já existe na base de dados
-            var nomeJaExiste = await _context.ExameTipo
-                .AnyAsync(et => et.Nome == exameTipo.Nome);
+            // 1. Validação de Unicidade (Nome)
+            bool nomeJaExiste = await _context.ExameTipo
+                .AnyAsync(et => et.Nome == viewModel.NomeExame);
 
             if (nomeJaExiste)
             {
-                // 2. Adicionar erro ao ModelState se o nome for repetido
-                ModelState.AddModelError("Nome", "Já existe um Tipo de Exame com este nome. Por favor, escolha um nome único.");
+                ModelState.AddModelError("NomeExame", "Já existe um tipo de exame com este nome. Por favor, escolha um nome único.");
             }
+
+            // 2. Validação de Stock (Segurança no Servidor)
+            // Carrega os materiais para verificar se a quantidade pedida existe em stock
+            var todosMateriaisDb = await _context.MaterialEquipamentoAssociado.ToListAsync();
+
+            foreach (var item in viewModel.Recursos.Where(r => r.IsSelected))
+            {
+                var materialDb = todosMateriaisDb.FirstOrDefault(m => m.MaterialEquipamentoAssociadoId == item.Id);
+
+                // Se pedir mais do que existe em stock
+                if (materialDb != null && item.Quantidade > materialDb.Quantidade)
+                {
+                    ModelState.AddModelError("", $"Erro: O recurso '{item.Nome}' só tem {materialDb.Quantidade} unidades em stock (pediu {item.Quantidade}).");
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(exameTipo);
+                // 3. Criar o Objeto ExameTipo (Mapear do ViewModel para a Entidade)
+                var novoExame = new ExameTipo
+                {
+                    Nome = viewModel.NomeExame,
+                    Descricao = viewModel.Descricao,
+                    EspecialidadeId = viewModel.EspecialidadeId,
+                    // Inicializar a lista de junção vazia
+                    ExameTipoRecursos = new List<ExameTipoRecurso>()
+                };
+
+                // 4. Adicionar os Recursos Selecionados à tabela de junção
+                // Filtra apenas os que foram marcados na View
+                var recursosSelecionados = viewModel.Recursos.Where(r => r.IsSelected).ToList();
+
+                foreach (var item in recursosSelecionados)
+                {
+                    // Cria a ligação com a quantidade definida
+                    novoExame.ExameTipoRecursos.Add(new ExameTipoRecurso
+                    {
+                        MaterialEquipamentoAssociadoId = item.Id,
+                        QuantidadeNecessaria = item.Quantidade
+                    });
+                }
+
+                // 5. Guardar tudo (O EF Core guarda o Pai e os Filhos automaticamente)
+                _context.Add(novoExame);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"O tipo de exame '{exameTipo.Nome}' foi criado com sucesso!";
+
+                TempData["SuccessMessage"] = $"O tipo de exame '{novoExame.Nome}' foi criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades, "EspecialidadeId", "Nome", exameTipo.EspecialidadeId);
-            return View(exameTipo);
+
+            // Se houver erro, repopular a dropdown e voltar à View com o ViewModel
+            ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades.OrderBy(e => e.Nome), "EspecialidadeId", "Nome", viewModel.EspecialidadeId);
+            return View(viewModel);
         }
 
         // GET: ExameTipoes/Edit/5
