@@ -33,7 +33,11 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchEspecialidade = searchEspecialidade;
 
             // 2. Aplicação dos Filtros na Query
-            var examesQuery = _context.ExameTipo.Include(et => et.Especialidade).AsQueryable();
+            var examesQuery = _context.ExameTipo
+                .Include(et => et.Especialidade)
+                .Include(et => et.ExameTipoRecursos!)      // <--- CARREGAR JUNÇÃO
+                    .ThenInclude(etr => etr.Recurso)       // <--- CARREGAR O MATERIAL
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchNome))
             {
