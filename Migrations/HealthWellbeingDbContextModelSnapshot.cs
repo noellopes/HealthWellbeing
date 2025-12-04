@@ -56,7 +56,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("AlimentoId");
 
-                    b.ToTable("Alergia");
+                    b.ToTable("Alergia", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
@@ -97,7 +97,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("CategoriaAlimentoId");
 
-                    b.ToTable("Alimento");
+                    b.ToTable("Alimento", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.CategoriaAlimento", b =>
@@ -118,7 +118,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("CategoriaID");
 
-                    b.ToTable("CategoriaAlimento");
+                    b.ToTable("CategoriaAlimento", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
@@ -150,7 +150,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("LocationMedDevice");
+                    b.ToTable("LocationMedDevice", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
@@ -204,7 +204,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("ReceitaId");
 
-                    b.ToTable("Receita");
+                    b.ToTable("Receita", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.RestricaoAlimentar", b =>
@@ -231,7 +231,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RestricaoAlimentar");
+                    b.ToTable("RestricaoAlimentar", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Room", b =>
@@ -278,7 +278,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("SpecialtyId");
 
-                    b.ToTable("Room");
+                    b.ToTable("Room", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TypeMaterial", b =>
@@ -301,7 +301,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("TypeMaterialID");
 
-                    b.ToTable("TypeMaterial");
+                    b.ToTable("TypeMaterial", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
@@ -344,7 +344,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Equipment");
+                    b.ToTable("Equipment", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.EquipmentStatus", b =>
@@ -361,7 +361,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("EquipmentStatusId");
 
-                    b.ToTable("EquipmentStatus");
+                    b.ToTable("EquipmentStatus", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.EquipmentType", b =>
@@ -383,7 +383,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("ManufacturerId");
 
-                    b.ToTable("EquipmentType");
+                    b.ToTable("EquipmentType", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
@@ -409,7 +409,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("LocalizacaoDispMovel_temporario");
+                    b.ToTable("LocalizacaoDispMovel_temporario", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Manufacturer", b =>
@@ -426,7 +426,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("ManufacturerId");
 
-                    b.ToTable("Manufacturer");
+                    b.ToTable("Manufacturer", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
@@ -466,7 +466,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasIndex("TypeMaterialID");
 
-                    b.ToTable("MedicalDevices");
+                    b.ToTable("MedicalDevices", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomLocation", b =>
@@ -482,7 +482,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("RoomLocationId");
 
-                    b.ToTable("RoomLocation");
+                    b.ToTable("RoomLocation", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomStatus", b =>
@@ -501,7 +501,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("RoomStatusId");
 
-                    b.ToTable("RoomStatus");
+                    b.ToTable("RoomStatus", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomType", b =>
@@ -520,7 +520,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("RoomTypeId");
 
-                    b.ToTable("RoomType");
+                    b.ToTable("RoomType", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Specialty", b =>
@@ -541,7 +541,7 @@ namespace HealthWellbeingRoom.Migrations
 
                     b.HasKey("SpecialtyId");
 
-                    b.ToTable("Specialty");
+                    b.ToTable("Specialty", (string)null);
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>

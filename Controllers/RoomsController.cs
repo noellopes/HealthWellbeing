@@ -6,9 +6,11 @@ using HealthWellbeingRoom.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeingRoom.Controllers
 {
+    
     public class RoomsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -31,6 +33,7 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.RoomSpecialty = new SelectList(await _context.Specialty.ToListAsync(),"SpecialtyId", "Name");
         }
         //------------------------------------------------------INDEX / LIST-------------------------------------------------------------------------------------
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Index(
             string? searchName,
             string? searchStatus,
@@ -180,6 +183,7 @@ namespace HealthWellbeingRoom.Controllers
             return View(pagination);
         }
         //------------------------------------------------------DETAILS-------------------------------------------------------------------------------------
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id, bool fromCreation = false)
         {
             if (id == null) return NotFound();
@@ -196,7 +200,9 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.FromCreation = fromCreation;
             return View(room);
         }
+
         //------------------------------------------------------CREATE-------------------------------------------------------------------------------------
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create()
         {
             await PreencherDropdowns();
@@ -205,6 +211,7 @@ namespace HealthWellbeingRoom.Controllers
         //--------------------------------------------------------CREATE POST-----------------------------------------------------------------------------------
         [HttpPost] // Indica que este método responde a requisições HTTP POST
         [ValidateAntiForgeryToken] // Protege contra ataques CSRF, validando o token antifalsificação
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(Room room) // Método assíncrono que recebe um objeto Room como parâmetro
         {
             if (room == null) return NotFound(); // Se o objeto recebido for nulo, retorna erro 404
@@ -252,6 +259,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         //----------------------------------------------------------EDIT---------------------------------------------------------------------------------
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -265,6 +273,7 @@ namespace HealthWellbeingRoom.Controllers
         //----------------------------------------------------------EDIT POST---------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, Room room)
         {
             if (id != room.RoomId) return NotFound();
@@ -298,6 +307,7 @@ namespace HealthWellbeingRoom.Controllers
             return RedirectToAction("Details", new { id = room.RoomId, fromCreation = true }); //
         }
         //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();

@@ -1,10 +1,12 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 
 namespace HealthWellBeingRoom.Data
 {
@@ -581,5 +583,65 @@ namespace HealthWellBeingRoom.Data
             });
             dbContext.SaveChanges();
         }
+
+
+        //Garante que ha um administrador no sistema, cria-o com a passe e atribuilhe o papel de "administrador".
+        //(Cria um admin por defeito)
+        internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
+        {
+            EnsureUserIsCreatedAsync(userManager, "admin@gse.pt", "Admin1234_", ["Administrator"]).Wait();
+        }
+
+        //Recebe username passeword e lista de roles, verifica se o utilizador ja existe, senao cria-o
+        //depois percorre os roles e garante que o utilizador esta associado a cada um addToRoleAsync
+        //(Cria qualquer utilizador e atribui-lhe roles, se ainda nao existir)
+        private static async Task EnsureUserIsCreatedAsync(UserManager<IdentityUser> userManager, string username, String password, string[] roles)
+        {
+            IdentityUser? user = await userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                user = new IdentityUser(username);
+                await userManager.CreateAsync(user, password);
+            }
+
+            foreach (var role in roles)
+            {
+                if (!await userManager.IsInRoleAsync(user, role))
+                {
+                    await userManager.AddToRoleAsync(user, role);
+                }
+            }
+        }
+
+        //Usa o RoleManager<IdentityRole> para verificar se jaa existe um role com o nome passado, 
+        //senao existir cria-o.
+        //(Garante que um papel(role) existe no sistema de autenticacao.
+        private static async Task EnsureRoleIsCreatedAsync(RoleManager<IdentityRole> roleManager, string role)
+        {
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
+
+        //Cria os utilizadores iniciais
+        //(Garante que esses utilizadores existem na base de dados e ja tem o papel correto atribuido)
+        internal static void SeedUser(UserManager<IdentityUser> userManager)
+        {
+            EnsureUserIsCreatedAsync(userManager, "nuno@gse.pt", "Nuno123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "evanilson@gse.pt", "Evanilson123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "vila@gse.pt", "Vila123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "leonel@gse.pt", "Leonel123_", ["logisticsTechnician"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "marcel@gse.pt", "Marcel123_", ["logisticsTechnician"]).Wait();
+        }
+
+        //Cria o papel logisticsTechnician se ainda n exisstir.
+        internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
+        {
+            EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "logisticsTechnician").Wait();
+        }
+
     }
 }

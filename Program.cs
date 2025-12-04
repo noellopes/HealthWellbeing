@@ -6,47 +6,71 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Contexto principal da aplicação
+builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection")
+        ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
+
+// Contexto para Identity
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// Configuração do Identity com roles
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+
+    // Password
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 6;
+    options.Password.RequireNonAlphanumeric = true;
+
+    // Lockout
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders()
+.AddDefaultUI();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 else
 {
     using (var serviceScope = app.Services.CreateScope())
     {
+        // Obter o DbContext e aplicar migrações
         var dbcontext = serviceScope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
-        //Aplica todas as migracoes pendentes
-        //dbcontext.Database.Migrate();
+        SeedData.Populate(dbcontext);
 
-        //Chama o Seeding
-        SeedData.Populate(dbcontext);//aplica apenas migracoes relevantes
+        var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        SeedData.SeedRoles(roleManager);
+
+        var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        SeedData.SeedDefaultAdmin(userManager);
+
+        SeedData.SeedRoles(roleManager);
+        SeedData.SeedDefaultAdmin(userManager);
+        SeedData.SeedUser(userManager);
     }
 }
-//Evitar aplicar migration de ApplicationDbContext pois a base ja tem Identity
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    var context = services.GetRequiredService<ApplicationDbContext>();
-//    context.Database.Migrate();
-//}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -61,3 +85,21 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+// Helper para criar utilizadores com roles
+static async Task EnsureUserIsCreatedAsync(UserManager<IdentityUser> userManager, string email, string password, string[] roles)
+{
+    var user = await userManager.FindByEmailAsync(email);
+    if (user == null)
+    {
+        user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true };
+        var result = await userManager.CreateAsync(user, password);
+        if (result.Succeeded)
+        {
+            foreach (var role in roles)
+            {
+                await userManager.AddToRoleAsync(user, role);
+            }
+        }
+    }
+}
