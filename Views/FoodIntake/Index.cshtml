@@ -1,0 +1,48 @@
+﻿@model IEnumerable<HealthWellbeing.Models.FoodIntake>
+@{
+    ViewData["Title"] = "Food Intake Calendar";
+}
+<div class="container mt-4">
+    <h2 class="mb-4">Food Intake Calendar</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">Nenhum registo encontrado.</div>
+    }
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var dayGroup in Model.OrderBy(m => m.Date).GroupBy(m => m.Date.Date))
+        {
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5>@dayGroup.Key.ToString("dd MMM yyyy")</h5>
+                    </div>
+                    <div class="card-body">
+                        @foreach (var item in dayGroup)
+                        {
+                            <div class="border rounded p-2 mb-3">
+                                <p><strong>Food:</strong> @item.FoodId</p>
+                                <p><strong>Plan:</strong> @item.PlanId</p>
+                                <p><strong>Status:</strong> @(item.Eaten ? "Eaten" : "Not Eaten")</p>
+
+                                <form asp-action="ToggleEaten" method="post">
+                                    <input type="hidden" name="id" value="@item.FoodIntakeId" />
+
+                                    @if (item.Eaten)
+                                    {
+                                        <button type="submit" class="btn btn-warning w-100">Mark as Not Eaten</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-success w-100">Mark as Eaten</button>
+                                    }
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

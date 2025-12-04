@@ -8,9 +8,9 @@ namespace HealthWellbeing.Controllers
 {
     public class FoodIntakeController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public FoodIntakeController(ApplicationDbContext context)
+        public FoodIntakeController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
