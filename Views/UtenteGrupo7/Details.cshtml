@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Detalhes do Utente";
-    // Captura a mensagem enviada via Query String (padrão usado no controlador)
     string? successMessage = Context.Request.Query["SuccessMessage"];
 }
 
@@ -51,6 +50,37 @@
                         <tr>
                             <th class="text-secondary">Nome Completo:</th>
                             <td class="fw-bold fs-5">@Model.Nome</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Objetivo Principal:</th>
+                            <td>
+                                @if (Model.ObjetivoFisico != null)
+                                {
+                                    <span class="badge bg-info text-dark">@Model.ObjetivoFisico.NomeObjetivo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">Nenhum Objetivo Definido</span>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Problemas de Saúde:</th>
+                            <td>
+                                @if (Model.UtenteProblemasSaude != null && Model.UtenteProblemasSaude.Any())
+                                {
+                                    @foreach (var up in Model.UtenteProblemasSaude)
+                                    {
+                                        <span class="badge bg-danger me-1">
+                                            @up.ProblemaSaude.ProblemaNome (@up.ProblemaSaude.ZonaAtingida)
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Nenhum Problema de Saúde Registado</span>
+                                }
+                            </td>
                         </tr>
                     </table>
                 </div>

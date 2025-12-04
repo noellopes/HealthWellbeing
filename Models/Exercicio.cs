@@ -14,6 +14,10 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A descrição é obrigatória.")]
         public string Descricao { get; set; }
 
+        [Required(ErrorMessage = "O Tipo de Exercício é obrigatório.")]
+        public int TipoExercicioId { get; set; }
+        public TipoExercicio TipoExercicio { get; set; }
+
         [Required(ErrorMessage = "A duração é obrigatória.")]
         [Range(0.1, 480, ErrorMessage = "A duração deve ser entre 0.1 e 480 minutos.")]
         public double Duracao { get; set; }

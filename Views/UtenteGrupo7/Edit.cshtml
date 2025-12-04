@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Editar Utente";
+    // MUDANÇA: Cast explicito para List<SelectListItem>
+    var problemasSaude = ViewBag.ProblemasSaudeCheckboxes as List<SelectListItem>;
 }
 
 <div class="container mt-4">
@@ -17,6 +19,46 @@
             <label asp-for="Nome" class="form-label">Nome do Utente *</label>
             <input asp-for="Nome" class="form-control" placeholder="Insira o nome do utente">
             <span asp-validation-for="Nome" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ObjetivoFisicoId" class="form-label">Objetivo Físico</label>
+            <select asp-for="ObjetivoFisicoId" class="form-select"
+                    asp-items="@(ViewBag.ObjetivoFisicoId as SelectList)">
+                <option value="">-- Selecionar Objetivo --</option>
+            </select>
+            <span asp-validation-for="ObjetivoFisicoId" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 border p-3 rounded bg-light">
+            <label class="form-label fw-bold d-block mb-2">Problemas de Saúde (Selecione um ou mais)</label>
+            <div class="row">
+                @if (problemasSaude != null && problemasSaude.Any())
+                {
+                    @foreach (var problema in problemasSaude)
+                    {
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox"
+                                       id="problema_@problema.Value"
+                                       name="selectedProblemas"
+                                       value="@problema.Value"
+                                       class="form-check-input"
+                                       @(problema.Selected ? "checked" : "") />
+                                <label class="form-check-label" for="problema_@problema.Value">
+                                    @problema.Text
+                                </label>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-muted">
+                        <i class="fas fa-info-circle"></i> Não há problemas de saúde registados na base de dados.
+                    </div>
+                }
+            </div>
         </div>
 
         <div class="mt-4">

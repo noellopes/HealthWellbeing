@@ -7,5 +7,10 @@
         public string Nome { get; set; }
 
         public ICollection<Sono>? Sonos { get; set; }
+
+        public int? ObjetivoFisicoId { get; set; }
+        public ObjetivoFisico? ObjetivoFisico { get; set; }
+
+        public ICollection<UtenteGrupo7ProblemaSaude>? UtenteProblemasSaude { get; set; }
     }
 }
