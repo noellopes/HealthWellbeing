@@ -1,4 +1,6 @@
 ﻿@model HealthWellbeing.Models.Room
+@using Microsoft.AspNetCore.Authorization
+
 
 @{
     ViewData["Title"] = "Detalhes da sala";
@@ -28,8 +30,12 @@
 
     <div class="card-body">
         <dl class="row mb-0 mt-4">
-            <dt class="col-sm-3 fw-bold text-muted">Id</dt>
-            <dd class="col-sm-9">@Model.FormattedRoomId</dd>
+            @if (User.IsInRole("Administrator"))
+            {
+                <dt class="col-sm-3 fw-bold text-muted">Id</dt>
+                <dd class="col-sm-9">@Model.FormattedRoomId</dd>
+            }
+
 
             <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
             <dd class="col-sm-9">@Model.RoomType?.Name</dd>
