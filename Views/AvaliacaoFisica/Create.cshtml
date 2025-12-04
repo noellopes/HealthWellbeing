@@ -1,0 +1,117 @@
+﻿@model HealthWellbeing.Models.AvaliacaoFisica
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>AvaliacaoFisica</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="DataMedicao" class="control-label"></label>
+                <input asp-for="DataMedicao" class="form-control" />
+                <span asp-validation-for="DataMedicao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Peso" class="control-label"></label>
+                <input asp-for="Peso" class="form-control" />
+                <span asp-validation-for="Peso" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Altura" class="control-label"></label>
+                <input asp-for="Altura" class="form-control" />
+                <span asp-validation-for="Altura" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GorduraCorporal" class="control-label"></label>
+                <input asp-for="GorduraCorporal" class="form-control" />
+                <span asp-validation-for="GorduraCorporal" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MassaMuscular" class="control-label"></label>
+                <input asp-for="MassaMuscular" class="form-control" />
+                <span asp-validation-for="MassaMuscular" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Pescoco" class="control-label"></label>
+                <input asp-for="Pescoco" class="form-control" />
+                <span asp-validation-for="Pescoco" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Ombros" class="control-label"></label>
+                <input asp-for="Ombros" class="form-control" />
+                <span asp-validation-for="Ombros" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Peitoral" class="control-label"></label>
+                <input asp-for="Peitoral" class="form-control" />
+                <span asp-validation-for="Peitoral" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BracoDireito" class="control-label"></label>
+                <input asp-for="BracoDireito" class="form-control" />
+                <span asp-validation-for="BracoDireito" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BracoEsquerdo" class="control-label"></label>
+                <input asp-for="BracoEsquerdo" class="form-control" />
+                <span asp-validation-for="BracoEsquerdo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cintura" class="control-label"></label>
+                <input asp-for="Cintura" class="form-control" />
+                <span asp-validation-for="Cintura" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Abdomen" class="control-label"></label>
+                <input asp-for="Abdomen" class="form-control" />
+                <span asp-validation-for="Abdomen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Anca" class="control-label"></label>
+                <input asp-for="Anca" class="form-control" />
+                <span asp-validation-for="Anca" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CoxaDireita" class="control-label"></label>
+                <input asp-for="CoxaDireita" class="form-control" />
+                <span asp-validation-for="CoxaDireita" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CoxaEsquerda" class="control-label"></label>
+                <input asp-for="CoxaEsquerda" class="form-control" />
+                <span asp-validation-for="CoxaEsquerda" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GemeoDireito" class="control-label"></label>
+                <input asp-for="GemeoDireito" class="form-control" />
+                <span asp-validation-for="GemeoDireito" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GemeoEsquerdo" class="control-label"></label>
+                <input asp-for="GemeoEsquerdo" class="form-control" />
+                <span asp-validation-for="GemeoEsquerdo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UtenteGrupo7Id" class="control-label"></label>
+                <select asp-for="UtenteGrupo7Id" class ="form-control" asp-items="ViewBag.UtenteGrupo7Id"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
