@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HealthWellbeing.Controllers;
+using HealthWellbeing.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
 {
@@ -25,9 +26,13 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
-
         public DbSet<HealthWellbeing.Models.Equipamento> Equipamento { get; set; }
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ExercicioProblemaSaude> ExercicioProblemaSaude { get; set; } = default!;
+        public DbSet<AvaliacaoFisica> AvaliacaoFisica { get; set; } = default!;
+        public DbSet<Profissional> Profissional { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,11 +129,5 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(ep => ep.ProblemaSaudeId);
 
         }
-        public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
-
-        public DbSet<HealthWellbeing.Models.ExercicioProblemaSaude> ExercicioProblemaSaude { get; set; } = default!;
-        }
-        public DbSet<AvaliacaoFisica> AvaliacaoFisica { get; set; } = default!;
     }
 }
