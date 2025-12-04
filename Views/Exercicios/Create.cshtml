@@ -15,7 +15,6 @@
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
-
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-3">
@@ -30,6 +29,7 @@
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
+    <!-- EQUIPAMENTOS -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Equipamentos Necessários</label>
         <small class="form-text text-muted d-block">Selecione os equipamentos necessários para este exercício</small>
@@ -48,8 +48,7 @@
                                 <label class="form-check-label" for="eq_@item.Value">
                                     <a href="@Url.Action("Details", "Equipamento", new { id = item.Value })"
                                        target="_blank"
-                                       class="text-decoration-none"
-                                       title="Ver detalhes do equipamento">
+                                       class="text-decoration-none">
                                         @item.Text
                                     </a>
                                 </label>
@@ -67,6 +66,7 @@
         </div>
     </div>
 
+    <!-- GRUPOS MUSCULARES -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Grupos Musculares Associados</label>
         <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
@@ -79,14 +79,13 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
-                                       name="GrupoMuscularIds"
+                                       name="musculosIds"
                                        value="@grupoMuscular.Value"
                                        id="musculo_@grupoMuscular.Value" />
                                 <label class="form-check-label" for="musculo_@grupoMuscular.Value">
                                     <a href="@Url.Action("Details", "GrupoMuscular", new { id = grupoMuscular.Value })"
                                        target="_blank"
-                                       class="text-decoration-none"
-                                       title="Ver detalhes do grupo muscular">
+                                       class="text-decoration-none">
                                         @grupoMuscular.Text
                                     </a>
                                 </label>
@@ -98,19 +97,21 @@
             else
             {
                 <div class="alert alert-warning">
-                    <p class="mb-1">Nenhum grupo muscular encontrado no sistema.</p>
+                    <p class="mb-1">Nenhum grupo muscular encontrado.</p>
                     <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">
                         Criar Grupo Muscular
                     </a>
                 </div>
             }
         </div>
+
         @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
         {
             <span class="text-danger small">@ViewData.ModelState["musculosIds"].Errors.First().ErrorMessage</span>
         }
     </div>
 
+    <!-- GÊNEROS -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Gêneros Associados</label>
         <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
@@ -129,8 +130,7 @@
                                 <label class="form-check-label" for="genero_@genero.Value">
                                     <a href="@Url.Action("Details", "Genero", new { id = genero.Value })"
                                        target="_blank"
-                                       class="text-decoration-none"
-                                       title="Ver detalhes do gênero">
+                                       class="text-decoration-none">
                                         @genero.Text
                                     </a>
                                 </label>
@@ -142,35 +142,67 @@
             else
             {
                 <div class="alert alert-warning">
-                    <p class="mb-1">Nenhum gênero encontrado no sistema.</p>
+                    <p class="mb-1">Nenhum gênero encontrado.</p>
                     <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
                         Criar Gênero
                     </a>
                 </div>
             }
         </div>
+
         @if (ViewData.ModelState["generosIds"] != null && ViewData.ModelState["generosIds"].Errors.Any())
         {
             <span class="text-danger small">@ViewData.ModelState["generosIds"].Errors.First().ErrorMessage</span>
         }
     </div>
 
+    <!-- CONTRAINDICAÇÕES -->
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
+        <small class="form-text text-muted d-block">Selecione os problemas de saúde a evitar para este exercício</small>
+        <div class="border p-3 rounded mt-2 bg-light">
+            @if (ViewBag.Contraindicacoes != null && ((IEnumerable<SelectListItem>)ViewBag.Contraindicacoes).Any())
+            {
+                <div class="row">
+                    @foreach (var problema in (IEnumerable<SelectListItem>)ViewBag.Contraindicacoes)
+                    {
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="problemasSaudeIds"
+                                       value="@problema.Value"
+                                       id="problema_@problema.Value" />
+                                <label class="form-check-label" for="problema_@problema.Value">
+                                    @problema.Text
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <span class="text-muted">Nenhum problema de saúde registado.</span>
+            }
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-4 mb-3">
             <label asp-for="Duracao" class="form-label">Duração (minutos) *</label>
-            <input asp-for="Duracao" type="number" step="0.1" class="form-control" placeholder="Ex: 30.5">
+            <input asp-for="Duracao" type="number" step="0.1" class="form-control">
             <span asp-validation-for="Duracao" class="text-danger small"></span>
         </div>
 
         <div class="col-md-4 mb-3">
             <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
-            <input asp-for="Intencidade" type="number" class="form-control" placeholder="1 a 10">
+            <input asp-for="Intencidade" type="number" class="form-control">
             <span asp-validation-for="Intencidade" class="text-danger small"></span>
         </div>
 
         <div class="col-md-4 mb-3">
             <label asp-for="CaloriasGastas" class="form-label">Calorias Gastas *</label>
-            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control" placeholder="Ex: 250.5">
+            <input asp-for="CaloriasGastas" type="number" step="0.1" class="form-control">
             <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
         </div>
     </div>
@@ -178,20 +210,20 @@
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Repeticoes" class="form-label">Repetições *</label>
-            <input asp-for="Repeticoes" type="number" class="form-control" placeholder="Ex: 12">
+            <input asp-for="Repeticoes" type="number" class="form-control">
             <span asp-validation-for="Repeticoes" class="text-danger small"></span>
         </div>
 
         <div class="col-md-6 mb-3">
             <label asp-for="Series" class="form-label">Séries *</label>
-            <input asp-for="Series" type="number" class="form-control" placeholder="Ex: 3">
+            <input asp-for="Series" type="number" class="form-control">
             <span asp-validation-for="Series" class="text-danger small"></span>
         </div>
     </div>
 
     <div class="mb-3">
         <label asp-for="Instrucoes" class="form-label">Instruções *</label>
-        <textarea asp-for="Instrucoes" class="form-control" rows="3" placeholder="Passo a passo..."></textarea>
+        <textarea asp-for="Instrucoes" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Instrucoes" class="text-danger small"></span>
     </div>
 
@@ -203,6 +235,7 @@
             <i class="fas fa-arrow-left"></i> Voltar à Lista
         </a>
     </div>
+
 </form>
 
 @section Scripts {
