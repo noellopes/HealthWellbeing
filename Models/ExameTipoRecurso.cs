@@ -19,6 +19,8 @@ namespace HealthWellbeing.Models
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser no mínimo 1.")]
         public int QuantidadeNecessaria { get; set; } = 1;
 
+        
+
         // Esta classe não precisa de uma PK separada (ExameTipoRecursoId), 
         // pois a PK será composta por ExameTipoId + MaterialEquipamentoAssociadoId.
     }

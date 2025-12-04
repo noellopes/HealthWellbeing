@@ -50,27 +50,45 @@
                             <div class="card-body" style="max-height: 300px; overflow-y: auto;">
                                 @if (Model.Recursos.Any())
                                 {
-                                    <div class="row">
-                                        @for (int i = 0; i < Model.Recursos.Count; i++)
-                                        {
-                                            <div class="col-md-6">
-                                                <div class="form-check mb-2">
-                                                    @* Hidden inputs são obrigatórios para o Model Binding funcionar no POST *@
-                                                    <input type="hidden" asp-for="@Model.Recursos[i].Id" />
-                                                    <input type="hidden" asp-for="@Model.Recursos[i].Nome" />
+                                    @for (int i = 0; i < Model.Recursos.Count; i++)
+                                    {
+                                        <div class="d-flex align-items-center border-bottom py-2">
+                                            @* Checkbox e Nome *@
+                                            <div class="form-check flex-grow-1">
+                                                <input type="hidden" asp-for="@Model.Recursos[i].Id" />
+                                                <input type="hidden" asp-for="@Model.Recursos[i].Nome" />
 
-                                                    <input class="form-check-input" type="checkbox" asp-for="@Model.Recursos[i].IsSelected" />
-                                                    <label class="form-check-label" asp-for="@Model.Recursos[i].IsSelected">
-                                                        @Model.Recursos[i].Nome
-                                                    </label>
-                                                </div>
+                                                <input class="form-check-input" type="checkbox" asp-for="@Model.Recursos[i].IsSelected" />
+                                                <label class="form-check-label" asp-for="@Model.Recursos[i].IsSelected">
+                                                    @Model.Recursos[i].Nome
+                                                </label>
                                             </div>
-                                        }
-                                    </div>
+
+                                            @* Input de Quantidade *@
+                                            <div class="d-flex align-items-center" style="width: 130px;">
+                                                <span class="small text-muted me-2">Qtd:</span>
+
+                                                @* Adicionado atributo max e mensagem de ajuda *@
+                                                <input type="number" class="form-control form-control-sm"
+                                                       asp-for="@Model.Recursos[i].Quantidade"
+                                                       min="1"
+                                                       max="@Model.Recursos[i].StockAtual" />
+                                            </div>
+
+                                            @* Mostrar o limite visualmente *@
+                                            <div class="ms-2">
+                                                <small class="text-muted" style="font-size: 0.75rem;">
+                                                    (Máx: @Model.Recursos[i].StockAtual)
+                                                </small>
+                                            </div>
+                                        </div>
+                                        @* Mensagem de erro de validação para a quantidade *@
+                                        <span asp-validation-for="@Model.Recursos[i].Quantidade" class="text-danger small"></span>
+                                    }
                                 }
                                 else
                                 {
-                                    <p class="text-muted mb-0">Não existem recursos registados no sistema para associar.</p>
+                                    <p class="text-muted mb-0">Não existem recursos registados no sistema.</p>
                                 }
                             </div>
                         </div>
