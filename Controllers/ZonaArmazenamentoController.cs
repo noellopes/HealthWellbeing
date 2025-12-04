@@ -20,22 +20,43 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ZonaArmazenamento
-        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchLocalizacao = "")
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchNome = "",
+            string searchLocalizacao = "",
+            string estado = "todas")
         {
             var zonasQuery = _context.ZonaArmazenamento
                 .Include(z => z.LocalizacaoZonaArmazenamento)
                 .AsQueryable();
 
-            // Pesquisa por nome
+            //  Pesquisa por nome
             if (!string.IsNullOrEmpty(searchNome))
                 zonasQuery = zonasQuery.Where(z => z.Nome.Contains(searchNome));
 
-            // Pesquisa por localização (Nome da localização)
+            //  Pesquisa por localização
             if (!string.IsNullOrEmpty(searchLocalizacao))
                 zonasQuery = zonasQuery.Where(z => z.LocalizacaoZonaArmazenamento.Nome.Contains(searchLocalizacao));
 
+            //  Filtro por estado
+            switch (estado)
+            {
+                case "ativas":
+                    zonasQuery = zonasQuery.Where(z => z.Ativa == true);
+                    break;
+
+                case "inativas":
+                    zonasQuery = zonasQuery.Where(z => z.Ativa == false);
+                    break;
+
+                default:
+                    break;
+            }
+
+            // Manter valores na View
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
+            ViewBag.Estado = estado;
 
             // Paginação
             int totalZonas = await zonasQuery.CountAsync();
