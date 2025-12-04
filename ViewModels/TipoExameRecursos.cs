@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.ViewModels
 {
@@ -8,6 +9,10 @@ namespace HealthWellbeing.ViewModels
         public int Id { get; set; }
         public string Nome { get; set; } // Ex: "Máquina Raio-X"
         public bool IsSelected { get; set; } // Se está marcado ou não
+
+        [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser no mínimo 1.")]
+        public int Quantidade { get; set; }
+        public int StockAtual { get; set; }
     }
 
     // O ViewModel principal para a View de Edição

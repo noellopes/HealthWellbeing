@@ -144,12 +144,22 @@ namespace HealthWellbeing.Controllers
                 NomeExame = exameTipo.Nome,
                 Descricao = exameTipo.Descricao,       // <--- ADICIONADO
                 EspecialidadeId = exameTipo.EspecialidadeId, // <--- ADICIONADO
-                Recursos = todosMateriais.Select(m => new RecursoCheckBoxItem
+                                                             // Dentro da criação do viewModel:
+                Recursos = todosMateriais.Select(m =>
                 {
-                    Id = m.MaterialEquipamentoAssociadoId,
-                    Nome = m.NomeEquipamento,
-                    // Verifica se este material já está na lista de recursos deste exame
-                    IsSelected = exameTipo.ExameTipoRecursos!.Any(etr => etr.MaterialEquipamentoAssociadoId == m.MaterialEquipamentoAssociadoId)
+                    // Tenta encontrar se já existe uma ligação
+                    var ligacao = exameTipo.ExameTipoRecursos!
+                        .FirstOrDefault(r => r.MaterialEquipamentoAssociadoId == m.MaterialEquipamentoAssociadoId);
+
+                    return new RecursoCheckBoxItem
+                    {
+                        Id = m.MaterialEquipamentoAssociadoId,
+                        Nome = m.NomeEquipamento,
+                        IsSelected = ligacao != null,
+                        // Se existir, usa a quantidade da BD; senão, mete 1 por defeito
+                        Quantidade = ligacao?.QuantidadeNecessaria ?? 1,
+                        StockAtual = m.Quantidade 
+                    };
                 }).ToList()
             };
 
@@ -209,17 +219,60 @@ namespace HealthWellbeing.Controllers
                         .Select(r => r.MaterialEquipamentoAssociadoId)
                         .ToList();
 
+                    // No método Edit (POST), antes do loop de adicionar/remover:
+
+                    // 1. Validar Stocks (Segurança no Servidor)
+                    var todosMateriaisDb = await _context.MaterialEquipamentoAssociado.ToListAsync();
+                    bool erroDeStock = false;
+
+                    foreach (var item in viewModel.Recursos.Where(r => r.IsSelected))
+                    {
+                        var materialDb = todosMateriaisDb.FirstOrDefault(m => m.MaterialEquipamentoAssociadoId == item.Id);
+
+                        // Se pedir mais do que existe em stock
+                        if (materialDb != null && item.Quantidade > materialDb.Quantidade)
+                        {
+                            ModelState.AddModelError("", $"Erro: O recurso '{item.Nome}' só tem {materialDb.Quantidade} unidades em stock (pediu {item.Quantidade}).");
+                            erroDeStock = true;
+                        }
+                    }
+
+                    // Se houver erro de stock, impedimos a gravação
+                    if (erroDeStock)
+                    {
+                        // Repopular dropdown e retornar View
+                        ViewData["EspecialidadeId"] = new SelectList(_context.Especialidades.OrderBy(e => e.Nome), "EspecialidadeId", "Nome", viewModel.EspecialidadeId);
+                        return View(viewModel);
+                    }
+
+                    
+
                     //Adicionar novos (Selecionados mas não existentes na BD)
                     foreach (var selectedId in selectedIds)
                     {
+                        // Dentro do loop foreach (var selectedId in selectedIds)
+
+                        // 1. Obter a quantidade que veio do formulário para este item
+                        int qtdFormulario = viewModel.Recursos.First(r => r.Id == selectedId).Quantidade;
+                        if (qtdFormulario < 1) qtdFormulario = 1; // Proteção extra
+
                         if (!currentIds.Contains(selectedId))
                         {
-                            // Cria o novo registo na tabela de junção
+                            // ADICIONAR NOVO: Grava a quantidade
                             exameTipoToUpdate.ExameTipoRecursos.Add(new ExameTipoRecurso
                             {
                                 ExameTipoId = id,
-                                MaterialEquipamentoAssociadoId = selectedId
+                                MaterialEquipamentoAssociadoId = selectedId,
+                                QuantidadeNecessaria = qtdFormulario // <--- AQUI
                             });
+                        }
+                        else
+                        {
+                            // ATUALIZAR EXISTENTE: Se a quantidade mudou, atualiza
+                            var ligacaoExistente = exameTipoToUpdate.ExameTipoRecursos
+                                .First(r => r.MaterialEquipamentoAssociadoId == selectedId);
+
+                            ligacaoExistente.QuantidadeNecessaria = qtdFormulario; // <--- AQUI
                         }
                     }
 
