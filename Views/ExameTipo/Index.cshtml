@@ -113,6 +113,7 @@
                     <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>   
                     <th>@Html.DisplayNameFor(model => model.Items.First().Especialidade!.Nome)</th>
                     <th class="text-center" style="width: 250px;">Ações</th>
+                    <th>Recursos Necessários</th>
                 </tr>
             </thead>
             <tbody>
@@ -126,6 +127,27 @@
                             <a asp-action="Edit" asp-route-id="@item.ExameTipoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
                             <a asp-action="Details" asp-route-id="@item.ExameTipoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
                             <a asp-action="Delete" asp-route-id="@item.ExameTipoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
+                        </td>
+                        @* Na secção <tbody>, antes da coluna das Ações *@
+
+                        <td>
+                            @if (item.ExameTipoRecursos != null && item.ExameTipoRecursos.Any())
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var rec in item.ExameTipoRecursos)
+                                    {
+                                        <span class="badge bg-light text-dark border border-secondary"
+                                              title="Qtd Necessária: @rec.QuantidadeNecessaria">
+                                            @rec.Recurso!.NomeEquipamento
+                                            <span class="text-muted ms-1" style="font-size: 0.7em;">(@rec.QuantidadeNecessaria)</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">-</span>
+                            }
                         </td>
                     </tr>
                 }
