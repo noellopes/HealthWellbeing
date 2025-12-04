@@ -21,6 +21,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Beneficio> Beneficio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TipoExercicioBeneficio> TipoExercicioBeneficio { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ProblemaSaude> ProblemaSaude { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TipoExercicioProblemaSaude> TipoExercicioProblemaSaude { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
@@ -55,6 +56,19 @@ namespace HealthWellbeing.Data
                 .HasOne(tb => tb.Beneficio)
                 .WithMany(b => b.TipoExercicioBeneficios)
                 .HasForeignKey(tb => tb.BeneficioId);
+
+            modelBuilder.Entity<TipoExercicioProblemaSaude>()
+                .HasKey(tb => new { tb.TipoExercicioId, tb.ProblemaSaudeId });
+
+            modelBuilder.Entity<TipoExercicioProblemaSaude>()
+                .HasOne(tb => tb.TipoExercicio)
+                .WithMany(t => t.Contraindicacao)
+                .HasForeignKey(tb => tb.TipoExercicioId);
+
+            modelBuilder.Entity<TipoExercicioProblemaSaude>()
+                .HasOne(tb => tb.ProblemaSaude)
+                .WithMany(b => b.TipoExercicioAfetado)
+                .HasForeignKey(tb => tb.ProblemaSaudeId);
 
             modelBuilder.Entity<ExercicioGenero>()
                 .HasKey(eg => new { eg.ExercicioId, eg.GeneroId });
@@ -95,9 +109,26 @@ namespace HealthWellbeing.Data
                 .WithMany(g => g.ExercicioEquipamentos)
                 .HasForeignKey(eg => eg.EquipamentoId);
 
+
+            modelBuilder.Entity<ExercicioProblemaSaude>()
+                .HasKey(ep => new { ep.ExercicioId, ep.ProblemaSaudeId });
+
+            modelBuilder.Entity<ExercicioProblemaSaude>()
+                .HasOne(ep => ep.Exercicio)
+                .WithMany(e => e.Contraindicacoes)
+                .HasForeignKey(ep => ep.ExercicioId);
+
+            modelBuilder.Entity<ExercicioProblemaSaude>()
+                .HasOne(ep => ep.ProblemaSaude)
+                .WithMany(p => p.ExercicioAfetado)
+                .HasForeignKey(ep => ep.ProblemaSaudeId);
+
         }
         public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Sono> Sono { get; set; } = default!;
+
+        public DbSet<HealthWellbeing.Models.ExercicioProblemaSaude> ExercicioProblemaSaude { get; set; } = default!;
+        }
         public DbSet<AvaliacaoFisica> AvaliacaoFisica { get; set; } = default!;
     }
 }

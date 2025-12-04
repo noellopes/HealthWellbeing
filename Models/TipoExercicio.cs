@@ -19,6 +19,8 @@ namespace HealthWellbeing.Models
         public string CaracteristicasTipoExercicios { get; set; }
 
         public ICollection<TipoExercicioBeneficio>? TipoExercicioBeneficios { get; set; }
+
+        public ICollection<TipoExercicioProblemaSaude>? Contraindicacao { get; set; }
     }
 }
 

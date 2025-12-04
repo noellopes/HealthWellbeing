@@ -317,6 +317,21 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ExercicioGrupoMuscular");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ExercicioProblemaSaude", b =>
+                {
+                    b.Property<int>("ExercicioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProblemaSaudeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExercicioId", "ProblemaSaudeId");
+
+                    b.HasIndex("ProblemaSaudeId");
+
+                    b.ToTable("ExercicioProblemaSaude");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Genero", b =>
                 {
                     b.Property<int>("GeneroId")
@@ -594,6 +609,21 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("TipoExercicioBeneficio");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicioProblemaSaude", b =>
+                {
+                    b.Property<int>("TipoExercicioId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProblemaSaudeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TipoExercicioId", "ProblemaSaudeId");
+
+                    b.HasIndex("ProblemaSaudeId");
+
+                    b.ToTable("TipoExercicioProblemaSaude");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.UtenteGrupo7", b =>
                 {
                     b.Property<int>("UtenteGrupo7Id")
@@ -714,6 +744,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("GrupoMuscular");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ExercicioProblemaSaude", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Exercicio", "Exercicio")
+                        .WithMany("Contraindicacoes")
+                        .HasForeignKey("ExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.ProblemaSaude", "ProblemaSaude")
+                        .WithMany("ExercicioAfetado")
+                        .HasForeignKey("ProblemaSaudeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Exercicio");
+
+                    b.Navigation("ProblemaSaude");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Musculo", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.GrupoMuscular", "GrupoMuscular")
@@ -755,6 +804,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("TipoExercicio");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TipoExercicioProblemaSaude", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.ProblemaSaude", "ProblemaSaude")
+                        .WithMany("TipoExercicioAfetado")
+                        .HasForeignKey("ProblemaSaudeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.TipoExercicio", "TipoExercicio")
+                        .WithMany("Contraindicacao")
+                        .HasForeignKey("TipoExercicioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProblemaSaude");
+
+                    b.Navigation("TipoExercicio");
+                });
+
             modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ProblemaSaude", null)
@@ -787,6 +855,8 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Exercicio", b =>
                 {
+                    b.Navigation("Contraindicacoes");
+
                     b.Navigation("ExercicioEquipamentos");
 
                     b.Navigation("ExercicioGeneros");
@@ -806,8 +876,17 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Musculos");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ProblemaSaude", b =>
+                {
+                    b.Navigation("ExercicioAfetado");
+
+                    b.Navigation("TipoExercicioAfetado");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
                 {
+                    b.Navigation("Contraindicacao");
+
                     b.Navigation("TipoExercicioBeneficios");
                 });
 

@@ -2,8 +2,11 @@
 
 @{
     ViewData["Title"] = "Criar";
-    var beneficios = ViewData["Beneficios"] as List<Beneficio> ?? new List<Beneficio>();
+    var beneficios = ViewData["Beneficios"] as List<HealthWellbeing.Models.Beneficio> ?? new List<HealthWellbeing.Models.Beneficio>();
     var selectedBeneficios = ViewData["SelectedBeneficios"] as List<int> ?? new List<int>();
+
+    var problemasSaude = ViewData["ProblemasSaude"] as List<HealthWellbeing.Models.ProblemaSaude> ?? new List<HealthWellbeing.Models.ProblemaSaude>();
+    var selectedProblemasSaude = ViewData["SelectedProblemasSaude"] as List<int> ?? new List<int>();
 }
 
 <h1>Criar Novo Tipo de Exercício</h1>
@@ -12,8 +15,8 @@
 
 @if (TempData["StatusMessage"] is string statusMessage)
 {
-    
-    string alertClass = "alert-info"; 
+
+    string alertClass = "alert-info";
 
     if (statusMessage.StartsWith("Sucesso:", StringComparison.OrdinalIgnoreCase))
     {
@@ -25,10 +28,10 @@
     }
     else if (statusMessage.StartsWith("Erro:", StringComparison.OrdinalIgnoreCase))
     {
-        alertClass = "alert-danger"; 
+        alertClass = "alert-danger";
     }
 
-    
+
     <div class="alert @alertClass alert-dismissible fade show" role="alert">
         @statusMessage
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
@@ -74,7 +77,7 @@
                                                name="selectedBeneficios"
                                                value="@beneficio.BeneficioId"
                                                id="beneficio_@beneficio.BeneficioId"
-                                               @(selectedBeneficios.Contains(beneficio.BeneficioId) ? "checked" : "") /> 
+                                               @(selectedBeneficios.Contains(beneficio.BeneficioId) ? "checked" : "") />
                                         <label class="form-check-label" for="beneficio_@beneficio.BeneficioId">
                                             <a href="@Url.Action("Details", "Beneficio", new { id = beneficio.BeneficioId })"
                                                target="_blank"
@@ -96,6 +99,37 @@
                                 Criar Benefício
                             </a>
                         </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
+                <small class="form-text text-muted d-block">Selecione os problemas de saúde para os quais este exercício <strong>não é recomendado</strong>.</small>
+                <div class="border p-3 rounded mt-2 bg-light">
+                    @if (problemasSaude.Any())
+                    {
+                        <div class="row">
+                            @foreach (var problema in problemasSaude)
+                            {
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="selectedProblemasSaude"
+                                               value="@problema.ProblemaSaudeId"
+                                               id="problema_@problema.ProblemaSaudeId"
+                                               @(selectedProblemasSaude.Contains(problema.ProblemaSaudeId) ? "checked" : "") />
+                                        <label class="form-check-label" for="problema_@problema.ProblemaSaudeId">
+                                            @problema.ProblemaNome
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum problema de saúde registado.</span>
                     }
                 </div>
             </div>

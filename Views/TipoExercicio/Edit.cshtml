@@ -2,8 +2,11 @@
 
 @{
     ViewData["Title"] = "Editar";
-    var beneficios = ViewData["Beneficios"] as List<Beneficio> ?? new List<Beneficio>();
+    var beneficios = ViewData["Beneficios"] as List<HealthWellbeing.Models.Beneficio> ?? new List<HealthWellbeing.Models.Beneficio>();
     var selectedBeneficios = ViewData["SelectedBeneficios"] as List<int> ?? new List<int>();
+
+    var problemasSaude = ViewData["ProblemasSaude"] as List<HealthWellbeing.Models.ProblemaSaude> ?? new List<HealthWellbeing.Models.ProblemaSaude>();
+    var selectedProblemasSaude = ViewData["SelectedProblemasSaude"] as List<int> ?? new List<int>();
 }
 
 <h1>Editar</h1>
@@ -12,14 +15,13 @@
 
 @if (ViewData["StatusMessage"] is string statusMessage)
 {
-    
+
     string alertClass = "alert-info";
 
     if (statusMessage.StartsWith("Erro:", StringComparison.OrdinalIgnoreCase))
     {
         alertClass = "alert-danger";
     }
-
 
     <div class="alert @alertClass alert-dismissible fade show" role="alert">
         @statusMessage
@@ -93,8 +95,39 @@
                 </div>
             </div>
 
+            <div class="form-group mb-4">
+                <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
+                <small class="form-text text-muted d-block">Selecione ou desmarque os problemas de saúde a evitar</small>
+                <div class="border p-3 rounded mt-2 bg-light">
+                    @if (problemasSaude.Any())
+                    {
+                        <div class="row">
+                            @foreach (var problema in problemasSaude)
+                            {
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="selectedProblemasSaude"
+                                               value="@problema.ProblemaSaudeId"
+                                               id="problema_@problema.ProblemaSaudeId"
+                                               @(selectedProblemasSaude.Contains(problema.ProblemaSaudeId) ? "checked" : "") />
+                                        <label class="form-check-label" for="problema_@problema.ProblemaSaudeId">
+                                            @problema.ProblemaNome
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum problema de saúde disponível.</span>
+                    }
+                </div>
+            </div>
+
             <div class="form-group">
-                <input type="submit" value="Guardar" class="btn btn-success" /> 
+                <input type="submit" value="Guardar" class="btn btn-success" />
                 <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
             </div>
         </form>

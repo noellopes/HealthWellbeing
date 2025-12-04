@@ -151,6 +151,30 @@
                 </div>
             </div>
 
+            <dt class="col-sm-2 text-danger">
+                Contraindicações
+            </dt>
+            <dd class="col-sm-10">
+                @if (Model.Contraindicacoes != null && Model.Contraindicacoes.Any())
+                {
+                    <ul class="list-unstyled">
+                        @foreach (var item in Model.Contraindicacoes)
+                        {
+                            if (item.ProblemaSaude != null)
+                            {
+                                <li class="mb-1">
+                                    <span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span>
+                                </li>
+                            }
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span class="text-muted">Nenhuma contraindicação registada</span>
+                }
+            </dd>
+
         </div>
     </div>
 </div>
