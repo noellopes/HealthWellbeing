@@ -1,0 +1,137 @@
+﻿@model IEnumerable<HealthWellbeing.Models.AvaliacaoFisica>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DataMedicao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Peso)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Altura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GorduraCorporal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MassaMuscular)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pescoco)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ombros)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Peitoral)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BracoDireito)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BracoEsquerdo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cintura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Abdomen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Anca)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CoxaDireita)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CoxaEsquerda)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GemeoDireito)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GemeoEsquerdo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UtenteGrupo7)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataMedicao)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Peso)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Altura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GorduraCorporal)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MassaMuscular)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Pescoco)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ombros)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Peitoral)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BracoDireito)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BracoEsquerdo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cintura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Abdomen)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Anca)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoxaDireita)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoxaEsquerda)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GemeoDireito)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GemeoEsquerdo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UtenteGrupo7.UtenteGrupo7Id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.AvaliacaoFisicaId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.AvaliacaoFisicaId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.AvaliacaoFisicaId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

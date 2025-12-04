@@ -1,4 +1,6 @@
-﻿using HealthWellbeing.Models;
+﻿using HealthWellbeing.Controllers;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -106,7 +108,6 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        // --- NOVO MÉTODO: POPULAR EQUIPAMENTOS ---
         private static void PopulateEquipamentos(HealthWellbeingDbContext dbContext)
         {
             if (dbContext.Equipamento.Any()) return;
@@ -342,8 +343,6 @@ namespace HealthWellbeing.Data
             dbContext.ProblemaSaude.AddRange(problemas);
             dbContext.SaveChanges();
         }
-
-        // --- INÍCIO DA SUA PARTE CORRIGIDA ---
 
         private static void PopulateBeneficios(HealthWellbeingDbContext dbContext)
         {
@@ -588,6 +587,123 @@ namespace HealthWellbeing.Data
                 // serão rastreadas, mas como apenas usamos o ID do Beneficio, não haverá conflito.
                 dbContext.TipoExercicio.AddRange(tiposParaAdicionar);
                 dbContext.SaveChanges();
+            }
+        }
+
+        public static class Roles
+        {
+            public const string Administrador = "Administrador";
+            public const string Profissional = "ProfissionalSaude";
+            public const string Utente = "Utente";
+        }
+
+        // Método para criar as Roles (Já tinhas, está correto)
+        public static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
+        {
+            string[] roleNames = { Roles.Administrador, Roles.Profissional, Roles.Utente };
+
+            foreach (var roleName in roleNames)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
+
+        // A. ADMIN
+        public static async Task SeedDefaultAdmin(UserManager<IdentityUser> userManager)
+        {
+            var adminEmail = "admin@ginasio.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+            if (adminUser == null)
+            {
+                adminUser = new IdentityUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
+
+                // A password deve ser forte
+                var result = await userManager.CreateAsync(adminUser, "Admin@123");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(adminUser, Roles.Administrador);
+                }
+            }
+        }
+
+        public static async Task SeedProfissional(
+        UserManager<IdentityUser> userManager, // Liga à BD de Users
+        HealthWellbeingDbContext dbContext)    // Liga à BD de Negócio
+        {
+            // 1. Criar o Login na BD "HealthWellbeingUsers"
+            var profEmail = "medico@ginasio.com";
+            var profUser = await userManager.FindByEmailAsync(profEmail);
+
+            if (profUser == null)
+            {
+                profUser = new IdentityUser
+                {
+                    UserName = profEmail,
+                    Email = profEmail,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(profUser, "Medico@123");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(profUser, Roles.Profissional);
+                }
+            }
+
+            // Importante: Recarregar o user para garantir que temos o ID correto
+            profUser = await userManager.FindByEmailAsync(profEmail);
+
+            // 2. Criar o Perfil na BD "HealthWellbeing"
+            // Usamos o UserId (string) para fazer a ponte
+            var perfilExiste = await dbContext.Profissional.AnyAsync(p => p.UserId == profUser.Id);
+
+            if (!perfilExiste)
+            {
+                var novoProfissional = new Profissional
+                {
+                    UserId = profUser.Id, //ID da outra BD
+                    Nome = "Dr. Exemplo",
+                    Especialidade = "Fisioterapeuta",
+                    NumeroCedula = "12345XYZ"
+                };
+
+                dbContext.Profissional.Add(novoProfissional);
+                await dbContext.SaveChangesAsync();
+            }
+        }
+
+        public static async Task SeedUtente(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+        {
+            var utenteEmail = "utente@ginasio.com";
+            var utenteUser = await userManager.FindByEmailAsync(utenteEmail);
+
+            // 1. Criar Login
+            if (utenteUser == null)
+            {
+                utenteUser = new IdentityUser
+                {
+                    UserName = utenteEmail,
+                    Email = utenteEmail,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(utenteUser, "Utente@123");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(utenteUser, Roles.Utente);
+                }
             }
         }
     }
