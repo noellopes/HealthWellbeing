@@ -109,6 +109,27 @@
                         @m.ToString("0.##")x
                     </span>
                 </dd>
+
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    Usage Count
+                </dt>
+                <dd class="col-sm-9 mb-0">
+                    @{
+                        int count = Model.Events?.Count ?? 0;
+                        // Lógica de Delete: Se houver uso, é um aviso Laranja
+                        string badgeClass = count > 0 ? "bg-warning text-dark border border-warning" : "bg-success text-white";
+                        string icon = count > 0 ? "bi-exclamation-circle" : "bi-check-circle";
+
+                        string badgeText = count > 0
+                        ? $"Used by {count} Event" + (count != 1 ? "s" : "")
+                        : "Safe to delete (Unused)";// Confirmação visual
+                    }
+
+                    <span class="badge @badgeClass rounded-pill" style="font-size: 0.9em; padding: 0.5em 1em;">
+                        <i class="bi @icon me-1"></i> @badgeText
+                    </span>
+                </dd>
+
             </dl>
         </div>
     </div>

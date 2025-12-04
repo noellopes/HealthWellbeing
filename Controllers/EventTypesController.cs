@@ -62,6 +62,7 @@ namespace HealthWellbeing.Controllers {
 
             var eventType = await _context.EventType
                 .Include(e => e.ScoringStrategy)
+                .Include(e => e.Events)
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
 
             if (eventType == null) {
@@ -161,6 +162,7 @@ namespace HealthWellbeing.Controllers {
 
             var eventType = await _context.EventType
                 .Include(e => e.ScoringStrategy)
+                .Include(e => e.Events)
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
 
             if (eventType == null) {
@@ -184,8 +186,14 @@ namespace HealthWellbeing.Controllers {
                     TempData["SuccessMessage"] = "Event Type deleted successfully.";
                 }
                 catch (Exception) {
+                    eventType = await _context.EventType
+                        .AsNoTracking()
+                        .Include(e => e.ScoringStrategy)
+                        .Include(e => e.Events)
+                        .FirstOrDefaultAsync(e => e.EventTypeId == id);
+
                     // Verifica se existem Eventos associados a este Tipo antes de apagar
-                    int numberEvents = await _context.Event.Where(e => e.EventTypeId == id).CountAsync();
+                    int numberEvents = eventType?.Events?.Count ?? 0;
 
                     if (numberEvents > 0) {
                         ViewBag.Error = $"Unable to delete Event Type. It is associated with {numberEvents} Events. Remove the events first.";
@@ -194,12 +202,7 @@ namespace HealthWellbeing.Controllers {
                         ViewBag.Error = "An error occurred while deleting the Event Type.";
                     }
 
-                    // Recarregar o objeto para a View não dar erro de NullReference
-                    var eventTypeForView = await _context.EventType
-                        .Include(e => e.ScoringStrategy)
-                        .FirstOrDefaultAsync(e => e.EventTypeId == id);
-
-                    return View(eventTypeForView);
+                    return View(eventType);
                 }
             }
 

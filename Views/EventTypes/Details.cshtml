@@ -95,6 +95,34 @@
                         @m.ToString("0.##")x
                     </span>
                 </dd>
+
+                <dt class="col-sm-3 text-muted d-flex align-items-center">
+                    Usage Count
+                </dt>
+                <dd class="col-sm-9 mb-0">
+                    @{
+                        int count = Model.Events?.Count ?? 0;
+                        string badgeClass;
+                        string badgeText;
+                        string icon;
+
+                        if (count > 0) {
+                            badgeClass = "bg-info text-dark";
+                            badgeText = $"Used by {count} Event" + (count != 1 ? "s" : "");
+                            icon = "bi-link-45deg";
+                        }
+                        else {
+                            badgeClass = "bg-secondary text-white";
+                            badgeText = "Not currently in use";
+                            icon = "bi-slash-circle";
+                        }
+                    }
+
+                    <span class="badge @badgeClass rounded-pill" style="font-size: 0.9em; padding: 0.5em 1em;">
+                        <i class="bi @icon me-1"></i> @badgeText
+                    </span>
+                </dd>
+
             </dl>
         </div>
     </div>

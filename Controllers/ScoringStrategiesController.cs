@@ -56,10 +56,11 @@ namespace HealthWellbeing.Controllers {
             }
 
             var scoringStrategy = await _context.ScoringStrategy
+                .Include(s => s.EventTypes)
                 .FirstOrDefaultAsync(m => m.ScoringStrategyId == id);
 
             if (scoringStrategy == null) {
-                return View("InvalidScoringStrategy"); // Opcional: Criar view de erro ou retornar NotFound
+                return View("InvalidScoringStrategy");
             }
 
             return View(scoringStrategy);
@@ -141,6 +142,7 @@ namespace HealthWellbeing.Controllers {
             }
 
             var scoringStrategy = await _context.ScoringStrategy
+                .Include(s => s.EventTypes)
                 .FirstOrDefaultAsync(m => m.ScoringStrategyId == id);
 
             if (scoringStrategy == null) {
@@ -164,10 +166,12 @@ namespace HealthWellbeing.Controllers {
                     TempData["SuccessMessage"] = "Scoring Strategy deleted successfully.";
                 }
                 catch (Exception) {
-                    // Lógica Inversa: Verificar se existem EventTypes a usar esta estratégia
-                    int numberEventTypes = await _context.EventType
-                        .Where(e => e.ScoringStrategyId == id)
-                        .CountAsync();
+                    scoringStrategy = await _context.ScoringStrategy
+                        .Include(s => s.EventTypes)
+                        .FirstOrDefaultAsync(s => s.ScoringStrategyId == id);
+
+                    // Calcular o número para a mensagem de erro textual
+                    int numberEventTypes = scoringStrategy?.EventTypes?.Count ?? 0;
 
                     if (numberEventTypes > 0) {
                         ViewBag.Error = $"Unable to delete. This Strategy is used by {numberEventTypes} Event Types. Please reassign or delete the Event Types first.";
