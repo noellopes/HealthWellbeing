@@ -79,18 +79,30 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
-            if (ModelState.IsValid)
+            // Normalizar nome (tirar espaços e ignorar maiúsculas/minúsculas)
+            string normalizedName = typeMaterial.Name.Trim().ToLower();
+
+            // Verificar duplicados
+            bool exists = await _context.TypeMaterial
+                .AnyAsync(t => t.Name.Trim().ToLower() == normalizedName);
+
+            if (exists)
             {
-                _context.Add(typeMaterial);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Tipo de material criado com sucesso!";
-                return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
-
+                ModelState.AddModelError("Name", "Já existe um tipo com este nome. Escolha outro.");
+                return View(typeMaterial);
             }
 
-            return View(typeMaterial);
+            if (!ModelState.IsValid)
+                return View(typeMaterial);
+
+            _context.Add(typeMaterial);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Tipo de material criado com sucesso!";
+            return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
         }
+
+
 
         // GET: TypeMaterials/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -110,13 +122,25 @@ namespace HealthWellbeingRoom.Controllers
         {
             if (id != typeMaterial.TypeMaterialID) return NotFound();
 
+            // Normalizar nome
+            string normalizedName = typeMaterial.Name.Trim().ToLower();
+
+            // Verificar duplicados (ignorando o próprio registro)
+            bool exists = await _context.TypeMaterial
+                .AnyAsync(t => t.Name.Trim().ToLower() == normalizedName && t.TypeMaterialID != id);
+
+            if (exists)
+            {
+                ModelState.AddModelError("Name", "Já existe um tipo com este nome. Escolha outro.");
+                return View(typeMaterial);
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(typeMaterial);
                     await _context.SaveChangesAsync();
-
                     TempData["SuccessMessage"] = "Tipo de material atualizado com sucesso!";
                     return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
                 }
@@ -131,6 +155,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(typeMaterial);
         }
+
 
         // GET: TypeMaterials/Delete/5
         public async Task<IActionResult> Delete(int? id)
