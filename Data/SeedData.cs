@@ -29,6 +29,67 @@ namespace HealthWellbeing.Data
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
             PopulateLevels(dbContext);
+            PopulateEmployees(dbContext);
+            PopulateCustomers(dbContext);
+        }
+
+
+        private static void PopulateEmployees(HealthWellbeingDbContext dbContext) {
+            if (dbContext.Employee.Any()) return;
+
+            var employees = new[]
+            {
+                new Employee
+                {
+                    Name = "Sophia Martinez Johnson",
+                    Email = "admin@ipg.pt",
+                    PhoneNumber = "+351 910000000"
+                },
+                new Employee
+                {
+                    Name = "João Marcelo da Silva Luis",
+                    Email = "joao@ipg.pt",
+                    PhoneNumber = "+351 910000001"
+                }
+            };
+
+            foreach (var emp in employees) {
+                // Avoid duplicates by email
+                if (!dbContext.Employee.Any(e => e.Email == emp.Email)) {
+                    dbContext.Employee.Add(emp);
+                }
+            }
+
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateCustomers(HealthWellbeingDbContext dbContext) {
+            if (dbContext.Customer.Any()) return;
+
+            var customers = new[]
+            {
+                new Customer
+                {
+                    Name = "Maria dos Santos",
+                    Email = "maria@ipg.pt",
+                    PhoneNumber = "+351 920000002"
+                },
+                new Customer
+                {
+                    Name = "Paulo Henrique Carvalho Santos",
+                    Email = "paulo@ipg.pt",
+                    PhoneNumber = "+351 920000003"
+                },
+
+            };
+
+            foreach (var cust in customers) {
+                if (!dbContext.Customer.Any(c => c.Email == cust.Email)) {
+                    dbContext.Customer.Add(cust);
+                }
+            }
+
+            dbContext.SaveChanges();
         }
 
         private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {

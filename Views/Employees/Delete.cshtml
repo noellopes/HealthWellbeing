@@ -1,0 +1,52 @@
+﻿@model HealthWellbeing.Models.Employee
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Delete Employee</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="mb-0 fw-semibold">Are you sure you want to delete this employee?</p>
+                        <p class="text-muted small mb-0">This action cannot be undone.</p>
+                    </div>
+
+                    <dl class="row g-2 align-items-start mb-4">
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 mb-2">@Html.DisplayFor(model => model.Name)</dd>
+
+                        <dt class="col-sm-4 text-muted">Email</dt>
+                        <dd class="col-sm-8 mb-2">
+                            <span class="d-block">@Html.DisplayFor(model => model.Email)</span>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Phone</dt>
+                        <dd class="col-sm-8 mb-2">@Html.DisplayFor(model => model.PhoneNumber)</dd>
+                    </dl>
+
+                    <form asp-action="Delete" method="post" class="d-flex justify-content-between">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="EmployeeId" />
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div>
+                            <a asp-action="Index" class="btn btn-outline-secondary me-2">Cancel</a>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

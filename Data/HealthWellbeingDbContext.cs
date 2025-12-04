@@ -50,5 +50,7 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(et => et.ScoringStrategyId) 
                 .OnDelete(DeleteBehavior.NoAction);
         }
+        public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
     }
 }

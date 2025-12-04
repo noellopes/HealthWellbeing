@@ -1,0 +1,58 @@
+﻿@model HealthWellbeing.Models.Customer
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Customer</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post" class="needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="invalid-feedback"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="invalid-feedback"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-action="Index" class="btn btn-link">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Add Bootstrap 'is-invalid' to inputs that have server-side validation errors
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                var errorSpans = document.querySelectorAll('.field-validation-error, .invalid-feedback');
+                errorSpans.forEach(function (span) {
+                    var name = span.getAttribute('data-valmsg-for') || span.getAttribute('asp-for');
+                    if (!name) return;
+                    var input = document.querySelector('[name="' + name + '"]');
+                    if (input) input.classList.add('is-invalid');
+                });
+            });
+        })();
+    </script>
+}
