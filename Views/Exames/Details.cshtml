@@ -62,7 +62,8 @@
             @Html.DisplayNameFor(model => model.MaterialEquipamentoAssociado)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MaterialEquipamentoAssociado.EstadoComponente)
+            @Html.DisplayFor(model => model.MaterialEquipamentoAssociado.NomeEquipamento)
+            (@Html.DisplayFor(model => model.MaterialEquipamentoAssociado.EstadoMaterial.Nome))
         </dd>
     </dl>
 </div>

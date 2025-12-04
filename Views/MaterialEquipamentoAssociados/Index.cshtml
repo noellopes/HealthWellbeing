@@ -67,36 +67,51 @@
             <thead class="table-dark">
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.Items.First().NomeEquipamento)
+                        Nome Equipamento
                     </th>
                     <th class="text-center">
-                        @Html.DisplayNameFor(model => model.Items.First().Quantidade)
+                        Quantidade
                     </th>
                     <th class="d-none d-sm-table-cell">
-                        @Html.DisplayNameFor(model => model.Items.First().EstadoComponente)
+                        Estado
                     </th>
                     <th class="text-center" style="width: 250px;">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.Items!)
-                { // Iteração no Model.Items
-                  <tr>
-                      <td>
-                          @Html.DisplayFor(modelItem => item.NomeEquipamento)
-                      </td>
-                      <td class="text-center">
-                          @Html.DisplayFor(modelItem => item.Quantidade)
-                      </td>
-                      <td class="d-none d-sm-table-cell">
-                          @Html.DisplayFor(modelItem => item.EstadoComponente)
-                      </td>
-                      <td class="text-center text-nowrap">
-                          <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
-                          <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
-                          <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
-                      </td>
-                  </tr>
+                { @* Iteração no Model.Items *@
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.NomeEquipamento)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Quantidade)
+                        </td>
+                        <td class="d-none d-sm-table-cell">
+                            @* CORRIGIDO: Bloco de código para calcular o badge e exibir o Nome *@
+                            @{
+                                // Acessa o nome do estado através da propriedade de navegação
+                                var estadoNome = item.EstadoMaterial?.Nome ?? "Não Especificado";
+                                var badgeClass = estadoNome.ToLower() switch
+                                {
+                                    "disponível" => "bg-success",
+                                    "em uso" => "bg-primary",
+                                    "em manutenção" => "bg-warning text-dark",
+                                    "danificado" => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">
+                                @Html.DisplayFor(modelItem => item.EstadoMaterial.Nome)
+                            </span>
+                        </td>
+                        <td class="text-center text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning btn-sm"><i class="bi bi-pencil me-1"></i> Editar</a>
+                            <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
+                            <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>

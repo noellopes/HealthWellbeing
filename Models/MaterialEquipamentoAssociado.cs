@@ -14,9 +14,15 @@ namespace HealthWellbeing.Models
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser um número positivo.")]
         public int Quantidade { get; set; }
 
-        [Required(ErrorMessage = "O estado do componente é obrigatório (ex.: operacional, avariado, em manutenção).")]
-        [StringLength(50)]
-        public string EstadoComponente { get; set; } = string.Empty;
+        // 1. Foreign Key Property (FK)
+        // This holds the actual ID of the EstadoMaterial (e.g., 1, 2, 3)
+        [Required(ErrorMessage = "O estado do componente é obrigatório.")]
+        // Make sure this name matches the primary key type (int) in EstadoMaterial
+        public int MaterialStatusId { get; set; }
+
+        // 2. Navigation Property
+        // This allows you to load the actual EstadoMaterial object (e.g., its Nome, Descricao)
+        public EstadoMaterial? EstadoMaterial { get; set; }
 
         // NOVO: Propriedade de Navegação para M:N
         public ICollection<ExameTipoRecurso>? ExameTipoRecursos { get; set; }

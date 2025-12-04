@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124172842_entidadeEstadoMaterial")]
+    partial class entidadeEstadoMaterial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -459,9 +462,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("MaterialEquipamentoAssociadoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantidadeNecessaria")
-                        .HasColumnType("int");
-
                     b.HasKey("ExameTipoId", "MaterialEquipamentoAssociadoId");
 
                     b.HasIndex("MaterialEquipamentoAssociadoId");
@@ -495,11 +495,10 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaterialEquipamentoAssociadoId"));
 
-                    b.Property<int?>("EstadoMaterialMaterialStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaterialStatusId")
-                        .HasColumnType("int");
+                    b.Property<string>("EstadoComponente")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("NomeEquipamento")
                         .IsRequired()
@@ -510,8 +509,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MaterialEquipamentoAssociadoId");
-
-                    b.HasIndex("EstadoMaterialMaterialStatusId");
 
                     b.ToTable("MaterialEquipamentoAssociado");
                 });
@@ -677,15 +674,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("ExameTipo");
 
                     b.Navigation("Recurso");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.EstadoMaterial", "EstadoMaterial")
-                        .WithMany()
-                        .HasForeignKey("EstadoMaterialMaterialStatusId");
-
-                    b.Navigation("EstadoMaterial");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
