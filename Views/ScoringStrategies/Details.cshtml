@@ -1,7 +1,7 @@
-﻿@model HealthWellbeing.Models.EventType
+﻿@model HealthWellbeing.Models.ScoringStrategy
 
 @{
-    ViewData["Title"] = "Event Type Details";
+    ViewData["Title"] = "Scoring Strategy Details";
 }
 
 <div class="container py-4">
@@ -10,40 +10,40 @@
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">
-                <i class="bi bi-info-circle me-2"></i>Event Type Details
+                <i class="bi bi-info-circle me-2"></i>Scoring Strategy Details
             </h5>
         </div>
         <div class="card-body">
             <dl class="row gy-3 mb-0">
 
                 <dt class="col-sm-3 text-muted d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.EventTypeName)
+                    @Html.DisplayNameFor(model => model.ScoringStrategyName)
                 </dt>
                 <dd class="col-sm-9 fs-5 fw-bold text-dark mb-0">
-                    @Html.DisplayFor(model => model.EventTypeName)
+                    @Html.DisplayFor(model => model.ScoringStrategyName)
                 </dd>
 
                 <dt class="col-sm-3 text-muted d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.EventTypeDescription)
+                    @Html.DisplayNameFor(model => model.ScoringStrategyDescription)
                 </dt>
                 <dd class="col-sm-9 mb-0">
-                    @if (string.IsNullOrEmpty(Model.EventTypeDescription)) {
+                    @if (string.IsNullOrEmpty(Model.ScoringStrategyDescription)) {
                         <span class="text-muted fst-italic">-</span>
                     }
                     else {
-                        @Html.DisplayFor(model => model.EventTypeDescription)
+                        @Html.DisplayFor(model => model.ScoringStrategyDescription)
                     }
                 </dd>
 
                 <dt class="col-sm-3 text-muted d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.ScoringStrategy)
+                    @Html.DisplayNameFor(model => model.ScoringStrategyCode)
                 </dt>
                 <dd class="col-sm-9 mb-0">
                     @{
                         string styleStrategy;
                         string iconClass;
 
-                        switch (Model.ScoringStrategy.ScoringStrategyCode) {
+                        switch (Model.ScoringStrategyCode) {
                             case "FIXED":
                                 styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
                                 iconClass = "bi-pin-angle-fill";
@@ -72,43 +72,22 @@
                     }
                     <span class="badge rounded-pill d-inline-flex align-items-center justify-content-center"
                           style="@styleStrategy font-weight: 500; width: 150px; padding: 0.5em 0;">
-                        <i class="bi @iconClass me-2"></i> @Html.DisplayFor(model => model.ScoringStrategy.ScoringStrategyName)
+                        <i class="bi @iconClass me-2"></i> @Html.DisplayFor(model => model.ScoringStrategyCode)
                     </span>
                 </dd>
-
-                <dt class="col-sm-3 text-muted d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.EventTypeMultiplier)
-                </dt>
-                <dd class="col-sm-9 mb-0">
-                    @{
-                        var m = Model.EventTypeMultiplier;
-                        string styleMulti;
-
-                        if (m <= 1.0m) { styleMulti = "background-color: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6;"; }
-                        else if (m <= 1.25m) { styleMulti = "background-color: #e7f1ff; color: #0d6efd; border: 1px solid #cce5ff;"; }
-                        else if (m <= 1.5m) { styleMulti = "background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;"; }
-                        else if (m <= 2.0m) { styleMulti = "background-color: #9ec5fe; color: #052c65; border: 1px solid #8ec0fc;"; }
-                        else { styleMulti = "background-color: #0d6efd; color: #fff; border: 1px solid #0d6efd;"; }
-                    }
-                    <span class="badge rounded-1 d-inline-flex align-items-center justify-content-center"
-                          style="@styleMulti font-size: 0.9em; width: 80px; padding: 0.5em 0;">
-                        @m.ToString("0.##")x
-                    </span>
-                </dd>
-
                 <dt class="col-sm-3 text-muted d-flex align-items-center">
                     Usage Count
                 </dt>
                 <dd class="col-sm-9 mb-0">
                     @{
-                        int count = Model.Events?.Count ?? 0;
+                        int count = Model.EventTypes?.Count ?? 0;
                         string badgeClass;
                         string badgeText;
                         string icon;
 
                         if (count > 0) {
                             badgeClass = "bg-info text-dark";
-                            badgeText = $"Used by {count} Event" + (count != 1 ? "s" : "");
+                            badgeText = $"Used by {count} Event Type" + (count != 1 ? "s" : "");
                             icon = "bi-link-45deg";
                         }
                         else {
@@ -128,11 +107,11 @@
     </div>
 
     <div class="mt-4 d-flex justify-content-end gap-2">
-        <a asp-action="Edit" asp-route-id="@Model?.EventTypeId" class="btn btn-warning">
+        <a asp-action="Edit" asp-route-id="@Model?.ScoringStrategyId" class="btn btn-warning">
             <i class="bi bi-pencil-square me-1"></i> Edit
         </a>
 
-        <a asp-action="Delete" asp-route-id="@Model?.EventTypeId" class="btn btn-danger">
+        <a asp-action="Delete" asp-route-id="@Model?.ScoringStrategyId" class="btn btn-danger">
             <i class="bi bi-trash-fill me-1"></i> Delete
         </a>
 

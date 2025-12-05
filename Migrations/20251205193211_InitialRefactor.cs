@@ -76,18 +76,33 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EventType",
+                name: "Customer",
                 columns: table => new
                 {
-                    EventTypeId = table.Column<int>(type: "int", nullable: false)
+                    CustomerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EventTypeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    EventTypeScoringMode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    EventTypeMultiplier = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EventType", x => x.EventTypeId);
+                    table.PrimaryKey("PK_Customer", x => x.CustomerId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employee",
+                columns: table => new
+                {
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employee", x => x.EmployeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -240,6 +255,21 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ScoringStrategy",
+                columns: table => new
+                {
+                    ScoringStrategyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScoringStrategyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ScoringStrategyCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ScoringStrategyDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoringStrategy", x => x.ScoringStrategyId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TipoExercicio",
                 columns: table => new
                 {
@@ -331,30 +361,6 @@ namespace HealthWellbeing.Migrations
                         principalTable: "Client",
                         principalColumn: "ClientId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Event",
-                columns: table => new
-                {
-                    EventId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    EventDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    EventTypeId = table.Column<int>(type: "int", nullable: false),
-                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventPoints = table.Column<int>(type: "int", nullable: false),
-                    MinLevel = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Event", x => x.EventId);
-                    table.ForeignKey(
-                        name: "FK_Event_EventType_EventTypeId",
-                        column: x => x.EventTypeId,
-                        principalTable: "EventType",
-                        principalColumn: "EventTypeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -472,6 +478,27 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventType",
+                columns: table => new
+                {
+                    EventTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventTypeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    EventTypeDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    ScoringStrategyId = table.Column<int>(type: "int", nullable: false),
+                    EventTypeMultiplier = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventType", x => x.EventTypeId);
+                    table.ForeignKey(
+                        name: "FK_EventType_ScoringStrategy_ScoringStrategyId",
+                        column: x => x.ScoringStrategyId,
+                        principalTable: "ScoringStrategy",
+                        principalColumn: "ScoringStrategyId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BeneficioTipoExercicio",
                 columns: table => new
                 {
@@ -549,6 +576,30 @@ namespace HealthWellbeing.Migrations
                         principalColumn: "AlimentoId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Event",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    EventDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EventPoints = table.Column<int>(type: "int", nullable: false),
+                    MinLevel = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Event", x => x.EventId);
+                    table.ForeignKey(
+                        name: "FK_Event_EventType_EventTypeId",
+                        column: x => x.EventTypeId,
+                        principalTable: "EventType",
+                        principalColumn: "EventTypeId");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Alergia_AlimentoId",
                 table: "Alergia",
@@ -565,9 +616,26 @@ namespace HealthWellbeing.Migrations
                 column: "TipoExercicioId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Customer_Email",
+                table: "Customer",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employee_Email",
+                table: "Employee",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_EventTypeId",
                 table: "Event",
                 column: "EventTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventType_ScoringStrategyId",
+                table: "EventType",
+                column: "ScoringStrategyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExercicioGenero_GeneroId",
@@ -622,6 +690,12 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "BeneficioTipoExercicio");
+
+            migrationBuilder.DropTable(
+                name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "Employee");
 
             migrationBuilder.DropTable(
                 name: "Event");
@@ -697,6 +771,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
+
+            migrationBuilder.DropTable(
+                name: "ScoringStrategy");
         }
     }
 }

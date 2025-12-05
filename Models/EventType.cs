@@ -4,15 +4,25 @@ namespace HealthWellbeing.Models {
 
     public class EventType {
         public int EventTypeId { get; set; }
+
+        [Display(Name = "Name")]
         [Required(ErrorMessage = "Please enter the event type name.")]
         [StringLength(100, ErrorMessage = "Event type name cannot exceed {1} characters.")]
         [RegularExpression(@"^[a-zA-Z0-9À-ÿ\s\-_.!,?()&+:;""']+$",
             ErrorMessage = "Only letters, numbers, spaces, and common punctuation are allowed.")]
-        public string EventTypeName { get; set; }
+        public required string EventTypeName { get; set; }
 
+        [Display(Name = "Description")]
+        [StringLength(300, ErrorMessage = "The description cannot exceed {1} characters.")]
+        public string? EventTypeDescription { get; set; }
+
+        [Display(Name = "Scoring Strategy")]
         [Required(ErrorMessage = "Please select a scoring mode.")]
-        [StringLength(50, ErrorMessage = "Scoring Mode cannot exceed {1} characters.")]
-        public string EventTypeScoringMode { get; set; }
+        public int ScoringStrategyId { get; set; }
+
+        [Display(Name = "Scoring Strategy")]
+        public virtual ScoringStrategy? ScoringStrategy { get; set; }
+        public virtual ICollection<Event>? Events { get; set; }
 
         [Display(Name = "Multiplier")]
         [Required(ErrorMessage = "Please enter a multiplier.")]

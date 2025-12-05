@@ -1,19 +1,20 @@
 ﻿@model HealthWellbeing.Models.EventType
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Event Type";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 @if (ViewBag.EventTypeWasDeleted != null) {
-    <div class="alert alert-danger d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
-        <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
-        <div class="ps-4">
-            <h4 class="alert-heading mb-2">Concurrent change detected</h4>
+    <div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-2"></i>
+        <div>
+            <h4 class="alert-heading h5">Concurrent change detected</h4>
             <p class="mb-0">
-                The event type you were editing was deleted by another user. Your current changes cannot be saved in the original event type.
-                However, you can create a new event type with the information you entered.
+                The event type you were editing was deleted by another user.
+                Your current changes cannot be saved in the original event type.
+                However, you can create a <strong>new event type</strong> with the information below.
             </p>
         </div>
     </div>
@@ -34,35 +35,47 @@
             }
 
             <div class="mb-3">
-                <label asp-for="EventTypeName" class="form-label fw-bold">Event Type Name</label>
-                <input asp-for="EventTypeName" class="form-control" placeholder="Enter event type name" />
+                <label asp-for="EventTypeName" class="form-label fw-bold"></label>
+                <input asp-for="EventTypeName" class="form-control" placeholder="E.g., Morning Yoga..." />
                 <span asp-validation-for="EventTypeName" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="EventTypeScoringMode" class="form-label fw-bold">Scoring Mode</label>
-                <select asp-for="EventTypeScoringMode" class="form-select" asp-items="ViewBag.ScoringModes"></select>
-                <span asp-validation-for="EventTypeScoringMode" class="text-danger small"></span>
+                <label asp-for="EventTypeDescription" class="form-label fw-bold"></label>
+                <textarea asp-for="EventTypeDescription" class="form-control" rows="3" placeholder="Brief description..."></textarea>
+                <span asp-validation-for="EventTypeDescription" class="text-danger small"></span>
             </div>
 
-            <div class="mb-4">
-                <label asp-for="EventTypeMultiplier" class="form-label fw-bold">Multiplier</label>
-                <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.01" min="0" placeholder="e.g. 1,15 or 1.15" />
-                <span asp-validation-for="EventTypeMultiplier" class="text-danger small"></span>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="ScoringStrategyId" class="form-label fw-bold"></label>
+                    <select asp-for="ScoringStrategyId" class="form-select" asp-items="ViewBag.ScoringStrategyId">
+                        <option value="">-- Select Strategy --</option>
+                    </select>
+                    <span asp-validation-for="ScoringStrategyId" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="EventTypeMultiplier" class="form-label fw-bold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">x</span>
+                        <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.01" min="1" max="3" placeholder="1.00" />
+                    </div>
+                    <span asp-validation-for="EventTypeMultiplier" class="text-danger small"></span>
+                </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
                 @if (ViewBag.EventTypeWasDeleted != null) {
                     <button type="submit" asp-action="Create" class="btn btn-success">
-                        <i class="bi bi-save me-1"></i> Create a new event type
+                        <i class="bi bi-save me-1"></i> Create as New
                     </button>
                     <a asp-action="Index" class="btn btn-danger">
-                        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+                        <i class="bi bi-x-circle me-1"></i> Cancel
                     </a>
                 }
                 else {
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i> Save
+                        <i class="bi bi-save me-1"></i> Save Changes
                     </button>
                     <a asp-action="Index" class="btn btn-secondary">
                         <i class="bi bi-arrow-left-circle me-1"></i> Back to List

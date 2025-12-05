@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251205154230_InitialRefactor")]
+    [Migration("20251205193211_InitialRefactor")]
     partial class InitialRefactor
     {
         /// <inheritdoc />
@@ -266,6 +266,67 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Client");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Customer", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("CustomerId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Employee", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("EmployeeId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Employee");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
                     b.Property<int>("EventId")
@@ -314,6 +375,10 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventTypeId"));
 
+                    b.Property<string>("EventTypeDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<decimal>("EventTypeMultiplier")
                         .HasColumnType("decimal(18,2)");
 
@@ -322,12 +387,12 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("EventTypeScoringMode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("ScoringStrategyId")
+                        .HasColumnType("int");
 
                     b.HasKey("EventTypeId");
+
+                    b.HasIndex("ScoringStrategyId");
 
                     b.ToTable("EventType");
                 });
@@ -673,6 +738,33 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("RestricaoAlimentar");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ScoringStrategy", b =>
+                {
+                    b.Property<int>("ScoringStrategyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScoringStrategyId"));
+
+                    b.Property<string>("ScoringStrategyCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ScoringStrategyDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("ScoringStrategyName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("ScoringStrategyId");
+
+                    b.ToTable("ScoringStrategy");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
                 {
                     b.Property<int>("TipoExercicioId")
@@ -896,12 +988,23 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("EventTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("EventType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.ScoringStrategy", "ScoringStrategy")
+                        .WithMany("EventTypes")
+                        .HasForeignKey("ScoringStrategyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ScoringStrategy");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Level", b =>
@@ -981,6 +1084,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Membership");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
+                {
+                    b.Navigation("Events");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
                     b.Navigation("Musculos");
@@ -989,6 +1097,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.LevelCategory", b =>
                 {
                     b.Navigation("Levels");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.ScoringStrategy", b =>
+                {
+                    b.Navigation("EventTypes");
                 });
 #pragma warning restore 612, 618
         }
