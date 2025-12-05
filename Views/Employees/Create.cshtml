@@ -1,0 +1,69 @@
+﻿@using HealthWellbeing.ViewModels
+@model EmployeeInputModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h4 mb-3">Create Employee</h1>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert" id="validationSummary"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <fieldset class="mb-3">
+                            <legend class="col-form-label">Roles</legend>
+
+                            <div class="form-check">
+                                <input asp-for="IsAdministrator" class="form-check-input" />
+                                <label class="form-check-label" for="IsAdministrator">Administrator</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input asp-for="IsProductManager" class="form-check-input" />
+                                <label class="form-check-label" for="IsProductManager">Product Manager</label>
+                            </div>
+
+                            <div class="form-text">Assign one or both roles to this employee (optional).</div>
+                        </fieldset>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

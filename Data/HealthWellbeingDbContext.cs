@@ -14,6 +14,7 @@ namespace HealthWellbeing.Data
         {
         }
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ScoringStrategy> ScoringStrategy { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Level { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.LevelCategory> LevelCategory { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;
@@ -40,9 +41,17 @@ namespace HealthWellbeing.Data
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
-                .WithMany()
+                .WithMany(et => et.Events)
                 .HasForeignKey(e => e.EventTypeId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EventType>()
+                .HasOne(et => et.ScoringStrategy)   
+                .WithMany(ss => ss.EventTypes)          
+                .HasForeignKey(et => et.ScoringStrategyId) 
+                .OnDelete(DeleteBehavior.NoAction);
         }
+        public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
     }
 }
