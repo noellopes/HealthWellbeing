@@ -426,9 +426,8 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LevelCategory")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("LevelCategoryId")
+                        .HasColumnType("int");
 
                     b.Property<int>("LevelNumber")
                         .HasColumnType("int");
@@ -438,7 +437,26 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("LevelId");
 
+                    b.HasIndex("LevelCategoryId");
+
                     b.ToTable("Level");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.LevelCategory", b =>
+                {
+                    b.Property<int>("LevelCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LevelCategoryId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LevelCategoryId");
+
+                    b.ToTable("LevelCategory");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
@@ -883,6 +901,17 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("EventType");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Level", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.LevelCategory", "Category")
+                        .WithMany("Levels")
+                        .HasForeignKey("LevelCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
@@ -952,6 +981,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
                     b.Navigation("Musculos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.LevelCategory", b =>
+                {
+                    b.Navigation("Levels");
                 });
 #pragma warning restore 612, 618
         }

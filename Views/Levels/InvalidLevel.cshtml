@@ -26,7 +26,7 @@
                 <dd class="col-sm-8">@Model.LevelNumber</dd>
 
                 <dt class="col-sm-4 text-muted">Category</dt>
-                <dd class="col-sm-8">@Model.LevelCategory</dd>
+                <dd class="col-sm-8">@Model.Category.Name</dd>
 
                 <dt class="col-sm-4 text-muted">Description</dt>
                 <dd class="col-sm-8">@Model.Description</dd>
@@ -35,7 +35,7 @@
             <div class="mt-3 text-end">
                 <a asp-action="Create"
                    asp-route-levelNumber="@Model.LevelNumber"
-                   asp-route-levelCategory="@Model.LevelCategory"
+                   asp-route-levelCategory="@Model.Category.Name"
                    asp-route-description="@Model.Description"
                    class="btn btn-success me-2">
                     <i class="bi bi-plus-lg me-1"></i> Create with these values

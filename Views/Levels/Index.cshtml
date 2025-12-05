@@ -191,7 +191,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>@Html.DisplayNameFor(m => m.Items.First().LevelNumber)</th>
-                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelCategory)</th>
+                            <th>@Html.DisplayNameFor(m => m.Items.First().Category.Name)</th>
                             <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
                             <th>@Html.DisplayNameFor(m => m.Items.First().LevelPointsLimit)</th>
                             <th class="text-end">Actions</th>
@@ -205,7 +205,7 @@
                             {
                                 <tr>
                                     <td>@Html.DisplayFor(_ => item.LevelNumber)</td>
-                                    <td>@Html.DisplayFor(_ => item.LevelCategory)</td>
+                                    <td>@Html.DisplayFor(_ => item.Category.Name)</td>
                                     <td>@Html.DisplayFor(_ => item.Description)</td>
                                     <td>@Html.DisplayFor(_ => item.LevelPointsLimit)</td>
 

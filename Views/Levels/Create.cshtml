@@ -37,9 +37,9 @@
     {
         categoryValue = cms.AttemptedValue;
     }
-    else if (!string.IsNullOrWhiteSpace(Model?.LevelCategory))
+    else if (!string.IsNullOrWhiteSpace(Model?.Category.Name))
     {
-        categoryValue = Model.LevelCategory;
+        categoryValue = Model.Category.Name;
     }
 
     var categoryInList = cats.Any(c => string.Equals(c, categoryValue, StringComparison.OrdinalIgnoreCase));
@@ -72,7 +72,7 @@
                         <div class="mb-3">
                             <label for="categorySelect" class="form-label">Category</label>
                             <div class="d-flex gap-2 align-items-start">
-                                <select asp-for="LevelCategory" id="categorySelect" class="form-select bg-white @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")" aria-label="Category selector">
+                                <select asp-for="Category.Name" id="categorySelect" class="form-select bg-white @(ViewData.ModelState["LevelCategory"]?.Errors.Count > 0 ? "is-invalid" : "")" aria-label="Category selector">
                                     @foreach (var c in cats)
                                     {
                                         <option value="@c">@c</option>
@@ -97,7 +97,7 @@
                                        style="min-width:220px;@(showNewBox ? "" : "display:none;")" />
                             </div>
 
-                            <span asp-validation-for="LevelCategory" class="invalid-feedback"></span>
+                            <span asp-validation-for="Category.Name" class="invalid-feedback"></span>
                         </div>
 
                         <!-- CAMPO POINTS LIMIT ALTERADO -->

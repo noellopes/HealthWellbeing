@@ -27,7 +27,7 @@
                         <div class="w-100">
                             <h4 class="mb-1">
                                 Level <span class="fw-semibold">@Html.DisplayFor(m => m.LevelNumber)</span>
-                                <small class="text-muted ms-2">@Html.DisplayFor(m => m.LevelCategory)</small>
+                                <small class="text-muted ms-2">@Html.DisplayFor(m => m.Category.Name)</small>
                             </h4>
 
                             <p class="text-muted mb-2">@Html.DisplayFor(m => m.Description)</p>
@@ -39,7 +39,7 @@
                                 <dd class="col-sm-8">@Html.DisplayFor(m => m.LevelNumber)</dd>
 
                                 <dt class="col-sm-4 text-muted">Category</dt>
-                                <dd class="col-sm-8">@Html.DisplayFor(m => m.LevelCategory)</dd>
+                                <dd class="col-sm-8">@Html.DisplayFor(m => m.Category.Name)</dd>
 
                                 <!-- NOVO CAMPO NA LISTA -->
                                 <dt class="col-sm-4 text-muted">Points Limit</dt>
