@@ -22,6 +22,15 @@ namespace HealthWellbeing.Controllers
         private IActionResult InvalidLevelView(Level? attempted = null)
         {
             Response.StatusCode = 404;
+            if (attempted != null && attempted.LevelCategoryId != 0)
+            {
+                var category = _context.LevelCategory.Find(attempted.LevelCategoryId);
+                if (category != null)
+                {
+                    attempted.Category = category;
+                }
+            }
+
             return View("InvalidLevel", attempted);
         }
 
@@ -34,14 +43,10 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Levels
-        public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null)
+        public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null, string? searchPoints = null)
         {
             const int pageSize = 10;
 
-            // Load Categories for the filter (if you want a dropdown in the filter)
-            // Or we keep it as text search for now.
-
-            // IMPORTANT: Include the Category table
             var query = _context.Level.Include(l => l.Category).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchNumber))
@@ -56,13 +61,20 @@ namespace HealthWellbeing.Controllers
             {
                 var cat = searchCategory!.Trim().ToLower();
                 // FIX: Search inside the related Category object
-                query = query.Where(l => l.Category != null && l.Category.Name.ToLower().Contains(cat));
+                query = query.Where(l => l.Category != null && l.Category.Name.ToLower() == cat);
             }
 
             if (!string.IsNullOrWhiteSpace(searchDescription))
             {
                 var desc = searchDescription.Trim();
                 query = query.Where(l => l.Description != null && l.Description.Contains(desc));
+            }
+            if (!string.IsNullOrWhiteSpace(searchPoints))
+            {
+                if (int.TryParse(searchPoints, out var parsedPoints))
+                {
+                    query = query.Where(l => l.LevelPointsLimit == parsedPoints);
+                }
             }
 
             var totalItems = await query.CountAsync();
@@ -84,6 +96,11 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchCategory = searchCategory;
             ViewBag.SearchDescription = searchDescription;
 
+            ViewBag.CategoriesList = await _context.LevelCategory
+                .OrderBy(c => c.Name)
+                .Select(c => c.Name)
+                .ToListAsync();
+
             return View(vm);
         }
 
@@ -104,11 +121,21 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Levels/Create
-        public IActionResult Create()
+        public IActionResult Create(int? levelNumber = null, int? levelCategoryId = null, string? description = null, int ? levelPointsLimit = null)
         {
-            // FIX: Load the dropdown
-            PopulateCategoriesDropdown();
-            return View();
+            
+            PopulateCategoriesDropdown(levelCategoryId);
+
+            var model = new Level
+            {
+                Description = description ?? string.Empty
+            };
+
+            if (levelNumber.HasValue) model.LevelNumber = levelNumber.Value;
+            if (levelCategoryId.HasValue) model.LevelCategoryId = levelCategoryId.Value;
+            if (levelPointsLimit.HasValue) model.LevelPointsLimit = levelPointsLimit.Value;
+
+            return View(model);
         }
 
         // POST: Levels/Create
@@ -172,7 +199,11 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            var level = await _context.Level.FindAsync(id);
+            var level = await _context.Level
+                .Include(l => l.Category) // <--- Loads the related data
+                .FirstOrDefaultAsync(m => m.LevelId == id);
+
+
             if (level == null) return InvalidLevelView();
 
             // FIX: Load dropdown with the current value selected
