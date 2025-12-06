@@ -14,12 +14,12 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // ================================
-        // LISTAGEM (Index)
-        // ================================
+        // =====================================================
+        // INDEX — Lista das opções de compra
+        // =====================================================
         public IActionResult Index()
         {
-            var opcoes = _context.CompraOpcoes
+            var opcoes = _context.CompraOpcao
                 .Include(c => c.Consumivel)
                 .Include(c => c.Fornecedor)
                 .OrderBy(c => c.Consumivel.Nome)
@@ -28,20 +28,25 @@ namespace HealthWellbeing.Controllers
             return View(opcoes);
         }
 
-        // ================================
-        // FORMULÁRIO (GET)
-        // ================================
+        // =====================================================
+        // CREATE (GET)
+        // =====================================================
         public IActionResult Create()
         {
-            ViewBag.Consumiveis = _context.Consumivel.ToList();
-            ViewBag.Fornecedores = _context.Fornecedor.ToList();
+            ViewBag.Consumiveis = _context.Consumivel
+                .OrderBy(c => c.Nome)
+                .ToList();
+
+            ViewBag.Fornecedores = _context.Fornecedor
+                .OrderBy(f => f.NomeEmpresa)
+                .ToList();
 
             return View(new CompraOpcao());
         }
 
-        // ================================
-        // GRAVAR (POST)
-        // ================================
+        // =====================================================
+        // CREATE (POST)
+        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(CompraOpcao opcao)
@@ -55,7 +60,7 @@ namespace HealthWellbeing.Controllers
 
             opcao.DataRegisto = DateTime.Now;
 
-            _context.CompraOpcoes.Add(opcao);
+            _context.CompraOpcao.Add(opcao);
             _context.SaveChanges();
 
             TempData["Success"] = "Opção de compra registada com sucesso!";

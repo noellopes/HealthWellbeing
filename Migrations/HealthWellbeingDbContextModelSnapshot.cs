@@ -147,6 +147,41 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("CategoriaConsumivel");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.CompraOpcao", b =>
+                {
+                    b.Property<int>("CompraOpcaoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraOpcaoId"));
+
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataRegisto")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Preco")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TempoEntrega")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompraOpcaoId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.ToTable("CompraOpcao");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
                 {
                     b.Property<int>("ConsumivelId")
@@ -641,6 +676,25 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.CompraOpcao", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Fornecedor");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>

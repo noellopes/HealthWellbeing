@@ -13,8 +13,8 @@
         <tr>
             <th>Consumível</th>
             <th>Fornecedor</th>
-            <th>Preço</th>
-            <th>Tempo (dias)</th>
+            <th>Preço (€)</th>
+            <th>Tempo Entrega (dias)</th>
             <th>Quantidade</th>
         </tr>
     </thead>
@@ -25,11 +25,10 @@
             <tr>
                 <td>@item.Consumivel?.Nome</td>
                 <td>@item.Fornecedor?.NomeEmpresa</td>
-                <td>@item.Preco €</td>
+                <td>@item.Preco</td>
                 <td>@item.TempoEntrega</td>
                 <td>@item.Quantidade</td>
             </tr>
         }
     </tbody>
 </table>
-
