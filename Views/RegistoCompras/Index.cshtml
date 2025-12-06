@@ -1,0 +1,35 @@
+﻿@model IEnumerable<HealthWellbeing.Models.CompraOpcao>
+
+@{
+    ViewData["Title"] = "Registo de Compras";
+}
+
+<h2 class="fw-bold text-primary mb-4">📦 Registo de Compras</h2>
+
+<a asp-action="Create" class="btn btn-success mb-3">➕ Adicionar Opção</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Consumível</th>
+            <th>Fornecedor</th>
+            <th>Preço</th>
+            <th>Tempo (dias)</th>
+            <th>Quantidade</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Consumivel?.Nome</td>
+                <td>@item.Fornecedor?.NomeEmpresa</td>
+                <td>@item.Preco €</td>
+                <td>@item.TempoEntrega</td>
+                <td>@item.Quantidade</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
