@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251120101608_AgendaMedica")]
-    partial class AgendaMedica
+    [Migration("20251125161507_MigracaoInicial")]
+    partial class MigracaoInicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -204,6 +204,9 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("IdEspecialidade")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -214,6 +217,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdMedico");
+
+                    b.HasIndex("IdEspecialidade");
 
                     b.ToTable("Doctor");
                 });
@@ -383,7 +388,8 @@ namespace HealthWellbeing.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Doctor", "Medico")
                         .WithMany("AgendaMedica")
-                        .HasForeignKey("IdMedico");
+                        .HasForeignKey("IdMedico")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Medico");
                 });
@@ -413,18 +419,29 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Specialities", "Speciality")
                         .WithMany("Consultas")
                         .HasForeignKey("IdEspecialidade")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
                         .WithMany("Consultas")
                         .HasForeignKey("IdMedico")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Speciality");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Specialities", "Especialidade")
+                        .WithMany("Medicos")
+                        .HasForeignKey("IdEspecialidade")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Especialidade");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
@@ -442,6 +459,8 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
                 {
                     b.Navigation("Consultas");
+
+                    b.Navigation("Medicos");
                 });
 #pragma warning restore 612, 618
         }
