@@ -29,9 +29,7 @@
                             foreach (var item in Model)
                             {
                                 <tr>
-                                    <td class="fw-bold text-primary">
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
                                     <td class="text-end">
                                         <div class="btn-group">
                                             <a asp-action="Details" asp-route-id="@item.LevelCategoryId" class="btn btn-sm btn-outline-info">Details</a>

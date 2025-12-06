@@ -1,14 +1,15 @@
-﻿using System;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; // Required for SelectList
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 
-namespace HealthWellbeing.Controllers
-{
+namespace HealthWellbeing.Controllers{
+    [Authorize(Roles = "Gestor")]
     public class LevelsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -143,12 +144,13 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level)
         {
-            // Note: We bind 'LevelCategoryId' now, not 'LevelCategory' string.
+            bool levelExists = await _context.Level.AnyAsync(l => l.LevelNumber == level.LevelNumber);
 
-            // Validation logic might need adjustment depending on if 'Category' object is expected
-            // Since we only bind ID, we check ModelState validity carefully.
+            if (levelExists)
+            {
+                ModelState.AddModelError("LevelNumber", $"Level {level.LevelNumber} already exists. Please choose a different number.");
+            }
 
-            // Remove the 'Category' navigation property from validation if it causes issues
             ModelState.Remove(nameof(level.Category));
 
             if (ModelState.IsValid)
@@ -159,7 +161,6 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Reload dropdown if validation fails
             PopulateCategoriesDropdown(level.LevelCategoryId);
             return View(level);
         }

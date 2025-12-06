@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace HealthWellbeing.Controllers
-{
+namespace HealthWellbeing.Controllers{
+    [Authorize(Roles = "Gestor")]
     public class LevelCategoriesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -17,6 +18,14 @@ namespace HealthWellbeing.Controllers
         public LevelCategoriesController(HealthWellbeingDbContext context)
         {
             _context = context;
+        }
+
+        private IActionResult InvalidCategoryView(LevelCategory? attempted = null)
+        {
+            Response.StatusCode = 404;
+            
+
+            return View("InvalidCategory", attempted);
         }
 
         // GET: LevelCategories
@@ -37,16 +46,23 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.LevelCategoryId == id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
 
             return View(levelCategory);
         }
 
         // GET: LevelCategories/Create
-        public IActionResult Create()
+        public IActionResult Create(string? name = null)
         {
-            return View();
+            var model = new LevelCategory();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                model.Name = name;
+            }
+
+            return View(model);
         }
 
         // POST: LevelCategories/Create
@@ -56,12 +72,21 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LevelCategoryId,Name")] LevelCategory levelCategory)
         {
+            bool categoryExists = await _context.LevelCategory
+                .AnyAsync(c => c.Name.ToLower() == levelCategory.Name.ToLower());
+
+            if (categoryExists)
+            {
+                ModelState.AddModelError("Name", $"The category '{levelCategory.Name}' already exists.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(levelCategory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(levelCategory);
         }
 
@@ -76,7 +101,7 @@ namespace HealthWellbeing.Controllers
             var levelCategory = await _context.LevelCategory.FindAsync(id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
             return View(levelCategory);
         }
@@ -104,7 +129,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!LevelCategoryExists(levelCategory.LevelCategoryId))
                     {
-                        return NotFound();
+                        return InvalidCategoryView(levelCategory);
                     }
                     else
                     {
@@ -128,8 +153,12 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.LevelCategoryId == id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
+
+            int levelsCount = await _context.Level.CountAsync(l => l.LevelCategoryId == id);
+
+            ViewBag.LevelsCount = levelsCount;
 
             return View(levelCategory);
         }
@@ -140,10 +169,22 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var levelCategory = await _context.LevelCategory.FindAsync(id);
-            if (levelCategory != null)
+            if (levelCategory == null)
             {
-                _context.LevelCategory.Remove(levelCategory);
+                return InvalidCategoryView();
             }
+
+            int levelsCount = await _context.Level.CountAsync(l => l.LevelCategoryId == id);
+
+            if (levelsCount > 0)
+            {
+                // If levels exist, reload the page with an error message
+                ViewBag.LevelsCount = levelsCount;
+                ViewBag.ErrorMessage = $"Unable to delete category. There are {levelsCount} levels associated with it.";
+                return View(levelCategory);
+            }
+
+            _context.LevelCategory.Remove(levelCategory);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
