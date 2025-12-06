@@ -65,7 +65,7 @@
 
                 <div class="mb-3">
                     <label asp-for="Quantidade" class="form-label">Quantidade a Comprar</label>
-                    <input asp-for="Quantidade" class="form-control" />
+                    <input asp-for="Quantidade" id="qtdComprar" class="form-control" />
                     <span asp-validation-for="Quantidade" class="text-danger"></span>
                 </div>
 
@@ -83,25 +83,29 @@
 
 @section Scripts {
     <script>
-        document.getElementById("stockSelect").addEventListener("change", function () {
+        const select = document.getElementById("stockSelect");
 
-            let opt = this.options[this.selectedIndex];
+        select.addEventListener("change", function () {
 
-            let atual = opt.getAttribute("data-atual");
-            let min = opt.getAttribute("data-min");
-            let max = opt.getAttribute("data-max");
+            let opt = select.options[select.selectedIndex];
 
-            document.getElementById("qtdAtual").value = atual || "";
-            document.getElementById("qtdMin").value = min || "";
-            document.getElementById("qtdMax").value = max || "";
+            // valores vindos dos atributos data-
+            let atual = parseInt(opt.getAttribute("data-atual") || 0);
+            let min = parseInt(opt.getAttribute("data-min") || 0);
+            let max = parseInt(opt.getAttribute("data-max") || 0);
 
-            if (atual && max) {
-                let diff = max - atual;
-                document.getElementById("sugestao").innerText =
-                    "Sugestão: comprar " + diff + " (para atingir a quantidade máxima).";
-            } else {
-                document.getElementById("sugestao").innerText = "";
-            }
+            // preencher os campos visuais
+            document.getElementById("qtdAtual").value = atual;
+            document.getElementById("qtdMin").value = min;
+            document.getElementById("qtdMax").value = max;
+
+            // calcular quantidade sugerida
+            let sugerida = max - atual;
+            if (sugerida < 0) sugerida = 0;
+
+            // preencher o input de compra (MAS PERMITE EDITAR)
+            document.getElementById("qtdComprar").value = sugerida;
         });
     </script>
 }
+

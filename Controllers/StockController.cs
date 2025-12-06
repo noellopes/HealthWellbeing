@@ -29,9 +29,6 @@ namespace HealthWellbeing.Controllers
             if (!consumiveis.Any() || !zonas.Any())
                 return;
 
-            // ❌ NÃO CRIAR Random novo aqui!
-            // Random rnd = new Random();   // <-- APAGA ISTO
-
             foreach (var c in consumiveis)
             {
                 bool existe = _context.Stock.Any(s => s.ConsumivelID == c.ConsumivelId);
@@ -45,7 +42,10 @@ namespace HealthWellbeing.Controllers
                     {
                         ConsumivelID = c.ConsumivelId,
                         ZonaID = zonaAleatoria.Id,
-                        QuantidadeAtual = 0,
+
+                        // ✅ AGORA COMEÇA COM A QUANTIDADE MÍNIMA DO CONSUMÍVEL
+                        QuantidadeAtual = c.QuantidadeMinima,
+
                         QuantidadeMinima = c.QuantidadeMinima,
                         QuantidadeMaxima = c.QuantidadeMaxima,
                         UsaValoresDoConsumivel = true,
@@ -58,6 +58,23 @@ namespace HealthWellbeing.Controllers
         }
 
 
+        // ===========================================
+        // 🔄 RESET TOTAL DO STOCK
+        // ===========================================
+        public IActionResult ResetStock()
+        {
+            // 1. Apaga tudo da tabela Stock
+            var todos = _context.Stock.ToList();
+            _context.Stock.RemoveRange(todos);
+            _context.SaveChanges();
+
+            // 2. Recria o stock base COMO DEVE SER
+            GarantirStockBase();
+
+            TempData["Success"] = "O stock foi totalmente reiniciado com sucesso!";
+            return RedirectToAction("Index");
+        }
+
 
         // ==============================================
         // INDEX COM FILTROS E PAGINAÇÃO
@@ -69,8 +86,8 @@ namespace HealthWellbeing.Controllers
             bool stockCritico = false)
 
         {
-          
 
+            
 
             var query = _context.Stock
                 .Include(s => s.Consumivel)
