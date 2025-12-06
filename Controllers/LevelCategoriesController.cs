@@ -156,6 +156,10 @@ namespace HealthWellbeing.Controllers{
                 return InvalidCategoryView();
             }
 
+            int levelsCount = await _context.Level.CountAsync(l => l.LevelCategoryId == id);
+
+            ViewBag.LevelsCount = levelsCount;
+
             return View(levelCategory);
         }
 
@@ -168,6 +172,16 @@ namespace HealthWellbeing.Controllers{
             if (levelCategory == null)
             {
                 return InvalidCategoryView();
+            }
+
+            int levelsCount = await _context.Level.CountAsync(l => l.LevelCategoryId == id);
+
+            if (levelsCount > 0)
+            {
+                // If levels exist, reload the page with an error message
+                ViewBag.LevelsCount = levelsCount;
+                ViewBag.ErrorMessage = $"Unable to delete category. There are {levelsCount} levels associated with it.";
+                return View(levelCategory);
             }
 
             _context.LevelCategory.Remove(levelCategory);
