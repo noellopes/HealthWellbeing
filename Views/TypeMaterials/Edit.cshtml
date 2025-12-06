@@ -34,8 +34,8 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de Material</label>
-                        <input asp-for="Name" class="form-control" placeholder="Ex: Consumível, Equipamento, Dispositivo Médico" />
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de dispositivo</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: ECG Portátil,Ventilação" />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
                 </div>
@@ -43,14 +43,14 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label asp-for="Description" class="form-label fw-bold">Descrição</label>
-                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Descrição detalhada do tipo de material..."></textarea>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Descrição detalhada do tipo de dispositivo..."></textarea>
                         <span asp-validation-for="Description" class="text-danger small"></span>
                     </div>
                 </div>
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-success" id="btnSave">
                     <i class="bi bi-save me-1"></i> Guardar Alterações
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">
@@ -64,7 +64,38 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const btnSave = document.getElementById('btnSave');
+
+            // Guardar valores iniciais
+            const initialValues = {};
+            form.querySelectorAll('input, textarea').forEach(input => {
+                initialValues[input.name] = input.value;
+            });
+
+            // Função para verificar alterações
+            function checkChanges() {
+                let changed = false;
+                form.querySelectorAll('input, textarea').forEach(input => {
+                    if (input.value !== initialValues[input.name]) {
+                        changed = true;
+                    }
+                });
+                btnSave.disabled = !changed;
+            }
+
+            // Verificar alterações em cada campo
+            form.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', checkChanges);
+            });
+
+            // Inicialmente desabilitar se não houver mudanças
+            checkChanges();
+        });
+    </script>
 }
+
