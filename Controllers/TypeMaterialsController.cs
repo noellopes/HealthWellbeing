@@ -176,14 +176,27 @@ namespace HealthWellbeingRoom.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var typeMaterial = await _context.TypeMaterial.FindAsync(id);
-            if (typeMaterial != null)
+
+            if (typeMaterial == null)
+                return NotFound();
+
+            // Verificar se este tipo está a ser usado por algum dispositivo médico
+            bool isInUse = await _context.MedicalDevices
+                .AnyAsync(d => d.TypeMaterialID == id);
+
+            if (isInUse)
             {
-                _context.TypeMaterial.Remove(typeMaterial);
-                await _context.SaveChangesAsync();
+                TempData["ErrorMessage"] = "Não é possível eliminar este tipo, pois existem dispositivos médicos associados.";
+                return RedirectToAction(nameof(Index));
             }
 
-            TempData["SuccessMessage"] = "Tipo de material eliminado com sucesso!";
+            // Se não estiver em uso  pode eliminar
+            _context.TypeMaterial.Remove(typeMaterial);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Tipo de dispositivo médico eliminado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
