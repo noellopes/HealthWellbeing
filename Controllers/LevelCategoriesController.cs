@@ -19,6 +19,14 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        private IActionResult InvalidCategoryView(LevelCategory? attempted = null)
+        {
+            Response.StatusCode = 404;
+            
+
+            return View("InvalidCategory", attempted);
+        }
+
         // GET: LevelCategories
         public async Task<IActionResult> Index()
         {
@@ -37,16 +45,23 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.LevelCategoryId == id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
 
             return View(levelCategory);
         }
 
         // GET: LevelCategories/Create
-        public IActionResult Create()
+        public IActionResult Create(string? name = null)
         {
-            return View();
+            var model = new LevelCategory();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                model.Name = name;
+            }
+
+            return View(model);
         }
 
         // POST: LevelCategories/Create
@@ -76,7 +91,7 @@ namespace HealthWellbeing.Controllers
             var levelCategory = await _context.LevelCategory.FindAsync(id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
             return View(levelCategory);
         }
@@ -104,7 +119,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!LevelCategoryExists(levelCategory.LevelCategoryId))
                     {
-                        return NotFound();
+                        return InvalidCategoryView(levelCategory);
                     }
                     else
                     {
@@ -128,7 +143,7 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(m => m.LevelCategoryId == id);
             if (levelCategory == null)
             {
-                return NotFound();
+                return InvalidCategoryView();
             }
 
             return View(levelCategory);
@@ -140,10 +155,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var levelCategory = await _context.LevelCategory.FindAsync(id);
-            if (levelCategory != null)
+            if (levelCategory == null)
             {
-                _context.LevelCategory.Remove(levelCategory);
+                return InvalidCategoryView();
             }
+
+            _context.LevelCategory.Remove(levelCategory);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
