@@ -1,14 +1,15 @@
-﻿using System;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; // Required for SelectList
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 
-namespace HealthWellbeing.Controllers
-{
+namespace HealthWellbeing.Controllers{
+    [Authorize(Roles = "Gestor")]
     public class LevelsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
