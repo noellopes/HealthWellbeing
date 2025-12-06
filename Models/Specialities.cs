@@ -16,5 +16,6 @@ namespace HealthWellbeing.Models
         public string Descricao { get; set; } = "";
 
         public ICollection<Consulta>? Consultas { get; set; }
+        public ICollection<Doctor>? Medicos { get; set; }
     }
 }

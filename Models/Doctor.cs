@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models{
 
@@ -19,6 +20,10 @@ namespace HealthWellbeing.Models{
         public string Email { get; set; } = default!;
 
         public ICollection<Consulta>? Consultas { get; set; }
+
+        [ForeignKey(nameof(Especialidade))]
+        public int IdEspecialidade { get; set; }
+        public Specialities? Especialidade { get; set; }
         public ICollection<AgendaMedica>? AgendaMedica { get; set; }
 
     }
