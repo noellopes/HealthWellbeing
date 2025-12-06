@@ -71,12 +71,21 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LevelCategoryId,Name")] LevelCategory levelCategory)
         {
+            bool categoryExists = await _context.LevelCategory
+                .AnyAsync(c => c.Name.ToLower() == levelCategory.Name.ToLower());
+
+            if (categoryExists)
+            {
+                ModelState.AddModelError("Name", $"The category '{levelCategory.Name}' already exists.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(levelCategory);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(levelCategory);
         }
 

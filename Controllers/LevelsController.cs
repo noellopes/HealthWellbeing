@@ -143,12 +143,13 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level)
         {
-            // Note: We bind 'LevelCategoryId' now, not 'LevelCategory' string.
+            bool levelExists = await _context.Level.AnyAsync(l => l.LevelNumber == level.LevelNumber);
 
-            // Validation logic might need adjustment depending on if 'Category' object is expected
-            // Since we only bind ID, we check ModelState validity carefully.
+            if (levelExists)
+            {
+                ModelState.AddModelError("LevelNumber", $"Level {level.LevelNumber} already exists. Please choose a different number.");
+            }
 
-            // Remove the 'Category' navigation property from validation if it causes issues
             ModelState.Remove(nameof(level.Category));
 
             if (ModelState.IsValid)
@@ -159,7 +160,6 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Reload dropdown if validation fails
             PopulateCategoriesDropdown(level.LevelCategoryId);
             return View(level);
         }
