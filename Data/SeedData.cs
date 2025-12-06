@@ -17,6 +17,7 @@ namespace HealthWellbeing.Data
 
             PopulateSpecialities(db);
             PopulateDoctor(db);
+            PopulateAgendaMedica(db);
             PopulateConsultas(db);
             PopulateUtenteSaude(db);
         }
@@ -90,23 +91,27 @@ namespace HealthWellbeing.Data
             {
                 return;
             }
+
+            var especialidades = db.Specialities
+                .ToDictionary(e => e.Nome, e => e);
+
             var doctor = new[]
             {
-                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },
-                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt" },
-                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt" },
-                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt" },
-                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt" },
-                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt" },
-                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt" },
-                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt" },
-                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt" },
-                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt" },
-                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt" },
-                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt" },
-                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt" },
-                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt" },
-                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
+                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt", Especialidade = especialidades["Cardiologia"]},
+                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt", Especialidade = especialidades["Dermatologia"]},
+                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt", Especialidade = especialidades["Pediatria"]},
+                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt", Especialidade = especialidades["Psiquiatria"] },
+                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt", Especialidade = especialidades["Nutrição"] },
+                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt", Especialidade = especialidades["Medicina Geral e Familiar"] },
+                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt", Especialidade = especialidades["Ortopedia"] },
+                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt", Especialidade = especialidades["Ginecologia e Obstetrícia"] },
+                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt", Especialidade = especialidades["Psicologia"] },
+                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt", Especialidade = especialidades["Fisioterapia"] },
+                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt", Especialidade = especialidades["Medicina Geral e Familiar"] },
+                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt", Especialidade = especialidades["Pediatria"] },
+                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt", Especialidade = especialidades["Cardiologia"] },
+                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt", Especialidade = especialidades["Pediatria"] },
+                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt", Especialidade = especialidades["Ginecologia e Obstetrícia"] },
             };
 
             db.Doctor.AddRange(doctor);
@@ -892,7 +897,38 @@ namespace HealthWellbeing.Data
             db.UtenteSaude.AddRange(utentes);
             db.SaveChanges();
         }
-        
+
+        private static void PopulateAgendaMedica(HealthWellbeingDbContext db)
+        {
+            if (db.AgendaMedica.Any()) return;
+
+            var medicos = db.Doctor.ToDictionary(m => m.Nome, m => m);
+
+
+            var horarios = new[]
+            {
+
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(17, 0) },
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Wednesday, HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(17, 0) },
+            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Friday,    HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
+
+
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(18, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(16, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Wednesday, HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(16, 0) },
+            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Friday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(18, 0) },
+        };
+
+            db.AgendaMedica.AddRange(horarios);
+            db.SaveChanges();
+        }
+
 
     }
 }
