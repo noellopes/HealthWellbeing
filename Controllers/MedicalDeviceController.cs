@@ -21,68 +21,98 @@ namespace HealthWellBeingRoom.Controllers
             _context = context;
         }
 
-        // --- 1. LISTA (Index) ---
+        // --- LISTA (Index) ---
         public async Task<IActionResult> Index(
-            int page = 1,
-            string searchName = "",
-            string searchType = "",
-            string searchRoom = "")
+        int page = 1,
+        string searchName = "",
+        string searchSerial = "", 
+        string searchType = "",
+        string searchRoom = "",
+        string searchStatus = "")
         {
-            //Consulta base com Eager Loading
+            // Consulta base com Eager Loading
             var devicesQuery = _context.MedicalDevices
                 .Include(m => m.TypeMaterial)
                 .Include(m => m.LocalizacaoDispMedicoMovel)
                     .ThenInclude(loc => loc.Room)
                 .AsQueryable();
 
-            //Aplicar filtros de pesquisa
+            // --- Filtro por NOME ---
             if (!string.IsNullOrEmpty(searchName))
             {
                 devicesQuery = devicesQuery.Where(d => d.Name.Contains(searchName));
             }
 
+            // --- Filtro por NÚMERO DE SÉRIE ---
+            if (!string.IsNullOrEmpty(searchSerial))
+            {
+                devicesQuery = devicesQuery.Where(d => d.SerialNumber.Contains(searchSerial));
+            }
+
+            // --- Filtro por TIPO ---
             if (!string.IsNullOrEmpty(searchType))
             {
                 devicesQuery = devicesQuery.Where(d => d.TypeMaterial.Name.Contains(searchType));
             }
 
+            // --- Filtro por SALA ---
             if (!string.IsNullOrEmpty(searchRoom))
             {
-                //Filtra pela sala ativa (sem EndDate)
                 devicesQuery = devicesQuery.Where(d =>
                     d.LocalizacaoDispMedicoMovel.Any(l => l.EndDate == null && l.Room.Name.Contains(searchRoom)));
             }
 
-            //Armazenar valores de pesquisa no ViewBag (para manter na view)
+            // --- Filtro por ESTADO  ---
+            if (!string.IsNullOrEmpty(searchStatus))
+            {
+                if (searchStatus == "Em Manutenção")
+                {
+                    // Filtra pela flag
+                    devicesQuery = devicesQuery.Where(d => d.IsUnderMaintenance == true);
+                }
+                else if (searchStatus == "Em Armazenamento")
+                {
+                    // Não está em manutenção E (está num Depósito OU não tem sala ativa)
+                    devicesQuery = devicesQuery.Where(d =>
+                        d.IsUnderMaintenance == false &&
+                        d.LocalizacaoDispMedicoMovel.Any(l => l.EndDate == null && l.Room.Name.Contains("Depósito")));
+                }
+                else if (searchStatus == "Alocado")
+                {
+                    // Não está em manutenção E tem sala ativa que NÃO é depósito
+                    devicesQuery = devicesQuery.Where(d =>
+                        d.IsUnderMaintenance == false &&
+                        d.LocalizacaoDispMedicoMovel.Any(l => l.EndDate == null && !l.Room.Name.Contains("Depósito")));
+                }
+            }
+
+            // Armazenar valores de pesquisa no ViewBag
             ViewBag.SearchName = searchName;
+            ViewBag.SearchSerial = searchSerial;
             ViewBag.SearchType = searchType;
             ViewBag.SearchRoom = searchRoom;
+            ViewBag.SearchStatus = searchStatus; 
 
-            //Contar o total de dispositivos após filtro
+            // Paginação e Ordenação
             int totalItems = await devicesQuery.CountAsync();
-
-            //Criar o objeto de paginação
             var paginationInfo = new RPaginationInfo<MedicalDevice>(page, totalItems, itemsPerPage: 10);
 
-            // 🔹 6️⃣ Buscar a página atual de dados ordenada por nome
             var listaDeDispositivos = await devicesQuery
                 .OrderBy(d => d.Name)
                 .Skip(paginationInfo.ItemsToSkip)
                 .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
 
-            //Atribuir os itens à paginação
             paginationInfo.Items = listaDeDispositivos;
 
-            // 1. Carregar Tipos de Material para o Dropdown
-            // Usamos 'Name' como valor submetido e texto visível
-            ViewBag.TypeMaterialList = new SelectList(await _context.TypeMaterial.OrderBy(t => t.Name).ToListAsync(),"Name","Name",searchType);
+            // Carregar Listas para Dropdowns
+            ViewBag.TypeMaterialList = new SelectList(await _context.TypeMaterial.OrderBy(t => t.Name).ToListAsync(), "Name", "Name", searchType);
+            ViewBag.RoomList = new SelectList(await _context.Room.OrderBy(s => s.Name).ToListAsync(), "Name", "Name", searchRoom);
 
-            // 2. Carregar Salas para o Dropdown
-            // Usamos 'Name' como valor submetido e texto visível
-            ViewBag.RoomList = new SelectList(await _context.Room.OrderBy(s => s.Name).ToListAsync(),"Name","Name",searchRoom);
+            // Lista Estática para o Estado (Hardcoded porque são regras de negócio fixas)
+            var listaEstados = new List<string> { "Em Armazenamento", "Alocado", "Em Manutenção" };
+            ViewBag.StatusList = new SelectList(listaEstados, searchStatus);
 
-            //Retornar para a view
             return View(paginationInfo);
         }
 

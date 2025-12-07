@@ -41,6 +41,10 @@
                 <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
             </div>
             <div class="col-md-4">
+                <label for="searchSerial" class="form-label">Nº Série</label>
+                <input id="searchSerial" name="searchSerial" value="@ViewBag.SearchSerial" class="form-control" placeholder="Ex: Pesquisar pelo número de série" />
+            </div>
+            <div class="col-md-4">
                 <label for="searchType" class="form-label">Tipo</label>
                 <select id="searchType" name="searchType" class="form-control" asp-items="ViewBag.TypeMaterialList">
                     <option value="">-- Todos os Tipos --</option>
@@ -50,6 +54,12 @@
                 <label for="searchRoom" class="form-label">Sala</label>
                 <select id="searchRoom" name="searchRoom" class="form-control" asp-items="ViewBag.RoomList">
                     <option value="">-- Todas as Salas --</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="searchStatus" class="form-label">Estado</label>
+                <select id="searchStatus" name="searchStatus" class="form-control" asp-items="ViewBag.StatusList">
+                    <option value="">-- Todos os Estados --</option>
                 </select>
             </div>
 
