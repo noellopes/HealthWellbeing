@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251204104017_RoomModelUpdate")]
-    partial class RoomModelUpdate
+    [Migration("20251207194155_initialGrupo5")]
+    partial class initialGrupo5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -389,32 +389,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("EquipmentType");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsCurrent")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MedicalDeviceID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicalDeviceID");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("LocalizacaoDispMovel_temporario");
-                });
-
             modelBuilder.Entity("HealthWellbeingRoom.Models.Manufacturer", b =>
                 {
                     b.Property<int>("ManufacturerId")
@@ -653,25 +627,6 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Manufacturer");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.LocalizacaoDispMovel_temporario", b =>
-                {
-                    b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
-                        .WithMany()
-                        .HasForeignKey("MedicalDeviceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MedicalDevice");
-
-                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>

@@ -33,7 +33,6 @@ namespace HealthWellBeingRoom.Data
             PolutateEquipment(dbContext);
             // 4 - Dispositivos e Localização médica
             PopulateMedicalDevices(dbContext);
-            PopulateLocalizacaoDispMovel_temporario(dbContext);
             PopulateLocationMedDevices(dbContext);
         }
 
@@ -503,84 +502,225 @@ namespace HealthWellBeingRoom.Data
         // 4️ - Dispositivos médicos
         private static void PopulateMedicalDevices(HealthWellbeingDbContext dbContext)
         {
+            // Se já existirem dados, não faz nada
             if (dbContext.MedicalDevices.Any()) return;
+
             dbContext.MedicalDevices.AddRange(new List<MedicalDevice>
             {
-                new MedicalDevice { Name = "Monitor de Paciente Vital X5", SerialNumber = "MT-VITAL-X5-001", RegistrationDate = DateTime.Now.AddDays(-150), Observation = "Monitor de cabeceira fixo.", TypeMaterialID = 1 },
-                new MedicalDevice { Name = "Monitor de Paciente Vital X5", SerialNumber = "MT-VITAL-X5-002", RegistrationDate = DateTime.Now.AddDays(-140), Observation = "Aguardando nova bateria.", TypeMaterialID = 1 },
-                new MedicalDevice { Name = "Oxímetro de Pulso Portátil", SerialNumber = "MT-OXI-HAND-01", RegistrationDate = DateTime.Now.AddDays(-130), Observation = "Usado na triagem.", TypeMaterialID = 1 },
-                new MedicalDevice { Name = "Eletrocardiógrafo ECG-1200", SerialNumber = "MT-ECG-1200", RegistrationDate = DateTime.Now.AddDays(-120), Observation = "Para consultas externas. Necessita de consumíveis (papel).", TypeMaterialID = 1 },
-                new MedicalDevice { Name = "Ventilador de Cuidados Intensivos Alpha", SerialNumber = "AV-VCI-A01", RegistrationDate = DateTime.Now.AddDays(-100), Observation = "Localizado na UCI 1.", TypeMaterialID = 1 },
-                new MedicalDevice { Name = "Ventilador de Cuidados Intensivos Alpha", SerialNumber = "AV-VCI-A02", RegistrationDate = DateTime.Now.AddDays(-90), Observation = "Localizado na UCI 2.", TypeMaterialID = 2 },
-                new MedicalDevice { Name = "Desfibrilhador DEA Auto", SerialNumber = "BC-DEA-001", RegistrationDate = DateTime.Now.AddDays(-80), Observation = "Localizado no carrinho de emergência principal.", TypeMaterialID = 2 },
-                new MedicalDevice { Name = "Sistema de Aspiração Central", SerialNumber = "BC-ASC-005", RegistrationDate = DateTime.Now.AddDays(-70), Observation = "Unidade fixa, manutenção trimestral.", TypeMaterialID = 2 },
-                new MedicalDevice { Name = "Ecógrafo Móvel 3D", SerialNumber = "AD-ECHO-M3D", RegistrationDate = DateTime.Now.AddDays(-60), Observation = "Transdutores convexos e lineares.", TypeMaterialID = 2 },
-                new MedicalDevice { Name = "Sistema de Raio-X Portátil", SerialNumber = "AD-RX-PORT-A", RegistrationDate = DateTime.Now.AddDays(-50), Observation = "Para radiografias de cabeceira.", TypeMaterialID = 2 },
-                new MedicalDevice { Name = "Unidade de Eletrocirurgia Portátil", SerialNumber = "SG-ELECSURG-01", RegistrationDate = DateTime.Now.AddDays(-40), Observation = "Modelo de alta frequência. Uso em Bloco 1.", TypeMaterialID = 3 },
-                new MedicalDevice { Name = "Caixa de Instrumental Básico (Grande)", SerialNumber = "SG-INST-BGC01", RegistrationDate = DateTime.Now.AddDays(-30), Observation = "Requer reesterilização.", TypeMaterialID = 3 },
-                new MedicalDevice { Name = "Foco Cirúrgico Móvel LED", SerialNumber = "BC-FOCUS-LED01", RegistrationDate = DateTime.Now.AddDays(-25), Observation = "Para procedimentos menores.", TypeMaterialID = 3 },
-                new MedicalDevice { Name = "Caixa de Instrumental Básico (Pequena)", SerialNumber = "SG-INST-BSC02", RegistrationDate = DateTime.Now.AddDays(-20), Observation = "Kit de sutura e pinças.", TypeMaterialID = 3 },
-                new MedicalDevice { Name = "Pinça Hemostática (Individual)", SerialNumber = "SG-PINZA-HEM01", RegistrationDate = DateTime.Now.AddDays(-15), Observation = "Pronta a usar.", TypeMaterialID = 3 },
-                new MedicalDevice { Name = "Analisador de Gás Sanguíneo Portátil", SerialNumber = "AD-AGS-P01", RegistrationDate = DateTime.Now.AddDays(-10), Observation = "Localizado no Laboratório de Urgência.", TypeMaterialID = 4 },
-                new MedicalDevice { Name = "Analisador de Gás Sanguíneo Portátil", SerialNumber = "AD-AGS-P02", RegistrationDate = DateTime.Now.AddDays(-9), Observation = "Requer substituição de cartuchos.", TypeMaterialID = 4 },
-                new MedicalDevice { Name = "Estetoscópio Digital", SerialNumber = "AD-EST-DIGI-1", RegistrationDate = DateTime.Now.AddDays(-8), Observation = "Para o chefe de serviço.", TypeMaterialID = 4 },
-                new MedicalDevice { Name = "Bomba de Infusão de Nutrição", SerialNumber = "AV-NUTRI-INF-01", RegistrationDate = DateTime.Now.AddDays(-7), Observation = "Uso exclusivo para nutrição parenteral.", TypeMaterialID = 4 },
-                new MedicalDevice { Name = "Oxímetro de Pulso Portátil", SerialNumber = "MT-OXI-HAND-02", RegistrationDate = DateTime.Now.AddDays(-6), Observation = "Unidade nova, em caixa.", TypeMaterialID = 4 }
-            });
-            dbContext.SaveChanges();
-        }
+                new MedicalDevice {
+                    Name = "Monitor Philips IntelliVue X3",
+                    SerialNumber = "MT-PHI-X3-01",
+                    RegistrationDate = DateTime.Now.AddMonths(-12),
+                    Observation = "Alocado à UCI 1. Monitorização contínua.",
+                    TypeMaterialID = 1,
+                    IsUnderMaintenance = false
+                },
 
-        // 5️ - Localizações
-        private static void PopulateLocalizacaoDispMovel_temporario(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.LocalizacaoDispMovel_temporario.Any()) return;
-            dbContext.LocalizacaoDispMovel_temporario.AddRange(new List<LocalizacaoDispMovel_temporario>
-            {
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 1, RoomId = 1, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 2, RoomId = 2, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 3, RoomId = 3, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 4, RoomId = 4, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 5, RoomId = 5, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 6, RoomId = 6, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 7, RoomId = 7, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 8, RoomId = 8, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 9, RoomId = 9, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 10, RoomId = 4, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 11, RoomId = 5, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 12, RoomId = 6, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 13, RoomId = 1, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 14, RoomId = 2, IsCurrent = true },
-                new LocalizacaoDispMovel_temporario { MedicalDeviceID = 15, RoomId = 3, IsCurrent = true }
+                new MedicalDevice {
+                    Name = "Bomba B.Braun Space",
+                    SerialNumber = "INF-BB-SP-02",
+                    RegistrationDate = DateTime.Now.AddMonths(-10),
+                    Observation = "Uso geral na Enfermaria.",
+                    TypeMaterialID = 2,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Ventilador Dräger Oxylog 3000",
+                    SerialNumber = "VEN-DRA-OX-03",
+                    RegistrationDate = DateTime.Now.AddMonths(-24),
+                    Observation = "Transporte de emergência (INEM).",
+                    TypeMaterialID = 3,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Aspirador Medela Vario 18",
+                    SerialNumber = "ASP-MED-VAR-04",
+                    RegistrationDate = DateTime.Now.AddMonths(-6),
+                    Observation = "Pequena cirurgia e cuidados domiciliários.",
+                    TypeMaterialID = 4,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Eletrocardiógrafo GE MAC 600",
+                    SerialNumber = "ECG-GE-MAC-05",
+                    RegistrationDate = DateTime.Now.AddMonths(-18),
+                    Observation = "Consultas de Cardiologia. Leve e compacto.",
+                    TypeMaterialID = 5,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Ecógrafo Sonosite Edge II",
+                    SerialNumber = "ECO-SON-ED-06",
+                    RegistrationDate = DateTime.Now.AddMonths(-5),
+                    Observation = "Usado em Obstetrícia e Urgência.",
+                    TypeMaterialID = 6,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Glicosímetro Accu-Chek Guide",
+                    SerialNumber = "GLI-ACC-GU-07",
+                    RegistrationDate = DateTime.Now.AddDays(-15),
+                    Observation = "Unidade de reserva no Depósito 1.",
+                    TypeMaterialID = 7,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Oxímetro Nonin Onyx Vantage",
+                    SerialNumber = "OXI-NON-ON-08",
+                    RegistrationDate = DateTime.Now.AddMonths(-8),
+                    Observation = "Triagem inicial na Receção.",
+                    TypeMaterialID = 8,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Nebulizador Omron MicroAir",
+                    SerialNumber = "NEB-OMR-U1-09",
+                    RegistrationDate = DateTime.Now.AddMonths(-3),
+                    Observation = "Pediatria. Silencioso e portátil.",
+                    TypeMaterialID = 9,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Desfibrilhador Zoll AED Plus",
+                    SerialNumber = "AED-ZOL-PL-10",
+                    RegistrationDate = DateTime.Now.AddMonths(-30),
+                    Observation = "Corredor Principal - Entrada.",
+                    TypeMaterialID = 10,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Bomba Seringa Alaris GH",
+                    SerialNumber = "SER-ALA-GH-11",
+                    RegistrationDate = DateTime.Now.AddMonths(-14),
+                    Observation = "Anestesia e Cuidados Intensivos.",
+                    TypeMaterialID = 11,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Otoscópio Welch Allyn MacroView",
+                    SerialNumber = "OTO-WAL-MV-12",
+                    RegistrationDate = DateTime.Now.AddMonths(-20),
+                    Observation = "Consultório de Otorrino.",
+                    TypeMaterialID = 12,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Retinógrafo Welch Allyn RetinaVue",
+                    SerialNumber = "RET-WAL-70-13",
+                    RegistrationDate = DateTime.Now.AddMonths(-1),
+                    Observation = "Rastreio oftalmológico móvel.",
+                    TypeMaterialID = 13,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Tensiómetro Omron M7 Intelli IT",
+                    SerialNumber = "TEN-OMR-M7-14",
+                    RegistrationDate = DateTime.Now.AddMonths(-4),
+                    Observation = "Carrinho de enfermagem (Piso 2).",
+                    TypeMaterialID = 14,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Capnógrafo Masimo EMMA",
+                    SerialNumber = "CAP-MAS-EM-15",
+                    RegistrationDate = DateTime.Now.AddMonths(-9),
+                    Observation = "Verificação de entubação em emergência.",
+                    TypeMaterialID = 15,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Holter Mortara H3+",
+                    SerialNumber = "HOL-MOR-H3-16",
+                    RegistrationDate = DateTime.Now.AddMonths(-7),
+                    Observation = "Em uso por paciente externo (Cardiologia).",
+                    TypeMaterialID = 16,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Termómetro Braun ThermoScan 7",
+                    SerialNumber = "TER-BRA-TS-17",
+                    RegistrationDate = DateTime.Now.AddMonths(-2),
+                    Observation = "Triagem Covid/Gripe.",
+                    TypeMaterialID = 17,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Philips Respironics V60",
+                    SerialNumber = "VNI-PHI-V60-18",
+                    RegistrationDate = DateTime.Now.AddMonths(-11),
+                    Observation = "Apoio respiratório intermédio.",
+                    TypeMaterialID = 18,
+                    IsUnderMaintenance = true // Exemplo em manutenção
+                },
+
+                new MedicalDevice {
+                    Name = "Transmissor Telemetria Dräger Apex",
+                    SerialNumber = "TEL-DRA-AP-19",
+                    RegistrationDate = DateTime.Now.AddMonths(-16),
+                    Observation = "Monitorização de pacientes ambulatórios.",
+                    TypeMaterialID = 19,
+                    IsUnderMaintenance = false
+                },
+
+                new MedicalDevice {
+                    Name = "Thor UVC Disinfection Robot",
+                    SerialNumber = "UVC-THO-RB-20",
+                    RegistrationDate = DateTime.Now.AddMonths(-1),
+                    Observation = "Desinfeção de salas cirúrgicas e quartos.",
+                    TypeMaterialID = 20,
+                    IsUnderMaintenance = false
+                }
             });
+
             dbContext.SaveChanges();
         }
 
         private static void PopulateLocationMedDevices(HealthWellbeingDbContext dbContext)
         {
+            // Se já existirem localizações, não faz nada
             if (dbContext.LocationMedDevice.Any()) return;
+
             dbContext.LocationMedDevice.AddRange(new List<LocationMedDevice>
             {
-                new LocationMedDevice { MedicalDeviceID = 1, RoomId = 1, InitialDate = DateTime.Now.AddMonths(-3), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 2, RoomId = 2, InitialDate = DateTime.Now.AddMonths(-2), EndDate = DateTime.Now.AddDays(-10), IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 3, RoomId = 3, InitialDate = DateTime.Now.AddMonths(-1), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 4, RoomId = 4, InitialDate = DateTime.Now.AddDays(-45), EndDate = DateTime.Now.AddDays(-5), IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 5, RoomId = 5, InitialDate = DateTime.Now.AddDays(-30), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 6, RoomId = 1, InitialDate = DateTime.Now.AddDays(-20), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 7, RoomId = 2, InitialDate = DateTime.Now.AddDays(-15), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 8, RoomId = 3, InitialDate = DateTime.Now.AddDays(-10), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 9, RoomId = 4, InitialDate = DateTime.Now.AddDays(-8), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 10, RoomId = 5, InitialDate = DateTime.Now.AddDays(-6), EndDate = DateTime.Now.AddDays(-1), IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 11, RoomId = 1, InitialDate = DateTime.Now.AddDays(-4), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 12, RoomId = 2, InitialDate = DateTime.Now.AddDays(-3), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 13, RoomId = 3, InitialDate = DateTime.Now.AddDays(-2), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 14, RoomId = 4, InitialDate = DateTime.Now.AddDays(-1), EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 15, RoomId = 5, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 16, RoomId = 1, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 17, RoomId = 2, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 18, RoomId = 3, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 19, RoomId = 4, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true },
-                new LocationMedDevice { MedicalDeviceID = 20, RoomId = 5, InitialDate = DateTime.Now, EndDate = null, IsCurrent = true }
+                new LocationMedDevice { MedicalDeviceID = 1, RoomId = 6, InitialDate = DateTime.Now.AddMonths(-12), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 2, RoomId = 26, InitialDate = DateTime.Now.AddMonths(-10), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 3, RoomId = 29, InitialDate = DateTime.Now.AddMonths(-24), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 4, RoomId = 13, InitialDate = DateTime.Now.AddMonths(-6), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 5, RoomId = 1, InitialDate = DateTime.Now.AddMonths(-18), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 6, RoomId = 5, InitialDate = DateTime.Now.AddMonths(-5), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 7, RoomId = 23, InitialDate = DateTime.Now.AddDays(-15), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 8, RoomId = 29, InitialDate = DateTime.Now.AddMonths(-8), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 9, RoomId = 2, InitialDate = DateTime.Now.AddMonths(-3), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 10, RoomId = 29, InitialDate = DateTime.Now.AddMonths(-30), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 11, RoomId = 7, InitialDate = DateTime.Now.AddMonths(-14), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 12, RoomId = 3, InitialDate = DateTime.Now.AddMonths(-20), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 13, RoomId = 14, InitialDate = DateTime.Now.AddMonths(-1), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 14, RoomId = 27, InitialDate = DateTime.Now.AddMonths(-4), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 15, RoomId = 30, InitialDate = DateTime.Now.AddMonths(-9), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 16, RoomId = 1, InitialDate = DateTime.Now.AddMonths(-7), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 17, RoomId = 29, InitialDate = DateTime.Now.AddMonths(-2), EndDate = null, IsCurrent = true },
+                // Lógica: Criamos um registo antigo que JÁ TERMINOU. Assim não aparece alocado, mas tem histórico.
+                new LocationMedDevice { MedicalDeviceID = 18, RoomId = 6, InitialDate = DateTime.Now.AddMonths(-11), EndDate = DateTime.Now.AddDays(-1), IsCurrent = false },
+                new LocationMedDevice { MedicalDeviceID = 19, RoomId = 26, InitialDate = DateTime.Now.AddMonths(-16), EndDate = null, IsCurrent = true },
+                new LocationMedDevice { MedicalDeviceID = 20, RoomId = 23, InitialDate = DateTime.Now.AddMonths(-1), EndDate = null, IsCurrent = true }
             });
+
             dbContext.SaveChanges();
         }
 

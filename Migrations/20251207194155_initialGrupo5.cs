@@ -213,7 +213,7 @@ namespace HealthWellbeingRoom.Migrations
                     RoomId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RoomTypeId = table.Column<int>(type: "int", nullable: false),
-                    SpecialtyId = table.Column<int>(type: "int", nullable: false),
+                    SpecialtyId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     RoomLocationId = table.Column<int>(type: "int", nullable: false),
                     OpeningTime = table.Column<TimeSpan>(type: "time", nullable: false),
@@ -245,8 +245,7 @@ namespace HealthWellbeingRoom.Migrations
                         name: "FK_Room_Specialty_SpecialtyId",
                         column: x => x.SpecialtyId,
                         principalTable: "Specialty",
-                        principalColumn: "SpecialtyId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "SpecialtyId");
                 });
 
             migrationBuilder.CreateTable(
@@ -333,33 +332,6 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LocalizacaoDispMovel_temporario",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MedicalDeviceID = table.Column<int>(type: "int", nullable: false),
-                    RoomId = table.Column<int>(type: "int", nullable: false),
-                    IsCurrent = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LocalizacaoDispMovel_temporario", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LocalizacaoDispMovel_temporario_MedicalDevices_MedicalDeviceID",
-                        column: x => x.MedicalDeviceID,
-                        principalTable: "MedicalDevices",
-                        principalColumn: "MedicalDeviceID",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_LocalizacaoDispMovel_temporario_Room_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Room",
-                        principalColumn: "RoomId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "LocationMedDevice",
                 columns: table => new
                 {
@@ -419,16 +391,6 @@ namespace HealthWellbeingRoom.Migrations
                 column: "ManufacturerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocalizacaoDispMovel_temporario_MedicalDeviceID",
-                table: "LocalizacaoDispMovel_temporario",
-                column: "MedicalDeviceID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_LocalizacaoDispMovel_temporario_RoomId",
-                table: "LocalizacaoDispMovel_temporario",
-                column: "RoomId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_LocationMedDevice_MedicalDeviceID",
                 table: "LocationMedDevice",
                 column: "MedicalDeviceID");
@@ -478,9 +440,6 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Equipment");
-
-            migrationBuilder.DropTable(
-                name: "LocalizacaoDispMovel_temporario");
 
             migrationBuilder.DropTable(
                 name: "LocationMedDevice");
