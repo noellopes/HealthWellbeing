@@ -2,6 +2,7 @@
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using HealthWellbeingRoom.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellBeingRoom.Controllers
 {
+    [Authorize(Roles = "logisticsTechnician,Administrator")]
     public class MedicalDeviceController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
