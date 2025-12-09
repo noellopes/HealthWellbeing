@@ -1,4 +1,4 @@
-﻿@* @model IEnumerable<HealthWellbeing.Models.RoomHistory> *@
+﻿@model IEnumerable<HealthWellbeingRoom.Models.RoomHistory>
 
 @{
     ViewData["Title"] = "Histórico da Sala";
@@ -9,20 +9,22 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Data</th>
-            <th>Ação</th>
-            <th>Utilizador</th>
+            <th>Início</th>
+            <th>Fim</th>
+            <th>Responsável</th>
+            <th>Nota</th>
         </tr>
     </thead>
     <tbody>
-        @*         @foreach (var item in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Date.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@item.Action</td>
-                <td>@item.UserName</td>
+                <td>@item.StarDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.Responsible</td>
+                <td>@item.Note</td>
             </tr>
-        } *@
+        }
     </tbody>
 </table>
 
