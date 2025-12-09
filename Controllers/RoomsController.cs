@@ -364,7 +364,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(room);
         }
-        //----------------------------------------------------------EDIT CONFIRMED---------------------------------------------------------------------------------
+        //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -405,5 +405,36 @@ namespace HealthWellbeingRoom.Controllers
         {
             return _context.Room.Any(e => e.RoomId == id);
         }
+
+        //----------------------------------------------------------HISTORY---------------------------------------------------------------------------------
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult History(int id)
+        {
+            ViewBag.RoomId = id;
+            // lógica para buscar histórico da sala com o id
+
+            return View();
+        }
+
+        //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult Equipments(int id)
+        {
+            ViewBag.RoomId = id;
+            return View();
+        }
+
+        //----------------------------------------------------------MEDICAL DEVICES---------------------------------------------------------------------------------
+
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult MedicalDevices(int id)
+        {
+            ViewBag.RoomId = id;
+            return View();
+        }
+
+
     }
 }
