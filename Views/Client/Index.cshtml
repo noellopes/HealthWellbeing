@@ -1,77 +1,91 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Client>
 
 @{
-    ViewData["Title"] = "Client Page";
+    // Using ViewData["Title"] instead of Viewbag.Title for ASP.NET Core consistency
+    ViewData["Title"] = "Client Management";
 }
 
-<h1>Viewbag.Title</h1>
+<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-circle"></i> Create New Client
+    </a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BirthDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RegistrationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateMember)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BirthDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RegistrationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateMember)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ClientId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ClientId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ClientId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th class="d-none d-md-table-cell">
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Phone)
+                </th>
+                <th class="d-none d-lg-table-cell">
+                    @Html.DisplayNameFor(model => model.Address)
+                </th>
+                <th class="d-none d-sm-table-cell">
+                    @Html.DisplayNameFor(model => model.BirthDate)
+                </th>
+                <th class="d-none d-lg-table-cell">
+                    @Html.DisplayNameFor(model => model.Gender)
+                </th>
+                <th class="d-none d-xl-table-cell">
+                    @Html.DisplayNameFor(model => model.RegistrationDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreateMember)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td class="d-none d-md-table-cell">
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Phone)
+                    </td>
+                    <td class="d-none d-lg-table-cell text-truncate" style="max-width: 150px;">
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td class="d-none d-sm-table-cell">
+                        @Html.DisplayFor(modelItem => item.BirthDate)
+                    </td>
+                    <td class="d-none d-lg-table-cell">
+                        @Html.DisplayFor(modelItem => item.Gender)
+                    </td>
+                    <td class="d-none d-xl-table-cell">
+                        @Html.DisplayFor(modelItem => item.RegistrationDate)
+                    </td>
+                    <td>
+                        @{
+                            string badgeClass = item.CreateMember == true ? "bg-success" : (item.CreateMember == false ? "bg-danger" : "bg-warning text-dark");
+                        }
+                        <span class="badge @badgeClass">
+                            @item.CreateMemberText
+                        </span>
+                    </td>
+                    <td class="text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-primary me-1">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-info me-1">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.ClientId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

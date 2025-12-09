@@ -1,45 +1,122 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Food>
+﻿@using HealthWellbeing.Models
+@model PaginationInfo<Food>
+
 @{
     ViewData["Title"] = "Foods";
+    string search = ViewBag.Search as string ?? "";
 }
 
-<h1 class="mb-3">Foods</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <h1 class="h4 mb-0">
+            <i class="bi bi-basket3-fill me-2 text-primary"></i>
+            Foods
+        </h1>
+    </div>
 
-@if (TempData["Success"] != null)
+    <div class="d-flex align-items-center gap-2">
+        <form asp-action="Index" method="get" class="d-flex">
+            <input type="search"
+                   name="search"
+                   value="@search"
+                   class="form-control form-control-sm me-2"
+                   placeholder="Search by name or category" />
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+
+        <a asp-action="Create" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Food
+        </a>
+    </div>
+</div>
+
+<hr />
+
+@if (!Model.Items.Any())
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading mb-1">No foods</h4>
+            <p class="mb-0">There are no foods matching your search.</p>
+        </div>
+    </div>
 }
-@if (TempData["Error"] != null)
+else
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th class="text-center" style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Category?.Category</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@item.FoodId"
+                               class="btn btn-sm btn-info text-white me-1">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.FoodId"
+                               class="btn btn-sm btn-warning text-white me-1">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.FoodId"
+                               class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Foods pagination">
+            <ul class="pagination justify-content-center mt-3">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-search="@search"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-search="@search">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-search="@search"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 }
-
-<p>
-    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create New Food</a>
-</p>
-
-<table class="table table-striped align-middle">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.First().Name)</th>
-            <th>@Html.DisplayNameFor(model => model.First().Description)</th>
-            <th>Category</th>
-            <th style="width:180px;"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-                <td>@item.FoodCategory?.Name</td>
-                <td class="text-end">
-                    <a asp-action="Details" asp-route-id="@item.FoodId" class="btn btn-sm btn-outline-secondary"><i class="bi bi-archive"></i> Details</a>
-                    <a asp-action="Edit" asp-route-id="@item.FoodId" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square"></i> Edit</a>
-                    <a asp-action="Delete" asp-route-id="@item.FoodId" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>

@@ -1,190 +1,190 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class GoalController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+
         public GoalController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string? clientId)
+        // GET: Goals
+        public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
             var query = _context.Goal
                 .Include(g => g.Client)
-                .AsNoTracking()
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(clientId))
-                query = query.Where(g => g.ClientId == clientId);
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
 
-            ViewBag.ClientId = clientId;
-            return View(await query.OrderBy(g => g.GoalType).ToListAsync());
+                query = query.Where(g =>
+                    g.GoalName.ToLower().Contains(search) ||
+                    (g.Client != null && g.Client.Name.ToLower().Contains(search)));
+            }
+
+            int totalItems = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(g => g.Client.Name)
+                .ThenBy(g => g.GoalName)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ToListAsync();
+
+            var model = new PaginationInfo<Goal>(items, totalItems, page, itemsPerPage);
+
+            ViewBag.Search = search;
+
+            return View(model);
         }
 
+
+        // GET: Goals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var goal = await _context.Goal
                 .Include(g => g.Client)
-                .Include(g => g.FoodPlans)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(g => g.GoalId == id);
+                .FirstOrDefaultAsync(m => m.GoalId == id);
+            if (goal == null)
+            {
+                return NotFound();
+            }
 
-            if (goal == null) return NotFound();
             return View(goal);
         }
 
-        public async Task<IActionResult> Create(string? clientId)
+        // GET: Goals/Create
+        public IActionResult Create()
         {
-            await LoadClientsAsync(clientId);
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email");
             return View();
         }
 
+        // POST: Goals/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,GoalType,DailyCalories,DailyProtein,DailyFat,DailyCarbs,DailyFiber,DailyVitamins,DailyMinerals")] Goal goal)
+        public async Task<IActionResult> Create([Bind("GoalId,ClientId,GoalName,DailyCalories,DailyProtein,DailyFat,DailyHydrates,DailyVitamins,DailyMinerals,DailyFibers")] Goal goal)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                await LoadClientsAsync(goal.ClientId);
-                TempData["Error"] = "Please correct the errors below.";
-                return View(goal);
-            }
-
-            try
-            {
-                goal.GoalType = goal.GoalType.Trim();
                 _context.Add(goal);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = "Goal created successfully.";
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Error creating record: {ex.GetBaseException().Message}";
-                await LoadClientsAsync(goal.ClientId);
-                return View(goal);
-            }
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var goal = await _context.Goal.FindAsync(id);
-            if (goal == null) return NotFound();
-
-            await LoadClientsAsync(goal.ClientId);
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
             return View(goal);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,GoalType,DailyCalories,DailyProtein,DailyFat,DailyCarbs,DailyFiber,DailyVitamins,DailyMinerals")] Goal goal)
+        // GET: Goals/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            if (id != goal.GoalId) return NotFound();
-
-            if (!ModelState.IsValid)
+            if (id == null)
             {
-                await LoadClientsAsync(goal.ClientId);
-                TempData["Error"] = "Please correct the errors below.";
-                return View(goal);
+                return NotFound();
             }
 
-            try
+            var goal = await _context.Goal.FindAsync(id);
+            if (goal == null)
             {
-                var entity = await _context.Goal.FirstOrDefaultAsync(g => g.GoalId == id);
-                if (entity == null) return NotFound();
-
-                entity.ClientId = goal.ClientId;
-                entity.GoalType = goal.GoalType.Trim();
-                entity.DailyCalories = goal.DailyCalories;
-                entity.DailyProtein = goal.DailyProtein;
-                entity.DailyFat = goal.DailyFat;
-                entity.DailyCarbs = goal.DailyCarbs;
-                entity.DailyFiber = goal.DailyFiber;
-                entity.DailyVitamins = goal.DailyVitamins;
-                entity.DailyMinerals = goal.DailyMinerals;
-
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Goal updated successfully.";
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.Goal.AnyAsync(g => g.GoalId == id))
-                    return NotFound();
-
-                TempData["Error"] = "This record was changed by another user. Please reload.";
-                await LoadClientsAsync(goal.ClientId);
-                return View(goal);
-            }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Could not save changes: {ex.GetBaseException().Message}";
-                await LoadClientsAsync(goal.ClientId);
-                return View(goal);
-            }
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            return View(goal);
         }
 
+        // POST: Goals/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,GoalName,DailyCalories,DailyProtein,DailyFat,DailyHydrates,DailyVitamins,DailyMinerals,DailyFibers")] Goal goal)
+        {
+            if (id != goal.GoalId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(goal);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!GoalExists(goal.GoalId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            return View(goal);
+        }
+
+        // GET: Goals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var goal = await _context.Goal
                 .Include(g => g.Client)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(g => g.GoalId == id);
+                .FirstOrDefaultAsync(m => m.GoalId == id);
+            if (goal == null)
+            {
+                return NotFound();
+            }
 
-            if (goal == null) return NotFound();
             return View(goal);
         }
 
+        // POST: Goals/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var goal = await _context.Goal
-                .Include(g => g.FoodPlans)
-                .FirstOrDefaultAsync(g => g.GoalId == id);
-
-            if (goal == null) return NotFound();
-
-            if (goal.FoodPlans != null && goal.FoodPlans.Any())
-            {
-                TempData["Error"] = "Cannot delete a goal that has associated food plans.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            try
+            var goal = await _context.Goal.FindAsync(id);
+            if (goal != null)
             {
                 _context.Goal.Remove(goal);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Goal deleted successfully.";
-            }
-            catch (DbUpdateException ex)
-            {
-                TempData["Error"] = $"Could not delete: {ex.GetBaseException().Message}";
             }
 
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task LoadClientsAsync(string? selectedClientId = null)
+        private bool GoalExists(int id)
         {
-            ViewBag.ClientId = new SelectList(
-                await _context.Client.AsNoTracking().OrderBy(c => c.Name).ToListAsync(),
-                "ClientId", "Name", selectedClientId);
+            return _context.Goal.Any(e => e.GoalId == id);
         }
     }
 }

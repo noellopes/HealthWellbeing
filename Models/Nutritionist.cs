@@ -7,14 +7,19 @@ namespace HealthWellbeing.Models
         [Key]
         public int NutritionistId { get; set; }
 
-        [Required, StringLength(80)]
+        [Required(ErrorMessage = "Nutritionist name is required.")]
+        [StringLength(80)]
         public string Name { get; set; } = string.Empty;
 
-        
-        [EmailAddress, StringLength(120)]
-        public string? Email { get; set; }
+        [Required(ErrorMessage = "Gender is required.")]
+        [StringLength(20)]
+        public string Gender { get; set; } = string.Empty;
 
-        [Phone, StringLength(30)]
-        public string? Phone { get; set; }
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        [StringLength(120)]
+        public string Email { get; set; } = string.Empty;
+
+        public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
     }
 }

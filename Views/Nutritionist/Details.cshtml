@@ -1,26 +1,45 @@
 ﻿@model HealthWellbeing.Models.Nutritionist
+
 @{
     ViewData["Title"] = "Nutritionist Details";
-    var success = TempData["Success"] as string;
-    var error = TempData["Error"] as string;
-}
-<h1><i class="bi bi-archive"></i> @ViewData["Title"]</h1>
-
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div class="alert alert-success">@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div class="alert alert-danger">@error</div>
 }
 
-<dl class="row">
-    <dt class="col-sm-3">Name</dt>
-    <dd class="col-sm-9">@Model.Name</dd>
-</dl>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <h1 class="h4 mb-0">
+            <i class="bi bi-person-vcard-fill me-2 text-info"></i>
+            Nutritionist Details
+        </h1>
+    </div>
 
-<div class="mt-3">
-    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.NutritionistId"><i class="bi bi-pencil-square"></i> Edit</a>
-    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-backspace"></i> Back</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to list
+    </a>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8">@Model.Name</dd>
+
+            <dt class="col-sm-4">Email</dt>
+            <dd class="col-sm-8">@Model.Email</dd>
+
+            <dt class="col-sm-4">Gender</dt>
+            <dd class="col-sm-8">@Model.Gender</dd>
+        </dl>
+
+        <div class="mt-3 d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.NutritionistId"
+               class="btn btn-warning text-white">
+                <i class="bi bi-pencil-square me-1"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Back to list
+            </a>
+        </div>
+    </div>
 </div>

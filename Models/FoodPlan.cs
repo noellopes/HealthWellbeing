@@ -6,35 +6,19 @@ namespace HealthWellbeing.Models
     public class FoodPlan
     {
         [Key]
-        public int FoodPlanId { get; set; }
+        public int PlanFoodId { get; set; }
 
-        [Required]
-        [Display(Name = "Client")]
-        public string ClientId { get; set; } = string.Empty;
-        public Client? Client { get; set; }
+        [Required(ErrorMessage = "Portion is required.")]
+        public int PortionId { get; set; }
 
-        [Required]
-        [Display(Name = "Goal")]
-        public int GoalId { get; set; }
-        public Goal? Goal { get; set; }
+        [Required(ErrorMessage = "Plan is required.")]
+        public int PlanId { get; set; }
 
-        [Required]
-        [Display(Name = "Food")]
+        [Required(ErrorMessage = "Food is required.")]
         public int FoodId { get; set; }
+
+        public Portion? Portion { get; set; }
+        public Plan? Plan { get; set; }
         public Food? Food { get; set; }
-
-
-        [Range(0.01, 999999.99, ErrorMessage = "Please enter a valid quantity.")]
-        [Column(TypeName = "decimal(9,2)")]
-        [Display(Name = "Quantity (g/ml)")]
-        public decimal Quantity { get; set; }
-
-        [StringLength(200)]
-        [Display(Name = "Description / Notes")]
-        public string? Description { get; set; }
-
-        [Display(Name = "Nutritionist")]
-        public int? NutritionistId { get; set; }
-        public Nutritionist? Nutritionist { get; set; }
     }
 }
