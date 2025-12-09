@@ -409,15 +409,40 @@ namespace HealthWellbeingRoom.Controllers
 
         //----------------------------------------------------------HISTORY---------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public async Task<IActionResult> History(int id)
+        public IActionResult History(int id, int page = 1)
         {
             ViewBag.RoomId = id;
 
-            List<RoomHistory> histories = await _context.RoomHistories
-                .Where(h => h.RoomId == id)
-                .ToListAsync();
+            // Dados fictícios
+            var fakeData = new List<RoomHistory>
+            {
+                new RoomHistory { RoomHistoryId = 10, StartDate = DateTime.Now.AddHours(-2), EndDate = DateTime.Now, Responsible = "João Silva", ResponsibleId = 1, Note = "Limpeza completa" },
+                new RoomHistory { RoomHistoryId = 20, StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(-1).AddHours(1), Responsible = "Maria Costa", ResponsibleId = 2, Note = "Inspeção técnica" },
+                new RoomHistory { RoomHistoryId = 30, StartDate = DateTime.Now.AddDays(-3), EndDate = DateTime.Now.AddDays(-3).AddHours(2), Responsible = "Carlos Mendes", ResponsibleId = 3, Note = "Revisão elétrica" },
+                new RoomHistory { RoomHistoryId = 40, StartDate = DateTime.Now.AddDays(-5), EndDate = DateTime.Now.AddDays(-5).AddHours(1), Responsible = "Ana Ferreira", ResponsibleId = 4, Note = "Troca de lâmpadas" },
+                new RoomHistory { RoomHistoryId = 50, StartDate = DateTime.Now.AddDays(-7), EndDate = DateTime.Now.AddDays(-7).AddHours(3), Responsible = "Pedro Santos", ResponsibleId = 5, Note = "Limpeza de ar condicionado" },
+                new RoomHistory { RoomHistoryId = 60, StartDate = DateTime.Now.AddDays(-10), EndDate = DateTime.Now.AddDays(-10).AddHours(2), Responsible = "Sofia Almeida", ResponsibleId = 6, Note = "Inspeção de segurança" },
+                new RoomHistory { RoomHistoryId = 70, StartDate = DateTime.Now.AddDays(-12), EndDate = DateTime.Now.AddDays(-12).AddHours(1), Responsible = "Ricardo Lopes", ResponsibleId = 7, Note = "Revisão de portas" },
+                new RoomHistory { RoomHistoryId = 80, StartDate = DateTime.Now.AddDays(-15), EndDate = DateTime.Now.AddDays(-15).AddHours(2), Responsible = "Helena Costa", ResponsibleId = 8, Note = "Verificação de extintores" },
+                new RoomHistory { RoomHistoryId = 90, StartDate = DateTime.Now.AddDays(-18), EndDate = DateTime.Now.AddDays(-18).AddHours(1), Responsible = "Miguel Rocha", ResponsibleId = 9, Note = "Revisão de cablagem" },
+                new RoomHistory { RoomHistoryId = 100, StartDate = DateTime.Now.AddDays(-20), EndDate = DateTime.Now.AddDays(-20).AddHours(2), Responsible = "Patrícia Gomes", ResponsibleId = 10, Note = "Limpeza geral" },
+                new RoomHistory { RoomHistoryId = 110, StartDate = DateTime.Now.AddDays(-22), EndDate = DateTime.Now.AddDays(-22).AddHours(1), Responsible = "Tiago Martins", ResponsibleId = 11, Note = "Inspeção técnica" },
+                new RoomHistory { RoomHistoryId = 120, StartDate = DateTime.Now.AddDays(-25), EndDate = DateTime.Now.AddDays(-25).AddHours(2), Responsible = "Beatriz Silva", ResponsibleId = 12, Note = "Troca de filtros" },
+                new RoomHistory { RoomHistoryId = 130, StartDate = DateTime.Now.AddDays(-27), EndDate = DateTime.Now.AddDays(-27).AddHours(1), Responsible = "André Carvalho", ResponsibleId = 13, Note = "Revisão de iluminação" },
+                new RoomHistory { RoomHistoryId = 140, StartDate = DateTime.Now.AddDays(-30), EndDate = DateTime.Now.AddDays(-30).AddHours(2), Responsible = "Mariana Ribeiro", ResponsibleId = 14, Note = "Limpeza técnica" },
+                new RoomHistory { RoomHistoryId = 150, StartDate = DateTime.Now.AddDays(-32), EndDate = DateTime.Now.AddDays(-32).AddHours(1), Responsible = "João Costa", ResponsibleId = 15, Note = "Inspeção final" }
+            };
 
-            return View(histories);
+            int itemsPerPage = 10;
+            var pagination = new RPaginationInfo<RoomHistory>(page, fakeData.Count, itemsPerPage);
+
+            // Pagination está construído, usar ItemsToSkip
+            pagination.Items = fakeData
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage);
+
+            return View(pagination);
+
         }
 
         //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------

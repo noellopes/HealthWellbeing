@@ -6,10 +6,13 @@ namespace HealthWellbeingRoom.Models
     {
         public int RoomHistoryId { get; set; }
 
-        public DateTime StarDate { get; set; }
+        public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
+        //No futuro será uma entidade, Medico 
         public string Responsible { get; set; } = string.Empty;
+
+        public int ResponsibleId { get; set; }
 
         public string Note { get; set; } = string.Empty;
 

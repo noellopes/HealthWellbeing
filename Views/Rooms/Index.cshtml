@@ -48,13 +48,16 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Salas Registadas</h2>
     <div>
-        <a class="btn btn-secondary me-2"
+        <!-- Botão de pesquisa -->
+        <a class="btn btn-outline-primary me-2"
            data-bs-toggle="collapse"
            data-bs-target="#postSearch"
            aria-expanded="false"
            aria-controls="postSearch">
-            <i class="bi bi-search me-1"></i> Pesquisar
+            <i class="bi bi-search me-1"></i> Pesquisa
         </a>
+
+        <!-- Botão criar nova sala -->
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Criar Nova Sala
         </a>
@@ -162,11 +165,15 @@
             <div class="col-12 mt-2 d-flex gap-2">
                 <!-- Força page=1 ao pesquisar -->
                 <input type="hidden" name="page" value="1" />
-                <button type="submit" class="btn btn-primary flex-fill">
-                    <i class="bi bi-search me-1"></i> Pesquisar
+
+                <!-- Botão de pesquisa atualizado -->
+                <button type="submit" class="btn btn-outline-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisa
                 </button>
+
+                <!-- Botão limpar -->
                 <a asp-action="Index" class="btn btn-secondary flex-fill">
-                    Limpar
+                    <i class="bi bi-x-circle me-1"></i> Limpar
                 </a>
             </div>
         </form>
@@ -280,17 +287,17 @@
 <nav aria-label="Room page" class="d-flex justify-content-between align-items-center mt-4">
     @if (Model.TotalItems > 0)
     {
-        <span>
+        <span class="text-muted">
             Mostrando
-            @((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)
+            <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
             -
-            @(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))
-            de @Model.TotalItems
+            <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong>
         </span>
     }
     else
     {
-        <span>0 itens</span>
+        <span class="text-muted">0 itens</span>
     }
 
     <ul class="pagination mb-0">
@@ -298,7 +305,7 @@
         @if (Model.CurrentPage == 1)
         {
             <li class="page-item disabled">
-                <a class="page-link">Primeira</a>
+                <a class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</a>
             </li>
         }
         else
@@ -314,7 +321,7 @@
                    asp-route-searchRoomType="@ViewBag.SearchRoomType"
                    asp-route-searchOpeningTime="@ViewBag.SearchOpeningTime"
                    asp-route-searchClosingTime="@ViewBag.SearchClosingTime">
-                    Primeira
+                    <i class="bi bi-chevron-double-left"></i> Primeira
                 </a>
             </li>
         }
@@ -351,7 +358,7 @@
         @if (Model.CurrentPage == Model.TotalPages)
         {
             <li class="page-item disabled">
-                <a class="page-link">Última</a>
+                <a class="page-link">Última <i class="bi bi-chevron-double-right"></i></a>
             </li>
         }
         else
@@ -367,7 +374,7 @@
                    asp-route-searchRoomType="@ViewBag.SearchRoomType"
                    asp-route-searchOpeningTime="@ViewBag.SearchOpeningTime"
                    asp-route-searchClosingTime="@ViewBag.SearchClosingTime">
-                    Última
+                    Última <i class="bi bi-chevron-double-right"></i>
                 </a>
             </li>
         }
