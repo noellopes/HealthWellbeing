@@ -59,43 +59,6 @@
             </div>
         </form>
     </div>
-    
 
 </div>
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('form');
-            const btnSave = document.getElementById('btnSave');
-
-            // Guardar valores iniciais
-            const initialValues = {};
-            form.querySelectorAll('input, textarea').forEach(input => {
-                initialValues[input.name] = input.value;
-            });
-
-            // Função para verificar alterações
-            function checkChanges() {
-                let changed = false;
-                form.querySelectorAll('input, textarea').forEach(input => {
-                    if (input.value !== initialValues[input.name]) {
-                        changed = true;
-                    }
-                });
-                btnSave.disabled = !changed;
-            }
-
-            // Verificar alterações em cada campo
-            form.querySelectorAll('input, textarea').forEach(input => {
-                input.addEventListener('input', checkChanges);
-            });
-
-            // Inicialmente desabilitar se não houver mudanças
-            checkChanges();
-        });
-    </script>
-}
 
