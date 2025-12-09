@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using HealthWellbeingRoom.Models;
 
 namespace HealthWellbeingRoom.Controllers
 {
-    
+
     public class RoomsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -24,13 +25,13 @@ namespace HealthWellbeingRoom.Controllers
         private async Task PreencherDropdowns()
         {
             // Tipos de Sala
-            ViewBag.RoomTypes = new SelectList(await _context.RoomType.ToListAsync(),"RoomTypeId", "Name");
+            ViewBag.RoomTypes = new SelectList(await _context.RoomType.ToListAsync(), "RoomTypeId", "Name");
             // Localizações
-            ViewBag.RoomLocations = new SelectList(await _context.RoomLocation.ToListAsync(),"RoomLocationId", "Name");
+            ViewBag.RoomLocations = new SelectList(await _context.RoomLocation.ToListAsync(), "RoomLocationId", "Name");
             // Status
-            ViewBag.RoomStatuses = new SelectList(await _context.RoomStatus.ToListAsync(),"RoomStatusId", "Name");
+            ViewBag.RoomStatuses = new SelectList(await _context.RoomStatus.ToListAsync(), "RoomStatusId", "Name");
             // Especialidades
-            ViewBag.RoomSpecialty = new SelectList(await _context.Specialty.ToListAsync(),"SpecialtyId", "Name");
+            ViewBag.RoomSpecialty = new SelectList(await _context.Specialty.ToListAsync(), "SpecialtyId", "Name");
         }
         //------------------------------------------------------INDEX / LIST-------------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
@@ -408,12 +409,15 @@ namespace HealthWellbeingRoom.Controllers
 
         //----------------------------------------------------------HISTORY---------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult History(int id)
+        public async Task<IActionResult> History(int id)
         {
             ViewBag.RoomId = id;
-            // lógica para buscar histórico da sala com o id
 
-            return View();
+            List<RoomHistory> histories = await _context.RoomHistories
+                .Where(h => h.RoomId == id)
+                .ToListAsync();
+
+            return View(histories);
         }
 
         //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------
@@ -430,6 +434,16 @@ namespace HealthWellbeingRoom.Controllers
 
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public IActionResult MedicalDevices(int id)
+        {
+            ViewBag.RoomId = id;
+            return View();
+        }
+
+        //----------------------------------------------------------RESERVATIONS---------------------------------------------------------------------------------
+
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult Reservations(int id)
         {
             ViewBag.RoomId = id;
             return View();
