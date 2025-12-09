@@ -12,6 +12,15 @@
     @ViewData["Title"]
 </h1>
 
+<!-- Mensagem de sucesso -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
 <div class="card shadow-sm">
     <div class="card-header bg-info text-white">
         <h4 class="mb-0">
