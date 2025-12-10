@@ -16,6 +16,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.ScoringStrategy> ScoringStrategy { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Level { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.LevelCategory> LevelCategory { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Activity_> Activity { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;

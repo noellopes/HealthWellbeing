@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace HealthWellbeing.Models
 {
     public class Level
@@ -17,11 +18,15 @@ namespace HealthWellbeing.Models
 
 
 
-        // Level Category
-        [Display(Name = "Level Category")]
-        [Required(ErrorMessage = "{0} cannot be empty.")]
-        public string LevelCategory { get; set; }
+        // Foreign key (Category ID)
+        [Display(Name = "Category")]
+        [Required(ErrorMessage = "Please select a category.")]
+        public int LevelCategoryId { get; set; }
 
+        // Navigation property
+        [ForeignKey("LevelCategoryId")]
+        [ValidateNever]
+        public LevelCategory Category { get; set; }
 
 
         // Level Points Limit

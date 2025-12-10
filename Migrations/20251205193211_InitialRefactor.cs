@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigrationUpdate : Migration
+    public partial class InitialRefactor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -154,19 +154,16 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Level",
+                name: "LevelCategory",
                 columns: table => new
                 {
-                    LevelId = table.Column<int>(type: "int", nullable: false)
+                    LevelCategoryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    LevelNumber = table.Column<int>(type: "int", nullable: false),
-                    LevelCategory = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LevelPointsLimit = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Level", x => x.LevelId);
+                    table.PrimaryKey("PK_LevelCategory", x => x.LevelCategoryId);
                 });
 
             migrationBuilder.CreateTable(
@@ -435,6 +432,28 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Level",
+                columns: table => new
+                {
+                    LevelId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    LevelNumber = table.Column<int>(type: "int", nullable: false),
+                    LevelCategoryId = table.Column<int>(type: "int", nullable: false),
+                    LevelPointsLimit = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Level", x => x.LevelId);
+                    table.ForeignKey(
+                        name: "FK_Level_LevelCategory_LevelCategoryId",
+                        column: x => x.LevelCategoryId,
+                        principalTable: "LevelCategory",
+                        principalColumn: "LevelCategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProblemaSaudeProfissionalExecutante",
                 columns: table => new
                 {
@@ -629,6 +648,11 @@ namespace HealthWellbeing.Migrations
                 column: "GrupoMuscularId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Level_LevelCategoryId",
+                table: "Level",
+                column: "LevelCategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Member_ClientId",
                 table: "Member",
                 column: "ClientId",
@@ -723,6 +747,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Exercicio");
+
+            migrationBuilder.DropTable(
+                name: "LevelCategory");
 
             migrationBuilder.DropTable(
                 name: "Client");

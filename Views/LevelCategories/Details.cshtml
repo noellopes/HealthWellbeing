@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.LevelCategory
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Category Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Category ID</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.LevelCategoryId)</dd>
+
+                        <dt class="col-sm-4 text-muted">Name</dt>
+                        <dd class="col-sm-8 fw-bold">@Html.DisplayFor(model => model.Name)</dd>
+                    </dl>
+                </div>
+                <div class="m-3 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Back to List
+                    </a>
+
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.LevelCategoryId" class="btn btn-warning me-2">
+                            <i class="bi bi-pencil me-1" aria-hidden="true"></i> Edit
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.LevelCategoryId" class="btn btn-danger">
+                            <i class="bi bi-trash me-1" aria-hidden="true"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

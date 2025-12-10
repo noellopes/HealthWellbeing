@@ -1,0 +1,44 @@
+﻿@model HealthWellbeing.Models.LevelCategory
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Edit Category</h5>
+                </div>
+
+                <div class="card-body">
+                    <form asp-action="Edit" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="LevelCategoryId" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <!-- Floating Label for Name -->
+                        <div class="form-floating mb-3">
+                            <input asp-for="Name" class="form-control" placeholder="Category Name" />
+                            <label asp-for="Name">Category Name</label>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
