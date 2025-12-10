@@ -75,6 +75,14 @@ namespace HealthWellbeing.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ScoringStrategyId,ScoringStrategyName,ScoringStrategyCode,ScoringStrategyDescription")] ScoringStrategy scoringStrategy) {
+            
+            bool codeExists = await _context.ScoringStrategy
+        .AnyAsync(s => s.ScoringStrategyCode == scoringStrategy.ScoringStrategyCode);
+
+            if (codeExists) {
+                ModelState.AddModelError("ScoringStrategyCode", "This Technical Code already exists. Please choose a unique code.");
+            }
+
             if (ModelState.IsValid) {
                 _context.Add(scoringStrategy);
                 await _context.SaveChangesAsync();
@@ -108,6 +116,13 @@ namespace HealthWellbeing.Controllers {
         public async Task<IActionResult> Edit(int id, [Bind("ScoringStrategyId,ScoringStrategyName,ScoringStrategyCode,ScoringStrategyDescription")] ScoringStrategy scoringStrategy) {
             if (id != scoringStrategy.ScoringStrategyId) {
                 return NotFound();
+            }
+
+            bool codeExists = await _context.ScoringStrategy
+        .AnyAsync(s => s.ScoringStrategyCode == scoringStrategy.ScoringStrategyCode && s.ScoringStrategyId != id);
+
+            if (codeExists) {
+                ModelState.AddModelError("ScoringStrategyCode", "This Technical Code is already in use by another strategy.");
             }
 
             if (ModelState.IsValid) {
