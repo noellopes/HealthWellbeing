@@ -7,65 +7,72 @@
 
 @if (successMessage != null)
 {
-    <div class="container py-4">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @successMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<h2 class="text-primary mb-4">
+    <i class="bi bi-gear me-2"></i> Equipamentos Associados a sala "@ViewData["RoomName"]"
+</h2>
 
-@* @foreach (var equipamento in Model)
+@if (!Model.Any())
 {
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-info text-black">
-            <h4 class="mb-0">
-                <i class="bi bi-gear me-2"></i> Informações do Equipamento "@equipamento.Name"
-            </h4>
-        </div>
-
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
-                <dd class="col-sm-9">@equipamento.Name</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Sala</dt>
-                <dd class="col-sm-9">@equipamento.Room?.Name</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Tipo de Equipamento</dt>
-                <dd class="col-sm-9">@equipamento.EquipmentType?.Name</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
-                <dd class="col-sm-9">@equipamento.EquipmentStatus?.Name</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Nº de Série</dt>
-                <dd class="col-sm-9">@equipamento.SerialNumber</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Data compra</dt>
-                <dd class="col-sm-9">@equipamento.PurchaseDate.ToString("dd/MM/yyyy")</dd>
-
-                <dt class="col-sm-3 fw-bold text-muted">Descrição</dt>
-                <dd class="col-sm-9">@equipamento.Description</dd>
-            </dl>
-        </div>
-
-        <div class="card-footer d-flex justify-content-end gap-2">
-            <a class="btn btn-warning me-1" asp-action="Edit" asp-route-id="@equipamento.EquipmentId">
-                <i class="bi bi-pencil-square"></i> Editar
-            </a>
-
-            <a asp-action="Delete" asp-route-id="@equipamento.EquipmentId" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Eliminar
-            </a>
-        </div>
+    <div class="alert alert-info d-flex align-items-center mt-4" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <span>Nenhum equipamento associado a esta sala.</span>
     </div>
-} *@
-
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nome</th>
+                    <th>Nº Série</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th class="text-center">Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var equipamento in Model)
+                {
+                    <tr>
+                        <td>@equipamento.Name</td>
+                        <td>@equipamento.SerialNumber</td>
+                        <td>@equipamento.EquipmentType?.Name</td>
+                        <td>
+                            @if (equipamento.EquipmentStatus?.Name == "Operacional")
+                            {
+                                <span class="text-success fw-bold">● Operacional</span>
+                            }
+                            else if (equipamento.EquipmentStatus?.Name == "Em Manutenção")
+                            {
+                                <span class="text-warning fw-bold">● Em Manutenção</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">● Desconhecido</span>
+                            }
+                        </td>
+                        <td class="text-center align-middle">
+                            <a asp-controller="Equipments"  asp-action="Details" asp-route-id="@equipamento.EquipmentId" class="btn btn-info px-4">
+                                <i class="bi bi-info-circle me-1"></i> Ver
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<!-- Botões de navegação -->
 <div class="mt-4 d-flex justify-content-end gap-2">
-    <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary">
+    <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
     </a>
 

@@ -1,14 +1,10 @@
 ﻿@model HealthWellbeing.ViewModels.RPaginationInfo<HealthWellbeingRoom.Models.RoomHistory>
 
-@{
-    ViewData["Title"] = "Histórico de Utilização de Sala";
-}
-
 <h2 class="text-primary mb-4">
-    <i class="bi bi-clock-history me-2"></i> @ViewData["Title"]
+    <i class="bi bi-clock-history me-2"></i> @ViewData["Title"] "@ViewBag.RoomName"
 </h2>
 
-<!-- Botão de pesquisa alinhado à direita -->
+<!-- Botão de pesquisa -->
 <div class="d-flex justify-content-end mb-3">
     <button class="btn btn-outline-primary"
             type="button"

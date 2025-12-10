@@ -413,6 +413,16 @@ namespace HealthWellbeingRoom.Controllers
         {
             ViewBag.RoomId = id;
 
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
+            if (room == null)
+                return NotFound();
+
+
+
+            ViewData["RoomName"] = room.Name;
+            ViewData["Title"] = "Histórico de uilização de Sala";
+
+
             // Dados fictícios
             var fakeData = new List<RoomHistory>
             {
@@ -450,8 +460,23 @@ namespace HealthWellbeingRoom.Controllers
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public IActionResult Equipments(int id)
         {
+
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
+            if (room == null)
+                return NotFound();
+
+            ViewData["RoomName"] = room.Name;   // passa o nome da sala para a View
+
             ViewBag.RoomId = id;
-            return View();
+
+            var equipamentos = _context.Equipment
+                .Include(e => e.EquipmentType)
+                .Include(e => e.EquipmentStatus)
+                .Include(e => e.Room)
+                .Where(e => e.RoomId == id)
+                .ToList();
+
+            return View(equipamentos);
         }
 
         //----------------------------------------------------------MEDICAL DEVICES---------------------------------------------------------------------------------
@@ -473,7 +498,6 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.RoomId = id;
             return View();
         }
-
 
     }
 }
