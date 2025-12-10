@@ -129,201 +129,6 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateExercicios(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.Exercicio.Any()) return;
-
-            // Recuperar referências para fazer as ligações
-            var generos = dbContext.Genero.ToDictionary(g => g.NomeGenero, g => g.GeneroId);
-            var grupos = dbContext.GrupoMuscular.ToDictionary(g => g.GrupoMuscularNome, g => g.GrupoMuscularId);
-            var equipamentos = dbContext.Equipamento.ToDictionary(e => e.NomeEquipamento, e => e.EquipamentoId);
-
-            // Helpers para obter IDs de forma segura
-            int GetGenId(string nome) => generos.ContainsKey(nome) ? generos[nome] : generos.Values.First();
-            int GetGrId(string nome) => grupos.ContainsKey(nome) ? grupos[nome] : grupos.Values.First();
-            int GetEqId(string nome) => equipamentos.ContainsKey(nome) ? equipamentos[nome] : 0;
-
-            var exercicios = new[]
-            {
-                new Exercicio
-                {
-                    ExercicioNome = "Flexão",
-                    Descricao = "Exercício para peito, braços e ombros usando apenas o peso do corpo.",
-                    Duracao = 10,
-                    Intencidade = 6,
-                    CaloriasGastas = 50,
-                    Instrucoes = "Deitar no chão, mãos alinhadas aos ombros, flexionar braços mantendo corpo reto.",
-                    Repeticoes = 15,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
-                    },
-                    // Flexão geralmente não precisa de equipamento, mas podemos por Tapete se quisermos
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
-                    }
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Agachamento",
-                    Descricao = "Exercício composto para membros inferiores.",
-                    Duracao = 15,
-                    Intencidade = 7,
-                    CaloriasGastas = 80,
-                    Instrucoes = "Ficar em pé, afastar pernas, flexionar joelhos mantendo costas retas.",
-                    Repeticoes = 20,
-                    Series = 4,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>() // Sem equipamento
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Prancha",
-                    Descricao = "Exercício isométrico para core.",
-                    Duracao = 5,
-                    Intencidade = 5,
-                    CaloriasGastas = 30,
-                    Instrucoes = "Apoiar antebraços e ponta dos pés, mantendo corpo reto.",
-                    Repeticoes = 1,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
-                    }
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Remada com Halteres",
-                    Descricao = "Exercício para costas.",
-                    Duracao = 12,
-                    Intencidade = 7,
-                    CaloriasGastas = 70,
-                    Instrucoes = "Inclinar tronco, puxar halteres em direção ao abdómen.",
-                    Repeticoes = 12,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero>
-                    {
-                        new ExercicioGenero { GeneroId = GetGenId("Masculino") },
-                        new ExercicioGenero { GeneroId = GetGenId("Feminino") }
-                    },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Costas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Bíceps") }
-                    },
-                    // Associa Halteres
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
-                    }
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Corrida no Lugar",
-                    Descricao = "Cardio para queimar calorias.",
-                    Duracao = 20,
-                    Intencidade = 6,
-                    CaloriasGastas = 150,
-                    Instrucoes = "Correr no mesmo lugar elevando os joelhos.",
-                    Repeticoes = 1,
-                    Series = 1,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>() // Sem equipamento
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Elevação Pélvica",
-                    Descricao = "Focado em glúteos.",
-                    Duracao = 10,
-                    Intencidade = 5,
-                    CaloriasGastas = 40,
-                    Instrucoes = "Deitar, elevar a bacia contraindo glúteos.",
-                    Repeticoes = 15,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero>
-                    {
-                        new ExercicioGenero { GeneroId = GetGenId("Feminino") },
-                        new ExercicioGenero { GeneroId = GetGenId("Unisexo") }
-                    },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
-                    }
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Supino Reto",
-                    Descricao = "Força para peitoral.",
-                    Duracao = 15,
-                    Intencidade = 8,
-                    CaloriasGastas = 90,
-                    Instrucoes = "Empurrar barra para cima deitado no banco.",
-                    Repeticoes = 10,
-                    Series = 4,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Masculino") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") }
-                    },
-                    // Associa Barra e Banco
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Barra Olímpica") },
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Banco de Musculação") }
-                    }
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Abdominal Crunch",
-                    Descricao = "Abdómen superior.",
-                    Duracao = 7,
-                    Intencidade = 5,
-                    CaloriasGastas = 35,
-                    Instrucoes = "Deitar, levantar ombros do chão.",
-                    Repeticoes = 20,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
-                    }
-                }
-            };
-
-            dbContext.Exercicio.AddRange(exercicios);
-            dbContext.SaveChanges();
-        }
-
         private static void PopulateProblemasSaude(HealthWellbeingDbContext dbContext)
         {
             if (dbContext.ProblemaSaude.Any()) return;
@@ -588,6 +393,219 @@ namespace HealthWellbeing.Data
                 dbContext.TipoExercicio.AddRange(tiposParaAdicionar);
                 dbContext.SaveChanges();
             }
+        }
+
+        private static void PopulateExercicios(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.Exercicio.Any()) return;
+
+            // 1. Carregar referências para chaves estrangeiras
+            var generos = dbContext.Genero.ToDictionary(g => g.NomeGenero, g => g.GeneroId);
+            var grupos = dbContext.GrupoMuscular.ToDictionary(g => g.GrupoMuscularNome, g => g.GrupoMuscularId);
+            var equipamentos = dbContext.Equipamento.ToDictionary(e => e.NomeEquipamento, e => e.EquipamentoId);
+            var tipos = dbContext.TipoExercicio.ToDictionary(t => t.NomeTipoExercicios, t => t.TipoExercicioId);
+            var problemas = dbContext.ProblemaSaude.ToDictionary(p => p.ProblemaNome, p => p.ProblemaSaudeId);
+
+            // Helpers seguros (Fallback para o primeiro item se não encontrar)
+            int GetGenId(string nome) => generos.TryGetValue(nome, out int id) ? id : generos.Values.First();
+            int GetGrId(string nome) => grupos.TryGetValue(nome, out int id) ? id : grupos.Values.First();
+            int GetEqId(string nome) => equipamentos.TryGetValue(nome, out int id) ? id : equipamentos.Values.First();
+            // Fallback para "Força" se não encontrar o tipo, ou o primeiro
+            int GetTipoId(string nome) => tipos.TryGetValue(nome, out int id) ? id : (tipos.TryGetValue("Força", out int fId) ? fId : tipos.Values.First());
+            int GetProbId(string nome) => problemas.TryGetValue(nome, out int id) ? id : 0;
+
+            var exercicios = new List<Exercicio>
+            {
+                new Exercicio
+                {
+                    ExercicioNome = "Flexão",
+                    Descricao = "Exercício para peito, braços e ombros usando apenas o peso do corpo.",
+                    TipoExercicioId = GetTipoId("Calistenia"), // Ou "Força"
+                    Duracao = 10,
+                    Intencidade = 6,
+                    CaloriasGastas = 50,
+                    Instrucoes = "Deitar no chão, mãos alinhadas aos ombros, flexionar braços mantendo corpo reto.",
+                    Repeticoes = 15,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
+                    // Contraindicação: Quem tem tendinite no braço
+                    Contraindicacoes = (GetProbId("Tendinite") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Agachamento",
+                    Descricao = "Exercício composto para membros inferiores.",
+                    TipoExercicioId = GetTipoId("Força"),
+                    Duracao = 15,
+                    Intencidade = 7,
+                    CaloriasGastas = 80,
+                    Instrucoes = "Ficar em pé, afastar pernas, flexionar joelhos mantendo costas retas.",
+                    Repeticoes = 20,
+                    Series = 4,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(), // Sem equipamento
+                    // Contraindicação: Artrite nos joelhos
+                    Contraindicacoes = (GetProbId("Artrite") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrite") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Prancha",
+                    Descricao = "Exercício isométrico para core.",
+                    TipoExercicioId = GetTipoId("Funcional"),
+                    Duracao = 5,
+                    Intencidade = 5,
+                    CaloriasGastas = 30,
+                    Instrucoes = "Apoiar antebraços e ponta dos pés, mantendo corpo reto.",
+                    Repeticoes = 1,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") } },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Remada com Halteres",
+                    Descricao = "Exercício para costas.",
+                    TipoExercicioId = GetTipoId("Força"),
+                    Duracao = 12,
+                    Intencidade = 7,
+                    CaloriasGastas = 70,
+                    Instrucoes = "Inclinar tronco, puxar halteres em direção ao abdómen.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = GetGenId("Masculino") },
+                        new ExercicioGenero { GeneroId = GetGenId("Feminino") }
+                    },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Costas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Bíceps") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") } },
+                    // Contraindicação: Escoliose (pode agravar se má postura)
+                    Contraindicacoes = (GetProbId("Escoliose") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Escoliose") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Corrida no Lugar",
+                    Descricao = "Cardio para queimar calorias.",
+                    TipoExercicioId = GetTipoId("Cardiovascular"), // Ou HIIT
+                    Duracao = 20,
+                    Intencidade = 6, // No original era 6, ajustei para 8 em alguns exemplos, mantendo 6
+                    CaloriasGastas = 150,
+                    Instrucoes = "Correr no mesmo lugar elevando os joelhos.",
+                    Repeticoes = 1,
+                    Series = 1,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
+                    // Contraindicação: Asma (se alta intensidade)
+                    Contraindicacoes = (GetProbId("Asma") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Asma") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Elevação Pélvica",
+                    Descricao = "Focado em glúteos.",
+                    TipoExercicioId = GetTipoId("Pilates"), // Ou Força
+                    Duracao = 10,
+                    Intencidade = 5,
+                    CaloriasGastas = 40,
+                    Instrucoes = "Deitar, elevar a bacia contraindo glúteos.",
+                    Repeticoes = 15,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero>
+                    {
+                        new ExercicioGenero { GeneroId = GetGenId("Feminino") },
+                        new ExercicioGenero { GeneroId = GetGenId("Unisexo") }
+                    },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Supino Reto",
+                    Descricao = "Força para peitoral.",
+                    TipoExercicioId = GetTipoId("Força"),
+                    Duracao = 15,
+                    Intencidade = 8,
+                    CaloriasGastas = 90,
+                    Instrucoes = "Empurrar barra para cima deitado no banco.",
+                    Repeticoes = 10,
+                    Series = 4,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Masculino") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Barra Olímpica") },
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Banco de Musculação") }
+                    },
+                    // Contraindicação: Tendinite e Hipertensão
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Abdominal Crunch",
+                    Descricao = "Abdómen superior.",
+                    TipoExercicioId = GetTipoId("Força"),
+                    Duracao = 7,
+                    Intencidade = 5,
+                    CaloriasGastas = 35,
+                    Instrucoes = "Deitar, levantar ombros do chão.",
+                    Repeticoes = 20,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") } },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                }
+            };
+
+            // Lógica extra para adicionar múltiplas contraindicações ao Supino se existirem
+            var supino = exercicios.FirstOrDefault(e => e.ExercicioNome == "Supino Reto");
+            if (supino != null)
+            {
+                if (GetProbId("Tendinite") > 0) supino.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") });
+                if (GetProbId("Hipertensão Arterial") > 0) supino.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hipertensão Arterial") });
+            }
+
+            dbContext.Exercicio.AddRange(exercicios);
+            dbContext.SaveChanges();
         }
 
         public static class Roles

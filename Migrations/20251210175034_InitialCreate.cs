@@ -109,6 +109,22 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Profissional",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Especialidade = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumeroCedula = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profissional", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProfissionalExecutante",
                 columns: table => new
                 {
@@ -389,21 +405,35 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlanoExercicios",
+                name: "AvaliacaoFisica",
                 columns: table => new
                 {
-                    PlanoExerciciosId = table.Column<int>(type: "int", nullable: false)
+                    AvaliacaoFisicaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NomePlano = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DataCriacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UtenteGrupo7Id = table.Column<int>(type: "int", nullable: false),
-                    CriadoAutomaticamente = table.Column<bool>(type: "bit", nullable: false)
+                    DataMedicao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Peso = table.Column<float>(type: "real", nullable: false),
+                    Altura = table.Column<float>(type: "real", nullable: false),
+                    GorduraCorporal = table.Column<float>(type: "real", nullable: false),
+                    MassaMuscular = table.Column<float>(type: "real", nullable: false),
+                    Pescoco = table.Column<float>(type: "real", nullable: true),
+                    Ombros = table.Column<float>(type: "real", nullable: true),
+                    Peitoral = table.Column<float>(type: "real", nullable: true),
+                    BracoDireito = table.Column<float>(type: "real", nullable: true),
+                    BracoEsquerdo = table.Column<float>(type: "real", nullable: true),
+                    Cintura = table.Column<float>(type: "real", nullable: true),
+                    Abdomen = table.Column<float>(type: "real", nullable: true),
+                    Anca = table.Column<float>(type: "real", nullable: true),
+                    CoxaDireita = table.Column<float>(type: "real", nullable: true),
+                    CoxaEsquerda = table.Column<float>(type: "real", nullable: true),
+                    GemeoDireito = table.Column<float>(type: "real", nullable: true),
+                    GemeoEsquerdo = table.Column<float>(type: "real", nullable: true),
+                    UtenteGrupo7Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlanoExercicios", x => x.PlanoExerciciosId);
+                    table.PrimaryKey("PK_AvaliacaoFisica", x => x.AvaliacaoFisicaId);
                     table.ForeignKey(
-                        name: "FK_PlanoExercicios_UtenteGrupo7_UtenteGrupo7Id",
+                        name: "FK_AvaliacaoFisica_UtenteGrupo7_UtenteGrupo7Id",
                         column: x => x.UtenteGrupo7Id,
                         principalTable: "UtenteGrupo7",
                         principalColumn: "UtenteGrupo7Id",
@@ -553,30 +583,6 @@ namespace HealthWellbeing.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "ExercicioPlanoExercicio",
-                columns: table => new
-                {
-                    PlanoExerciciosId = table.Column<int>(type: "int", nullable: false),
-                    ExercicioId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExercicioPlanoExercicio", x => new { x.PlanoExerciciosId, x.ExercicioId });
-                    table.ForeignKey(
-                        name: "FK_ExercicioPlanoExercicio_Exercicio_ExercicioId",
-                        column: x => x.ExercicioId,
-                        principalTable: "Exercicio",
-                        principalColumn: "ExercicioId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ExercicioPlanoExercicio_PlanoExercicios_PlanoExerciciosId",
-                        column: x => x.PlanoExerciciosId,
-                        principalTable: "PlanoExercicios",
-                        principalColumn: "PlanoExerciciosId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Alergia_AlimentoId",
                 table: "Alergia",
@@ -586,6 +592,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Alimento_CategoriaAlimentoId",
                 table: "Alimento",
                 column: "CategoriaAlimentoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AvaliacaoFisica_UtenteGrupo7Id",
+                table: "AvaliacaoFisica",
+                column: "UtenteGrupo7Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exercicio_TipoExercicioId",
@@ -608,11 +619,6 @@ namespace HealthWellbeing.Migrations
                 column: "GrupoMuscularId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExercicioPlanoExercicio_ExercicioId",
-                table: "ExercicioPlanoExercicio",
-                column: "ExercicioId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ExercicioProblemaSaude_ProblemaSaudeId",
                 table: "ExercicioProblemaSaude",
                 column: "ProblemaSaudeId");
@@ -626,11 +632,6 @@ namespace HealthWellbeing.Migrations
                 name: "IX_ObjetivoTipoExercicio_TipoExercicioId",
                 table: "ObjetivoTipoExercicio",
                 column: "TipoExercicioId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlanoExercicios_UtenteGrupo7Id",
-                table: "PlanoExercicios",
-                column: "UtenteGrupo7Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProblemaSaudeProfissionalExecutante_ProfissionalExecutanteId",
@@ -670,6 +671,9 @@ namespace HealthWellbeing.Migrations
                 name: "Alergia");
 
             migrationBuilder.DropTable(
+                name: "AvaliacaoFisica");
+
+            migrationBuilder.DropTable(
                 name: "ExercicioEquipamento");
 
             migrationBuilder.DropTable(
@@ -677,9 +681,6 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "ExercicioGrupoMuscular");
-
-            migrationBuilder.DropTable(
-                name: "ExercicioPlanoExercicio");
 
             migrationBuilder.DropTable(
                 name: "ExercicioProblemaSaude");
@@ -692,6 +693,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProblemaSaudeProfissionalExecutante");
+
+            migrationBuilder.DropTable(
+                name: "Profissional");
 
             migrationBuilder.DropTable(
                 name: "Receita");
@@ -721,9 +725,6 @@ namespace HealthWellbeing.Migrations
                 name: "Genero");
 
             migrationBuilder.DropTable(
-                name: "PlanoExercicios");
-
-            migrationBuilder.DropTable(
                 name: "Exercicio");
 
             migrationBuilder.DropTable(
@@ -739,10 +740,10 @@ namespace HealthWellbeing.Migrations
                 name: "ProblemaSaude");
 
             migrationBuilder.DropTable(
-                name: "CategoriaAlimento");
+                name: "UtenteGrupo7");
 
             migrationBuilder.DropTable(
-                name: "UtenteGrupo7");
+                name: "CategoriaAlimento");
 
             migrationBuilder.DropTable(
                 name: "TipoExercicio");

@@ -76,6 +76,7 @@ using (var scope = app.Services.CreateScope())
 
         // C. Criar Profissional de Saúde (Login na BD Users + Perfil na BD HealthWellbeing)
         await SeedData.SeedProfissional(userManager, healthContext);
+        SeedData.Populate(healthContext);
     }
     catch (Exception ex)
     {
