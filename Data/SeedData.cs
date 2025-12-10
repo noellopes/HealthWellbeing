@@ -43,13 +43,13 @@ namespace HealthWellbeing.Data
                 {
                     Name = "Sophia Martinez Johnson",
                     Email = "admin@ipg.pt",
-                    PhoneNumber = "+351 910000000"
+                    PhoneNumber = "+351 +351 910000000"
                 },
                 new Employee
                 {
                     Name = "João Marcelo da Silva Luis",
                     Email = "joao@ipg.pt",
-                    PhoneNumber = "+351 910000001"
+                    PhoneNumber = "+351 +351 910000001"
                 }
             };
 
@@ -68,18 +68,16 @@ namespace HealthWellbeing.Data
 
             var customers = new[]
             {
-                new Customer
-                {
-                    Name = "Maria dos Santos",
-                    Email = "maria@ipg.pt",
-                    PhoneNumber = "+351 920000002"
-                },
-                new Customer
-                {
-                    Name = "Paulo Henrique Carvalho Santos",
-                    Email = "paulo@ipg.pt",
-                    PhoneNumber = "+351 920000003"
-                },
+                new Customer { Name = "Ana Pereira", Email = "ana.pereira@ipg.pt", PhoneNumber = "+351 912345678", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-12), TotalPoints = 1250 },
+                new Customer { Name = "Bruno Silva", Email = "bruno.silva@ipg.pt", PhoneNumber = "+351 965874123", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-1), TotalPoints = 0 },
+                new Customer { Name = "Carla Santos", Email = "carla.santos@ipg.pt", PhoneNumber = "+351 932145698", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 450 },
+                new Customer { Name = "Diogo Costa", Email = "diogo.costa@ipg.pt", PhoneNumber = "+351 918745236", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-15), TotalPoints = 100 },
+                new Customer { Name = "Elisa Martins", Email = "elisa.martins@ipg.pt", PhoneNumber = "+351 925632147", Gender = "Feminino", RegistrationDate = DateTime.Now.AddYears(-2), TotalPoints = 3500 },
+                new Customer { Name = "Fábio Rocha", Email = "fabio.rocha@ipg.pt", PhoneNumber = "+351 963258741", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-3), TotalPoints = 20 },
+                new Customer { Name = "Gisela Nunes", Email = "gisela.nunes@ipg.pt", PhoneNumber = "+351 914785236", Gender = "Feminino", RegistrationDate = DateTime.Now.AddDays(-2), TotalPoints = 0 },
+                new Customer { Name = "Hugo Almeida", Email = "hugo.almeida@ipg.pt", PhoneNumber = "+351 936547896", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-8), TotalPoints = 890 },
+                new Customer { Name = "Inês Rodrigues", Email = "ines.rodrigues@ipg.pt", PhoneNumber = "+351 921456987", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-4), TotalPoints = 210 },
+                new Customer { Name = "João Soares", Email = "joao.soares@ipg.pt", PhoneNumber = "+351 915632478", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-50), TotalPoints = 300 }
 
             };
 

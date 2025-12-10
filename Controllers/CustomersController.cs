@@ -22,7 +22,8 @@ namespace HealthWellbeing.Controllers
         // GET: Customers
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Customer.ToListAsync());
+            //Order customers by Name
+            return View(await _context.Customer.OrderBy(c => c.Name).ToListAsync());
         }
 
         // GET: Customers/Details/5
@@ -54,7 +55,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CustomerId,Name,Email,PhoneNumber")] Customer customer)
+        public async Task<IActionResult> Create([Bind("CustomerId,Name,Email,PhoneNumber,RegistrationDate,Gender,TotalPoints")] Customer customer)
         {
             if (ModelState.IsValid)
             {
@@ -94,7 +95,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CustomerId,Name,Email,PhoneNumber")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("CustomerId,Name,Email,PhoneNumber,RegistrationDate,Gender,TotalPoints")] Customer customer)
         {
             if (id != customer.CustomerId)
             {
