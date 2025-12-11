@@ -103,6 +103,18 @@
 
 <div class="mt-4 d-flex justify-content-end gap-2">
 
+ @* Adicinado por nuno abre *@
+    @if (ViewBag.Origem == "dispositivosAssociados")
+    {
+        <a asp-controller="Rooms"
+           asp-action="MedicalDevices"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista de dispositivos médicos associados
+        </a>
+    }
+ @* Adicionado por nuno fecha *@
+
     @{
         //Pode mover se NÃO estiver em Manutenção
         bool podeMover = Model.CurrentStatus != "Em Manutenção";
