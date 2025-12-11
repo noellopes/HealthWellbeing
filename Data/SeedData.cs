@@ -3,6 +3,7 @@ using HealthWellbeing.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Data
 {
@@ -929,6 +930,54 @@ namespace HealthWellbeing.Data
             db.SaveChanges();
         }
 
+
+        internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
+        {
+            EnsureUserIsCreatedAsync(userManager, "admin@jbma.pt", "Secret123$", ["Administrador"]).Wait();
+        }
+
+        private static async Task EnsureUserIsCreatedAsync(UserManager<IdentityUser> userManager, string username, string password, string[] roles)
+        {
+            IdentityUser? user = await userManager.FindByNameAsync(username);
+
+            if (user == null)
+            {
+                user = new IdentityUser(username);
+                await userManager.CreateAsync(user, password);
+            }
+
+            foreach (var role in roles)
+            {
+                if (!await userManager.IsInRoleAsync(user, role))
+                {
+                    await userManager.AddToRoleAsync(user, role);
+                }
+            }
+        }
+
+        internal static void SeedUsers(UserManager<IdentityUser> userManager)
+        {
+            EnsureUserIsCreatedAsync(userManager, "joao@jbma.pt", "Secret123$", ["DiretorClinico"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "anab@jbma.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "brunoMP@jbma.pt", "Secret123$", ["Utente"]).Wait();
+        }
+
+        internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
+        {
+            EnsureRoleIsCreatedAsync(roleManager, "Administrador").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "DiretorClinino").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Utente").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Medico").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "Rececionista").Wait();
+        }
+
+        private static async Task EnsureRoleIsCreatedAsync(RoleManager<IdentityRole> roleManager, string role)
+        {
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
 
     }
 }
