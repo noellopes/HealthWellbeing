@@ -1,48 +1,245 @@
-﻿@model IEnumerable<HealthWellbeing.Models.FoodIntake>
+﻿@using System.Linq
+@using System.Globalization
+@model IEnumerable<HealthWellbeing.Models.FoodIntake>
+
 @{
-    ViewData["Title"] = "Food Intake Calendar";
+    ViewData["Title"] = "Food Intake";
+
+    var selectedDate = (DateTime)(ViewBag.SelectedDate ?? DateTime.Today);
+    string clientName = ViewBag.ClientName as string ?? "Client";
+    int totalItems = ViewBag.TotalItems != null ? (int)ViewBag.TotalItems : 0;
+    int consumedCount = ViewBag.ConsumedCount != null ? (int)ViewBag.ConsumedCount : 0;
+    int notConsumedCount = ViewBag.NotConsumedCount != null ? (int)ViewBag.NotConsumedCount : 0;
+    double consumedPercentage = ViewBag.ConsumedPercentage != null ? (double)ViewBag.ConsumedPercentage : 0.0;
+    double notConsumedPercentage = ViewBag.NotConsumedPercentage != null ? (double)ViewBag.NotConsumedPercentage : 0.0;
+
+    var progressRaw = (IEnumerable<dynamic>)(ViewBag.Progress ?? Enumerable.Empty<dynamic>());
+    var progressList = progressRaw.ToList();
+
+
+    var labelsJson = "[" + string.Join(",", progressList.Select(p => "\"" + (string)p.Label + "\"")) + "]";
+    var dataJson = "[" + string.Join(",", progressList.Select(p =>
+        ((double)p.Percentage).ToString(CultureInfo.InvariantCulture))) + "]";
 }
-<div class="container mt-4">
-    <h2 class="mb-4">Food Intake Calendar</h2>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-warning">Nenhum registo encontrado.</div>
-    }
+<div class="d-flex align-items-center mb-3">
+    <h2 class="me-3">
+        <i class="bi bi-bar-chart-line me-2 text-success"></i>
+        Food intake dashboard
+    </h2>
+</div>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @foreach (var dayGroup in Model.OrderBy(m => m.Date).GroupBy(m => m.Date.Date))
-        {
-            <div class="col">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-primary text-white text-center">
-                        <h5>@dayGroup.Key.ToString("dd MMM yyyy")</h5>
-                    </div>
-                    <div class="card-body">
-                        @foreach (var item in dayGroup)
-                        {
-                            <div class="border rounded p-2 mb-3">
-                                <p><strong>Food:</strong> @item.FoodId</p>
-                                <p><strong>Plan:</strong> @item.PlanId</p>
-                                <p><strong>Status:</strong> @(item.Eaten ? "Eaten" : "Not Eaten")</p>
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
 
-                                <form asp-action="ToggleEaten" method="post">
-                                    <input type="hidden" name="id" value="@item.FoodIntakeId" />
+            @if (ViewBag.ClientId != null)
+            {
+                <input type="hidden" name="clientId" value="@ViewBag.ClientId" />
+            }
 
-                                    @if (item.Eaten)
-                                    {
-                                        <button type="submit" class="btn btn-warning w-100">Mark as Not Eaten</button>
-                                    }
-                                    else
-                                    {
-                                        <button type="submit" class="btn btn-success w-100">Mark as Eaten</button>
-                                    }
-                                </form>
-                            </div>
-                        }
-                    </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Select day</label>
+                <input type="date"
+                       class="form-control"
+                       name="selectedDate"
+                       value="@selectedDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Client</label>
+                <select class="form-select"
+                        name="clientId"
+                        asp-items="(SelectList)ViewBag.ClientList">
+                    <option value="">All the Clients</option>
+                </select>
+            </div>
+
+
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Summary</label>
+                <div class="d-flex flex-column">
+                    <small class="text-muted">
+                        Total items: <span class="fw-bold">@totalItems</span>
+                    </small>
+                    <small class="text-success">
+                        Consumed: <span class="fw-bold">@consumedCount</span>
+                    </small>
+                    <small class="text-danger">
+                        Not consumed: <span class="fw-bold">@notConsumedCount</span>
+                    </small>
                 </div>
             </div>
+
+            <div class="col-md-2 text-end">
+                <button type="submit" class="btn btn-success mt-2">
+                    <i class="bi bi-calendar-event me-1"></i>
+                    View day
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-pie-chart-fill text-success me-1"></i>
+                    Daily intake
+                </h5>
+                <canvas id="dailyDonutChart" height="220"></canvas>
+
+                <div class="mt-3">
+                    <span class="badge bg-success me-2">
+                        @consumedPercentage% consumed
+                    </span>
+                    <span class="badge bg-danger">
+                        @notConsumedPercentage% not consumed
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">
+                    <i class="bi bi-graph-up-arrow text-primary me-1"></i>
+                    Progress over last days
+                </h5>
+                <canvas id="progressLineChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title mb-3">
+            <i class="bi bi-list-check text-warning me-1"></i>
+            Foods in this day
+        </h5>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Food</th>
+                            <th>Portion</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderBy(i => i.ScheduledTime))
+                        {
+                            <tr>
+                                <td>@item.ScheduledTime.ToString("HH:mm")</td>
+                                <td>@item.Food?.Name</td>
+                                <td>@item.Portion?.PortionName</td>
+                                <td class="text-center">
+                                    <form asp-action="ToggleEaten" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.FoodIntakeId" />
+                                        <input type="hidden" name="clientId" value="@ViewBag.ClientId" />
+                                        <input type="hidden" name="selectedDate" value="@selectedDate.ToString("yyyy-MM-dd")" />
+
+                                        @if (item.Eaten)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                <i class="bi bi-check-circle me-1"></i> Comi
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-circle me-1"></i> Não comi
+                                            </button>
+                                        }
+                                    </form>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted mb-0">
+                No food intake registered for this day.
+            </p>
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ---------- Donut ----------
+        const donutCtx = document.getElementById('dailyDonutChart').getContext('2d');
+
+        const consumed = @consumedCount;
+        const notConsumed = @notConsumedCount;
+
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Consumed', 'Not consumed'],
+                datasets: [{
+                    data: [consumed, notConsumed],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // ---------- Line chart ----------
+        const lineCtx = document.getElementById('progressLineChart').getContext('2d');
+
+        const progressLabels = @Html.Raw(labelsJson);
+        const progressData = @Html.Raw(dataJson);
+
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: progressLabels,
+                datasets: [{
+                    label: '% consumed',
+                    data: progressData,
+                    tension: 0.3,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}

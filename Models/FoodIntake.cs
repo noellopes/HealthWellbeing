@@ -6,14 +6,21 @@ namespace HealthWellbeing.Models
     {
         [Key]
         public int FoodIntakeId { get; set; }
+
         public int PlanId { get; set; }
         public int FoodId { get; set; }
+        public int PortionId { get; set; }
+
+        public DateTime ScheduledTime { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
+
         public bool Eaten { get; set; }
-        public ICollection<Food>? Foods { get; set; }
-        public ICollection<Plan>? Plans { get; set; }
+
+        public Food? Food { get; set; }
+        public Plan? Plan { get; set; }
+        public Portion? Portion { get; set; }
 
     }
 }
