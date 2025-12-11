@@ -35,7 +35,7 @@ else
                     <th>Nº Série</th>
                     <th>Tipo</th>
                     <th>Estado</th>
-                    <th class="text-center">Detalhes</th>
+                    <th class="text-center">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,8 +60,13 @@ else
                             }
                         </td>
                         <td class="text-center align-middle">
-                            <a asp-controller="Equipments"  asp-action="Details" asp-route-id="@equipamento.EquipmentId" class="btn btn-info px-4">
-                                <i class="bi bi-info-circle me-1"></i> Ver
+                            <a asp-controller="Equipments"
+                               asp-action="Details"
+                               asp-route-id="@equipamento.EquipmentId"
+                               asp-route-roomId="@ViewBag.RoomId"
+                               asp-route-origem="dispositivosAssociados"
+                               class="btn btn-info px-4">
+                                <i class="bi bi-info-circle me-1"></i> Detalhes
                             </a>
                         </td>
                     </tr>

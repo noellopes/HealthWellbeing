@@ -97,8 +97,15 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int? roomId, string origem)
         {
+
+            //Adicionado por Nuno abre
+            var equipamento = await _context.Equipment.FindAsync(id);
+            if (equipamento == null) return NotFound();
+            ViewBag.Origem = origem;
+            //Adicionado por Nuno fecha
+
             if (id == null)
             {
                 /* Retornar para minha page do not found */
@@ -115,6 +122,11 @@ namespace HealthWellbeingRoom.Controllers
                 /* Retornar para minha page do not found */
                 return View("NotFound");
             }
+
+            //Adicionado por Nuno abre
+            ViewBag.Origem = origem;
+            ViewBag.RoomId = roomId ?? equipamento.RoomId; // garante que tem sempre o RoomId
+            //Adicionado por Nuno fecha
 
             return View(equipment);
         }

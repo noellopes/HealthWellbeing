@@ -190,6 +190,7 @@ namespace HealthWellbeingRoom.Controllers
             if (id == null) return NotFound();
 
             var room = await _context.Room
+                //.Include(r => r.Equipments)
                 .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
