@@ -161,6 +161,9 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("IdEspecialidade")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -171,6 +174,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdMedico");
+
+                    b.HasIndex("IdEspecialidade");
 
                     b.ToTable("Doctor");
                 });
@@ -354,6 +359,17 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Specialities", "Especialidade")
+                        .WithMany()
+                        .HasForeignKey("IdEspecialidade")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Especialidade");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>

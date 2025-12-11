@@ -21,12 +21,16 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string searchName = "" )
         {
             // Base query sem Includes (a menos que tenhas navegações para carregar)
             var doctorQuery = _context.Doctor
                 .AsNoTracking();
-
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                doctorQuery = doctorQuery.Where(d => d.Nome.Contains(searchName));
+            }
+            ViewBag.SearchName = searchName;
             // total de registos
             int numberDoctors = await doctorQuery.CountAsync();
 
@@ -55,6 +59,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var doctor = await _context.Doctor
+                .Include(d => d.Especialidade)
                 .FirstOrDefaultAsync(m => m.IdMedico == id);
             if (doctor == null)
             {
@@ -67,25 +72,40 @@ namespace HealthWellbeing.Controllers
         // GET: Doctors/Create
         public IActionResult Create()
         {
+            ViewData["IdEspecialidade"] = new SelectList(
+                _context.Specialities,      
+                "IdEspecialidade",          
+                "Nome"                      
+            );
+
             return View();
         }
 
         // POST: Doctors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdMedico,Nome,Telemovel,Email")] Doctor doctor)
+        public async Task<IActionResult> Create([Bind("IdMedico,Nome,Telemovel,Email,IdEspecialidade")] Doctor doctor)
         {
+            if (await _context.Doctor.AnyAsync(d => d.Email == doctor.Email))
+            {
+                ModelState.AddModelError("Email", "Já existe um médico registado com este email.");
+            }
+
             if (ModelState.IsValid)
             {
-                
                 _context.Add(doctor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["IdEspecialidade"] = new SelectList(
+                _context.Specialities,
+                "IdEspecialidade",
+                "Nome",
+                doctor.IdEspecialidade      
+            );
+
             return View(doctor);
-
-
-           
         }
 
         // GET: Doctors/Edit

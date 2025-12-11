@@ -14,9 +14,73 @@ namespace HealthWellbeing.Data
             // Garante que a BD existe
             db.Database.EnsureCreated();
 
+            PopulateSpecialities(db);
             PopulateConsultas(db);
             PopulateDoctor(db);
             PopulateUtenteSaude(db);
+        }
+
+        private static void PopulateSpecialities(HealthWellbeingDbContext db)
+        {
+            if (db.Specialities.Any()) return; // Evita duplicar registos
+
+            var especialidades = new[]
+            {
+    new Specialities
+    {
+        Nome = "Cardiologia",
+        Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
+    },
+    new Specialities
+    {
+        Nome = "Dermatologia",
+        Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
+    },
+    new Specialities
+    {
+        Nome = "Pediatria",
+        Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
+    },
+    new Specialities
+    {
+        Nome = "Psiquiatria",
+        Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
+    },
+    new Specialities
+    {
+        Nome = "Nutrição",
+        Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
+    },
+    new Specialities
+    {
+        Nome = "Medicina Geral e Familiar",
+        Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
+    },
+    new Specialities
+    {
+        Nome = "Ortopedia",
+        Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
+    },
+    new Specialities
+    {
+        Nome = "Ginecologia e Obstetrícia",
+        Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
+    },
+    new Specialities
+    {
+        Nome = "Psicologia",
+        Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
+    },
+    new Specialities
+    {
+        Nome = "Fisioterapia",
+        Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
+    },
+
+};
+
+            db.Specialities.AddRange(especialidades);
+            db.SaveChanges();
         }
 
         private static void PopulateConsultas(HealthWellbeingDbContext db)
@@ -164,24 +228,25 @@ namespace HealthWellbeing.Data
             {
                 return;
             }
+            var especialidades = db.Specialities.ToDictionary(e => e.Nome, e => e);
             var doctor = new[]
-            {
-                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },
-                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt" },
-                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt" },
-                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt" },
-                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt" },
-                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt" },
-                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt" },
-                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt" },
-                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt" },
-                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt" },
-                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt" },
-                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt" },
-                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt" },
-                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt" },
-                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
-            };
+   {
+    new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt", Especialidade = especialidades["Cardiologia"]},
+    new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt", Especialidade = especialidades["Dermatologia"]},
+    new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt", Especialidade = especialidades["Pediatria"]},
+    new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt", Especialidade = especialidades["Psiquiatria"] },
+    new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt", Especialidade = especialidades["Nutrição"] },
+    new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt", Especialidade = especialidades["Medicina Geral e Familiar"] },
+    new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt", Especialidade = especialidades["Ortopedia"] },
+    new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt", Especialidade = especialidades["Ginecologia e Obstetrícia"] },
+    new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt", Especialidade = especialidades["Psicologia"] },
+    new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt", Especialidade = especialidades["Fisioterapia"] },
+    new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt", Especialidade = especialidades["Medicina Geral e Familiar"] },
+    new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt", Especialidade = especialidades["Pediatria"] },
+    new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt", Especialidade = especialidades["Cardiologia"] },
+    new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt", Especialidade = especialidades["Pediatria"] },
+    new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt", Especialidade = especialidades["Ginecologia e Obstetrícia"] },
+};
 
             db.Doctor.AddRange(doctor);
             db.SaveChanges();

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoInicial : Migration
+    public partial class Migracao_Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,21 +40,6 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Consulta", x => x.IdConsulta);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Doctor",
-                columns: table => new
-                {
-                    IdMedico = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Telemovel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Doctor", x => x.IdMedico);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,6 +143,28 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Doctor",
+                columns: table => new
+                {
+                    IdMedico = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Telemovel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IdEspecialidade = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctor", x => x.IdMedico);
+                    table.ForeignKey(
+                        name: "FK_Doctor_Specialities_IdEspecialidade",
+                        column: x => x.IdEspecialidade,
+                        principalTable: "Specialities",
+                        principalColumn: "IdEspecialidade",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alergia",
                 columns: table => new
                 {
@@ -188,6 +195,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Alimento_CategoriaAlimentoId",
                 table: "Alimento",
                 column: "CategoriaAlimentoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Doctor_IdEspecialidade",
+                table: "Doctor",
+                column: "IdEspecialidade");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UtenteSaude_Nif",
@@ -227,13 +239,13 @@ namespace HealthWellbeing.Migrations
                 name: "RestricaoAlimentar");
 
             migrationBuilder.DropTable(
-                name: "Specialities");
-
-            migrationBuilder.DropTable(
                 name: "UtenteSaude");
 
             migrationBuilder.DropTable(
                 name: "Alimento");
+
+            migrationBuilder.DropTable(
+                name: "Specialities");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
