@@ -7,7 +7,7 @@
 
     // VERIFICAÇÃO DE PERMISSÕES
     // Ajusta os nomes das Roles conforme tens na tua BD ("Admin", "Profissional", "Staff", etc.)
-    bool isStaff = User.IsInRole("Admin") || User.IsInRole("Profissional");
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
 }
 
 <div class="container mt-4">
@@ -135,13 +135,13 @@
                             </td>
                             <td class="text-center">
                                 <a asp-action="Details" asp-route-id="@item.SonoId" class="btn btn-primary btn-sm me-1" title="Ver Detalhes">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye"></i> Ver
                                 </a>
                                 <a asp-action="Edit" asp-route-id="@item.SonoId" class="btn btn-warning btn-sm me-1" title="Editar">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-edit"></i> Editar
                                 </a>
                                 <a asp-action="Delete" asp-route-id="@item.SonoId" class="btn btn-danger btn-sm" title="Apagar">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="fas fa-trash-alt"></i> Apagar
                                 </a>
                             </td>
                         </tr>

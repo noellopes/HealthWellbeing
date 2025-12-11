@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Registar Sono";
+
+    // 1. VERIFICAÇÃO DE PERMISSÕES
+    // Verifica se o utilizador logado é Admin ou Profissional
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -17,6 +21,24 @@
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="All" class="text-danger small"></div>
+
+    @* --- 2. BLOCO CONDICIONAL PARA SELEÇÃO DE UTENTE --- *@
+    @if (isStaff)
+    {
+        <div class="mb-3 p-3 bg-light border rounded">
+            <label asp-for="UtenteGrupo7Id" class="form-label fw-bold text-primary">
+                <i class="bi bi-person-lines-fill me-1"></i> Selecionar Utente *
+            </label>
+            <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id">
+                <option value="">-- Selecione um Utente --</option>
+            </select>
+            <span asp-validation-for="UtenteGrupo7Id" class="text-danger small"></span>
+            <div class="form-text text-muted">
+                Como Admin/Profissional, é obrigatório indicar a quem pertence este registo.
+            </div>
+        </div>
+    }
+    @* --- FIM DO BLOCO --- *@
 
     <div class="mb-3">
         <label asp-for="Data" class="form-label fw-bold">Data do Registo *</label>
