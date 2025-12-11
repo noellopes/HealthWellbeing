@@ -8,6 +8,18 @@
   </PropertyGroup>
 	
   <ItemGroup>
+    <Compile Remove="Views\TipoMaterial - Cópia\**" />
+    <Content Remove="Views\TipoMaterial - Cópia\**" />
+    <EmbeddedResource Remove="Views\TipoMaterial - Cópia\**" />
+    <None Remove="Views\TipoMaterial - Cópia\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.11" />
+    <Content Remove="Views\ExerciciosView.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.20" />

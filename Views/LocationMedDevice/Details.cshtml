@@ -1,0 +1,66 @@
+﻿@using HealthWellbeing.Models
+@model LocationMedDevice
+
+@{
+    // Título dinâmico
+    ViewData["Title"] = "Detalhes da Localização";
+
+    // Mensagem de sucesso opcional (por exemplo, após editar ou criar)
+    string? successMessage = Context.Request.Query["SuccessMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-black">
+        <h4 class="mb-0">
+            <i class="bi bi-geo-alt-fill me-2"></i> Informações da Localização do Dispositivo Médico
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.LocationMedDeviceID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.LocationMedDeviceID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.MedicalDeviceID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.MedicalDeviceID)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RoomId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.RoomId)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.InitialDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.InitialDate)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.EndDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndDate)</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+
+    <a asp-action="Edit" asp-route-id="@Model.LocationMedDeviceID" class="btn btn-sm btn-warning me-1">
+        <i class="bi bi-pencil-square"></i> Editar
+    </a>
+
+    <a asp-action="Delete" asp-route-id="@Model.LocationMedDeviceID" class="btn btn-sm btn-danger">
+        <i class="bi bi-trash"></i> Eliminar
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+    </a>
+</div>

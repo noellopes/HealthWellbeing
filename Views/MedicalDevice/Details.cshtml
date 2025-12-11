@@ -1,0 +1,145 @@
+﻿@using HealthWellbeingRoom.Models
+@model MedicalDevice;
+
+@{
+    ViewData["Title"] = "Detalhes do Dispositivo";
+
+    // Garante que pegamos a localização que ainda está aberta (EndDate == null)
+    LocationMedDevice? localizacao = Model.LocalizacaoDispMedicoMovel
+        .FirstOrDefault(l => l.EndDate == null);
+    string localizacaoNome = localizacao?.Room?.Name ?? "N/A"; //atribuido se não houver
+
+    // 2. Obtém o status calculado no modelo MedicalDevice.
+    string statusAtual = Model.CurrentStatus;
+}
+
+@* --- Secção de Mensagem de Sucesso (Usando TempData) --- *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-gear me-2"></i> Informações do Dispositivo
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
+            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SerialNumber)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.SerialNumber)</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Tipo de Material</dt> 
+            <dd class="col-sm-9">
+                @(Model.TypeMaterial?.Name ?? Model.TypeMaterialID.ToString())
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
+
+
+            @* ESTADO ATUAL (CurrentStatus)*@
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.CurrentStatus)</dt>
+            <dd class="col-sm-9">
+                @if (statusAtual.Contains("Em Manutenção"))
+                {
+                    <span class="badge bg-warning text-dark">@statusAtual</span>
+                }
+                else if (statusAtual.Contains("Alocado"))
+                {
+                    <span class="badge bg-danger">@statusAtual</span>
+                }
+                else
+                {
+                    @* "Em Armazenamento" *@
+                    <span class="badge bg-success">@statusAtual</span>
+                }
+            </dd>
+
+
+            @*LOCALIZAÇÃO (Nome da Sala) *@
+            <dt class="col-sm-3 fw-bold text-muted">Localização Atual</dt>
+            <dd class="col-sm-9">
+                @if (localizacaoNome != "N/A")
+                {
+                    <span class="fw-bold text-dark">@localizacaoNome</span>
+                }
+                else
+                {
+                    <span class="text-dark">Sem atribuição</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
+            <dd class="col-sm-9 text-wrap">@Html.DisplayFor(model => model.Observation)</dd> 
+
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+
+    @{
+        //Pode mover se NÃO estiver em Manutenção
+        bool podeMover = Model.CurrentStatus != "Em Manutenção";
+
+        //Só pode eliminar se estiver "Em Armazenamento"
+        //(Ou seja: Bloqueia se estiver 'Alocado' ou 'Em Manutenção')
+        bool podeEliminar = Model.CurrentStatus == "Em Armazenamento";
+    }
+
+    @* --- BOTÃO MOVER --- *@
+    @if (podeMover)
+    {
+        <a asp-controller="LocationMedDevice" asp-action="Create"
+           asp-route-id="@Model.MedicalDeviceID"
+           class="btn btn-sm btn-success me-1">
+            <i class="bi bi-geo-alt"></i> Mover
+        </a>
+    }
+    else
+    {
+        <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
+            <i class="bi bi-x-octagon"></i> Mover
+        </span>
+    }
+
+    @* --- BOTÃO EDITAR --- *@
+    <a asp-action="Edit" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+        <i class="bi bi-pencil-square"></i> Editar
+    </a>
+
+    @* --- BOTÃO ELIMINAR --- *@
+    @if (podeEliminar)
+    {
+        <a asp-action="Delete" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-danger">
+            <i class="bi bi-trash"></i> Eliminar
+        </a>
+    }
+    else
+    {
+        <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+            <i class="bi bi-trash"></i> Eliminar
+        </span>
+    }
+
+    @* --- BOTÃO VOLTAR --- *@
+    <a href="javascript:void(0);" onclick="history.back();" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
+    </a>
+</div>
