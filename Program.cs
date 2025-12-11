@@ -1,9 +1,13 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeingRoom;
 using HealthWellBeingRoom.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using static System.Formats.Asn1.AsnWriter;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +47,11 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddDefaultUI();
 
 builder.Services.AddControllersWithViews();
+
+// GROUP 1 - Filtering Service (Sort/Search)
+builder.Services.AddScoped<IRecordFilterService<Pathology>, PathologyFilterService>();
+builder.Services.AddScoped<IRecordFilterService<TreatmentType>, TreatmentTypeFilterService>();
+builder.Services.AddScoped<IRecordFilterService<TreatmentRecord>, TreatmentRecordFilterService>();
 
 var app = builder.Build();
 

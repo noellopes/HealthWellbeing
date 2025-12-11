@@ -1,0 +1,202 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.ZonaArmazenamento>
+
+@{
+    ViewData["Title"] = "Zonas de Armazenamento";
+}
+
+<style>
+    .btn-acao {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        padding: 4px 10px;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary mb-0">🏭 Zonas de Armazenamento</h2>
+        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">Nova Zona</a>
+    </div>
+
+    <!-- Barra de Pesquisa -->
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-2">
+
+            <!-- Pesquisa Nome -->
+            <div class="col-md-4">
+                <input type="text" name="searchNome" value="@ViewBag.SearchNome"
+                       class="form-control shadow-sm"
+                       placeholder="🔍 Procurar por nome..." />
+            </div>
+
+            <!-- Pesquisa Localização -->
+            <div class="col-md-4">
+                <input type="text" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao"
+                       class="form-control shadow-sm"
+                       placeholder="📍 Procurar por localização..." />
+            </div>
+
+            <!-- Dropdown Estado -->
+            <div class="col-md-2">
+                <select name="estado" class="form-control shadow-sm">
+                    <option value="todas" selected="@(ViewBag.Estado == "todas")">Todas</option>
+                    <option value="ativas" selected="@(ViewBag.Estado == "ativas")">Apenas Ativas</option>
+                    <option value="inativas" selected="@(ViewBag.Estado == "inativas")">Apenas Inativas</option>
+                </select>
+            </div>
+
+            <!-- Botões -->
+            <div class="col-md-2 d-flex justify-content-between">
+
+                <button type="submit" class="btn btn-primary w-50 me-2">
+                    OK
+                </button>
+
+                <a asp-action="Index" class="btn btn-outline-secondary w-50">
+                    Limpar
+                </a>
+
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Mensagens -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm">
+            @TempData["SuccessMessage"]
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+            @TempData["ErrorMessage"]
+            <button class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tabela -->
+    @if (Model.Items == null || !Model.Items.Any())
+    {
+        <div class="alert alert-warning text-center shadow-sm p-4"
+             role="alert"
+             style="font-size: 1.15rem; border-left: 6px solid #d39e00;">
+            ⚠️ <strong>Nenhuma zona encontrada!</strong>
+            <br />
+            Verifique os termos pesquisados e tente novamente.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Localização</th>
+                        <th>Capacidade (m³)</th>
+                        <th>Ativa</th>
+                        <th class="text-center" style="width: 250px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@item.Nome</td>
+                            <td>@item.LocalizacaoZonaArmazenamento?.Nome</td>
+                            <td>@item.CapacidadeMaxima m³</td>
+
+                            <td>
+                                @if (item.Ativa)
+                                {
+                                    <span class="badge bg-success">Ativa</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inativa</span>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger btn-acao">Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <!-- Paginação -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center">
+
+                <!-- Anterior -->
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-searchNome="@ViewBag.SearchNome"
+                       asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao"
+                       asp-route-estado="@ViewBag.Estado">
+                        Anterior
+                    </a>
+                </li>
+
+                <!-- Números -->
+                @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-searchNome="@ViewBag.SearchNome"
+                           asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao"
+                           asp-route-estado="@ViewBag.Estado">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <!-- Seguinte -->
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-searchNome="@ViewBag.SearchNome"
+                       asp-route-searchLocalizacao="@ViewBag.SearchLocalizacao"
+                       asp-route-estado="@ViewBag.Estado">
+                        Seguinte
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+
+</div>
+
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(a => new bootstrap.Alert(a).close());
+    }, 4000);
+</script>

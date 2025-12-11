@@ -1,0 +1,78 @@
+﻿@model HealthWellbeing.Models.TreatmentType
+
+@{
+    ViewData["Title"] = "Criar Tipo de Tratamento";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg border-0 rounded-4">
+
+        <div class="card-header bg-success text-white rounded-top-4 py-3">
+            <h4 class="mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Novo Tipo de Tratamento
+            </h4>
+        </div>
+
+        <div class="card-body p-4">
+
+            <form asp-action="Create">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- Nome -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-semibold"></label>
+                    <input asp-for="Name" class="form-control rounded-3" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Descrição -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Description" rows="3" class="form-control rounded-3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Duração Estimada -->
+                <div class="mb-3">
+                    <label asp-for="EstimatedDuration" class="form-label fw-semibold"></label>
+                    <input asp-for="EstimatedDuration" class="form-control rounded-3" type="number" min="1" max="480" />
+                    <span asp-validation-for="EstimatedDuration" class="text-danger"></span>
+                </div>
+
+                <!-- Prioridade -->
+                <div class="mb-3">
+                    <label asp-for="Priority" class="form-label fw-semibold"></label>
+                    <select asp-for="Priority" class="form-select rounded-3">
+                        <option value="">-- Selecione --</option>
+                        <option value="Urgente">Urgente</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Rotina">Rotina</option>
+                    </select>
+                    <span asp-validation-for="Priority" class="text-danger"></span>
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary rounded-3 px-4">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+
+                    <button type="submit" class="btn btn-success rounded-3 px-4">
+                        <i class="bi bi-check-circle"></i> Criar
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

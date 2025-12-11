@@ -1,0 +1,109 @@
+﻿@model HealthWellbeing.Models.ZonaArmazenamento
+
+@{
+    ViewData["Title"] = "Eliminar Zona de Armazenamento";
+}
+
+<style>
+    .delete-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .confirm-text {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 12px 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="card">
+        <div class="card-header">
+            🗑️ Eliminar Zona de Armazenamento
+        </div>
+
+        <div class="card-body">
+
+            <div class="confirm-text">
+                ⚠️ Tens a certeza que queres eliminar esta zona? Esta ação não pode ser desfeita.
+            </div>
+
+            <dl class="row mb-4">
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
+
+
+                <dt class="col-sm-4 details-label">Localização</dt>
+                <dd class="col-sm-8 details-value">
+                    @Model.LocalizacaoZonaArmazenamento?.Nome
+                </dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
+                <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima m³</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
+                <dd class="col-sm-8 details-value">
+                    @if (Model.Ativa)
+                    {
+                        <span class="badge bg-success">Ativa</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inativa</span>
+                    }
+                </dd>
+
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-end mt-3">
+                <input type="hidden" asp-for="Id" />
+
+                <button type="submit" class="btn btn-danger me-2">
+                    Eliminar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </form>
+
+        </div>
+    </div>
+</div>

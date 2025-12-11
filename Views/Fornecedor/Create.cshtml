@@ -1,0 +1,86 @@
+﻿@model HealthWellbeing.Models.Fornecedor
+
+@{
+    ViewData["Title"] = "Adicionar Novo Fornecedor";
+}
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #198754;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="create-container">
+    <div class="card">
+        <div class="card-header">
+            ➕ Adicionar Fornecedor
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="NomeEmpresa" class="form-label">Nome da empresa</label>
+                    <input asp-for="NomeEmpresa" class="form-control" />
+                    <span asp-validation-for="NomeEmpresa" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NIF" class="form-label"></label>
+                    <input asp-for="NIF" class="form-control" />
+                    <span asp-validation-for="NIF" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Morada" class="form-label"></label>
+                    <input asp-for="Morada" class="form-control" />
+                    <span asp-validation-for="Morada" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Telefone" class="form-label"></label>
+                    <input asp-for="Telefone" class="form-control" />
+                    <span asp-validation-for="Telefone" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success btn-spacing">Adicionar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

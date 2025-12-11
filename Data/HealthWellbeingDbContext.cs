@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Utils.Group1.Interfaces;
+using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
+using System.Linq.Expressions;
 
 namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
     {
-        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
+        public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
         }

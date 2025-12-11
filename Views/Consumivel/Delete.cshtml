@@ -1,0 +1,83 @@
+﻿@model HealthWellbeing.Models.Consumivel
+
+@{
+    ViewData["Title"] = "Eliminar Consumível";
+}
+
+<style>
+    .delete-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .confirm-text {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 12px 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="card">
+        <div class="card-header">🗑️ Eliminar Consumível</div>
+        <div class="card-body">
+            <div class="confirm-text">
+                ⚠️ Tens a certeza que queres eliminar este consumível? Esta ação não pode ser desfeita.
+            </div>
+
+            <dl class="row mb-4">
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.Nome)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.Nome)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.Descricao)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.Descricao)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.QuantidadeMaxima)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.QuantidadeMaxima)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.QuantidadeAtual)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.QuantidadeAtual)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.QuantidadeMinima)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.QuantidadeMinima)</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(m => m.CategoriaConsumivel)</dt>
+                <dd class="col-sm-8 details-value">@Html.DisplayFor(m => m.CategoriaConsumivel.CategoriaId)</dd>
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-end mt-3">
+                <input type="hidden" asp-for="ConsumivelId" />
+                <button type="submit" class="btn btn-danger me-2">Eliminar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
