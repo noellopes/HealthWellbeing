@@ -4,19 +4,16 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.ApplicationDb
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251210164526_MigrationUpdateApp")]
-    partial class MigrationUpdateApp
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
