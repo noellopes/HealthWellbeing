@@ -48,7 +48,16 @@ namespace HealthWellbeing.Controllers
         // GET: MoodEntries/Create
         public IActionResult Create()
         {
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName");
             return View();
         }
 
@@ -57,7 +66,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Triggers")] MoodEntry moodEntry)
+        public async Task<IActionResult> Create([Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Trigger")] MoodEntry moodEntry)
         {
             if (ModelState.IsValid)
             {
@@ -82,7 +91,19 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", moodEntry.PatientId);
+
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", moodEntry.PatientId);
+            // Has third parameter ↑ to pre-select current patient
+
             return View(moodEntry);
         }
 
@@ -91,7 +112,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Triggers")] MoodEntry moodEntry)
+        public async Task<IActionResult> Edit(int id, [Bind("MoodEntryId,PatientId,EntryDateTime,MoodScore,Emotion,Notes,Trigger")] MoodEntry moodEntry)
         {
             if (id != moodEntry.MoodEntryId)
             {

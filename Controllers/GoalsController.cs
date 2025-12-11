@@ -48,7 +48,16 @@ namespace HealthWellbeing.Controllers
         // GET: Goals/Create
         public IActionResult Create()
         {
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName");
             return View();
         }
 
@@ -77,12 +86,25 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
+            // FETCH THE GOAL FROM DATABASE FIRST!
             var goal = await _context.Goals.FindAsync(id);
             if (goal == null)
             {
                 return NotFound();
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", goal.PatientId);
+
+            // NOW you can use goal.PatientId
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", goal.PatientId);
+
             return View(goal);
         }
 

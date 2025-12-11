@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -25,17 +26,29 @@ namespace HealthWellbeing.Models
         public string Email { get; set; } = null!;
 
         [Phone]
+        [MaxLength(15, ErrorMessage = "Phone number cannot exceed 15 characters.")]
+        [Display(Name = "Phone Number")]
         public string? Phone { get; set; }
 
+        [Required(ErrorMessage = "Professional type is required.")]
+        [Display(Name = "Professional Type")]
         public ProfessionalType Type { get; set; }
 
-        [MaxLength(200)]
-        public string? Specialization { get; set; }
+        [Required(ErrorMessage = "Specialization is required.")]
+        [Display(Name = "Specialization")]
+        public Specialization Specialization { get; set; }  // CHANGED: Now enum
 
-        [MaxLength(100)]
+        [MaxLength(50, ErrorMessage = "License number cannot exceed 50 characters.")]
+        [Display(Name = "License Number")]
         public string? LicenseNumber { get; set; }
 
-        public bool IsActive { get; set; }
+        [Display(Name = "Active Status")]
+        public bool IsActive { get; set; } = true;
+
+        // Computed Property
+        [NotMapped]
+        [Display(Name = "Full Name")]
+        public string FullName => $"{FirstName} {LastName}";
 
         // Navigation properties
         public virtual ICollection<TherapySession>? TherapySessions { get; set; }
@@ -43,10 +56,52 @@ namespace HealthWellbeing.Models
 
     public enum ProfessionalType
     {
+        [Display(Name = "Psychologist")]
         Psychologist,
+
+        [Display(Name = "Therapist")]
         Therapist,
+
+        [Display(Name = "Psychiatrist")]
         Psychiatrist,
+
+        [Display(Name = "Life Coach")]
         Coach,
+
+        [Display(Name = "Counselor")]
         Counselor
+    }
+
+    public enum Specialization
+    {
+        [Display(Name = "Anxiety & Stress Management")]
+        AnxietyStress,
+
+        [Display(Name = "Depression Treatment")]
+        Depression,
+
+        [Display(Name = "Trauma & PTSD")]
+        TraumaPTSD,
+
+        [Display(Name = "Addiction Recovery")]
+        Addiction,
+
+        [Display(Name = "Family Therapy")]
+        FamilyTherapy,
+
+        [Display(Name = "Child & Adolescent Psychology")]
+        ChildPsychology,
+
+        [Display(Name = "Couples Counseling")]
+        CouplesCounseling,
+
+        [Display(Name = "Eating Disorders")]
+        EatingDisorders,
+
+        [Display(Name = "Grief & Loss")]
+        GriefLoss,
+
+        [Display(Name = "General Mental Health")]
+        General
     }
 }

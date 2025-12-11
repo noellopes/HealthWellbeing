@@ -48,13 +48,22 @@ namespace HealthWellbeing.Controllers
         // GET: CrisisAlerts/Create
         public IActionResult Create()
         {
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
+            // Prepare patient dropdown with FullName
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName");
+
             return View();
         }
 
         // POST: CrisisAlerts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AlertId,PatientId,AlertDateTime,Level,Description,IsResolved,ResolvedDateTime,Resolution")] CrisisAlert crisisAlert)
@@ -65,7 +74,19 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", crisisAlert.PatientId);
+
+            // Re-populate dropdown if validation fails
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", crisisAlert.PatientId);
+
             return View(crisisAlert);
         }
 
@@ -82,13 +103,23 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", crisisAlert.PatientId);
+
+            // Prepare patient dropdown with FullName
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", crisisAlert.PatientId);
+
             return View(crisisAlert);
         }
 
         // POST: CrisisAlerts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AlertId,PatientId,AlertDateTime,Level,Description,IsResolved,ResolvedDateTime,Resolution")] CrisisAlert crisisAlert)
@@ -118,7 +149,19 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", crisisAlert.PatientId);
+
+            // Re-populate dropdown if validation fails
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", crisisAlert.PatientId);
+
             return View(crisisAlert);
         }
 

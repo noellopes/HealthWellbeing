@@ -39,12 +39,16 @@
             </div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control"></select>
+                <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<ProfessionalType>()">
+                    <option value="">-Select Professional Type-</option>
+                </select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Specialization" class="control-label"></label>
-                <input asp-for="Specialization" class="form-control" />
+                <select asp-for="Specialization" class="form-control" asp-items="Html.GetEnumSelectList<Specialization>()">
+                    <option value="">-Select Specialization-</option>
+                </select>
                 <span asp-validation-for="Specialization" class="text-danger"></span>
             </div>
             <div class="form-group">

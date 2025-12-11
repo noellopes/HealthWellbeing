@@ -49,14 +49,35 @@ namespace HealthWellbeing.Controllers
         // GET: TherapySessions/Create
         public IActionResult Create()
         {
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email");
-            ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email");
+            // Create Patient dropdown with FullName
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName");
+
+            // Create Professional dropdown with FullName and Type
+            var professionals = _context.MentalHealthProfessionals
+                .Where(m => m.IsActive)
+                .ToList()  // Bring to memory first
+                .Select(m => new {
+                    m.ProfessionalId,
+                    FullName = $"{m.FirstName} {m.LastName} ({m.Type})"
+                })
+                .OrderBy(m => m.FullName)
+                .ToList();
+
+            ViewData["ProfessionalId"] = new SelectList(professionals, "ProfessionalId", "FullName");
+
             return View();
         }
 
         // POST: TherapySessions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SessionId,PatientId,ProfessionalId,ScheduledDateTime,DurationMinutes,Status,Type,Notes,CompletedDateTime")] TherapySession therapySession)
@@ -67,8 +88,31 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
-            ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
+
+            // Re-populate dropdowns if validation fails
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", therapySession.PatientId);
+
+            var professionals = _context.MentalHealthProfessionals
+                .Where(m => m.IsActive)
+                .ToList()  // Bring to memory first
+                .Select(m => new {
+                    m.ProfessionalId,
+                    FullName = $"{m.FirstName} {m.LastName} ({m.Type})"
+                })
+                .OrderBy(m => m.FullName)
+                .ToList();
+
+            ViewData["ProfessionalId"] = new SelectList(professionals, "ProfessionalId", "FullName", therapySession.ProfessionalId);
+
             return View(therapySession);
         }
 
@@ -85,8 +129,32 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
-            ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
+
+            // Create Patient dropdown with FullName
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", therapySession.PatientId);
+
+            // Create Professional dropdown with FullName and Type
+            var professionals = _context.MentalHealthProfessionals
+                .Where(m => m.IsActive)
+                .ToList()  // Bring to memory first
+                .Select(m => new {
+                    m.ProfessionalId,
+                    FullName = $"{m.FirstName} {m.LastName} ({m.Type})"
+                })
+                .OrderBy(m => m.FullName)
+                .ToList();
+
+            ViewData["ProfessionalId"] = new SelectList(professionals, "ProfessionalId", "FullName", therapySession.ProfessionalId);
+
             return View(therapySession);
         }
 
@@ -122,8 +190,33 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PatientId"] = new SelectList(_context.Patients, "PatientId", "Email", therapySession.PatientId);
-            ViewData["ProfessionalId"] = new SelectList(_context.MentalHealthProfessionals, "ProfessionalId", "Email", therapySession.ProfessionalId);
+
+            // Re-populate dropdowns if validation fails
+            // Patient dropdown with FullName
+            var patients = _context.Patients
+                .Where(p => p.IsActive)
+                .Select(p => new {
+                    p.PatientId,
+                    FullName = p.FirstName + " " + p.LastName
+                })
+                .OrderBy(p => p.FullName)
+                .ToList();
+
+            ViewData["PatientId"] = new SelectList(patients, "PatientId", "FullName", therapySession.PatientId);
+
+            // Professional dropdown with FullName and Type
+            var professionals = _context.MentalHealthProfessionals
+                .Where(m => m.IsActive)
+                .ToList()  // Bring to memory first to properly convert enum
+                .Select(m => new {
+                    m.ProfessionalId,
+                    FullName = $"{m.FirstName} {m.LastName} ({m.Type})"
+                })
+                .OrderBy(m => m.FullName)
+                .ToList();
+
+            ViewData["ProfessionalId"] = new SelectList(professionals, "ProfessionalId", "FullName", therapySession.ProfessionalId);
+
             return View(therapySession);
         }
 
