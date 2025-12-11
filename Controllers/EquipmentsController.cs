@@ -97,18 +97,12 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments/Details/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id, int? roomId, string origem)
         {
-
-            //Adicionado por Nuno abre
-            var equipamento = await _context.Equipment.FindAsync(id);
-            if (equipamento == null) return NotFound();
-            ViewBag.Origem = origem;
-            //Adicionado por Nuno fecha
-
             if (id == null)
             {
-                /* Retornar para minha page do not found */
+                // Retornar para a página personalizada de NotFound
                 return View("NotFound");
             }
 
@@ -117,16 +111,15 @@ namespace HealthWellbeingRoom.Controllers
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .FirstOrDefaultAsync(m => m.EquipmentId == id);
+
             if (equipment == null)
             {
-                /* Retornar para minha page do not found */
                 return View("NotFound");
             }
 
-            //Adicionado por Nuno abre
+            // Contexto adicional para navegação
             ViewBag.Origem = origem;
-            ViewBag.RoomId = roomId ?? equipamento.RoomId; // garante que tem sempre o RoomId
-            //Adicionado por Nuno fecha
+            ViewBag.RoomId = roomId ?? equipment.RoomId; // garante que tens sempre RoomId
 
             return View(equipment);
         }
