@@ -467,9 +467,9 @@ namespace HealthWellbeingRoom.Controllers
                 return NotFound();
 
             ViewData["RoomName"] = room.Name;   // passa o nome da sala para a View
-
             ViewBag.RoomId = id;
 
+            // Carrega equipamentos associados à sala
             var equipamentos = _context.Equipment
                 .Include(e => e.EquipmentType)
                 .Include(e => e.EquipmentStatus)
@@ -482,13 +482,29 @@ namespace HealthWellbeingRoom.Controllers
 
         //----------------------------------------------------------MEDICAL DEVICES---------------------------------------------------------------------------------
 
-
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public IActionResult MedicalDevices(int id)
         {
+            // Verifica se a sala existe
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
+            if (room == null)
+                return NotFound();
+
+            ViewData["RoomName"] = room.Name;
             ViewBag.RoomId = id;
-            return View();
+
+            // Carrega dispositivos médicos associados à sala via LocationMedDevice
+            var dispositivos = _context.MedicalDevices
+                .Include(d => d.TypeMaterial)
+                .Include(d => d.LocalizacaoDispMedicoMovel)
+                    .ThenInclude(l => l.Room)
+                .Where(d => d.LocalizacaoDispMedicoMovel
+                    .Any(l => l.RoomId == id && l.EndDate == null)) // apenas localização ativa
+                .ToList();
+
+            return View(dispositivos);
         }
+
 
         //----------------------------------------------------------RESERVATIONS---------------------------------------------------------------------------------
 

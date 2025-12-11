@@ -145,6 +145,7 @@ namespace HealthWellBeingRoom.Controllers
             return View(dispositivo);
         }
 
+
         // --- 3. CRIAR (Create) - GET ---
         public IActionResult Create()
         {
