@@ -32,6 +32,11 @@ public class ProfissionalExecutantesController : Controller
         int totalItems = await profissionaisQuery.CountAsync();
         var paginationInfo = new PaginationInfo<ProfissionalExecutante>(page, totalItems, itemsPerPage);
 
+
+        ViewBag.TotalProfissionais = await _context.ProfissionalExecutante.CountAsync();
+        ViewBag.TotalFuncoes = await _context.Funcoes.CountAsync();
+
+
         paginationInfo.Items = await profissionaisQuery
             .Skip(paginationInfo.ItemsToSkip)
             .Take(paginationInfo.ItemsPerPage)
@@ -58,11 +63,12 @@ public class ProfissionalExecutantesController : Controller
         ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao");
         return View();
     }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
     {
+        Console.WriteLine(">>> ENTROU NO POST DO CREATE <<<");
+
         if (ModelState.IsValid)
         {
             _context.Add(profissionalExecutante);
@@ -88,35 +94,62 @@ public class ProfissionalExecutantesController : Controller
         return View(profissional);
     }
 
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, [Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
     {
-        if (id != profissionalExecutante.ProfissionalExecutanteId) return NotFound();
+        if (id != profissionalExecutante.ProfissionalExecutanteId)
+            return NotFound();
+
+        // ---------------------------------------------------------------------------------
+        // >> 🚀 DIAGNÓSTICO: Verificando as Falhas de Validação <<
+        // ---------------------------------------------------------------------------------
+        if (!ModelState.IsValid)
+        {
+            Console.WriteLine("\n=======================================================");
+            Console.WriteLine(">>> FALHA NA VALIDAÇÃO DO MODELO PROFISSIONAL EXECUTANTE <<<");
+            // Itera sobre todos os erros de validação e imprime-os no console
+            foreach (var modelStateEntry in ModelState.Where(e => e.Value.Errors.Count > 0))
+            {
+                var key = modelStateEntry.Key;
+                var errors = modelStateEntry.Value.Errors;
+                Console.WriteLine($"Campo: {key}");
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($" - ERRO: {error.ErrorMessage}");
+                }
+            }
+            Console.WriteLine("=======================================================\n");
+        }
+        // ---------------------------------------------------------------------------------
+
 
         if (ModelState.IsValid)
         {
-            _context.Update(profissionalExecutante);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                // Se for válido, as alterações serão salvas.
+                _context.Update(profissionalExecutante);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.ProfissionalExecutante.Any(e => e.ProfissionalExecutanteId == profissionalExecutante.ProfissionalExecutanteId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
+        // Se a validação falhar, volta para a View para mostrar os erros.
         ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao", profissionalExecutante.FuncaoId);
         return View(profissionalExecutante);
-    }
-
-    // GET opcional apenas para confirmação, pode remover se não precisar
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null) return NotFound();
-
-        var profissional = await _context.ProfissionalExecutante
-            .Include(p => p.Funcao)
-            .FirstOrDefaultAsync(p => p.ProfissionalExecutanteId == id);
-
-        if (profissional == null) return NotFound();
-
-        return View(profissional); // se tiver view de confirmação
     }
 
     [HttpPost, ActionName("Delete")]
