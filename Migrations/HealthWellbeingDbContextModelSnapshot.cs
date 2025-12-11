@@ -706,6 +706,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<int?>("ObjetivoFisicoId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UtenteGrupo7Id");
 
                     b.HasIndex("ObjetivoFisicoId");

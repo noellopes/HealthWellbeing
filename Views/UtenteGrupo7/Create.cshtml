@@ -4,6 +4,7 @@
     ViewData["Title"] = "Criar Utente";
     // MUDANÇA: Cast explicito para List<SelectListItem>
     var problemasSaude = ViewBag.ProblemasSaudeCheckboxes as List<SelectListItem>;
+    string? successMessage = Context.Request.Query["SuccessMessage"];
 }
 
 <div class="container mt-4">

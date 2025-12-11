@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251210175034_InitialCreate")]
+    [Migration("20251210191516_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -708,6 +708,10 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<int?>("ObjetivoFisicoId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UtenteGrupo7Id");
 

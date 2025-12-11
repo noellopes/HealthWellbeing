@@ -4,6 +4,9 @@
     {
         public int UtenteGrupo7Id { get; set; }
 
+        // Guarda o ID do utilizador logado (AspNetUsers)
+        public string UserId { get; set; }
+
         public string Nome { get; set; }
 
         public ICollection<Sono>? Sonos { get; set; }

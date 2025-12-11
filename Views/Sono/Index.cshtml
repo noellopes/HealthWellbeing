@@ -4,11 +4,25 @@
     ViewData["Title"] = "Registos de Sono";
     var successMessage = TempData["SuccessMessage"];
     var errorMessage = TempData["ErrorMessage"];
+
+    // VERIFICAÇÃO DE PERMISSÕES
+    // Ajusta os nomes das Roles conforme tens na tua BD ("Admin", "Profissional", "Staff", etc.)
+    bool isStaff = User.IsInRole("Admin") || User.IsInRole("Profissional");
 }
 
 <div class="container mt-4">
     <h2 class="mb-3 text-primary"><i class="bi bi-moon-stars-fill"></i> Registos de Sono</h2>
-    <p class="text-muted">Histórico de sono dos utentes:</p>
+    <p class="text-muted">
+        @if (isStaff)
+        {
+            <span>Gestão de registos de sono dos utentes:</span>
+        }
+        else
+        {
+
+            <span>O meu histórico de sono:</span>
+        }
+    </p>
 
     @* Mensagens de Sucesso *@
     @if (successMessage != null)
@@ -34,7 +48,7 @@
         </div>
     }
 
-    @* Barra de Ferramentas (Pesquisa e Botões) *@
+    @* Barra de Ferramentas *@
     <div class="d-flex justify-content-end align-items-center mb-3">
         <div>
             <a class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
@@ -49,19 +63,32 @@
         </div>
     </div>
 
-    @* Formulário de Pesquisa (Expandível) *@
-    <div class="collapse mb-3" id="searchForm">
+    @* Formulário de Pesquisa *@
+    <div class="collapse mb-3 @(ViewBag.SearchData != null || ViewBag.CurrentUtenteFilter != null ? "show" : "")" id="searchForm">
         <div class="card card-body bg-light">
             <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+                @* 1. DROPDOWN DE UTENTES (Só aparece para Staff) *@
+                @if (isStaff)
+                {
+                    <div class="col-md-4">
+                        <label for="searchUtenteId" class="form-label fw-bold">Filtrar por Utente</label>
+                        <select name="searchUtenteId" id="searchUtenteId" class="form-select" asp-items="ViewBag.ListaUtentes">
+                            <option value="">-- Todos os Utentes --</option>
+                        </select>
+                    </div>
+                }
+
                 <div class="col-md-4">
                     <label for="searchData" class="form-label fw-bold">Filtrar por Data</label>
                     <input type="date" id="searchData" name="searchData" value="@ViewBag.SearchData" class="form-control" />
                 </div>
-                <div class="col-md-8 d-flex gap-2">
+
+                <div class="col-md-4 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-search"></i> Pesquisar
                     </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar Filtros</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
                 </div>
             </form>
         </div>
@@ -73,11 +100,15 @@
             <table class="table table-striped table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
+                        @* 2. CABEÇALHO UTENTE (Só aparece para Staff) *@
+                        @if (isStaff)
+                        {
+                            <th>Utente</th>
+                        }
                         <th>Data</th>
                         <th>Hora Deitar</th>
                         <th>Hora Levantar</th>
                         <th>Total Horas</th>
-                        <th>Utente (ID)</th>
                         <th class="text-center" style="width: 220px;">Ações</th>
                     </tr>
                 </thead>
@@ -85,6 +116,15 @@
                     @foreach (var item in Model.Items)
                     {
                         <tr>
+                            @* 3. COLUNA UTENTE (Só aparece para Staff) *@
+                            @if (isStaff)
+                            {
+                                <td>
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    @item.UtenteGrupo7?.Nome
+                                </td>
+                            }
+
                             <td class="fw-bold">@item.Data.ToString("dd/MM/yyyy")</td>
                             <td>@item.HoraDeitar.ToString(@"hh\:mm")</td>
                             <td>@item.HoraLevantar.ToString(@"hh\:mm")</td>
@@ -93,19 +133,15 @@
                                     @item.HorasSono.ToString(@"hh\:mm")
                                 </span>
                             </td>
-                            <td>
-                                @* Se tiveres acesso ao nome do utente via navegação, usa item.UtenteGrupo7.Nome *@
-                                <span class="">@item.UtenteGrupo7.Nome</span>
-                            </td>
                             <td class="text-center">
                                 <a asp-action="Details" asp-route-id="@item.SonoId" class="btn btn-primary btn-sm me-1" title="Ver Detalhes">
-                                    <i class="fas fa-eye"></i> Ver
+                                    <i class="fas fa-eye"></i>
                                 </a>
                                 <a asp-action="Edit" asp-route-id="@item.SonoId" class="btn btn-warning btn-sm me-1" title="Editar">
-                                    <i class="fas fa-edit"></i> Editar
+                                    <i class="fas fa-edit"></i>
                                 </a>
                                 <a asp-action="Delete" asp-route-id="@item.SonoId" class="btn btn-danger btn-sm" title="Apagar">
-                                    <i class="fas fa-trash-alt"></i> Apagar
+                                    <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>
                         </tr>
@@ -113,6 +149,7 @@
                 </tbody>
             </table>
 
+            @* 4. PAGINAÇÃO ATUALIZADA (Para não perder os filtros) *@
             <nav aria-label="Navegação de páginas">
                 <ul class="pagination justify-content-center my-3">
                     @* Botão Início *@
@@ -123,11 +160,14 @@
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchData="@ViewBag.SearchData">Início</a>
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchData="@ViewBag.SearchData"
+                               asp-route-searchUtenteId="@ViewBag.CurrentUtenteFilter">Início</a>
                         </li>
                     }
 
-                    @* Números das Páginas *@
+                    @* Loop Paginas *@
                     @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                     {
                         if (p == Model.CurrentPage)
@@ -137,7 +177,10 @@
                         else
                         {
                             <li class="page-item">
-                                <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchData="@ViewBag.SearchData">@p</a>
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchData="@ViewBag.SearchData"
+                                   asp-route-searchUtenteId="@ViewBag.CurrentUtenteFilter">@p</a>
                             </li>
                         }
                     }
@@ -150,7 +193,10 @@
                     else
                     {
                         <li class="page-item">
-                            <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchData="@ViewBag.SearchData">Fim</a>
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchData="@ViewBag.SearchData"
+                               asp-route-searchUtenteId="@ViewBag.CurrentUtenteFilter">Fim</a>
                         </li>
                     }
                 </ul>
@@ -163,9 +209,9 @@
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
                 Nenhum registo de sono encontrado.
-                @if (!string.IsNullOrEmpty(ViewBag.SearchData))
+                @if (!string.IsNullOrEmpty(ViewBag.SearchData) || ViewBag.CurrentUtenteFilter != null)
                 {
-                    <span>Tente alterar a data da pesquisa.</span>
+                    <span>Tente alterar os filtros de pesquisa.</span>
                 }
             </div>
         </div>
