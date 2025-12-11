@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class initialGrupo5 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,6 +26,20 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CategoriaConsumivel",
+                columns: table => new
+                {
+                    CategoriaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoriaConsumivel", x => x.CategoriaId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EquipmentStatus",
                 columns: table => new
                 {
@@ -39,6 +53,36 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Fornecedor",
+                columns: table => new
+                {
+                    FornecedorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeEmpresa = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    Morada = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Telefone = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fornecedor", x => x.FornecedorId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LocalizacaoZonaArmazenamento",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocalizacaoZonaArmazenamento", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Manufacturer",
                 columns: table => new
                 {
@@ -49,6 +93,40 @@ namespace HealthWellbeingRoom.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Manufacturer", x => x.ManufacturerId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Nurse",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProfessionalLicense = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Specialty = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Nurse", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Pathology",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Severity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pathology", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -147,6 +225,39 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Stock",
+                columns: table => new
+                {
+                    StockId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConsumivelID = table.Column<int>(type: "int", nullable: false),
+                    ZonaID = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeMinima = table.Column<int>(type: "int", nullable: false),
+                    DataUltimaAtualizacao = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stock", x => x.StockId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TreatmentType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    EstimatedDuration = table.Column<int>(type: "int", nullable: false),
+                    Priority = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TreatmentType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TypeMaterial",
                 columns: table => new
                 {
@@ -183,6 +294,53 @@ namespace HealthWellbeingRoom.Migrations
                         column: x => x.CategoriaAlimentoId,
                         principalTable: "CategoriaAlimento",
                         principalColumn: "CategoriaID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Consumivel",
+                columns: table => new
+                {
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CategoriaId = table.Column<int>(type: "int", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    QuantidadeMaxima = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeMinima = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Consumivel", x => x.ConsumivelId);
+                    table.ForeignKey(
+                        name: "FK_Consumivel_CategoriaConsumivel_CategoriaId",
+                        column: x => x.CategoriaId,
+                        principalTable: "CategoriaConsumivel",
+                        principalColumn: "CategoriaId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ZonaArmazenamento",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    LocalizacaoZonaArmazenamentoId = table.Column<int>(type: "int", nullable: false),
+                    CapacidadeMaxima = table.Column<double>(type: "float", nullable: false),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ZonaArmazenamento", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ZonaArmazenamento_LocalizacaoZonaArmazenamento_LocalizacaoZonaArmazenamentoId",
+                        column: x => x.LocalizacaoZonaArmazenamentoId,
+                        principalTable: "LocalizacaoZonaArmazenamento",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -246,6 +404,51 @@ namespace HealthWellbeingRoom.Migrations
                         column: x => x.SpecialtyId,
                         principalTable: "Specialty",
                         principalColumn: "SpecialtyId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TreatmentRecord",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NurseId = table.Column<int>(type: "int", nullable: false),
+                    TreatmentTypeId = table.Column<int>(type: "int", nullable: false),
+                    PathologyId = table.Column<int>(type: "int", nullable: true),
+                    TreatmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AdditionalNotes = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    EstimatedDuration = table.Column<int>(type: "int", nullable: true),
+                    Observations = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CompletedDuration = table.Column<int>(type: "int", nullable: true),
+                    CanceledReason = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    CanceledAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedBy = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TreatmentRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_Nurse_NurseId",
+                        column: x => x.NurseId,
+                        principalTable: "Nurse",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_Pathology_PathologyId",
+                        column: x => x.PathologyId,
+                        principalTable: "Pathology",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TreatmentRecord_TreatmentType_TreatmentTypeId",
+                        column: x => x.TreatmentTypeId,
+                        principalTable: "TreatmentType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -332,6 +535,58 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoomHistories",
+                columns: table => new
+                {
+                    RoomHistoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Responsible = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResponsibleId = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomHistories", x => x.RoomHistoryId);
+                    table.ForeignKey(
+                        name: "FK_RoomHistories_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UsoConsumivel",
+                columns: table => new
+                {
+                    UsoConsumivelId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TreatmentRecordId = table.Column<int>(type: "int", nullable: false),
+                    ConsumivelID = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeUsada = table.Column<int>(type: "int", nullable: false),
+                    DataConsumo = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsoConsumivel", x => x.UsoConsumivelId);
+                    table.ForeignKey(
+                        name: "FK_UsoConsumivel_Consumivel_ConsumivelID",
+                        column: x => x.ConsumivelID,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UsoConsumivel_TreatmentRecord_TreatmentRecordId",
+                        column: x => x.TreatmentRecordId,
+                        principalTable: "TreatmentRecord",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LocationMedDevice",
                 columns: table => new
                 {
@@ -369,6 +624,17 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_Alimento_CategoriaAlimentoId",
                 table: "Alimento",
                 column: "CategoriaAlimentoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoriaConsumivel_Nome",
+                table: "CategoriaConsumivel",
+                column: "Nome",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Consumivel_CategoriaId",
+                table: "Consumivel",
+                column: "CategoriaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Equipment_EquipmentStatusId",
@@ -430,6 +696,41 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_Room_SpecialtyId",
                 table: "Room",
                 column: "SpecialtyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomHistories_RoomId",
+                table: "RoomHistories",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_NurseId",
+                table: "TreatmentRecord",
+                column: "NurseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_PathologyId",
+                table: "TreatmentRecord",
+                column: "PathologyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TreatmentRecord_TreatmentTypeId",
+                table: "TreatmentRecord",
+                column: "TreatmentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsoConsumivel_ConsumivelID",
+                table: "UsoConsumivel",
+                column: "ConsumivelID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UsoConsumivel_TreatmentRecordId",
+                table: "UsoConsumivel",
+                column: "TreatmentRecordId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ZonaArmazenamento_LocalizacaoZonaArmazenamentoId",
+                table: "ZonaArmazenamento",
+                column: "LocalizacaoZonaArmazenamentoId");
         }
 
         /// <inheritdoc />
@@ -442,6 +743,9 @@ namespace HealthWellbeingRoom.Migrations
                 name: "Equipment");
 
             migrationBuilder.DropTable(
+                name: "Fornecedor");
+
+            migrationBuilder.DropTable(
                 name: "LocationMedDevice");
 
             migrationBuilder.DropTable(
@@ -449,6 +753,18 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
+
+            migrationBuilder.DropTable(
+                name: "RoomHistories");
+
+            migrationBuilder.DropTable(
+                name: "Stock");
+
+            migrationBuilder.DropTable(
+                name: "UsoConsumivel");
+
+            migrationBuilder.DropTable(
+                name: "ZonaArmazenamento");
 
             migrationBuilder.DropTable(
                 name: "Alimento");
@@ -464,6 +780,15 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Room");
+
+            migrationBuilder.DropTable(
+                name: "Consumivel");
+
+            migrationBuilder.DropTable(
+                name: "TreatmentRecord");
+
+            migrationBuilder.DropTable(
+                name: "LocalizacaoZonaArmazenamento");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
@@ -485,6 +810,18 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Specialty");
+
+            migrationBuilder.DropTable(
+                name: "CategoriaConsumivel");
+
+            migrationBuilder.DropTable(
+                name: "Nurse");
+
+            migrationBuilder.DropTable(
+                name: "Pathology");
+
+            migrationBuilder.DropTable(
+                name: "TreatmentType");
         }
     }
 }
