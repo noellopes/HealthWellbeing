@@ -120,29 +120,58 @@ namespace HealthWellBeingRoom.Controllers
 
 
         // --- 2. DETALHES (Read/Details) ---
-        public async Task<IActionResult> Details(int? id)
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return View("NotFound");
+        //    }
+
+        //    var dispositivo = await _context.MedicalDevices
+        //        .Include(m => m.TypeMaterial)
+
+        //        // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
+        //        .Include(md => md.LocalizacaoDispMedicoMovel
+        //             .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
+        //        )
+        //        .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
+        //        .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
+
+        //    if (dispositivo == null)
+        //    {
+        //        return View("NotFound");
+        //    }
+
+        //    return View(dispositivo);
+        //}
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public async Task<IActionResult> Details(int? id, int? roomId, string origem)
         {
             if (id == null)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            var dispositivo = await _context.MedicalDevices
+            var medicalDevice = await _context.MedicalDevices
+                .Where(m => m.MedicalDeviceID == id)
                 .Include(m => m.TypeMaterial)
+                .Include(m => m.LocalizacaoDispMedicoMovel
+                    .Where(loc => loc.EndDate == null)) // apenas localização ativa
+                    .ThenInclude(loc => loc.Room)
+                .FirstOrDefaultAsync();
 
-                // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
-                .Include(md => md.LocalizacaoDispMedicoMovel
-                     .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
-                )
-                .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
-                .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
-
-            if (dispositivo == null)
+            if (medicalDevice == null)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            return View(dispositivo);
+            // Contexto adicional para navegação
+            ViewBag.Origem = origem;
+            ViewBag.RoomId = roomId ?? medicalDevice.LocalizacaoDispMedicoMovel
+                .FirstOrDefault(l => l.EndDate == null)?.RoomId;
+
+            return View(medicalDevice);
         }
 
         // --- 3. CRIAR (Create) - GET ---
@@ -397,6 +426,70 @@ namespace HealthWellBeingRoom.Controllers
         private bool MedicalDevicesExists(int id)
         {
             return _context.MedicalDevices.Any(e => e.MedicalDeviceID == id);
+        }
+
+
+        // GET: MedicalDevice/HistoryLoc/5
+        public async Task<IActionResult> HistoryLoc(
+            int id,
+            int page = 1,
+            string searchRoom = "",
+            string searchDate = "")
+        {
+            // 1. Verificar se o dispositivo existe (para exibir o nome no título)
+            var device = await _context.MedicalDevices.FindAsync(id);
+            if (device == null) return NotFound();
+
+            // 2. Query Base (Igual à do Marcel, mas filtrada pelo ID do dispositivo)
+            var query = _context.LocationMedDevice
+                .Include(l => l.Room)           // Precisamos do nome da sala
+                .Include(l => l.MedicalDevice)  // Opcional, mas boa prática
+                .Where(l => l.MedicalDeviceID == id) // <--- O FILTRO CRUCIAL (Só este dispositivo)
+                .AsQueryable();
+
+
+            // Filtro por Sala
+            if (!string.IsNullOrEmpty(searchRoom))
+            {
+                query = query.Where(l => l.Room.Name.Contains(searchRoom));
+            }
+
+            // Filtro por Data
+            if (!string.IsNullOrEmpty(searchDate))
+            {
+                if (DateTime.TryParse(searchDate, out DateTime parsedDate))
+                {
+                    query = query.Where(l => l.InitialDate.Date == parsedDate.Date);
+                }
+            }
+
+            int itemsPerPage = 10;
+            int totalItems = await query.CountAsync();
+
+            var paginationInfo = new RPaginationInfo<LocationMedDevice>(page, totalItems, itemsPerPage);
+
+            // Buscar dados ordenados (Do mais recente para o mais antigo fica melhor em históricos)
+            var historyItems = await query
+                .OrderByDescending(l => l.InitialDate)
+                .Skip(paginationInfo.ItemsToSkip)
+                .Take(paginationInfo.ItemsPerPage)
+                .ToListAsync();
+
+            paginationInfo.Items = historyItems;
+
+            // Dados para o Cabeçalho
+            ViewBag.DeviceName = device.Name;
+            ViewBag.DeviceSerial = device.SerialNumber;
+            ViewBag.DeviceId = id;
+
+            // Manter os filtros na caixa de pesquisa
+            ViewBag.SearchRoom = searchRoom;
+            ViewBag.SearchDate = searchDate;
+
+            // Carregar lista para dropdowns
+            ViewBag.RoomList = new SelectList(await _context.Room.OrderBy(s => s.Name).ToListAsync(), "Name", "Name", searchRoom);
+
+            return View(paginationInfo);
         }
     }
 }

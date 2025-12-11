@@ -80,6 +80,16 @@
 </div>
 
 <div class="mt-4 d-flex justify-content-end gap-2">
+@*     Voltar a pagina anterior de equipamentos associados*@
+    @if (ViewBag.Origem == "dispositivosAssociados")
+    {
+        <a asp-controller="Rooms"
+           asp-action="Equipments"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar a lista de equipamentos associados
+        </a>
+    }
     <a class="btn btn-warning me-1" asp-action="Edit" asp-route-id="@Model?.EquipmentId">
         <i class="bi bi-pencil-square"></i> Editar
     </a>

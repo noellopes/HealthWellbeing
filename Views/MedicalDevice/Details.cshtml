@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeingRoom.Models
-@model MedicalDevice;
+@model MedicalDevice
 
 @{
     ViewData["Title"] = "Detalhes do Dispositivo";
@@ -34,65 +34,86 @@
         </h4>
     </div>
 
-    <div class="card-body">
+    <div class="card-body row">
+        <!-- Coluna com os detalhes -->
+        <div class="col-md-8">
+            <dl class="row mb-0">
 
-        <dl class="row mb-0">
+                <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
+                <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Name)</dt>
-            <dd class="col-sm-9"><strong>@Html.DisplayFor(model => model.Name)</strong></dd>
+                <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SerialNumber)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.SerialNumber)</dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.SerialNumber)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.SerialNumber)</dd>
+                <dt class="col-sm-3 fw-bold text-muted">Tipo de Material</dt>
+                <dd class="col-sm-9">
+                    @(Model.TypeMaterial?.Name ?? Model.TypeMaterialID.ToString())
+                </dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">Tipo de Material</dt> 
-            <dd class="col-sm-9">
-                @(Model.TypeMaterial?.Name ?? Model.TypeMaterialID.ToString())
-            </dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
-
-
-            @* ESTADO ATUAL (CurrentStatus)*@
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.CurrentStatus)</dt>
-            <dd class="col-sm-9">
-                @if (statusAtual.Contains("Em Manutenção"))
-                {
-                    <span class="badge bg-warning text-dark">@statusAtual</span>
-                }
-                else if (statusAtual.Contains("Alocado"))
-                {
-                    <span class="badge bg-danger">@statusAtual</span>
-                }
-                else
-                {
-                    @* "Em Armazenamento" *@
-                    <span class="badge bg-success">@statusAtual</span>
-                }
-            </dd>
+                <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
 
-            @*LOCALIZAÇÃO (Nome da Sala) *@
-            <dt class="col-sm-3 fw-bold text-muted">Localização Atual</dt>
-            <dd class="col-sm-9">
-                @if (localizacaoNome != "N/A")
-                {
-                    <span class="fw-bold text-dark">@localizacaoNome</span>
-                }
-                else
-                {
-                    <span class="text-dark">Sem atribuição</span>
-                }
-            </dd>
+                @* ESTADO ATUAL (CurrentStatus)*@
+                <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.CurrentStatus)</dt>
+                <dd class="col-sm-9">
+                    @if (statusAtual.Contains("Em Manutenção"))
+                    {
+                        <span class="badge bg-warning text-dark">@statusAtual</span>
+                    }
+                    else if (statusAtual.Contains("Alocado"))
+                    {
+                        <span class="badge bg-danger">@statusAtual</span>
+                    }
+                    else
+                    {
+                        @* "Em Armazenamento" *@
+                        <span class="badge bg-success">@statusAtual</span>
+                    }
+                </dd>
 
-            <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
-            <dd class="col-sm-9 text-wrap">@Html.DisplayFor(model => model.Observation)</dd> 
 
-        </dl>
+                @*LOCALIZAÇÃO (Nome da Sala) *@
+                <dt class="col-sm-3 fw-bold text-muted">Localização Atual</dt>
+                <dd class="col-sm-9">
+                    @if (localizacaoNome != "N/A")
+                    {
+                        <span class="fw-bold text-dark">@localizacaoNome</span>
+                    }
+                    else
+                    {
+                        <span class="text-dark">Sem atribuição</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.Observation)</dt>
+                <dd class="col-sm-9 text-wrap">@Html.DisplayFor(model => model.Observation)</dd>
+
+            </dl>
+        </div>
+        
+        <!-- Coluna com o botão à direita -->
+        <div class="col-md-4 d-flex flex-column align-items-start gap-2 mt-4">
+            <a asp-action="HistoryLoc" asp-route-id="@Model.MedicalDeviceID" class="btn btn-outline-primary w-100">
+                <i class="bi bi-clock-history me-1"></i> Ver Histórico de Localização
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="mt-4 d-flex justify-content-end gap-2">
+
+ @* Adicinado por nuno abre *@
+    @if (ViewBag.Origem == "dispositivosAssociados")
+    {
+        <a asp-controller="Rooms"
+           asp-action="MedicalDevices"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista de dispositivos médicos associados
+        </a>
+    }
+ @* Adicionado por nuno fecha *@
 
     @{
         //Pode mover se NÃO estiver em Manutenção
