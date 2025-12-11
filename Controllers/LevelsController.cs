@@ -177,14 +177,14 @@ namespace HealthWellbeing.Controllers{
                 .ToListAsync();
 
             int remaining = points.Value;
-            int level = 0;
+            int completedLevel = 0;
 
             foreach (var l in levels)
             {
                 if (remaining >= l.LevelPointsLimit)
                 {
                     remaining -= l.LevelPointsLimit;
-                    level = l.LevelNumber;
+                    completedLevel = l.LevelNumber;
                 }
                 else
                 {
@@ -192,7 +192,9 @@ namespace HealthWellbeing.Controllers{
                 }
             }
 
-            return Json(new { level, remaining });
+            int resultLevel = Math.Max(1, completedLevel + 1);
+
+            return Json(new { level = resultLevel, remaining });
         }
 
         // GET: Levels/Edit/5
