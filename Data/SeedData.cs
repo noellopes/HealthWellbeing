@@ -29,6 +29,7 @@ namespace HealthWellbeing.Data
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
             PopulateLevels(dbContext);
+            PopulateActivities(dbContext);
             PopulateEmployees(dbContext);
             PopulateCustomers(dbContext);
         }
@@ -60,6 +61,67 @@ namespace HealthWellbeing.Data
                 }
             }
 
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateActivities(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.Activity.Any()) return;
+
+            var activities = new List<Activity>
+            {
+                // HÁBITOS DIÁRIOS
+                new Activity { ActivityName = "Beber 2L de água", ActivityType = "Hábito Diário", ActivityDescription = "Completar a meta diária de hidratação (pelo menos 2 litros de água).", ActivityReward = 20 },
+                new Activity { ActivityName = "Dormir 8 horas", ActivityType = "Hábito Diário", ActivityDescription = "Registar uma noite de sono com 8 horas ou mais.", ActivityReward = 25 },
+                new Activity { ActivityName = "Subir escadas", ActivityType = "Hábito Diário", ActivityDescription = "Optar por subir escadas em vez de usar o elevador durante o dia.", ActivityReward = 15 },
+                new Activity { ActivityName = "Pausa ativa", ActivityType = "Hábito Diário", ActivityDescription = "Fazer pelo menos 5 minutos de alongamentos ou movimento a cada 2 horas de trabalho.", ActivityReward = 15 },
+                new Activity { ActivityName = "Zero refrigerantes", ActivityType = "Hábito Diário", ActivityDescription = "Passar o dia sem consumir refrigerantes ou bebidas açucaradas.", ActivityReward = 20 },
+                new Activity { ActivityName = "Caminhada curta", ActivityType = "Hábito Diário", ActivityDescription = "Realizar uma caminhada de pelo menos 15 minutos.", ActivityReward = 15 },
+                new Activity { ActivityName = "Diário de bem-estar", ActivityType = "Hábito Diário", ActivityDescription = "Registar no diário uma reflexão sobre o bem-estar físico e mental do dia.", ActivityReward = 10 },
+                new Activity { ActivityName = "Alongar ao acordar", ActivityType = "Hábito Diário", ActivityDescription = "Realizar uma rotina de alongamentos simples logo ao acordar.", ActivityReward = 10 },
+
+                // TREINO / EXERCÍCIO
+                new Activity { ActivityName = "Treino de força 30 min", ActivityType = "Treino", ActivityDescription = "Completar pelo menos 30 minutos de treino de força (peso corporal ou pesos).", ActivityReward = 40 },
+                new Activity { ActivityName = "Treino de cardio 30 min", ActivityType = "Treino", ActivityDescription = "Realizar 30 minutos de atividade cardiovascular (corrida, bicicleta, elíptica, etc.).", ActivityReward = 35 },
+                new Activity { ActivityName = "Aula de grupo", ActivityType = "Treino", ActivityDescription = "Participar numa aula de grupo (Zumba, HIIT, Yoga, etc.).", ActivityReward = 30 },
+                new Activity { ActivityName = "Treino completo corpo inteiro", ActivityType = "Treino", ActivityDescription = "Concluir um treino de corpo inteiro com pelo menos 6 exercícios diferentes.", ActivityReward = 50 },
+                new Activity { ActivityName = "Sessão de alongamentos 20 min", ActivityType = "Treino", ActivityDescription = "Fazer uma sessão dedicada de mobilidade/alongamentos de 20 minutos.", ActivityReward = 25 },
+                new Activity { ActivityName = "Corrida 5 km", ActivityType = "Treino", ActivityDescription = "Percorrer pelo menos 5 quilómetros a correr ou em corrida ligeira.", ActivityReward = 60 },
+                new Activity { ActivityName = "Ciclismo 10 km", ActivityType = "Treino", ActivityDescription = "Percorrer pelo menos 10 quilómetros de bicicleta (interior ou exterior).", ActivityReward = 55 },
+                new Activity { ActivityName = "Treino em casa", ActivityType = "Treino", ActivityDescription = "Concluir uma sessão de treino em casa sem equipamentos de ginásio.", ActivityReward = 30 },
+
+                // NUTRIÇÃO
+                new Activity { ActivityName = "Dia sem fast-food", ActivityType = "Nutrição", ActivityDescription = "Passar o dia sem consumir fast-food ou fritos.", ActivityReward = 25 },
+                new Activity { ActivityName = "1 refeição completa saudável", ActivityType = "Nutrição", ActivityDescription = "Preparar e consumir uma refeição equilibrada (proteína, vegetais e hidratos complexos).", ActivityReward = 20 },
+                new Activity { ActivityName = "Inserir registo alimentar diário", ActivityType = "Nutrição", ActivityDescription = "Atualizar o registo alimentar com todas as refeições do dia.", ActivityReward = 15 },
+                new Activity { ActivityName = "Dia sem açúcares adicionados", ActivityType = "Nutrição", ActivityDescription = "Evitar doces, sobremesas e alimentos com açúcar adicionado durante o dia.", ActivityReward = 30 },
+                new Activity { ActivityName = "Comer 3 peças de fruta", ActivityType = "Nutrição", ActivityDescription = "Consumir pelo menos três peças de fruta ao longo do dia.", ActivityReward = 15 },
+                new Activity { ActivityName = "Jantar leve", ActivityType = "Nutrição", ActivityDescription = "Fazer um jantar leve antes das 21h, evitando refeições pesadas.", ActivityReward = 20 },
+                new Activity { ActivityName = "Planeamento semanal de refeições", ActivityType = "Nutrição", ActivityDescription = "Planear, pelo menos de forma básica, as refeições saudáveis da semana.", ActivityReward = 35 },
+                new Activity { ActivityName = "Dia vegetariano", ActivityType = "Nutrição", ActivityDescription = "Passar o dia a consumir apenas refeições vegetarianas equilibradas.", ActivityReward = 40 },
+
+                // MINDFULNESS / SAÚDE MENTAL
+                new Activity { ActivityName = "Sessão de meditação 10 min", ActivityType = "Mindfulness", ActivityDescription = "Realizar pelo menos 10 minutos de meditação guiada ou silenciosa.", ActivityReward = 15 },
+                new Activity { ActivityName = "Técnicas de respiração", ActivityType = "Mindfulness", ActivityDescription = "Praticar exercícios de respiração profunda durante 5 minutos.", ActivityReward = 10 },
+                new Activity { ActivityName = "Pausa digital", ActivityType = "Mindfulness", ActivityDescription = "Passar pelo menos 2 horas sem redes sociais ou ecrãs de entretenimento.", ActivityReward = 20 },
+                new Activity { ActivityName = "Passeio ao ar livre", ActivityType = "Mindfulness", ActivityDescription = "Fazer uma caminhada ao ar livre focada na observação e relaxamento.", ActivityReward = 20 },
+                new Activity { ActivityName = "Gratidão diária", ActivityType = "Mindfulness", ActivityDescription = "Listar três coisas pelas quais se sente grato(a) no dia.", ActivityReward = 10 },
+                new Activity { ActivityName = "Tempo para hobby", ActivityType = "Mindfulness", ActivityDescription = "Dedicar pelo menos 30 minutos a um hobby relaxante (leitura, desenho, música, etc.).", ActivityReward = 20 },
+                new Activity { ActivityName = "Alongamentos antes de dormir", ActivityType = "Mindfulness", ActivityDescription = "Fazer uma rotina leve de alongamentos antes de ir para a cama.", ActivityReward = 10 },
+                new Activity { ActivityName = "Dia com gestão de stress", ActivityType = "Mindfulness", ActivityDescription = "Aplicar ao longo do dia técnicas de gestão de stress em momentos de maior pressão.", ActivityReward = 25 },
+
+                // DESAFIOS / METAS SEMANAIS
+                new Activity { ActivityName = "Completar 5 treinos na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Registar no mínimo 5 sessões de treino físico na mesma semana.", ActivityReward = 100 },
+                new Activity { ActivityName = "7 dias seguidos a hidratar bem", ActivityType = "Desafio Semanal", ActivityDescription = "Cumprir a meta de 2L de água durante 7 dias consecutivos.", ActivityReward = 120 },
+                new Activity { ActivityName = "Semana sem fast-food", ActivityType = "Desafio Semanal", ActivityDescription = "Passar uma semana completa sem consumir fast-food.", ActivityReward = 130 },
+                new Activity { ActivityName = "3 aulas de grupo na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Participar em pelo menos três aulas de grupo na mesma semana.", ActivityReward = 90 },
+                new Activity { ActivityName = "5 dias de registo alimentar", ActivityType = "Desafio Semanal", ActivityDescription = "Registar as refeições de pelo menos 5 dias seguidos.", ActivityReward = 80 },
+                new Activity { ActivityName = "Passos semanais 70 000", ActivityType = "Desafio Semanal", ActivityDescription = "Atingir um total de 70 000 passos numa semana (média de 10 000 por dia).", ActivityReward = 140 },
+                new Activity { ActivityName = "3 sessões de mindfulness na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Realizar pelo menos 3 sessões de meditação ou mindfulness numa semana.", ActivityReward = 85 },
+                new Activity { ActivityName = "Semana de sono regulado", ActivityType = "Desafio Semanal", ActivityDescription = "Dormir entre 7–9 horas por noite durante 7 dias seguidos.", ActivityReward = 150 }
+            };
+
+            dbContext.Activity.AddRange(activities);
             dbContext.SaveChanges();
         }
 

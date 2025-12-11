@@ -1,0 +1,60 @@
+﻿@model HealthWellbeing.Models.Activity
+
+@{
+    ViewData["Title"] = "Eliminar Activity";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h5 mb-1">@ViewData["Title"]</h1>
+                    <h3 class="h6 text-muted mb-3">Tem a certeza que pretende eliminar esta activity?</h3>
+
+                    <h4 class="fw-semibold mb-2">Activity</h4>
+                    <hr />
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.ActivityName)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(model => model.ActivityName)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.ActivityType)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(model => model.ActivityType)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.ActivityDescription)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(model => model.ActivityDescription)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(model => model.ActivityReward)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(model => model.ActivityReward)
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="card-footer bg-white d-flex justify-content-between">
+                    <form asp-action="Delete" class="m-0">
+                        <input type="hidden" asp-for="ActivityId" />
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+
+                    <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

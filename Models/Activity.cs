@@ -1,16 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HealthWellbeing.Models {
-    public class Activity_ {
+namespace HealthWellbeing.Models
+{
+    public class Activity
+    {
+        public int ActivityId { get; set; }
 
-        public int Activity_Id { get; set; }
         [Required]
-        public string Activity_Name { get; set; }
-        public string? Activity_Description { get; set; }
+        public string ActivityName { get; set; } = string.Empty;
+
         [Required]
-        public string Activity_Type { get; set; }
-        public int? NumberSets { get; set; }
-        public int? NumberReps { get; set; }
-        public decimal Weigth { get; set; }
+        public string ActivityType { get; set; } = string.Empty;
+
+        [Required]
+        public string ActivityDescription { get; set; } = string.Empty;
+
+        [Required]
+        public int ActivityReward { get; set; }
+
+        // Método da classe, conforme o diagrama
+        public void obterRecompensas()
+        {
+            
+        }
     }
 }

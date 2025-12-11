@@ -4,16 +4,19 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251211165127_UpdateMigration")]
+    partial class UpdateMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,35 +70,30 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.ToTable("ExercicioGrupoMuscular");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Activity_", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Activity", b =>
                 {
-                    b.Property<int>("Activity_Id")
+                    b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Activity_Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
 
-                    b.Property<string>("Activity_Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Activity_Name")
+                    b.Property<string>("ActivityDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Activity_Type")
+                    b.Property<string>("ActivityName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("NumberReps")
+                    b.Property<int>("ActivityReward")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NumberSets")
-                        .HasColumnType("int");
+                    b.Property<string>("ActivityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Weigth")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Activity_Id");
+                    b.HasKey("ActivityId");
 
                     b.ToTable("Activity");
                 });

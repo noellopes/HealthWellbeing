@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialApp : Migration
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,18 +15,16 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 name: "Activity",
                 columns: table => new
                 {
-                    Activity_Id = table.Column<int>(type: "int", nullable: false)
+                    ActivityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Activity_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Activity_Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Activity_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumberSets = table.Column<int>(type: "int", nullable: true),
-                    NumberReps = table.Column<int>(type: "int", nullable: true),
-                    Weigth = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    ActivityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityReward = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Activity", x => x.Activity_Id);
+                    table.PrimaryKey("PK_Activity", x => x.ActivityId);
                 });
 
             migrationBuilder.CreateTable(
