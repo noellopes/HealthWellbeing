@@ -1,0 +1,147 @@
+﻿@using HealthWellbeingRoom.Models
+@model HealthWellbeing.ViewModels.RPaginationInfo<LocationMedDevice>
+
+@{
+    ViewData["Title"] = "Histórico de Movimentação:";
+}
+
+<h2 class="text-primary mb-4">
+    <i class="bi bi-clock-history me-2"></i> @ViewData["Title"]
+    <span class="text-dark">@ViewBag.DeviceName</span>
+</h2>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-primary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#historySearch"
+            aria-expanded="false"
+            aria-controls="historySearch">
+        <i class="bi bi-search me-1"></i> Pesquisa Avançada
+    </button>
+</div>
+
+<div class="collapse mb-3" id="historySearch">
+    <div class="card card-body shadow-sm">
+        <form asp-action="HistoryLoc" method="get" class="row g-2 align-items-end">
+
+            <input type="hidden" name="id" value="@ViewBag.DeviceId" />
+
+            <div class="col-md-5">
+                <label for="searchRoom" class="form-label">Sala</label>
+                <select id="searchRoom" name="searchRoom" class="form-control" asp-items="ViewBag.RoomList">
+                    <option value="">-- Todas as Salas --</option>
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label for="searchDate" class="form-label">Data de Movimentação</label>
+                <input id="searchDate"
+                       name="searchDate"
+                       value="@ViewBag.SearchDate"
+                       class="form-control"
+                       type="date" />
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-search"></i>
+                </button>
+                <a asp-action="HistoryLoc" asp-route-id="@ViewBag.DeviceId" class="btn btn-secondary flex-fill" title="Limpar Filtros">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (Model == null || !Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center" role="alert">
+        <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+        <div>
+            Não foram encontrados registos de movimentação para este dispositivo com os filtros atuais.
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sala</th>
+                    <th>Data Entrada</th>
+                    <th>Data Saída</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    bool isAtual = item.EndDate == null;
+                    string rowClass = isAtual ? "table-success bg-opacity-10" : "";
+
+                    <tr class="@rowClass">
+                        <td>
+                            @item.Room?.Name
+                        </td>
+                        <td>
+                            @item.InitialDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td>
+                            @if (item.EndDate.HasValue)
+                            {
+                                @item.EndDate.Value.ToString("dd/MM/yyyy HH:mm")
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Atual</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="History page" class="d-flex justify-content-between align-items-center mt-4">
+        <span class="text-muted small">
+            Mostrando <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
+            a <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong> registos
+        </span>
+
+        <ul class="pagination pagination-sm mb-0">
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="HistoryLoc" asp-route-id="@ViewBag.DeviceId" asp-route-page="1"
+                   asp-route-searchRoom="@ViewBag.SearchRoom" asp-route-searchDate="@ViewBag.SearchDate">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="HistoryLoc" asp-route-id="@ViewBag.DeviceId" asp-route-page="@p"
+                       asp-route-searchRoom="@ViewBag.SearchRoom" asp-route-searchDate="@ViewBag.SearchDate">
+                        @p
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="HistoryLoc" asp-route-id="@ViewBag.DeviceId" asp-route-page="@Model.TotalPages"
+                   asp-route-searchRoom="@ViewBag.SearchRoom" asp-route-searchDate="@ViewBag.SearchDate">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
+
+@* --- BOTÃO VOLTAR --- *@
+<div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+    <a href="javascript:void(0);" onclick="history.back();" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
+    </a>
+</div>
