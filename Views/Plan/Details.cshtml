@@ -1,7 +1,23 @@
 ﻿@model HealthWellbeing.Models.Plan
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Plan Details";
+
+    var selectedDate = (DateTime)(ViewBag.SelectedDate ?? DateTime.Today);
+    int totalItems = ViewBag.TotalItems != null ? (int)ViewBag.TotalItems : 0;
+    int consumedCount = ViewBag.ConsumedCount != null ? (int)ViewBag.ConsumedCount : 0;
+    int notConsumedCount = ViewBag.NotConsumedCount != null ? (int)ViewBag.NotConsumedCount : 0;
+    double consumedPercentage = ViewBag.ConsumedPercentage != null ? (double)ViewBag.ConsumedPercentage : 0.0;
+    double notConsumedPercentage = ViewBag.NotConsumedPercentage != null ? (double)ViewBag.NotConsumedPercentage : 0.0;
+
+    var progressRaw = (IEnumerable<dynamic>)(ViewBag.Progress ?? Enumerable.Empty<dynamic>());
+    var progressList = progressRaw.ToList();
+
+    var labelsJson = "[" + string.Join(",", progressList.Select(p => "\"" + (string)p.Label + "\"")) + "]";
+    var dataJson = "[" + string.Join(",", progressList.Select(p =>
+        ((double)p.Percentage).ToString(CultureInfo.InvariantCulture))) + "]";
+
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -25,7 +41,7 @@
 }
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <h5 class="mb-3">Plan information</h5>
         <dl class="row">
             <dt class="col-sm-4">Starting Date</dt>
@@ -81,11 +97,10 @@
                 }
             </dd>
         </dl>
-    </div>
 
-    <div class="col-md-6">
+        <hr />
+
         <h5 class="mb-3">Client goals</h5>
-
         @if (goals.Any())
         {
             <div class="table-responsive">
@@ -116,8 +131,32 @@
         {
             <p class="text-muted">This client has no goals registered.</p>
         }
+
     </div>
-</div>
+
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm h-60">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-pie-chart-fill text-success me-1"></i>
+                    Daily Intake
+                </h5>
+                <canvas id="dailyDonutChart" height="200" ></canvas>
+
+                <div class="mt-1">
+                    <span class="badge bg-success me-1">
+                        @consumedPercentage% consumed
+                    </span>
+                    <span class="badge bg-danger">
+                        @notConsumedPercentage% not consumed
+                    </span>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
 
 <hr />
 
@@ -159,4 +198,70 @@ else
         <i class="bi bi-arrow-left-circle me-1"></i> Back to list
     </a>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ---------- Donut ----------
+        const donutCtx = document.getElementById('dailyDonutChart').getContext('2d');
+
+        const consumed = @consumedCount;
+        const notConsumed = @notConsumedCount;
+
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Consumed', 'Not consumed'],
+                datasets: [{
+                    data: [consumed, notConsumed],
+                    backgroundColor: ['#28a745', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // ---------- Line chart ----------
+        const lineCtx = document.getElementById('progressLineChart').getContext('2d');
+
+        const progressLabels = @Html.Raw(labelsJson);
+        const progressData = @Html.Raw(dataJson);
+
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: progressLabels,
+                datasets: [{
+                    label: '% consumed',
+                    data: progressData,
+                    tension: 0.3,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+}
 
