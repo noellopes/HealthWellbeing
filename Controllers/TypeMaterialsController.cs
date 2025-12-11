@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -21,6 +22,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: TypeMaterials
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Index(
             int page = 1,
             string searchName = "",
@@ -56,6 +58,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: TypeMaterials/Details/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -69,6 +72,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: TypeMaterials/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -77,6 +81,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: TypeMaterials/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
             // Normalizar nome (tirar espaços e ignorar maiúsculas/minúsculas)
@@ -105,6 +110,7 @@ namespace HealthWellbeingRoom.Controllers
 
 
         // GET: TypeMaterials/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -118,6 +124,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: TypeMaterials/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
             if (id != typeMaterial.TypeMaterialID) return NotFound();
@@ -158,6 +165,7 @@ namespace HealthWellbeingRoom.Controllers
 
 
         // GET: TypeMaterials/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -173,6 +181,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: TypeMaterials/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var typeMaterial = await _context.TypeMaterial.FindAsync(id);
