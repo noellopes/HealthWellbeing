@@ -42,42 +42,62 @@
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                <!-- Nome da Zona -->
                 <div class="mb-3">
-                    <label asp-for="Nome" class="form-label"></label>
-                    <input asp-for="Nome" class="form-control" placeholder="Ex: Armazém Central" />
-                    <span asp-validation-for="Nome" class="text-danger"></span>
+                    <label asp-for="NomeZona" class="form-label"></label>
+                    <input asp-for="NomeZona" class="form-control" placeholder="Ex: Gaveta 1 - Luvas" />
+                    <span asp-validation-for="NomeZona" class="text-danger"></span>
                 </div>
 
+                <!-- Consumível -->
                 <div class="mb-3">
-                    <label asp-for="Descricao" class="form-label"></label>
-                    <input asp-for="Descricao" class="form-control" placeholder="Descrição breve da zona" />
-                    <span asp-validation-for="Descricao" class="text-danger"></span>
-                </div>
+                    <label asp-for="ConsumivelId" class="form-label"></label>
 
-                <!-- 🔽 CAMPO ALTERADO PARA DROPDOWN -->
-                <div class="mb-3">
-                    <label asp-for="LocalizacaoZonaArmazenamentoId" class="form-label"></label>
-
-                    <select asp-for="LocalizacaoZonaArmazenamentoId"
+                    <select asp-for="ConsumivelId"
                             class="form-select"
-                            asp-items="ViewBag.Localizacoes">
-                        <option value="">-- Selecionar Localização --</option>
+                            asp-items="ViewBag.Consumiveis">
+                        <option value="">-- Selecionar Consumível --</option>
                     </select>
 
-                    <span asp-validation-for="LocalizacaoZonaArmazenamentoId" class="text-danger"></span>
+                    <span asp-validation-for="ConsumivelId" class="text-danger"></span>
                 </div>
 
+                <!-- Sala -->
+                <div class="mb-3">
+                    <label asp-for="RoomId" class="form-label"></label>
+
+                    <select asp-for="RoomId"
+                            class="form-select"
+                            asp-items="ViewBag.Rooms">
+                        <option value="">-- Selecionar Sala --</option>
+                    </select>
+
+                    <span asp-validation-for="RoomId" class="text-danger"></span>
+                </div>
+
+                <!-- Capacidade Máxima (unidades) -->
                 <div class="mb-3">
                     <label asp-for="CapacidadeMaxima" class="form-label"></label>
                     <input asp-for="CapacidadeMaxima"
                            class="form-control"
                            type="number"
-                           min="1" max="10000"
-                           step="0.1"
-                           placeholder="Ex: 5000 (m³)" />
+                           min="1"
+                           placeholder="Ex: 200" />
                     <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
                 </div>
 
+                <!-- Quantidade Atual -->
+                <div class="mb-3">
+                    <label asp-for="QuantidadeAtual" class="form-label"></label>
+                    <input asp-for="QuantidadeAtual"
+                           class="form-control"
+                           type="number"
+                           min="0"
+                           placeholder="Ex: 50" />
+                    <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
+                </div>
+
+                <!-- Ativa -->
                 <div class="form-check mb-4">
                     <input class="form-check-input" asp-for="Ativa" id="ativaCheck" />
                     <label class="form-check-label" for="ativaCheck">
