@@ -21,7 +21,7 @@ namespace HealthWellbeing.Controllers
         // View: Views/UtenteSaude/Index.cshtml
         // ================================
         // GET: UtenteSaude
-        public async Task<IActionResult> Index(
+      /*  public async Task<IActionResult> Index(
             int page = 1,
             string searchNome = "",
             string searchNif = "")
@@ -51,6 +51,57 @@ namespace HealthWellbeing.Controllers
             int numberUtentes = await utentesQuery.CountAsync();
 
             var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            utentesInfo.Items = await utentesQuery
+                .OrderBy(u => u.NomeCompleto)
+                .Skip(utentesInfo.ItemsToSkip)
+                .Take(utentesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(utentesInfo);
+        }*/
+        public async Task<IActionResult> Index(
+    int page = 1,
+    string searchNome = "",
+    string searchNif = "")
+        {
+            // 👉 Garantir que nunca há página < 1
+            if (page < 1)
+                page = 1;
+
+            // 1) Começamos com um IQueryable
+            var utentesQuery = _db.UtenteSaude.AsQueryable();
+
+            // 2) Aplicar filtros se tiverem valor
+            if (!string.IsNullOrWhiteSpace(searchNome))
+            {
+                utentesQuery = utentesQuery
+                    .Where(u => u.NomeCompleto.Contains(searchNome));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchNif))
+            {
+                utentesQuery = utentesQuery
+                    .Where(u => u.Nif.Contains(searchNif));
+            }
+
+            // 3) Guardar valores para a View (inputs ficam preenchidos)
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+
+            // 4) Paginação
+            int numberUtentes = await utentesQuery.CountAsync();
+
+            // Se quiseres ser ainda mais defensivo:
+            // se não houver utentes, mantém page = 1
+            if (numberUtentes == 0)
+                page = 1;
+
+            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            // (Opcional, se ItemsToSkip tiver setter)
+            // if (utentesInfo.ItemsToSkip < 0)
+            //     utentesInfo.ItemsToSkip = 0;
 
             utentesInfo.Items = await utentesQuery
                 .OrderBy(u => u.NomeCompleto)
