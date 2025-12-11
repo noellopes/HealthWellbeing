@@ -63,6 +63,7 @@ public class ProfissionalExecutantesController : Controller
         ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao");
         return View();
     }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
@@ -73,6 +74,8 @@ public class ProfissionalExecutantesController : Controller
         {
             _context.Add(profissionalExecutante);
             await _context.SaveChangesAsync();
+            // >> MENSAGEM DE SUCESSO PARA CRIAÇÃO <<
+            TempData["SuccessMessage"] = "Novo profissional executante criado!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -102,36 +105,16 @@ public class ProfissionalExecutantesController : Controller
         if (id != profissionalExecutante.ProfissionalExecutanteId)
             return NotFound();
 
-        // ---------------------------------------------------------------------------------
-        // >> 🚀 DIAGNÓSTICO: Verificando as Falhas de Validação <<
-        // ---------------------------------------------------------------------------------
-        if (!ModelState.IsValid)
-        {
-            Console.WriteLine("\n=======================================================");
-            Console.WriteLine(">>> FALHA NA VALIDAÇÃO DO MODELO PROFISSIONAL EXECUTANTE <<<");
-            // Itera sobre todos os erros de validação e imprime-os no console
-            foreach (var modelStateEntry in ModelState.Where(e => e.Value.Errors.Count > 0))
-            {
-                var key = modelStateEntry.Key;
-                var errors = modelStateEntry.Value.Errors;
-                Console.WriteLine($"Campo: {key}");
-                foreach (var error in errors)
-                {
-                    Console.WriteLine($" - ERRO: {error.ErrorMessage}");
-                }
-            }
-            Console.WriteLine("=======================================================\n");
-        }
-        // ---------------------------------------------------------------------------------
-
+        // Código de Diagnóstico removido para simplificar, mas mantive a lógica principal
 
         if (ModelState.IsValid)
         {
             try
             {
-                // Se for válido, as alterações serão salvas.
                 _context.Update(profissionalExecutante);
                 await _context.SaveChangesAsync();
+                // >> MENSAGEM DE SUCESSO PARA EDIÇÃO <<
+                TempData["SuccessMessage"] = "Dados do Profissional editados!";
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
@@ -152,6 +135,20 @@ public class ProfissionalExecutantesController : Controller
         return View(profissionalExecutante);
     }
 
+    // Ação GET para exibir a confirmação de exclusão
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null) return NotFound();
+
+        var profissional = await _context.ProfissionalExecutante
+            .Include(p => p.Funcao)
+            .FirstOrDefaultAsync(m => m.ProfissionalExecutanteId == id);
+
+        if (profissional == null) return NotFound();
+
+        return View(profissional);
+    }
+
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
@@ -161,6 +158,8 @@ public class ProfissionalExecutantesController : Controller
         {
             _context.ProfissionalExecutante.Remove(profissional);
             await _context.SaveChangesAsync();
+            // >> MENSAGEM DE SUCESSO PARA EXCLUSÃO <<
+            TempData["SuccessMessage"] = "Profissional executante removido!";
         }
 
         return RedirectToAction(nameof(Index));

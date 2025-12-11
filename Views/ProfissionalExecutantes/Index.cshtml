@@ -116,8 +116,8 @@ else
                     <th>Função</th>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Telefone)</th>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Email)</th>
-                    <th>Autor do Registo</th>
-                    <th class="text-end">Ações</th>
+                    <th>Autor do Registo</th> @* 5ª coluna *@
+                    <th class="text-end">Ações</th> @* 6ª coluna *@
                 </tr>
             </thead>
             <tbody>
@@ -128,7 +128,10 @@ else
                         <td>@item.Funcao?.NomeFuncao</td>
                         <td>@Html.DisplayFor(modelItem => item.Telefone)</td>
                         <td>@Html.DisplayFor(modelItem => item.Email)</td>
-                        
+
+                        @* Célula corrigida para o Autor do Registo (Se precisar exibir o autor, coloque aqui) *@
+                        <td> - </td>
+
                         <td class="text-end">
                             <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-warning me-1">
                                 <i class="bi bi-pencil-square"></i> Editar
@@ -146,37 +149,60 @@ else
         </table>
 
         @* --- BLOCO DE PAGINAÇÃO --- *@
-        <nav aria-label="Profissionais page">
-            <ul class="pagination">
-                @* Link Primeira *@
-                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link" asp-action="Index"
-                       asp-route-page="1"
-                       asp-route-searchNome="@searchNome"
-                       asp-route-searchFuncao="@searchFuncao">Primeira</a>
-                </li>
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                Página @Model.CurrentPage de @Model.TotalPages. (@Model.TotalItems registos)
+            </small>
 
-                @* Links Numéricos *@
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+            <nav aria-label="Profissionais page">
+                <ul class="pagination mb-0">
+                    @* Link Primeira *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchNome="@searchNome"
+                           asp-route-searchFuncao="@searchFuncao">Primeira</a>
+                    </li>
+
+                    @* Links Numéricos *@
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchNome="@searchNome"
+                               asp-route-searchFuncao="@searchFuncao">@p</a>
+                        </li>
+                    }
+
+                    @* Link Última *@
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                         <a class="page-link"
                            asp-action="Index"
-                           asp-route-page="@p"
+                           asp-route-page="@Model.TotalPages"
                            asp-route-searchNome="@searchNome"
-                           asp-route-searchFuncao="@searchFuncao">@p</a>
+                           asp-route-searchFuncao="@searchFuncao">Última</a>
                     </li>
-                }
-
-                @* Link Última *@
-                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@Model.TotalPages"
-                       asp-route-searchNome="@searchNome"
-                       asp-route-searchFuncao="@searchFuncao">Última</a>
-                </li>
-            </ul>
-        </nav>
+                </ul>
+            </nav>
+        </div>
     </div>
+}
+
+@section Scripts {
+    <script>
+        // Opção para manter o bloco de pesquisa aberto após a submissão (se houver filtros)
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchNome = document.getElementById('searchNome').value;
+            var searchFuncao = document.getElementById('searchFuncao').value;
+            var searchCollapse = document.getElementById('profissionalSearch');
+
+            if (searchNome || searchFuncao) {
+                new bootstrap.Collapse(searchCollapse, {
+                    toggle: true
+                });
+            }
+        });
+    </script>
 }
