@@ -26,5 +26,8 @@
         public int LastPageShow => Math.Min(TotalPages, CurrentPage + NUMBER_PAGES_SHOW_BEFORE_AFTER);
 
         public int ItemsToSkip => ItemsPerPage * (CurrentPage - 1);
+
+        public int FirstItemOnPage => TotalItems == 0 ? 0 : ((CurrentPage - 1) * ItemsPerPage) + 1;
+        public int LastItemOnPage => Math.Min(TotalItems, CurrentPage * ItemsPerPage);
     }
 }

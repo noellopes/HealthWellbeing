@@ -20,10 +20,33 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchEmail = "") 
         {
-            //Order customers by Name
-            return View(await _context.Customer.OrderBy(c => c.Name).ToListAsync());
+            var customersQuery = _context.Customer.AsQueryable();
+            
+            //Filtering
+            if (!string.IsNullOrEmpty(searchName)) {
+                customersQuery = customersQuery.Where(c => c.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrEmpty(searchEmail)) {
+                customersQuery = customersQuery.Where(c => c.Email.Contains(searchEmail));
+            }
+
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchEmail = searchEmail;
+
+            // Pagination
+            int totalItems = await customersQuery.CountAsync();
+            var paginationInfo = new HealthWellbeing.ViewModels.PaginationInfo<Customer>(page, totalItems);
+
+            paginationInfo.Items = await customersQuery
+                .OrderBy(c => c.Name)
+                .Skip(paginationInfo.ItemsToSkip)
+                .Take(paginationInfo.ItemsPerPage)
+                .ToListAsync();
+
+            return View(paginationInfo);
         }
 
         // GET: Customers/Details/5

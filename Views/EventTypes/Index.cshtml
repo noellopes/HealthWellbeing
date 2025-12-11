@@ -86,7 +86,7 @@ else {
     }
     else {
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
+            <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
                         <th>Name</th>
@@ -115,7 +115,6 @@ else {
                                     string styleStrategy;
                                     string iconClass;
 
-                                    
                                     switch (item.ScoringStrategy.ScoringStrategyCode) {
                                         case "FIXED":
                                             styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
@@ -191,32 +190,39 @@ else {
                 </tbody>
             </table>
 
-            <nav aria-label="Event Types page">
-                <ul class="pagination">
-                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index"
-                           asp-route-page="1"
-                           asp-route-searchName="@ViewBag.SearchName"
-                           asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">First</a>
-                    </li>
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 border rounded-bottom">
 
-                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
-                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                <div class="small text-muted">
+                    Showing @Model.FirstItemOnPage - @Model.LastItemOnPage of @Model.TotalItems
+                </div>
+
+                <nav aria-label="Event Types page">
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                             <a class="page-link" asp-action="Index"
-                               asp-route-page="@p"
+                               asp-route-page="1"
                                asp-route-searchName="@ViewBag.SearchName"
-                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">@p</a>
+                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">First</a>
                         </li>
-                    }
 
-                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index"
-                           asp-route-page="@Model.TotalPages"
-                           asp-route-searchName="@ViewBag.SearchName"
-                           asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">Last</a>
-                    </li>
-                </ul>
-            </nav>
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchName="@ViewBag.SearchName"
+                                   asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">@p</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     }
 }
