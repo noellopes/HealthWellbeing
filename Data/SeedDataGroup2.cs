@@ -11,12 +11,12 @@ namespace HealthWellbeing.Data
 
             db.Database.EnsureCreated();
 
-            PopulateLocalizacoes(db);
+            //PopulateLocalizacoes(db);
             PopulateCategorias(db);
             PopulateConsumiveis(db);
-            PopulateZonasArmazenamento(db);
+            //PopulateZonasArmazenamento(db);
         }
-
+        /*
         private static void PopulateLocalizacoes(HealthWellbeingDbContext db)
         {
             if (db.LocalizacaoZonaArmazenamento.Any()) return;
@@ -45,7 +45,8 @@ namespace HealthWellbeing.Data
             db.LocalizacaoZonaArmazenamento.AddRange(localizacoes);
             db.SaveChanges();
         }
-
+        */
+/*
         private static void PopulateZonasArmazenamento(HealthWellbeingDbContext db)
         {
             if (db.ZonaArmazenamento.Any()) return;
@@ -114,7 +115,7 @@ namespace HealthWellbeing.Data
             db.SaveChanges();
         }
 
-
+*/
 
 
         private static void PopulateCategorias(HealthWellbeingDbContext db)
