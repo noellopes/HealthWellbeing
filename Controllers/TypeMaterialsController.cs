@@ -175,7 +175,22 @@ namespace HealthWellbeingRoom.Controllers
 
             if (typeMaterial == null) return NotFound();
 
-            return View(typeMaterial);
+            // Considera "ligado" como dispositivo que não está em manutenção e tem localização ativa
+            var connectedDevicesCount = await _context.MedicalDevices
+                .Where(d => d.TypeMaterialID == id
+                            && !d.IsUnderMaintenance
+                            && d.LocalizacaoDispMedicoMovel.Any(l => l.EndDate == null))
+                .CountAsync();
+
+            var viewModel = new TypeMaterialDeleteViewModel
+            {
+                TypeMaterialID = typeMaterial.TypeMaterialID,
+                Name = typeMaterial.Name,
+                Description = typeMaterial.Description,
+                ConnectedDevicesCount = connectedDevicesCount
+            };
+
+            return View(viewModel);
         }
 
         // POST: TypeMaterials/Delete/5
@@ -184,10 +199,10 @@ namespace HealthWellbeingRoom.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var typeMaterial = await _context.TypeMaterial.FindAsync(id);
+            var typeMaterial = await _context.TypeMaterial
+                .FirstOrDefaultAsync(m => m.TypeMaterialID == id);
 
-            if (typeMaterial == null)
-                return NotFound();
+            if (typeMaterial == null) return NotFound();
 
             // Verificar se este tipo está a ser usado por algum dispositivo médico
             bool isInUse = await _context.MedicalDevices
@@ -199,7 +214,7 @@ namespace HealthWellbeingRoom.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Se não estiver em uso  pode eliminar
+            // Eliminar
             _context.TypeMaterial.Remove(typeMaterial);
             await _context.SaveChangesAsync();
 
