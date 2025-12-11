@@ -96,7 +96,8 @@ else
                 <tr>
                     <th scope="col">@Html.DisplayNameFor(model => model.Items.First().Name)</th>
                     <th scope="col">Tipo de Dispositivo</th>
-                    <th scope="col">Localização</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Sala</th>
                     <th class="text-end" scope="col">Ações</th>
                 </tr>
             </thead>
@@ -131,22 +132,19 @@ else
                             {
                                 <span class="badge bg-danger">@status</span>
                             }
+                        </td>
 
+                        <td>
                             @* Exibir a localização(sala) *@
                             @if (localizacao != null && localizacao.Room != null)
                             {
                                 // Tem atribuição, mostra o nome da sala
-                                <span class="fw-bold ms-2">na @localizacao.Room.Name</span>
+                                <span>@localizacao.Room.Name</span>
                             }
-                            else if (status == "Em Armazenamento")
-                            {
-                                // Não tem atribuição (e não está em manutenção), está à espera
-                                <span class="text-muted small ms-2">...</span>
-                            }
-                            else if (status == "Em Manutenção")
+                            else
                             {
                                 // Se estiver em manutenção, não precisa de mostrar a localização da sala
-                                <span class="text-muted small ms-2">...</span>
+                                <span>...</span>
                             }
                         </td>
 
