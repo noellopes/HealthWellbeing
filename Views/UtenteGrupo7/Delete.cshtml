@@ -3,53 +3,64 @@
 @{
     ViewData["Title"] = "Eliminar Utente";
 
-    // Captura as variáveis da ViewBag (definidas no Controller)
-    // Se não vier nada, assume que pode eliminar e que tem 0 dependências
     bool podeEliminar = ViewBag.PodeEliminar ?? true;
-
-    // Como no controller deixámos genérico, aqui usamos uma variável genérica "NumDependencias"
-    // Podes ajustar isto no futuro se o Utente tiver "Consultas", "Exames", etc.
     int numDependencias = ViewBag.NumDependencias ?? 0;
 }
 
 <div class="container mt-4">
-    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
+    <h2 class="text-danger mb-4"><i class="fas fa-trash-alt"></i> Eliminar Utente</h2>
 
     @if (!podeEliminar)
     {
         <div class="alert alert-warning shadow-sm border-warning" role="alert">
-            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h4>
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Não é possível eliminar!</h4>
             <p>
-                Não é possível eliminar o utente <strong>@Model.Nome</strong> porque ele possui
-                <strong>@numDependencias</strong> registo(s) associado(s) (ex: consultas, tarefas, etc.).
+                O utente <strong>@Model.Nome</strong> possui <strong>@numDependencias</strong> registo(s) associado(s)
+                (ex: registos de sono).
             </p>
             <hr>
-            <p class="mb-0">Tens de eliminar ou desassociar esses registos antes de poderes apagar este utente.</p>
+            <p class="mb-0">Para manter a integridade dos dados, deve eliminar ou desassociar esses registos antes de apagar o utente.</p>
         </div>
     }
     else
     {
-        <p class="lead">Tem a certeza que deseja eliminar o seguinte utente? Esta ação <strong>não pode ser desfeita</strong>.</p>
+        <div class="alert alert-danger shadow-sm" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-circle"></i> Atenção!</h5>
+            <p class="mb-0">Tem a certeza que deseja eliminar este utente? Esta ação <strong>não pode ser desfeita</strong>.</p>
+        </div>
     }
 
     <div class="card mb-4 shadow-sm border-danger">
         <div class="card-header bg-danger text-white fw-bold">
-            Dados do Utente
+            Dados do Registo a Eliminar
         </div>
         <div class="card-body">
             <dl class="row mb-0">
                 <dt class="col-sm-3">Nome do Utente</dt>
-                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+                <dd class="col-sm-9 fw-bold">@Html.DisplayFor(model => model.Nome)</dd>
 
-                <dt class="col-sm-3">Estado / Dependências</dt>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <dt class="col-sm-3">Profissional Responsável</dt>
+                    <dd class="col-sm-9 text-muted">
+                        @(Model.ProfissionalSaudeId ?? "Nenhum atribuído")
+                    </dd>
+                }
+
+                <dt class="col-sm-3">Objetivo</dt>
+                <dd class="col-sm-9">
+                    @(Model.ObjetivoFisico?.NomeObjetivo ?? "Sem objetivo")
+                </dd>
+
+                <dt class="col-sm-3">Dependências</dt>
                 <dd class="col-sm-9">
                     @if (numDependencias > 0)
                     {
-                        <span class="badge bg-warning text-dark">@numDependencias registos associados</span>
+                        <span class="badge bg-warning text-dark">@numDependencias registos vinculados</span>
                     }
                     else
                     {
-                        <span class="badge bg-success">0 (Livre para eliminar)</span>
+                        <span class="badge bg-success"><i class="fas fa-check"></i> 0 (Pronto para eliminar)</span>
                     }
                 </dd>
             </dl>
@@ -60,22 +71,22 @@
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="UtenteGrupo7Id" />
 
-        <div class="d-flex">
+        <div class="d-flex gap-2">
             @if (podeEliminar)
             {
-                <button type="submit" class="btn btn-danger me-2">
-                    <i class="fas fa-trash-alt"></i> Eliminar
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Confirmar Eliminação
                 </button>
             }
             else
             {
-                <button type="button" class="btn btn-secondary me-2" disabled title="Existem registos associados">
-                    <i class="fas fa-trash-alt"></i> Eliminar (Bloqueado)
+                <button type="button" class="btn btn-secondary" disabled title="Existem registos associados">
+                    <i class="fas fa-ban"></i> Eliminação Bloqueada
                 </button>
             }
 
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar à Lista
+                <i class="fas fa-arrow-left"></i> Cancelar / Voltar
             </a>
         </div>
     </form>

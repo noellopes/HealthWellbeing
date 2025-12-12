@@ -9,23 +9,30 @@ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization; // Necessário para [Authorize]
 
 namespace HealthWellbeing.Controllers
 {
+    // Apenas utilizadores autenticados podem aceder a este controlador
+    [Authorize]
     public class UtenteGrupo7Controller : Controller
     {
         private readonly HealthWellbeingDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        // Adicionamos RoleManager para conseguir listar quem são os profissionais
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UtenteGrupo7Controller(HealthWellbeingDbContext context, UserManager<IdentityUser> userManager)
+        public UtenteGrupo7Controller(HealthWellbeingDbContext context,
+                                      UserManager<IdentityUser> userManager,
+                                      RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         // --- MÉTODOS DE SUPORTE ---
 
-        // Preenche a Dropdown do Objetivo Físico
         private async Task PopularObjetivosDropDownList(object selectedId = null)
         {
             var objetivos = await _context.ObjetivoFisico
@@ -36,25 +43,33 @@ namespace HealthWellbeing.Controllers
             ViewBag.ObjetivoFisicoId = new SelectList(objetivos, "ObjetivoFisicoId", "NomeObjetivo", selectedId);
         }
 
-        // Preenche as Checkboxes dos Problemas de Saúde
+        // NOVO: Método para preencher dropdown de Profissionais (apenas para Admins)
+        private async Task PopularProfissionaisDropDownList(object selectedId = null)
+        {
+            // Apenas carregamos esta lista se for Admin, para poupar recursos
+            if (User.IsInRole("Administrador"))
+            {
+                // Busca todos os users que tenham a Role "ProfissionalSaude"
+                var profissionais = await _userManager.GetUsersInRoleAsync("ProfissionalSaude");
+
+                ViewBag.ProfissionalSaudeId = new SelectList(profissionais, "Id", "UserName", selectedId);
+            }
+        }
+
         private async Task PopularProblemasSaudeCheckboxes(UtenteGrupo7 utente = null)
         {
-            // 1. Buscar todos os problemas disponíveis
             var todosProblemas = await _context.ProblemaSaude
                                                .AsNoTracking()
                                                .OrderBy(p => p.ProblemaCategoria)
                                                .ThenBy(p => p.ProblemaNome)
                                                .ToListAsync();
 
-            // 2. Identificar quais já estão selecionados (no caso de Edit)
             var utenteProblemasIds = new HashSet<int>();
             if (utente != null && utente.UtenteProblemasSaude != null)
             {
-                utenteProblemasIds = new HashSet<int>(
-                    utente.UtenteProblemasSaude.Select(up => up.ProblemaSaudeId));
+                utenteProblemasIds = new HashSet<int>(utente.UtenteProblemasSaude.Select(up => up.ProblemaSaudeId));
             }
 
-            // 3. Criar a lista de SelectListItem para a View
             ViewBag.ProblemasSaudeCheckboxes = todosProblemas.Select(p => new SelectListItem
             {
                 Value = p.ProblemaSaudeId.ToString(),
@@ -63,19 +78,16 @@ namespace HealthWellbeing.Controllers
             }).ToList();
         }
 
-        // Atualiza a relação Muitos-para-Muitos durante a Edição
         private void UpdateUtenteProblemasSaude(UtenteGrupo7 utenteToUpdate, int[] selectedProblemas)
         {
             var selectedProblemasHs = new HashSet<int>(selectedProblemas ?? new int[] { });
             var utenteProblemasHs = new HashSet<int>(utenteToUpdate.UtenteProblemasSaude.Select(up => up.ProblemaSaudeId));
-
             var todosProblemasIds = _context.ProblemaSaude.Select(p => p.ProblemaSaudeId).ToList();
 
             foreach (var problemaId in todosProblemasIds)
             {
                 if (selectedProblemasHs.Contains(problemaId))
                 {
-                    // Se foi selecionado mas não existe na coleção: ADICIONAR
                     if (!utenteProblemasHs.Contains(problemaId))
                     {
                         utenteToUpdate.UtenteProblemasSaude.Add(new UtenteGrupo7ProblemaSaude
@@ -87,7 +99,6 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    // Se não foi selecionado mas existe na coleção: REMOVER
                     if (utenteProblemasHs.Contains(problemaId))
                     {
                         var problemaToRemove = utenteToUpdate.UtenteProblemasSaude
@@ -95,7 +106,7 @@ namespace HealthWellbeing.Controllers
 
                         if (problemaToRemove != null)
                         {
-                            _context.Remove(problemaToRemove); // Remove da tabela de junção
+                            _context.Remove(problemaToRemove);
                         }
                     }
                 }
@@ -108,6 +119,24 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(string searchNome, int page = 1)
         {
             var query = _context.UtenteGrupo7.AsQueryable();
+            var currentUserId = _userManager.GetUserId(User);
+
+            // LOGICA DE FILTRO DO INDEX
+            if (User.IsInRole("Administrador"))
+            {
+                // Admin vê TODOS (não faz filtro extra)
+            }
+            else if (User.IsInRole("ProfissionalSaude"))
+            {
+                // Profissional vê APENAS os seus atribuídos
+                // Assumindo que tens o campo ProfissionalSaudeId no modelo
+                query = query.Where(u => u.ProfissionalSaudeId == currentUserId);
+            }
+            else
+            {
+                // Se for um Utente normal, vê apenas o seu próprio registo
+                query = query.Where(u => u.UserId == currentUserId);
+            }
 
             if (!string.IsNullOrEmpty(searchNome))
             {
@@ -134,11 +163,26 @@ namespace HealthWellbeing.Controllers
 
             var utenteGrupo7 = await _context.UtenteGrupo7
                 .Include(u => u.ObjetivoFisico)
-                .Include(u => u.UtenteProblemasSaude) // Inclui a tabela de junção
-                    .ThenInclude(up => up.ProblemaSaude) // Inclui o ProblemaSaude real
+                .Include(u => u.UtenteProblemasSaude)
+                    .ThenInclude(up => up.ProblemaSaude)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
             if (utenteGrupo7 == null) return NotFound();
+
+            // Verificação de Segurança de Visualização
+            var currentUserId = _userManager.GetUserId(User);
+            if (!User.IsInRole("Administrador"))
+            {
+                // Se for Profissional, só vê se for dele. Se for User, só vê se for ele mesmo.
+                if (User.IsInRole("ProfissionalSaude"))
+                {
+                    if (utenteGrupo7.ProfissionalSaudeId != currentUserId) return Forbid();
+                }
+                else
+                {
+                    if (utenteGrupo7.UserId != currentUserId) return Forbid();
+                }
+            }
 
             return View(utenteGrupo7);
         }
@@ -146,56 +190,45 @@ namespace HealthWellbeing.Controllers
         // GET: UtenteGrupo7/Create
         public async Task<IActionResult> Create()
         {
-
             await PopularObjetivosDropDownList();
-            await PopularProblemasSaudeCheckboxes(); // Carrega as checkboxes vazias
+            await PopularProblemasSaudeCheckboxes();
+            // Carrega lista de profissionais apenas se for Admin
+            await PopularProfissionaisDropDownList();
             return View();
         }
 
         // POST: UtenteGrupo7/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
+        // Adicionei profissionalSaudeId aos parâmetros bind, mas vamos validar abaixo
+        public async Task<IActionResult> Create([Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId,ProfissionalSaudeId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
         {
-
-            // 1. Apanhar o ID do utilizador logado
-            var userId = _userManager.GetUserId(User);
-
-            // 2. Atribuir ao modelo
-            utenteGrupo7.UserId = userId;
-
-            // 3. Remover o erro de validação do ModelState 
-            // (Como o campo UserId não vem do formulário HTML, o sistema acha que está vazio e dá erro. 
-            // Temos de dizer "está tudo bem, eu já preenchi manualmente acima")
+            var currentUserId = _userManager.GetUserId(User);
+            utenteGrupo7.UserId = currentUserId;
             ModelState.Remove("UserId");
 
-            // Validação de Nome Duplicado
-            bool existeRegisto = await _context.UtenteGrupo7
-                .AnyAsync(u => u.Nome.ToLower() == utenteGrupo7.Nome.ToLower());
-
-            if (existeRegisto)
+            // SEGURANÇA: Apenas Admin pode definir o ProfissionalSaudeId
+            if (!User.IsInRole("Administrador"))
             {
-                ModelState.AddModelError("Nome", "Já existe um Utente com este nome.");
+                // Se não é admin, garante que o campo fica nulo ou ignorado,
+                // prevenindo que um utilizador malicioso tente injetar este valor.
+                utenteGrupo7.ProfissionalSaudeId = null;
             }
 
-            bool existeid = await _context.UtenteGrupo7
-                .AnyAsync(u => u.UserId == userId);
+            // Validações
+            bool existeRegisto = await _context.UtenteGrupo7.AnyAsync(u => u.Nome.ToLower() == utenteGrupo7.Nome.ToLower());
+            if (existeRegisto) ModelState.AddModelError("Nome", "Já existe um Utente com este nome.");
 
-            if (existeid)
-            {
-                ModelState.AddModelError("Nome", "So pode se registrar uma vez.");
-            }
+            bool existeid = await _context.UtenteGrupo7.AnyAsync(u => u.UserId == currentUserId);
+            if (existeid) ModelState.AddModelError("Nome", "Só pode registrar-se uma vez.");
 
-            // Inicializar e preencher a coleção de problemas de saúde
+            // Problemas de Saude
             utenteGrupo7.UtenteProblemasSaude = new List<UtenteGrupo7ProblemaSaude>();
             if (selectedProblemas != null)
             {
                 foreach (var problemaId in selectedProblemas)
                 {
-                    utenteGrupo7.UtenteProblemasSaude.Add(new UtenteGrupo7ProblemaSaude
-                    {
-                        ProblemaSaudeId = problemaId
-                    });
+                    utenteGrupo7.UtenteProblemasSaude.Add(new UtenteGrupo7ProblemaSaude { ProblemaSaudeId = problemaId });
                 }
             }
 
@@ -206,9 +239,9 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Details), new { id = utenteGrupo7.UtenteGrupo7Id, SuccessMessage = "Utente criado com sucesso" });
             }
 
-            // Recarregar listas em caso de erro
             await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
             await PopularProblemasSaudeCheckboxes(utenteGrupo7);
+            await PopularProfissionaisDropDownList(utenteGrupo7.ProfissionalSaudeId);
             return View(utenteGrupo7);
         }
 
@@ -218,13 +251,34 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var utenteGrupo7 = await _context.UtenteGrupo7
-                .Include(u => u.UtenteProblemasSaude) // Necessário para marcar as checkboxes
+                .Include(u => u.UtenteProblemasSaude)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
             if (utenteGrupo7 == null) return NotFound();
 
+            // VERIFICAÇÃO DE PERMISSÃO PARA EDITAR
+            var currentUserId = _userManager.GetUserId(User);
+
+            if (User.IsInRole("Administrador"))
+            {
+                // Admin pode editar tudo
+            }
+            else if (User.IsInRole("ProfissionalSaude"))
+            {
+                // Profissional só edita os seus
+                if (utenteGrupo7.ProfissionalSaudeId != currentUserId)
+                    return Forbid(); // Ou Redirect para AccessDenied
+            }
+            else
+            {
+                // User normal só edita o seu próprio
+                if (utenteGrupo7.UserId != currentUserId)
+                    return Forbid();
+            }
+
             await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
-            await PopularProblemasSaudeCheckboxes(utenteGrupo7); // Carrega checkboxes com seleção atual
+            await PopularProblemasSaudeCheckboxes(utenteGrupo7);
+            await PopularProfissionaisDropDownList(utenteGrupo7.ProfissionalSaudeId); // Apenas Admin verá isto na View
 
             return View(utenteGrupo7);
         }
@@ -232,36 +286,49 @@ namespace HealthWellbeing.Controllers
         // POST: UtenteGrupo7/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
+        public async Task<IActionResult> Edit(int id, [Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId,ProfissionalSaudeId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
         {
             if (id != utenteGrupo7.UtenteGrupo7Id) return NotFound();
 
-            // Buscar a entidade na BD com as relações para poder editar
+            ModelState.Remove("UserId");
+
             var utenteToUpdate = await _context.UtenteGrupo7
                 .Include(u => u.UtenteProblemasSaude)
                 .FirstOrDefaultAsync(u => u.UtenteGrupo7Id == id);
 
             if (utenteToUpdate == null) return View("InvalidUtenteGrupo7", utenteGrupo7);
 
-            // Atualizar valores simples (Nome, Objetivo)
-            _context.Entry(utenteToUpdate).CurrentValues.SetValues(utenteGrupo7);
+            // VERIFICAÇÃO DE PERMISSÃO NO POST (CRUCIAL)
+            var currentUserId = _userManager.GetUserId(User);
+            if (!User.IsInRole("Administrador"))
+            {
+                if (User.IsInRole("ProfissionalSaude") && utenteToUpdate.ProfissionalSaudeId != currentUserId) return Forbid();
+                if (!User.IsInRole("ProfissionalSaude") && utenteToUpdate.UserId != currentUserId) return Forbid();
+            }
+
+            // Atualizar campos permitidos
+            utenteToUpdate.Nome = utenteGrupo7.Nome;
+            utenteToUpdate.ObjetivoFisicoId = utenteGrupo7.ObjetivoFisicoId;
+
+            // SEGURANÇA: Apenas Admin altera o Profissional
+            if (User.IsInRole("Administrador"))
+            {
+                utenteToUpdate.ProfissionalSaudeId = utenteGrupo7.ProfissionalSaudeId;
+            }
+            // Nota: Se não for Admin, ignoramos o ProfissionalSaudeId que veio do form, 
+            // mantendo o original que está em utenteToUpdate.
 
             // Validação de Duplicados
             bool existeOutro = await _context.UtenteGrupo7
                 .AnyAsync(u => u.Nome == utenteToUpdate.Nome && u.UtenteGrupo7Id != id);
 
-            if (existeOutro)
-            {
-                ModelState.AddModelError("Nome", "Já existe outro Utente com este nome.");
-            }
+            if (existeOutro) ModelState.AddModelError("Nome", "Já existe outro Utente com este nome.");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Atualizar a relação Many-to-Many
                     UpdateUtenteProblemasSaude(utenteToUpdate, selectedProblemas);
-
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Details), new { id = utenteToUpdate.UtenteGrupo7Id, SuccessMessage = "Utente editado com sucesso" });
                 }
@@ -272,18 +339,16 @@ namespace HealthWellbeing.Controllers
                 }
             }
 
-            // Recarregar listas em caso de erro
             await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
             await PopularProblemasSaudeCheckboxes(utenteToUpdate);
+            await PopularProfissionaisDropDownList(utenteToUpdate.ProfissionalSaudeId);
 
-            // Forçar visualmente a seleção que o utilizador tentou fazer (se falhou a validação)
+            // Re-mapear seleções visuais em caso de erro
             var listaProblemas = ViewBag.ProblemasSaudeCheckboxes as List<SelectListItem>;
             if (selectedProblemas != null && listaProblemas != null)
             {
                 foreach (var item in listaProblemas)
-                {
                     item.Selected = selectedProblemas.Contains(int.Parse(item.Value));
-                }
             }
 
             return View(utenteGrupo7);
@@ -295,12 +360,31 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var utenteGrupo7 = await _context.UtenteGrupo7
-                .Include(u => u.Sonos) // Para verificar dependências
+                .Include(u => u.Sonos)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
-            if (utenteGrupo7 == null)
+            if (utenteGrupo7 == null) return NotFound();
+
+            // LOGICA DE SEGURANÇA PARA DELETE
+            var currentUserId = _userManager.GetUserId(User);
+
+            if (User.IsInRole("Administrador"))
             {
-                TempData["SuccessMessage"] = "Este Utente já foi eliminado.";
+                // Admin pode apagar qualquer um
+            }
+            else if (User.IsInRole("ProfissionalSaude"))
+            {
+                // Profissional só apaga os seus
+                if (utenteGrupo7.ProfissionalSaudeId != currentUserId)
+                {
+                    TempData["ErrorMessage"] = "Não tem permissão para eliminar este utente.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            else
+            {
+                // Utilizador normal NÃO PODE APAGAR (conforme a tua lógica de que só Admin e Pro podem)
+                TempData["ErrorMessage"] = "Apenas administradores e profissionais de saúde podem eliminar registos.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -320,13 +404,22 @@ namespace HealthWellbeing.Controllers
                 .Include(u => u.Sonos)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
-            if (utenteGrupo7 == null)
+            if (utenteGrupo7 == null) return RedirectToAction(nameof(Index));
+
+            // LOGICA DE SEGURANÇA (Repetir a verificação do GET para garantir segurança)
+            var currentUserId = _userManager.GetUserId(User);
+            if (!User.IsInRole("Administrador"))
             {
-                TempData["SuccessMessage"] = "Este Utente já tinha sido eliminado.";
-                return RedirectToAction(nameof(Index));
+                if (User.IsInRole("ProfissionalSaude"))
+                {
+                    if (utenteGrupo7.ProfissionalSaudeId != currentUserId) return Forbid();
+                }
+                else
+                {
+                    return Forbid();
+                }
             }
 
-            // Verificação de Segurança de dependências
             if ((utenteGrupo7.Sonos?.Count ?? 0) > 0)
             {
                 TempData["ErrorMessage"] = "Não é possível eliminar o utente. Existem registos associados.";

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Detalhes do Utente";
     string? successMessage = Context.Request.Query["SuccessMessage"];
+    bool canDelete = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
 <div class="container mt-4">
@@ -10,25 +11,26 @@
         <h1>@ViewData["Title"]</h1>
         <div>
             <a asp-action="Index" class="btn btn-secondary me-2">
-                <i class="fas fa-arrow-left"></i> Voltar à Lista
+                <i class="fas fa-arrow-left"></i> Voltar
             </a>
             <a asp-action="Edit" asp-route-id="@Model.UtenteGrupo7Id" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Editar
             </a>
-            <a asp-action="Delete" asp-route-id="@Model.UtenteGrupo7Id" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i> Apagar
-            </a>
+
+            @if (canDelete)
+            {
+                <a asp-action="Delete" asp-route-id="@Model.UtenteGrupo7Id" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Apagar
+                </a>
+            }
         </div>
     </div>
 
     @if (successMessage != null)
     {
-        <div class="container py-4">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                @successMessage
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
@@ -37,54 +39,55 @@
             <h3 class="mb-0"><i class="bi bi-person-circle me-2"></i>@Model.Nome</h3>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <h5 class="fw-bold text-primary border-bottom pb-2">Informações Pessoais</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <th class="text-secondary" style="width: 20%;">ID do Utente:</th>
-                            <td>
-                                <span class="badge bg-secondary">#@Model.UtenteGrupo7Id</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Nome Completo:</th>
-                            <td class="fw-bold fs-5">@Model.Nome</td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Objetivo Principal:</th>
-                            <td>
-                                @if (Model.ObjetivoFisico != null)
-                                {
-                                    <span class="badge bg-info text-dark">@Model.ObjetivoFisico.NomeObjetivo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Nenhum Objetivo Definido</span>
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Problemas de Saúde:</th>
-                            <td>
-                                @if (Model.UtenteProblemasSaude != null && Model.UtenteProblemasSaude.Any())
-                                {
-                                    @foreach (var up in Model.UtenteProblemasSaude)
-                                    {
-                                        <span class="badge bg-danger me-1">
-                                            @up.ProblemaSaude.ProblemaNome (@up.ProblemaSaude.ZonaAtingida)
-                                        </span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success">Nenhum Problema de Saúde Registado</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            <table class="table table-borderless">
+                <tr>
+                    <th class="text-secondary" style="width: 25%;">ID:</th>
+                    <td><span class="badge bg-secondary">#@Model.UtenteGrupo7Id</span></td>
+                </tr>
+                <tr>
+                    <th class="text-secondary">Nome:</th>
+                    <td class="fw-bold fs-5">@Model.Nome</td>
+                </tr>
+
+                @if (User.IsInRole("Administrador"))
+                {
+                    <tr>
+                        <th class="text-secondary">Profissional Atribuído (ID):</th>
+                        <td class="text-primary font-monospace">@(Model.ProfissionalSaudeId ?? "Não Atribuído")</td>
+                    </tr>
+                }
+
+                <tr>
+                    <th class="text-secondary">Objetivo:</th>
+                    <td>
+                        @if (Model.ObjetivoFisico != null)
+                        {
+                            <span class="badge bg-info text-dark">@Model.ObjetivoFisico.NomeObjetivo</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-warning text-dark">Nenhum</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-secondary">Problemas de Saúde:</th>
+                    <td>
+                        @if (Model.UtenteProblemasSaude != null && Model.UtenteProblemasSaude.Any())
+                        {
+                            @foreach (var up in Model.UtenteProblemasSaude)
+                            {
+                                <span class="badge bg-danger me-1">@up.ProblemaSaude.ProblemaNome</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Saudável / Sem registo</span>
+                        }
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>

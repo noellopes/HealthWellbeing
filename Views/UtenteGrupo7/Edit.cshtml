@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Editar Utente";
-    // MUDANÇA: Cast explicito para List<SelectListItem>
     var problemasSaude = ViewBag.ProblemasSaudeCheckboxes as List<SelectListItem>;
 }
 
@@ -15,23 +14,39 @@
 
         <div asp-validation-summary="All" class="text-danger small"></div>
 
-        <div class="mb-3">
-            <label asp-for="Nome" class="form-label">Nome do Utente *</label>
-            <input asp-for="Nome" class="form-control" placeholder="Insira o nome do utente">
-            <span asp-validation-for="Nome" class="text-danger small"></span>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Nome" class="form-label">Nome do Utente *</label>
+                <input asp-for="Nome" class="form-control" placeholder="Insira o nome do utente">
+                <span asp-validation-for="Nome" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="ObjetivoFisicoId" class="form-label">Objetivo Físico</label>
+                <select asp-for="ObjetivoFisicoId" class="form-select"
+                        asp-items="@(ViewBag.ObjetivoFisicoId as SelectList)">
+                    <option value="">-- Selecionar Objetivo --</option>
+                </select>
+                <span asp-validation-for="ObjetivoFisicoId" class="text-danger small"></span>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label asp-for="ObjetivoFisicoId" class="form-label">Objetivo Físico</label>
-            <select asp-for="ObjetivoFisicoId" class="form-select"
-                    asp-items="@(ViewBag.ObjetivoFisicoId as SelectList)">
-                <option value="">-- Selecionar Objetivo --</option>
-            </select>
-            <span asp-validation-for="ObjetivoFisicoId" class="text-danger small"></span>
-        </div>
+        @if (User.IsInRole("Administrador"))
+        {
+            <div class="card border-primary mb-3">
+                <div class="card-header bg-primary text-white small py-1">Área Administrativa</div>
+                <div class="card-body py-2">
+                    <label asp-for="ProfissionalSaudeId" class="form-label fw-bold">Atribuir a Profissional de Saúde</label>
+                    <select asp-for="ProfissionalSaudeId" class="form-select" asp-items="ViewBag.ProfissionalSaudeId">
+                        <option value="">-- Nenhum Profissional Atribuído --</option>
+                    </select>
+                    <small class="text-muted">Selecione o profissional responsável por este utente.</small>
+                </div>
+            </div>
+        }
 
         <div class="mb-3 border p-3 rounded bg-light">
-            <label class="form-label fw-bold d-block mb-2">Problemas de Saúde (Selecione um ou mais)</label>
+            <label class="form-label fw-bold d-block mb-2">Problemas de Saúde</label>
             <div class="row">
                 @if (problemasSaude != null && problemasSaude.Any())
                 {
@@ -54,20 +69,14 @@
                 }
                 else
                 {
-                    <div class="col-12 text-muted">
-                        <i class="fas fa-info-circle"></i> Não há problemas de saúde registados na base de dados.
-                    </div>
+                    <div class="col-12 text-muted">Sem problemas registados na BD.</div>
                 }
             </div>
         </div>
 
         <div class="mt-4">
-            <button type="submit" class="btn btn-success">
-                <i class="fas fa-save"></i> Guardar Alterações
-            </button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">
-                <i class="fas fa-arrow-left"></i> Cancelar
-            </a>
+            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Guardar Alterações</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2"><i class="fas fa-arrow-left"></i> Cancelar</a>
         </div>
     </form>
 </div>
