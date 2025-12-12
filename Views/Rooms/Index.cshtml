@@ -203,9 +203,9 @@
     <table class="table table-bordered table-hover align-middle">
         <thead>
             <tr>
+                <th>Nome</th>
                 <th>Tipo</th>
                 <th>Especialidade</th>
-                <th>Nome</th>
                 <th>Localização</th>
                 <th>Horário</th>
                 <th>Estado</th>
@@ -219,32 +219,35 @@
                 var displayName = item.RoomStatus?.Name;
 
                 <tr>
-                    <td>
-                        @(item.RoomType?.Name?.Length > 20
-                                            ? item.RoomType.Name.Substring(0, 20) + "..."
-                                            : item.RoomType?.Name)
-                    </td>
-                    <td>
-                        @(
-                                            !string.IsNullOrWhiteSpace(item.Specialty?.Name)
-                                            ? (item.Specialty.Name.Length > 20
-                                            ? item.Specialty.Name.Substring(0, 20) + "..."
-                                            : item.Specialty.Name)
-                                            : "--sem especialidade--"
-                                            )
-                    </td>
-
+                    <!-- Nome na primeira coluna -->
                     <td>
                         @(item.Name?.Length > 20
                                             ? item.Name.Substring(0, 20) + "..."
                                             : item.Name)
                     </td>
+
+                    <td>
+                        @(item.RoomType?.Name?.Length > 20
+                                            ? item.RoomType.Name.Substring(0, 20) + "..."
+                                            : item.RoomType?.Name)
+                    </td>
+
+                    <td>
+                        @(!string.IsNullOrWhiteSpace(item.Specialty?.Name)
+                                            ? (item.Specialty.Name.Length > 20
+                                            ? item.Specialty.Name.Substring(0, 20) + "..."
+                                            : item.Specialty.Name)
+                                            : "--sem especialidade--")
+                    </td>
+
                     <td>@item.RoomLocation?.Name</td>
+
                     <td>
                         @item.OpeningTime.ToString(@"hh\:mm")
                         -
                         @item.ClosingTime.ToString(@"hh\:mm")
                     </td>
+
                     <td>
                         <span class="rounded-circle d-inline-block me-2 @color"
                               style="width:10px; height:10px;"
@@ -252,6 +255,7 @@
                         </span>
                         @displayName
                     </td>
+
                     <td class="text-center">
                         <a asp-action="Edit"
                            asp-route-id="@item.RoomId"

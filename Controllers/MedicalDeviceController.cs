@@ -121,32 +121,59 @@ namespace HealthWellBeingRoom.Controllers
 
 
         // --- 2. DETALHES (Read/Details) ---
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return View("NotFound");
+        //    }
+
+        //    var dispositivo = await _context.MedicalDevices
+        //        .Include(m => m.TypeMaterial)
+
+        //        // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
+        //        .Include(md => md.LocalizacaoDispMedicoMovel
+        //             .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
+        //        )
+        //        .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
+        //        .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
+
+        //    if (dispositivo == null)
+        //    {
+        //        return View("NotFound");
+        //    }
+
+        //    return View(dispositivo);
+        //}
+
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int? roomId, string origem)
         {
             if (id == null)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            var dispositivo = await _context.MedicalDevices
+            var medicalDevice = await _context.MedicalDevices
+                .Where(m => m.MedicalDeviceID == id)
                 .Include(m => m.TypeMaterial)
+                .Include(m => m.LocalizacaoDispMedicoMovel
+                    .Where(loc => loc.EndDate == null)) // apenas localização ativa
+                    .ThenInclude(loc => loc.Room)
+                .FirstOrDefaultAsync();
 
-                // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
-                .Include(md => md.LocalizacaoDispMedicoMovel
-                     .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
-                )
-                .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
-                .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
-
-            if (dispositivo == null)
+            if (medicalDevice == null)
             {
-                return View("NotFound");
+                return NotFound();
             }
 
-            return View(dispositivo);
-        }
+            // Contexto adicional para navegação
+            ViewBag.Origem = origem;
+            ViewBag.RoomId = roomId ?? medicalDevice.LocalizacaoDispMedicoMovel
+                .FirstOrDefault(l => l.EndDate == null)?.RoomId;
 
+            return View(medicalDevice);
+        }
 
         // --- 3. CRIAR (Create) - GET ---
         [Authorize(Roles = "logisticsTechnician")]

@@ -1,5 +1,5 @@
 ﻿@using HealthWellbeingRoom.Models
-@model MedicalDevice;
+@model MedicalDevice
 
 @{
     ViewData["Title"] = "Detalhes do Dispositivo";
@@ -101,6 +101,18 @@
 </div>
 
 <div class="mt-4 d-flex justify-content-end gap-2">
+
+ @* Adicinado por nuno abre *@
+    @if (ViewBag.Origem == "dispositivosAssociados")
+    {
+        <a asp-controller="Rooms"
+           asp-action="MedicalDevices"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista de dispositivos médicos associados
+        </a>
+    }
+ @* Adicionado por nuno fecha *@
 
     @{
         //Pode mover se NÃO estiver em Manutenção

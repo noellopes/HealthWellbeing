@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeingRoom.Models.Equipment>
+﻿@model HealthWellbeing.ViewModels.RPaginationInfo<HealthWellbeingRoom.Models.Equipment>
 
 @{
     ViewData["Title"] = "Equipamentos Associados";
@@ -15,31 +15,91 @@
 }
 
 <h2 class="text-primary mb-4">
-    <i class="bi bi-gear me-2"></i> Equipamentos Associados a sala "@ViewData["RoomName"]"
+    <i class="bi bi-gear me-2"></i> Equipamentos Associados à sala "@ViewData["RoomName"]"
 </h2>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info d-flex align-items-center mt-4" role="alert">
-        <i class="bi bi-info-circle-fill me-2"></i>
-        <span>Nenhum equipamento associado a esta sala.</span>
+<!-- Botão de pesquisa -->
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-primary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#equipSearch"
+            aria-expanded="false"
+            aria-controls="equipSearch">
+        <i class="bi bi-search me-1"></i> Pesquisa
+    </button>
+</div>
+
+<!-- Formulário de pesquisa -->
+<div class="collapse mb-3" id="equipSearch">
+    <div class="card card-body">
+        <form asp-action="Equipments" method="get" class="row g-2 align-items-end">
+            <input type="hidden" name="id" value="@ViewBag.RoomId" />
+
+            <div class="col-md-6">
+                <label for="searchName" class="form-label">Nome</label>
+                <input id="searchName" name="searchName" value="@ViewBag.SearchName"
+                       class="form-control" placeholder="Pesquisar pelo nome" type="text" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchSerial" class="form-label">Nº Série</label>
+                <input id="searchSerial" name="searchSerial" value="@ViewBag.SearchSerial"
+                       class="form-control" placeholder="Pesquisar pelo nº série" type="text" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchType" class="form-label">Tipo</label>
+                <input id="searchType" name="searchType" value="@ViewBag.SearchType"
+                       class="form-control" placeholder="Pesquisar pelo tipo" type="text" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchStatus" class="form-label">Estado</label>
+                <input id="searchStatus" name="searchStatus" value="@ViewBag.SearchStatus"
+                       class="form-control" placeholder="Pesquisar pelo estado" type="text" />
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <input type="hidden" name="page" value="1" />
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Equipments" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary flex-fill">
+                    <i class="bi bi-x-circle me-1"></i> Limpar
+                </a>
+            </div>
+        </form>
     </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-light">
+</div>
+
+<!-- Tabela -->
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nome</th>
+                <th>Nº Série</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
                 <tr>
-                    <th>Nome</th>
-                    <th>Nº Série</th>
-                    <th>Tipo</th>
-                    <th>Estado</th>
-                    <th class="text-center">Ações</th>
+                    <td colspan="5" class="text-center">
+                        <span class="alert alert-info d-block mb-0" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Nenhum equipamento associado a esta sala.
+                        </span>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var equipamento in Model)
+            }
+            else
+            {
+                @foreach (var equipamento in Model.Items)
                 {
                     <tr>
                         <td>@equipamento.Name</td>
@@ -64,24 +124,102 @@ else
                                asp-action="Details"
                                asp-route-id="@equipamento.EquipmentId"
                                asp-route-roomId="@ViewBag.RoomId"
-                               asp-route-origem="dispositivosAssociados"
+                               asp-route-origem="equipamentosAssociados"
                                class="btn btn-info px-4">
                                 <i class="bi bi-info-circle me-1"></i> Detalhes
                             </a>
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    </div>
-}
+            }
+        </tbody>
+    </table>
+</div>
+
 <!-- Botões de navegação -->
 <div class="mt-4 d-flex justify-content-end gap-2">
     <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
     </a>
-
     <a asp-action="Index" class="btn btn-primary">
         <i class="bi bi-list-ul me-1"></i> Voltar à Lista
     </a>
 </div>
+
+<!-- Paginação -->
+<nav aria-label="Equipment page" class="d-flex justify-content-between align-items-center mt-4">
+    @if (Model.TotalItems > 0)
+    {
+        <span class="text-muted">
+            Mostrando <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
+            - <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong>
+        </span>
+    }
+    else
+    {
+        <span class="text-muted">0 itens</span>
+    }
+
+    <ul class="pagination mb-0">
+        <!-- Primeira página -->
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Equipments"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="1">
+                    <i class="bi bi-chevron-double-left"></i> Primeira
+                </a>
+            </li>
+        }
+
+        <!-- Números de página -->
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">@p</span>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Equipments"
+                       asp-route-id="@ViewBag.RoomId"
+                       asp-route-page="@p">
+                        @p
+                    </a>
+                </li>
+            }
+        }
+
+        <!-- Última página -->
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Última <i class="bi bi-chevron-double-right"></i></a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Equipments"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="@Model.TotalPages">
+                    Última <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

@@ -26,10 +26,6 @@ namespace HealthWellbeing.Data
         public DbSet<Alergia> Alergia { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<Receita> Receita { get; set; } = default!;
-
-        public DbSet<RoomHistory> RoomHistories { get; set; }
-
-        // Novos DbSets
         public DbSet<Specialty> Specialty { get; set; } = default!;
         public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
         public DbSet<RoomType> RoomType { get; set; } = default!;
