@@ -119,33 +119,6 @@ namespace HealthWellBeingRoom.Controllers
             return View(paginationInfo);
         }
 
-
-        // --- 2. DETALHES (Read/Details) ---
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return View("NotFound");
-        //    }
-
-        //    var dispositivo = await _context.MedicalDevices
-        //        .Include(m => m.TypeMaterial)
-
-        //        // Incluir a coleção da Localização, filtrando SÓ o registo ATIVO (EndDate == null)
-        //        .Include(md => md.LocalizacaoDispMedicoMovel
-        //             .Where(loc => loc.EndDate == null) // 🎯 CORREÇÃO: Usar a lógica temporal
-        //        )
-        //        .ThenInclude(loc => loc.Room) // para ter acesso ao nome da sala
-        //        .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
-
-        //    if (dispositivo == null)
-        //    {
-        //        return View("NotFound");
-        //    }
-
-        //    return View(dispositivo);
-        //}
-
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id, int? roomId, string origem)
         {

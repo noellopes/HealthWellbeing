@@ -3,6 +3,9 @@
 
 @{
     ViewData["Title"] = "Dispositivos Médicos Registados";
+
+    // Verifica se o utilizador tem permissão de Logística
+    bool isLogistica = User.IsInRole("logisticsTechnician");
 }
 
 @* --- Secção de Mensagem de Sucesso --- *@
@@ -26,13 +29,16 @@
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Registar Novo
-        </a>
+        @if (isLogistica)
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+            </a>
+        }
     </div>
 </div>
 
-@* --- FORMULÁRIO DE PESQUISA (Seu código existente) --- *@
+@* --- FORMULÁRIO DE PESQUISA --- *@
 <div class="collapse mt-2 mb-2" id="postSearch">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
@@ -89,7 +95,7 @@
 }
 else
 {
-    @* --- TABELA DE ITENS (Seu código existente) --- *@
+    @* --- TABELA DE ITENS --- *@
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="table-light">
@@ -156,9 +162,6 @@ else
                                 //Só pode eliminar se estiver "Em Armazenamento"
                                 //(Ou seja: NÃO está em manutenção E NÃO está alocado)
                                 bool podeEliminar = dispositivo.CurrentStatus == "Em Armazenamento";
-
-                                // Verifica se o utilizador tem permissão de Logística
-                                bool isLogistica = User.IsInRole("logisticsTechnician");
                             }
 
                             @* --- BOTÃO MOVER (Apenas Logística) --- *@
@@ -215,7 +218,7 @@ else
             </tbody>
         </table>
 
-        @* --- Secção de Paginação (Seu código existente) --- *@
+        @* --- Secção de Paginação --- *@
         <nav aria-label="Medical Device page" class="d-flex justify-content-between align-items-center">
             @* Model.Items.Count() mostra quantos itens estão na página atual *@
             <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
