@@ -26,6 +26,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
+
+        public DbSet<HealthWellbeing.Models.PlanoExercicios> PlanoExercicios { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Equipamento> Equipamento { get; set; }
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
         public DbSet<HealthWellbeing.Models.UtenteGrupo7> UtenteGrupo7 { get; set; } = default!;
@@ -89,6 +91,11 @@ namespace HealthWellbeing.Data
                 .HasOne(eg => eg.Genero)
                 .WithMany(g => g.ExercicioGeneros)
                 .HasForeignKey(eg => eg.GeneroId);
+
+            modelBuilder.Entity<PlanoExercicios>()
+                .HasMany(p => p.Exercicios)
+                .WithMany(e => e.PlanoExercicios)
+                .UsingEntity(j => j.ToTable("PlanoExerciciosExercicio"));
 
             modelBuilder.Entity<ExercicioGrupoMuscular>()
                 .HasKey(egm => new { egm.ExercicioId, egm.GrupoMuscularId });

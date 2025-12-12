@@ -8,16 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Controllers
 {
     public class UtenteGrupo7Controller : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UtenteGrupo7Controller(HealthWellbeingDbContext context)
+        public UtenteGrupo7Controller(HealthWellbeingDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // --- MÉTODOS DE SUPORTE ---
@@ -143,6 +146,7 @@ namespace HealthWellbeing.Controllers
         // GET: UtenteGrupo7/Create
         public async Task<IActionResult> Create()
         {
+
             await PopularObjetivosDropDownList();
             await PopularProblemasSaudeCheckboxes(); // Carrega as checkboxes vazias
             return View();
@@ -153,6 +157,18 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
         {
+
+            // 1. Apanhar o ID do utilizador logado
+            var userId = _userManager.GetUserId(User);
+
+            // 2. Atribuir ao modelo
+            utenteGrupo7.UserId = userId;
+
+            // 3. Remover o erro de validação do ModelState 
+            // (Como o campo UserId não vem do formulário HTML, o sistema acha que está vazio e dá erro. 
+            // Temos de dizer "está tudo bem, eu já preenchi manualmente acima")
+            ModelState.Remove("UserId");
+
             // Validação de Nome Duplicado
             bool existeRegisto = await _context.UtenteGrupo7
                 .AnyAsync(u => u.Nome.ToLower() == utenteGrupo7.Nome.ToLower());
@@ -160,6 +176,14 @@ namespace HealthWellbeing.Controllers
             if (existeRegisto)
             {
                 ModelState.AddModelError("Nome", "Já existe um Utente com este nome.");
+            }
+
+            bool existeid = await _context.UtenteGrupo7
+                .AnyAsync(u => u.UserId == userId);
+
+            if (existeid)
+            {
+                ModelState.AddModelError("Nome", "So pode se registrar uma vez.");
             }
 
             // Inicializar e preencher a coleção de problemas de saúde
