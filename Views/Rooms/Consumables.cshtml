@@ -17,6 +17,81 @@
     <i class="bi bi-box-seam me-2"></i> Consumíveis Associados à sala "@ViewData["RoomName"]"
 </h2>
 
+<!-- Botão de pesquisa -->
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-primary"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#consumableSearch"
+            aria-expanded="false"
+            aria-controls="consumableSearch">
+        <i class="bi bi-search me-1"></i> Pesquisa
+    </button>
+</div>
+
+<!-- FORMULÁRIO DE PESQUISA (collapse) -->
+<div class="collapse mb-3" id="consumableSearch">
+    <div class="card card-body">
+        <form asp-action="Consumables" method="get" class="row g-2 align-items-end">
+            <input type="hidden" name="id" value="@ViewBag.RoomId" />
+
+            <!-- Primeira linha: Nome e Categoria -->
+            <div class="col-md-6">
+                <label for="searchName" class="form-label">Nome</label>
+                <input id="searchName"
+                       name="searchName"
+                       value="@ViewBag.SearchName"
+                       class="form-control"
+                       placeholder="Pesquisar pelo nome do consumível"
+                       type="text" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchCategory" class="form-label">Categoria</label>
+                <input id="searchCategory"
+                       name="searchCategory"
+                       value="@ViewBag.SearchCategory"
+                       class="form-control"
+                       placeholder="Pesquisar pela categoria"
+                       type="text" />
+            </div>
+
+            <!-- Segunda linha: Quantidade mínima e máxima -->
+            <div class="col-md-6">
+                <label for="searchMinQuantity" class="form-label">Quantidade mínima</label>
+                <input id="searchMinQuantity"
+                       name="searchMinQuantity"
+                       value="@ViewBag.SearchMinQuantity"
+                       class="form-control"
+                       type="number"
+                       min="0" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchMaxQuantity" class="form-label">Quantidade máxima</label>
+                <input id="searchMaxQuantity"
+                       name="searchMaxQuantity"
+                       value="@ViewBag.SearchMaxQuantity"
+                       class="form-control"
+                       type="number"
+                       min="0" />
+            </div>
+
+            <!-- Botões -->
+            <div class="col-12 mt-2 d-flex gap-2">
+                <input type="hidden" name="page" value="1" />
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Consumables" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary flex-fill">
+                    <i class="bi bi-x-circle me-1"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- TABELA -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
@@ -74,3 +149,83 @@
         <i class="bi bi-list-ul me-1"></i> Voltar à Lista
     </a>
 </div>
+
+<!-- PAGINAÇÃO AO FINAL -->
+<nav aria-label="RoomConsumable page" class="d-flex justify-content-between align-items-center mt-4">
+    @if (Model.TotalItems > 0)
+    {
+        <span class="text-muted">
+            Mostrando
+            <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
+            -
+            <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong>
+        </span>
+    }
+    else
+    {
+        <span class="text-muted">0 itens</span>
+    }
+
+    <ul class="pagination mb-0">
+        <!-- Primeira página -->
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Consumables"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="1">
+                    <i class="bi bi-chevron-double-left"></i> Primeira
+                </a>
+            </li>
+        }
+
+        <!-- Números de página -->
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="#">@p</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Consumables"
+                       asp-route-id="@ViewBag.RoomId"
+                       asp-route-page="@p">
+                        @p
+                    </a>
+                </li>
+            }
+        }
+
+        <!-- Última página -->
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Última <i class="bi bi-chevron-double-right"></i></a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Consumables"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="@Model.TotalPages">
+                    Última <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

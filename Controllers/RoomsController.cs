@@ -409,7 +409,13 @@ namespace HealthWellbeingRoom.Controllers
 
         //----------------------------------------------------------HISTORY---------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult History(int id, int page = 1)
+        public IActionResult History(
+            int id,
+            int? searchHistoryId,
+            int? searchResponsibleId,
+            DateTime? searchStartDate,
+            DateTime? searchEndDate,
+            int page = 1)
         {
             ViewBag.RoomId = id;
 
@@ -417,10 +423,8 @@ namespace HealthWellbeingRoom.Controllers
             if (room == null)
                 return NotFound();
 
-
-
             ViewData["RoomName"] = room.Name;
-            ViewData["Title"] = "Histórico de uilização de Sala";
+            ViewData["Title"] = "Histórico de utilização de Sala";
 
 
             // Dados fictícios
@@ -443,45 +447,47 @@ namespace HealthWellbeingRoom.Controllers
                 new RoomHistory { RoomHistoryId = 150, StartDate = DateTime.Now.AddDays(-32), EndDate = DateTime.Now.AddDays(-32).AddHours(1), Responsible = "João Costa", ResponsibleId = 15, Note = "Inspeção final" }
             };
 
+            // Aplicar filtros
+            if (searchHistoryId.HasValue)
+                fakeData = fakeData.Where(h => h.RoomHistoryId == searchHistoryId.Value).ToList();
+
+            if (searchResponsibleId.HasValue)
+                fakeData = fakeData.Where(h => h.ResponsibleId == searchResponsibleId.Value).ToList();
+
+            if (searchStartDate.HasValue)
+                fakeData = fakeData.Where(h => h.StartDate >= searchStartDate.Value).ToList();
+
+            if (searchEndDate.HasValue)
+                fakeData = fakeData.Where(h => h.EndDate <= searchEndDate.Value).ToList();
+
+            // Paginação segura
             int itemsPerPage = 10;
             var pagination = new RPaginationInfo<RoomHistory>(page, fakeData.Count, itemsPerPage);
 
-            // Pagination está construído, usar ItemsToSkip
             pagination.Items = fakeData
+                .OrderByDescending(h => h.StartDate)
                 .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage);
+                .Take(pagination.ItemsPerPage)
+                .ToList();
+
+            // Guardar filtros para preencher o formulário
+            ViewBag.SearchHistoryId = searchHistoryId;
+            ViewBag.SearchResponsibleId = searchResponsibleId;
+            ViewBag.SearchStartDate = searchStartDate?.ToString("yyyy-MM-dd");
+            ViewBag.SearchEndDate = searchEndDate?.ToString("yyyy-MM-dd");
 
             return View(pagination);
         }
 
         //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------
-
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult Equipments(int id)
-        {
-
-            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
-            if (room == null)
-                return NotFound();
-
-            ViewData["RoomName"] = room.Name;   // passa o nome da sala para a View
-            ViewBag.RoomId = id;
-
-            // Carrega equipamentos associados à sala
-            var equipamentos = _context.Equipment
-                .Include(e => e.EquipmentType)
-                .Include(e => e.EquipmentStatus)
-                .Include(e => e.Room)
-                .Where(e => e.RoomId == id)
-                .ToList();
-
-            return View(equipamentos);
-        }
-
-        //----------------------------------------------------------MEDICAL DEVICES---------------------------------------------------------------------------------
-
-        [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult MedicalDevices(int id)
+        public IActionResult Equipments(
+            int id,
+            string? searchName,
+            string? searchType,
+            string? searchStatus,
+            string? searchSerial,
+            int page = 1)
         {
             // Verifica se a sala existe
             var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
@@ -491,16 +497,113 @@ namespace HealthWellbeingRoom.Controllers
             ViewData["RoomName"] = room.Name;
             ViewBag.RoomId = id;
 
-            // Carrega dispositivos médicos associados à sala via LocationMedDevice
-            var dispositivos = _context.MedicalDevices
+            // Query base: equipamentos associados à sala
+            var equipamentosQuery = _context.Equipment
+                .Include(e => e.EquipmentType)
+                .Include(e => e.EquipmentStatus)
+                .Where(e => e.RoomId == id);
+
+            // Aplicar filtros
+            if (!string.IsNullOrWhiteSpace(searchName))
+                equipamentosQuery = equipamentosQuery.Where(e =>
+                    e.Name.ToLower().Contains(searchName.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(searchType))
+                equipamentosQuery = equipamentosQuery.Where(e =>
+                    e.EquipmentType.Name.ToLower().Contains(searchType.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(searchStatus))
+                equipamentosQuery = equipamentosQuery.Where(e =>
+                    e.EquipmentStatus.Name.ToLower().Contains(searchStatus.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(searchSerial))
+                equipamentosQuery = equipamentosQuery.Where(e =>
+                    e.SerialNumber.ToLower().Contains(searchSerial.ToLower()));
+
+            // Executa a query em memória
+            var equipamentos = equipamentosQuery.ToList();
+
+            // Paginação segura
+            int itemsPerPage = 10;
+            int totalItems = equipamentos.Count;
+            var pagination = new RPaginationInfo<Equipment>(page, totalItems, itemsPerPage);
+
+            pagination.Items = equipamentos
+                .OrderBy(e => e.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToList();
+
+            // Guardar filtros para preencher o formulário
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchType = searchType;
+            ViewBag.SearchStatus = searchStatus;
+            ViewBag.SearchSerial = searchSerial;
+
+            return View(pagination);
+        }
+
+        //----------------------------------------------------------MEDICAL DEVICES---------------------------------------------------------------------------------
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult MedicalDevices(
+            int id,
+            string? searchName,
+            string? searchType,
+            string? searchStatus,
+            int page = 1)
+        {
+            // Verifica se a sala existe
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
+            if (room == null)
+                return NotFound();
+
+            ViewData["RoomName"] = room.Name;
+            ViewBag.RoomId = id;
+
+            // Carrega dispositivos médicos associados à sala via LocationMedDevice (apenas localização ativa)
+            var dispositivosQuery = _context.MedicalDevices
                 .Include(d => d.TypeMaterial)
                 .Include(d => d.LocalizacaoDispMedicoMovel)
                     .ThenInclude(l => l.Room)
                 .Where(d => d.LocalizacaoDispMedicoMovel
-                    .Any(l => l.RoomId == id && l.EndDate == null)) // apenas localização ativa
+                    .Any(l => l.RoomId == id && l.EndDate == null));
+
+            // Aplicar filtros
+            if (!string.IsNullOrWhiteSpace(searchName))
+                dispositivosQuery = dispositivosQuery.Where(d =>
+                    d.Name.ToLower().Contains(searchName.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(searchType))
+                dispositivosQuery = dispositivosQuery.Where(d =>
+                    d.TypeMaterial.Name.ToLower().Contains(searchType.ToLower()));
+
+            if (!string.IsNullOrWhiteSpace(searchStatus))
+                dispositivosQuery = dispositivosQuery.Where(d =>
+                    d.CurrentStatus.ToLower().Contains(searchStatus.ToLower()));
+
+            // Executa a query e transforma em List<T>
+            var dispositivos = dispositivosQuery.ToList();
+
+            // Paginação segura (igual ao Consumables)
+            int itemsPerPage = 10;
+            itemsPerPage = itemsPerPage > 0 ? itemsPerPage : 10;
+
+            int totalItems = dispositivos.Count;
+            var pagination = new RPaginationInfo<MedicalDevice>(page, totalItems, itemsPerPage);
+
+            pagination.Items = dispositivos
+                .OrderBy(d => d.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
                 .ToList();
 
-            return View(dispositivos);
+            // Guardar filtros para manter no formulário
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchType = searchType;
+            ViewBag.SearchStatus = searchStatus;
+
+            return View(pagination);
         }
 
 
@@ -518,8 +621,13 @@ namespace HealthWellbeingRoom.Controllers
 
 
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult Consumables(int id, int page = 1)
-        {
+        public IActionResult Consumables(
+            int id,
+            string? searchName,
+            string? searchCategory,
+            int? searchMinQuantity,
+            int? searchMaxQuantity,
+            int page = 1){
             ViewBag.RoomId = id;
 
             var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
@@ -549,6 +657,28 @@ namespace HealthWellbeingRoom.Controllers
                 new RoomConsumable { RoomConsumableId = 15, Name = "Protetor facial", Quantity = 12, Note = "Visores reutilizáveis", Category = "Proteção" }
             };
 
+            // Aplicar filtros
+            if (!string.IsNullOrEmpty(searchName))
+                consumables = consumables
+                    .Where(c => c.Name.Contains(searchName, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (!string.IsNullOrEmpty(searchCategory))
+                consumables = consumables
+                    .Where(c => c.Category.Contains(searchCategory, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+            if (searchMinQuantity.HasValue)
+                consumables = consumables
+                    .Where(c => c.Quantity >= searchMinQuantity.Value)
+                    .ToList();
+
+            if (searchMaxQuantity.HasValue)
+                consumables = consumables
+                    .Where(c => c.Quantity <= searchMaxQuantity.Value)
+                    .ToList();
+
+            // Paginação
             int itemsPerPage = 10;
             var pagination = new RPaginationInfo<RoomConsumable>(page, consumables.Count, itemsPerPage);
 
@@ -556,10 +686,57 @@ namespace HealthWellbeingRoom.Controllers
                 .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage);
 
+            // Manter filtros na ViewBag para preencher o formulário
+            ViewBag.SearchName = searchName;
+            ViewBag.SearchCategory = searchCategory;
+            ViewBag.SearchMinQuantity = searchMinQuantity;
+            ViewBag.SearchMaxQuantity = searchMaxQuantity;
+
             return View(pagination);
         }
 
+        //----------------------------------------------------------HISTORYDETAILS---------------------------------------------------------------------------------
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult HistoryDetails(int id, int roomId)
+        {
+            // Buscar a sala
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == roomId);
+            if (room == null)
+                return NotFound();
 
+            ViewBag.RoomId = roomId;
+            ViewData["RoomName"] = room.Name;
 
+            // Dados fictícios (mesmos do método History, mas agora com RoomId preenchido)
+            var fakeData = new List<RoomHistory>
+            {
+                new RoomHistory { RoomHistoryId = 10, RoomId = roomId, StartDate = DateTime.Now.AddHours(-2), EndDate = DateTime.Now, Responsible = "João Silva", ResponsibleId = 1, Note = "Limpeza completa" },
+                new RoomHistory { RoomHistoryId = 20, RoomId = roomId, StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(-1).AddHours(1), Responsible = "Maria Costa", ResponsibleId = 2, Note = "Inspeção técnica" },
+                new RoomHistory { RoomHistoryId = 30, RoomId = roomId, StartDate = DateTime.Now.AddDays(-3), EndDate = DateTime.Now.AddDays(-3).AddHours(2), Responsible = "Carlos Mendes", ResponsibleId = 3, Note = "Revisão elétrica" },
+                new RoomHistory { RoomHistoryId = 40, RoomId = roomId, StartDate = DateTime.Now.AddDays(-5), EndDate = DateTime.Now.AddDays(-5).AddHours(1), Responsible = "Ana Ferreira", ResponsibleId = 4, Note = "Troca de lâmpadas" },
+                new RoomHistory { RoomHistoryId = 50, RoomId = roomId, StartDate = DateTime.Now.AddDays(-7), EndDate = DateTime.Now.AddDays(-7).AddHours(3), Responsible = "Pedro Santos", ResponsibleId = 5, Note = "Limpeza de ar condicionado" },
+                new RoomHistory { RoomHistoryId = 60, RoomId = roomId, StartDate = DateTime.Now.AddDays(-10), EndDate = DateTime.Now.AddDays(-10).AddHours(2), Responsible = "Sofia Almeida", ResponsibleId = 6, Note = "Inspeção de segurança" },
+                new RoomHistory { RoomHistoryId = 70, RoomId = roomId, StartDate = DateTime.Now.AddDays(-12), EndDate = DateTime.Now.AddDays(-12).AddHours(1), Responsible = "Ricardo Lopes", ResponsibleId = 7, Note = "Revisão de portas" },
+                new RoomHistory { RoomHistoryId = 80, RoomId = roomId, StartDate = DateTime.Now.AddDays(-15), EndDate = DateTime.Now.AddDays(-15).AddHours(2), Responsible = "Helena Costa", ResponsibleId = 8, Note = "Verificação de extintores" },
+                new RoomHistory { RoomHistoryId = 90, RoomId = roomId, StartDate = DateTime.Now.AddDays(-18), EndDate = DateTime.Now.AddDays(-18).AddHours(1), Responsible = "Miguel Rocha", ResponsibleId = 9, Note = "Revisão de cablagem" },
+                new RoomHistory { RoomHistoryId = 100, RoomId = roomId, StartDate = DateTime.Now.AddDays(-20), EndDate = DateTime.Now.AddDays(-20).AddHours(2), Responsible = "Patrícia Gomes", ResponsibleId = 10, Note = "Limpeza geral" },
+                new RoomHistory { RoomHistoryId = 110, RoomId = roomId, StartDate = DateTime.Now.AddDays(-22), EndDate = DateTime.Now.AddDays(-22).AddHours(1), Responsible = "Tiago Martins", ResponsibleId = 11, Note = "Inspeção técnica" },
+                new RoomHistory { RoomHistoryId = 120, RoomId = roomId, StartDate = DateTime.Now.AddDays(-25), EndDate = DateTime.Now.AddDays(-25).AddHours(2), Responsible = "Beatriz Silva", ResponsibleId = 12, Note = "Troca de filtros" },
+                new RoomHistory { RoomHistoryId = 130, RoomId = roomId, StartDate = DateTime.Now.AddDays(-27), EndDate = DateTime.Now.AddDays(-27).AddHours(1), Responsible = "André Carvalho", ResponsibleId = 13, Note = "Revisão de iluminação" },
+                new RoomHistory { RoomHistoryId = 140, RoomId = roomId, StartDate = DateTime.Now.AddDays(-30), EndDate = DateTime.Now.AddDays(-30).AddHours(2), Responsible = "Mariana Ribeiro", ResponsibleId = 14, Note = "Limpeza técnica" },
+                new RoomHistory { RoomHistoryId = 150, RoomId = roomId, StartDate = DateTime.Now.AddDays(-32), EndDate = DateTime.Now.AddDays(-32).AddHours(1), Responsible = "João Costa", ResponsibleId = 15, Note = "Inspeção final" }
+            };
+
+            // Procurar o histórico pelo ID e RoomId
+            var history = fakeData.FirstOrDefault(h => h.RoomHistoryId == id && h.RoomId == roomId);
+
+            if (history == null)
+                return NotFound();
+
+            ViewBag.RoomId = roomId;
+            ViewData["Title"] = "Detalhes do Histórico da Sala";
+
+            return View(history); // envia para HistoryDetails.cshtml
+        }
     }
 }

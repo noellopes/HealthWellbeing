@@ -90,6 +90,7 @@
                 <th>Responsável</th>
                 <th>Id do Responsável</th>
                 <th>Observação</th>
+                <th class="text-center">Ações</th> <!-- nova coluna -->
             </tr>
         </thead>
         <tbody>
@@ -102,6 +103,15 @@
                     <td>@item.Responsible</td>
                     <td>@item.ResponsibleId.ToString("D4")</td>
                     <td>@item.Note</td>
+                    <td class="text-center align-middle">
+                        <a asp-action="HistoryDetails"
+                           asp-route-id="@item.RoomHistoryId"
+                           asp-route-roomId="@ViewBag.RoomId"
+                           class="btn btn-info px-4">
+                            <i class="bi bi-info-circle me-1"></i> Detalhes
+                        </a>
+
+                    </td>
                 </tr>
             }
         </tbody>

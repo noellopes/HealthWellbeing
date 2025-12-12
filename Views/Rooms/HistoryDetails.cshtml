@@ -1,0 +1,22 @@
+﻿@model HealthWellbeingRoom.Models.RoomHistory
+
+<h2 class="text-primary mb-4">
+    <i class="bi bi-info-circle me-2"></i> Detalhes do Histórico da sala "@ViewData["RoomName"]"
+</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Id:</strong> @Model.RoomHistoryId</p>
+        <p><strong>Sala:</strong> @ViewData["RoomName"]</p>
+        <p><strong>Início:</strong> @Model.StartDate.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Fim:</strong> @Model.EndDate.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Responsável:</strong> @Model.Responsible (@Model.ResponsibleId)</p>
+        <p><strong>Observação:</strong> @Model.Note</p>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="History" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar ao Histórico
+    </a>
+</div>
