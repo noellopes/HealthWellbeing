@@ -18,15 +18,8 @@ namespace HealthWellbeing.Models
         [StringLength(50, ErrorMessage = "A Zona Atingida do problema deve ter no máximo 50 caracteres")]
         public string ZonaAtingida { get; set; }
 
-        public ICollection<ProfissionalExecutante>? ProfissionalExecutante { get; set; }
-
         [Range(1, 10, ErrorMessage = "A gravidade deve estar entre 1 e 10")]
         public int Gravidade { get; set; }
-
-        public ProblemaSaude()
-        {
-            ProfissionalExecutante = new HashSet<ProfissionalExecutante>();
-        }
 
         public ICollection<TipoExercicioProblemaSaude>? TipoExercicioAfetado { get; set; }
         public ICollection<ExercicioProblemaSaude>? ExercicioAfetado { get; set; }

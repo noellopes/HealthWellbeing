@@ -3,13 +3,9 @@ using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static HealthWellbeing.Data.SeedData;
 
 namespace HealthWellbeing.Controllers
 {
@@ -28,16 +24,13 @@ namespace HealthWellbeing.Controllers
             string categoria,
             string nome,
             string zona,
-            string profissional, // Termo de pesquisa para Profissional
             string gravidade,
             int page = 1)
         {
             int pageSize = 10;
 
-            // Inclui a tabela relacionada para poder filtrar
-            var query = _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .AsQueryable();
+            // Removido o .Include(ProfissionalExecutante)
+            var query = _context.ProblemaSaude.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(categoria))
                 query = query.Where(p => p.ProblemaCategoria.ToLower().Contains(categoria.ToLower()));
@@ -48,13 +41,7 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(zona))
                 query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
 
-            // Filtro na tabela relacionada (Muitos-para-Muitos)
-            if (!string.IsNullOrWhiteSpace(profissional))
-            {
-                query = query.Where(p => p.ProfissionalExecutante.Any(
-                    prof => prof.Nome.ToLower().Contains(profissional.ToLower())
-                ));
-            }
+            // Removido o bloco de filtro por Profissional
 
             if (!string.IsNullOrWhiteSpace(gravidade))
                 query = query.Where(p => p.Gravidade.ToString() == gravidade);
@@ -72,7 +59,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.Categoria = categoria;
             ViewBag.Nome = nome;
             ViewBag.Zona = zona;
-            ViewBag.Profissional = profissional;
+            // ViewBag.Profissional removido
             ViewBag.Gravidade = gravidade;
 
             return View(pagination);
@@ -86,9 +73,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Inclui os profissionais para mostrar nos detalhes
+            // Removido o .Include
             var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
@@ -102,8 +88,7 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Create
         public IActionResult Create()
         {
-            // Carrega todos os profissionais para mostrar nas checkboxes
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
+            // Removida a carga da lista de profissionais para ViewData
             return View();
         }
 
@@ -111,32 +96,15 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude,
-            int[] selectedProfissionais) // Recebe os IDs dos profissionais selecionados
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
+        // Removido o argumento int[] selectedProfissionais
         {
             if (ModelState.IsValid)
             {
-                // Lógica para associar os profissionais selecionados
-                if (selectedProfissionais != null && selectedProfissionais.Any())
-                {
-                    problemaSaude.ProfissionalExecutante = new List<ProfissionalExecutante>();
-                    foreach (var profId in selectedProfissionais)
-                    {
-                        var profissional = await _context.ProfissionalExecutante.FindAsync(profId);
-                        if (profissional != null)
-                        {
-                            problemaSaude.ProfissionalExecutante.Add(profissional);
-                        }
-                    }
-                }
-
                 _context.Add(problemaSaude);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, recarrega a lista de profissionais
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
             return View(problemaSaude);
         }
 
@@ -148,23 +116,15 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Carrega o problema de saúde E os profissionais já associados
-            var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
+            // Removido o .Include
+            var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
 
             if (problemaSaude == null)
             {
                 return NotFound();
             }
 
-            // Carrega a lista completa de profissionais para as checkboxes
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
-
-            // Carrega os IDs dos profissionais que já estão selecionados
-            ViewData["SelectedProfissionais"] = problemaSaude.ProfissionalExecutante
-                .Select(p => p.ProfissionalExecutanteId).ToList();
-
+            // Removida a lógica de carregar checkboxes
             return View(problemaSaude);
         }
 
@@ -173,8 +133,8 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude,
-            int[] selectedProfissionais)
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
+        // Removido o argumento int[] selectedProfissionais
         {
             if (id != problemaSaude.ProblemaSaudeId)
             {
@@ -185,39 +145,7 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    // Lógica correta para atualizar Muitos-para-Muitos:
-                    // 1. Carregar a entidade existente do BD
-                    var problemaSaudeExistente = await _context.ProblemaSaude
-                        .Include(p => p.ProfissionalExecutante)
-                        .FirstOrDefaultAsync(p => p.ProblemaSaudeId == id);
-
-                    if (problemaSaudeExistente == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // 2. Atualizar propriedades simples
-                    problemaSaudeExistente.ProblemaCategoria = problemaSaude.ProblemaCategoria;
-                    problemaSaudeExistente.ProblemaNome = problemaSaude.ProblemaNome;
-                    problemaSaudeExistente.ZonaAtingida = problemaSaude.ZonaAtingida;
-                    problemaSaudeExistente.Gravidade = problemaSaude.Gravidade;
-
-                    // 3. Atualizar a coleção de profissionais
-                    problemaSaudeExistente.ProfissionalExecutante?.Clear();
-                    if (selectedProfissionais != null && selectedProfissionais.Any())
-                    {
-                        problemaSaudeExistente.ProfissionalExecutante ??= new List<ProfissionalExecutante>();
-                        foreach (var profId in selectedProfissionais)
-                        {
-                            var profissional = await _context.ProfissionalExecutante.FindAsync(profId);
-                            if (profissional != null)
-                            {
-                                problemaSaudeExistente.ProfissionalExecutante.Add(profissional);
-                            }
-                        }
-                    }
-
-                    _context.Update(problemaSaudeExistente);
+                    _context.Update(problemaSaude);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -233,10 +161,6 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, recarrega os dados para a View
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
-            ViewData["SelectedProfissionais"] = selectedProfissionais?.ToList() ?? new List<int>();
             return View(problemaSaude);
         }
 
@@ -248,9 +172,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Inclui profissionais para mostrar o que está associado
+            // Removido o .Include
             var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
