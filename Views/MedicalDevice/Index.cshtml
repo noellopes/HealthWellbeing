@@ -156,46 +156,58 @@ else
                                 //Só pode eliminar se estiver "Em Armazenamento"
                                 //(Ou seja: NÃO está em manutenção E NÃO está alocado)
                                 bool podeEliminar = dispositivo.CurrentStatus == "Em Armazenamento";
+
+                                // Verifica se o utilizador tem permissão de Logística
+                                bool isLogistica = User.IsInRole("logisticsTechnician");
                             }
 
-                            @* --- BOTÃO MOVER --- *@
-                            @if (podeMover)
+                            @* --- BOTÃO MOVER (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <a asp-controller="LocationMedDevice" asp-action="Create"
-                                   asp-route-id="@dispositivo.MedicalDeviceID"
-                                   class="btn btn-sm btn-success me-1">
-                                    <i class="bi bi-geo-alt"></i> Mover
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
-                                    <i class="bi bi-x-octagon"></i> Mover
-                                </span>
+                                @if (podeMover)
+                                {
+                                    <a asp-controller="LocationMedDevice" asp-action="Create"
+                                       asp-route-id="@dispositivo.MedicalDeviceID"
+                                       class="btn btn-sm btn-success me-1">
+                                        <i class="bi bi-geo-alt"></i> Mover
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
+                                        <i class="bi bi-x-octagon"></i> Mover
+                                    </span>
+                                }
                             }
 
-                            @* --- BOTÃO DETALHES --- *@
+                            @* --- BOTÃO DETALHES (Visível para todos) --- *@
                             <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
 
-                            @* --- BOTÃO EDITAR --- *@
-                            <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-
-                            @* --- BOTÃO ELIMINAR --- *@
-                            @if (podeEliminar)
+                            @* --- BOTÃO EDITAR (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
                                 </a>
                             }
-                            else
+
+                            @* --- BOTÃO ELIMINAR (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </span>
+                                @if (podeEliminar)
+                                {
+                                    <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </span>
+                                }
                             }
                         </td>
                     </tr>

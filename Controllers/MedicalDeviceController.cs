@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellBeingRoom.Controllers
 {
-    [Authorize(Roles = "logisticsTechnician,Administrator")]
+    [Authorize]
     public class MedicalDeviceController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -24,6 +24,7 @@ namespace HealthWellBeingRoom.Controllers
         }
 
         // --- LISTA (Index) ---
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Index(
         int page = 1,
         string searchName = "",
@@ -120,6 +121,7 @@ namespace HealthWellBeingRoom.Controllers
 
 
         // --- 2. DETALHES (Read/Details) ---
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -147,15 +149,17 @@ namespace HealthWellBeingRoom.Controllers
 
 
         // --- 3. CRIAR (Create) - GET ---
+        [Authorize(Roles = "logisticsTechnician")]
         public IActionResult Create()
         {
-            ViewBag.TypeMaterialID = new SelectList(_context.Set<TypeMaterial>(), "TypeMaterialID", "Name");
+            ViewBag.TypeMaterialID = new SelectList(_context.Set<TypeMaterial>().OrderBy(t => t.Name), "TypeMaterialID", "Name");
             return View(new MedicalDevice());
         }
 
         // POST: MedicalDevice/Create 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "logisticsTechnician")]
         // BIND: Inclui SerialNumber e ManufacturerId
         public async Task<IActionResult> Create([Bind("MedicalDeviceID,Name,SerialNumber,Observation,TypeMaterialID,IsUnderMaintenance")] MedicalDevice medicalDevices)
         {
@@ -214,6 +218,7 @@ namespace HealthWellBeingRoom.Controllers
         }
 
         // --- 4. EDITAR (Edit) - GET ---
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -235,9 +240,10 @@ namespace HealthWellBeingRoom.Controllers
             return View(medicalDevices);
         }
 
-        // POST: MedicalDevice/Edit
+        // POST: MedicalDevice/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Edit(int id, [Bind("MedicalDeviceID,Name,SerialNumber,RegistrationDate,Observation,TypeMaterialID,IsUnderMaintenance")] MedicalDevice medicalDevices)
         {
             if (id != medicalDevices.MedicalDeviceID)
@@ -245,13 +251,23 @@ namespace HealthWellBeingRoom.Controllers
                 return View("NotFound");
             }
 
+            // Verifica se já existe esse Serial, mas que NÃO SEJA este dispositivo
+            bool serialExiste = await _context.MedicalDevices
+                .AnyAsync(d => d.SerialNumber == medicalDevices.SerialNumber && d.MedicalDeviceID != id);
+
+            if (serialExiste)
+            {
+                ModelState.AddModelError("SerialNumber", "Este Número de Série já está registado noutro dispositivo.");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    //busca a "Ficha Completa" original do dispositivo tal como está gravada na base de dados
-                    var dispositivoOriginal = await _context.MedicalDevices 
-                        .AsNoTracking() //para não bloquear o Entity Framework ao atualizar o objeto 'medicalDevices' depois.
+                    // Busca o original apenas para leitura (comparar estados)
+                    // AsNoTracking é importante aqui porque vamos usar o _context.Update
+                    var dispositivoOriginal = await _context.MedicalDevices
+                        .AsNoTracking()
                         .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
                     if (dispositivoOriginal == null) return View("NotFound");
@@ -260,9 +276,10 @@ namespace HealthWellBeingRoom.Controllers
                     bool entrouEmManutencao = !dispositivoOriginal.IsUnderMaintenance && medicalDevices.IsUnderMaintenance;
                     bool saiuDeManutencao = dispositivoOriginal.IsUnderMaintenance && !medicalDevices.IsUnderMaintenance;
 
+                    // O _context.Update vai marcar esse objeto como "Modificado" e o EF vai gerar o SQL para gravar tudo
                     _context.Update(medicalDevices);
 
-                    //Entrou em Manutenção (Fecha a localização atual), deixa o dispositivo num limbo(como se não estivesse ali)
+                    // Lógica de Manutenção
                     if (entrouEmManutencao)
                     {
                         var localizacaoAtiva = await _context.LocationMedDevice
@@ -273,12 +290,10 @@ namespace HealthWellBeingRoom.Controllers
                             localizacaoAtiva.EndDate = DateTime.Now;
                             _context.Update(localizacaoAtiva);
                         }
-                        TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' atualizado e colocado em Modo de Manutenção (Localização anterior encerrada).";
+                        TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' atualizado e colocado em Manutenção.";
                     }
-                    //Saiu de Manutenção (Procura o Depósito)
                     else if (saiuDeManutencao)
                     {
-                        // Procura Depósito Disponível (com base no RoomStatus)
                         var salaDeposito = await _context.Room
                             .Include(r => r.RoomStatus)
                             .Where(r => r.Name.Contains("Depósito") &&
@@ -288,24 +303,23 @@ namespace HealthWellBeingRoom.Controllers
 
                         if (salaDeposito != null)
                         {
-                            // Garante que fecha registos antigos
                             var locsAntigas = await _context.LocationMedDevice
                                 .Where(l => l.MedicalDeviceID == id && l.EndDate == null)
                                 .ToListAsync();
 
                             locsAntigas.ForEach(l => l.EndDate = DateTime.Now);
 
-                            // Cria nova localização para o dispositivo(vai para o deposito)
                             var novaLocalizacao = new LocationMedDevice
                             {
                                 MedicalDeviceID = id,
                                 RoomId = salaDeposito.RoomId,
                                 InitialDate = DateTime.Now,
-                                EndDate = null
+                                EndDate = null,
+                                IsCurrent = true
                             };
                             _context.Add(novaLocalizacao);
 
-                            TempData["SuccessMessage"] = $"Manutenção concluída!";
+                            TempData["SuccessMessage"] = $"Manutenção concluída! Movido para {salaDeposito.Name}.";
                         }
                         else
                         {
@@ -317,7 +331,7 @@ namespace HealthWellBeingRoom.Controllers
                         TempData["SuccessMessage"] = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!";
                     }
 
-                    //SALVAR TUDO
+                    // SALVAR TUDO
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
@@ -326,7 +340,6 @@ namespace HealthWellBeingRoom.Controllers
                 {
                     if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID))
                     {
-                        ViewBag.MedDeviceWasDeleted = true;
                         return View("NotFound");
                     }
                     else
@@ -336,13 +349,14 @@ namespace HealthWellBeingRoom.Controllers
                 }
             }
 
-            // Recarregar ViewBags em caso de falha
+            // Se falhar, recarregar ViewBags
             ViewBag.TypeMaterialID = new SelectList(_context.Set<TypeMaterial>(), "TypeMaterialID", "Name", medicalDevices.TypeMaterialID);
 
             return View(medicalDevices);
         }
 
         // --- 5. APAGAR (Delete) - GET ---
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -372,6 +386,7 @@ namespace HealthWellBeingRoom.Controllers
         // POST: MedicalDevice/Delete/5 (Substitui o seu DeleteConfirmed POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var medicalDevices = await _context.MedicalDevices.FindAsync(id);
@@ -402,6 +417,7 @@ namespace HealthWellBeingRoom.Controllers
 
 
         // GET: MedicalDevice/HistoryLoc/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> HistoryLoc(
             int id,
             int page = 1,

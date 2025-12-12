@@ -11,6 +11,7 @@
 
     // 2. Obtém o status calculado no modelo MedicalDevice.
     string statusAtual = Model.CurrentStatus;
+
 }
 
 @* --- Secção de Mensagem de Sucesso (Usando TempData) --- *@
@@ -35,7 +36,6 @@
     </div>
 
     <div class="card-body row">
-        <!-- Coluna com os detalhes -->
         <div class="col-md-8">
             <dl class="row mb-0">
 
@@ -91,8 +91,7 @@
 
             </dl>
         </div>
-        
-        <!-- Coluna com o botão à direita -->
+
         <div class="col-md-4 d-flex flex-column align-items-start gap-2 mt-4">
             <a asp-action="HistoryLoc" asp-route-id="@Model.MedicalDeviceID" class="btn btn-outline-primary w-100">
                 <i class="bi bi-clock-history me-1"></i> Ver Histórico de Localização
@@ -108,46 +107,57 @@
         bool podeMover = Model.CurrentStatus != "Em Manutenção";
 
         //Só pode eliminar se estiver "Em Armazenamento"
-        //(Ou seja: Bloqueia se estiver 'Alocado' ou 'Em Manutenção')
         bool podeEliminar = Model.CurrentStatus == "Em Armazenamento";
+
+        // Apenas quem tem a Role "logisticsTechnician" pode ver os botões de ação
+        bool isLogistica = User.IsInRole("logisticsTechnician");
     }
 
-    @* --- BOTÃO MOVER --- *@
-    @if (podeMover)
+    @* --- BOTÃO MOVER (Apenas Logística) --- *@
+    @if (isLogistica)
     {
-        <a asp-controller="LocationMedDevice" asp-action="Create"
-           asp-route-id="@Model.MedicalDeviceID"
-           class="btn btn-sm btn-success me-1">
-            <i class="bi bi-geo-alt"></i> Mover
+        @if (podeMover)
+        {
+            <a asp-controller="LocationMedDevice" asp-action="Create"
+               asp-route-id="@Model.MedicalDeviceID"
+               class="btn btn-sm btn-success me-1">
+                <i class="bi bi-geo-alt"></i> Mover
+            </a>
+        }
+        else
+        {
+            <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
+                <i class="bi bi-x-octagon"></i> Mover
+            </span>
+        }
+    }
+
+    @* --- BOTÃO EDITAR (Apenas Logística) --- *@
+    @if (isLogistica)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+            <i class="bi bi-pencil-square"></i> Editar
         </a>
     }
-    else
+
+    @* --- BOTÃO ELIMINAR (Apenas Logística) --- *@
+    @if (isLogistica)
     {
-        <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
-            <i class="bi bi-x-octagon"></i> Mover
-        </span>
+        @if (podeEliminar)
+        {
+            <a asp-action="Delete" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-danger">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+        }
+        else
+        {
+            <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+                <i class="bi bi-trash"></i> Eliminar
+            </span>
+        }
     }
 
-    @* --- BOTÃO EDITAR --- *@
-    <a asp-action="Edit" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
-        <i class="bi bi-pencil-square"></i> Editar
-    </a>
-
-    @* --- BOTÃO ELIMINAR --- *@
-    @if (podeEliminar)
-    {
-        <a asp-action="Delete" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-danger">
-            <i class="bi bi-trash"></i> Eliminar
-        </a>
-    }
-    else
-    {
-        <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
-            <i class="bi bi-trash"></i> Eliminar
-        </span>
-    }
-
-    @* --- BOTÃO VOLTAR --- *@
+    @* --- BOTÃO VOLTAR (Visível para todos) --- *@
     <a href="javascript:void(0);" onclick="history.back();" class="btn btn-secondary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar
     </a>
