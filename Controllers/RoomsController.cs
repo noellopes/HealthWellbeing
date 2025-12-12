@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using HealthWellbeingRoom.Models;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -453,7 +452,6 @@ namespace HealthWellbeingRoom.Controllers
                 .Take(pagination.ItemsPerPage);
 
             return View(pagination);
-
         }
 
         //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------
@@ -515,6 +513,53 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.RoomId = id;
             return View();
         }
+
+        //----------------------------------------------------------CONSUMABLES---------------------------------------------------------------------------------
+
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult Consumables(int id, int page = 1)
+        {
+            ViewBag.RoomId = id;
+
+            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
+            if (room == null)
+                return NotFound();
+
+            ViewData["RoomName"] = room.Name;
+            ViewData["Title"] = "Consumíveis associados à sala";
+
+            // Dados fictícios
+            var consumables = new List<RoomConsumable>
+            {
+                new RoomConsumable { RoomConsumableId = 1, Name = "Álcool gel", Quantity = 40, Note = "Uso diário nas entradas", Category = "Higiene" },
+                new RoomConsumable { RoomConsumableId = 2, Name = "Máscaras descartáveis", Quantity = 200, Note = "Caixa com 50 unidades", Category = "Proteção" },
+                new RoomConsumable { RoomConsumableId = 3, Name = "Luvas de látex", Quantity = 120, Note = "Tamanhos variados", Category = "Proteção" },
+                new RoomConsumable { RoomConsumableId = 4, Name = "Lenços de papel", Quantity = 75, Note = "Pacotes individuais", Category = "Higiene" },
+                new RoomConsumable { RoomConsumableId = 5, Name = "Sabonete líquido", Quantity = 30, Note = "Frascos de 500ml", Category = "Higiene" },
+                new RoomConsumable { RoomConsumableId = 6, Name = "Toalhas de papel", Quantity = 90, Note = "Rolos grandes", Category = "Higiene" },
+                new RoomConsumable { RoomConsumableId = 7, Name = "Desinfetante multiuso", Quantity = 25, Note = "Para limpeza geral", Category = "Limpeza" },
+                new RoomConsumable { RoomConsumableId = 8, Name = "Água oxigenada", Quantity = 15, Note = "Frascos de 1L", Category = "Medicinal" },
+                new RoomConsumable { RoomConsumableId = 9, Name = "Gaze estéril", Quantity = 60, Note = "Pacotes com 10 unidades", Category = "Medicinal" },
+                new RoomConsumable { RoomConsumableId = 10, Name = "Curativos adesivos", Quantity = 150, Note = "Diversos tamanhos", Category = "Medicinal" },
+                new RoomConsumable { RoomConsumableId = 11, Name = "Termômetro digital", Quantity = 10, Note = "Uso em triagem", Category = "Equipamento" },
+                new RoomConsumable { RoomConsumableId = 12, Name = "Spray antisséptico", Quantity = 35, Note = "Frascos de bolso", Category = "Higiene" },
+                new RoomConsumable { RoomConsumableId = 13, Name = "Soro fisiológico", Quantity = 50, Note = "Ampolas de 10ml", Category = "Medicinal" },
+                new RoomConsumable { RoomConsumableId = 14, Name = "Fita adesiva médica", Quantity = 20, Note = "Rolos de 5m", Category = "Medicinal" },
+                new RoomConsumable { RoomConsumableId = 15, Name = "Protetor facial", Quantity = 12, Note = "Visores reutilizáveis", Category = "Proteção" }
+            };
+
+            int itemsPerPage = 10;
+            var pagination = new RPaginationInfo<RoomConsumable>(page, consumables.Count, itemsPerPage);
+
+            pagination.Items = consumables
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage);
+
+            return View(pagination);
+        }
+
+
 
     }
 }
