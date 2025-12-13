@@ -7,20 +7,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
-namespace HealthWellbeing.Controllers
-{
-    public class EventsController : Controller
-    {
+namespace HealthWellbeing.Controllers {
+    public class EventsController : Controller {
         private readonly HealthWellbeingDbContext _context;
 
-        public EventsController(HealthWellbeingDbContext context)
-        {
+        public EventsController(HealthWellbeingDbContext context) {
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int page = 1)
-        {
+        public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int page = 1) {
+
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
             ViewBag.SearchStatus = searchStatus;
@@ -34,8 +32,7 @@ namespace HealthWellbeing.Controllers
             };
 
             var selectedStatus = statusList.FirstOrDefault(s => s.Value == searchStatus);
-            if (selectedStatus != null)
-            {
+            if (selectedStatus != null) {
                 selectedStatus.Selected = true;
             }
             ViewBag.StatusList = statusList;
@@ -43,51 +40,48 @@ namespace HealthWellbeing.Controllers
             var eventTypes = _context.EventType.OrderBy(t => t.EventTypeName);
             ViewBag.EventTypesList = new SelectList(eventTypes, "EventTypeId", "EventTypeName", searchType);
 
-            var events = _context.Event.Include(e => e.EventType).AsQueryable();
+            var eventsQuery = _context.Event.Include(e => e.EventType).AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchName))
-            {
-                events = events.Where(e => e.EventName.Contains(searchName));
+            if (!string.IsNullOrEmpty(searchName)) {
+                eventsQuery = eventsQuery.Where(e => e.EventName.Contains(searchName));
             }
 
-            if (searchType.HasValue)
-            {
-                events = events.Where(e => e.EventTypeId == searchType);
+            if (searchType.HasValue) {
+                eventsQuery = eventsQuery.Where(e => e.EventTypeId == searchType);
             }
 
-            if (!string.IsNullOrEmpty(searchStatus))
-            {
+            if (!string.IsNullOrEmpty(searchStatus)) {
                 var now = DateTime.Now;
-                if (searchStatus == "Agendado")
-                {
-                    events = events.Where(e => e.EventStart > now);
+                if (searchStatus == "Agendado") {
+                    eventsQuery = eventsQuery.Where(e => e.EventStart > now);
                 }
-                else if (searchStatus == "Adecorrer")
-                {
-                    events = events.Where(e => e.EventStart <= now && e.EventEnd >= now);
+                else if (searchStatus == "Adecorrer") {
+                    eventsQuery = eventsQuery.Where(e => e.EventStart <= now && e.EventEnd >= now);
                 }
-                else if (searchStatus == "Realizado")
-                {
-                    events = events.Where(e => e.EventEnd < now);
+                else if (searchStatus == "Realizado") {
+                    eventsQuery = eventsQuery.Where(e => e.EventEnd < now);
                 }
             }
 
-            int pageSize = 5;
-            int totalItems = await events.CountAsync();
 
-            var pagedEvents = await events
-                                    .OrderByDescending(e => e.EventStart)
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToListAsync();
+            int totalItems = await eventsQuery.CountAsync();
+            int pageSize = 10;
 
-            var paginationInfo = new PaginationInfo<Event>(pagedEvents, totalItems, pageSize, page);
+            var paginationInfo = new ViewModels.PaginationInfo<Event>(page, totalItems, pageSize);
+
+            var pagedEvents = await eventsQuery
+                .OrderByDescending(e => e.EventStart)
+                .Skip(paginationInfo.ItemsToSkip) 
+                .Take(paginationInfo.ItemsPerPage)
+                .ToListAsync();
+
+            paginationInfo.Items = pagedEvents;
 
             return View(paginationInfo);
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
+
+        public async Task<IActionResult> Details(int? id) {
             if (id == null)
                 return View("InvalidEvent");
 
@@ -101,26 +95,22 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
-        private void PopulateEventTypesDropDownList(object? selectedEventType = null)
-        {
+        private void PopulateEventTypesDropDownList(object? selectedEventType = null) {
             var eventTypesQuery = from et in _context.EventType
                                   orderby et.EventTypeName
                                   select et;
             ViewBag.EventTypeId = new SelectList(eventTypesQuery.AsNoTracking(), "EventTypeId", "EventTypeName", selectedEventType);
         }
 
-        public IActionResult Create()
-        {
+        public IActionResult Create() {
             PopulateEventTypesDropDownList();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event) {
+            if (ModelState.IsValid) {
                 _context.Add(@event);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Event created successfully!";
@@ -131,8 +121,7 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
-        public async Task<IActionResult> Edit(int? id)
-        {
+        public async Task<IActionResult> Edit(int? id) {
             if (id == null)
                 return View("InvalidEvent");
 
@@ -146,21 +135,17 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event)
-        {
+        public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventTypeId,EventStart,EventEnd,EventPoints,MinLevel")] Event @event) {
             if (id != @event.EventId)
                 return View("InvalidEvent");
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            if (ModelState.IsValid) {
+                try {
                     _context.Update(@event);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Event updated successfully!";
                 }
-                catch (DbUpdateConcurrencyException)
-                {
+                catch (DbUpdateConcurrencyException) {
                     if (!EventExists(@event.EventId))
                         return View("InvalidEvent");
                     else
@@ -173,8 +158,7 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
-        public async Task<IActionResult> Delete(int? id)
-        {
+        public async Task<IActionResult> Delete(int? id) {
             if (id == null)
                 return View("InvalidEvent");
 
@@ -190,8 +174,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
+        public async Task<IActionResult> DeleteConfirmed(int id) {
             var @event = await _context.Event.FindAsync(id);
             if (@event == null)
                 return View("InvalidEvent");
@@ -202,8 +185,7 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EventExists(int id)
-        {
+        private bool EventExists(int id) {
             return _context.Event.Any(e => e.EventId == id);
         }
     }

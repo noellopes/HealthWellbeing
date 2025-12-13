@@ -1,0 +1,69 @@
+﻿@model HealthWellbeing.Models.Activity
+
+@{
+    ViewData["Title"] = "Criar Activity";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm my-4">
+                <div class="card-body">
+                    <h1 class="h3 mb-1">@ViewData["Title"]</h1>
+                    <h4 class="h6 text-muted mb-3">Activity</h4>
+
+                    <form asp-action="Create" novalidate>
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger"
+                             role="alert"></div>
+
+                        <!-- Activity_Name -->
+                        <div class="mb-3">
+                            <label asp-for="ActivityName" class="form-label"></label>
+                            <input asp-for="ActivityName" class="form-control" />
+                            <span asp-validation-for="ActivityName"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Activity_Type -->
+                        <div class="mb-3">
+                            <label asp-for="ActivityType" class="form-label"></label>
+                            <input asp-for="ActivityType" class="form-control" />
+                            <span asp-validation-for="ActivityType"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Activity_Description -->
+                        <div class="mb-3">
+                            <label asp-for="ActivityDescription" class="form-label"></label>
+                            <textarea asp-for="ActivityDescription"
+                                      class="form-control"
+                                      rows="3"></textarea>
+                            <span asp-validation-for="ActivityDescription"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Activity_Reward -->
+                        <div class="mb-3">
+                            <label asp-for="ActivityReward" class="form-label"></label>
+                            <input asp-for="ActivityReward" class="form-control" />
+                            <span asp-validation-for="ActivityReward"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Criar</button>
+                            <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -67,35 +67,30 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("ExercicioGrupoMuscular");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Activity_", b =>
+            modelBuilder.Entity("HealthWellbeing.Models.Activity", b =>
                 {
-                    b.Property<int>("Activity_Id")
+                    b.Property<int>("ActivityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Activity_Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityId"));
 
-                    b.Property<string>("Activity_Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Activity_Name")
+                    b.Property<string>("ActivityDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Activity_Type")
+                    b.Property<string>("ActivityName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("NumberReps")
+                    b.Property<int>("ActivityReward")
                         .HasColumnType("int");
 
-                    b.Property<int?>("NumberSets")
-                        .HasColumnType("int");
+                    b.Property<string>("ActivityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Weigth")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Activity_Id");
+                    b.HasKey("ActivityId");
 
                     b.ToTable("Activity");
                 });

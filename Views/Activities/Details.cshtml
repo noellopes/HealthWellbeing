@@ -1,0 +1,74 @@
+﻿@model HealthWellbeing.Models.Activity
+
+@{
+    ViewData["Title"] = "Detalhes da Activity";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h5 mb-1">@ViewData["Title"]</h1>
+                    <h4 class="h6 text-muted mb-3">Activity</h4>
+                    <hr />
+
+                    <dl class="row mb-0">
+                        <!-- Id -->
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(m => m.ActivityId)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(m => m.ActivityId)
+                        </dd>
+
+                        <!-- Name -->
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(m => m.ActivityName)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(m => m.ActivityName)
+                        </dd>
+
+                        <!-- Type -->
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(m => m.ActivityType)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(m => m.ActivityType)
+                        </dd>
+
+                        <!-- Description -->
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(m => m.ActivityDescription)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(m => m.ActivityDescription)
+                        </dd>
+
+                        <!-- Reward -->
+                        <dt class="col-sm-4 text-muted">
+                            @Html.DisplayNameFor(m => m.ActivityReward)
+                        </dt>
+                        <dd class="col-sm-8 mb-2">
+                            @Html.DisplayFor(m => m.ActivityReward)
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="card-footer bg-white d-flex justify-content-between">
+                    <div>
+                        <a asp-action="Edit"
+                           asp-route-id="@Model?.ActivityId"
+                           class="btn btn-primary me-2">
+                            Editar
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Voltar à lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
