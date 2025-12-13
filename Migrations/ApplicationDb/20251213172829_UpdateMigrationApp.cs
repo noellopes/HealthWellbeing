@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations.ApplicationDb
 {
     /// <inheritdoc />
-    public partial class MigrationUpdateApp : Migration
+    public partial class UpdateMigrationApp : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

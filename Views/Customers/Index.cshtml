@@ -4,12 +4,23 @@
     ViewData["Title"] = "Customers";
     var successMessage = TempData["SuccessMessage"];
     var errorMessage = TempData["ErrorMessage"];
+
+    // Captura os valores para manter os campos preenchidos
+    var searchName = ViewBag.SearchName as string;
+    var searchEmail = ViewBag.SearchEmail as string;
+    // Captura o ID do nível (QueryString ou ViewData)
+    var searchLevelId = Context.Request.Query["searchLevelId"].ToString();
+
+    // Verifica se há algum filtro ativo (para decidir se abre a aba de pesquisa)
+    bool hasSearch = !string.IsNullOrEmpty(searchName) ||
+                     !string.IsNullOrEmpty(searchEmail) ||
+                     !string.IsNullOrEmpty(searchLevelId);
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 @if (successMessage != null) {
-    <div class="container py-4">
+    <div class="container py-2 px-0">
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> @successMessage
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -17,57 +28,69 @@
     </div>
 }
 @if (errorMessage != null) {
-    <div class="container py-4">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="container py-2 px-0">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 }
 
-@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && string.IsNullOrEmpty(ViewBag.SearchEmail)) {
-    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+@if (!Model.Items.Any() && !hasSearch) {
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded shadow-sm" role="alert">
         <i class="bi bi-people-fill" style="font-size: 3rem;"></i>
         <div class="ps-3">
             <h4 class="alert-heading">No Customers Found</h4>
-            <p>No customers are currently registered in the system.</p>
+            <p class="mb-0">No customers are currently registered in the system.</p>
         </div>
     </div>
 
-    <a asp-action="Create" class="btn btn-success">
+    <a asp-action="Create" class="btn btn-success mt-2">
         <i class="bi bi-person-plus-fill me-1"></i> Create New Customer
     </a>
 }
 else {
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 text-secondary">Overview</h2>
-        <div class="d-flex justify-content-end">
-            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#customerSearch" aria-expanded="false" aria-controls="customerSearch">
+        <h2 class="h4 text-secondary mb-0">Overview</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#customerSearch" aria-expanded="@(hasSearch ? "true" : "false")" aria-controls="customerSearch">
                 <i class="bi bi-search me-1"></i> Search
-            </a>
+            </button>
             <a asp-action="Create" class="btn btn-success">
                 <i class="bi bi-person-plus-fill me-1"></i> Create New
             </a>
         </div>
     </div>
 
-    <div class="collapse mt-2 mb-3" id="customerSearch">
-        <div class="card card-body">
+    <div class="collapse mt-2 mb-3 @(hasSearch ? "show" : "")" id="customerSearch">
+        <div class="card card-body shadow-sm border-0 bg-light">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
-                <div class="col-md-5">
-                    <label for="searchName" class="form-label">Name</label>
-                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+
+                <div class="col-md-3">
+                    <label for="searchName" class="form-label fw-bold small text-muted">Name</label>
+                    <input id="searchName" name="searchName" value="@searchName" class="form-control" placeholder="Contains..." type="search" />
                 </div>
-                <div class="col-md-5">
-                    <label for="searchEmail" class="form-label">Email</label>
-                    <input id="searchEmail" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control" placeholder="Search by email" type="search" />
+
+                <div class="col-md-3">
+                    <label for="searchEmail" class="form-label fw-bold small text-muted">Email</label>
+                    <input id="searchEmail" name="searchEmail" value="@searchEmail" class="form-control" placeholder="Contains..." type="search" />
                 </div>
-                <div class="col-md-2 d-flex gap-2">
+
+                <div class="col-md-3">
+                    <label for="searchLevelId" class="form-label fw-bold small text-muted">Level</label>
+                    <select id="searchLevelId" name="searchLevelId"
+                            class="form-select"
+                            asp-items="@(ViewData["Levels"] as SelectList)">
+                        <option value="">All Levels</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
-                    <a asp-action="Index" class="btn btn-secondary" title="Clear Filters">
-                        <i class="bi bi-x-lg"></i>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100" title="Clear Filters">
+                        Clear
                     </a>
                 </div>
             </form>
@@ -75,108 +98,126 @@ else {
     </div>
 
     @if (!Model.Items.Any()) {
-        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+        <div class="alert alert-info d-flex align-items-center p-3 rounded shadow-sm" role="alert">
             <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
             <div class="ps-3">
-                <h5 class="alert-heading">No results found for your search criteria.</h5>
+                <h5 class="alert-heading mb-0">No results found for your search criteria.</h5>
             </div>
         </div>
     }
     else {
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        
-                        <th>@Html.DisplayNameFor(model => model.Items.First().Name)</th>
-                        <th>@Html.DisplayNameFor(model => model.Items.First().Email)</th>
-                        <th>@Html.DisplayNameFor(model => model.Items.First().PhoneNumber)</th>
-                        <th>@Html.DisplayNameFor(model => model.Items.First().RegistrationDate)</th>
-                        <th>@Html.DisplayNameFor(model => model.Items.First().Gender)</th>
-                        <th class="text-center">@Html.DisplayNameFor(model => model.Items.First().TotalPoints)</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Items) {
-                        <tr>
-                            <td class="fw-bold">
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>@Html.DisplayNameFor(model => model.Items.First().Name)</th>
+                                <th>@Html.DisplayNameFor(model => model.Items.First().Email)</th>
+                                <th>@Html.DisplayNameFor(model => model.Items.First().PhoneNumber)</th>
+                                <th>@Html.DisplayNameFor(model => model.Items.First().RegistrationDate)</th>
+                                <th>@Html.DisplayNameFor(model => model.Items.First().Gender)</th>
+                                <th>Level</th>
+                                <th class="text-center">@Html.DisplayNameFor(model => model.Items.First().TotalPoints)</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items) {
+                                <tr>
+                                    <td class="fw-bold text-primary">
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
 
-                            <td>
-                                <a href="mailto:@item.Email" class="text-decoration-none">
-                                    @Html.DisplayFor(modelItem => item.Email)
-                                </a>
-                            </td>
+                                    <td>
+                                        <a href="mailto:@item.Email" class="text-decoration-none text-body">
+                                            @Html.DisplayFor(modelItem => item.Email)
+                                        </a>
+                                    </td>
 
-                            <td>
-                                @(string.IsNullOrEmpty(item.PhoneNumber) ? "-" : item.PhoneNumber)
-                            </td>
+                                    <td>
+                                        @(string.IsNullOrEmpty(item.PhoneNumber) ? "-" : item.PhoneNumber)
+                                    </td>
 
-                            <td>
-                                @item.RegistrationDate.ToShortDateString()
-                            </td>
+                                    <td>
+                                        @item.RegistrationDate.ToShortDateString()
+                                    </td>
 
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Gender)
-                            </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Gender)
+                                    </td>
 
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark border">
-                                    @Html.DisplayFor(modelItem => item.TotalPoints) pts
-                                </span>
-                            </td>
+                                    <td>
+                                        @if (item.Level != null) {
+                                            <span class="badge bg-info text-dark">Lvl @item.Level.LevelNumber</span>
+                                        }
+                                        else {
+                                            <span class="text-muted small">No Level</span>
+                                        }
+                                    </td>
 
-                            <td class="text-end text-nowrap">
-                                <a asp-action="Edit" asp-route-id="@item.CustomerId" class="btn btn-sm btn-warning me-1">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.CustomerId" class="btn btn-sm btn-info me-1">
-                                    <i class="bi bi-info-circle"></i> Details
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.CustomerId" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border">
+                                            @Html.DisplayFor(modelItem => item.TotalPoints) pts
+                                        </span>
+                                    </td>
 
-            <div class="d-flex justify-content-between align-items-center bg-light p-3 border rounded-bottom">
-
-                <div class="small text-muted">
-                    Showing @Model.FirstItemOnPage - @Model.LastItemOnPage of @Model.TotalItems
+                                    <td class="text-end text-nowrap">
+                                        <div class="btn-group">
+                                            <a asp-action="Details" asp-route-id="@item.CustomerId" class="btn btn-sm btn-outline-info" title="Details">Details</a>
+                                            <a asp-action="Edit" asp-route-id="@item.CustomerId" class="btn btn-sm btn-outline-warning" title="Edit">Edit</a>
+                                            <a asp-action="Delete" asp-route-id="@item.CustomerId" class="btn btn-sm btn-outline-danger" title="Delete">Delete</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-
-                <nav aria-label="Customers page">
-                    <ul class="pagination mb-0">
-                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index"
-                               asp-route-page="1"
-                               asp-route-searchName="@ViewBag.SearchName"
-                               asp-route-searchEmail="@ViewBag.SearchEmail">First</a>
-                        </li>
-
-                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
-                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                                <a class="page-link" asp-action="Index"
-                                   asp-route-page="@p"
-                                   asp-route-searchName="@ViewBag.SearchName"
-                                   asp-route-searchEmail="@ViewBag.SearchEmail">@p</a>
-                            </li>
-                        }
-
-                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index"
-                               asp-route-page="@Model.TotalPages"
-                               asp-route-searchName="@ViewBag.SearchName"
-                               asp-route-searchEmail="@ViewBag.SearchEmail">Last</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
+
+            @if (Model.TotalPages > 1) {
+                <div class="card-footer d-flex justify-content-between align-items-center bg-white">
+
+                    @{
+                        var p = Model.CurrentPage;
+                        var size = Model.ItemsPerPage;
+                        var start = Model.TotalItems == 0 ? 0 : ((p - 1) * size + 1);
+                        var end = Math.Min(Model.TotalItems, p * size);
+                    }
+
+                    <div class="small text-muted">
+                        Showing @start - @end of @Model.TotalItems
+                    </div>
+
+                    <nav aria-label="Customers page">
+                        <ul class="pagination mb-0">
+                            <li class="page-item @(p == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="1"
+                                   asp-route-searchName="@searchName"
+                                   asp-route-searchEmail="@searchEmail"
+                                   asp-route-searchLevelId="@searchLevelId">First</a>
+                            </li>
+
+                            @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++) {
+                                <li class="page-item @(i == p ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                       asp-route-searchName="@searchName"
+                                       asp-route-searchEmail="@searchEmail"
+                                       asp-route-searchLevelId="@searchLevelId">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(p == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                                   asp-route-searchName="@searchName"
+                                   asp-route-searchEmail="@searchEmail"
+                                   asp-route-searchLevelId="@searchLevelId">Last</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            }
         </div>
     }
 }

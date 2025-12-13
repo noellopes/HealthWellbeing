@@ -1,51 +1,82 @@
-﻿@model HealthWellbeing.Models.PaginationInfo<HealthWellbeing.Models.Level>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Level>
 @using System.Linq
 
 @{
     ViewData["Title"] = "Levels";
     var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+
+    // Captura os valores de pesquisa para facilitar a leitura no HTML
+    var searchNumber = ViewBag.SearchNumber as string;
+    // Tenta ir buscar ao QueryString se o ViewBag falhar para o ID da categoria
+    var searchCategoryId = ViewBag.SearchCategoryId?.ToString() ?? Context.Request.Query["searchCategoryId"].ToString();
+    var searchDescription = ViewBag.SearchDescription as string;
+    var searchPoints = ViewBag.SearchPoints as string;
+
+    // Lógica para decidir se a aba de pesquisa começa aberta
+    bool hasSearch = !string.IsNullOrEmpty(searchNumber) || 
+                     !string.IsNullOrEmpty(searchCategoryId) || 
+                     !string.IsNullOrEmpty(searchDescription) || 
+                     !string.IsNullOrEmpty(searchPoints);
 }
 
 <style>
-    #successToast {
+    /* Estilo "Top Level" */
+    #successToast, #errorToast {
         min-width: 28rem;
         max-width: 40rem;
         border-radius: .75rem;
         box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(16,185,129,0.06);
         font-size: 1.02rem;
     }
+    
+    #errorToast {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(220,53,69,0.06);
+    }
 
-        #successToast .toast-body {
-            padding: 1rem 1.25rem;
-            display: flex;
-            gap: .75rem;
-            align-items: center;
-            font-weight: 600;
-        }
+    .toast-body {
+        padding: 1rem 1.25rem;
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        font-weight: 600;
+    }
 
-            #successToast .toast-body .bi {
-                font-size: 1.5rem;
-                opacity: .95;
-            }
+    .toast-body .bi {
+        font-size: 1.5rem;
+        opacity: .95;
+    }
 </style>
 
 <div class="container py-4">
 
-    <!-- Toast -->
     <div class="position-fixed top-0 start-50 translate-middle-x mt-4" style="z-index:1080;">
         @if (!string.IsNullOrEmpty(successMessage))
         {
             <div id="successToast" class="toast align-items-center text-bg-success border-0"
                  role="alert" aria-live="polite" aria-atomic="true"
                  data-bs-delay="4000" data-bs-autohide="true">
-
                 <div class="d-flex">
                     <div class="toast-body">
                         <i class="bi bi-check-circle-fill text-white"></i>
                         <div class="flex-grow-1">@successMessage</div>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"></button>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div id="errorToast" class="toast align-items-center text-bg-danger border-0"
+                 role="alert" aria-live="assertive" aria-atomic="true"
+                 data-bs-delay="5000" data-bs-autohide="true">
+                <div class="d-flex">
+                    <div class="toast-body text-white">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <div class="flex-grow-1">@errorMessage</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             </div>
         }
@@ -55,8 +86,7 @@
         <h1 class="h3 mb-0">Levels</h1>
 
         <div class="d-flex align-items-center">
-            <a class="btn btn-secondary me-2" data-bs-toggle="collapse"
-               data-bs-target="#levelSearch">
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#levelSearch">
                 <i class="bi bi-search me-1"></i> Search
             </a>
 
@@ -70,54 +100,44 @@
         </div>
     </div>
 
-    <!-- Search -->
-    <div class="collapse mt-2 mb-3 @( (ViewBag.SearchNumber!=null || ViewBag.SearchCategory!=null || ViewBag.SearchDescription!=null) ? "show" : "")"
-         id="levelSearch">
-
+    <div class="collapse mt-2 mb-3 @(hasSearch ? "show" : "")" id="levelSearch">
         <div class="card card-body">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
 
                 <div class="col-md-3">
                     <label class="form-label">Level Number</label>
                     <input id="searchNumber" name="searchNumber"
-                           value="@(ViewBag.SearchNumber ?? "")"
+                           value="@searchNumber"
                            class="form-control" type="number" min="1" max="100"
                            placeholder="Exact number (1–100)" />
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Category</label>
-                    <select id="searchCategory" name="searchCategory" class="form-select">
+                    <select id="searchCategoryId" name="searchCategoryId"
+                            class="form-select"
+                            asp-items="ViewBag.LevelCategories">
                         <option value="">All Categories</option>
-
-                        @{
-                            var cats = ViewBag.CategoriesList as IEnumerable<string> ?? Enumerable.Empty<string>();
-                            var selectedCat = (ViewBag.SearchCategory as string) ?? "";
-                        }
-
-                        @foreach (var c in cats)
-                        {
-                            <option value="@c" selected="@(c == selectedCat ? "selected" : null)">@c</option>
-                        }
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Description</label>
                     <input id="searchDescription" name="searchDescription"
-                           value="@(ViewBag.SearchDescription ?? "")"
-                           class="form-control" placeholder="Contains..." />
+                           value="@searchDescription"
+                           class="form-control" 
+                           placeholder="Keywords (ex: Cardio)..." />
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Points Limit</label>
                     <input id="searchPoints" name="searchPoints"
-                           value="@(ViewBag.SearchPoints ?? "")"
+                           value="@searchPoints"
                            class="form-control" type="number" min="0"
                            placeholder="Exact value" />
                 </div>
 
-                <div class="col-12 mt-1 d-flex gap-2">
+                <div class="col-12 mt-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
@@ -129,71 +149,52 @@
         </div>
     </div>
 
-    <!-- Calculate Level -->
-    <!-- Calculate Level -->
     <div class="collapse mt-2 mb-3" id="calcLevelBox">
         <div class="card card-body">
-
             <label class="form-label fw-bold">Calculate Level</label>
-
             <div class="row g-3 align-items-end">
-                <!-- 1. Entrada de Pontos -->
                 <div class="col-md-3">
                     <label class="form-label small text-muted mb-1">Total Points</label>
-                    <input id="pointsInput"
-                           type="number"
-                           min="0"
-                           class="form-control"
-                           placeholder="Enter points..." />
+                    <input id="pointsInput" type="number" min="0" class="form-control" placeholder="Enter points..." />
                 </div>
-
-                <!-- 2. Botão -->
                 <div class="col-md-2">
-                    <button id="calcBtn" class="btn btn-primary w-100">
-                        Calculate
-                    </button>
+                    <button id="calcBtn" class="btn btn-primary w-100">Calculate</button>
                 </div>
-
-                <!-- 3. Resultado do Nível -->
                 <div class="col-md-3">
                     <label class="form-label small text-muted mb-1">Result</label>
-                    <input id="calcResult"
-                           type="text"
-                           class="form-control fw-bold"
-                           readonly
-                           placeholder="Level..." />
+                    <input id="calcResult" type="text" class="form-control fw-bold" readonly placeholder="Level..." />
                 </div>
-
-                <!-- 4. NOVO: Pontos Restantes -->
                 <div class="col-md-4">
                     <label class="form-label small text-muted mb-1">Next Level Progress</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light">Remaining</span>
-                        <input id="calcRemaining"
-                               type="text"
-                               class="form-control"
-                               readonly
-                               placeholder="Pts left over..." />
+                        <input id="calcRemaining" type="text" class="form-control" readonly placeholder="Pts left over..." />
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
-
-
-    <!-- Table -->
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-striped table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelNumber)</th>
-                            <th>@Html.DisplayNameFor(m => m.Items.First().Category.Name)</th>
-                            <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
-                            <th>@Html.DisplayNameFor(m => m.Items.First().LevelPointsLimit)</th>
+                            @if (Model.Items.Any())
+                            {
+                                <th>@Html.DisplayNameFor(m => m.Items.First().LevelNumber)</th>
+                                <th>Category</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().Description)</th>
+                                <th>@Html.DisplayNameFor(m => m.Items.First().LevelPointsLimit)</th>
+                            }
+                            else
+                            {
+                                <th>Level Number</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Points Limit</th>
+                            }
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -204,26 +205,32 @@
                             foreach (var item in Model.Items)
                             {
                                 <tr>
-                                    <td>@Html.DisplayFor(_ => item.LevelNumber)</td>
-                                    <td>@Html.DisplayFor(_ => item.Category.Name)</td>
+                                    <td>
+                                        <span class="badge bg-primary rounded-pill">@Html.DisplayFor(_ => item.LevelNumber)</span>
+                                    </td>
+                                    <td>
+                                        @if (item.Category != null)
+                                        {
+                                            @item.Category.Name
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
                                     <td>@Html.DisplayFor(_ => item.Description)</td>
                                     <td>@Html.DisplayFor(_ => item.LevelPointsLimit)</td>
 
                                     <td class="text-end">
                                         <div class="btn-group">
-
                                             <a asp-action="Details" asp-route-id="@item.LevelId"
-                                               asp-route-page="@Model.CurrentPage"
-                                               class="btn btn-sm btn-outline-info">Details</a>
+                                               class="btn btn-sm btn-outline-info" title="Details">Details</a>
 
                                             <a asp-action="Edit" asp-route-id="@item.LevelId"
-                                               asp-route-page="@Model.CurrentPage"
-                                               class="btn btn-sm btn-outline-warning">Edit</a>
+                                               class="btn btn-sm btn-outline-warning" title="Edit">Edit</a>
 
                                             <a asp-action="Delete" asp-route-id="@item.LevelId"
-                                               asp-route-page="@Model.CurrentPage"
-                                               class="btn btn-sm btn-outline-danger">Delete</a>
-
+                                               class="btn btn-sm btn-outline-danger" title="Delete">Delete</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -240,42 +247,52 @@
             </div>
         </div>
 
-        <!-- Pager -->
-        <div class="card-footer d-flex justify-content-between align-items-center">
+        @if (Model.TotalPages > 1)
+        {
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                @{
+                    var p = Model.CurrentPage;
+                    var size = Model.ItemsPerPage;
+                    var start = Model.TotalItems == 0 ? 0 : ((p - 1) * size + 1);
+                    var end = Math.Min(Model.TotalItems, p * size);
+                }
 
-            @{
-                var p = Model.CurrentPage;
-                var size = Model.PageSize;
-                var start = Model.TotalItems == 0 ? 0 : ((p - 1) * size + 1);
-                var end = Math.Min(Model.TotalItems, p * size);
-            }
+                <div class="small text-muted">
+                    Showing @start - @end of @Model.TotalItems
+                </div>
 
-            <div class="small text-muted">
-                Showing @start - @end of @Model.TotalItems
-            </div>
-
-            <nav>
-                <ul class="pagination mb-0">
-
-                    <li class="page-item @(p == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="1">First</a>
-                    </li>
-
-                    @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
-                    {
-                        <li class="page-item @(i == p ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(p == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="1"
+                               asp-route-searchNumber="@searchNumber"
+                               asp-route-searchCategoryId="@searchCategoryId"
+                               asp-route-searchDescription="@searchDescription"
+                               asp-route-searchPoints="@searchPoints">First</a>
                         </li>
-                    }
 
-                    <li class="page-item @(p == Model.TotalPages ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Last</a>
-                    </li>
+                        @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                        {
+                            <li class="page-item @(i == p ? "active" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@i"
+                                   asp-route-searchNumber="@searchNumber"
+                                   asp-route-searchCategoryId="@searchCategoryId"
+                                   asp-route-searchDescription="@searchDescription"
+                                   asp-route-searchPoints="@searchPoints">@i</a>
+                            </li>
+                        }
 
-                </ul>
-            </nav>
-
-        </div>
+                        <li class="page-item @(p == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
+                               asp-route-searchNumber="@searchNumber"
+                               asp-route-searchCategoryId="@searchCategoryId"
+                               asp-route-searchDescription="@searchDescription"
+                               asp-route-searchPoints="@searchPoints">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     </div>
 </div>
 
@@ -283,22 +300,22 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            const toastEl = document.getElementById('successToast');
-            if (toastEl && bootstrap?.Toast) {
-                bootstrap.Toast.getOrCreateInstance(toastEl).show();
+            // Toasts initialization
+            const toasts = document.querySelectorAll('.toast');
+            if (bootstrap?.Toast) {
+                toasts.forEach(t => bootstrap.Toast.getOrCreateInstance(t).show());
             }
 
-            // --- Lógica da Calculadora ---
+            // --- Calculator Logic ---
             const calcInput = document.getElementById("pointsInput");
             const calcBtn = document.getElementById("calcBtn");
             const calcResult = document.getElementById("calcResult");
-            const calcRemaining = document.getElementById("calcRemaining"); // <--- NOVO ELEMENTO
+            const calcRemaining = document.getElementById("calcRemaining");
 
             if (calcBtn) {
                 calcBtn.addEventListener("click", async () => {
                     const points = calcInput.value;
 
-                    // Limpar resultados anteriores se a entrada for inválida
                     if (!points || points < 0) {
                         calcResult.value = "";
                         calcRemaining.value = "";
@@ -306,7 +323,6 @@
                         return;
                     }
 
-                    // Feedback visual de carregamento
                     calcResult.value = "...";
                     calcRemaining.value = "...";
 
@@ -318,9 +334,8 @@
 
                         const data = await response.json();
 
-                        // Atualiza as duas caixas
                         calcResult.value = `Level ${data.level}`;
-                        calcRemaining.value = `${data.remaining} pts`; // <--- AQUI ESTÁ O VALOR RESTANTE
+                        calcRemaining.value = `${data.remaining} pts`;
 
                     } catch (error) {
                         console.error("Error:", error);
@@ -332,4 +347,3 @@
         });
     </script>
 }
-

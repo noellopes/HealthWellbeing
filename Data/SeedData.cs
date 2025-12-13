@@ -8,27 +8,26 @@ namespace HealthWellbeing.Data
 {
     internal class SeedData
     {
-        internal static void Populate(HealthWellbeingDbContext? dbContext)
-        {
+        internal static void Populate(HealthWellbeingDbContext? dbContext) {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             dbContext.Database.EnsureCreated();
 
-            // Add seed data here
             var clients = PopulateClients(dbContext);
             PopulateMember(dbContext, clients);
             PopulateTrainingType(dbContext);
             PopulatePlan(dbContext);
 
-            // --- ALTERAÇÃO AQUI: Capturamos a lista de Trainers ---
             var trainers = PopulateTrainer(dbContext);
-
-            // --- NOVO MÉTODO: Povoamento dos Treinos Agendados ---
             PopulateTraining(dbContext, trainers);
+
             PopulateScoringStrategies(dbContext);
             PopulateEventTypes(dbContext);
             PopulateEvents(dbContext);
-            PopulateLevels(dbContext);
+
+            PopulateLevelCategories(dbContext);
+            PopulateLevels(dbContext);          
+
             PopulateEmployees(dbContext);
             PopulateCustomers(dbContext);
         }
@@ -66,6 +65,10 @@ namespace HealthWellbeing.Data
         private static void PopulateCustomers(HealthWellbeingDbContext dbContext) {
             if (dbContext.Customer.Any()) return;
 
+            var defaultLevel = dbContext.Level.FirstOrDefault(l => l.LevelNumber == 1);
+
+            if (defaultLevel == null) return;
+
             var customers = new[]
             {
                 new Customer { Name = "Ana Pereira", Email = "ana.pereira@ipg.pt", PhoneNumber = "+351 912345678", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-12), TotalPoints = 1250 },
@@ -78,11 +81,11 @@ namespace HealthWellbeing.Data
                 new Customer { Name = "Hugo Almeida", Email = "hugo.almeida@ipg.pt", PhoneNumber = "+351 936547896", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-8), TotalPoints = 890 },
                 new Customer { Name = "Inês Rodrigues", Email = "ines.rodrigues@ipg.pt", PhoneNumber = "+351 921456987", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-4), TotalPoints = 210 },
                 new Customer { Name = "João Soares", Email = "joao.soares@ipg.pt", PhoneNumber = "+351 915632478", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-50), TotalPoints = 300 }
-
             };
 
             foreach (var cust in customers) {
                 if (!dbContext.Customer.Any(c => c.Email == cust.Email)) {
+                    cust.Level = defaultLevel;
                     dbContext.Customer.Add(cust);
                 }
             }
@@ -220,98 +223,97 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateLevels(HealthWellbeingDbContext dbContext)
-        {
-            // 1. Check if data already exists to prevent duplication
+        private static void PopulateLevels(HealthWellbeingDbContext dbContext) {
+            // 1. Se já existirem níveis, sai
             if (dbContext.Level.Any()) return;
 
-            // 2. Create the Category Objects first
-            var catBeginner = new LevelCategory { Name = "Beginner" };
-            var catIntermediate = new LevelCategory { Name = "Intermediate" };
-            var catAdvanced = new LevelCategory { Name = "Advanced" };
-            var catExpert = new LevelCategory { Name = "Expert" };
-            var catMaster = new LevelCategory { Name = "Master" };
-            var catGrandmaster = new LevelCategory { Name = "Grandmaster" };
-            var catLegendary = new LevelCategory { Name = "Legendary" };
-            var catMythic = new LevelCategory { Name = "Mythic" };
+            // 2. Buscar as categorias (que sabemos que existem porque o PopulateLevelCategories correu antes)
+            // Usamos um Dicionário ou variáveis locais para facilitar a atribuição abaixo
+            var catBeginner = dbContext.LevelCategory.First(c => c.Name == "Beginner");
+            var catIntermediate = dbContext.LevelCategory.First(c => c.Name == "Intermediate");
+            var catAdvanced = dbContext.LevelCategory.First(c => c.Name == "Advanced");
+            var catExpert = dbContext.LevelCategory.First(c => c.Name == "Expert");
+            var catMaster = dbContext.LevelCategory.First(c => c.Name == "Master");
+            var catGrandmaster = dbContext.LevelCategory.First(c => c.Name == "Grandmaster");
+            var catLegendary = dbContext.LevelCategory.First(c => c.Name == "Legendary");
+            var catMythic = dbContext.LevelCategory.First(c => c.Name == "Mythic");
 
-            // 3. Add Categories to DB and Save (so they get IDs)
-            if (!dbContext.LevelCategory.Any())
-            {
-                dbContext.LevelCategory.AddRange(catBeginner, catIntermediate, catAdvanced, catExpert, catMaster, catGrandmaster, catLegendary, catMythic);
-                dbContext.SaveChanges();
-            }
-            else
-            {
-                // If categories already exist (e.g. from previous run), fetch them to get the IDs
-                catBeginner = dbContext.LevelCategory.First(c => c.Name == "Beginner");
-                catIntermediate = dbContext.LevelCategory.First(c => c.Name == "Intermediate");
-                catAdvanced = dbContext.LevelCategory.First(c => c.Name == "Advanced");
-                catExpert = dbContext.LevelCategory.First(c => c.Name == "Expert");
-                catMaster = dbContext.LevelCategory.First(c => c.Name == "Master");
-                catGrandmaster = dbContext.LevelCategory.First(c => c.Name == "Grandmaster");
-                catLegendary = dbContext.LevelCategory.First(c => c.Name == "Legendary");
-                catMythic = dbContext.LevelCategory.First(c => c.Name == "Mythic");
-            }
-
-            // 4. Create Levels using the Category IDs
+            // 3. Criar os Níveis
             dbContext.Level.AddRange(new List<Level>() {
-        // Beginner
-        new Level { LevelNumber = 1, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1000, Description = "First steps in the health journey" },
-        new Level { LevelNumber = 2, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1200, Description = "Starting to build healthy routines" },
-        new Level { LevelNumber = 3, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1400, Description = "Gaining consistency in workouts" },
-        new Level { LevelNumber = 4, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1600, Description = "Steady progress in your well-being" },
-        new Level { LevelNumber = 5, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1800, Description = "End of beginner phase – solid habits established" },
+                // Beginner
+                new Level { LevelNumber = 1, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1000, Description = "First steps in the health journey" },
+                new Level { LevelNumber = 2, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1200, Description = "Starting to build healthy routines" },
+                new Level { LevelNumber = 3, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1400, Description = "Gaining consistency in workouts" },
+                new Level { LevelNumber = 4, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1600, Description = "Steady progress in your well-being" },
+                new Level { LevelNumber = 5, LevelCategoryId = catBeginner.LevelCategoryId, LevelPointsLimit = 1800, Description = "End of beginner phase – solid habits established" },
 
-        // Intermediate
-        new Level { LevelNumber = 6, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 2000, Description = "Entering the intermediate stage" },
-        new Level { LevelNumber = 7, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 2600, Description = "Developing physical endurance" },
-        new Level { LevelNumber = 8, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 3200, Description = "Improving overall performance" },
-        new Level { LevelNumber = 9, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 3800, Description = "Consolidating advanced techniques" },
-        new Level { LevelNumber = 10, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 4400, Description = "Ready for tougher challenges" },
+                // Intermediate
+                new Level { LevelNumber = 6, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 2000, Description = "Entering the intermediate stage" },
+                new Level { LevelNumber = 7, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 2600, Description = "Developing physical endurance" },
+                new Level { LevelNumber = 8, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 3200, Description = "Improving overall performance" },
+                new Level { LevelNumber = 9, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 3800, Description = "Consolidating advanced techniques" },
+                new Level { LevelNumber = 10, LevelCategoryId = catIntermediate.LevelCategoryId, LevelPointsLimit = 4400, Description = "Ready for tougher challenges" },
 
-        // Advanced
-        new Level { LevelNumber = 11, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 5000, Description = "Beginning the advanced journey" },
-        new Level { LevelNumber = 12, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 6000, Description = "Mastering complex exercises" },
-        new Level { LevelNumber = 13, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 7000, Description = "Excellence in cardiovascular training" },
-        new Level { LevelNumber = 14, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 8000, Description = "Specializing in strength and endurance" },
-        new Level { LevelNumber = 15, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 9000, Description = "Forming a complete athlete" },
+                // Advanced
+                new Level { LevelNumber = 11, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 5000, Description = "Beginning the advanced journey" },
+                new Level { LevelNumber = 12, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 6000, Description = "Mastering complex exercises" },
+                new Level { LevelNumber = 13, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 7000, Description = "Excellence in cardiovascular training" },
+                new Level { LevelNumber = 14, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 8000, Description = "Specializing in strength and endurance" },
+                new Level { LevelNumber = 15, LevelCategoryId = catAdvanced.LevelCategoryId, LevelPointsLimit = 9000, Description = "Forming a complete athlete" },
 
-        // Expert
-        new Level { LevelNumber = 16, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 10000, Description = "First expert-level achievement" },
-        new Level { LevelNumber = 17, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 11000, Description = "Advanced conditioning techniques" },
-        new Level { LevelNumber = 18, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 12000, Description = "Master of personalized routines" },
-        new Level { LevelNumber = 19, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 13000, Description = "A reference within the fitness community" },
-        new Level { LevelNumber = 20, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 14000, Description = "Established expert" },
+                // Expert
+                new Level { LevelNumber = 16, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 10000, Description = "First expert-level achievement" },
+                new Level { LevelNumber = 17, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 11000, Description = "Advanced conditioning techniques" },
+                new Level { LevelNumber = 18, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 12000, Description = "Master of personalized routines" },
+                new Level { LevelNumber = 19, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 13000, Description = "A reference within the fitness community" },
+                new Level { LevelNumber = 20, LevelCategoryId = catExpert.LevelCategoryId, LevelPointsLimit = 14000, Description = "Established expert" },
 
-        // Master
-        new Level { LevelNumber = 21, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 15000, Description = "Beginning the path of a master" },
-        new Level { LevelNumber = 22, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 16000, Description = "Complete mastery across multiple disciplines" },
-        new Level { LevelNumber = 23, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 17000, Description = "Natural leader in group workouts" },
-        new Level { LevelNumber = 24, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 18000, Description = "An inspiration to other users" },
-        new Level { LevelNumber = 25, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 19000, Description = "Recognized master in health and wellness" },
+                // Master
+                new Level { LevelNumber = 21, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 15000, Description = "Beginning the path of a master" },
+                new Level { LevelNumber = 22, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 16000, Description = "Complete mastery across multiple disciplines" },
+                new Level { LevelNumber = 23, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 17000, Description = "Natural leader in group workouts" },
+                new Level { LevelNumber = 24, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 18000, Description = "An inspiration to other users" },
+                new Level { LevelNumber = 25, LevelCategoryId = catMaster.LevelCategoryId, LevelPointsLimit = 19000, Description = "Recognized master in health and wellness" },
 
-        // Grandmaster
-        new Level { LevelNumber = 26, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 20000, Description = "First grandmaster level" },
-        new Level { LevelNumber = 27, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 22000, Description = "Excellence in all aspects of fitness" },
-        new Level { LevelNumber = 28, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 24000, Description = "Deep knowledge of nutrition and exercise" },
-        new Level { LevelNumber = 29, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 26000, Description = "A legend in the making" },
-        new Level { LevelNumber = 30, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 28000, Description = "A fully established grandmaster" },
+                // Grandmaster
+                new Level { LevelNumber = 26, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 20000, Description = "First grandmaster level" },
+                new Level { LevelNumber = 27, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 22000, Description = "Excellence in all aspects of fitness" },
+                new Level { LevelNumber = 28, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 24000, Description = "Deep knowledge of nutrition and exercise" },
+                new Level { LevelNumber = 29, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 26000, Description = "A legend in the making" },
+                new Level { LevelNumber = 30, LevelCategoryId = catGrandmaster.LevelCategoryId, LevelPointsLimit = 28000, Description = "A fully established grandmaster" },
 
-        // Legendary
-        new Level { LevelNumber = 31, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 30000, Description = "Entering the legendary hall" },
-        new Level { LevelNumber = 32, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 34000, Description = "Legendary consistency in training" },
-        new Level { LevelNumber = 33, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 38000, Description = "Outstanding long-term performance" },
-        new Level { LevelNumber = 34, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 42000, Description = "A true icon of the app" },
-        new Level { LevelNumber = 35, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 46000, Description = "A living fitness legend" },
+                // Legendary
+                new Level { LevelNumber = 31, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 30000, Description = "Entering the legendary hall" },
+                new Level { LevelNumber = 32, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 34000, Description = "Legendary consistency in training" },
+                new Level { LevelNumber = 33, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 38000, Description = "Outstanding long-term performance" },
+                new Level { LevelNumber = 34, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 42000, Description = "A true icon of the app" },
+                new Level { LevelNumber = 35, LevelCategoryId = catLegendary.LevelCategoryId, LevelPointsLimit = 46000, Description = "A living fitness legend" },
 
-        // Mythic
-        new Level { LevelNumber = 36, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 50000, Description = "Achieving mythic status" },
-        new Level { LevelNumber = 37, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 55000, Description = "Superhuman strength and determination" },
-        new Level { LevelNumber = 38, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 60000, Description = "A legend among legends" },
-        new Level { LevelNumber = 39, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 65000, Description = "Close to the maximum level" },
-        new Level { LevelNumber = 40, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 70000, Description = "Maximum level – A living myth of the app" }
-    });
+                // Mythic
+                new Level { LevelNumber = 36, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 50000, Description = "Achieving mythic status" },
+                new Level { LevelNumber = 37, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 55000, Description = "Superhuman strength and determination" },
+                new Level { LevelNumber = 38, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 60000, Description = "A legend among legends" },
+                new Level { LevelNumber = 39, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 65000, Description = "Close to the maximum level" },
+                new Level { LevelNumber = 40, LevelCategoryId = catMythic.LevelCategoryId, LevelPointsLimit = 70000, Description = "Maximum level – A living myth of the app" }
+            });
+
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateLevelCategories(HealthWellbeingDbContext dbContext) {
+            
+            if (dbContext.LevelCategory.Any()) return;
+
+            dbContext.LevelCategory.AddRange(
+                new LevelCategory { Name = "Beginner" },
+                new LevelCategory { Name = "Intermediate" },
+                new LevelCategory { Name = "Advanced" },
+                new LevelCategory { Name = "Expert" },
+                new LevelCategory { Name = "Master" },
+                new LevelCategory { Name = "Grandmaster" },
+                new LevelCategory { Name = "Legendary" },
+                new LevelCategory { Name = "Mythic" }
+            );
 
             dbContext.SaveChanges();
         }

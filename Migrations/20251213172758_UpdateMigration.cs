@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigrationUpdate : Migration
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -73,24 +73,6 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Client", x => x.ClientId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Customer",
-                columns: table => new
-                {
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Gender = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TotalPoints = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customer", x => x.CustomerId);
                 });
 
             migrationBuilder.CreateTable(
@@ -580,6 +562,30 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Customer",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TotalPoints = table.Column<int>(type: "int", nullable: false),
+                    LevelId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customer", x => x.CustomerId);
+                    table.ForeignKey(
+                        name: "FK_Customer_Level_LevelId",
+                        column: x => x.LevelId,
+                        principalTable: "Level",
+                        principalColumn: "LevelId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Event",
                 columns: table => new
                 {
@@ -623,6 +629,11 @@ namespace HealthWellbeing.Migrations
                 table: "Customer",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customer_LevelId",
+                table: "Customer",
+                column: "LevelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_Email",
@@ -710,9 +721,6 @@ namespace HealthWellbeing.Migrations
                 name: "ExercicioGrupoMuscular");
 
             migrationBuilder.DropTable(
-                name: "Level");
-
-            migrationBuilder.DropTable(
                 name: "Member");
 
             migrationBuilder.DropTable(
@@ -743,6 +751,9 @@ namespace HealthWellbeing.Migrations
                 name: "TipoExercicio");
 
             migrationBuilder.DropTable(
+                name: "Level");
+
+            migrationBuilder.DropTable(
                 name: "EventType");
 
             migrationBuilder.DropTable(
@@ -750,9 +761,6 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Exercicio");
-
-            migrationBuilder.DropTable(
-                name: "LevelCategory");
 
             migrationBuilder.DropTable(
                 name: "Client");
@@ -774,6 +782,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
+
+            migrationBuilder.DropTable(
+                name: "LevelCategory");
 
             migrationBuilder.DropTable(
                 name: "ScoringStrategy");

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Models {
@@ -35,6 +37,13 @@ namespace HealthWellbeing.Models {
         [Required(ErrorMessage = "The {0} is required.")]
         [Range(0, int.MaxValue, ErrorMessage = "The {0} cannot be negative.")]
         public int TotalPoints { get; set; } = 0;
+
+        [Display(Name = "Level")]
+        [Required(ErrorMessage = "Please select a {0}.")]
+        public int LevelId { get; set; }
+
+        [Display(Name = "Scoring Strategy")]
+        public Level? Level { get; set; }
     }
 }
 

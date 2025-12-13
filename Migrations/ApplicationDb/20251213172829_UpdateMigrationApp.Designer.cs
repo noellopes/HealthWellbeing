@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251210164526_MigrationUpdateApp")]
-    partial class MigrationUpdateApp
+    [Migration("20251213172829_UpdateMigrationApp")]
+    partial class UpdateMigrationApp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
