@@ -21,14 +21,22 @@ namespace HealthWellbeingRoom.Controllers
         }
         //------------------------------------------------------PREENCHER DROPDOWNS-------------------------------------------------------------------------------------
 
-        private async Task PreencherDropdowns()
+        private async Task PreencherDropdowns(Room? room = null)
         {
             // Tipos de Sala
             ViewBag.RoomTypes = new SelectList(await _context.RoomType.ToListAsync(), "RoomTypeId", "Name");
+
             // Localizações
             ViewBag.RoomLocations = new SelectList(await _context.RoomLocation.ToListAsync(), "RoomLocationId", "Name");
-            // Status
-            ViewBag.RoomStatuses = new SelectList(await _context.RoomStatus.ToListAsync(), "RoomStatusId", "Name");
+
+            // Status (filtra "Criado" se estiver editando uma sala existente)
+            var statusList = await _context.RoomStatus.ToListAsync();
+            if (room != null && room.RoomId > 0)
+            {
+                statusList = statusList.Where(s => s.Name != "Criado").ToList();
+            }
+            ViewBag.RoomStatuses = new SelectList(statusList, "RoomStatusId", "Name", room?.RoomStatusId);
+
             // Especialidades
             ViewBag.RoomSpecialty = new SelectList(await _context.Specialty.ToListAsync(), "SpecialtyId", "Name");
         }
@@ -289,7 +297,7 @@ namespace HealthWellbeingRoom.Controllers
             var room = await _context.Room.FindAsync(id);
             if (room == null) return NotFound();
 
-            await PreencherDropdowns();
+            await PreencherDropdowns(room);//sala ja criada entao ignora estado "criado"
             return View(room);
         }
 

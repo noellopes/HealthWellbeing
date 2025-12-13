@@ -8,6 +8,10 @@
 @{
     ViewData["Title"] = "Lista de Salas";
 
+    // Verifica se o utilizador tem permissão de deministrador e de Logística
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
+
     // Função local para definir a cor da bolinha com base no estado da sala
     string GetStatusColor(string statusName) => statusName.ToLower() switch
     {
@@ -58,9 +62,12 @@
         </a>
 
         <!-- Botão criar nova sala -->
+        @if (isAdmin){
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Criar Nova Sala
         </a>
+        }
+
     </div>
 </div>
 
@@ -257,22 +264,29 @@
                     </td>
 
                     <td class="text-center">
+
+                        @if (isAdmin){
                         <a asp-action="Edit"
                            asp-route-id="@item.RoomId"
                            class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
                         </a>
+                        }
+
                         <a asp-action="Details"
                            asp-route-id="@item.RoomId"
                            asp-route-fromCreation="false"
                            class="btn btn-sm btn-info me-1">
                             <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
                         </a>
+                        @if (isAdmin){
                         <a asp-action="Delete"
                            asp-route-id="@item.RoomId"
                            class="btn btn-sm btn-danger">
                             <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
                         </a>
+                        }
+
                     </td>
                 </tr>
             }

@@ -3,7 +3,14 @@
 
 @{
     ViewData["Title"] = "Detalhes da Sala";
-    bool fromCreation = Context.Request.Query["fromCreation"] == "true";
+
+    //Verifica se a URL vem de uma criacao de sala (duas versoes)
+    // bool fromCreation = Context.Request.Query["fromCreation"] == "True";
+    bool fromCreation = bool.TryParse(Context.Request.Query["fromCreation"], out var result) && result;
+
+    // Verifica se o utilizador tem permissão de deministrador e de Logística
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
 }
 
 <!-- Título principal da página -->
@@ -83,13 +90,16 @@
     </div>
 
     <div class="card-footer d-flex justify-content-end gap-2">
-        <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning me-2">
-            <i class="bi bi-pencil-square me-1"></i> Editar
-        </a>
+        @if (isAdmin)
+        {
+            <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning me-2">
+                <i class="bi bi-pencil-square me-1"></i> Editar
+            </a>
 
-        <a asp-action="Delete" asp-route-id="@Model.RoomId" class="btn btn-danger me-2">
-            <i class="bi bi-trash me-1"></i> Eliminar
-        </a>
+            <a asp-action="Delete" asp-route-id="@Model.RoomId" class="btn btn-danger me-2">
+                <i class="bi bi-trash me-1"></i> Eliminar
+            </a>
+        }
 
         @if (fromCreation)
         {
