@@ -15,5 +15,7 @@
         public ObjetivoFisico? ObjetivoFisico { get; set; }
 
         public ICollection<UtenteGrupo7ProblemaSaude>? UtenteProblemasSaude { get; set; }
+        public ICollection<HistoricoAtividade> HistoricoAtividades { get; set; }
+
     }
 }
