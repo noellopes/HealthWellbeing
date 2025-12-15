@@ -33,6 +33,12 @@
                     </div>
 
                     <div class="mb-3">
+                        <label asp-for="ReceitaId" class="form-label">Receita</label>
+                        <select asp-for="ReceitaId" class="form-select" asp-items="ViewBag.ReceitaId"></select>
+                        <span asp-validation-for="ReceitaId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
                         <label asp-for="UnidadeMedida" class="form-label"></label>
                         <select asp-for="UnidadeMedida" class="form-select"
                             asp-items="Html.GetEnumSelectList<UnidadeMedidaEnum>()">

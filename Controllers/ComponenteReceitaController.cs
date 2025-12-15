@@ -20,16 +20,19 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ComponenteReceita
-        public async Task<IActionResult> Index(string alimentoName, string opcional, int page = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string alimentoName, string opcional, string receitaNome, int page = 1, int pageSize = 10)
         {
-            // Monta query base incluindo Alimento
-            var query = _context.ComponenteReceita.Include(c => c.Alimento).AsQueryable();
+            // Monta query base incluindo Alimento e Receita
+            var query = _context.ComponenteReceita
+                .Include(c => c.Alimento)
+                .Include(c => c.Receita)
+                .AsQueryable();
 
             // Filtra por nome do alimento (se informado)
             if (!string.IsNullOrWhiteSpace(alimentoName))
             {
                 var term = alimentoName.Trim().ToLower();
-                query = query.Where(c => c.Alimento.Name.ToLower().Contains(term));
+                query = query.Where(c => c.Alimento != null && c.Alimento.Name != null && c.Alimento.Name.ToLower().Contains(term));
             }
 
             // Filtra por opcional (se informado: "true"/"false")
@@ -39,6 +42,13 @@ namespace HealthWellbeing.Controllers
                 {
                     query = query.Where(c => c.IsOpcional == opc);
                 }
+            }
+
+            // Filtra por nome da receita (se informado)
+            if (!string.IsNullOrWhiteSpace(receitaNome))
+            {
+                var rTerm = receitaNome.Trim().ToLower();
+                query = query.Where(c => c.Receita != null && c.Receita.Nome.ToLower().Contains(rTerm));
             }
 
             // Total antes da paginação
@@ -51,7 +61,8 @@ namespace HealthWellbeing.Controllers
             if (page > totalPages) page = totalPages;
 
             var items = await query
-                .OrderBy(c => c.ComponenteReceitaId)
+                .OrderBy(c => c.Alimento != null ? c.Alimento.Name : string.Empty)
+                .ThenBy(c => c.ComponenteReceitaId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -63,6 +74,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.TotalCount = totalCount;
             ViewBag.SearchAlimentoName = alimentoName ?? string.Empty;
             ViewBag.SearchOpcional = opcional ?? string.Empty;
+            ViewBag.SearchReceitaNome = receitaNome ?? string.Empty;
 
             return View(items);
         }
@@ -90,6 +102,7 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
+            ViewData["ReceitaId"] = new SelectList(_context.Receita, "ReceitaId", "Nome");
             return View();
         }
 
@@ -98,7 +111,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ComponenteReceitaId,AlimentoId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
+        public async Task<IActionResult> Create([Bind("ComponenteReceitaId,AlimentoId,ReceitaId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
         {
             if (ModelState.IsValid)
             {
@@ -112,6 +125,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            ViewData["ReceitaId"] = new SelectList(_context.Receita, "ReceitaId", "Nome", componenteReceita.ReceitaId);
             return View(componenteReceita);
         }
 
@@ -129,6 +143,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
             ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            ViewData["ReceitaId"] = new SelectList(_context.Receita, "ReceitaId", "Nome", componenteReceita.ReceitaId);
             return View(componenteReceita);
         }
 
@@ -137,7 +152,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ComponenteReceitaId,AlimentoId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
+        public async Task<IActionResult> Edit(int id, [Bind("ComponenteReceitaId,AlimentoId,ReceitaId,UnidadeMedida,Quantidade,IsOpcional")] ComponenteReceita componenteReceita)
         {
             if (id != componenteReceita.ComponenteReceitaId)
             {
@@ -168,6 +183,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["AlimentoId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", componenteReceita.AlimentoId);
+            ViewData["ReceitaId"] = new SelectList(_context.Receita, "ReceitaId", "Nome", componenteReceita.ReceitaId);
             return View(componenteReceita);
         }
 
@@ -181,6 +197,7 @@ namespace HealthWellbeing.Controllers
 
             var componenteReceita = await _context.ComponenteReceita
                 .Include(c => c.Alimento)
+                .Include(c => c.Receita)
                 .FirstOrDefaultAsync(m => m.ComponenteReceitaId == id);
             if (componenteReceita == null)
             {
