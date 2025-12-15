@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251215134230_SeedingInicialDados")]
+    partial class SeedingInicialDados
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -523,83 +526,6 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("FuncaoId");
 
                     b.ToTable("Funcoes");
-
-                    b.HasData(
-                        new
-                        {
-                            FuncaoId = 1,
-                            NomeFuncao = "Técnico de Radiologia"
-                        },
-                        new
-                        {
-                            FuncaoId = 2,
-                            NomeFuncao = "Fisioterapeuta"
-                        },
-                        new
-                        {
-                            FuncaoId = 3,
-                            NomeFuncao = "Técnico de Cardiopneumologia"
-                        },
-                        new
-                        {
-                            FuncaoId = 4,
-                            NomeFuncao = "Técnico de Análises Clínicas"
-                        },
-                        new
-                        {
-                            FuncaoId = 5,
-                            NomeFuncao = "Terapeuta Ocupacional"
-                        },
-                        new
-                        {
-                            FuncaoId = 6,
-                            NomeFuncao = "Ortopedista"
-                        },
-                        new
-                        {
-                            FuncaoId = 7,
-                            NomeFuncao = "Enfermeiro Especialista"
-                        },
-                        new
-                        {
-                            FuncaoId = 8,
-                            NomeFuncao = "Nutricionista"
-                        },
-                        new
-                        {
-                            FuncaoId = 9,
-                            NomeFuncao = "Técnico de Medicina Nuclear"
-                        },
-                        new
-                        {
-                            FuncaoId = 10,
-                            NomeFuncao = "Cardiologista"
-                        },
-                        new
-                        {
-                            FuncaoId = 11,
-                            NomeFuncao = "Podologista"
-                        },
-                        new
-                        {
-                            FuncaoId = 12,
-                            NomeFuncao = "Técnico de Neurofisiologia"
-                        },
-                        new
-                        {
-                            FuncaoId = 13,
-                            NomeFuncao = "Técnico Auxiliar de Saúde"
-                        },
-                        new
-                        {
-                            FuncaoId = 14,
-                            NomeFuncao = "Optometrista"
-                        },
-                        new
-                        {
-                            FuncaoId = 15,
-                            NomeFuncao = "Técnico de Medicina Física e Reabilitação"
-                        });
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
@@ -881,56 +807,6 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("FuncaoId1");
 
                     b.ToTable("ProfissionalExecutante");
-
-                    b.HasData(
-                        new
-                        {
-                            ProfissionalExecutanteId = 1,
-                            Email = "Kandonga123@gmail.com",
-                            FuncaoId = 1,
-                            Nome = "André Kandonga",
-                            Telefone = "912912915"
-                        },
-                        new
-                        {
-                            ProfissionalExecutanteId = 2,
-                            Email = "MiguelSantos123@gmail.com",
-                            FuncaoId = 2,
-                            Nome = "Miguel Santos",
-                            Telefone = "912912914"
-                        },
-                        new
-                        {
-                            ProfissionalExecutanteId = 3,
-                            Email = "DostoevskySuba@gmail.com",
-                            FuncaoId = 3,
-                            Nome = "Dostoevsky",
-                            Telefone = "912913914"
-                        },
-                        new
-                        {
-                            ProfissionalExecutanteId = 4,
-                            Email = "QuaresmaPorto@gmail.com",
-                            FuncaoId = 4,
-                            Nome = "Ricardo Quaresma",
-                            Telefone = "910101010"
-                        },
-                        new
-                        {
-                            ProfissionalExecutanteId = 5,
-                            Email = "Mai123222suba@gmail.com",
-                            FuncaoId = 5,
-                            Nome = "Mai Da Silva",
-                            Telefone = "912912222"
-                        },
-                        new
-                        {
-                            ProfissionalExecutanteId = 6,
-                            Email = "DiogoRodrigues04@gmail.com",
-                            FuncaoId = 6,
-                            Nome = "Diogo Rodrigues",
-                            Telefone = "912912522"
-                        });
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.SalaDeExames", b =>

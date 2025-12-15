@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Models;
 using HealthWellBeing.Models;
 using Microsoft.EntityFrameworkCore;
+using NuGet.ContentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace HealthWellbeing.Data
         public DbSet<ExameTipoRecurso> ExameTipoRecursos { get; set; } = default!;
 
         public DbSet<Funcao> Funcoes { get; set; }
-
+        public DbSet<EstadoMaterial> EstadosMaterial{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -114,7 +115,296 @@ namespace HealthWellbeing.Data
                 new ExameTipo { ExameTipoId = 23, Nome = "Cultura de Urina", Descricao = "Identificação de bactérias que podem causar infeção urinária.", EspecialidadeId = 6 }
             );
 
+            modelBuilder.Entity<Funcao>().HasData(
+                new Funcao { FuncaoId = 1, NomeFuncao = "Técnico de Radiologia" },
+                new Funcao { FuncaoId = 2, NomeFuncao = "Fisioterapeuta" },
+                new Funcao { FuncaoId = 3, NomeFuncao = "Técnico de Cardiopneumologia" },
+                new Funcao { FuncaoId = 4, NomeFuncao = "Técnico de Análises Clínicas" },
+                new Funcao { FuncaoId = 5, NomeFuncao = "Terapeuta Ocupacional" },
+                new Funcao { FuncaoId = 6, NomeFuncao = "Ortopedista" },
+                new Funcao { FuncaoId = 7, NomeFuncao = "Enfermeiro Especialista" },
+                new Funcao { FuncaoId = 8, NomeFuncao = "Nutricionista" },
+                new Funcao { FuncaoId = 9, NomeFuncao = "Técnico de Medicina Nuclear" },
+                new Funcao { FuncaoId = 10, NomeFuncao = "Cardiologista" },
+                new Funcao { FuncaoId = 11, NomeFuncao = "Podologista" },
+                new Funcao { FuncaoId = 12, NomeFuncao = "Técnico de Neurofisiologia" },
+                new Funcao { FuncaoId = 13, NomeFuncao = "Técnico Auxiliar de Saúde" },
+                new Funcao { FuncaoId = 14, NomeFuncao = "Optometrista" },
+                new Funcao { FuncaoId = 15, NomeFuncao = "Técnico de Medicina Física e Reabilitação" }
+            );
 
+
+
+            modelBuilder.Entity<EstadoMaterial>().HasData(
+                            new EstadoMaterial { MaterialStatusId = 1, Nome = "Disponível", Descricao = "Material pronto para utilização" },
+                            new EstadoMaterial { MaterialStatusId = 2, Nome = "Em Uso", Descricao = "Material atualmente utilizado" },
+                            new EstadoMaterial { MaterialStatusId = 3, Nome = "Reservado", Descricao = "Material reservado para utilização futura" },
+                            new EstadoMaterial { MaterialStatusId = 4, Nome = "Em Manutenção", Descricao = "Material em reparação/manutenção" },
+                            new EstadoMaterial { MaterialStatusId = 5, Nome = "Danificado", Descricao = "Material danificado e não utilizável" },
+                            new EstadoMaterial { MaterialStatusId = 6, Nome = "Perdido", Descricao = "Material não localizado" }
+            );
+
+            modelBuilder.Entity<ProfissionalExecutante>().HasData(
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 1,
+                    Nome = "André Kandonga",
+                    FuncaoId = 1, // Técnico de Radiologia
+                    Telefone = "912912915",
+                    Email = "Kandonga123@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 2,
+                    Nome = "Miguel Santos",
+                    FuncaoId = 2, // Fisioterapeuta
+                    Telefone = "912912914",
+                    Email = "MiguelSantos123@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 3,
+                    Nome = "Dostoevsky",
+                    FuncaoId = 3, // Técnico de Cardiopneumologia
+                    Telefone = "912913914",
+                    Email = "DostoevskySuba@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 4,
+                    Nome = "Ricardo Quaresma",
+                    FuncaoId = 4, // Técnico de Análises Clínicas
+                    Telefone = "910101010",
+                    Email = "QuaresmaPorto@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 5,
+                    Nome = "Mai Da Silva",
+                    FuncaoId = 5, // Terapeuta Ocupacional
+                    Telefone = "912912222",
+                    Email = "Mai123222suba@gmail.com",
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 6,
+                    Nome = "Diogo Rodrigues",
+                    FuncaoId = 6, // Ortopedista
+                    Telefone = "912912522",
+                    Email = "DiogoRodrigues04@gmail.com",
+                }
+            );
+
+            modelBuilder.Entity<MaterialEquipamentoAssociado>().HasData(
+                // 1
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 1, // PK
+                    NomeEquipamento = "Seringa Descartável 5ml",
+                    Quantidade = 500,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 2
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 2, // PK
+                    NomeEquipamento = "Compressa de Gaze Esterilizada",
+                    Quantidade = 1200,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 3
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 3, // PK
+                    NomeEquipamento = "Monitor de Sinais Vitais",
+                    Quantidade = 15,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 4
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 4, // PK
+                    NomeEquipamento = "Eletrocardiógrafo Portátil",
+                    Quantidade = 5,
+                    MaterialStatusId = 4 // Em Manutenção
+                },
+                // 5
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 5, // PK
+                    NomeEquipamento = "Luvas de Nitrilo (Caixa)",
+                    Quantidade = 80,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 6
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 6, // PK
+                    NomeEquipamento = "Cadeira de Rodas Standard",
+                    Quantidade = 25,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 7
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 7, // PK
+                    NomeEquipamento = "Bomba de Infusão Volumétrica",
+                    Quantidade = 40,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 8
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 8, // PK
+                    NomeEquipamento = "Termómetro Digital de Testa",
+                    Quantidade = 95,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 9
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 9, // PK
+                    NomeEquipamento = "Aspirador Cirúrgico",
+                    Quantidade = 8,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 10
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 10, // PK
+                    NomeEquipamento = "Mesa de Cirurgia Multiusos",
+                    Quantidade = 3,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 11
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 11, // PK
+                    NomeEquipamento = "Kit de Sutura Estéril",
+                    Quantidade = 300,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 12
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 12, // PK
+                    NomeEquipamento = "Bisturi Descartável (Unidade)",
+                    Quantidade = 1500,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 13
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 13, // PK
+                    NomeEquipamento = "Ventilador Pulmonar",
+                    Quantidade = 12,
+                    MaterialStatusId = 4 // Em Manutenção
+                },
+                // 14
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 14, // PK
+                    NomeEquipamento = "Carro de Emergência (Completo)",
+                    Quantidade = 6,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 15
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 15, // PK
+                    NomeEquipamento = "Agulha Hipodérmica 21G",
+                    Quantidade = 2000,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 16
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 16, // PK
+                    NomeEquipamento = "Otoscópio/Oftalmoscópio",
+                    Quantidade = 18,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 17
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 17, // PK
+                    NomeEquipamento = "Tala Imobilizadora (Vários Tamanhos)",
+                    Quantidade = 75,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 18
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 18, // PK
+                    NomeEquipamento = "Esfigmomanómetro Digital",
+                    Quantidade = 35,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 19
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 19, // PK
+                    NomeEquipamento = "Mascára Cirúrgica N95",
+                    Quantidade = 1000,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 20
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 20, // PK
+                    NomeEquipamento = "Laringoscópio Completo",
+                    Quantidade = 7,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 21
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 21, // PK
+                    NomeEquipamento = "Fato de Proteção Biológica",
+                    Quantidade = 150,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 22
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 22, // PK
+                    NomeEquipamento = "Desfibrilhador Externo Automático (DEA)",
+                    Quantidade = 10,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 23
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 23, // PK
+                    NomeEquipamento = "Pilha Alcalina AA (Pack de 10)",
+                    Quantidade = 20,
+                    MaterialStatusId = 1 // Disponível
+                },
+                // 24
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 24, // PK
+                    NomeEquipamento = "Estetoscópio Littmann",
+                    Quantidade = 55,
+                    MaterialStatusId = 2 // Em Uso
+                },
+                // 25
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 25, // PK
+                    NomeEquipamento = "Balança Hospitalar Digital",
+                    Quantidade = 4,
+                    MaterialStatusId = 4 // Em Manutenção
+                },
+                // 26
+                new MaterialEquipamentoAssociado
+                {
+                    MaterialEquipamentoAssociadoId = 26, // PK
+                    NomeEquipamento = "Gesso Ortopédico (Rolo)",
+                    Quantidade = 90,
+                    MaterialStatusId = 1 // Disponível
+                }
+            );
         }
     }
 }

@@ -70,7 +70,8 @@
                 @Html.DisplayFor(modelItem => item.ProfissionalExecutante.Email)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.EstadoComponente)
+                @Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.NomeEquipamento)
+                <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.EstadoMaterial.Nome)</span>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ExameId">Edit</a> |

@@ -38,11 +38,12 @@
                             @Html.DisplayFor(model => model.Quantidade)
                         </dd>
 
+                        @* FIX: DISPLAY THE RELATED STATUS NAME (EstadoMaterial.Nome) *@
                         <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.EstadoComponente)
+                            @Html.DisplayNameFor(model => model.EstadoMaterial.Nome)
                         </dt>
                         <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.EstadoComponente)
+                            @Html.DisplayFor(model => model.EstadoMaterial.Nome)
                         </dd>
                     </dl>
                 </div>

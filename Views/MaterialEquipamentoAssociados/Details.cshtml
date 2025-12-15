@@ -43,23 +43,25 @@
                             </span>
                         </dd>
 
-                        @* Detalhe: EstadoComponente *@
+                        @* Detalhe: EstadoMaterial.Nome (Corrigido para usar a entidade relacionada) *@
                         <dt class="col-sm-3 text-muted">
-                            @Html.DisplayNameFor(model => model.EstadoComponente)
+                            @Html.DisplayNameFor(model => model.EstadoMaterial.Nome)
                         </dt>
                         <dd class="col-sm-9">
                             @* Estilização do Estado com Badge para melhor destaque *@
                             @{
-                                var badgeClass = Model.EstadoComponente?.ToLower() switch
+                                // Garantir que Model.EstadoMaterial não é nulo antes de aceder a Nome
+                                var estadoNome = Model.EstadoMaterial?.Nome ?? "Não Especificado";
+                                var badgeClass = estadoNome.ToLower() switch
                                 {
                                     "bom" => "bg-success",
                                     "danificado" => "bg-danger",
                                     "em manutenção" => "bg-warning text-dark",
-                                    _ => "bg-info text-dark"
+                                    _ => "bg-info text-dark" // Caso não corresponda a nenhum dos acima
                                 };
                             }
                             <span class="badge @badgeClass">
-                                @Html.DisplayFor(model => model.EstadoComponente)
+                                @Html.DisplayFor(model => model.EstadoMaterial.Nome)
                             </span>
                         </dd>
 
