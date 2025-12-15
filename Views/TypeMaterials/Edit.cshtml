@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de dispositivo</label>
+                        <label asp-for="Name" class="form-label fw-bold">Nome do Tipo de Dispositivo</label>
                         <input asp-for="Name" class="form-control" placeholder="Ex: ECG Portátil,Ventilação" />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
@@ -50,9 +50,13 @@
             </div>
 
             <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-success" id="btnSave">
+                <button type="submit"
+                        class="btn btn-success"
+                        id="btnSave"
+                        disabled>
                     <i class="bi bi-save me-1"></i> Guardar Alterações
                 </button>
+
                 <a asp-action="Index" class="btn btn-secondary">
                     <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
                 </a>
@@ -61,4 +65,21 @@
     </div>
 
 </div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const saveButton = document.getElementById("btnSave");
+
+            document.querySelectorAll("input, textarea, select").forEach(el => {
+                el.addEventListener("input", () => {
+                    saveButton.disabled = false;
+                });
+            });
+
+        });
+    </script>
+}
+
+
 
