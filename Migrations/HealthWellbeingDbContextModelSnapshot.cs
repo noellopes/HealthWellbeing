@@ -100,6 +100,33 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Activity");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.AgendaMedica", b =>
+                {
+                    b.Property<int>("IdAgendaMedica")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAgendaMedica"));
+
+                    b.Property<int>("DiaSemana")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly>("HoraFim")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("HoraInicio")
+                        .HasColumnType("time");
+
+                    b.Property<int?>("IdMedico")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdAgendaMedica");
+
+                    b.HasIndex("IdMedico");
+
+                    b.ToTable("AgendaMedica");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.Property<int>("AlergiaID")
@@ -222,6 +249,47 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("CategoriaAlimento");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
+                {
+                    b.Property<string>("ClientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ClientId");
+
+                    b.ToTable("Client");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Consulta", b =>
                 {
                     b.Property<int>("IdConsulta")
@@ -275,46 +343,23 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("IdEspecialidade")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
-            modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
-                {
-                    b.Property<string>("ClientId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
+                    b.Property<string>("Telemovel")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.HasKey("IdMedico");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.HasIndex("IdEspecialidade");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ClientId");
-
-                    b.ToTable("Client");
+                    b.ToTable("Doctor");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
@@ -578,13 +623,6 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Telemovel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("IdMedico");
-
-                    b.ToTable("Doctor");
                     b.Property<string>("ProblemaNome")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -733,36 +771,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Specialities");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
-                {
-                    b.Property<int>("UtenteSaudeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtenteSaudeId"));
-
-                    b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("Morada")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Nif")
-                        .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
-
-                    b.Property<string>("Niss")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
-
-                    b.Property<string>("NomeCompleto")
             modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
                 {
                     b.Property<int>("TipoExercicioId")
@@ -898,6 +906,45 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.HasKey("TrainingTypeId");
+
+                    b.ToTable("TrainingType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
+                {
+                    b.Property<int>("UtenteSaudeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtenteSaudeId"));
+
+                    b.Property<DateTime>("DataNascimento")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("Morada")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Nif")
+                        .IsRequired()
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
+
+                    b.Property<string>("Niss")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
+
+                    b.Property<string>("NomeCompleto")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Nus")
                         .IsRequired()
                         .HasMaxLength(9)
@@ -919,9 +966,6 @@ namespace HealthWellbeing.Migrations
                         .IsUnique();
 
                     b.ToTable("UtenteSaude");
-                    b.HasKey("TrainingTypeId");
-
-                    b.ToTable("TrainingType");
                 });
 
             modelBuilder.Entity("ProblemaSaudeProfissionalExecutante", b =>
@@ -984,6 +1028,16 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.AgendaMedica", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Doctor", "Medico")
+                        .WithMany("AgendaMedica")
+                        .HasForeignKey("IdMedico")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Medico");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
@@ -1009,18 +1063,31 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Specialities", "Speciality")
                         .WithMany("Consultas")
                         .HasForeignKey("IdEspecialidade")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
                         .WithMany("Consultas")
                         .HasForeignKey("IdMedico")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Doctor");
 
                     b.Navigation("Speciality");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Specialities", "Especialidade")
+                        .WithMany("Medicos")
+                        .HasForeignKey("IdEspecialidade")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Especialidade");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
@@ -1093,22 +1160,28 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("AlergiasRelacionadas");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
-                {
-                    b.Navigation("Consultas");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
-                {
-                    b.Navigation("Consultas");
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
                     b.Navigation("Membership");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
+                {
+                    b.Navigation("AgendaMedica");
+
+                    b.Navigation("Consultas");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.GrupoMuscular", b =>
                 {
                     b.Navigation("Musculos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
+                {
+                    b.Navigation("Consultas");
+
+                    b.Navigation("Medicos");
                 });
 #pragma warning restore 612, 618
         }
