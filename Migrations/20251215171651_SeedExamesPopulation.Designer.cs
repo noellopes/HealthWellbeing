@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251215150447_SeedProfissionais")]
-    partial class SeedProfissionais
+    [Migration("20251215171651_SeedExamesPopulation")]
+    partial class SeedExamesPopulation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "9.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -136,29 +136,28 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("DataHoraMarcacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("ExameTipoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("MaterialEquipamentoAssociadoId")
+                    b.Property<int>("MaterialEquipamentoAssociadoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MedicoId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("MedicoSolicitanteId")
+                    b.Property<int>("MedicoSolicitanteId")
                         .HasColumnType("int");
 
                     b.Property<string>("Notas")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("ProfissionalExecutanteId")
+                    b.Property<int>("ProfissionalExecutanteId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SalaDeExameId")
+                    b.Property<int>("SalaDeExameId")
                         .HasColumnType("int");
 
                     b.Property<int>("UtenteId")
@@ -968,19 +967,27 @@ namespace HealthWellbeing.Migrations
 
                     b.HasOne("HealthWellbeing.Models.MaterialEquipamentoAssociado", "MaterialEquipamentoAssociado")
                         .WithMany()
-                        .HasForeignKey("MaterialEquipamentoAssociadoId");
+                        .HasForeignKey("MaterialEquipamentoAssociadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Medicos", "MedicoSolicitante")
                         .WithMany()
-                        .HasForeignKey("MedicoSolicitanteId");
+                        .HasForeignKey("MedicoSolicitanteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.ProfissionalExecutante", "ProfissionalExecutante")
                         .WithMany()
-                        .HasForeignKey("ProfissionalExecutanteId");
+                        .HasForeignKey("ProfissionalExecutanteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.SalaDeExames", "SalaDeExame")
                         .WithMany()
-                        .HasForeignKey("SalaDeExameId");
+                        .HasForeignKey("SalaDeExameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellBeing.Models.Utente", "Utente")
                         .WithMany("Exames")

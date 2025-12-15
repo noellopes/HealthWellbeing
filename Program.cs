@@ -1,30 +1,54 @@
 ﻿using HealthWellbeing.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellBeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellBeingConnection' not found.")));
 
-        // Add services to the container.
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        // ==========================================
+        // 1. CONFIGURAÇÃO DOS SERVIÇOS (DI)
+        // ==========================================
+
+        // Configuração do HealthWellbeingDbContext (Dados de Negócio: Exames, Utentes, etc.)
+        var healthConnection = builder.Configuration.GetConnectionString("HealthWellBeingConnection")
+            ?? throw new InvalidOperationException("Connection string 'HealthWellBeingConnection' not found.");
+
+        builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
+            options.UseSqlServer(healthConnection));
+
+        // Configuração do ApplicationDbContext (Dados de Identidade: Users, Roles)
+        var identityConnection = builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseSqlServer(identityConnection));
+
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+        // Configuração do Identity (Users e Roles)
+        builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+            // Configurações extra de password (opcional)
+            options.Password.RequireDigit = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 6;
+        })
+        .AddRoles<IdentityRole>() // IMPORTANTE: Permite o uso de Roles (Admin, Medico, etc.)
+        .AddEntityFrameworkStores<ApplicationDbContext>();
+
         builder.Services.AddControllersWithViews();
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // ==========================================
+        // 2. PIPELINE DE PEDIDOS HTTP
+        // ==========================================
+
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -32,54 +56,58 @@ internal class Program
         else
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            // The default HSTS value is 30 days.
             app.UseHsts();
         }
 
-        // ... (Imports e configurações iniciais mantêm-se)
-
-        // ==========================================
-        // ÁREA DE INICIALIZAÇÃO DA BASE DE DADOS
-        // ==========================================
-       
         app.UseHttpsRedirection();
         app.UseStaticFiles();
 
         app.UseRouting();
 
+        app.UseAuthentication(); // Obrigatório antes do Authorization
         app.UseAuthorization();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
         app.MapRazorPages();
+
+        // ==========================================
+        // 3. ÁREA DE INICIALIZAÇÃO DA BASE DE DADOS (SEEDING)
+        // ==========================================
 
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
             try
             {
-                var context = services.GetRequiredService<ApplicationDbContext>();
-                var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
+                // Obter os serviços necessários
+                var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
+                var contextHealth = services.GetRequiredService<HealthWellbeingDbContext>();
                 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-                // 1. MIGRAR (Isto cria tabelas E insere as Seringas/Exames do seu colega)
-                context.Database.Migrate();
-                healthContext.Database.Migrate();
+                // 1. MIGRAR AS BASES DE DADOS AUTOMATICAMENTE
+                // Isto garante que as tabelas são criadas se não existirem
+                await contextIdentity.Database.MigrateAsync();
+                await contextHealth.Database.MigrateAsync();
 
-                // 2. INSERIR USERS (Chama o ficheiro que acabou de criar)
-                // O await garante que os users são criados antes da app abrir
-                await HealthWellbeing.Data.SeedDataG6.Populate(healthContext, userManager, roleManager);
+                // 2. EXECUTAR O SEEDING
+                // Chama a classe SeedDataG6 que criámos anteriormente
+                await SeedDataG6.Populate(contextHealth, userManager, roleManager);
             }
             catch (Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "Ocorreu um erro ao inicializar a base de dados.");
+                logger.LogError(ex, "Ocorreu um erro ao inicializar ou popular a base de dados.");
             }
         }
 
-
+        // ==========================================
+        // 4. INICIAR A APLICAÇÃO
+        // ==========================================
         app.Run();
     }
 }

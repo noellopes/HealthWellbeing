@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class SeedExamesPopulation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,20 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EstadosMaterial",
+                columns: table => new
+                {
+                    MaterialStatusId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nome = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EstadosMaterial", x => x.MaterialStatusId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Funcoes",
                 columns: table => new
                 {
@@ -37,21 +51,6 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Funcoes", x => x.FuncaoId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MaterialEquipamentoAssociado",
-                columns: table => new
-                {
-                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NomeEquipamento = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Quantidade = table.Column<int>(type: "int", nullable: false),
-                    EstadoComponente = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MaterialEquipamentoAssociado", x => x.MaterialEquipamentoAssociadoId);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,6 +129,27 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MaterialEquipamentoAssociado",
+                columns: table => new
+                {
+                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeEquipamento = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    MaterialStatusId = table.Column<int>(type: "int", nullable: false),
+                    EstadoMaterialMaterialStatusId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MaterialEquipamentoAssociado", x => x.MaterialEquipamentoAssociadoId);
+                    table.ForeignKey(
+                        name: "FK_MaterialEquipamentoAssociado_EstadosMaterial_EstadoMaterialMaterialStatusId",
+                        column: x => x.EstadoMaterialMaterialStatusId,
+                        principalTable: "EstadosMaterial",
+                        principalColumn: "MaterialStatusId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProfissionalExecutante",
                 columns: table => new
                 {
@@ -162,7 +182,8 @@ namespace HealthWellbeing.Migrations
                 columns: table => new
                 {
                     ExameTipoId = table.Column<int>(type: "int", nullable: false),
-                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false)
+                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeNecessaria = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -188,15 +209,14 @@ namespace HealthWellbeing.Migrations
                     ExameId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DataHoraMarcacao = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Estado = table.Column<int>(type: "int", nullable: false),
+                    Estado = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Notas = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     UtenteId = table.Column<int>(type: "int", nullable: false),
                     ExameTipoId = table.Column<int>(type: "int", nullable: false),
-                    MedicoId = table.Column<int>(type: "int", nullable: false),
-                    MedicoSolicitanteId = table.Column<int>(type: "int", nullable: true),
-                    SalaDeExameId = table.Column<int>(type: "int", nullable: true),
-                    ProfissionalExecutanteId = table.Column<int>(type: "int", nullable: true),
-                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: true)
+                    MedicoSolicitanteId = table.Column<int>(type: "int", nullable: false),
+                    ProfissionalExecutanteId = table.Column<int>(type: "int", nullable: false),
+                    SalaDeExameId = table.Column<int>(type: "int", nullable: false),
+                    MaterialEquipamentoAssociadoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -211,22 +231,26 @@ namespace HealthWellbeing.Migrations
                         name: "FK_Exames_MaterialEquipamentoAssociado_MaterialEquipamentoAssociadoId",
                         column: x => x.MaterialEquipamentoAssociadoId,
                         principalTable: "MaterialEquipamentoAssociado",
-                        principalColumn: "MaterialEquipamentoAssociadoId");
+                        principalColumn: "MaterialEquipamentoAssociadoId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Exames_Medicos_MedicoSolicitanteId",
                         column: x => x.MedicoSolicitanteId,
                         principalTable: "Medicos",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Exames_ProfissionalExecutante_ProfissionalExecutanteId",
                         column: x => x.ProfissionalExecutanteId,
                         principalTable: "ProfissionalExecutante",
-                        principalColumn: "ProfissionalExecutanteId");
+                        principalColumn: "ProfissionalExecutanteId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Exames_SalaDeExame_SalaDeExameId",
                         column: x => x.SalaDeExameId,
                         principalTable: "SalaDeExame",
-                        principalColumn: "SalaId");
+                        principalColumn: "SalaId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Exames_Utentes_UtenteId",
                         column: x => x.UtenteId,
@@ -259,6 +283,74 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "EstadosMaterial",
+                columns: new[] { "MaterialStatusId", "Descricao", "Nome" },
+                values: new object[,]
+                {
+                    { 1, "Material pronto para utilização", "Disponível" },
+                    { 2, "Material atualmente utilizado", "Em Uso" },
+                    { 3, "Material reservado para utilização futura", "Reservado" },
+                    { 4, "Material em reparação/manutenção", "Em Manutenção" },
+                    { 5, "Material danificado e não utilizável", "Danificado" },
+                    { 6, "Material não localizado", "Perdido" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Funcoes",
+                columns: new[] { "FuncaoId", "NomeFuncao" },
+                values: new object[,]
+                {
+                    { 1, "Técnico de Radiologia" },
+                    { 2, "Fisioterapeuta" },
+                    { 3, "Técnico de Cardiopneumologia" },
+                    { 4, "Técnico de Análises Clínicas" },
+                    { 5, "Terapeuta Ocupacional" },
+                    { 6, "Ortopedista" },
+                    { 7, "Enfermeiro Especialista" },
+                    { 8, "Nutricionista" },
+                    { 9, "Técnico de Medicina Nuclear" },
+                    { 10, "Cardiologista" },
+                    { 11, "Podologista" },
+                    { 12, "Técnico de Neurofisiologia" },
+                    { 13, "Técnico Auxiliar de Saúde" },
+                    { 14, "Optometrista" },
+                    { 15, "Técnico de Medicina Física e Reabilitação" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MaterialEquipamentoAssociado",
+                columns: new[] { "MaterialEquipamentoAssociadoId", "EstadoMaterialMaterialStatusId", "MaterialStatusId", "NomeEquipamento", "Quantidade" },
+                values: new object[,]
+                {
+                    { 1, null, 1, "Seringa Descartável 5ml", 500 },
+                    { 2, null, 1, "Compressa de Gaze Esterilizada", 1200 },
+                    { 3, null, 2, "Monitor de Sinais Vitais", 15 },
+                    { 4, null, 4, "Eletrocardiógrafo Portátil", 5 },
+                    { 5, null, 1, "Luvas de Nitrilo (Caixa)", 80 },
+                    { 6, null, 2, "Cadeira de Rodas Standard", 25 },
+                    { 7, null, 2, "Bomba de Infusão Volumétrica", 40 },
+                    { 8, null, 1, "Termómetro Digital de Testa", 95 },
+                    { 9, null, 2, "Aspirador Cirúrgico", 8 },
+                    { 10, null, 2, "Mesa de Cirurgia Multiusos", 3 },
+                    { 11, null, 1, "Kit de Sutura Estéril", 300 },
+                    { 12, null, 1, "Bisturi Descartável (Unidade)", 1500 },
+                    { 13, null, 4, "Ventilador Pulmonar", 12 },
+                    { 14, null, 2, "Carro de Emergência (Completo)", 6 },
+                    { 15, null, 1, "Agulha Hipodérmica 21G", 2000 },
+                    { 16, null, 2, "Otoscópio/Oftalmoscópio", 18 },
+                    { 17, null, 1, "Tala Imobilizadora (Vários Tamanhos)", 75 },
+                    { 18, null, 1, "Esfigmomanómetro Digital", 35 },
+                    { 19, null, 1, "Mascára Cirúrgica N95", 1000 },
+                    { 20, null, 2, "Laringoscópio Completo", 7 },
+                    { 21, null, 1, "Fato de Proteção Biológica", 150 },
+                    { 22, null, 2, "Desfibrilhador Externo Automático (DEA)", 10 },
+                    { 23, null, 1, "Pilha Alcalina AA (Pack de 10)", 20 },
+                    { 24, null, 2, "Estetoscópio Littmann", 55 },
+                    { 25, null, 4, "Balança Hospitalar Digital", 4 },
+                    { 26, null, 1, "Gesso Ortopédico (Rolo)", 90 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "ExameTipo",
                 columns: new[] { "ExameTipoId", "Descricao", "EspecialidadeId", "Nome" },
                 values: new object[,]
@@ -286,6 +378,19 @@ namespace HealthWellbeing.Migrations
                     { 21, "Colheita de pequena amostra de tecido cutâneo.", 15, "Biopsia de Pele" },
                     { 22, "Detecção e quantificação de substâncias químicas no organismo.", 16, "Análise Toxicológica" },
                     { 23, "Identificação de bactérias que podem causar infeção urinária.", 6, "Cultura de Urina" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ProfissionalExecutante",
+                columns: new[] { "ProfissionalExecutanteId", "Email", "FuncaoId", "FuncaoId1", "Nome", "Telefone" },
+                values: new object[,]
+                {
+                    { 1, "Kandonga123@gmail.com", 1, null, "André Kandonga", "912912915" },
+                    { 2, "MiguelSantos123@gmail.com", 2, null, "Miguel Santos", "912912914" },
+                    { 3, "DostoevskySuba@gmail.com", 3, null, "Dostoevsky", "912913914" },
+                    { 4, "QuaresmaPorto@gmail.com", 4, null, "Ricardo Quaresma", "910101010" },
+                    { 5, "Mai123222suba@gmail.com", 5, null, "Mai Da Silva", "912912222" },
+                    { 6, "DiogoRodrigues04@gmail.com", 6, null, "Diogo Rodrigues", "912912522" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -327,6 +432,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_ExameTipoRecursos_MaterialEquipamentoAssociadoId",
                 table: "ExameTipoRecursos",
                 column: "MaterialEquipamentoAssociadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaterialEquipamentoAssociado_EstadoMaterialMaterialStatusId",
+                table: "MaterialEquipamentoAssociado",
+                column: "EstadoMaterialMaterialStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProfissionalExecutante_FuncaoId",
@@ -371,6 +481,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Especialidades");
+
+            migrationBuilder.DropTable(
+                name: "EstadosMaterial");
         }
     }
 }
