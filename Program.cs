@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
@@ -35,14 +35,37 @@ internal class Program
             app.UseHsts();
         }
 
+        // ... (Imports e configurações iniciais mantêm-se)
+
+        // ==========================================
+        // ÁREA DE INICIALIZAÇÃO DA BASE DE DADOS
+        // ==========================================
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
-            var context = services.GetRequiredService<ApplicationDbContext>();
-            context.Database.Migrate();
-            var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
-            //healthContext.Database.ExecuteSqlRaw("DELETE FROM MaterialEquipamentoAssociado");
+            try
+            {
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                var healthContext = services.GetRequiredService<HealthWellbeingDbContext>();
+                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                // 1. MIGRAR (Isto cria tabelas E insere as Seringas/Exames do seu colega)
+                context.Database.Migrate();
+                healthContext.Database.Migrate();
+
+                // 2. INSERIR USERS (Chama o ficheiro que acabou de criar)
+                // O await garante que os users são criados antes da app abrir
+                await HealthWellbeing.Data.SeedDataG6.Populate(healthContext, userManager, roleManager);
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "Ocorreu um erro ao inicializar a base de dados.");
+            }
         }
+
+        app.Run();
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
@@ -55,6 +78,7 @@ internal class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
+
 
         app.Run();
     }
