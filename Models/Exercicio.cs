@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
@@ -6,40 +7,43 @@ namespace HealthWellbeing.Models
     {
         public int ExercicioId { get; set; }
 
-        [Required(ErrorMessage = "Nome é obrigatório")]
-        [StringLength(100, ErrorMessage = "Nome não pode exceder 100 caracteres")]
+        [Required(ErrorMessage = "O nome do exercício é obrigatório.")]
+        [StringLength(100)]
         public string ExercicioNome { get; set; }
 
-        [Required(ErrorMessage = "Descricao é obrigatória")]
-        [StringLength(500, ErrorMessage = "Descrição não pode exceder 500 caracteres")]
+        [Required(ErrorMessage = "A descrição é obrigatória.")]
         public string Descricao { get; set; }
 
-        [Required(ErrorMessage = "Duração é obrigatória")]
-        [Range(0.1, 480, ErrorMessage = "Duração deve ser entre 0.1 e 480 minutos")]
+        [Required(ErrorMessage = "A duração é obrigatória.")]
+        [Range(0.1, 480, ErrorMessage = "A duração deve ser entre 0.1 e 480 minutos.")]
         public double Duracao { get; set; }
 
-        [Required(ErrorMessage = "Intensidade é obrigatória")]
-        [Range(1, 10, ErrorMessage = "Intensidade deve ser entre 1 e 10")]
+        [Required(ErrorMessage = "A intensidade é obrigatória.")]
+        [Range(1, 10, ErrorMessage = "A intensidade deve ser entre 1 e 10.")]
         public int Intencidade { get; set; }
 
-        [Required(ErrorMessage = "Calorias Gastas é obrigatório")]
-        [Range(0, 5000, ErrorMessage = "Calorias devem ser entre 0 e 5000")]
+        [Required(ErrorMessage = "As calorias gastas são obrigatórias.")]
+        [Range(0.1, 2000, ErrorMessage = "As calorias devem ser entre 0.1 e 2000.")]
         public double CaloriasGastas { get; set; }
 
-        [StringLength(500, ErrorMessage = "Descrição não pode exceder 500 caracteres")]
-        public string? Instrucoes { get; set; }
+        [Required(ErrorMessage = "As instruções são obrigatórias.")]
+        public string Instrucoes { get; set; }
 
-        [StringLength(50)]
-        public string? EquipamentoNecessario { get; set; }
+        [Required(ErrorMessage = "O equipamento necessário é obrigatório.")]
+        public string EquipamentoNecessario { get; set; }
 
-        [Range(1, 1000)]
-        public int? Repeticoes { get; set; }
+        [Required(ErrorMessage = "As repetições são obrigatórias.")]
+        [Range(1, 1000, ErrorMessage = "As repetições devem ser entre 1 e 1000.")]
+        public int Repeticoes { get; set; }
 
-        [Range(1, 50)]
-        public int? Series { get; set; }
+        [Required(ErrorMessage = "As séries são obrigatórias.")]
+        [Range(1, 100, ErrorMessage = "As séries devem ser entre 1 e 100.")]
+        public int Series { get; set; }
 
-        public int? MusculoId { get; set; }
-        public GruposMusculares? GrupoMuscular { get; set; }
+        // Lista de grupos Generos
+        public ICollection<Genero>? Genero { get; set; }
 
+        // Lista de grupos musculares
+        public ICollection<GrupoMuscular>? GrupoMuscular { get; set; }
     }
 }
