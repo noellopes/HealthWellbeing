@@ -647,33 +647,37 @@ namespace HealthWellbeingRoom.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.ZonaArmazenamento", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ZonaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ZonaId"));
 
                     b.Property<bool>("Ativa")
                         .HasColumnType("bit");
 
-                    b.Property<double>("CapacidadeMaxima")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("LocalizacaoZonaArmazenamentoId")
+                    b.Property<int>("CapacidadeMaxima")
                         .HasColumnType("int");
 
-                    b.Property<string>("Nome")
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NomeZona")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.Property<int>("QuantidadeAtual")
+                        .HasColumnType("int");
 
-                    b.HasIndex("LocalizacaoZonaArmazenamentoId");
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ZonaId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("ZonaArmazenamento");
                 });
@@ -1054,13 +1058,21 @@ namespace HealthWellbeingRoom.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.ZonaArmazenamento", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.LocalizacaoZonaArmazenamento", "LocalizacaoZonaArmazenamento")
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
                         .WithMany()
-                        .HasForeignKey("LocalizacaoZonaArmazenamentoId")
+                        .HasForeignKey("ConsumivelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LocalizacaoZonaArmazenamento");
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>

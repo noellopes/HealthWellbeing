@@ -322,29 +322,6 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ZonaArmazenamento",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    LocalizacaoZonaArmazenamentoId = table.Column<int>(type: "int", nullable: false),
-                    CapacidadeMaxima = table.Column<double>(type: "float", nullable: false),
-                    Ativa = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ZonaArmazenamento", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ZonaArmazenamento_LocalizacaoZonaArmazenamento_LocalizacaoZonaArmazenamentoId",
-                        column: x => x.LocalizacaoZonaArmazenamentoId,
-                        principalTable: "LocalizacaoZonaArmazenamento",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "EquipmentType",
                 columns: table => new
                 {
@@ -559,6 +536,36 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ZonaArmazenamento",
+                columns: table => new
+                {
+                    ZonaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    NomeZona = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CapacidadeMaxima = table.Column<int>(type: "int", nullable: false),
+                    QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
+                    Ativa = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ZonaArmazenamento", x => x.ZonaId);
+                    table.ForeignKey(
+                        name: "FK_ZonaArmazenamento_Consumivel_ConsumivelId",
+                        column: x => x.ConsumivelId,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ZonaArmazenamento_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UsoConsumivel",
                 columns: table => new
                 {
@@ -728,9 +735,14 @@ namespace HealthWellbeingRoom.Migrations
                 column: "TreatmentRecordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ZonaArmazenamento_LocalizacaoZonaArmazenamentoId",
+                name: "IX_ZonaArmazenamento_ConsumivelId",
                 table: "ZonaArmazenamento",
-                column: "LocalizacaoZonaArmazenamentoId");
+                column: "ConsumivelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ZonaArmazenamento_RoomId",
+                table: "ZonaArmazenamento",
+                column: "RoomId");
         }
 
         /// <inheritdoc />
@@ -744,6 +756,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Fornecedor");
+
+            migrationBuilder.DropTable(
+                name: "LocalizacaoZonaArmazenamento");
 
             migrationBuilder.DropTable(
                 name: "LocationMedDevice");
@@ -779,16 +794,13 @@ namespace HealthWellbeingRoom.Migrations
                 name: "MedicalDevices");
 
             migrationBuilder.DropTable(
-                name: "Room");
+                name: "TreatmentRecord");
 
             migrationBuilder.DropTable(
                 name: "Consumivel");
 
             migrationBuilder.DropTable(
-                name: "TreatmentRecord");
-
-            migrationBuilder.DropTable(
-                name: "LocalizacaoZonaArmazenamento");
+                name: "Room");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
@@ -798,6 +810,18 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "TypeMaterial");
+
+            migrationBuilder.DropTable(
+                name: "Nurse");
+
+            migrationBuilder.DropTable(
+                name: "Pathology");
+
+            migrationBuilder.DropTable(
+                name: "TreatmentType");
+
+            migrationBuilder.DropTable(
+                name: "CategoriaConsumivel");
 
             migrationBuilder.DropTable(
                 name: "RoomLocation");
@@ -810,18 +834,6 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "Specialty");
-
-            migrationBuilder.DropTable(
-                name: "CategoriaConsumivel");
-
-            migrationBuilder.DropTable(
-                name: "Nurse");
-
-            migrationBuilder.DropTable(
-                name: "Pathology");
-
-            migrationBuilder.DropTable(
-                name: "TreatmentType");
         }
     }
 }

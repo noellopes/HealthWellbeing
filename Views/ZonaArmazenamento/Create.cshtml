@@ -39,8 +39,16 @@
             ➕ Criar Nova Zona de Armazenamento
         </div>
         <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
             <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
 
                 <!-- Nome da Zona -->
                 <div class="mb-3">
