@@ -1,0 +1,32 @@
+
+version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: razor_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=HealthWellbeingUsers;User=sa;Password=Project_prog_123;TrustServerCertificate=True;"
+      ConnectionStrings__HealthWellbeingConnection: "Server=sqlserver,1433;Database=HealthWellbeing;User=sa;Password=Project_prog_123;TrustServerCertificate=True;"
+    entrypoint: ["dotnet", "HealthWellbeing.dll"]
+
+  sqlserver:
+    platform: linux/amd64  
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_container
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Project_prog_123"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:
+
