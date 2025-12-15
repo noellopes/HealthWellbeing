@@ -1,0 +1,148 @@
+﻿@using HealthWellbeingRoom.Models
+@using HealthWellbeingRoom.ViewModels
+@using HealthWellbeing.ViewModels
+@model RPaginationInfo<DeviceGroupMedicalDevice>
+
+@{
+    ViewData["Title"] = "Lista de Dispositivos Médicos";
+
+    // Recupera o termo pesquisado
+    string currentSearch = ViewData["CurrentFilter"] as string;
+
+    // Lógica para abrir/fechar o menu de pesquisa
+    string searchCollapseClass = string.IsNullOrEmpty(currentSearch) ? "collapse" : "collapse show";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@* --- AÇÕES DE TOPO --- *@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Visão Geral</h2>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#groupSearch" aria-expanded="false" aria-controls="groupSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+
+        @if (User.IsInRole("logisticsTechnician"))
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+            </a>
+        }
+    </div>
+</div>
+
+@* --- PESQUISA --- *@
+<div class="@searchCollapseClass mt-2 mb-4" id="groupSearch">
+    <div class="card card-body bg-light">
+        <form asp-action="DeviceGroupIndex" method="get" class="row g-2 align-items-end">
+
+            <div class="col-md-8">
+                @* Label normal sem negrito *@
+                <label for="searchName" class="form-label text-muted">Nome do Dispositivo</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="searchName" name="searchName" value="@currentSearch" class="form-control" placeholder="Ex: Monitor..." />
+                </div>
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    Filtrar
+                </button>
+                @if (!string.IsNullOrEmpty(currentSearch))
+                {
+                    <a asp-action="DeviceGroupIndex" class="btn btn-secondary w-100">Limpar</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@* --- TABELA --- *@
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center p-4 border-2 shadow-sm mt-3" role="alert">
+        <i class="bi bi-search flex-shrink-0" style="font-size: 3rem;"></i>
+        <div class="ms-4">
+            <h4 class="alert-heading fw-bold">Nenhum Grupo Encontrado</h4>
+            <p class="mb-0">Não existem dispositivos com o nome "<strong>@currentSearch</strong>".</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Nome do Dispositivo</th>
+                        <th scope="col" class="text-center">Quantidade Total</th>
+                        <th scope="col" class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                @item.DeviceName
+                            </td>
+
+                            <td class="text-center">
+                                <span class="badge bg-secondary rounded-pill" style="font-size: 1rem;">
+                                    @item.TotalQuantity unidades
+                                </span>
+                            </td>
+
+                            <td class="text-end pe-3">
+                                <a asp-action="Index" asp-route-searchName="@item.DeviceName" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-list-ul me-1"></i> Ver Lista Detalhada
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @* --- PAGINAÇÃO --- *@
+        <div class="card-footer bg-light">
+            <nav aria-label="Page navigation" class="d-flex justify-content-between align-items-center">
+                <span>Mostrando @Model.Items.Count() de @Model.TotalItems grupos</span>
+                <ul class="pagination mb-0">
+                    @if (Model.CurrentPage == 1)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Primeira</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="DeviceGroupIndex" asp-route-page="1" asp-route-searchName="@currentSearch">Primeira</a></li>
+                    }
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><span class="page-link">@p</span></li>
+                        }
+                        else
+                        {
+                            <li class="page-item"><a class="page-link" asp-action="DeviceGroupIndex" asp-route-page="@p" asp-route-searchName="@currentSearch">@p</a></li>
+                        }
+                    }
+
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><span class="page-link">Última</span></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="DeviceGroupIndex" asp-route-page="@Model.TotalPages" asp-route-searchName="@currentSearch">Última</a></li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+}
