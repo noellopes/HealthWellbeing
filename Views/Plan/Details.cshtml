@@ -132,6 +132,14 @@
             <p class="text-muted">This client has no goals registered.</p>
         }
 
+        <div class="col-md-4">
+                <label class="form-label fw-semibold">Select day</label>
+                <input type="date"
+                       class="form-control"
+                       name="selectedDate"
+                       value="@selectedDate.ToString("yyyy-MM-dd")" />
+            </div>
+
     </div>
 
     <div class="col-md-5">
@@ -153,11 +161,7 @@
                 </div>
             </div>
         </div>
-
-
     </div>
-
-
 <hr />
 
 <h5 class="mb-3">Foods in this plan</h5>
@@ -170,6 +174,7 @@
                 <tr>
                     <th>Food</th>
                     <th>Portion</th>
+                    <th>Food Intake</th>
                 </tr>
             </thead>
             <tbody>
@@ -178,6 +183,7 @@
                 <tr>
                     <td>@fp.Food?.Name</td>
                     <td>@fp.Portion?.PortionName</td>
+                    
                 </tr>
             }
             </tbody>
