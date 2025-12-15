@@ -21,14 +21,16 @@
             </div>
             <div class="form-group">
                 <label>Exercícios</label>
-                @foreach (var ex in ViewBag.Exercicios)
+                @foreach (var ex in ViewBag.Exercicio)
                 {
+                    var isChecked = Model.Exercicios != null && Model.Exercicios.Any(e => e.ExercicioId.ToString() == ex.Value);
+
                     <div>
                         <input type="checkbox"
                                name="ExerciciosSelecionados"
-                               value="@ex.ExercicioId"
-                               @(Model.Exercicios != null && Model.Exercicios.Any(e => e.ExercicioId == ex.ExercicioId) ? "checked" : "") />
-                        @ex.ExercicioNome
+                               value="@ex.Value"
+                               @(isChecked ? "checked" : "") />
+                        @ex.Text
                     </div>
                 }
             </div>
