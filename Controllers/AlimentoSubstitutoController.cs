@@ -25,34 +25,39 @@ namespace HealthWellbeing.Controllers
             int pageSize = 10;
             int pageNumber = page ?? 1;
 
-            // Query ordered so paging is deterministic
             var query = _context.AlimentoSubstitutos
                 .Include(a => a.AlimentoOriginal)
                 .Include(a => a.AlimentoSubstitutoRef)
-                .OrderBy(a => a.AlimentoSubstitutoId)
                 .AsQueryable();
 
-            // Aplicar filtros de busca (antes da paginação)
+
             if (!string.IsNullOrWhiteSpace(originalName))
             {
-                query = query.Where(a => a.AlimentoOriginal != null && a.AlimentoOriginal.Name.Contains(originalName));
+                var pattern = $"%{originalName}%";
+
+                query = query.Where(a =>
+                    a.AlimentoOriginal != null &&
+                    EF.Functions.Like(EF.Functions.Collate(a.AlimentoOriginal.Name, "Latin1_General_CI_AI"), pattern));
             }
 
             if (!string.IsNullOrWhiteSpace(substitutoName))
             {
-                query = query.Where(a => a.AlimentoSubstitutoRef != null && a.AlimentoSubstitutoRef.Name.Contains(substitutoName));
+                var pattern = $"%{substitutoName}%";
+                query = query.Where(a =>
+                    a.AlimentoSubstitutoRef != null &&
+                    EF.Functions.Like(EF.Functions.Collate(a.AlimentoSubstitutoRef.Name, "Latin1_General_CI_AI"), pattern));
             }
 
             if (factorValue.HasValue)
             {
-                // factorOp: "gt" (maior que), "eq" (igual), "lt" (menor que)
+
                 switch (factorOp)
                 {
                     case "gt":
                         query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value > (double)factorValue.Value);
                         break;
                     case "eq":
-                        // igualdade com tolerância fina
+
                         query = query.Where(a => a.FatorSimilaridade.HasValue && a.FatorSimilaridade.Value == (double)factorValue.Value);
                         break;
                     case "lt":
@@ -63,18 +68,45 @@ namespace HealthWellbeing.Controllers
                 }
             }
 
-            int totalCount = await query.CountAsync();
-            var items = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+           
+            query = query.OrderBy(a => a.AlimentoOriginal!.Name).ThenBy(a => a.AlimentoSubstitutoRef!.Name).ThenBy(a => a.AlimentoSubstitutoId);
+
+           
+            var allItems = await query.ToListAsync();
+
+            var groups = allItems
+                .GroupBy(a => a.AlimentoOriginal != null ? a.AlimentoOriginal.Name : "(Sem Nome)")
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            int totalOriginals = groups.Count;
+
+           
+            int totalPages = Math.Max(1, (int)Math.Ceiling((double)totalOriginals / pageSize));
+
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageNumber > totalPages) pageNumber = totalPages;
+
+            var groupsForPage = groups.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+           
+            var items = groupsForPage
+                .SelectMany(g => g.OrderBy(a => a.AlimentoSubstitutoRef!.Name).ThenBy(a => a.AlimentoSubstitutoId))
+                .ToList();
+
+           
+            int skippedGroups = (pageNumber - 1) * pageSize;
+            int startOriginalIndex = totalOriginals == 0 ? 0 : skippedGroups + 1;
+            int endOriginalIndex = totalOriginals == 0 ? 0 : skippedGroups + groupsForPage.Count;
 
             ViewBag.CurrentPage = pageNumber;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+            ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = pageSize;
-            ViewBag.TotalCount = totalCount;
+            ViewBag.TotalCount = totalOriginals;
 
-            // Preservar valores de busca na View
+            ViewBag.StartItem = startOriginalIndex; 
+            ViewBag.EndItem = endOriginalIndex;
+
             ViewBag.SearchOriginalName = originalName;
             ViewBag.SearchSubstitutoName = substitutoName;
             ViewBag.SearchFactorOp = factorOp;
@@ -124,7 +156,8 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 TempData["AlertMessage"] = "Registro criado com sucesso.";
                 TempData["AlertType"] = "success";
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details), new { id = alimentoSubstituto.AlimentoSubstitutoId });
             }
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
             ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
@@ -181,7 +214,8 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details), new { id = alimentoSubstituto.AlimentoSubstitutoId });
             }
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoOriginalId);
             ViewData["AlimentoSubstitutoRefId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name", alimentoSubstituto.AlimentoSubstitutoRefId);
