@@ -213,6 +213,31 @@ namespace HealthWellbeingRoom.Controllers
             {
                 try
                 {
+                    // Verificar se hoveram alterações nos dados
+                    var existingEquipment = await _context.Equipment.AsNoTracking().FirstOrDefaultAsync(e => e.EquipmentId == equipment.EquipmentId);
+                    if (existingEquipment == null)
+                    {
+                        /* Retornar para minha page do not found */
+                        return View("NotFound");
+                    }
+                    if (existingEquipment.Name == equipment.Name &&
+                        existingEquipment.Description == equipment.Description &&
+                        existingEquipment.SerialNumber == equipment.SerialNumber &&
+                        existingEquipment.RoomId == equipment.RoomId &&
+                        existingEquipment.PurchaseDate == equipment.PurchaseDate &&
+                        existingEquipment.EquipmentTypeId == equipment.EquipmentTypeId &&
+                        existingEquipment.EquipmentStatusId == equipment.EquipmentStatusId)
+                    {
+                        // Nenhuma alteração foi feita, retornar com uma mensagem informativa
+                        ModelState.AddModelError(string.Empty, "Nenhuma alteração foi feita nos dados do equipamento.");
+                        ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
+                        ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name", equipment.EquipmentTypeId);
+                        ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name", equipment.EquipmentStatusId);
+                        return View(equipment);
+                    }
+
+
+                    // Salvar as alteraçoes no equipamento
                     _context.Update(equipment);
                     await _context.SaveChangesAsync();
                 }
