@@ -40,5 +40,7 @@ namespace HealthWellbeing.Models
         [Display(Name = "Description")]
         [Required(ErrorMessage = "{0} cannot be empty.")]
         public string Description { get; set; }
+
+        public virtual ICollection<Customer>? Customer { get; set; }
     }
 }

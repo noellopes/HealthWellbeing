@@ -50,6 +50,12 @@ namespace HealthWellbeing.Data
                 .WithMany(ss => ss.EventTypes)          
                 .HasForeignKey(et => et.ScoringStrategyId) 
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(l => l.Level)
+                .WithMany(c => c.Customer)
+                .HasForeignKey(l => l.LevelId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;

@@ -1,283 +1,243 @@
-﻿using HealthWellbeing.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace HealthWellbeing.Controllers{
+namespace HealthWellbeing.Controllers {
     [Authorize(Roles = "Gestor")]
-    public class LevelsController : Controller
-    {
+    public class LevelsController : Controller {
         private readonly HealthWellbeingDbContext _context;
 
-        public LevelsController(HealthWellbeingDbContext context)
-        {
+        public LevelsController(HealthWellbeingDbContext context) {
             _context = context;
         }
 
-        // Helper to render the InvalidLevel view and set 404 status code.
-        private IActionResult InvalidLevelView(Level? attempted = null)
-        {
-            Response.StatusCode = 404;
-            if (attempted != null && attempted.LevelCategoryId != 0)
-            {
-                var category = _context.LevelCategory.Find(attempted.LevelCategoryId);
-                if (category != null)
-                {
-                    attempted.Category = category;
-                }
-            }
-
-            return View("InvalidLevel", attempted);
-        }
-
-        // UPDATED: Populate categories for Dropdown (ForeignKey)
-        // Uses the new table LevelCategory instead of distinct strings
-        private void PopulateCategoriesDropdown(object? selectedCategory = null)
-        {
-            var categoriesQuery = _context.LevelCategory.OrderBy(c => c.Name);
-            ViewData["LevelCategoryId"] = new SelectList(categoriesQuery.AsNoTracking(), "LevelCategoryId", "Name", selectedCategory);
-        }
-
         // GET: Levels
-        public async Task<IActionResult> Index(int page = 1, string? searchNumber = null, string? searchCategory = null, string? searchDescription = null, string? searchPoints = null)
-        {
-            const int pageSize = 10;
+        // Alterei searchNumber para int? para evitar parsing manual desnecessário
+        public async Task<IActionResult> Index(
+            int page = 1,
+            int? searchNumber = null,
+            int? searchCategoryId = null,
+            string searchDescription = null,
+            int? searchPoints = null) {
+            // 1. Iniciar a query
+            var levelsQuery = _context.Level
+                .Include(l => l.Category)
+                .AsQueryable();
 
-            var query = _context.Level.Include(l => l.Category).AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(searchNumber))
-            {
-                if (int.TryParse(searchNumber, out var parsedNumber))
-                {
-                    query = query.Where(l => l.LevelNumber == parsedNumber);
-                }
+            // 2. Aplicar Filtros
+            if (searchNumber.HasValue) {
+                levelsQuery = levelsQuery.Where(l => l.LevelNumber == searchNumber.Value);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchCategory))
-            {
-                var cat = searchCategory!.Trim().ToLower();
-                // FIX: Search inside the related Category object
-                query = query.Where(l => l.Category != null && l.Category.Name.ToLower() == cat);
+            if (searchCategoryId.HasValue) {
+                levelsQuery = levelsQuery.Where(l => l.LevelCategoryId == searchCategoryId);
             }
 
-            if (!string.IsNullOrWhiteSpace(searchDescription))
-            {
-                var desc = searchDescription.Trim();
-                query = query.Where(l => l.Description != null && l.Description.Contains(desc));
-            }
-            if (!string.IsNullOrWhiteSpace(searchPoints))
-            {
-                if (int.TryParse(searchPoints, out var parsedPoints))
-                {
-                    query = query.Where(l => l.LevelPointsLimit == parsedPoints);
-                }
+            if (!string.IsNullOrEmpty(searchDescription)) {
+                // Usa o Contains para pesquisa parcial (LIKE '%texto%')
+                levelsQuery = levelsQuery.Where(l => l.Description.Contains(searchDescription));
             }
 
-            var totalItems = await query.CountAsync();
+            if (searchPoints.HasValue) {
+                levelsQuery = levelsQuery.Where(l => l.LevelPointsLimit == searchPoints.Value);
+            }
 
-            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-            if (totalPages == 0) totalPages = 1;
-            if (page < 1) page = 1;
-            if (page > totalPages) page = totalPages;
-
-            var levels = await query
-                .OrderBy(l => l.LevelNumber)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var vm = new PaginationInfo<Level>(levels, totalItems, pageSize, page);
-
+            // 3. Persistir dados na ViewBag para a View manter os inputs preenchidos
             ViewBag.SearchNumber = searchNumber;
-            ViewBag.SearchCategory = searchCategory;
+            // Nota: Para SelectList, passamos o valor selecionado diretamente no construtor abaixo
+            ViewBag.SearchCategoryId = searchCategoryId;
             ViewBag.SearchDescription = searchDescription;
+            ViewBag.SearchPoints = searchPoints;
 
-            ViewBag.CategoriesList = await _context.LevelCategory
-                .OrderBy(c => c.Name)
-                .Select(c => c.Name)
+            // Preencher a dropdown de categorias
+            ViewData["LevelCategories"] = new SelectList(_context.LevelCategory, "LevelCategoryId", "Name", searchCategoryId);
+
+            // 4. Paginação
+            int totalItems = await levelsQuery.CountAsync();
+            var paginationInfo = new ViewModels.PaginationInfo<Level>(page, totalItems);
+
+            // Nota: Se quiseres alterar o tamanho da página, faz-se na classe PaginationInfo,
+            // ou podes sobrescrever aqui: paginationInfo.ItemsPerPage = 5;
+
+            paginationInfo.Items = await levelsQuery
+                .OrderBy(l => l.LevelNumber)
+                .Skip(paginationInfo.ItemsToSkip)
+                .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
 
-            return View(vm);
+            return View(paginationInfo);
+        }
+
+        // NOVO: Endpoint para a Calculadora funcionar via AJAX
+        [HttpGet]
+        public IActionResult CalculateLevel(int points) {
+            // --- Lógica de Exemplo ---
+            // Ajusta esta matemática para a tua regra de negócio real.
+            // Exemplo: Nível 1 = 0-99, Nível 2 = 100-199, etc.
+
+            int level = 1;
+            int remaining = 0;
+
+            if (points >= 0) {
+                level = (points / 100) + 1; // 150 pts -> nivel 2
+                int nextLevelPoints = level * 100;
+                remaining = nextLevelPoints - points;
+            }
+
+            // Retorna JSON para o JavaScript consumir
+            return Json(new { level = level, remaining = remaining });
         }
 
         // GET: Levels/Details/5
-        public async Task<IActionResult> Details(int? id, int page = 1)
-        {
+        public async Task<IActionResult> Details(int? id) {
             if (id == null) return NotFound();
 
-            // FIX: Include Category
             var level = await _context.Level
                 .Include(l => l.Category)
+                .Include(l => l.Customer)
                 .FirstOrDefaultAsync(m => m.LevelId == id);
 
-            if (level == null) return InvalidLevelView();
+            if (level == null) return View("InvalidLevel");
 
-            ViewBag.Page = page;
             return View(level);
         }
 
         // GET: Levels/Create
-        public IActionResult Create(int? levelNumber = null, int? levelCategoryId = null, string? description = null, int ? levelPointsLimit = null)
-        {
-            
-            PopulateCategoriesDropdown(levelCategoryId);
-
-            var model = new Level
-            {
-                Description = description ?? string.Empty
-            };
-
-            if (levelNumber.HasValue) model.LevelNumber = levelNumber.Value;
-            if (levelCategoryId.HasValue) model.LevelCategoryId = levelCategoryId.Value;
-            if (levelPointsLimit.HasValue) model.LevelPointsLimit = levelPointsLimit.Value;
-
-            return View(model);
+        public IActionResult Create() {
+            ViewData["LevelCategoryId"] = new SelectList(_context.LevelCategory, "LevelCategoryId", "Name");
+            return View();
         }
 
         // POST: Levels/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level)
-        {
-            bool levelExists = await _context.Level.AnyAsync(l => l.LevelNumber == level.LevelNumber);
-
-            if (levelExists)
-            {
-                ModelState.AddModelError("LevelNumber", $"Level {level.LevelNumber} already exists. Please choose a different number.");
+        public async Task<IActionResult> Create([Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level) {
+            if (await _context.Level.AnyAsync(l => l.LevelNumber == level.LevelNumber)) {
+                ModelState.AddModelError("LevelNumber", $"Level {level.LevelNumber} already exists.");
             }
 
-            ModelState.Remove(nameof(level.Category));
-
-            if (ModelState.IsValid)
-            {
+            if (ModelState.IsValid) {
                 _context.Add(level);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"Level {level.LevelNumber} created.";
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(nameof(Details),
+                    new {
+                        id = level.LevelId,
+                        SuccessMessage = "Level created successfully."
+                    }
+                );
             }
 
-            PopulateCategoriesDropdown(level.LevelCategoryId);
+            ViewData["LevelCategoryId"] = new SelectList(_context.LevelCategory, "LevelCategoryId", "Name", level.LevelCategoryId);
             return View(level);
         }
 
-        // GET: Levels/CalculateLevel
-        [HttpGet]
-        public async Task<IActionResult> CalculateLevel(int? points)
-        {
-            if (points == null || points < 0)
-                return Json(new { level = "-", remaining = points });
-
-            var levels = await _context.Level
-                .OrderBy(l => l.LevelNumber)
-                .ToListAsync();
-
-            int remaining = points.Value;
-            int completedLevel = 0;
-
-            foreach (var l in levels)
-            {
-                if (remaining >= l.LevelPointsLimit)
-                {
-                    remaining -= l.LevelPointsLimit;
-                    completedLevel = l.LevelNumber;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            int resultLevel = Math.Max(1, completedLevel + 1);
-
-            return Json(new { level = resultLevel, remaining });
-        }
-
         // GET: Levels/Edit/5
-        public async Task<IActionResult> Edit(int? id, int page = 1)
-        {
+        public async Task<IActionResult> Edit(int? id) {
             if (id == null) return NotFound();
 
-            var level = await _context.Level
-                .Include(l => l.Category) // <--- Loads the related data
-                .FirstOrDefaultAsync(m => m.LevelId == id);
+            var level = await _context.Level.FindAsync(id);
+            if (level == null) return View("InvalidLevel");
 
-
-            if (level == null) return InvalidLevelView();
-
-            // FIX: Load dropdown with the current value selected
-            PopulateCategoriesDropdown(level.LevelCategoryId);
-
-            ViewBag.Page = page;
+            ViewData["LevelCategoryId"] = new SelectList(_context.LevelCategory, "LevelCategoryId", "Name", level.LevelCategoryId);
             return View(level);
         }
 
         // POST: Levels/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level, int page = 1)
-        {
+        public async Task<IActionResult> Edit(int id, [Bind("LevelId,LevelNumber,LevelCategoryId,LevelPointsLimit,Description")] Level level) {
             if (id != level.LevelId) return NotFound();
 
-            // Remove navigation property from validation
-            ModelState.Remove(nameof(level.Category));
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            if (ModelState.IsValid) {
+                try {
                     _context.Update(level);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Level {level.LevelNumber} updated successfully.";
+
+                    return RedirectToAction(nameof(Details),
+                        new {
+                            id = level.LevelId,
+                            SuccessMessage = "Level updated successfully."
+                        }
+                    );
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LevelExists(level.LevelId)) return InvalidLevelView(level);
-                    throw;
+                catch (DbUpdateConcurrencyException) {
+                    if (!LevelExists(level.LevelId)) {
+                        ViewBag.LevelWasDeleted = true;
+                    }
+                    else {
+                        throw;
+                    }
                 }
-                return RedirectToAction(nameof(Index), new { page });
+                return RedirectToAction(nameof(Index));
             }
 
-            // Reload dropdown if validation fails
-            PopulateCategoriesDropdown(level.LevelCategoryId);
-            ViewBag.Page = page;
+            ViewData["LevelCategoryId"] = new SelectList(_context.LevelCategory, "LevelCategoryId", "Name", level.LevelCategoryId);
             return View(level);
         }
 
         // GET: Levels/Delete/5
-        public async Task<IActionResult> Delete(int? id, int page = 1)
-        {
+        public async Task<IActionResult> Delete(int? id) {
             if (id == null) return NotFound();
 
-            // FIX: Include Category to show the name in the delete confirmation
             var level = await _context.Level
                 .Include(l => l.Category)
+                .Include(l => l.Customer)
                 .FirstOrDefaultAsync(m => m.LevelId == id);
 
-            if (level == null) return InvalidLevelView();
+            if (level == null) {
+                TempData["ErrorMessage"] = "The Level is no longer available.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            ViewBag.Page = page;
             return View(level);
         }
 
         // POST: Levels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id, int page = 1)
-        {
+        public async Task<IActionResult> DeleteConfirmed(int id) {
             var level = await _context.Level.FindAsync(id);
-            if (level == null) return InvalidLevelView();
 
-            _context.Level.Remove(level);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"Level {level.LevelNumber} deleted.";
-            return RedirectToAction(nameof(Index), new { page });
+            if (level != null) {
+                try {
+                    _context.Level.Remove(level);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Level deleted successfully.";
+                }
+                catch (Exception) {
+                    level = await _context.Level
+                        .AsNoTracking()
+                        .Include(l => l.Category)
+                        .Include(l => l.Customer)
+                        .FirstOrDefaultAsync(l => l.LevelId == id);
+
+                    int numberCustomers = level?.Customer?.Count ?? 0;
+
+                    if (numberCustomers > 0) {
+                        ViewBag.Error = $"Unable to delete Level. It is associated with {numberCustomers} Customers. Reassign them first.";
+                    }
+                    else {
+                        ViewBag.Error = "An error occurred while deleting the Level.";
+                    }
+
+                    return View(level);
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
-        private bool LevelExists(int id) => _context.Level.Any(e => e.LevelId == id);
+        private bool LevelExists(int id) {
+            return _context.Level.Any(e => e.LevelId == id);
+        }
     }
 }
