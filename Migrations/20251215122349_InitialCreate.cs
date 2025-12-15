@@ -541,9 +541,9 @@ namespace HealthWellbeingRoom.Migrations
                 {
                     ZonaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeZona = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ConsumivelId = table.Column<int>(type: "int", nullable: false),
                     RoomId = table.Column<int>(type: "int", nullable: false),
-                    NomeZona = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CapacidadeMaxima = table.Column<int>(type: "int", nullable: false),
                     QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
                     Ativa = table.Column<bool>(type: "bit", nullable: false)
