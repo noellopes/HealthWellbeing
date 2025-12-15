@@ -1,8 +1,130 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Página Inicial";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mb-5">
+    <h1 class="display-4">Bem-vindo ao Health Wellbeing</h1>
+    <p class="lead">O seu parceiro de saúde e bem-estar.</p>
 </div>
+
+@* LÓGICA DO DASHBOARD 
+    O objeto 'User' está disponível em todas as Views automaticamente.
+*@
+
+@if (User.Identity != null && User.Identity.IsAuthenticated)
+{
+    // === UTILIZADOR ESTÁ LOGADO ===
+    <div class="alert alert-success">
+        Olá, <strong>@User.Identity.Name</strong>! Você entrou como:
+        @if (User.IsInRole("Admin"))
+        {
+            <span class="badge bg-danger">Administrador</span>
+        }
+        @if (User.IsInRole("Gestor"))
+        {
+            <span class="badge bg-warning text-dark">Gestor</span>
+        }
+        @if (User.IsInRole("Medico"))
+        {
+            <span class="badge bg-primary">Médico</span>
+        }
+        @if (User.IsInRole("Rececionista"))
+        {
+            <span class="badge bg-info text-dark">Rececionista</span>
+        }
+        @if (User.IsInRole("Utente"))
+        {
+            <span class="badge bg-success">Utente</span>
+        }
+    </div>
+
+    <div class="row mt-4">
+
+        @* --- ÁREA DE ADMINISTRAÇÃO --- *@
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-danger h-100">
+                    <div class="card-header bg-danger text-white">Administração</div>
+                    <div class="card-body">
+                        <p class="card-text">Gerir funcionários, criar logins e acessos.</p>
+                        <a asp-controller="ProfissionalExecutantes" asp-action="Index" class="btn btn-outline-danger w-100 mb-2">Gerir Profissionais</a>
+                        <a asp-controller="Roles" asp-action="Index" class="btn btn-outline-danger w-100">Gerir Permissões</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* --- ÁREA DE GESTÃO DE EXAMES --- *@
+        @if (User.IsInRole("Gestor") || User.IsInRole("Admin"))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-warning h-100">
+                    <div class="card-header bg-warning text-dark">Gestão Clínica</div>
+                    <div class="card-body">
+                        <p class="card-text">Configurar tipos de exames e materiais.</p>
+                        <a asp-controller="ExameTipo" asp-action="Index" class="btn btn-outline-dark w-100">Gerir Tipos de Exame</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* --- ÁREA MÉDICA --- *@
+        @if (User.IsInRole("Medico"))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-primary h-100">
+                    <div class="card-header bg-primary text-white">Área Médica</div>
+                    <div class="card-body">
+                        <p class="card-text">Consultar agenda e realizar exames.</p>
+                        <a asp-controller="Consultas" asp-action="Index" class="btn btn-outline-primary w-100">As Minhas Consultas</a>
+                        <a asp-controller="Exames" asp-action="Index" class="btn btn-outline-primary w-100 mt-2">Registar Resultados</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* --- ÁREA DE RECEÇÃO --- *@
+        @if (User.IsInRole("Rececionista") || User.IsInRole("Gestor"))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-info h-100">
+                    <div class="card-header bg-info text-dark">Receção</div>
+                    <div class="card-body">
+                        <p class="card-text">Fazer marcações e check-in de utentes.</p>
+                        <a asp-controller="Marcacoes" asp-action="Create" class="btn btn-outline-info w-100">Nova Marcação</a>
+                        <a asp-controller="Utentes" asp-action="Index" class="btn btn-outline-info w-100 mt-2">Listar Utentes</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* --- ÁREA DO UTENTE --- *@
+        @if (User.IsInRole("Utente"))
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card border-success h-100">
+                    <div class="card-header bg-success text-white">O Meu Espaço</div>
+                    <div class="card-body">
+                        <p class="card-text">Veja o seu histórico e exames marcados.</p>
+                        <a asp-controller="Historico" asp-action="Index" class="btn btn-outline-success w-100">Meus Exames</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    // === UTILIZADOR NÃO ESTÁ LOGADO (Público) ===
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <h3>Bem-vindo ao Portal de Saúde</h3>
+            <p>Faça login para aceder à sua área reservada.</p>
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <a class="btn btn-primary btn-lg" asp-area="Identity" asp-page="/Account/Login">Entrar (Login)</a>
+                <a class="btn btn-outline-secondary btn-lg" asp-controller="Utentes" asp-action="Register">Registar-me como Utente</a>
+            </div>
+        </div>
+    </div>
+}
