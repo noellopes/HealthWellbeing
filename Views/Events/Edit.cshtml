@@ -2,20 +2,18 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var selectedIds = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.SelectedActivityIds);
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <div class="card shadow-sm">
     <div class="card-header bg-warning text-dark">
-        <h4 class="mb-0">
-            <i class="bi bi-pencil-square me-2"></i> Edit Event
-        </h4>
+        <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Edit Event</h4>
     </div>
     <div class="card-body">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
-
             <input type="hidden" asp-for="EventId" />
 
             <div class="mb-3">
@@ -30,10 +28,30 @@
                 <span asp-validation-for="EventDescription" class="text-danger small"></span>
             </div>
 
-            <div class="mb-4">
-                <label asp-for="EventTypeId" class="form-label fw-bold"></label>
-                <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId"></select>
-                <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="EventTypeId" class="form-label fw-bold"></label>
+                    <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId"></select>
+                    <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ActivityTypeId" class="form-label fw-bold"></label>
+                    <select asp-for="ActivityTypeId" class="form-select" asp-items="ViewBag.ActivityCategory" id="activityCategoryDropdown">
+                        <option value="">-- Select Activity Focus --</option>
+                    </select>
+                    <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="card bg-light mb-4" id="activitiesContainer">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Select Activities:</h6>
+                    <div id="activitiesList" class="row"></div>
+                    <div class="mt-2 fw-bold text-end text-primary">
+                        Total Points: <span id="totalPointsDisplay">@Model.EventPoints</span>
+                    </div>
+                </div>
             </div>
 
             <div class="row mb-3">
@@ -50,12 +68,7 @@
             </div>
 
             <div class="row mb-4">
-                <div class="col-md-6">
-                    <label asp-for="EventPoints" class="form-label fw-bold"></label>
-                    <input asp-for="EventPoints" class="form-control" type="number" />
-                    <span asp-validation-for="EventPoints" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
+                <div class="mb-4">
                     <label asp-for="MinLevel" class="form-label fw-bold"></label>
                     <input asp-for="MinLevel" class="form-control" type="number" />
                     <span asp-validation-for="MinLevel" class="text-danger small"></span>
@@ -63,7 +76,7 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2">
-                <button type-"submit" class="btn btn-warning">
+                <button type="submit" class="btn btn-warning">
                     <i class="bi bi-save me-1"></i> Save
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">
@@ -78,4 +91,60 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function () {
+            var preSelectedIds = @Html.Raw(selectedIds ?? "[]");
+
+            function loadActivities(category, preselect) {
+                var list = $('#activitiesList');
+                if (!category) {
+                    list.empty();
+                    $('#totalPointsDisplay').text(0);
+                    return;
+                }
+
+                $.getJSON('/Events/GetActivitiesByType', { typeId: category }, function (data) {
+                    list.empty();
+                    if (data.length === 0) {
+                        list.append('<div class="col-12 text-muted">No activities found.</div>');
+                    } else {
+                        $.each(data, function (i, item) {
+                            var isChecked = preselect && preSelectedIds.includes(item.id) ? 'checked' : '';
+                            var checkbox = `
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input activity-check" type="checkbox"
+                                               name="selectedActivities" value="${item.id}"
+                                               data-points="${item.points}" id="act_${item.id}" ${isChecked}>
+                                        <label class="form-check-label" for="act_${item.id}">
+                                            ${item.name} <span class="badge bg-secondary rounded-pill ms-1">${item.points} pts</span>
+                                        </label>
+                                    </div>
+                                </div>`;
+                            list.append(checkbox);
+                        });
+                    }
+                    $('.activity-check').change(updateTotal);
+                    updateTotal();
+                });
+            }
+
+            function updateTotal() {
+                var total = 0;
+                $('.activity-check:checked').each(function () {
+                    total += $(this).data('points');
+                });
+                $('#totalPointsDisplay').text(total);
+            }
+
+            $('#activityCategoryDropdown').change(function () {
+                loadActivities($(this).val(), false);
+            });
+
+            var initialCategory = $('#activityCategoryDropdown').val();
+            if (initialCategory) {
+                loadActivities(initialCategory, true);
+            }
+        });
+    </script>
 }

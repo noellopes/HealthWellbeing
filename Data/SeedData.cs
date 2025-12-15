@@ -1,14 +1,16 @@
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HealthWellbeing.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Data
 {
     internal class SeedData
     {
-        internal static void Populate(HealthWellbeingDbContext? dbContext) {
+        internal static void Populate(HealthWellbeingDbContext? dbContext)
+        {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             dbContext.Database.EnsureCreated();
@@ -22,14 +24,24 @@ namespace HealthWellbeing.Data
             PopulateTraining(dbContext, trainers);
 
             PopulateScoringStrategies(dbContext);
-            PopulateEventTypes(dbContext);
+            PopulateEventTypes(dbContext); // Este tem de vir antes de Events
+
+            // --- ALTERAÇÃO AQUI: MOVER ESTES DOIS PARA CIMA ---
+            PopulateActivityTypes(dbContext); // Necessário para os Events
+            PopulateActivities(dbContext);    // Opcional, mas boa prática manter junto
+                                              // --------------------------------------------------
+
+            // Agora sim, pode criar os eventos porque os ActivityTypes já existem
             PopulateEvents(dbContext);
 
             PopulateLevelCategories(dbContext);
-            PopulateLevels(dbContext);          
+            PopulateLevels(dbContext);
 
             PopulateEmployees(dbContext);
             PopulateCustomers(dbContext);
+
+            // PopulateEventActivities usa Events e Activities, por isso fica no fim
+            PopulateEventActivities(dbContext);
         }
 
 
@@ -61,62 +73,86 @@ namespace HealthWellbeing.Data
 
             dbContext.SaveChanges();
         }
+        private static void PopulateActivityTypes(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.ActivityType.Any()) return;
 
+            var types = new List<ActivityType>
+            {
+                new ActivityType { Name = "Hábito Diário", Description = "Pequenas ações repetidas todos os dias." },
+                new ActivityType { Name = "Treino", Description = "Atividades físicas de média a alta intensidade." },
+                new ActivityType { Name = "Nutrição", Description = "Foco na alimentação saudável e hidratação." },
+                new ActivityType { Name = "Mindfulness", Description = "Saúde mental, meditação e relaxamento." },
+                new ActivityType { Name = "Desafio Semanal", Description = "Metas de longo prazo." }
+            };
+
+            dbContext.ActivityType.AddRange(types);
+            dbContext.SaveChanges();
+        }
         private static void PopulateActivities(HealthWellbeingDbContext dbContext)
         {
             if (dbContext.Activity.Any()) return;
 
+            // Buscar os tipos da BD
+            var tHabito = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Hábito Diário");
+            var tTreino = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Treino");
+            var tNutri = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Nutrição");
+            var tMind = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Mindfulness");
+            var tDesafio = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Desafio Semanal");
+
+            if (tHabito == null) return;
+
             var activities = new List<Activity>
             {
-                // HÁBITOS DIÁRIOS
-                new Activity { ActivityName = "Beber 2L de água", ActivityType = "Hábito Diário", ActivityDescription = "Completar a meta diária de hidratação (pelo menos 2 litros de água).", ActivityReward = 20 },
-                new Activity { ActivityName = "Dormir 8 horas", ActivityType = "Hábito Diário", ActivityDescription = "Registar uma noite de sono com 8 horas ou mais.", ActivityReward = 25 },
-                new Activity { ActivityName = "Subir escadas", ActivityType = "Hábito Diário", ActivityDescription = "Optar por subir escadas em vez de usar o elevador durante o dia.", ActivityReward = 15 },
-                new Activity { ActivityName = "Pausa ativa", ActivityType = "Hábito Diário", ActivityDescription = "Fazer pelo menos 5 minutos de alongamentos ou movimento a cada 2 horas de trabalho.", ActivityReward = 15 },
-                new Activity { ActivityName = "Zero refrigerantes", ActivityType = "Hábito Diário", ActivityDescription = "Passar o dia sem consumir refrigerantes ou bebidas açucaradas.", ActivityReward = 20 },
-                new Activity { ActivityName = "Caminhada curta", ActivityType = "Hábito Diário", ActivityDescription = "Realizar uma caminhada de pelo menos 15 minutos.", ActivityReward = 15 },
-                new Activity { ActivityName = "Diário de bem-estar", ActivityType = "Hábito Diário", ActivityDescription = "Registar no diário uma reflexão sobre o bem-estar físico e mental do dia.", ActivityReward = 10 },
-                new Activity { ActivityName = "Alongar ao acordar", ActivityType = "Hábito Diário", ActivityDescription = "Realizar uma rotina de alongamentos simples logo ao acordar.", ActivityReward = 10 },
+                // 1. HÁBITOS DIÁRIOS (8 itens)
+                new Activity { ActivityName = "Beber 2L de água", ActivityType = tHabito, ActivityDescription = "Meta diária.", ActivityReward = 20 },
+                new Activity { ActivityName = "Dormir 8 horas", ActivityType = tHabito, ActivityDescription = "Sono reparador.", ActivityReward = 25 },
+                new Activity { ActivityName = "Subir escadas", ActivityType = tHabito, ActivityDescription = "Evitar elevador.", ActivityReward = 15 },
+                new Activity { ActivityName = "Pausa ativa", ActivityType = tHabito, ActivityDescription = "Alongar a cada 2h.", ActivityReward = 15 },
+                new Activity { ActivityName = "Zero refrigerantes", ActivityType = tHabito, ActivityDescription = "Sem bebidas açucaradas.", ActivityReward = 20 },
+                new Activity { ActivityName = "Caminhada curta", ActivityType = tHabito, ActivityDescription = "15 min a andar.", ActivityReward = 15 },
+                new Activity { ActivityName = "Diário de bem-estar", ActivityType = tHabito, ActivityDescription = "Registar dia.", ActivityReward = 10 },
+                new Activity { ActivityName = "Ler 10 páginas", ActivityType = tHabito, ActivityDescription = "Hábito de leitura.", ActivityReward = 15 },
 
-                // TREINO / EXERCÍCIO
-                new Activity { ActivityName = "Treino de força 30 min", ActivityType = "Treino", ActivityDescription = "Completar pelo menos 30 minutos de treino de força (peso corporal ou pesos).", ActivityReward = 40 },
-                new Activity { ActivityName = "Treino de cardio 30 min", ActivityType = "Treino", ActivityDescription = "Realizar 30 minutos de atividade cardiovascular (corrida, bicicleta, elíptica, etc.).", ActivityReward = 35 },
-                new Activity { ActivityName = "Aula de grupo", ActivityType = "Treino", ActivityDescription = "Participar numa aula de grupo (Zumba, HIIT, Yoga, etc.).", ActivityReward = 30 },
-                new Activity { ActivityName = "Treino completo corpo inteiro", ActivityType = "Treino", ActivityDescription = "Concluir um treino de corpo inteiro com pelo menos 6 exercícios diferentes.", ActivityReward = 50 },
-                new Activity { ActivityName = "Sessão de alongamentos 20 min", ActivityType = "Treino", ActivityDescription = "Fazer uma sessão dedicada de mobilidade/alongamentos de 20 minutos.", ActivityReward = 25 },
-                new Activity { ActivityName = "Corrida 5 km", ActivityType = "Treino", ActivityDescription = "Percorrer pelo menos 5 quilómetros a correr ou em corrida ligeira.", ActivityReward = 60 },
-                new Activity { ActivityName = "Ciclismo 10 km", ActivityType = "Treino", ActivityDescription = "Percorrer pelo menos 10 quilómetros de bicicleta (interior ou exterior).", ActivityReward = 55 },
-                new Activity { ActivityName = "Treino em casa", ActivityType = "Treino", ActivityDescription = "Concluir uma sessão de treino em casa sem equipamentos de ginásio.", ActivityReward = 30 },
+                // 2. TREINO (8 itens)
+                new Activity { ActivityName = "Treino Força 30min", ActivityType = tTreino, ActivityDescription = "Musculação.", ActivityReward = 40 },
+                new Activity { ActivityName = "Cardio 30min", ActivityType = tTreino, ActivityDescription = "Corrida/Bike.", ActivityReward = 35 },
+                new Activity { ActivityName = "Aula de Grupo", ActivityType = tTreino, ActivityDescription = "Zumba/Pilates.", ActivityReward = 30 },
+                new Activity { ActivityName = "Treino Full Body", ActivityType = tTreino, ActivityDescription = "Corpo inteiro.", ActivityReward = 50 },
+                new Activity { ActivityName = "Sessão Alongamentos", ActivityType = tTreino, ActivityDescription = "Flexibilidade.", ActivityReward = 25 },
+                new Activity { ActivityName = "Corrida 5km", ActivityType = tTreino, ActivityDescription = "Outdoor.", ActivityReward = 60 },
+                new Activity { ActivityName = "Ciclismo 10km", ActivityType = tTreino, ActivityDescription = "Bicicleta.", ActivityReward = 55 },
+                new Activity { ActivityName = "Treino Calistenia", ActivityType = tTreino, ActivityDescription = "Peso do corpo.", ActivityReward = 45 },
 
-                // NUTRIÇÃO
-                new Activity { ActivityName = "Dia sem fast-food", ActivityType = "Nutrição", ActivityDescription = "Passar o dia sem consumir fast-food ou fritos.", ActivityReward = 25 },
-                new Activity { ActivityName = "1 refeição completa saudável", ActivityType = "Nutrição", ActivityDescription = "Preparar e consumir uma refeição equilibrada (proteína, vegetais e hidratos complexos).", ActivityReward = 20 },
-                new Activity { ActivityName = "Inserir registo alimentar diário", ActivityType = "Nutrição", ActivityDescription = "Atualizar o registo alimentar com todas as refeições do dia.", ActivityReward = 15 },
-                new Activity { ActivityName = "Dia sem açúcares adicionados", ActivityType = "Nutrição", ActivityDescription = "Evitar doces, sobremesas e alimentos com açúcar adicionado durante o dia.", ActivityReward = 30 },
-                new Activity { ActivityName = "Comer 3 peças de fruta", ActivityType = "Nutrição", ActivityDescription = "Consumir pelo menos três peças de fruta ao longo do dia.", ActivityReward = 15 },
-                new Activity { ActivityName = "Jantar leve", ActivityType = "Nutrição", ActivityDescription = "Fazer um jantar leve antes das 21h, evitando refeições pesadas.", ActivityReward = 20 },
-                new Activity { ActivityName = "Planeamento semanal de refeições", ActivityType = "Nutrição", ActivityDescription = "Planear, pelo menos de forma básica, as refeições saudáveis da semana.", ActivityReward = 35 },
-                new Activity { ActivityName = "Dia vegetariano", ActivityType = "Nutrição", ActivityDescription = "Passar o dia a consumir apenas refeições vegetarianas equilibradas.", ActivityReward = 40 },
+                // 3. NUTRIÇÃO (8 itens)
+                new Activity { ActivityName = "Sem Fast-Food", ActivityType = tNutri, ActivityDescription = "Comer limpo.", ActivityReward = 25 },
+                new Activity { ActivityName = "Refeição Equilibrada", ActivityType = tNutri, ActivityDescription = "Prato saudável.", ActivityReward = 20 },
+                new Activity { ActivityName = "Registo Alimentar", ActivityType = tNutri, ActivityDescription = "Log refeições.", ActivityReward = 15 },
+                new Activity { ActivityName = "Zero Açúcares", ActivityType = tNutri, ActivityDescription = "Sem doces.", ActivityReward = 30 },
+                new Activity { ActivityName = "3 Peças de Fruta", ActivityType = tNutri, ActivityDescription = "Vitaminas.", ActivityReward = 15 },
+                new Activity { ActivityName = "Jantar Leve", ActivityType = tNutri, ActivityDescription = "Antes das 21h.", ActivityReward = 20 },
+                new Activity { ActivityName = "Meal Prep Semanal", ActivityType = tNutri, ActivityDescription = "Planear semana.", ActivityReward = 35 },
+                new Activity { ActivityName = "Dia Vegetariano", ActivityType = tNutri, ActivityDescription = "Sem carne.", ActivityReward = 40 },
 
-                // MINDFULNESS / SAÚDE MENTAL
-                new Activity { ActivityName = "Sessão de meditação 10 min", ActivityType = "Mindfulness", ActivityDescription = "Realizar pelo menos 10 minutos de meditação guiada ou silenciosa.", ActivityReward = 15 },
-                new Activity { ActivityName = "Técnicas de respiração", ActivityType = "Mindfulness", ActivityDescription = "Praticar exercícios de respiração profunda durante 5 minutos.", ActivityReward = 10 },
-                new Activity { ActivityName = "Pausa digital", ActivityType = "Mindfulness", ActivityDescription = "Passar pelo menos 2 horas sem redes sociais ou ecrãs de entretenimento.", ActivityReward = 20 },
-                new Activity { ActivityName = "Passeio ao ar livre", ActivityType = "Mindfulness", ActivityDescription = "Fazer uma caminhada ao ar livre focada na observação e relaxamento.", ActivityReward = 20 },
-                new Activity { ActivityName = "Gratidão diária", ActivityType = "Mindfulness", ActivityDescription = "Listar três coisas pelas quais se sente grato(a) no dia.", ActivityReward = 10 },
-                new Activity { ActivityName = "Tempo para hobby", ActivityType = "Mindfulness", ActivityDescription = "Dedicar pelo menos 30 minutos a um hobby relaxante (leitura, desenho, música, etc.).", ActivityReward = 20 },
-                new Activity { ActivityName = "Alongamentos antes de dormir", ActivityType = "Mindfulness", ActivityDescription = "Fazer uma rotina leve de alongamentos antes de ir para a cama.", ActivityReward = 10 },
-                new Activity { ActivityName = "Dia com gestão de stress", ActivityType = "Mindfulness", ActivityDescription = "Aplicar ao longo do dia técnicas de gestão de stress em momentos de maior pressão.", ActivityReward = 25 },
+                // 4. MINDFULNESS (8 itens)
+                new Activity { ActivityName = "Meditação 10min", ActivityType = tMind, ActivityDescription = "Foco.", ActivityReward = 15 },
+                new Activity { ActivityName = "Respiração Profunda", ActivityType = tMind, ActivityDescription = "5 minutos.", ActivityReward = 10 },
+                new Activity { ActivityName = "Pausa Digital", ActivityType = tMind, ActivityDescription = "2h sem ecrãs.", ActivityReward = 20 },
+                new Activity { ActivityName = "Passeio Natureza", ActivityType = tMind, ActivityDescription = "Ar livre.", ActivityReward = 20 },
+                new Activity { ActivityName = "Gratidão", ActivityType = tMind, ActivityDescription = "3 coisas boas.", ActivityReward = 10 },
+                new Activity { ActivityName = "Tempo Hobby", ActivityType = tMind, ActivityDescription = "Lazer criativo.", ActivityReward = 20 },
+                new Activity { ActivityName = "Relaxamento Noturno", ActivityType = tMind, ActivityDescription = "Pré-sono.", ActivityReward = 10 },
+                new Activity { ActivityName = "Gestão Stress", ActivityType = tMind, ActivityDescription = "Técnicas coping.", ActivityReward = 25 },
 
-                // DESAFIOS / METAS SEMANAIS
-                new Activity { ActivityName = "Completar 5 treinos na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Registar no mínimo 5 sessões de treino físico na mesma semana.", ActivityReward = 100 },
-                new Activity { ActivityName = "7 dias seguidos a hidratar bem", ActivityType = "Desafio Semanal", ActivityDescription = "Cumprir a meta de 2L de água durante 7 dias consecutivos.", ActivityReward = 120 },
-                new Activity { ActivityName = "Semana sem fast-food", ActivityType = "Desafio Semanal", ActivityDescription = "Passar uma semana completa sem consumir fast-food.", ActivityReward = 130 },
-                new Activity { ActivityName = "3 aulas de grupo na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Participar em pelo menos três aulas de grupo na mesma semana.", ActivityReward = 90 },
-                new Activity { ActivityName = "5 dias de registo alimentar", ActivityType = "Desafio Semanal", ActivityDescription = "Registar as refeições de pelo menos 5 dias seguidos.", ActivityReward = 80 },
-                new Activity { ActivityName = "Passos semanais 70 000", ActivityType = "Desafio Semanal", ActivityDescription = "Atingir um total de 70 000 passos numa semana (média de 10 000 por dia).", ActivityReward = 140 },
-                new Activity { ActivityName = "3 sessões de mindfulness na semana", ActivityType = "Desafio Semanal", ActivityDescription = "Realizar pelo menos 3 sessões de meditação ou mindfulness numa semana.", ActivityReward = 85 },
-                new Activity { ActivityName = "Semana de sono regulado", ActivityType = "Desafio Semanal", ActivityDescription = "Dormir entre 7–9 horas por noite durante 7 dias seguidos.", ActivityReward = 150 }
+                // 5. DESAFIOS (8 itens)
+                new Activity { ActivityName = "5 Treinos/Semana", ActivityType = tDesafio, ActivityDescription = "Consistência.", ActivityReward = 100 },
+                new Activity { ActivityName = "Hidratação 7 Dias", ActivityType = tDesafio, ActivityDescription = "2L/dia.", ActivityReward = 120 },
+                new Activity { ActivityName = "Semana Limpa", ActivityType = tDesafio, ActivityDescription = "Zero processados.", ActivityReward = 130 },
+                new Activity { ActivityName = "3 Aulas Grupo", ActivityType = tDesafio, ActivityDescription = "Social.", ActivityReward = 90 },
+                new Activity { ActivityName = "Log 5 Dias", ActivityType = tDesafio, ActivityDescription = "Diário alimentar.", ActivityReward = 80 },
+                new Activity { ActivityName = "70k Passos", ActivityType = tDesafio, ActivityDescription = "Caminhada.", ActivityReward = 140 },
+                new Activity { ActivityName = "3x Mindfulness", ActivityType = tDesafio, ActivityDescription = "Saúde mental.", ActivityReward = 85 },
+                new Activity { ActivityName = "Sono 7 Dias", ActivityType = tDesafio, ActivityDescription = "8h/noite.", ActivityReward = 150 }
             };
 
             dbContext.Activity.AddRange(activities);
@@ -234,53 +270,115 @@ namespace HealthWellbeing.Data
             var eventTypes = dbContext.EventType.ToList();
             if (!eventTypes.Any()) return;
 
-            var eventList = new List<Event>();
+            // 1. Buscar os Objetos REAIS para ter os IDs
+            var tTreino = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Treino");
+            var tNutri = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Nutrição");
+            var tMind = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Mindfulness");
+            var tDesafio = dbContext.ActivityType.FirstOrDefault(t => t.Name == "Desafio Semanal");
+
             var now = DateTime.Now;
+            var eventList = new List<Event>();
 
-            eventList.Add(new Event { EventName = "Competição Anual", EventDescription = "Competição de final de ano.", EventTypeId = eventTypes[0].EventTypeId, EventStart = now.AddDays(-30), EventEnd = now.AddDays(-30).AddHours(3), EventPoints = 200, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Workshop de Nutrição", EventDescription = "Aprenda a comer melhor.", EventTypeId = eventTypes[1].EventTypeId, EventStart = now.AddDays(-28), EventEnd = now.AddDays(-28).AddHours(2), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula de Zumba", EventDescription = "Dança e diversão.", EventTypeId = eventTypes[2].EventTypeId, EventStart = now.AddDays(-26), EventEnd = now.AddDays(-26).AddHours(1), EventPoints = 75, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Desafio CrossFit", EventDescription = "Teste os seus limites.", EventTypeId = eventTypes[3].EventTypeId, EventStart = now.AddDays(-24), EventEnd = now.AddDays(-24).AddHours(2), EventPoints = 150, MinLevel = 4 });
-            eventList.Add(new Event { EventName = "Torneio de Ténis", EventDescription = "Torneio de pares.", EventTypeId = eventTypes[4].EventTypeId, EventStart = now.AddDays(-22), EventEnd = now.AddDays(-22).AddHours(5), EventPoints = 250, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Seminário de Saúde Mental", EventDescription = "Bem-estar psicológico.", EventTypeId = eventTypes[5].EventTypeId, EventStart = now.AddDays(-20), EventEnd = now.AddDays(-20).AddHours(2), EventPoints = 55, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Sessão de Personal Trainer", EventDescription = "Foco nos seus objetivos.", EventTypeId = eventTypes[6].EventTypeId, EventStart = now.AddDays(-18), EventEnd = now.AddDays(-18).AddHours(1), EventPoints = 90, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Meia Maratona", EventDescription = "Corrida de 21km.", EventTypeId = eventTypes[7].EventTypeId, EventStart = now.AddDays(-16), EventEnd = now.AddDays(-16).AddHours(4), EventPoints = 300, MinLevel = 5 });
-            eventList.Add(new Event { EventName = "Campeonato de Natação", EventDescription = "Vários estilos.", EventTypeId = eventTypes[8].EventTypeId, EventStart = now.AddDays(-14), EventEnd = now.AddDays(-14).AddHours(3), EventPoints = 280, MinLevel = 4 });
-            eventList.Add(new Event { EventName = "Palestra Motivacional", EventDescription = "Alcance o seu potencial.", EventTypeId = eventTypes[9].EventTypeId, EventStart = now.AddDays(-12), EventEnd = now.AddDays(-12).AddHours(1), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula de Yoga Experimental", EventDescription = "Descubra o Yoga.", EventTypeId = eventTypes[10].EventTypeId, EventStart = now.AddDays(-10), EventEnd = now.AddDays(-10).AddHours(1), EventPoints = 60, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Desafio de Powerlifting", EventDescription = "Supino, Agachamento e Peso Morto.", EventTypeId = eventTypes[11].EventTypeId, EventStart = now.AddDays(-8), EventEnd = now.AddDays(-8).AddHours(3), EventPoints = 180, MinLevel = 4 });
-            eventList.Add(new Event { EventName = "Torneio de Voleibol", EventDescription = "Equipas de 4.", EventTypeId = eventTypes[12].EventTypeId, EventStart = now.AddDays(-6), EventEnd = now.AddDays(-6).AddHours(4), EventPoints = 220, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Workshop de Mindfulness", EventDescription = "Técnicas de relaxamento.", EventTypeId = eventTypes[13].EventTypeId, EventStart = now.AddDays(-4), EventEnd = now.AddDays(-4).AddHours(2), EventPoints = 65, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula de Técnica de Corrida", EventDescription = "Corra de forma eficiente.", EventTypeId = eventTypes[14].EventTypeId, EventStart = now.AddDays(-2), EventEnd = now.AddDays(-2).AddHours(1), EventPoints = 80, MinLevel = 2 });
+            // --- EVENTOS DE TREINO ---
+            if (tTreino != null)
+            {
+                eventList.Add(new Event { EventName = "Competição CrossFit", EventDescription = "Teste limites.", EventTypeId = eventTypes[0].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 4, EventStart = now.AddDays(-10), EventEnd = now.AddDays(-10).AddHours(4), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Torneio Ténis", EventDescription = "Pares.", EventTypeId = eventTypes[4].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 3, EventStart = now.AddDays(-5), EventEnd = now.AddDays(-5).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Meia Maratona", EventDescription = "21km.", EventTypeId = eventTypes[7].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 5, EventStart = now.AddDays(2), EventEnd = now.AddDays(2).AddHours(4), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Campeonato Natação", EventDescription = "Estilos.", EventTypeId = eventTypes[8].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 4, EventStart = now.AddDays(5), EventEnd = now.AddDays(5).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Liga Basquetebol", EventDescription = "Jornada 1.", EventTypeId = eventTypes[16].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(7), EventEnd = now.AddDays(7).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Torneio Padel", EventDescription = "Open.", EventTypeId = eventTypes[36].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(10), EventEnd = now.AddDays(10).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Desafio Powerlifting", EventDescription = "Peso máximo.", EventTypeId = eventTypes[11].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 5, EventStart = now.AddDays(12), EventEnd = now.AddDays(12).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Competição Remo", EventDescription = "Indoor.", EventTypeId = eventTypes[33].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 3, EventStart = now.AddDays(15), EventEnd = now.AddDays(15).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Torneio Voleibol", EventDescription = "Praia.", EventTypeId = eventTypes[12].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(18), EventEnd = now.AddDays(18).AddHours(4), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Desafio Sprint", EventDescription = "100m.", EventTypeId = eventTypes[15].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(20), EventEnd = now.AddDays(20).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Aula Zumba", EventDescription = "Dança.", EventTypeId = eventTypes[2].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(1), EventEnd = now.AddDays(1).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Yoga Morning", EventDescription = "Flexibilidade.", EventTypeId = eventTypes[0].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(3), EventEnd = now.AddDays(3).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Treino HIIT", EventDescription = "Intenso.", EventTypeId = eventTypes[18].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 3, EventStart = now.AddDays(4), EventEnd = now.AddDays(4).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Aula Pilates", EventDescription = "Core.", EventTypeId = eventTypes[25].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(6), EventEnd = now.AddDays(6).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Spinning", EventDescription = "Montanha.", EventTypeId = eventTypes[21].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(8), EventEnd = now.AddDays(8).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Técnica Corrida", EventDescription = "Postura.", EventTypeId = eventTypes[14].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(9), EventEnd = now.AddDays(9).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Personal Trainer", EventDescription = "Sessão.", EventTypeId = eventTypes[6].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(11), EventEnd = now.AddDays(11).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Artes Marciais", EventDescription = "Defesa.", EventTypeId = eventTypes[17].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(13), EventEnd = now.AddDays(13).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Flexibilidade", EventDescription = "Alongar.", EventTypeId = eventTypes[34].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(14), EventEnd = now.AddDays(14).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Boxe Fitness", EventDescription = "Cardio.", EventTypeId = eventTypes[38].EventTypeId, ActivityTypeId = tTreino.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(16), EventEnd = now.AddDays(16).AddHours(1), EventPoints = 0 });
+            }
 
-            eventList.Add(new Event { EventName = "Desafio de Sprint", EventDescription = "Evento a decorrer agora.", EventTypeId = eventTypes[15].EventTypeId, EventStart = now.AddMinutes(-30), EventEnd = now.AddMinutes(30), EventPoints = 110, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Liga de Basquetebol", EventDescription = "Jogo semanal.", EventTypeId = eventTypes[16].EventTypeId, EventStart = now.AddHours(-1), EventEnd = now.AddHours(1), EventPoints = 290, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Demonstração de Artes Marciais", EventDescription = "Apresentação de técnicas.", EventTypeId = eventTypes[17].EventTypeId, EventStart = now.AddMinutes(-15), EventEnd = now.AddHours(1), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Treino de HIIT", EventDescription = "Alta intensidade.", EventTypeId = eventTypes[18].EventTypeId, EventStart = now.AddMinutes(-10), EventEnd = now.AddMinutes(45), EventPoints = 70, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Competição de Crossfit", EventDescription = "WOD especial.", EventTypeId = eventTypes[19].EventTypeId, EventStart = now.AddHours(-2), EventEnd = now.AddHours(1), EventPoints = 190, MinLevel = 4 });
+            // --- EVENTOS DE NUTRIÇÃO ---
+            if (tNutri != null)
+            {
+                eventList.Add(new Event { EventName = "Workshop Nutrição", EventDescription = "Básico.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(5), EventEnd = now.AddDays(5).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Cozinha Saudável", EventDescription = "Receitas.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(12), EventEnd = now.AddDays(12).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Detox Day", EventDescription = "Limpeza.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(19), EventEnd = now.AddDays(19).AddHours(8), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Seminário Suplementos", EventDescription = "Info.", EventTypeId = eventTypes[9].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 3, EventStart = now.AddDays(22), EventEnd = now.AddDays(22).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Planeamento Refeições", EventDescription = "Meal Prep.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(25), EventEnd = now.AddDays(25).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Conferência Médica", EventDescription = "Saúde.", EventTypeId = eventTypes[24].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 4, EventStart = now.AddDays(28), EventEnd = now.AddDays(28).AddHours(4), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Workshop Primeiros Socorros", EventDescription = "Emergência.", EventTypeId = eventTypes[20].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(30), EventEnd = now.AddDays(30).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Feira Biológica", EventDescription = "Produtos.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(32), EventEnd = now.AddDays(32).AddHours(5), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Aula Hidratação", EventDescription = "Importância.", EventTypeId = eventTypes[9].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(35), EventEnd = now.AddDays(35).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Degustação Vegan", EventDescription = "Provais.", EventTypeId = eventTypes[1].EventTypeId, ActivityTypeId = tNutri.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(38), EventEnd = now.AddDays(38).AddHours(2), EventPoints = 0 });
+            }
 
-            eventList.Add(new Event { EventName = "Workshop Prático de Primeiros Socorros", EventDescription = "Saiba como agir.", EventTypeId = eventTypes[20].EventTypeId, EventStart = now.AddDays(1), EventEnd = now.AddDays(1).AddHours(3), EventPoints = 75, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula Avançada de Spinning", EventDescription = "Suba a montanha.", EventTypeId = eventTypes[21].EventTypeId, EventStart = now.AddDays(2), EventEnd = now.AddDays(2).AddHours(1), EventPoints = 95, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Desafio de Tiro ao Arco", EventDescription = "Teste a sua mira.", EventTypeId = eventTypes[22].EventTypeId, EventStart = now.AddDays(3), EventEnd = now.AddDays(3).AddHours(2), EventPoints = 100, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Torneio de Xadrez", EventDescription = "Eliminatórias.", EventTypeId = eventTypes[23].EventTypeId, EventStart = now.AddDays(4), EventEnd = now.AddDays(4).AddHours(4), EventPoints = 260, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Conferência de Medicina Desportiva", EventDescription = "Novas tendências.", EventTypeId = eventTypes[24].EventTypeId, EventStart = now.AddDays(5), EventEnd = now.AddDays(5).AddHours(6), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula de Pilates para Iniciantes", EventDescription = "Controle o seu corpo.", EventTypeId = eventTypes[25].EventTypeId, EventStart = now.AddDays(6), EventEnd = now.AddDays(6).AddHours(1), EventPoints = 65, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Competição de Skate", EventDescription = "Melhor manobra.", EventTypeId = eventTypes[26].EventTypeId, EventStart = now.AddDays(7), EventEnd = now.AddDays(7).AddHours(3), EventPoints = 230, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Workshop Teórico de Treino", EventDescription = "Planeamento de treino.", EventTypeId = eventTypes[27].EventTypeId, EventStart = now.AddDays(8), EventEnd = now.AddDays(8).AddHours(2), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Treino de Maratona (Grupo)", EventDescription = "Preparação conjunta.", EventTypeId = eventTypes[28].EventTypeId, EventStart = now.AddDays(9), EventEnd = now.AddDays(9).AddHours(2), EventPoints = 150, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Desafio de Slackline", EventDescription = "Teste o seu equilíbrio.", EventTypeId = eventTypes[29].EventTypeId, EventStart = now.AddDays(10), EventEnd = now.AddDays(10).AddHours(2), EventPoints = 90, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Campeonato de Judo", EventDescription = "Fases de grupos.", EventTypeId = eventTypes[30].EventTypeId, EventStart = now.AddDays(11), EventEnd = now.AddDays(11).AddHours(5), EventPoints = 270, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Aula Especializada de Defesa Pessoal", EventDescription = "Técnicas essenciais.", EventTypeId = eventTypes[31].EventTypeId, EventStart = now.AddDays(12), EventEnd = now.AddDays(12).AddHours(2), EventPoints = 85, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Workshop de Dança Contemporânea", EventDescription = "Movimento e expressão.", EventTypeId = eventTypes[32].EventTypeId, EventStart = now.AddDays(13), EventEnd = now.AddDays(13).AddHours(2), EventPoints = 70, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Competição de Remo", EventDescription = "Contra-relógio.", EventTypeId = eventTypes[33].EventTypeId, EventStart = now.AddDays(14), EventEnd = now.AddDays(14).AddHours(3), EventPoints = 240, MinLevel = 3 });
-            eventList.Add(new Event { EventName = "Treino de Flexibilidade (Grupo)", EventDescription = "Alongamentos profundos.", EventTypeId = eventTypes[34].EventTypeId, EventStart = now.AddDays(15), EventEnd = now.AddDays(15).AddHours(1), EventPoints = 75, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Desafio de Parkour", EventDescription = "Circuito de obstáculos.", EventTypeId = eventTypes[35].EventTypeId, EventStart = now.AddDays(16), EventEnd = now.AddDays(16).AddHours(2), EventPoints = 160, MinLevel = 4 });
-            eventList.Add(new Event { EventName = "Torneio de Padel", EventDescription = "Sistema Round Robin.", EventTypeId = eventTypes[36].EventTypeId, EventStart = now.AddDays(17), EventEnd = now.AddDays(17).AddHours(4), EventPoints = 250, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Sessão de Orientação (Outdoor)", EventDescription = "Navegação e natureza.", EventTypeId = eventTypes[37].EventTypeId, EventStart = now.AddDays(18), EventEnd = now.AddDays(18).AddHours(3), EventPoints = 50, MinLevel = 1 });
-            eventList.Add(new Event { EventName = "Aula de Boxe (Consolidação)", EventDescription = "Revisão de técnicas.", EventTypeId = eventTypes[38].EventTypeId, EventStart = now.AddDays(19), EventEnd = now.AddDays(19).AddHours(1), EventPoints = 65, MinLevel = 2 });
-            eventList.Add(new Event { EventName = "Competição de E-Sports", EventDescription = "Torneio de FIFA.", EventTypeId = eventTypes[39].EventTypeId, EventStart = now.AddDays(20), EventEnd = now.AddDays(20).AddHours(5), EventPoints = 220, MinLevel = 1 });
+            // --- EVENTOS DE MINDFULNESS ---
+            if (tMind != null)
+            {
+                eventList.Add(new Event { EventName = "Seminário Mental", EventDescription = "Psicologia.", EventTypeId = eventTypes[5].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(2), EventEnd = now.AddDays(2).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Retiro Yoga", EventDescription = "Fim de semana.", EventTypeId = eventTypes[10].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(15), EventEnd = now.AddDays(17).AddHours(0), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Meditação Guiada", EventDescription = "Grupo.", EventTypeId = eventTypes[13].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(4), EventEnd = now.AddDays(4).AddHours(1), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Torneio Xadrez", EventDescription = "Foco.", EventTypeId = eventTypes[23].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(18), EventEnd = now.AddDays(18).AddHours(4), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Tiro ao Arco", EventDescription = "Concentração.", EventTypeId = eventTypes[22].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(21), EventEnd = now.AddDays(21).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Orientação Outdoor", EventDescription = "Natureza.", EventTypeId = eventTypes[37].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 2, EventStart = now.AddDays(24), EventEnd = now.AddDays(24).AddHours(3), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Workshop Stress", EventDescription = "Gestão.", EventTypeId = eventTypes[5].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(27), EventEnd = now.AddDays(27).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Dança Contemp.", EventDescription = "Expressão.", EventTypeId = eventTypes[32].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(29), EventEnd = now.AddDays(29).AddHours(2), EventPoints = 0 });
+                eventList.Add(new Event { EventName = "Palestra Motivacional", EventDescription = "Coaching.", EventTypeId = eventTypes[9].EventTypeId, ActivityTypeId = tMind.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(36), EventEnd = now.AddDays(36).AddHours(2), EventPoints = 0 });
+            }
+
+            // --- EVENTOS DE DESAFIO ---
+            if (tDesafio != null)
+            {
+                eventList.Add(new Event { EventName = "Competição E-Sports", EventDescription = "FIFA.", EventTypeId = eventTypes[39].EventTypeId, ActivityTypeId = tDesafio.ActivityTypeId, MinLevel = 1, EventStart = now.AddDays(33), EventEnd = now.AddDays(33).AddHours(5), EventPoints = 0 });
+            }
 
             dbContext.Event.AddRange(eventList);
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateEventActivities(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.EventActivity.Any()) return;
+
+            var events = dbContext.Event.ToList();
+            var activities = dbContext.Activity.ToList();
+
+            if (!events.Any() || !activities.Any()) return;
+
+            var random = new Random();
+
+            foreach (var evt in events)
+            {
+                if (evt.ActivityTypeId == null) continue;
+
+                // --- CORREÇÃO: Comparar ID com ID ---
+                var matchingActivities = activities
+                    .Where(a => a.ActivityTypeId == evt.ActivityTypeId)
+                    .ToList();
+
+                if (matchingActivities.Any())
+                {
+                    int numToSelect = random.Next(1, 3);
+                    var selected = matchingActivities.OrderBy(x => random.Next()).Take(numToSelect).ToList();
+                    int totalPoints = 0;
+
+                    foreach (var act in selected)
+                    {
+                        dbContext.EventActivity.Add(new EventActivity { EventId = evt.EventId, ActivityId = act.ActivityId });
+                        totalPoints += act.ActivityReward;
+                    }
+
+                    // Atualiza os pontos
+                    evt.EventPoints = totalPoints;
+                }
+            }
             dbContext.SaveChanges();
         }
 

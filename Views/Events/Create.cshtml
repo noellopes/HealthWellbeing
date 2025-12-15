@@ -8,9 +8,7 @@
 
 <div class="card shadow-sm">
     <div class="card-header bg-success text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-plus-circle me-2"></i> New Event
-        </h4>
+        <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i> New Event</h4>
     </div>
     <div class="card-body">
         <form asp-action="Create">
@@ -28,12 +26,33 @@
                 <span asp-validation-for="EventDescription" class="text-danger small"></span>
             </div>
 
-            <div class="mb-4">
-                <label asp-for="EventTypeId" class="form-label fw-bold"></label>
-                <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId">
-                    <option value="">All Types</option>
-                </select>
-                <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="EventTypeId" class="form-label fw-bold"></label>
+                    <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId">
+                        <option value="">All Types</option>
+                    </select>
+                    <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ActivityTypeId" class="form-label fw-bold"></label>
+                    <select asp-for="ActivityTypeId" class="form-select" asp-items="ViewBag.ActivityCategory" id="activityCategoryDropdown">
+                        <option value="">-- Select Activity Focus --</option>
+                    </select>
+                    <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="card bg-light mb-4 d-none" id="activitiesContainer">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold">Select Activities to Include:</h6>
+                    <p class="small text-muted mb-2">Total Points will be calculated automatically based on selections.</p>
+                    <div id="activitiesList" class="row"></div>
+                    <div class="mt-2 fw-bold text-end text-primary">
+                        Total Points: <span id="totalPointsDisplay">0</span>
+                    </div>
+                </div>
             </div>
 
             <div class="row mb-3">
@@ -49,17 +68,10 @@
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label asp-for="EventPoints" class="form-label fw-bold"></label>
-                    <input asp-for="EventPoints" class="form-control" type="number" />
-                    <span asp-validation-for="EventPoints" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="MinLevel" class="form-label fw-bold"></label>
-                    <input asp-for="MinLevel" class="form-control" type="number" />
-                    <span asp-validation-for="MinLevel" class="text-danger small"></span>
-                </div>
+            <div class="mb-4">
+                <label asp-for="MinLevel" class="form-label fw-bold"></label>
+                <input asp-for="MinLevel" class="form-control" type="number" />
+                <span asp-validation-for="MinLevel" class="text-danger small"></span>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
@@ -78,4 +90,53 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function () {
+            $('#activityCategoryDropdown').change(function () {
+                var category = $(this).val(); // Agora isto devolve um ID (número)
+                var container = $('#activitiesContainer');
+                var list = $('#activitiesList');
+
+                if (!category) {
+                    container.addClass('d-none');
+                    list.empty();
+                    updateTotal();
+                    return;
+                }
+
+                // A chamada AJAX agora envia "typeId" porque o Controller espera isso
+                $.getJSON('/Events/GetActivitiesByType', { typeId: category }, function (data) {
+                    list.empty();
+                    if (data.length === 0) {
+                        list.append('<div class="col-12 text-muted">No activities found for this category.</div>');
+                    } else {
+                        $.each(data, function (i, item) {
+                            var checkbox = `
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input activity-check" type="checkbox"
+                                               name="selectedActivities" value="${item.id}" data-points="${item.points}" id="act_${item.id}">
+                                        <label class="form-check-label" for="act_${item.id}">
+                                            ${item.name} <span class="badge bg-secondary rounded-pill ms-1">${item.points} pts</span>
+                                        </label>
+                                    </div>
+                                </div>`;
+                            list.append(checkbox);
+                        });
+                    }
+                    container.removeClass('d-none');
+                    $('.activity-check').change(updateTotal);
+                    updateTotal();
+                });
+            });
+
+            function updateTotal() {
+                var total = 0;
+                $('.activity-check:checked').each(function () {
+                    total += $(this).data('points');
+                });
+                $('#totalPointsDisplay').text(total);
+            }
+        });
+    </script>
 }

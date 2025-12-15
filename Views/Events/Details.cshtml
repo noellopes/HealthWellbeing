@@ -35,6 +35,31 @@
                 @Html.DisplayFor(model => model.EventType.EventTypeName)
             </dd>
 
+            <dt class="col-sm-3 fw-bold text-muted">Activity Focus</dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.ActivityTypeId)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Activities</dt>
+            <dd class="col-sm-9">
+                @if (Model.EventActivities != null && Model.EventActivities.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var ea in Model.EventActivities)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1">
+                                @ea.Activity.ActivityName
+                                <span class="badge bg-light text-dark border">@ea.Activity.ActivityReward pts</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span class="text-muted small">No activities assigned.</span>
+                }
+            </dd>
+
             <dt class="col-sm-3 fw-bold text-muted">
                 @Html.DisplayNameFor(model => model.EventStart)
             </dt>
@@ -66,8 +91,8 @@
             <dt class="col-sm-3 fw-bold text-muted">
                 @Html.DisplayNameFor(model => model.EventPoints)
             </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventPoints)
+            <dd class="col-sm-9 fw-bold text-primary">
+                @Html.DisplayFor(model => model.EventPoints) pts
             </dd>
         </dl>
     </div>

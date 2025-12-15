@@ -9,7 +9,7 @@ namespace HealthWellbeing.Data
 {
     public class HealthWellbeingDbContext : DbContext
     {
-        public HealthWellbeingDbContext (DbContextOptions<HealthWellbeingDbContext> options)
+        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
         {
         }
@@ -19,6 +19,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.LevelCategory> LevelCategory { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Activity> Activity { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.ActivityType> ActivityType { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.EventActivity> EventActivity { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
@@ -36,8 +38,11 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
@@ -46,9 +51,9 @@ namespace HealthWellbeing.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<EventType>()
-                .HasOne(et => et.ScoringStrategy)   
-                .WithMany(ss => ss.EventTypes)          
-                .HasForeignKey(et => et.ScoringStrategyId) 
+                .HasOne(et => et.ScoringStrategy)
+                .WithMany(ss => ss.EventTypes)
+                .HasForeignKey(et => et.ScoringStrategyId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Customer>()
@@ -56,8 +61,25 @@ namespace HealthWellbeing.Data
                 .WithMany(c => c.Customer)
                 .HasForeignKey(l => l.LevelId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Activity>()
+                .HasOne(a => a.ActivityType)
+                .WithMany(at => at.Activities)
+                .HasForeignKey(a => a.ActivityTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<EventActivity>()
+               .HasKey(ea => new { ea.EventId, ea.ActivityId });
+
+            modelBuilder.Entity<EventActivity>()
+                .HasOne(ea => ea.Event)
+                .WithMany(e => e.EventActivities)
+                .HasForeignKey(ea => ea.EventId);
+
+            modelBuilder.Entity<EventActivity>()
+                .HasOne(ea => ea.Activity)
+                .WithMany() 
+                .HasForeignKey(ea => ea.ActivityId);
         }
-        public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
     }
 }

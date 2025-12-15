@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
@@ -6,22 +8,26 @@ namespace HealthWellbeing.Models
     {
         public int ActivityId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Activity Name is required.")]
         public string ActivityName { get; set; } = string.Empty;
 
-        [Required]
-        public string ActivityType { get; set; } = string.Empty;
-
-        [Required]
+        [Required(ErrorMessage = "Activity Description is required.")]
         public string ActivityDescription { get; set; } = string.Empty;
 
-        [Required]
+        [Required(ErrorMessage = "Reward points are required.")]
         public int ActivityReward { get; set; }
 
-        // Método da classe, conforme o diagrama
+        [Display(Name = "Activity Type")]
+        public int ActivityTypeId { get; set; }
+
+        [ForeignKey("ActivityTypeId")]
+        public virtual ActivityType? ActivityType { get; set; }
+
+        public virtual ICollection<EventActivity>? EventActivities { get; set; }
+
         public void obterRecompensas()
         {
-            
+
         }
     }
 }

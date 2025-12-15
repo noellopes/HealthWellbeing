@@ -6,25 +6,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateMigration : Migration
+    public partial class FixEventStructure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Activity",
+                name: "ActivityType",
                 columns: table => new
                 {
-                    ActivityId = table.Column<int>(type: "int", nullable: false)
+                    ActivityTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ActivityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ActivityType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ActivityDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ActivityReward = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Activity", x => x.ActivityId);
+                    table.PrimaryKey("PK_ActivityType", x => x.ActivityTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -299,6 +297,27 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TrainingType", x => x.TrainingTypeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Activity",
+                columns: table => new
+                {
+                    ActivityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ActivityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityReward = table.Column<int>(type: "int", nullable: false),
+                    ActivityTypeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Activity", x => x.ActivityId);
+                    table.ForeignKey(
+                        name: "FK_Activity_ActivityType_ActivityTypeId",
+                        column: x => x.ActivityTypeId,
+                        principalTable: "ActivityType",
+                        principalColumn: "ActivityTypeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -592,6 +611,7 @@ namespace HealthWellbeing.Migrations
                     EventName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     EventDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     EventTypeId = table.Column<int>(type: "int", nullable: false),
+                    ActivityTypeId = table.Column<int>(type: "int", nullable: true),
                     EventStart = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EventEnd = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EventPoints = table.Column<int>(type: "int", nullable: false),
@@ -601,11 +621,51 @@ namespace HealthWellbeing.Migrations
                 {
                     table.PrimaryKey("PK_Event", x => x.EventId);
                     table.ForeignKey(
+                        name: "FK_Event_ActivityType_ActivityTypeId",
+                        column: x => x.ActivityTypeId,
+                        principalTable: "ActivityType",
+                        principalColumn: "ActivityTypeId");
+                    table.ForeignKey(
                         name: "FK_Event_EventType_EventTypeId",
                         column: x => x.EventTypeId,
                         principalTable: "EventType",
                         principalColumn: "EventTypeId");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "EventActivity",
+                columns: table => new
+                {
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    ActivityId = table.Column<int>(type: "int", nullable: false),
+                    ActivityId1 = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventActivity", x => new { x.EventId, x.ActivityId });
+                    table.ForeignKey(
+                        name: "FK_EventActivity_Activity_ActivityId",
+                        column: x => x.ActivityId,
+                        principalTable: "Activity",
+                        principalColumn: "ActivityId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventActivity_Activity_ActivityId1",
+                        column: x => x.ActivityId1,
+                        principalTable: "Activity",
+                        principalColumn: "ActivityId");
+                    table.ForeignKey(
+                        name: "FK_EventActivity_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "EventId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Activity_ActivityTypeId",
+                table: "Activity",
+                column: "ActivityTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Alergia_AlimentoId",
@@ -640,9 +700,24 @@ namespace HealthWellbeing.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Event_ActivityTypeId",
+                table: "Event",
+                column: "ActivityTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Event_EventTypeId",
                 table: "Event",
                 column: "EventTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventActivity_ActivityId",
+                table: "EventActivity",
+                column: "ActivityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventActivity_ActivityId1",
+                table: "EventActivity",
+                column: "ActivityId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventType_ScoringStrategyId",
@@ -695,9 +770,6 @@ namespace HealthWellbeing.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Activity");
-
-            migrationBuilder.DropTable(
                 name: "Alergia");
 
             migrationBuilder.DropTable(
@@ -710,7 +782,7 @@ namespace HealthWellbeing.Migrations
                 name: "Employee");
 
             migrationBuilder.DropTable(
-                name: "Event");
+                name: "EventActivity");
 
             migrationBuilder.DropTable(
                 name: "ExercicioGenero");
@@ -752,7 +824,10 @@ namespace HealthWellbeing.Migrations
                 name: "Level");
 
             migrationBuilder.DropTable(
-                name: "EventType");
+                name: "Activity");
+
+            migrationBuilder.DropTable(
+                name: "Event");
 
             migrationBuilder.DropTable(
                 name: "Genero");
@@ -783,6 +858,12 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "LevelCategory");
+
+            migrationBuilder.DropTable(
+                name: "ActivityType");
+
+            migrationBuilder.DropTable(
+                name: "EventType");
 
             migrationBuilder.DropTable(
                 name: "ScoringStrategy");

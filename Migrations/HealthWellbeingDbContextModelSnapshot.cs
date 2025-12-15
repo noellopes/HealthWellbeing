@@ -86,13 +86,36 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("ActivityReward")
                         .HasColumnType("int");
 
-                    b.Property<string>("ActivityType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ActivityTypeId")
+                        .HasColumnType("int");
 
                     b.HasKey("ActivityId");
 
+                    b.HasIndex("ActivityTypeId");
+
                     b.ToTable("Activity");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.ActivityType", b =>
+                {
+                    b.Property<int>("ActivityTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityTypeId"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ActivityTypeId");
+
+                    b.ToTable("ActivityType");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
@@ -343,6 +366,9 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EventId"));
 
+                    b.Property<int?>("ActivityTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EventDescription")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -370,9 +396,31 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("EventId");
 
+                    b.HasIndex("ActivityTypeId");
+
                     b.HasIndex("EventTypeId");
 
                     b.ToTable("Event");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.EventActivity", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ActivityId1")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventId", "ActivityId");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("ActivityId1");
+
+                    b.ToTable("EventActivity");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
@@ -973,6 +1021,17 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Activity", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.ActivityType", "ActivityType")
+                        .WithMany("Activities")
+                        .HasForeignKey("ActivityTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ActivityType");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Alimento", "Alimento")
@@ -1006,13 +1065,42 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
+                    b.HasOne("HealthWellbeing.Models.ActivityType", "ActivityType")
+                        .WithMany()
+                        .HasForeignKey("ActivityTypeId");
+
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
                         .WithMany("Events")
                         .HasForeignKey("EventTypeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("ActivityType");
+
                     b.Navigation("EventType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.EventActivity", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Activity", null)
+                        .WithMany("EventActivities")
+                        .HasForeignKey("ActivityId1");
+
+                    b.HasOne("HealthWellbeing.Models.Event", "Event")
+                        .WithMany("EventActivities")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
@@ -1093,6 +1181,16 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Activity", b =>
+                {
+                    b.Navigation("EventActivities");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.ActivityType", b =>
+                {
+                    b.Navigation("Activities");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
                     b.Navigation("AlergiasRelacionadas");
@@ -1101,6 +1199,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
                     b.Navigation("Membership");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
+                {
+                    b.Navigation("EventActivities");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
