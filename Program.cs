@@ -13,8 +13,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(
+    options =>
+    {
+        // Sign in
+        options.SignIn.RequireConfirmedAccount = false;
+
+        // Password
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 6;
+        options.Password.RequireNonAlphanumeric = true;
+
+        // Lockout
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultUI();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -30,24 +49,25 @@ else
 {
     using (var scope = app.Services.CreateScope())
     {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        SeedData.SeedRoles(roleManager);
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        SeedData.SeedDefaultAdmin(userManager);
+
+        SeedData.SeedUsers(userManager);
+
         var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
         SeedData.Populate(context);
     }
 
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
-}
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
