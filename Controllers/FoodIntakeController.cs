@@ -22,7 +22,13 @@ namespace HealthWellbeing.Controllers
         {
             var date = (selectedDate ?? DateTime.Today).Date;
 
-            // 1) Clientes que têm planos
+            // 1) Verificar e resetar os dados se a data for diferente do dia atual
+            if (selectedDate.HasValue && selectedDate.Value.Date != DateTime.Today.Date)
+            {
+                await ResetFoodIntakeForDate(clientId, selectedDate); // Chama o método de reset
+            }
+
+            // 2) Clientes que têm planos
             var clientsWithPlans = await _context.Plan
                 .Include(p => p.Client)
                 .Select(p => p.Client)
@@ -30,11 +36,11 @@ namespace HealthWellbeing.Controllers
                 .OrderBy(c => c.Name)
                 .ToListAsync();
 
-            // 2) SelectList para o dropdown
+            // 3) SelectList para o dropdown
             ViewBag.ClientList = new SelectList(clientsWithPlans, "ClientId", "Name", clientId);
             ViewBag.ClientId = clientId;
 
-            // 3) Query base dos FoodIntake
+            // 4) Query base dos FoodIntake
             var query = _context.FoodIntake
                 .Include(fi => fi.Food)
                 .Include(fi => fi.Plan)
@@ -50,6 +56,7 @@ namespace HealthWellbeing.Controllers
                 .OrderBy(fi => fi.ScheduledTime)
                 .ToListAsync();
 
+            // 5) Passar os dados para o View
             ViewBag.SelectedDate = date;
             ViewBag.ClientId = clientId;
 
@@ -80,11 +87,11 @@ namespace HealthWellbeing.Controllers
             ViewBag.NotConsumedPercentage = notConsumedPercentage;
 
             return View(items);
+
+
         }
 
 
-
-        // POST: Toggle eaten status
         [HttpPost]
         public async Task<IActionResult> ToggleEaten(int id, int? clientId, DateTime? selectedDate)
         {
@@ -107,6 +114,36 @@ namespace HealthWellbeing.Controllers
                 selectedDate = selectedDate ?? foodIntake.Date
             });
         }
+
+        // Método para resetar a ingestão alimentar
+        public async Task<IActionResult> ResetFoodIntakeForDate(int? clientId, DateTime? selectedDate)
+        {
+            var date = (selectedDate ?? DateTime.Today).Date;
+
+            // Verifica se existe um plano alimentar associado ao cliente e à data
+            var planForDate = await _context.Plan
+                .Where(p => p.ClientId == clientId && p.StartingDate <= date && p.EndingDate >= date)
+                .FirstOrDefaultAsync();
+
+            if (planForDate != null)
+            {
+                // Encontrar todos os registros de ingestão de alimentos para o cliente e a data selecionada
+                var foodIntakesToReset = await _context.FoodIntake
+                    .Where(fi => fi.PlanId == planForDate.PlanId && fi.Date.Date == date)
+                    .ToListAsync();
+
+                if (foodIntakesToReset.Any())
+                {
+                    // Remover todos os registros encontrados
+                    _context.FoodIntake.RemoveRange(foodIntakesToReset);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            // Redireciona para a visualização do plano alimentar com a data atualizada
+            return RedirectToAction(nameof(Index), new { clientId = clientId, selectedDate = date });
+        }
+
 
     }
 }
