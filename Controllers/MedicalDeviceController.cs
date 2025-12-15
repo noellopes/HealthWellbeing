@@ -2,6 +2,7 @@
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using HealthWellbeingRoom.Models;
+using HealthWellbeingRoom.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -476,6 +477,51 @@ namespace HealthWellBeingRoom.Controllers
 
             // Carregar lista para dropdowns
             ViewBag.RoomList = new SelectList(await _context.Room.OrderBy(s => s.Name).ToListAsync(), "Name", "Name", searchRoom);
+
+            return View(paginationInfo);
+        }
+
+        // GET: MedicalDevice/DeviceGroupIndex
+        [Authorize(Roles = "logisticsTechnician, Administrator")]
+        public async Task<IActionResult> DeviceGroupIndex(string searchName, int page = 1)
+        {
+            int pageSize = 10;
+
+            // Guardar a pesquisa para devolver à View (para a caixa de texto e paginação)
+            ViewData["CurrentFilter"] = searchName;
+
+            // 1. Começar a Query
+            var query = _context.MedicalDevices.AsQueryable();
+
+            // 2. Aplicar Filtro (SE houver pesquisa)
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                query = query.Where(m => m.Name.Contains(searchName));
+            }
+
+            // 3. Agrupar (Agora já filtra antes de agrupar!)
+            var groupedQuery = query.GroupBy(m => m.Name);
+
+            // 4. Contar grupos
+            var totalItems = await groupedQuery.CountAsync();
+
+            // 5. Ordenar, Paginar e Transformar na ViewModel
+            var items = await groupedQuery
+                .OrderBy(g => g.Key)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(g => new DeviceGroupMedicalDevice
+                {
+                    DeviceName = g.Key,
+                    TotalQuantity = g.Count()
+                })
+                .ToListAsync();
+
+            // 6. Criar Paginação
+            var paginationInfo = new RPaginationInfo<DeviceGroupMedicalDevice>(page, totalItems, pageSize)
+            {
+                Items = items
+            };
 
             return View(paginationInfo);
         }

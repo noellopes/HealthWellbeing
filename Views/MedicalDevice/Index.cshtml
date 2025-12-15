@@ -2,78 +2,110 @@
 @model HealthWellbeing.ViewModels.RPaginationInfo<MedicalDevice>
 
 @{
-    ViewData["Title"] = "Dispositivos Médicos Registados";
+    // Verifica se estamos a filtrar por um nome específico
+    string nomeDispositivo = ViewBag.SearchName as string;
+    bool temFiltroNome = !string.IsNullOrEmpty(nomeDispositivo);
 
-    // Verifica se o utilizador tem permissão de Logística
+    // Define o título
+    if (temFiltroNome)
+    {
+        ViewData["Title"] = $"Detalhes: {nomeDispositivo}";
+    }
+    else
+    {
+        ViewData["Title"] = "Lista de Dispositivos";
+    }
+
     bool isLogistica = User.IsInRole("logisticsTechnician");
 }
 
-@* --- Secção de Mensagem de Sucesso --- *@
+@* --- MENSAGENS DE SUCESSO --- *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="container py-4">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @TempData["SuccessMessage"]
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     </div>
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+@* --- CABEÇALHO E AÇÕES --- *@
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    @* Lado Esquerdo: Título *@
+    <div>
+        <h1 class="h2 mb-0">@ViewData["Title"]</h1>
+        @if (temFiltroNome)
+        {
+            <p class="text-muted mb-0">A ver todas as unidades do tipo <strong>@nomeDispositivo</strong></p>
+        }
+    </div>
 
-@* --- AÇÕES PRINCIPAIS (Registar e Pesquisar) --- *@
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4">Lista de Dispositivos</h2>
-    <div class="d-flex justify-content-end">
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
-            <i class="bi bi-search me-1"></i> Pesquisar
+    @* Lado Direito: Botões (Voltar, Pesquisar, Registar) *@
+    <div class="d-flex align-items-center gap-2">
+
+        @* 1. BOTÃO VOLTAR (Agora aparece primeiro) *@
+        <a asp-action="DeviceGroupIndex" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
         </a>
+
+        @* 2. BOTÃO PESQUISAR *@
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </button>
+
+        @* 3. BOTÃO REGISTAR (Só Logística) *@
         @if (isLogistica)
         {
             <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+                <i class="bi bi-plus-circle me-1"></i> Registar
             </a>
         }
     </div>
 </div>
 
-@* --- FORMULÁRIO DE PESQUISA --- *@
-<div class="collapse mt-2 mb-2" id="postSearch">
-    <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label for="searchName" class="form-label">Nome</label>
-                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+@* --- FORMULÁRIO DE PESQUISA (COLLAPSE) --- *@
+<div class="collapse mb-4" id="postSearch">
+    <div class="card card-body bg-light">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+            @* Lógica para esconder o campo Nome se já estivermos a filtrar por ele *@
+            @if (temFiltroNome)
+            {
+                <input type="hidden" name="searchName" value="@nomeDispositivo" />
+            }
+            else
+            {
+                <div class="col-md-3">
+                    <label for="searchName" class="form-label small text-muted">Nome</label>
+                    <input type="text" id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Nome..." />
+                </div>
+            }
+
+            <div class="col-md-3">
+                <label for="searchSerial" class="form-label small text-muted">Nº Série</label>
+                <input type="text" id="searchSerial" name="searchSerial" value="@ViewBag.SearchSerial" class="form-control" placeholder="Nº Série..." />
             </div>
-            <div class="col-md-4">
-                <label for="searchSerial" class="form-label">Nº Série</label>
-                <input id="searchSerial" name="searchSerial" value="@ViewBag.SearchSerial" class="form-control" placeholder="Ex: Pesquisar pelo número de série" />
-            </div>
-            <div class="col-md-4">
-                <label for="searchType" class="form-label">Tipo</label>
-                <select id="searchType" name="searchType" class="form-control" asp-items="ViewBag.TypeMaterialList">
-                    <option value="">-- Todos os Tipos --</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label for="searchRoom" class="form-label">Sala</label>
-                <select id="searchRoom" name="searchRoom" class="form-control" asp-items="ViewBag.RoomList">
-                    <option value="">-- Todas as Salas --</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label for="searchStatus" class="form-label">Estado</label>
-                <select id="searchStatus" name="searchStatus" class="form-control" asp-items="ViewBag.StatusList">
-                    <option value="">-- Todos os Estados --</option>
+
+            <div class="col-md-2">
+                <label for="searchRoom" class="form-label small text-muted">Sala</label>
+                <select id="searchRoom" name="searchRoom" class="form-select" asp-items="ViewBag.RoomList">
+                    <option value="">-- Todas --</option>
                 </select>
             </div>
 
-            <div class="col-12 mt-2 d-flex gap-2">
+            <div class="col-md-2">
+                <label for="searchStatus" class="form-label small text-muted">Estado</label>
+                <select id="searchStatus" name="searchStatus" class="form-select" asp-items="ViewBag.StatusList">
+                    <option value="">-- Todos --</option>
+                </select>
+            </div>
+
+            <div class="col-md-auto d-flex gap-2">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Pesquisar
+                    <i class="bi bi-filter"></i> Filtrar
                 </button>
-                <a asp-action="Index" class="btn btn-secondary">
+                <a asp-action="Index" asp-route-searchName="@nomeDispositivo" class="btn btn-secondary">
                     Limpar
                 </a>
             </div>
@@ -81,178 +113,152 @@
     </div>
 </div>
 
-@* --- RESULTADOS DA PESQUISA --- *@
+@* --- RESULTADOS (TABELA) --- *@
 @if (!Model.Items.Any())
 {
-    // Exibe a mensagem de aviso se não houver itens (após pesquisa ou lista geral)
     <div class="alert alert-warning d-flex align-items-center border-2 mt-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
         <div class="ps-3">
-            <h4 class="alert-heading">Nenhum Dispositivo Encontrado</h4>
-            <p>Não há dispositivos que correspondam aos filtros de pesquisa ou registados na base de dados.</p>
+            <h4 class="alert-heading h5">Nenhum Resultado</h4>
+            <p class="mb-0">Não foram encontrados dispositivos com estes critérios.</p>
         </div>
     </div>
 }
 else
 {
-    @* --- TABELA DE ITENS --- *@
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th scope="col">@Html.DisplayNameFor(model => model.Items.First().Name)</th>
-                    <th scope="col">Tipo de Dispositivo</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Sala</th>
-                    <th class="text-end" scope="col">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @* Percorremos Model.Items (a lista de dispositivos na página atual) *@
-                @foreach (var dispositivo in Model.Items)
-                {
-
-                    @* Extrair a localização do dispositivo *@
-                    // Pega a localização ativa (a que ainda não tem data de fim)
-                    var localizacao = dispositivo.LocalizacaoDispMedicoMovel
-                    .FirstOrDefault(l => l.EndDate == null);
-
-                    string status = dispositivo.CurrentStatus;
-
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>@Html.DisplayFor(modelItem => dispositivo.Name)</td>
-
-                        <td>@(dispositivo.TypeMaterial?.Name ?? "N/A")</td>
-
-                        <td class="text-nowrap">
-                            @* Exibir Status *@
-                            @if (status == "Em Armazenamento")
-                            {
-                                <span class="badge bg-success">@status</span>
-                            }
-                            else if (status == "Em Manutenção")
-                            {
-                                <span class="badge bg-warning text-dark">@status</span>
-                            }
-                            else /* Alocado */
-                            {
-                                <span class="badge bg-danger">@status</span>
-                            }
-                        </td>
-
-                        <td>
-                            @* Exibir a localização(sala) *@
-                            @if (localizacao != null && localizacao.Room != null)
-                            {
-                                // Tem atribuição, mostra o nome da sala
-                                <span>@localizacao.Room.Name</span>
-                            }
-                            else
-                            {
-                                // Se estiver em manutenção, não precisa de mostrar a localização da sala
-                                <span>...</span>
-                            }
-                        </td>
-
-                        <td class="text-end">
-                            @{
-                                //Pode mover se NÃO estiver em Manutenção
-                                bool podeMover = dispositivo.CurrentStatus != "Em Manutenção";
-
-                                //Só pode eliminar se estiver "Em Armazenamento"
-                                //(Ou seja: NÃO está em manutenção E NÃO está alocado)
-                                bool podeEliminar = dispositivo.CurrentStatus == "Em Armazenamento";
-                            }
-
-                            @* --- BOTÃO MOVER (Apenas Logística) --- *@
-                            @if (isLogistica)
-                            {
-                                @if (podeMover)
-                                {
-                                    <a asp-controller="LocationMedDevice" asp-action="Create"
-                                       asp-route-id="@dispositivo.MedicalDeviceID"
-                                       class="btn btn-sm btn-success me-1">
-                                        <i class="bi bi-geo-alt"></i> Mover
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
-                                        <i class="bi bi-x-octagon"></i> Mover
-                                    </span>
-                                }
-                            }
-
-                            @* --- BOTÃO DETALHES (Visível para todos) --- *@
-                            <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle"></i> Detalhes
-                            </a>
-
-                            @* --- BOTÃO EDITAR (Apenas Logística) --- *@
-                            @if (isLogistica)
-                            {
-                                <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
-                                    <i class="bi bi-pencil-square"></i> Editar
-                                </a>
-                            }
-
-                            @* --- BOTÃO ELIMINAR (Apenas Logística) --- *@
-                            @if (isLogistica)
-                            {
-                                @if (podeEliminar)
-                                {
-                                    <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </span>
-                                }
-                            }
-                        </td>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Tipo de Dispositivo</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Sala</th>
+                        <th class="text-end pe-4" scope="col">Ações</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-
-        @* --- Secção de Paginação --- *@
-        <nav aria-label="Medical Device page" class="d-flex justify-content-between align-items-center">
-            @* Model.Items.Count() mostra quantos itens estão na página atual *@
-            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
-
-            <ul class="pagination mb-0">
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
-                }
-
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
+                </thead>
+                <tbody>
+                    @foreach (var dispositivo in Model.Items)
                     {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        var localizacao = dispositivo.LocalizacaoDispMedicoMovel.FirstOrDefault(l => l.EndDate == null);
+                        string status = dispositivo.CurrentStatus;
+
+                        <tr>
+                            @* 1. NOME (Sem Negrito) *@
+                            <td>@dispositivo.Name</td>
+
+                            <td>@(dispositivo.TypeMaterial?.Name ?? "N/A")</td>
+
+                            <td class="text-nowrap">
+                                @if (status == "Em Armazenamento")
+                                {
+                                    <span class="badge bg-success">@status</span>
+                                }
+                                else if (status == "Em Manutenção")
+                                {
+
+                                    <span class="badge bg-warning text-dark">@status</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-danger">@status</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (localizacao?.Room != null)
+                                {
+                                    <span>@localizacao.Room.Name</span>
+                                }
+                                else
+                                {
+
+                                    <span class="text-muted">...</span>
+                                }
+                            </td>
+
+                            <td class="text-end pe-3">
+                                @{
+                                    bool podeMover = status != "Em Manutenção";
+                                    bool podeEliminar = status == "Em Armazenamento";
+                                }
+
+                                @* 2. BOTÕES COLORIDOS COM TEXTO *@
+                                <div class="btn-group btn-group-sm" role="group">
+                                    @* MOVER (Verde) *@
+                                    @if (isLogistica)
+                                    {
+                                        @if (podeMover)
+                                        {
+                                            <a asp-controller="LocationMedDevice" asp-action="Create" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-success me-1 rounded">
+                                                <i class="bi bi-geo-alt"></i> Mover
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="btn btn-secondary me-1 rounded disabled">
+                                                <i class="bi bi-geo-alt"></i> Mover
+                                            </span>
+                                        }
+                                    }
+
+                                    @* DETALHES (Azul Claro) *@
+                                    <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-info me-1 rounded text-black">
+                                        <i class="bi bi-info-circle"></i> Detalhes
+                                    </a>
+
+                                    @if (isLogistica)
+                                    {
+                                        @* EDITAR (Amarelo) *@
+                                        <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-warning me-1 rounded">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+
+                                        @* ELIMINAR (Vermelho) *@
+                                        @if (podeEliminar)
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-danger rounded">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="btn btn-secondary rounded disabled">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </span>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
                     }
-                    else
+                </tbody>
+            </table>
+        </div>
+
+        @* --- PAGINAÇÃO --- *@
+        <div class="card-footer bg-light">
+            <nav aria-label="Page navigation" class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">Mostrando @Model.Items.Count() de @Model.TotalItems</small>
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchName="@ViewBag.SearchName" asp-route-searchSerial="@ViewBag.SearchSerial">Primeira</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                     {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchName="@ViewBag.SearchName" asp-route-searchSerial="@ViewBag.SearchSerial">@p</a>
+                        </li>
                     }
-                }
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled"><a class="page-link">Última</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
-                }
-            </ul>
-        </nav>
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchName="@ViewBag.SearchName" asp-route-searchSerial="@ViewBag.SearchSerial">Última</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 }
