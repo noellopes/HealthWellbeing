@@ -2,6 +2,7 @@
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using HealthWellbeingRoom.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Index(
             int page = 1,
             string searchDevice = "",
@@ -76,6 +78,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice/Details/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -94,6 +97,7 @@ namespace HealthWellbeingRoom.Controllers
 
         // GET: LocationMedDevice/Create/16
         // O parâmetro 'id' é o ID do dispositivo que está a ser movido.
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(int? id)
         {
             if (id == null)
@@ -135,6 +139,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: LocationMedDevice/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("MedicalDeviceID,RoomId")] LocationMedDevice locationMedDevice)
         {
             if (ModelState.IsValid)
@@ -187,6 +192,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -205,6 +211,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: LocationMedDevice/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("LocationMedDeviceID,MedicalDeviceID,RoomId,InitialDate,EndDate")] LocationMedDevice locationMedDevice)
         {
             if (id != locationMedDevice.LocationMedDeviceID)
@@ -245,6 +252,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: LocationMedDevice/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -264,6 +272,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: LocationMedDevice/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var location = await _context.LocationMedDevice.FindAsync(id);
