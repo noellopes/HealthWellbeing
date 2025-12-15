@@ -1,74 +1,93 @@
 ﻿@model HealthWellBeing.Models.Exame
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Exame";
 }
 
-<h1>Edit</h1>
-
-<h4>Exame</h4>
+<h1>Editar Exame</h1>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            @* Campo Hidden para o ID do Exame (essencial para o POST de Edit) *@
             <input type="hidden" asp-for="ExameId" />
-            <div class="form-group">
-                <label asp-for="DataHoraMarcacao" class="control-label"></label>
-                <input asp-for="DataHoraMarcacao" class="form-control" />
-                <span asp-validation-for="DataHoraMarcacao" class="text-danger"></span>
+
+            @* Sumário de Validação *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* --- Seção de Dados Principais (Idêntica à Create) --- *@
+
+            <div class="mb-3">
+                <label asp-for="DataHoraMarcacao" class="form-label"></label>
+                <input asp-for="DataHoraMarcacao" class="form-control" type="datetime-local" />
+                <span asp-validation-for="DataHoraMarcacao" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <select asp-for="Estado" class="form-control"></select>
-                <span asp-validation-for="Estado" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="Notas" class="form-label"></label>
+                <textarea asp-for="Notas" class="form-control"></textarea>
+                <span asp-validation-for="Notas" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Notas" class="control-label"></label>
-                <input asp-for="Notas" class="form-control" />
-                <span asp-validation-for="Notas" class="text-danger"></span>
+
+            @* --- Campo Estado (Opções Fixas, com valor atual selecionado) --- *@
+            <div class="mb-3">
+                <label asp-for="Estado" class="form-label">Estado da Marcação</label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="">-- Selecionar Estado --</option>
+                    @foreach (var opcao in HealthWellBeing.Models.Exame.OpcoesEstado)
+                    {
+                        <option value="@opcao">@opcao</option>
+                    }
+                </select>
+                <span asp-validation-for="Estado" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UtenteId" class="control-label"></label>
-                <select asp-for="UtenteId" class="form-control" asp-items="ViewBag.UtenteId"></select>
-                <span asp-validation-for="UtenteId" class="text-danger"></span>
+
+            @* --- Chaves Estrangeiras (Dropdowns com ViewData e valor selecionado) --- *@
+
+            @* Os SelectList no Controller (Edit GET) garantem que o valor atual está pré-selecionado *@
+
+            <div class="mb-3">
+                <label asp-for="UtenteId" class="form-label">Utente (Paciente)</label>
+                <select asp-for="UtenteId" class="form-select" asp-items="@(ViewData[" UtenteId"] as SelectList)"></select>
+                <span asp-validation-for="UtenteId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ExameTipoId" class="control-label"></label>
-                <select asp-for="ExameTipoId" class="form-control" asp-items="ViewBag.ExameTipoId"></select>
-                <span asp-validation-for="ExameTipoId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="ExameTipoId" class="form-label">Tipo de Exame</label>
+                <select asp-for="ExameTipoId" class="form-select" asp-items="@(ViewData[" ExameTipoId"] as SelectList)"></select>
+                <span asp-validation-for="ExameTipoId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="MedicoId" class="control-label"></label>
-                <input asp-for="MedicoId" class="form-control" />
-                <span asp-validation-for="MedicoId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="MedicoSolicitanteId" class="form-label">Médico Solicitante</label>
+                <select asp-for="MedicoSolicitanteId" class="form-select" asp-items="@(ViewData[" MedicoSolicitanteId"] as SelectList)"></select>
+                <span asp-validation-for="MedicoSolicitanteId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="SalaDeExameId" class="control-label"></label>
-                <select asp-for="SalaDeExameId" class="form-control" asp-items="ViewBag.SalaDeExameId"></select>
-                <span asp-validation-for="SalaDeExameId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="ProfissionalExecutanteId" class="form-label">Profissional Executante</label>
+                <select asp-for="ProfissionalExecutanteId" class="form-select" asp-items="@(ViewData[" ProfissionalExecutanteId"] as SelectList)"></select>
+                <span asp-validation-for="ProfissionalExecutanteId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ProfissionalExecutanteId" class="control-label"></label>
-                <select asp-for="ProfissionalExecutanteId" class="form-control" asp-items="ViewBag.ProfissionalExecutanteId"></select>
-                <span asp-validation-for="ProfissionalExecutanteId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="SalaDeExameId" class="form-label">Sala de Exames</label>
+                <select asp-for="SalaDeExameId" class="form-select" asp-items="@(ViewData[" SalaDeExameId"] as SelectList)"></select>
+                <span asp-validation-for="SalaDeExameId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="MaterialEquipamentoAssociadoId" class="control-label"></label>
-                <select asp-for="MaterialEquipamentoAssociadoId" class="form-control" asp-items="ViewBag.MaterialEquipamentoAssociadoId"></select>
-                <span asp-validation-for="MaterialEquipamentoAssociadoId" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="MaterialEquipamentoAssociadoId" class="form-label">Equipamento</label>
+                <select asp-for="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData[" MaterialEquipamentoAssociadoId"] as SelectList)"></select>
+                <span asp-validation-for="MaterialEquipamentoAssociadoId" class="text-danger small"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            @* --- Botões de Ação (Do PDF de Edit Book) --- *@
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Guardar Alterações</button>
+                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista</a>
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

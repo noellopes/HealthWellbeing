@@ -1,84 +1,113 @@
-﻿@model IEnumerable<HealthWellBeing.Models.Exame>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellBeing.Models.Exame>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Exames Marcados";
+    string? sucessoMensagem = TempData["SuccessMessage"] as string;
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DataHoraMarcacao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notas)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Utente)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ExameTipo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MedicoId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SalaDeExame)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProfissionalExecutante)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MaterialEquipamentoAssociado)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataHoraMarcacao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notas)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Utente.Nif)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ExameTipo.Especialidade)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MedicoId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SalaDeExame.TipoSala)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProfissionalExecutante.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.NomeEquipamento)
-                <span class="badge bg-secondary">@Html.DisplayFor(modelItem => item.MaterialEquipamentoAssociado.EstadoMaterial.Nome)</span>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ExameId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ExameId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ExameId">Delete</a>
-            </td>
-        </tr>
+@* Exibe Mensagem de Sucesso (Do PDF de Success Messages) *@
+@if (sucessoMensagem != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @sucessoMensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
-    </tbody>
-</table>
+
+@* --- Secção de Pesquisa (Do PDF de Search) --- *@
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista de Exames</h2>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#areaPesquisa" aria-expanded="false" aria-controls="areaPesquisa">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Marcar Novo Exame
+        </a>
+    </div>
+</div>
+
+<div class="collapse mt-2 mb-2" id="areaPesquisa">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label for="pesquisaUtente" class="form-label">Utente</label>
+                <input id="pesquisaUtente" name="pesquisaUtente" value="@ViewBag.PesquisaUtente" class="form-control" placeholder="Nome do Utente" type="search" />
+            </div>
+            <div class="col-md-6">
+                <label for="pesquisaTipo" class="form-label">Tipo de Exame</label>
+                <input id="pesquisaTipo" name="pesquisaTipo" value="@ViewBag.PesquisaTipo" class="form-control" placeholder="Nome do Tipo" type="search" />
+            </div>
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Pesquisar</button>
+                <a asp-action="Index" class="btn btn-secondary">Limpar Filtros</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* --- Tabela de Exames (Baseado no PDF de GuestList/Products List) --- *@
+@if (!Model.Items?.Any() ?? true)
+{
+    <div class="alert alert-warning" role="alert">
+        <h4 class="alert-heading">Nenhum Exame Encontrado</h4>
+        <p>Não há exames marcados que correspondam aos seus critérios.</p>
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Data e Hora</th>
+                <th>Utente</th>
+                <th>Tipo de Exame</th>
+                <th>Estado</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var exame in Model.Items!)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => exame.DataHoraMarcacao)</td>
+                    <td>@Html.DisplayFor(modelItem => exame.Utente!.Nome)</td>
+                    <td>@Html.DisplayFor(modelItem => exame.ExameTipo!.Nome)</td>
+                    <td>@Html.DisplayFor(modelItem => exame.Estado)</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@exame.ExameId" class="btn btn-sm btn-primary">Editar</a>
+                        <a asp-action="Details" asp-route-id="@exame.ExameId" class="btn btn-sm btn-info">Detalhes</a>
+                        <a asp-action="Delete" asp-route-id="@exame.ExameId" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @* --- Secção de Paginação (Do PDF de Paginação) --- *@
+    <nav aria-label="Páginas de Exames">
+        <ul class="pagination justify-content-center">
+            @* Botão Primeira Página *@
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pagina="1" asp-route-pesquisaUtente="@ViewBag.PesquisaUtente" asp-route-pesquisaTipo="@ViewBag.PesquisaTipo">Primeira</a>
+            </li>
+
+            @* Números de Página *@
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="@p" asp-route-pesquisaUtente="@ViewBag.PesquisaUtente" asp-route-pesquisaTipo="@ViewBag.PesquisaTipo">@p</a>
+                </li>
+            }
+
+            @* Botão Última Página *@
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pagina="@Model.TotalPages" asp-route-pesquisaUtente="@ViewBag.PesquisaUtente" asp-route-pesquisaTipo="@ViewBag.PesquisaTipo">Última</a>
+            </li>
+        </ul>
+    </nav>
+}
+
