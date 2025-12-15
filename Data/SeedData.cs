@@ -290,11 +290,13 @@ internal static class SeedData
         {
             var plans = new List<Plan>();
             DateTime today = DateTime.Today;
+            var clients = db.Client.OrderBy(c => c.ClientId).ToList();
 
             for (int i = 0; i < 30; i++)
             {
                 plans.Add(new Plan
                 {
+                    ClientId = clients[i].ClientId,
                     StartingDate = today.AddDays(-i * 7),
                     EndingDate = today.AddDays(-i * 7 + 30),
                     Done = i % 3 == 0

@@ -6,6 +6,7 @@ namespace HealthWellbeing.Models
     {
         [Key]
         public int PlanId { get; set; }
+        public int ClientId { get; set; }
 
         [Required(ErrorMessage = "Starting date is required.")]
         [DataType(DataType.Date)]
@@ -16,6 +17,7 @@ namespace HealthWellbeing.Models
         public DateTime EndingDate { get; set; }
 
         public bool Done { get; set; }
+        public Client? Client { get; set; }
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
         public ICollection<FoodPlan>? FoodPlans { get; set; }
