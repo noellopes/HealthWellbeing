@@ -11,7 +11,7 @@ namespace HealthWellbeing.Data
     {
         public static void Initialize(HealthWellbeingDbContext context)
         {
-            int existentes = context.Terapeutas.Count();
+            int existentes = 100; //context.Terapeutas.Count();
             int alvo = 100;
 
             if (existentes >= alvo) return;
@@ -71,7 +71,7 @@ namespace HealthWellbeing.Data
                 });
             }
 
-            context.Terapeutas.AddRange(novos);
+            //context.Terapeutas.AddRange(novos);
             context.SaveChanges();
         }
 
