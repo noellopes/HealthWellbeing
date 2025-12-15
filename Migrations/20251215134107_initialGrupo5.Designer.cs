@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251215115717_MergeGrupo2toGrupo5")]
-    partial class MergeGrupo2toGrupo5
+    [Migration("20251215134107_initialGrupo5")]
+    partial class initialGrupo5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -823,6 +823,35 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("MedicalDevices");
                 });
 
+            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomConsumable", b =>
+                {
+                    b.Property<int>("RoomConsumableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomConsumableId"));
+
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoomConsumableId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("RoomConsumable");
+                });
+
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomHistory", b =>
                 {
                     b.Property<int>("RoomHistoryId")
@@ -1126,6 +1155,25 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("TypeMaterial");
                 });
 
+            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomConsumable", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany("RoomConsumables")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomHistory", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Room", "Room")
@@ -1147,6 +1195,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Equipments");
 
                     b.Navigation("LocalizacaoDispMedicoMovel");
+
+                    b.Navigation("RoomConsumables");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>

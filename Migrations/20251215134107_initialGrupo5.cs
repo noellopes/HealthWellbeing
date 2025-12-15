@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialGrupo5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -512,6 +512,34 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoomConsumable",
+                columns: table => new
+                {
+                    RoomConsumableId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomConsumable", x => x.RoomConsumableId);
+                    table.ForeignKey(
+                        name: "FK_RoomConsumable_Consumivel_ConsumivelId",
+                        column: x => x.ConsumivelId,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoomConsumable_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoomHistories",
                 columns: table => new
                 {
@@ -541,9 +569,9 @@ namespace HealthWellbeingRoom.Migrations
                 {
                     ZonaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    NomeZona = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ConsumivelId = table.Column<int>(type: "int", nullable: false),
                     RoomId = table.Column<int>(type: "int", nullable: false),
-                    NomeZona = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CapacidadeMaxima = table.Column<int>(type: "int", nullable: false),
                     QuantidadeAtual = table.Column<int>(type: "int", nullable: false),
                     Ativa = table.Column<bool>(type: "bit", nullable: false)
@@ -705,6 +733,16 @@ namespace HealthWellbeingRoom.Migrations
                 column: "SpecialtyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RoomConsumable_ConsumivelId",
+                table: "RoomConsumable",
+                column: "ConsumivelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomConsumable_RoomId",
+                table: "RoomConsumable",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoomHistories_RoomId",
                 table: "RoomHistories",
                 column: "RoomId");
@@ -768,6 +806,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
+
+            migrationBuilder.DropTable(
+                name: "RoomConsumable");
 
             migrationBuilder.DropTable(
                 name: "RoomHistories");
