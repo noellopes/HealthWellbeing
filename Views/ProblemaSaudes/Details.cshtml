@@ -7,46 +7,35 @@
 <div class="container py-5">
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white text-center py-3 rounded-top-4">
-            <h2 class="mb-0"><i class="bi bi-heart-pulse-fill me-2"></i>@ViewData["Title"]</h2>
+            <h2 class="mb-0">
+                <i class="bi bi-heart-pulse-fill me-2"></i>@ViewData["Title"]
+            </h2>
         </div>
 
         <div class="card-body px-5 py-4">
             <dl class="row mb-0">
+
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
                     Categoria:
                 </dt>
-                <dd class="col-sm-8">@Model.ProblemaCategoria</dd>
+                <dd class="col-sm-8">
+                    @Model.ProblemaCategoria
+                </dd>
 
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
                     Nome:
                 </dt>
-                <dd class="col-sm-8">@Model.ProblemaNome</dd>
+                <dd class="col-sm-8">
+                    @Model.ProblemaNome
+                </dd>
 
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
                     Zona Atingida:
                 </dt>
-                <dd class="col-sm-8">@Model.ZonaAtingida</dd>
-
-                <dt class="col-sm-4 text-end fw-semibold text-secondary">
-                    Profissionais de Apoio:
-                </dt>
                 <dd class="col-sm-8">
-                    @if (Model.ProfissionalExecutante?.Any() ?? false)
-                    {
-                        <div class="d-flex flex-wrap gap-1">
-                            @foreach (var prof in Model.ProfissionalExecutante)
-                            {
-                                <span class="badge bg-primary fs-6">
-                                    @prof.Nome (@prof.Funcao)
-                                </span>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <span class="text-muted">Nenhum profissional associado.</span>
-                    }
+                    @Model.ZonaAtingida
                 </dd>
+
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">
                     Gravidade:
                 </dt>
@@ -60,14 +49,16 @@
                                  style="width: @(Model.Gravidade * 10)%;">
                             </div>
                         </div>
-                        <span class="fw-bold">@Model.Gravidade/10</span>
+                        <span class="fw-bold">@Model.Gravidade / 10</span>
                     </div>
                 </dd>
+
             </dl>
         </div>
 
         <div class="card-footer bg-light text-center py-3 rounded-bottom-4">
-            <a asp-action="Edit" asp-route-id="@Model.ProblemaSaudeId" class="btn btn-outline-primary me-2">
+            <a asp-action="Edit" asp-route-id="@Model.ProblemaSaudeId"
+               class="btn btn-outline-primary me-2">
                 <i class="bi bi-pencil-square"></i> Editar
             </a>
             <a asp-action="Index" class="btn btn-outline-secondary">
@@ -87,12 +78,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-    dt {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-    }
-
-    dd {
+    dt, dd {
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
     }

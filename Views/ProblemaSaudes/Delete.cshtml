@@ -22,24 +22,6 @@
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">Zona Atingida:</dt>
                 <dd class="col-sm-8">@Model.ZonaAtingida</dd>
 
-                <dt class="col-sm-4 text-end fw-semibold text-secondary">Profissionais de Apoio:</dt>
-                <dd class="col-sm-8">
-                    @if (Model.ProfissionalExecutante?.Any() ?? false)
-                    {
-                        <div class="d-flex flex-wrap gap-1">
-                            @foreach (var prof in Model.ProfissionalExecutante)
-                            {
-                                <span class="badge bg-primary">
-                                    @prof.Nome (@prof.Funcao)
-                                </span>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <span class="text-muted">Nenhum profissional associado.</span>
-                    }
-                </dd>
                 <dt class="col-sm-4 text-end fw-semibold text-secondary">Gravidade:</dt>
                 <dd class="col-sm-8">
                     <div class="d-flex align-items-center gap-3">
