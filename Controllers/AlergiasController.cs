@@ -29,14 +29,26 @@ namespace HealthWellbeing.Controllers
                     .ThenInclude(aa => aa.Alimento)
                 .AsQueryable();
 
+            var searchNome = nome?.ToLower();
+            var searchAlimento = alimento?.ToLower();
+
+
             // FILTRO POR NOME DA ALERGIA
-            if (!string.IsNullOrEmpty(nome))
-                query = query.Where(a => a.Nome.Contains(nome));
+            if (!string.IsNullOrEmpty(searchNome))
+                query = query.Where(a =>
+                    EF.Functions.Collate(a.Nome, "SQL_Latin1_General_CP1_CI_AI")
+                        .Contains(searchNome)
+                );
+
 
             // FILTRO POR NOME DO ALIMENTO
-            if (!string.IsNullOrEmpty(alimento))
+            if (!string.IsNullOrEmpty(searchAlimento))
                 query = query.Where(a => a.AlimentosAssociados
-                    .Any(aa => aa.Alimento.Name.Contains(alimento)));
+                    .Any(aa =>
+                        EF.Functions.Collate(aa.Alimento.Name, "SQL_Latin1_General_CP1_CI_AI")
+                            .Contains(searchAlimento)
+                    )
+                );
 
             // CONTAGEM TOTAL
             int totalCount = await query.CountAsync();
@@ -49,7 +61,6 @@ namespace HealthWellbeing.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Passando filtros e metadados para a View
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             ViewBag.PageSize = pageSize;
@@ -129,7 +140,7 @@ namespace HealthWellbeing.Controllers
                 TempData["AlertType"] = "success";
                 TempData["AlertMessage"] = "Alergia criada com sucesso!";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = alergia.AlergiaId });
             }
 
             return View(alergia);
@@ -218,7 +229,7 @@ namespace HealthWellbeing.Controllers
                 TempData["AlertType"] = "success";
                 TempData["AlertMessage"] = "Alergia atualizada com sucesso!";
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = id });
             }
 
             // Recarrega dados caso ModelState não seja válido
