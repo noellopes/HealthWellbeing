@@ -9,6 +9,8 @@ namespace HealthWellbeing.Models {
         public int CustomerId { get; set; }
 
         [Required(ErrorMessage = "Please enter {0}.")]
+        [RegularExpression(@"^[a-zA-Z0-9À-ÿ\s\-_.!,?()&+:;""']+$",
+            ErrorMessage = "Only letters, numbers, spaces, and common punctuation are allowed.")]
         [StringLength(100, ErrorMessage = "{0} must be at most {1} characters long.")]
         public required string Name { get; set; }
 
@@ -44,6 +46,8 @@ namespace HealthWellbeing.Models {
 
         [Display(Name = "Scoring Strategy")]
         public Level? Level { get; set; }
+
+        public virtual ICollection<CustomerBadge>? CustomerBadges { get; set; }
     }
 }
 

@@ -38,6 +38,10 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.BadgeType> BadgeType { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Badge> Badge { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.BadgeRequirement> BadgeRequirement { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.CustomerBadge> CustomerBadge { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
 
@@ -57,10 +61,41 @@ namespace HealthWellbeing.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Customer>()
-                .HasOne(l => l.Level)
-                .WithMany(c => c.Customer)
-                .HasForeignKey(l => l.LevelId)
+                .HasOne(c => c.Level)
+                .WithMany(l => l.Customer)
+                .HasForeignKey(c => c.LevelId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Badge>()
+                .HasOne(b => b.BadgeType)
+                .WithMany(bt => bt.Badges)
+                .HasForeignKey(b => b.BadgeTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<BadgeRequirement>()
+                .HasOne(br => br.Badge)
+                .WithMany(b => b.BadgeRequirements)
+                .HasForeignKey(br => br.BadgeId)
+                .OnDelete(DeleteBehavior.Cascade)
+
+            modelBuilder.Entity<CustomerBadge>(entity =>
+            {
+                entity.HasIndex(cb => new { cb.CustomerId, cb.BadgeId })
+                      .IsUnique();
+
+                entity.HasOne(cb => cb.Customer)
+                      .WithMany(c => c.CustomerBadges)
+                      .HasForeignKey(cb => cb.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cb => cb.Badge)
+                      .WithMany(b => b.CustomerBadges)
+                      .HasForeignKey(cb => cb.BadgeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+
 
             modelBuilder.Entity<Activity>()
                 .HasOne(a => a.ActivityType)

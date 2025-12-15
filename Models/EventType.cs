@@ -31,6 +31,8 @@ namespace HealthWellbeing.Models {
         ErrorMessage = "Enter a number with up to 3 digits, optionally followed by a comma or dot and 2 decimal (e.g., 1.15 or 1,15).")]
         public decimal EventTypeMultiplier { get; set; }
 
+        public virtual ICollection<BadgeRequirement>? BadgeRequirements { get; set; }
+
 
     }
 }
