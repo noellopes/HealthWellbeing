@@ -21,6 +21,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.TreatmentType> TreatmentType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Nurse> Nurse { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TreatmentRecord> TreatmentRecord { get; set; } = default!;
+        public DbSet<RoomConsumable> RoomConsumable { get; set; }
 
         // Adiciona capacidade de "Soft Delete" ao contexto
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
@@ -74,5 +75,7 @@ namespace HealthWellbeing.Data
         public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
         public DbSet<RoomType> RoomType { get; set; } = default!;
         public DbSet<RoomLocation> RoomLocation { get; set; }
+        //public DbSet<RoomConsumable> RoomConsumable { get; set; }
+
     }
 }

@@ -1,20 +1,24 @@
 ﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
     public class RoomConsumable
     {
+        [Key]
         public int RoomConsumableId { get; set; }
 
-        // Nome do consumível
-        public string Name { get; set; }
+        [ForeignKey("Room")]
+        public int RoomId { get; set; }
+        public Room Room { get; set; }
 
-        public string Category { get; set; }
+        [ForeignKey("Consumivel")]
+        public int ConsumivelId { get; set; }
+        public Consumivel? Consumivel { get; set; }  // <-- Navegação obrigatória
 
-        // Quantidade associada
         public int Quantity { get; set; }
-
-        // Observações ou notas (opcional)
         public string? Note { get; set; }
+
     }
 }
