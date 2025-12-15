@@ -38,19 +38,34 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var serviceScope = app.Services.CreateScope())
 {
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    SeedData.SeedRoles(roleManager);
+
+    var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    SeedData.SeedDefaultAdmin(userManager);
+
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
+    else
+    {
+        app.UseMigrationsEndPoint();
+
+        SeedData.SeedUsers(userManager);
+
+        var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
+        SeedData.Populate(dbContext);
+    }
 }
 
-using (var scope = app.Services.CreateScope())
+    using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetService<HealthWellbeingDbContext>();
     SeedData.Populate(dbContext);

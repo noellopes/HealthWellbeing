@@ -957,7 +957,7 @@ namespace HealthWellbeing.Data
 
         internal static void SeedUsers(UserManager<IdentityUser> userManager)
         {
-            EnsureUserIsCreatedAsync(userManager, "joao@jbma.pt", "Secret123$", ["DiretorClinico"]).Wait();
+            //EnsureUserIsCreatedAsync(userManager, "joao@jbma.pt", "Secret123$", ["DiretorClinico"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "anab@jbma.pt", "Secret123$", ["Utente"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "brunoMP@jbma.pt", "Secret123$", ["Utente"]).Wait();
         }
@@ -979,5 +979,7 @@ namespace HealthWellbeing.Data
             }
         }
 
+
+        
     }
 }
