@@ -1,5 +1,6 @@
-﻿using HealthWellbeing.Data;
+﻿ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Data
 {
@@ -15,6 +16,72 @@ namespace HealthWellbeing.Data
             PopulateCategorias(db);
             PopulateConsumiveis(db);
             PopulateZonasArmazenamento(db);
+            PopulateStock(db);
+            PopulateHistoricoCompras(db);
+        }
+        private static void PopulateHistoricoCompras(HealthWellbeingDbContext db)
+        {
+            if (db.StockMovimento.Any()) return;
+
+            var stocks = db.Stock
+                .Include(s => s.Consumivel)
+                .ToList();
+
+            if (!stocks.Any()) return;
+
+            var movimentos = new List<StockMovimento>();
+
+            foreach (var stock in stocks)
+            {
+                // simula uma compra inicial
+                movimentos.Add(new StockMovimento
+                {
+                    StockId = stock.StockId,
+                    Quantidade = stock.QuantidadeAtual,
+                    Tipo = "Entrada",
+                    Data = DateTime.Now.AddDays(-7) // compra há 1 semana
+                });
+            }
+
+            db.StockMovimento.AddRange(movimentos);
+            db.SaveChanges();
+        }
+
+        private static void PopulateStock(HealthWellbeingDbContext db)
+        {
+            if (db.Stock.Any()) return;
+
+            var consumiveis = db.Consumivel.ToList();
+            var zonas = db.ZonaArmazenamento.Where(z => z.Ativa).ToList();
+
+            if (!consumiveis.Any() || !zonas.Any()) return;
+
+            var rnd = new Random();
+
+            var stocks = new List<Stock>();
+
+            foreach (var c in consumiveis)
+            {
+                var zona = zonas[rnd.Next(zonas.Count)];
+
+                stocks.Add(new Stock
+                {
+                    ConsumivelID = c.ConsumivelId,
+                    ZonaID = zona.Id,
+
+                    // 🔑 COMEÇA NA QUANTIDADE MÍNIMA
+                    QuantidadeAtual = c.QuantidadeMinima,
+
+                    QuantidadeMinima = c.QuantidadeMinima,
+                    QuantidadeMaxima = c.QuantidadeMaxima,
+
+                    UsaValoresDoConsumivel = true,
+                    DataUltimaAtualizacao = DateTime.Now
+                });
+            }
+
+            db.Stock.AddRange(stocks);
+            db.SaveChanges();
         }
 
         private static void PopulateLocalizacoes(HealthWellbeingDbContext db)
