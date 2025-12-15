@@ -1,53 +1,67 @@
 ﻿@model HealthWellbeing.Models.Stock
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Stock";
 }
 
-<h1>Create</h1>
+<h2 class="text-primary fw-bold mb-4">
+    <i class="bi bi-plus-circle"></i> Criar Stock
+</h2>
 
-<h4>Stock</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ConsumivelID" class="control-label"></label>
-                <input asp-for="ConsumivelID" class="form-control" />
-                <span asp-validation-for="ConsumivelID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ZonaID" class="control-label"></label>
-                <input asp-for="ZonaID" class="form-control" />
-                <span asp-validation-for="ZonaID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeAtual" class="control-label"></label>
-                <input asp-for="QuantidadeAtual" class="form-control" />
-                <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeMinima" class="control-label"></label>
-                <input asp-for="QuantidadeMinima" class="form-control" />
-                <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataUltimaAtualizacao" class="control-label"></label>
-                <input asp-for="DataUltimaAtualizacao" class="form-control" />
-                <span asp-validation-for="DataUltimaAtualizacao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Create" method="post">
+
+    <!-- Consumível -->
+    <div class="mb-3">
+        <label class="form-label">Consumível</label>
+        <select asp-for="ConsumivelID" class="form-select" required>
+            <option value="">-- Escolha o Consumível --</option>
+            @foreach (var c in ViewBag.Consumiveis)
+            {
+                <option value="@c.ConsumivelId">@c.Nome</option>
+            }
+        </select>
+        <span asp-validation-for="ConsumivelID" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <!-- Zona -->
+    <div class="mb-3">
+        <label class="form-label">Zona de Armazenamento</label>
+        <select asp-for="ZonaID" class="form-select" required>
+            <option value="">-- Escolha a Zona --</option>
+            @foreach (var z in ViewBag.Zonas)
+            {
+                <option value="@z.Id">@z.Nome</option>
+            }
+        </select>
+        <span asp-validation-for="ZonaID" class="text-danger"></span>
+    </div>
 
+    <!-- Quantidade Atual (READ-ONLY) -->
+    <div class="mb-3">
+        <label class="form-label">Quantidade Atual</label>
+        <input asp-for="QuantidadeAtual" class="form-control" value="0" readonly />
+    </div>
+
+    <!-- Quantidade Mínima -->
+    <div class="mb-3">
+        <label class="form-label">Quantidade Mínima</label>
+        <input asp-for="QuantidadeMinima" class="form-control" />
+        <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
+    </div>
+
+    <!-- Quantidade Máxima (EDITÁVEL) -->
+    <div class="mb-3">
+        <label class="form-label">Quantidade Máxima</label>
+        <input asp-for="QuantidadeMaxima" class="form-control" />
+        <span asp-validation-for="QuantidadeMaxima" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Criar</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Voltar</a>
+
+</form>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

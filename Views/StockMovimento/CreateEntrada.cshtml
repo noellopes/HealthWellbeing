@@ -1,0 +1,107 @@
+﻿@model HealthWellbeing.Models.StockMovimento
+
+@{
+    ViewData["Title"] = "Nova Compra de Consumível";
+    var stocks = ViewBag.Stocks as List<HealthWellbeing.Models.Stock>;
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold text-primary mb-4">
+        🛒 Nova Compra de Consumível
+    </h2>
+
+    <form asp-action="CreateEntrada" method="post">
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <!-- =======================
+                     SELECIONAR CONSUMÍVEL
+                ========================= -->
+                <div class="mb-4">
+                    <label class="form-label">Consumível</label>
+                    <select id="stockSelect" asp-for="StockId" class="form-select">
+                        <option value="">-- Selecionar Consumível --</option>
+
+                        @foreach (var s in stocks)
+                        {
+                            <option value="@s.StockId"
+                                    data-atual="@s.QuantidadeAtual"
+                                    data-min="@s.Consumivel.QuantidadeMinima"
+                                    data-max="@s.Consumivel.QuantidadeMaxima">
+                                @s.Consumivel.Nome
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="StockId" class="text-danger"></span>
+                </div>
+
+                <!-- =======================
+                     QUANTIDADES AUTOMÁTICAS
+                ========================= -->
+
+                <div class="row mb-4">
+
+                    <div class="col-md-4">
+                        <label class="form-label">Quantidade Atual</label>
+                        <input id="qtdAtual" class="form-control" disabled />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Quantidade Mínima</label>
+                        <input id="qtdMin" class="form-control" disabled />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Quantidade Máxima</label>
+                        <input id="qtdMax" class="form-control" disabled />
+                    </div>
+                </div>
+
+                <!-- =======================
+                     QUANTIDADE A COMPRAR
+                ========================= -->
+
+                <div class="mb-3">
+                    <label asp-for="Quantidade" class="form-label">Quantidade a Comprar</label>
+                    <input asp-for="Quantidade" class="form-control" />
+                    <span asp-validation-for="Quantidade" class="text-danger"></span>
+                </div>
+
+                <p id="sugestao" class="text-muted small"></p>
+
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary px-4">← Voltar</a>
+            <button type="submit" class="btn btn-success px-4">✔ Aceitar Compra</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("stockSelect").addEventListener("change", function () {
+
+            let opt = this.options[this.selectedIndex];
+
+            let atual = opt.getAttribute("data-atual");
+            let min = opt.getAttribute("data-min");
+            let max = opt.getAttribute("data-max");
+
+            document.getElementById("qtdAtual").value = atual || "";
+            document.getElementById("qtdMin").value = min || "";
+            document.getElementById("qtdMax").value = max || "";
+
+            if (atual && max) {
+                let diff = max - atual;
+                document.getElementById("sugestao").innerText =
+                    "Sugestão: comprar " + diff + " (para atingir a quantidade máxima).";
+            } else {
+                document.getElementById("sugestao").innerText = "";
+            }
+        });
+    </script>
+}

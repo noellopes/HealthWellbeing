@@ -1,48 +1,60 @@
 ﻿@model HealthWellbeing.Models.Stock
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Stock";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-4">
+        <i class="bi bi-box-seam"></i> Detalhes do Stock
+    </h2>
 
-<div>
-    <h4>Stock</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ConsumivelID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ConsumivelID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ZonaID)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ZonaID)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.QuantidadeAtual)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.QuantidadeAtual)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.QuantidadeMinima)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.QuantidadeMinima)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataUltimaAtualizacao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataUltimaAtualizacao)
-        </dd>
-    </dl>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+
+                <dt class="col-sm-3">Consumível</dt>
+                <dd class="col-sm-9">
+                    @Model.Consumivel?.Nome
+                </dd>
+
+                <dt class="col-sm-3">Zona</dt>
+                <dd class="col-sm-9">
+                    @Model.Zona?.Nome
+                </dd>
+
+                <dt class="col-sm-3">Quantidade Atual</dt>
+                <dd class="col-sm-9">
+                    @Model.QuantidadeAtual
+                    @if (Model.QuantidadeAtual < Model.QuantidadeMinima)
+                    {
+                        <span class="badge bg-danger ms-2">Baixo</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Quantidade Mínima</dt>
+                <dd class="col-sm-9">
+                    @Model.QuantidadeMinima
+                </dd>
+
+                <dt class="col-sm-3">Última Atualização</dt>
+                <dd class="col-sm-9">
+                    @Model.DataUltimaAtualizacao.ToString("dd/MM/yyyy")
+                </dd>
+
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.StockId" class="btn btn-warning text-white px-3">
+            <i class="bi bi-pencil-square"></i> Editar
+        </a>
+        <a asp-action="Index" class="btn btn-secondary px-3">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.StockId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+

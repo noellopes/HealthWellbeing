@@ -1,0 +1,70 @@
+﻿@model HealthWellbeing.Models.StockMovimento
+
+@{
+    ViewData["Title"] = "Nova Saída";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold text-primary mb-4">
+        🛒 Nova Saída de Consumível
+    </h2>
+
+    <form asp-action="CreateSaida" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <!-- Seleção do Stock (Consumível + Zona) -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Consumível</label>
+                    <select asp-for="StockId" class="form-select" required>
+                        <option value="">-- Selecione um Consumível --</option>
+
+                        @foreach (var s in ViewBag.Stocks)
+                        {
+                            <option value="@s.StockId">
+                                @s.Consumivel.Nome — (Zona: @s.Zona.Nome)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="StockId" class="text-danger"></span>
+                </div>
+
+                <!-- Quantidade -->
+                <div class="mb-3">
+                    <label asp-for="Quantidade" class="form-label fw-bold"></label>
+                    <input asp-for="Quantidade" class="form-control" />
+                    <span asp-validation-for="Quantidade" class="text-danger"></span>
+                </div>
+
+                <!-- Descrição -->
+                <div class="mb-3">
+                    <label asp-for="Descricao" class="form-label fw-bold"></label>
+                    <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <a asp-action="Index" asp-controller="Stock" class="btn btn-secondary px-4">
+                ❮ Voltar
+            </a>
+
+            <button type="submit" class="btn btn-danger px-5">
+                🛒 Confirmar Saída
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

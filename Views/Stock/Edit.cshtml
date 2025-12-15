@@ -1,54 +1,79 @@
 ﻿@model HealthWellbeing.Models.Stock
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Stock";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
+    <h2 class="fw-bold text-primary mb-4">
+        <i class="bi bi-box-seam"></i> Editar Stock
+    </h2>
 
-<h4>Stock</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="StockId" />
-            <div class="form-group">
-                <label asp-for="ConsumivelID" class="control-label"></label>
-                <input asp-for="ConsumivelID" class="form-control" />
-                <span asp-validation-for="ConsumivelID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ZonaID" class="control-label"></label>
-                <input asp-for="ZonaID" class="form-control" />
-                <span asp-validation-for="ZonaID" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeAtual" class="control-label"></label>
-                <input asp-for="QuantidadeAtual" class="form-control" />
-                <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="QuantidadeMinima" class="control-label"></label>
-                <input asp-for="QuantidadeMinima" class="form-control" />
-                <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataUltimaAtualizacao" class="control-label"></label>
-                <input asp-for="DataUltimaAtualizacao" class="form-control" />
-                <span asp-validation-for="DataUltimaAtualizacao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="StockId" />
+        <input type="hidden" asp-for="ConsumivelID" />
+        <input type="hidden" asp-for="ZonaID" />
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <dl class="row mb-0">
+
+                    <!-- Nome do Consumível -->
+                    <dt class="col-sm-3">Consumível</dt>
+                    <dd class="col-sm-9">
+                        <input value="@Model.Consumivel?.Nome" class="form-control" disabled />
+                    </dd>
+
+                    <!-- Zona -->
+                    <dt class="col-sm-3">Zona</dt>
+                    <dd class="col-sm-9">
+                        <input value="@Model.Zona?.Nome" class="form-control" disabled />
+                    </dd>
+
+                    <!-- Quantidade Atual (READ-ONLY) -->
+                    <dt class="col-sm-3">Quantidade Atual</dt>
+                    <dd class="col-sm-9">
+                        <input value="@Model.QuantidadeAtual" class="form-control" disabled />
+                        <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
+                    </dd>
+
+                    <!-- Quantidade Mínima -->
+                    <dt class="col-sm-3">Quantidade Mínima</dt>
+                    <dd class="col-sm-9">
+                        <input asp-for="QuantidadeMinima" class="form-control" />
+                        <span asp-validation-for="QuantidadeMinima" class="text-danger"></span>
+                    </dd>
+
+                    <!-- Quantidade Máxima -->
+                    <dt class="col-sm-3">Quantidade Máxima</dt>
+                    <dd class="col-sm-9">
+                        <input asp-for="QuantidadeMaxima" class="form-control" />
+                        <span asp-validation-for="QuantidadeMaxima" class="text-danger"></span>
+                    </dd>
+
+                    <!-- Última Atualização (READ-ONLY) -->
+                    <dt class="col-sm-3">Última Atualização</dt>
+                    <dd class="col-sm-9">
+                        <input asp-for="DataUltimaAtualizacao" class="form-control" type="date" disabled />
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning text-white px-3">
+                <i class="bi bi-pencil-square"></i> Salvar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary px-3">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
