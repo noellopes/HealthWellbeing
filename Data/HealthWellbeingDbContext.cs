@@ -71,19 +71,26 @@ namespace HealthWellbeing.Data
                 .HasOne(br => br.Badge)
                 .WithMany(b => b.BadgeRequirements)
                 .HasForeignKey(br => br.BadgeId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade)
 
-            modelBuilder.Entity<CustomerBadge>()
-                .HasOne(cb => cb.Badge)
-                .WithMany(b => b.CustomerBadges)
-                .HasForeignKey(cb => cb.BadgeId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CustomerBadge>(entity =>
+            {
+                entity.HasIndex(cb => new { cb.CustomerId, cb.BadgeId })
+                      .IsUnique();
 
-            modelBuilder.Entity<CustomerBadge>()
-                .HasOne(cb => cb.Customer)
-                .WithMany(c => c.CustomerBadges)
-                .HasForeignKey(cb => cb.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(cb => cb.Customer)
+                      .WithMany(c => c.CustomerBadges)
+                      .HasForeignKey(cb => cb.CustomerId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(cb => cb.Badge)
+                      .WithMany(b => b.CustomerBadges)
+                      .HasForeignKey(cb => cb.BadgeId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+
         }
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;

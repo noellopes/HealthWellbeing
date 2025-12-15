@@ -14,6 +14,6 @@ namespace HealthWellbeing.Models
         public string ActivityDescription { get; set; } = string.Empty;
 
         public virtual ICollection <Activity>? Activity { get; set; }
-
+        public virtual ICollection<BadgeRequirement>? BadgeRequirements { get; set; }
     }
 }

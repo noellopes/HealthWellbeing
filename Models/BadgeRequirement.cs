@@ -29,5 +29,9 @@ namespace HealthWellbeing.Models {
         public int EventTypeId { get; set; }
         public virtual EventType? EventTypes { get; set; }
 
-    }
+        [Display(Name = "Activity Type")]
+        public int ActivityTypeId { get; set; }
+        public virtual ActivityType? ActivityTypes { get; set;
+
+        }
 }
