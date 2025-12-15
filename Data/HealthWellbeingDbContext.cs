@@ -115,6 +115,26 @@ namespace HealthWellbeing.Data
                 new ExameTipo { ExameTipoId = 23, Nome = "Cultura de Urina", Descricao = "Identificação de bactérias que podem causar infeção urinária.", EspecialidadeId = 6 }
             );
 
+            modelBuilder.Entity<Funcao>().HasData(
+                new Funcao { FuncaoId = 1, NomeFuncao = "Técnico de Radiologia" },
+                new Funcao { FuncaoId = 2, NomeFuncao = "Fisioterapeuta" },
+                new Funcao { FuncaoId = 3, NomeFuncao = "Técnico de Cardiopneumologia" },
+                new Funcao { FuncaoId = 4, NomeFuncao = "Técnico de Análises Clínicas" },
+                new Funcao { FuncaoId = 5, NomeFuncao = "Terapeuta Ocupacional" },
+                new Funcao { FuncaoId = 6, NomeFuncao = "Ortopedista" },
+                new Funcao { FuncaoId = 7, NomeFuncao = "Enfermeiro Especialista" },
+                new Funcao { FuncaoId = 8, NomeFuncao = "Nutricionista" },
+                new Funcao { FuncaoId = 9, NomeFuncao = "Técnico de Medicina Nuclear" },
+                new Funcao { FuncaoId = 10, NomeFuncao = "Cardiologista" },
+                new Funcao { FuncaoId = 11, NomeFuncao = "Podologista" },
+                new Funcao { FuncaoId = 12, NomeFuncao = "Técnico de Neurofisiologia" },
+                new Funcao { FuncaoId = 13, NomeFuncao = "Técnico Auxiliar de Saúde" },
+                new Funcao { FuncaoId = 14, NomeFuncao = "Optometrista" },
+                new Funcao { FuncaoId = 15, NomeFuncao = "Técnico de Medicina Física e Reabilitação" }
+            );
+
+
+
             modelBuilder.Entity<EstadoMaterial>().HasData(
                             new EstadoMaterial { MaterialStatusId = 1, Nome = "Disponível", Descricao = "Material pronto para utilização" },
                             new EstadoMaterial { MaterialStatusId = 2, Nome = "Em Uso", Descricao = "Material atualmente utilizado" },
@@ -122,6 +142,57 @@ namespace HealthWellbeing.Data
                             new EstadoMaterial { MaterialStatusId = 4, Nome = "Em Manutenção", Descricao = "Material em reparação/manutenção" },
                             new EstadoMaterial { MaterialStatusId = 5, Nome = "Danificado", Descricao = "Material danificado e não utilizável" },
                             new EstadoMaterial { MaterialStatusId = 6, Nome = "Perdido", Descricao = "Material não localizado" }
+            );
+
+            modelBuilder.Entity<ProfissionalExecutante>().HasData(
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 1,
+                    Nome = "André Kandonga",
+                    FuncaoId = 1, // Técnico de Radiologia
+                    Telefone = "912912915",
+                    Email = "Kandonga123@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 2,
+                    Nome = "Miguel Santos",
+                    FuncaoId = 2, // Fisioterapeuta
+                    Telefone = "912912914",
+                    Email = "MiguelSantos123@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 3,
+                    Nome = "Dostoevsky",
+                    FuncaoId = 3, // Técnico de Cardiopneumologia
+                    Telefone = "912913914",
+                    Email = "DostoevskySuba@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 4,
+                    Nome = "Ricardo Quaresma",
+                    FuncaoId = 4, // Técnico de Análises Clínicas
+                    Telefone = "910101010",
+                    Email = "QuaresmaPorto@gmail.com"
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 5,
+                    Nome = "Mai Da Silva",
+                    FuncaoId = 5, // Terapeuta Ocupacional
+                    Telefone = "912912222",
+                    Email = "Mai123222suba@gmail.com",
+                },
+                new ProfissionalExecutante
+                {
+                    ProfissionalExecutanteId = 6,
+                    Nome = "Diogo Rodrigues",
+                    FuncaoId = 6, // Ortopedista
+                    Telefone = "912912522",
+                    Email = "DiogoRodrigues04@gmail.com",
+                }
             );
 
             modelBuilder.Entity<MaterialEquipamentoAssociado>().HasData(
