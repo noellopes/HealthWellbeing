@@ -18,6 +18,7 @@ internal class Program
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
         builder.Services.AddControllersWithViews();
 
@@ -40,6 +41,19 @@ internal class Program
         // ==========================================
         // ÁREA DE INICIALIZAÇÃO DA BASE DE DADOS
         // ==========================================
+       
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+        app.MapRazorPages();
+
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
@@ -64,20 +78,6 @@ internal class Program
                 logger.LogError(ex, "Ocorreu um erro ao inicializar a base de dados.");
             }
         }
-
-        app.Run();
-
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseAuthorization();
-
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-        app.MapRazorPages();
 
 
         app.Run();

@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
+    // Restringe todo o controller a quem tem permissão
+    [Authorize(Roles = "Admin, Gestor")]
     public class ExameTipoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -233,7 +236,7 @@ namespace HealthWellbeing.Controllers
                         IsSelected = ligacao != null,
                         // Se existir, usa a quantidade da BD; senão, mete 1 por defeito
                         Quantidade = ligacao?.QuantidadeNecessaria ?? 1,
-                        StockAtual = m.Quantidade 
+                        StockAtual = m.Quantidade
                     };
                 }).ToList()
             };
@@ -320,7 +323,7 @@ namespace HealthWellbeing.Controllers
                         return View(viewModel);
                     }
 
-                    
+
 
                     //Adicionar novos (Selecionados mas não existentes na BD)
                     foreach (var selectedId in selectedIds)
@@ -363,7 +366,7 @@ namespace HealthWellbeing.Controllers
                         _context.Remove(recursoRemover);
                     }
 
-                    
+
                     await _context.SaveChangesAsync();
 
                     TempData["SuccessMessage"] = $"O tipo de exame '{viewModel.NomeExame}' foi atualizado com sucesso!";
@@ -416,7 +419,7 @@ namespace HealthWellbeing.Controllers
             var exameTipo = await _context.ExameTipo.FindAsync(id);
             if (exameTipo != null)
             {
-               
+
                 // Checar se existem exames (na tabela 'Exames') que referenciam este ExameTipoId
                 int numExamesAssociados = await _context.Exames
                     .CountAsync(e => e.ExameTipoId == id); // Usa a FK ExameTipoId
