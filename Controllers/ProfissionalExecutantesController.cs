@@ -1,12 +1,23 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class ProfissionalExecutantesController : Controller
+namespace HealthWellbeing.Controllers
 {
+    // Restringe todo o controller a quem tem permissão
+    [Authorize(Roles = "Admin, Gestor,Tecnico")]
+    public class ProfissionalExecutantesController : Controller
+    {
+
+
     private readonly HealthWellbeingDbContext _context;
 
     public ProfissionalExecutantesController(HealthWellbeingDbContext context)
@@ -163,5 +174,6 @@ public class ProfissionalExecutantesController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
     }
 }
