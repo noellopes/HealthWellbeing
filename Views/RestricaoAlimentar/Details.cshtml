@@ -1,0 +1,81 @@
+@model HealthWellbeing.Models.RestricaoAlimentar
+
+@{
+    ViewData["Title"] = "Detalhes da Restrição Alimentar";
+}
+
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Cabeçalho padronizado -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Detalhes da Restrição Alimentar</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Informações Gerais</h5>
+
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tipo)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Tipo)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Gravidade)</dt>
+                    <dd class="col-sm-9">
+                        @{
+                            var gravidadeClass = Model.Gravidade switch
+                            {
+                                GravidadeRestricao.Leve => "badge bg-success",
+                                GravidadeRestricao.Moderada => "badge bg-warning",
+                                GravidadeRestricao.Grave => "badge bg-danger",
+                                _ => "badge bg-secondary"
+                            };
+                        }
+                        <span class="@gravidadeClass">@Html.DisplayFor(model => model.Gravidade)</span>
+                    </dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descricao)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
+
+                    <dt class="col-sm-3">Alimentos Relacionados</dt>
+                    <dd class="col-sm-9">
+                        @if (Model?.AlimentosAssociados?.Any() == true)
+                        {
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var aa in Model.AlimentosAssociados)
+                                {
+                                    <span class="badge bg-primary">@aa.Alimento?.Name</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Nenhum alimento associado</span>
+                        }
+                    </dd>
+                </dl>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.RestricaoAlimentarId" 
+                       class="btn btn-warning me-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@Model?.RestricaoAlimentarId" 
+                       class="btn btn-danger me-2">Excluir</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -35,16 +35,10 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Sintomas)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Alimento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Alimento.AlimentoId)
-        </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="AlergiaID" />
+        <input type="hidden" asp-for="AlergiaId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>

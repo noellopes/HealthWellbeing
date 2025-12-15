@@ -15,6 +15,10 @@ namespace HealthWellbeing.Models
         [Range(0, 100)] public decimal ProteinaGPor100g { get; set; }
         [Range(0, 100)] public decimal HidratosGPor100g { get; set; }
         [Range(0, 100)] public decimal GorduraGPor100g { get; set; }
-        public ICollection<Alergia> AlergiasRelacionadas { get; set; }
+
+        public ICollection<AlergiaAlimento>? AlergiaRelacionadas { get; set; }
+        public ICollection<RestricaoAlimentarAlimento>? RestricoesAssociadas { get; set; }
+        public ICollection<AlimentoSubstituto>? Substitutos { get; set; }
+        public ICollection<AlimentoSubstituto>? SubstituidoPor { get; set; }
     }
 }

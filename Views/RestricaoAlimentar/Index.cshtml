@@ -1,7 +1,8 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Alergia>
+
+@model IEnumerable<HealthWellbeing.Models.RestricaoAlimentar>
 
 @{
-    ViewData["Title"] = "Alergias";
+    ViewData["Title"] = "Restrições Alimentares";
 
     var currentPage = (int)(ViewBag.CurrentPage ?? 1);
     var totalPages = (int)(ViewBag.TotalPages ?? 1);
@@ -11,7 +12,7 @@
     var endItem = startItem == 0 ? 0 : startItem + Model.Count() - 1;
 
     var searchNome = (string)ViewBag.SearchNome ?? string.Empty;
-    var searchAlimento = (string)ViewBag.SearchAlimento ?? string.Empty;
+    var searchTipo = (string)ViewBag.SearchTipo ?? string.Empty;
 }
 
 @if (TempData["AlertMessage"] != null)
@@ -23,13 +24,13 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Alergias</h1>
+    <h1 class="h3 mb-0">Restrições Alimentares</h1>
 
     <div class="d-flex">
         <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#searchPanel">
             Pesquisar
         </a>
-        <a class="btn btn-primary" asp-action="Create">Nova Alergia</a>
+        <a class="btn btn-primary" asp-action="Create">Nova Restrição</a>
     </div>
 </div>
 
@@ -39,15 +40,20 @@
         <form asp-action="Index" method="get" class="row g-3 align-items-end">
 
             <div class="col-md-4">
-                <label class="form-label">Nome da Alergia</label>
+                <label class="form-label">Nome da Restrição</label>
                 <input type="search" name="nome" class="form-control"
-                       value="@searchNome" placeholder="Digite o nome da alergia" />
+                       value="@searchNome" placeholder="Digite o nome da restrição" />
             </div>
 
             <div class="col-md-4">
-                <label class="form-label">Nome do Alimento</label>
-                <input type="search" name="alimento" class="form-control"
-                       value="@searchAlimento" placeholder="Alimento associado" />
+                <label class="form-label">Tipo</label>
+                <select name="tipo" class="form-control">
+                    <option value="">-- Todos os Tipos --</option>
+                    @foreach (var tipo in Enum.GetValues(typeof(HealthWellbeing.Models.TipoRestricao)))
+                    {
+                        <option value="@tipo" selected="@(searchTipo == tipo.ToString())">@tipo</option>
+                    }
+                </select>
             </div>
 
             <div class="col-12 d-flex gap-2">
@@ -58,10 +64,9 @@
     </div>
 </div>
 
-
 @{
     // Verifica se algum filtro está ativo
-    bool hasActiveFilter = !string.IsNullOrEmpty(searchNome) || !string.IsNullOrEmpty(searchAlimento);
+    bool hasActiveFilter = !string.IsNullOrEmpty(searchNome) || !string.IsNullOrEmpty(searchTipo);
 }
 
 @if (hasActiveFilter)
@@ -70,28 +75,29 @@
         <span class="me-2">Filtros Ativos:</span>
 
         <div class="d-flex flex-wrap gap-2">
+
             @if (!string.IsNullOrEmpty(searchNome))
             {
                 <span class="badge bg-primary d-flex align-items-center">
-                    Nome: **@searchNome**
+                    Nome: <strong>@searchNome</strong>
                     <a asp-action="Index"
-                       asp-route-alimento="@searchAlimento"
                        asp-route-nome=""
+                       asp-route-tipo="@searchTipo"
                        class="btn-close btn-close-white ms-1"
                        aria-label="Remover filtro Nome">
                     </a>
                 </span>
             }
 
-            @if (!string.IsNullOrEmpty(searchAlimento))
+            @if (!string.IsNullOrEmpty(searchTipo))
             {
                 <span class="badge bg-primary d-flex align-items-center">
-                    Alimento: **@searchAlimento**
+                    Tipo: <strong>@searchTipo</strong>
                     <a asp-action="Index"
                        asp-route-nome="@searchNome"
-                       asp-route-alimento=""
+                       asp-route-tipo=""
                        class="btn-close btn-close-white ms-1"
-                       aria-label="Remover filtro Alimento">
+                       aria-label="Remover filtro Tipo">
                     </a>
                 </span>
             }
@@ -109,10 +115,9 @@
     <thead class="table-light">
         <tr>
             <th>Nome</th>
-            @*<th>Descrição</th>*@
+            <th>Tipo</th>
             <th>Gravidade</th>
-            <th>Sintomas</th>
-            @* <th>Alimentos Relacionados</th>*@
+            <th>Alimentos Relacionados</th>
             <th></th>
         </tr>
     </thead>
@@ -122,48 +127,50 @@
         {
             string rowClass = item.Gravidade switch
             {
-                GravidadeAlergia.Leve => "table-success",      // verde
-                GravidadeAlergia.Moderada => "table-warning",  // amarelo
-                GravidadeAlergia.Grave => "table-danger",      // vermelho
+                GravidadeRestricao.Leve => "table-success",
+                GravidadeRestricao.Moderada => "table-warning",
+                GravidadeRestricao.Grave => "table-danger",
                 _ => ""
             };
             <tr class="@rowClass">
                 <td>@item.Nome</td>
-                @* <td>@item.Descricao</td>*@
+                <td>@item.Tipo</td>
                 <td>
                     @{
                         var gravidadeBadgeClass = item.Gravidade switch
                         {
-                            GravidadeAlergia.Leve => "badge bg-success",
-                            GravidadeAlergia.Moderada => "badge bg-warning",
-                            GravidadeAlergia.Grave => "badge bg-danger",
+                            GravidadeRestricao.Leve => "badge bg-success",
+                            GravidadeRestricao.Moderada => "badge bg-warning",
+                            GravidadeRestricao.Grave => "badge bg-danger",
                             _ => "badge bg-secondary"
                         };
                     }
                     <span class="@gravidadeBadgeClass">@item.Gravidade</span>
                 </td>
-                <td>@item.Sintomas</td>
-                @*
                 <td>
                     @if (item.AlimentosAssociados?.Any() == true)
                     {
-                        <ul class="mb-0">
-                            @foreach (var aa in item.AlimentosAssociados)
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var aa in item.AlimentosAssociados.Take(3))
                             {
-                                <li>@aa.Alimento.Name</li>
+                                <span class="badge bg-primary">@aa.Alimento?.Name</span>
                             }
-                        </ul>
+                            @if (item.AlimentosAssociados.Count > 3)
+                            {
+                                <span class="badge bg-secondary">+@(item.AlimentosAssociados.Count - 3)</span>
+                            }
+                        </div>
                     }
                     else
                     {
-                        <span>—</span>
+                        <span class="text-muted">—</span>
                     }
-                </td> *@
+                </td>
                 <td class="text-end">
                     <div class="d-flex gap-2 justify-content-end">
-                    <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.AlergiaId">Ver</a>
-                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.AlergiaId">Editar</a>
-                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.AlergiaId">Apagar</a>
+                        <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.RestricaoAlimentarId">Ver</a>
+                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.RestricaoAlimentarId">Editar</a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.RestricaoAlimentarId">Excluir</a>
                     </div>
                 </td>
             </tr>
@@ -180,7 +187,7 @@
                 <a class="page-link"
                    asp-route-page="@(currentPage - 1)"
                    asp-route-nome="@searchNome"
-                   asp-route-alimento="@searchAlimento">« Anterior</a>
+                   asp-route-tipo="@searchTipo">« Anterior</a>
             </li>
 
             @for (int i = 1; i <= totalPages; i++)
@@ -189,7 +196,7 @@
                     <a class="page-link"
                        asp-route-page="@i"
                        asp-route-nome="@searchNome"
-                       asp-route-alimento="@searchAlimento">@i</a>
+                       asp-route-tipo="@searchTipo">@i</a>
                 </li>
             }
 
@@ -197,7 +204,7 @@
                 <a class="page-link"
                    asp-route-page="@(currentPage + 1)"
                    asp-route-nome="@searchNome"
-                   asp-route-alimento="@searchAlimento">Próximo »</a>
+                   asp-route-tipo="@searchTipo">Próximo »</a>
             </li>
 
         </ul>

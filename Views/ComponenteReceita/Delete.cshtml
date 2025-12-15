@@ -1,0 +1,56 @@
+﻿@model HealthWellbeing.Models.ComponenteReceita
+
+@{
+    ViewData["Title"] = "Apagar";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Apagar Componente de Receita</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
+</div>
+
+<hr />
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Tem certeza que deseja apagar esse registro?</h5>
+        <div>
+            <h6>ComponenteReceita</h6>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Alimento)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Alimento.Name)
+                </dd>
+
+                <dt class="col-sm-3">Receita</dt>
+                <dd class="col-sm-9">@(Model.Receita?.Nome ?? "-")</dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.UnidadeMedida)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.UnidadeMedida)
+                </dd>
+
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Quantidade)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Quantidade)
+                </dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IsOpcional)</dt>
+                <dd class="col-sm-9">@(Model.IsOpcional ? "Sim" : "Não")</dd>
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-end">
+                <input type="hidden" asp-for="ComponenteReceitaId" />
+                <input type="submit" value="Apagar" class="btn btn-danger me-2" />
+                <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+            </form>
+        </div>
+    </div>
+</div>
