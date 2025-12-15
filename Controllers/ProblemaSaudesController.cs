@@ -29,7 +29,6 @@ namespace HealthWellbeing.Controllers
         {
             int pageSize = 10;
 
-            // Removido o .Include(ProfissionalExecutante)
             var query = _context.ProblemaSaude.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(categoria))
@@ -40,8 +39,6 @@ namespace HealthWellbeing.Controllers
 
             if (!string.IsNullOrWhiteSpace(zona))
                 query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
-
-            // Removido o bloco de filtro por Profissional
 
             if (!string.IsNullOrWhiteSpace(gravidade))
                 query = query.Where(p => p.Gravidade.ToString() == gravidade);
@@ -59,7 +56,6 @@ namespace HealthWellbeing.Controllers
             ViewBag.Categoria = categoria;
             ViewBag.Nome = nome;
             ViewBag.Zona = zona;
-            // ViewBag.Profissional removido
             ViewBag.Gravidade = gravidade;
 
             return View(pagination);
@@ -69,18 +65,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
-            // Removido o .Include
             var problemaSaude = await _context.ProblemaSaude
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
             return View(problemaSaude);
         }
@@ -88,7 +79,6 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Create
         public IActionResult Create()
         {
-            // Removida a carga da lista de profissionais para ViewData
             return View();
         }
 
@@ -96,8 +86,8 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
-        // Removido o argumento int[] selectedProfissionais
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")]
+            ProblemaSaude problemaSaude)
         {
             if (ModelState.IsValid)
             {
@@ -112,19 +102,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
-            // Removido o .Include
             var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
 
             if (problemaSaude == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
-            // Removida a lógica de carregar checkboxes
             return View(problemaSaude);
         }
 
@@ -133,13 +117,11 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")] ProblemaSaude problemaSaude)
-        // Removido o argumento int[] selectedProfissionais
+            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")]
+            ProblemaSaude problemaSaude)
         {
             if (id != problemaSaude.ProblemaSaudeId)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
             if (ModelState.IsValid)
             {
@@ -152,7 +134,7 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!ProblemaSaudeExists(problemaSaude.ProblemaSaudeId))
                     {
-                        return NotFound();
+                        return View("Invalid", problemaSaude);
                     }
                     else
                     {
@@ -168,18 +150,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
-            // Removido o .Include
             var problemaSaude = await _context.ProblemaSaude
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
-            {
-                return NotFound();
-            }
+                return View("Invalid", null);
 
             return View(problemaSaude);
         }
@@ -193,9 +170,9 @@ namespace HealthWellbeing.Controllers
             if (problemaSaude != null)
             {
                 _context.ProblemaSaude.Remove(problemaSaude);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
