@@ -28,19 +28,13 @@ namespace HealthWellbeingRoom.Controllers
         // GET: Equipments
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchSerie = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
-            var statusIdExcluido = _context.EquipmentStatus
-                    .Where(es => es.Name == "Excluído")
-                    .Select(es => es.EquipmentStatusId)
-                    .FirstOrDefault();
-
-
             // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
                 .AsQueryable()
-                .Where(e => e.EquipmentStatusId != statusIdExcluido);
+                .Where(e => e.EquipmentStatus.Name != "Excluído");
 
             // Validar se os parâmetros de pesquisa não estão vazios e aplicar os filtros correspondentes
             if (!string.IsNullOrEmpty(searchName))
@@ -183,12 +177,30 @@ namespace HealthWellbeingRoom.Controllers
                 return View("NotFound");
             }
 
-            var equipment = await _context.Equipment.FindAsync(id);
+            //var equipment = await _context.Equipment.FindAsync(id);
+            var equipment = await _context.Equipment
+                .Include(r => r.Room)
+                .Include(et => et.EquipmentType)
+                .Include(es => es.EquipmentStatus)
+                .FirstOrDefaultAsync(m => m.EquipmentId == id);
             if (equipment == null)
             {
                 /* Retornar para minha page do not found */
                 return View("NotFound");
             }
+
+            // Não permitir editar Equipamentos excluidos
+            if (equipment.EquipmentStatus.Name == "Excluído")
+            {
+                return RedirectToAction(nameof(Details),
+                    new
+                    {
+                        id = equipment.EquipmentId,
+                        SuccessMessage = "Não é possível editar esse equipamento porque foi excluído."
+                    }
+                );
+            }
+
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
             ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name");

@@ -16,7 +16,12 @@
     </div>
 
     <div class="card-body">
-        <p class="lead text-muted">Tem a certeza que deseja eliminar o registo do equipamento? Esta ação é irreversível.</p>
+        <p class="lead text-muted">
+            @(Model.EquipmentStatus.Name != "Excluído" ? 
+                "Tem a certeza que deseja eliminar o registo do equipamento? Esta ação é irreversível."
+                : "Este equipamento já se encontra excluído."
+            )
+        </p>
 
         <dl class="row mb-0 mt-4">
             <dt class="col-sm-3 fw-bold text-muted">
@@ -44,7 +49,9 @@
                 Estado
             </dt>
             <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EquipmentStatus.Name)
+                <span class="badge bg-@(Model.EquipmentStatusId == 1 ? "success" : Model.EquipmentStatusId == 2 ? "warning" : "danger")">
+                    @Html.DisplayFor(model => model.EquipmentStatus.Name)
+                </span>
             </dd>
 
             <dt class="col-sm-3 fw-bold text-muted">
@@ -73,9 +80,14 @@
     <div class="card-footer d-flex justify-content-end gap-2">
 		<form asp-action="Delete" class="text-end mt-3">
 			<input type="hidden" asp-for="EquipmentId" />
-            <button type="submit" class="btn btn-danger me-2">
-                <i class="bi bi-trash me-1"></i> Sim
-			</button>
+
+            @if (Model.EquipmentStatus.Name != "Excluído")
+            {
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="bi bi-trash me-1"></i> Sim
+			    </button>
+            }
+
 			<a class="btn btn-secondary" asp-action="Index">
                 <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
             </a>
