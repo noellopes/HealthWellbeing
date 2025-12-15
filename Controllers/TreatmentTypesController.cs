@@ -3,6 +3,7 @@ using HealthWellbeing.Models;
 using HealthWellbeing.Utils.Group1;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Controllers
 {
+
     public class TreatmentTypesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -21,7 +23,10 @@ namespace HealthWellbeing.Controllers
             _filterService = filterService;
         }
 
+
         // GET: TreatmentTypes
+        [Authorize(Roles = "TreatmentOfficeManager")]
+
         public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
             // Controla quantos itens por pagina

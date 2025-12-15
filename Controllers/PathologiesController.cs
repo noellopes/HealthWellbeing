@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.Utils.Group1;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace HealthWellbeing.Controllers
 {
@@ -23,6 +25,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Pathologies
+        [Authorize(Roles = "TreatmentOfficeManager")]
         public async Task<IActionResult> Index(string searchBy, string searchString, string sortOrder, int page = 1)
         {
             // Controla quantos itens por pagina
@@ -54,6 +57,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Pathologies/Details/5
+        [Authorize(Roles = "TreatmentOfficeManager")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -72,6 +76,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Pathologies/Create
+        [Authorize(Roles = "TreatmentOfficeManager")]
         public IActionResult Create()
         {
             return View();
@@ -94,6 +99,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Pathologies/Edit/5
+        [Authorize(Roles = "TreatmentOfficeManager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
