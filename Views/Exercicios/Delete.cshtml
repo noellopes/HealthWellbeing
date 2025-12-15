@@ -25,6 +25,48 @@
                 <dt class="col-sm-3">Descrição</dt>
                 <dd class="col-sm-9">@Model.Descricao</dd>
 
+                <dt class="col-sm-3">Tipo de Exercício</dt>
+                <dd class="col-sm-9 fw-bold text-primary">
+                    @if (Model.ExercicioTipoExercicios != null && Model.ExercicioTipoExercicios.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.ExercicioTipoExercicios)
+                            {
+                                <li>
+                                    <i class="fas fa-dumbbell me-1"></i>
+                                    @item.TipoExercicio?.NomeTipoExercicios
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Não definido</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Objetivos Físicos</dt>
+                <dd class="col-sm-9">
+                    @if (Model.ExercicioObjetivos != null && Model.ExercicioObjetivos.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.ExercicioObjetivos)
+                            {
+                                <li>
+                                    <i class="fas fa-check text-success me-1"></i>
+                                    @item.ObjetivoFisico?.NomeObjetivo
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum objetivo associado.</span>
+                    }
+                </dd>
+
+                <hr class="my-2" />
+
                 <dt class="col-sm-3">Duração (min)</dt>
                 <dd class="col-sm-9">@Model.Duracao</dd>
 
@@ -42,6 +84,8 @@
 
                 <dt class="col-sm-3">Instruções</dt>
                 <dd class="col-sm-9">@Model.Instrucoes</dd>
+
+                <hr class="my-2" />
 
                 <dt class="col-sm-3">Equipamentos</dt>
                 <dd class="col-sm-9">

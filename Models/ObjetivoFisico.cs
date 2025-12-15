@@ -12,5 +12,6 @@ namespace HealthWellbeing.Models
 
         public ICollection<ObjetivoTipoExercicio>? ObjetivoTipoExercicio { get; set; }
         public ICollection<UtenteGrupo7>? Utentes { get; set; }
+        public ICollection<ExercicioObjetivoFisico>? ExercicioObjetivos { get; set; }
     }
 }

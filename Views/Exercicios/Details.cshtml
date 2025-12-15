@@ -47,6 +47,45 @@
                             <th class="text-secondary" style="width: 140px;">Descrição:</th>
                             <td>@Model.Descricao</td>
                         </tr>
+
+                        <tr>
+                            <th class="text-secondary">Tipos:</th>
+                            <td>
+                                @if (Model.ExercicioTipoExercicios != null && Model.ExercicioTipoExercicios.Any())
+                                {
+                                    foreach (var item in Model.ExercicioTipoExercicios)
+                                    {
+                                        <span class="badge bg-info text-dark me-1">
+                                            @item.TipoExercicio?.NomeTipoExercicios
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Não definido</span>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-secondary">Objetivos:</th>
+                            <td>
+                                @if (Model.ExercicioObjetivos != null && Model.ExercicioObjetivos.Any())
+                                {
+                                    foreach (var item in Model.ExercicioObjetivos)
+                                    {
+                                        <span class="badge bg-success me-1">
+                                            @item.ObjetivoFisico?.NomeObjetivo
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Não definido</span>
+                                }
+                            </td>
+                        </tr>
+
                         <tr>
                             <th class="text-secondary">Duração:</th>
                             <td>@Model.Duracao minutos</td>
@@ -60,6 +99,39 @@
                         <tr>
                             <th class="text-secondary">Calorias:</th>
                             <td>@Model.CaloriasGastas kcal</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <h5 class="fw-bold text-primary border-bottom pb-2">Configuração do Treino</h5>
+                    <table class="table table-borderless mt-2">
+                        <tr>
+                            <th class="text-secondary" style="width: 140px;">Séries:</th>
+                            <td>@Model.Series</td>
+                        </tr>
+                        <tr>
+                            <th class="text-secondary">Repetições:</th>
+                            <td>@Model.Repeticoes</td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-secondary">Músculos:</th>
+                            <td>
+                                @if (Model.ExercicioGrupoMusculares?.Any() == true)
+                                {
+                                    foreach (var item in Model.ExercicioGrupoMusculares)
+                                    {
+                                        <span class="badge bg-secondary me-1">
+                                            @item.GrupoMuscular.GrupoMuscularNome
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">Nenhum músculo definido</span>
+                                }
+                            </td>
                         </tr>
 
                         <tr>
@@ -88,7 +160,7 @@
                                 {
                                     foreach (var item in Model.ExercicioGeneros)
                                     {
-                                        <span class="badge bg-success me-1">
+                                        <span class="badge bg-dark me-1">
                                             @item.Genero.NomeGenero
                                         </span>
                                     }
@@ -102,38 +174,6 @@
                     </table>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold text-primary border-bottom pb-2">Configuração do Treino</h5>
-                    <table class="table table-borderless mt-2">
-                        <tr>
-                            <th class="text-secondary" style="width: 140px;">Séries:</th>
-                            <td>@Model.Series</td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Repetições:</th>
-                            <td>@Model.Repeticoes</td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Músculos:</th>
-                            <td>
-                                @if (Model.ExercicioGrupoMusculares?.Any() == true)
-                                {
-                                    foreach (var item in Model.ExercicioGrupoMusculares)
-                                    {
-                                        <span class="badge bg-secondary me-1">
-                                            @item.GrupoMuscular.GrupoMuscularNome
-                                        </span>
-                                    }
-                                }
-                                else
-                                {
-                                    <span class="text-muted small">Nenhum músculo definido</span>
-                                }
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-
             </div>
 
             <div class="mt-4">
@@ -141,7 +181,6 @@
                 <div class="border rounded p-3 bg-light mt-2">
                     @if (!string.IsNullOrEmpty(Model.Instrucoes))
                     {
-                        /* Permite quebras de linha se houver */
                         @Html.Raw(Model.Instrucoes.Replace("\n", "<br>"))
                     }
                     else
@@ -151,29 +190,29 @@
                 </div>
             </div>
 
-            <dt class="col-sm-2 text-danger">
-                Contraindicações
-            </dt>
-            <dd class="col-sm-10">
-                @if (Model.Contraindicacoes != null && Model.Contraindicacoes.Any())
-                {
-                    <ul class="list-unstyled">
-                        @foreach (var item in Model.Contraindicacoes)
+            <div class="mt-4">
+                <h5 class="fw-bold text-danger border-bottom pb-2">Contraindicações</h5>
+                <div class="mt-2">
+                    @if (Model.Contraindicacoes != null && Model.Contraindicacoes.Any())
+                    {
+                        foreach (var item in Model.Contraindicacoes)
                         {
                             if (item.ProblemaSaude != null)
                             {
-                                <li class="mb-1">
-                                    <span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span>
-                                </li>
+                                <span class="badge bg-danger fs-6 me-2 mb-2 p-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i> @item.ProblemaSaude.ProblemaNome
+                                </span>
                             }
                         }
-                    </ul>
-                }
-                else
-                {
-                    <span class="text-muted">Nenhuma contraindicação registada</span>
-                }
-            </dd>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success d-inline-block py-2 px-3 m-0">
+                            <i class="fas fa-check-circle me-1"></i> Nenhuma contraindicação registada
+                        </div>
+                    }
+                </div>
+            </div>
 
         </div>
     </div>

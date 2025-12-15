@@ -420,7 +420,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Flexão",
                     Descricao = "Exercício para peito, braços e ombros usando apenas o peso do corpo.",
-                    TipoExercicioId = GetTipoId("Calistenia"), // Ou "Força"
                     Duracao = 10,
                     Intencidade = 6,
                     CaloriasGastas = 50,
@@ -444,7 +443,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Agachamento",
                     Descricao = "Exercício composto para membros inferiores.",
-                    TipoExercicioId = GetTipoId("Força"),
                     Duracao = 15,
                     Intencidade = 7,
                     CaloriasGastas = 80,
@@ -467,7 +465,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Prancha",
                     Descricao = "Exercício isométrico para core.",
-                    TipoExercicioId = GetTipoId("Funcional"),
                     Duracao = 5,
                     Intencidade = 5,
                     CaloriasGastas = 30,
@@ -483,7 +480,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Remada com Halteres",
                     Descricao = "Exercício para costas.",
-                    TipoExercicioId = GetTipoId("Força"),
                     Duracao = 12,
                     Intencidade = 7,
                     CaloriasGastas = 70,
@@ -510,7 +506,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Corrida no Lugar",
                     Descricao = "Cardio para queimar calorias.",
-                    TipoExercicioId = GetTipoId("Cardiovascular"), // Ou HIIT
                     Duracao = 20,
                     Intencidade = 6, // No original era 6, ajustei para 8 em alguns exemplos, mantendo 6
                     CaloriasGastas = 150,
@@ -533,7 +528,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Elevação Pélvica",
                     Descricao = "Focado em glúteos.",
-                    TipoExercicioId = GetTipoId("Pilates"), // Ou Força
                     Duracao = 10,
                     Intencidade = 5,
                     CaloriasGastas = 40,
@@ -557,7 +551,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Supino Reto",
                     Descricao = "Força para peitoral.",
-                    TipoExercicioId = GetTipoId("Força"),
                     Duracao = 15,
                     Intencidade = 8,
                     CaloriasGastas = 90,
@@ -582,7 +575,6 @@ namespace HealthWellbeing.Data
                 {
                     ExercicioNome = "Abdominal Crunch",
                     Descricao = "Abdómen superior.",
-                    TipoExercicioId = GetTipoId("Força"),
                     Duracao = 7,
                     Intencidade = 5,
                     CaloriasGastas = 35,

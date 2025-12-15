@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.Exercicio
+@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Criar Exercício";
@@ -29,10 +30,72 @@
         <span asp-validation-for="Descricao" class="text-danger small"></span>
     </div>
 
-    <!-- EQUIPAMENTOS -->
+    <hr class="my-4" />
+
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold">Tipo de Exercício *</label>
+        <div class="border p-3 rounded mt-2">
+            @if (ViewBag.TiposExercicios != null && ((IEnumerable<TipoExercicio>)ViewBag.TiposExercicios).Any())
+            {
+                <div class="row">
+                    @foreach (var item in (IEnumerable<TipoExercicio>)ViewBag.TiposExercicios)
+                    {
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="tipoExerciciosIds"
+                                       value="@item.TipoExercicioId"
+                                       id="type_@item.TipoExercicioId" />
+
+                                <label class="form-check-label" for="type_@item.TipoExercicioId">
+                                    @item.NomeTipoExercicios
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">Nenhum tipo de exercício registado.</div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group mb-4">
+        <label class="control-label fw-bold">Objetivos Físicos</label>
+        <div class="border p-3 rounded mt-2">
+            @if (ViewBag.ObjetivosFisicos != null && ((IEnumerable<ObjetivoFisico>)ViewBag.ObjetivosFisicos).Any())
+            {
+                <div class="row">
+                    @foreach (var item in (IEnumerable<ObjetivoFisico>)ViewBag.ObjetivosFisicos)
+                    {
+                        <div class="col-md-4 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="objetivosFisicosIds"
+                                       value="@item.ObjetivoFisicoId"
+                                       id="goal_@item.ObjetivoFisicoId" />
+
+                                <label class="form-check-label" for="goal_@item.ObjetivoFisicoId">
+                                    @item.NomeObjetivo
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">Nenhum objetivo registado.</div>
+            }
+        </div>
+    </div>
+
+    <hr class="my-4" />
+
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Equipamentos Necessários</label>
-        <small class="form-text text-muted d-block">Selecione os equipamentos necessários para este exercício</small>
         <div class="border p-3 rounded mt-2">
             @if (ViewBag.Equipamentos != null && ((IEnumerable<SelectListItem>)ViewBag.Equipamentos).Any())
             {
@@ -46,11 +109,7 @@
                                        value="@item.Value"
                                        id="eq_@item.Value" />
                                 <label class="form-check-label" for="eq_@item.Value">
-                                    <a href="@Url.Action("Details", "Equipamento", new { id = item.Value })"
-                                       target="_blank"
-                                       class="text-decoration-none">
-                                        @item.Text
-                                    </a>
+                                    @item.Text
                                 </label>
                             </div>
                         </div>
@@ -59,17 +118,13 @@
             }
             else
             {
-                <div class="alert alert-warning">
-                    <p class="mb-1">Nenhum equipamento encontrado no sistema.</p>
-                </div>
+                <div class="alert alert-warning">Nenhum equipamento encontrado.</div>
             }
         </div>
     </div>
 
-    <!-- GRUPOS MUSCULARES -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Grupos Musculares Associados</label>
-        <small class="form-text text-muted d-block">Selecione os grupos musculares associados a este exercício</small>
         <div class="border p-3 rounded mt-2">
             @if (ViewBag.GruposMusculares != null && ((IEnumerable<SelectListItem>)ViewBag.GruposMusculares).Any())
             {
@@ -79,15 +134,14 @@
                         <div class="col-md-6 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
-                                       name="musculosIds"
+                                       name="GrupoMuscularIds"
                                        value="@grupoMuscular.Value"
                                        id="musculo_@grupoMuscular.Value" />
+
+                                @* Nota: O name="GrupoMuscularIds" deve bater certo com o controller *@
+
                                 <label class="form-check-label" for="musculo_@grupoMuscular.Value">
-                                    <a href="@Url.Action("Details", "GrupoMuscular", new { id = grupoMuscular.Value })"
-                                       target="_blank"
-                                       class="text-decoration-none">
-                                        @grupoMuscular.Text
-                                    </a>
+                                    @grupoMuscular.Text
                                 </label>
                             </div>
                         </div>
@@ -96,25 +150,13 @@
             }
             else
             {
-                <div class="alert alert-warning">
-                    <p class="mb-1">Nenhum grupo muscular encontrado.</p>
-                    <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">
-                        Criar Grupo Muscular
-                    </a>
-                </div>
+                <div class="alert alert-warning">Nenhum grupo muscular encontrado.</div>
             }
         </div>
-
-        @if (ViewData.ModelState["musculosIds"] != null && ViewData.ModelState["musculosIds"].Errors.Any())
-        {
-            <span class="text-danger small">@ViewData.ModelState["musculosIds"].Errors.First().ErrorMessage</span>
-        }
     </div>
 
-    <!-- GÊNEROS -->
     <div class="form-group mb-4">
         <label class="control-label fw-bold">Gêneros Associados</label>
-        <small class="form-text text-muted d-block">Selecione os gêneros associados a este exercício</small>
         <div class="border p-3 rounded mt-2">
             @if (ViewBag.Generos != null && ((IEnumerable<SelectListItem>)ViewBag.Generos).Any())
             {
@@ -128,11 +170,7 @@
                                        value="@genero.Value"
                                        id="genero_@genero.Value" />
                                 <label class="form-check-label" for="genero_@genero.Value">
-                                    <a href="@Url.Action("Details", "Genero", new { id = genero.Value })"
-                                       target="_blank"
-                                       class="text-decoration-none">
-                                        @genero.Text
-                                    </a>
+                                    @genero.Text
                                 </label>
                             </div>
                         </div>
@@ -141,25 +179,13 @@
             }
             else
             {
-                <div class="alert alert-warning">
-                    <p class="mb-1">Nenhum gênero encontrado.</p>
-                    <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">
-                        Criar Gênero
-                    </a>
-                </div>
+                <div class="alert alert-warning">Nenhum gênero encontrado.</div>
             }
         </div>
-
-        @if (ViewData.ModelState["generosIds"] != null && ViewData.ModelState["generosIds"].Errors.Any())
-        {
-            <span class="text-danger small">@ViewData.ModelState["generosIds"].Errors.First().ErrorMessage</span>
-        }
     </div>
 
-    <!-- CONTRAINDICAÇÕES -->
     <div class="form-group mb-4">
-        <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
-        <small class="form-text text-muted d-block">Selecione os problemas de saúde a evitar para este exercício</small>
+        <label class="control-label fw-bold text-danger">Contraindicações</label>
         <div class="border p-3 rounded mt-2 bg-light">
             @if (ViewBag.Contraindicacoes != null && ((IEnumerable<SelectListItem>)ViewBag.Contraindicacoes).Any())
             {
@@ -182,10 +208,12 @@
             }
             else
             {
-                <span class="text-muted">Nenhum problema de saúde registado.</span>
+                <div class="alert alert-warning">Nenhum problema de saúde registado.</div>
             }
         </div>
     </div>
+
+    <hr class="my-4" />
 
     <div class="row">
         <div class="col-md-4 mb-3">

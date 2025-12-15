@@ -14,10 +14,6 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A descrição é obrigatória.")]
         public string Descricao { get; set; }
 
-        [Required(ErrorMessage = "O Tipo de Exercício é obrigatório.")]
-        public int TipoExercicioId { get; set; }
-        public TipoExercicio TipoExercicio { get; set; }
-
         [Required(ErrorMessage = "A duração é obrigatória.")]
         [Range(0.1, 480, ErrorMessage = "A duração deve ser entre 0.1 e 480 minutos.")]
         public double Duracao { get; set; }
@@ -44,11 +40,11 @@ namespace HealthWellbeing.Models
         public ICollection<ExercicioGenero>? ExercicioGeneros { get; set; }
         public ICollection<ExercicioGrupoMuscular>? ExercicioGrupoMusculares { get; set; }
         public ICollection<ExercicioEquipamento>? ExercicioEquipamentos { get; set; }
-        public ICollection<ExercicioProblemaSaude> Contraindicacoes { get; set; }
-        public ICollection<HistoricoAtividade> HistoricoAtividades { get; set; }
-
+        public ICollection<ExercicioProblemaSaude>? Contraindicacoes { get; set; }
+        public ICollection<HistoricoAtividade>? HistoricoAtividades { get; set; }
         public ICollection<PlanoExercicios>? PlanoExercicios { get; set; }
-
+        public ICollection<ExercicioTipoExercicio>? ExercicioTipoExercicios { get; set; }
+        public ICollection<ExercicioObjetivoFisico>? ExercicioObjetivos { get; set; }
 
     }
 }

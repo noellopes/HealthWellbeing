@@ -149,8 +149,6 @@ namespace HealthWellbeing.Data
                 .WithMany(p => p.ExercicioAfetado)
                 .HasForeignKey(ep => ep.ProblemaSaudeId);
 
-
-
             modelBuilder.Entity<UtenteGrupo7ProblemaSaude>()
                 .HasKey(up => new { up.UtenteGrupo7Id, up.ProblemaSaudeId });
 
@@ -164,6 +162,31 @@ namespace HealthWellbeing.Data
                 .WithMany(p => p.UtenteProblemasSaude)
                 .HasForeignKey(up => up.ProblemaSaudeId);
 
+            modelBuilder.Entity<ExercicioTipoExercicio>()
+        .HasKey(et => new { et.ExercicioId, et.TipoExercicioId });
+
+            modelBuilder.Entity<ExercicioTipoExercicio>()
+                .HasOne(et => et.Exercicio)
+                .WithMany(e => e.ExercicioTipoExercicios)
+                .HasForeignKey(et => et.ExercicioId);
+
+            modelBuilder.Entity<ExercicioTipoExercicio>()
+                .HasOne(et => et.TipoExercicio)
+                .WithMany(t => t.ExercicioTipoExercicios)
+                .HasForeignKey(et => et.TipoExercicioId);
+
+            modelBuilder.Entity<ExercicioObjetivoFisico>()
+                .HasKey(eo => new { eo.ExercicioId, eo.ObjetivoFisicoId });
+
+            modelBuilder.Entity<ExercicioObjetivoFisico>()
+                .HasOne(eo => eo.Exercicio)
+                .WithMany(e => e.ExercicioObjetivos)
+                .HasForeignKey(eo => eo.ExercicioId);
+
+            modelBuilder.Entity<ExercicioObjetivoFisico>()
+                .HasOne(eo => eo.ObjetivoFisico)
+                .WithMany(o => o.ExercicioObjetivos)
+                .HasForeignKey(eo => eo.ObjetivoFisicoId);
 
         }
     }

@@ -23,6 +23,7 @@ namespace HealthWellbeing.Models
         public ICollection<TipoExercicioProblemaSaude>? Contraindicacao { get; set; }
 
         public ICollection<ObjetivoTipoExercicio>? ObjetivoTipoExercicio { get; set; }
+        public ICollection<ExercicioTipoExercicio>? ExercicioTipoExercicios { get; set; }
     }
 }
 

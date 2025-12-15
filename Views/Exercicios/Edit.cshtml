@@ -4,11 +4,16 @@
 @{
     ViewData["Title"] = "Editar Exercício";
 
-    // Helpers para recuperar os IDs selecionados vindos do Controller
+    // --- VARIÁVEIS DE SELEÇÃO (Para marcar o 'checked') ---
+    // Estes nomes têm de bater certo com as ViewBags do método Edit (GET)
     var generosSel = ViewBag.GenerosSelecionados as List<int> ?? new List<int>();
     var gruposSel = ViewBag.GruposSelecionados as List<int> ?? new List<int>();
     var equipamentosSel = ViewBag.EquipamentosSelecionados as List<int> ?? new List<int>();
     var problemasSel = ViewBag.ProblemasSelecionados as List<int> ?? new List<int>();
+
+    // Novas variáveis para as relações N:N
+    var objetivosSel = ViewBag.ObjetivosSelecionados as List<int> ?? new List<int>();
+    var tiposSel = ViewBag.TiposSelecionados as List<int> ?? new List<int>();
 }
 
 <div class="container mt-4">
@@ -33,13 +38,77 @@
         </div>
 
         <div class="form-group mb-4">
-            <label class="control-label fw-bold">Equipamentos Necessários</label>
-            <small class="form-text text-muted d-block">Selecione os equipamentos necessários</small>
+            <label class="control-label fw-bold text-primary">Tipo de Exercício</label>
+            <small class="form-text text-muted d-block">Selecione os Tipos de exercícios associados</small>
             <div class="border p-3 rounded mt-2">
-                @if (ViewBag.Equipamentos != null && ((IEnumerable<HealthWellbeing.Models.Equipamento>)ViewBag.Equipamentos).Any())
+                @if (ViewBag.TiposExercicios != null && ((IEnumerable<TipoExercicio>)ViewBag.TiposExercicios).Any())
                 {
                     <div class="row">
-                        @foreach (var item in (IEnumerable<HealthWellbeing.Models.Equipamento>)ViewBag.Equipamentos)
+                        @foreach (var item in (IEnumerable<TipoExercicio>)ViewBag.TiposExercicios)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="tipoExerciciosIds"
+                                           value="@item.TipoExercicioId"
+                                           id="type_@item.TipoExercicioId"
+                                           @(tiposSel.Contains(item.TipoExercicioId) ? "checked" : "") />
+
+                                    <label class="form-check-label" for="type_@item.TipoExercicioId">
+                                        @item.NomeTipoExercicios
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">Nenhum tipo de exercício encontrado.</div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold text-primary">Objetivos Físicos</label>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.ObjetivosFisicos != null && ((IEnumerable<ObjetivoFisico>)ViewBag.ObjetivosFisicos).Any())
+                {
+                    <div class="row">
+                        @foreach (var item in (IEnumerable<ObjetivoFisico>)ViewBag.ObjetivosFisicos)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="objetivosFisicosIds"
+                                           value="@item.ObjetivoFisicoId"
+                                           id="goal_@item.ObjetivoFisicoId"
+                                           @(objetivosSel.Contains(item.ObjetivoFisicoId) ? "checked" : "") />
+
+                                    <label class="form-check-label" for="goal_@item.ObjetivoFisicoId">
+                                        @item.NomeObjetivo
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">Nenhum objetivo encontrado.</div>
+                }
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold">Equipamentos Necessários</label>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.Equipamentos != null && ((IEnumerable<Equipamento>)ViewBag.Equipamentos).Any())
+                {
+                    <div class="row">
+                        @foreach (var item in (IEnumerable<Equipamento>)ViewBag.Equipamentos)
                         {
                             <div class="col-md-4 mb-2">
                                 <div class="form-check">
@@ -58,55 +127,18 @@
                 }
                 else
                 {
-                    <div class="alert alert-warning mb-0">
-                        <p class="mb-0">Nenhum equipamento registado no sistema.</p>
-                    </div>
+                    <div class="alert alert-warning mb-0">Nenhum equipamento registado.</div>
                 }
             </div>
         </div>
 
         <div class="form-group mb-4">
-            <label class="control-label fw-bold">Gêneros Associados</label>
-            <small class="form-text text-muted d-block">Selecione os gêneros associados</small>
+            <label class="control-label fw-bold">Grupos Musculares</label>
             <div class="border p-3 rounded mt-2">
-                @if (ViewBag.Generos != null && ((IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos).Any())
+                @if (ViewBag.GruposMusculares != null && ((IEnumerable<GrupoMuscular>)ViewBag.GruposMusculares).Any())
                 {
                     <div class="row">
-                        @foreach (var genero in (IEnumerable<HealthWellbeing.Models.Genero>)ViewBag.Generos)
-                        {
-                            <div class="col-md-4 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox"
-                                           name="generosIds"
-                                           value="@genero.GeneroId"
-                                           id="genero_@genero.GeneroId"
-                                           @(generosSel.Contains(genero.GeneroId) ? "checked" : "") />
-                                    <label class="form-check-label" for="genero_@genero.GeneroId">
-                                        @genero.NomeGenero
-                                    </label>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-warning mb-0">
-                        <p class="mb-1">Nenhum gênero encontrado.</p>
-                        <a href="@Url.Action("Create", "Genero")" class="btn btn-sm btn-outline-primary">Criar Gênero</a>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div class="form-group mb-4">
-            <label class="control-label fw-bold">Grupos Musculares Associados</label>
-            <small class="form-text text-muted d-block">Selecione os grupos musculares associados</small>
-            <div class="border p-3 rounded mt-2">
-                @if (ViewBag.GruposMusculares != null && ((IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares).Any())
-                {
-                    <div class="row">
-                        @foreach (var grupo in (IEnumerable<HealthWellbeing.Models.GrupoMuscular>)ViewBag.GruposMusculares)
+                        @foreach (var grupo in (IEnumerable<GrupoMuscular>)ViewBag.GruposMusculares)
                         {
                             <div class="col-md-4 mb-2">
                                 <div class="form-check">
@@ -125,78 +157,56 @@
                 }
                 else
                 {
-                    <div class="alert alert-warning mb-0">
-                        <p class="mb-1">Nenhum grupo muscular encontrado.</p>
-                        <a href="@Url.Action("Create", "GrupoMuscular")" class="btn btn-sm btn-outline-primary">Criar Grupo Muscular</a>
-                    </div>
+                    <div class="alert alert-warning mb-0">Nenhum grupo muscular encontrado.</div>
                 }
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="Duracao" class="form-label">Duração (min) *</label>
-                <input asp-for="Duracao" type="number" class="form-control" min="1" />
-                <span asp-validation-for="Duracao" class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
-                <input asp-for="Intencidade" type="number" class="form-control" min="1" max="10" />
-                <span asp-validation-for="Intencidade" class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="CaloriasGastas" class="form-label">Calorias *</label>
-                <input asp-for="CaloriasGastas" type="number" class="form-control" min="0" />
-                <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="Repeticoes" class="form-label">Repetições *</label>
-                <input asp-for="Repeticoes" type="number" class="form-control" min="1" />
-                <span asp-validation-for="Repeticoes" class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label asp-for="Series" class="form-label">Séries *</label>
-                <input asp-for="Series" type="number" class="form-control" min="1" />
-                <span asp-validation-for="Series" class="text-danger small"></span>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Instrucoes" class="form-label">Instruções *</label>
-            <textarea asp-for="Instrucoes" rows="3" class="form-control"></textarea>
-            <span asp-validation-for="Instrucoes" class="text-danger small"></span>
-        </div>
-
-        @{
-            var problemas = ViewBag.ProblemasSaude as IEnumerable<ProblemaSaude>;
-            var problemasSel = ViewBag.ProblemasSelecionados as List<int> ?? new List<int>();
-        }
-
         <div class="form-group mb-4">
-            <label class="control-label fw-bold text-danger">Contraindicações (Problemas de Saúde)</label>
-            <small class="form-text text-muted d-block">Selecione os problemas de saúde que contraindicam este exercício</small>
-
-            <div class="border p-3 rounded mt-2 bg-light">
-                @if (problemas != null && problemas.Any())
+            <label class="control-label fw-bold">Gêneros</label>
+            <div class="border p-3 rounded mt-2">
+                @if (ViewBag.Generos != null && ((IEnumerable<Genero>)ViewBag.Generos).Any())
                 {
                     <div class="row">
-                        @foreach (var problema in problemas)
+                        @foreach (var genero in (IEnumerable<Genero>)ViewBag.Generos)
+                        {
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="generosIds"
+                                           value="@genero.GeneroId"
+                                           id="genero_@genero.GeneroId"
+                                           @(generosSel.Contains(genero.GeneroId) ? "checked" : "") />
+                                    <label class="form-check-label" for="genero_@genero.GeneroId">
+                                        @genero.NomeGenero
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">Nenhum género encontrado.</div>
+                }
+            </div>
+        </div>
+
+        <div class="form-group mb-4">
+            <label class="control-label fw-bold text-danger">Contraindicações</label>
+            <div class="border p-3 rounded mt-2 bg-light">
+                @if (ViewBag.ProblemasSaude != null && ((IEnumerable<ProblemaSaude>)ViewBag.ProblemasSaude).Any())
+                {
+                    <div class="row">
+                        @foreach (var problema in (IEnumerable<ProblemaSaude>)ViewBag.ProblemasSaude)
                         {
                             <div class="col-md-6 mb-2">
                                 <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
+                                    <input class="form-check-input" type="checkbox"
                                            name="problemasSaudeIds"
                                            value="@problema.ProblemaSaudeId"
                                            id="prob_@problema.ProblemaSaudeId"
                                            @(problemasSel.Contains(problema.ProblemaSaudeId) ? "checked" : "") />
-
                                     <label class="form-check-label" for="prob_@problema.ProblemaSaudeId">
                                         @problema.ProblemaNome
                                     </label>
@@ -212,7 +222,47 @@
             </div>
         </div>
 
+        <hr class="my-4" />
 
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Duracao" class="form-label">Duração (min) *</label>
+                <input asp-for="Duracao" type="number" class="form-control" step="0.1" />
+                <span asp-validation-for="Duracao" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="Intencidade" class="form-label">Intensidade (1-10) *</label>
+                <input asp-for="Intencidade" type="number" class="form-control" />
+                <span asp-validation-for="Intencidade" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label asp-for="CaloriasGastas" class="form-label">Calorias *</label>
+                <input asp-for="CaloriasGastas" type="number" class="form-control" step="0.1" />
+                <span asp-validation-for="CaloriasGastas" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="Repeticoes" class="form-label">Repetições *</label>
+                <input asp-for="Repeticoes" type="number" class="form-control" />
+                <span asp-validation-for="Repeticoes" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Series" class="form-label">Séries *</label>
+                <input asp-for="Series" type="number" class="form-control" />
+                <span asp-validation-for="Series" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Instrucoes" class="form-label">Instruções *</label>
+            <textarea asp-for="Instrucoes" rows="3" class="form-control"></textarea>
+            <span asp-validation-for="Instrucoes" class="text-danger small"></span>
+        </div>
 
         <div class="mt-4">
             <button type="submit" class="btn btn-success">
