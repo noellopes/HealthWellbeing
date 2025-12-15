@@ -1,0 +1,116 @@
+﻿@model HealthWellbeing.Models.ZonaArmazenamento
+
+@{
+    ViewData["Title"] = "Editar Zona de Armazenamento";
+}
+
+<style>
+    .edit-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="edit-container">
+    <div class="card">
+        <div class="card-header">
+            ✏️ Editar Zona de Armazenamento
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="ZonaId" />
+
+                <!-- Nome da Zona -->
+                <div class="mb-3">
+                    <label asp-for="NomeZona" class="form-label"></label>
+                    <input asp-for="NomeZona" class="form-control" placeholder="Ex: Gaveta 1 - Luvas" />
+                    <span asp-validation-for="NomeZona" class="text-danger"></span>
+                </div>
+
+                <!-- Consumível -->
+                <div class="mb-3">
+                    <label asp-for="ConsumivelId" class="form-label"></label>
+                    <select asp-for="ConsumivelId"
+                            class="form-select"
+                            asp-items="ViewBag.Consumiveis">
+                    </select>
+                    <span asp-validation-for="ConsumivelId" class="text-danger"></span>
+                </div>
+
+                <!-- Sala -->
+                <div class="mb-3">
+                    <label asp-for="RoomId" class="form-label"></label>
+                    <select asp-for="RoomId"
+                            class="form-select"
+                            asp-items="ViewBag.Rooms">
+                    </select>
+                    <span asp-validation-for="RoomId" class="text-danger"></span>
+                </div>
+
+                <!-- Capacidade Máxima -->
+                <div class="mb-3">
+                    <label asp-for="CapacidadeMaxima" class="form-label"></label>
+                    <input asp-for="CapacidadeMaxima"
+                           class="form-control"
+                           type="number"
+                           min="1"
+                           placeholder="Ex: 200" />
+                    <span asp-validation-for="CapacidadeMaxima" class="text-danger"></span>
+                </div>
+
+                <!-- Quantidade Atual -->
+                <div class="mb-3">
+                    <label asp-for="QuantidadeAtual" class="form-label"></label>
+                    <input asp-for="QuantidadeAtual"
+                           class="form-control"
+                           type="number"
+                           min="0"
+                           placeholder="Ex: 50" />
+                    <span asp-validation-for="QuantidadeAtual" class="text-danger"></span>
+                </div>
+
+                <!-- Ativa -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" asp-for="Ativa" id="ativaCheck" />
+                    <label class="form-check-label" for="ativaCheck">
+                        @Html.DisplayNameFor(model => model.Ativa)
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-spacing">💾 Guardar alterações</button>
+                    <a asp-action="Index" class="btn btn-secondary">⬅️ Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
