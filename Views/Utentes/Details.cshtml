@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.UtenteBalneario
+
+@{
+    ViewData["Title"] = "Detalhes do Utente";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>@Model.NomeCompleto</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">Data de Nascimento</dt>
+        <dd class="col-sm-9">@Model.DataNascimento.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Sexo</dt>
+        <dd class="col-sm-9">@Model.Sexo</dd>
+
+        <dt class="col-sm-3">NIF</dt>
+        <dd class="col-sm-9">@Model.NIF</dd>
+
+        <dt class="col-sm-3">Contacto</dt>
+        <dd class="col-sm-9">@Model.Contacto</dd>
+
+        <dt class="col-sm-3">Morada</dt>
+        <dd class="col-sm-9">@Model.Morada</dd>
+
+        <dt class="col-sm-3">Ativo</dt>
+        <dd class="col-sm-9">@(Model.Ativo ? "Sim" : "Não")</dd>
+
+        <dt class="col-sm-3">Médico Responsável</dt>
+        <dd class="col-sm-9">@Model.DadosMedicos.MedicoResponsavel</dd>
+
+        <dt class="col-sm-3">Seguro de Saúde</dt>
+        <dd class="col-sm-9">@Model.SeguroSaude.NomeSeguradora</dd>
+    </dl>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Voltar</a>
+<a asp-action="Edit" asp-route-id="@Model.UtenteBalnearioId" class="btn btn-warning">Editar</a>
