@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -22,7 +23,9 @@ namespace HealthWellbeing.Controllers
         // GET: PlanoExercicios
         public async Task<IActionResult> Index()
         {
-            var healthWellbeingDbContext = _context.PlanoExercicios.Include(p => p.UtenteGrupo7);
+            var healthWellbeingDbContext = _context.PlanoExercicios
+                .Include(o => o.Exercicios)
+                .Include(p => p.UtenteGrupo7);
             return View(await healthWellbeingDbContext.ToListAsync());
         }
 
@@ -35,6 +38,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var planoExercicios = await _context.PlanoExercicios
+                .Include(o => o.Exercicios)
                 .Include(p => p.UtenteGrupo7)
                 .FirstOrDefaultAsync(m => m.PlanoExerciciosId == id);
             if (planoExercicios == null)
@@ -49,6 +53,15 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id");
+
+            ViewBag.Exercicio = _context.Exercicio
+        .Select(e => new SelectListItem
+        {
+            Value = e.ExercicioId.ToString(),
+            Text = e.ExercicioNome
+        })
+        .ToList();
+
             return View();
         }
 
@@ -57,15 +70,35 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PlanoExerciciosId,UtenteGrupo7Id")] PlanoExercicios planoExercicios)
+        public async Task<IActionResult> Create(
+    PlanoExercicios planoExercicios,
+    int[] exerciciosSelecionados)
         {
+            if (exerciciosSelecionados == null || !exerciciosSelecionados.Any())
+            {
+                ModelState.AddModelError("", "Deve selecionar pelo menos um exercício.");
+            }
+
             if (ModelState.IsValid)
             {
+                planoExercicios.Exercicios = _context.Exercicio
+                    .Where(e => exerciciosSelecionados.Contains(e.ExercicioId))
+                    .ToList();
+
                 _context.Add(planoExercicios);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", planoExercicios.UtenteGrupo7Id);
+
+            ViewBag.Exercicio = _context.Exercicio
+                .Select(e => new SelectListItem
+                {
+                    Value = e.ExercicioId.ToString(),
+                    Text = e.ExercicioNome
+                }).ToList();
+
             return View(planoExercicios);
         }
 
@@ -77,12 +110,20 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var planoExercicios = await _context.PlanoExercicios.FindAsync(id);
+            var planoExercicios = await _context.PlanoExercicios.Include(p => p.Exercicios).FirstOrDefaultAsync(p => p.PlanoExerciciosId == id);
             if (planoExercicios == null)
             {
                 return NotFound();
             }
             ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", planoExercicios.UtenteGrupo7Id);
+
+            ViewBag.Exercicio = _context.Exercicio
+                .Select(e => new SelectListItem
+                {
+                    Value = e.ExercicioId.ToString(),
+                    Text = e.ExercicioNome
+                }).ToList();
+
             return View(planoExercicios);
         }
 
