@@ -11,9 +11,12 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "Client is required.")]
         public int ClientId { get; set; }
 
+        public Client? Client { get; set; }
+
         [Required(ErrorMessage = "Goal name is required.")]
         [StringLength(200)]
         public string GoalName { get; set; } = string.Empty;
+
 
         [Range(0, 20000, ErrorMessage = "Daily calories must be a positive value.")]
         public int DailyCalories { get; set; }
@@ -35,7 +38,5 @@ namespace HealthWellbeing.Models
 
         [Range(0, 1000, ErrorMessage = "Daily fibers must be a positive value.")]
         public int DailyFibers { get; set; }
-
-        public Client? Client { get; set; }
     }
 }

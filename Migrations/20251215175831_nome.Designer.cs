@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
     [Migration("20251215175831_nome")]
     partial class nome
+========
+    [Migration("20251215184551_fresh")]
+    partial class fresh
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,6 +93,9 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"));
 
+                    b.Property<double>("ActivityFactor")
+                        .HasColumnType("float");
+
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -109,6 +117,9 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int>("HeightCm")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -121,6 +132,9 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<double>("WeightKg")
+                        .HasColumnType("float");
 
                     b.HasKey("ClientId");
 
@@ -161,6 +175,12 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
+========
+                    b.Property<int?>("FoodIntakeId")
+                        .HasColumnType("int");
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -170,6 +190,11 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("CategoryId");
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
+========
+                    b.HasIndex("FoodIntakeId");
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                     b.ToTable("Food");
                 });
 
@@ -214,6 +239,7 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
                     b.Property<int>("PortionId")
                         .HasColumnType("int");
 
@@ -228,6 +254,10 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("PortionId");
 
+========
+                    b.HasKey("FoodIntakeId");
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                     b.ToTable("FoodIntake");
                 });
 
@@ -443,12 +473,22 @@ namespace HealthWellbeing.Migrations
                     b.Property<DateTime>("EndingDate")
                         .HasColumnType("datetime2");
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
+========
+                    b.Property<int?>("FoodIntakeId")
+                        .HasColumnType("int");
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                     b.Property<DateTime>("StartingDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("PlanId");
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
                     b.HasIndex("ClientId");
+========
+                    b.HasIndex("FoodIntakeId");
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
 
                     b.ToTable("Plan");
                 });
@@ -587,6 +627,13 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
+========
+                    b.HasOne("HealthWellbeing.Models.FoodIntake", null)
+                        .WithMany("Foods")
+                        .HasForeignKey("FoodIntakeId");
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                     b.Navigation("Category");
                 });
 
@@ -714,6 +761,7 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
                 {
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
                     b.HasOne("HealthWellbeing.Models.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
@@ -721,6 +769,11 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+========
+                    b.HasOne("HealthWellbeing.Models.FoodIntake", null)
+                        .WithMany("Plans")
+                        .HasForeignKey("FoodIntakeId");
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergy", b =>
@@ -751,6 +804,16 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Foods");
                 });
 
+<<<<<<<< HEAD:Migrations/20251215175831_nome.Designer.cs
+========
+            modelBuilder.Entity("HealthWellbeing.Models.FoodIntake", b =>
+                {
+                    b.Navigation("Foods");
+
+                    b.Navigation("Plans");
+                });
+
+>>>>>>>> RegistoHabitos:Migrations/20251215184551_fresh.Designer.cs
             modelBuilder.Entity("HealthWellbeing.Models.NutritionalComponent", b =>
                 {
                     b.Navigation("FoodNutritionalComponents");
