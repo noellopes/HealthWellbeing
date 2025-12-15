@@ -8,6 +8,10 @@
 @{
     ViewData["Title"] = "Lista de Salas";
 
+    // Verifica se o utilizador tem permissão de deministrador e de Logística
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
+
     // Função local para definir a cor da bolinha com base no estado da sala
     string GetStatusColor(string statusName) => statusName.ToLower() switch
     {
@@ -58,9 +62,12 @@
         </a>
 
         <!-- Botão criar nova sala -->
+        @if (isAdmin){
         <a asp-action="Create" class="btn btn-success">
             <i class="bi bi-plus-circle"></i> Criar Nova Sala
         </a>
+        }
+
     </div>
 </div>
 
@@ -203,9 +210,9 @@
     <table class="table table-bordered table-hover align-middle">
         <thead>
             <tr>
+                <th>Nome</th>
                 <th>Tipo</th>
                 <th>Especialidade</th>
-                <th>Nome</th>
                 <th>Localização</th>
                 <th>Horário</th>
                 <th>Estado</th>
@@ -219,32 +226,35 @@
                 var displayName = item.RoomStatus?.Name;
 
                 <tr>
-                    <td>
-                        @(item.RoomType?.Name?.Length > 20
-                                            ? item.RoomType.Name.Substring(0, 20) + "..."
-                                            : item.RoomType?.Name)
-                    </td>
-                    <td>
-                        @(
-                                            !string.IsNullOrWhiteSpace(item.Specialty?.Name)
-                                            ? (item.Specialty.Name.Length > 20
-                                            ? item.Specialty.Name.Substring(0, 20) + "..."
-                                            : item.Specialty.Name)
-                                            : "--sem especialidade--"
-                                            )
-                    </td>
-
+                    <!-- Nome na primeira coluna -->
                     <td>
                         @(item.Name?.Length > 20
                                             ? item.Name.Substring(0, 20) + "..."
                                             : item.Name)
                     </td>
+
+                    <td>
+                        @(item.RoomType?.Name?.Length > 20
+                                            ? item.RoomType.Name.Substring(0, 20) + "..."
+                                            : item.RoomType?.Name)
+                    </td>
+
+                    <td>
+                        @(!string.IsNullOrWhiteSpace(item.Specialty?.Name)
+                                            ? (item.Specialty.Name.Length > 20
+                                            ? item.Specialty.Name.Substring(0, 20) + "..."
+                                            : item.Specialty.Name)
+                                            : "--sem especialidade--")
+                    </td>
+
                     <td>@item.RoomLocation?.Name</td>
+
                     <td>
                         @item.OpeningTime.ToString(@"hh\:mm")
                         -
                         @item.ClosingTime.ToString(@"hh\:mm")
                     </td>
+
                     <td>
                         <span class="rounded-circle d-inline-block me-2 @color"
                               style="width:10px; height:10px;"
@@ -252,23 +262,31 @@
                         </span>
                         @displayName
                     </td>
+
                     <td class="text-center">
+
+                        @if (isAdmin){
                         <a asp-action="Edit"
                            asp-route-id="@item.RoomId"
                            class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
                         </a>
+                        }
+
                         <a asp-action="Details"
                            asp-route-id="@item.RoomId"
                            asp-route-fromCreation="false"
                            class="btn btn-sm btn-info me-1">
                             <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
                         </a>
+                        @if (isAdmin){
                         <a asp-action="Delete"
                            asp-route-id="@item.RoomId"
                            class="btn btn-sm btn-danger">
                             <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
                         </a>
+                        }
+
                     </td>
                 </tr>
             }

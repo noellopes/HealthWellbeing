@@ -54,12 +54,10 @@
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
-                    @*o meu serialNumber aqui vai ser não editável -> (readonly)*@
                     <div class="mb-3">
                         <label asp-for="SerialNumber" class="form-label fw-bold"></label>
-                        <input asp-for="SerialNumber" class="form-control" readonly> 
+                        <input asp-for="SerialNumber" class="form-control">
                         <span asp-validation-for="SerialNumber" class="text-danger small"></span>
-                        <div class="small text-muted">O Número de Série não deve ser alterado após o registo inicial.</div>
                     </div>
 
                 </div>

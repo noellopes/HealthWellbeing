@@ -2,11 +2,7 @@
 using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
+
 
 namespace HealthWellBeingRoom.Data
 {
@@ -224,7 +220,7 @@ namespace HealthWellBeingRoom.Data
             {
                 var roomsStatus = new List<RoomStatus>
                 {
-                new RoomStatus { Name = "Criado", Description = "Sala registrada no sistema" },
+                new RoomStatus { Name = "Criado", Description = "Sala acabada de ser criada" },
                 new RoomStatus { Name = "Disponível", Description = "Sala pronta para uso" },
                 new RoomStatus { Name = "Indisponível", Description = "Sala ocupada ou bloqueada" },
                 new RoomStatus { Name = "Em Limpeza", Description = "Sala em processo de higienização" },

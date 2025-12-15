@@ -1,7 +1,20 @@
-﻿@model HealthWellbeing.ViewModels.RPaginationInfo<HealthWellbeingRoom.Models.RoomHistory>
+﻿@model HealthWellbeing.ViewModels.RPaginationInfo<HealthWellbeingRoom.Models.RoomConsumable>
+@{
+    ViewData["Title"] = "Consumíveis Associados";
+    string? successMessage = Context.Request.Query["SuccessMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <h2 class="text-primary mb-4">
-    <i class="bi bi-clock-history me-2"></i> @ViewData["Title"] "@ViewBag.RoomName"
+    <i class="bi bi-box-seam me-2"></i> Consumíveis Associados à sala "@ViewData["RoomName"]"
 </h2>
 
 <!-- Botão de pesquisa -->
@@ -9,61 +22,59 @@
     <button class="btn btn-outline-primary"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#historySearch"
+            data-bs-target="#consumableSearch"
             aria-expanded="false"
-            aria-controls="historySearch">
+            aria-controls="consumableSearch">
         <i class="bi bi-search me-1"></i> Pesquisa
     </button>
 </div>
 
-
 <!-- FORMULÁRIO DE PESQUISA (collapse) -->
-<div class="collapse mb-3" id="historySearch">
+<div class="collapse mb-3" id="consumableSearch">
     <div class="card card-body">
-        <form asp-action="History" method="get" class="row g-2 align-items-end">
+        <form asp-action="Consumables" method="get" class="row g-2 align-items-end">
             <input type="hidden" name="id" value="@ViewBag.RoomId" />
 
-            <!-- Primeira linha: Responsável e Id do Responsável -->
+            <!-- Primeira linha: Nome e Categoria -->
             <div class="col-md-6">
-                <label for="searchHistoryId" class="form-label">Id do Histórico</label>
-                <input id="searchHistoryId"
-                       name="searchHistoryId"
-                       value="@ViewBag.SearchHistoryId"
+                <label for="searchName" class="form-label">Nome</label>
+                <input id="searchName"
+                       name="searchName"
+                       value="@ViewBag.SearchName"
                        class="form-control"
-                       placeholder="Pesquisar pelo Id do histórico"
+                       placeholder="Pesquisar pelo nome do consumível"
+                       type="text" />
+            </div>
+
+            <div class="col-md-6">
+                <label for="searchCategory" class="form-label">Categoria</label>
+                <input id="searchCategory"
+                       name="searchCategory"
+                       value="@ViewBag.SearchCategory"
+                       class="form-control"
+                       placeholder="Pesquisar pela categoria"
+                       type="text" />
+            </div>
+
+            <!-- Segunda linha: Quantidade mínima e máxima -->
+            <div class="col-md-6">
+                <label for="searchMinQuantity" class="form-label">Quantidade mínima</label>
+                <input id="searchMinQuantity"
+                       name="searchMinQuantity"
+                       value="@ViewBag.SearchMinQuantity"
+                       class="form-control"
                        type="number"
-                       min="1" />
+                       min="0" />
             </div>
 
-
             <div class="col-md-6">
-                <label for="searchResponsibleId" class="form-label">Id do Responsável</label>
-                <input id="searchResponsibleId"
-                       name="searchResponsibleId"
-                       value="@ViewBag.SearchResponsibleId"
+                <label for="searchMaxQuantity" class="form-label">Quantidade máxima</label>
+                <input id="searchMaxQuantity"
+                       name="searchMaxQuantity"
+                       value="@ViewBag.SearchMaxQuantity"
                        class="form-control"
-                       placeholder="Pesquisar pelo Id do responsável"
                        type="number"
-                       min="1" />
-            </div>
-
-            <!-- Segunda linha: Intervalo de datas -->
-            <div class="col-md-6">
-                <label for="searchStartDate" class="form-label">Data Início</label>
-                <input id="searchStartDate"
-                       name="searchStartDate"
-                       value="@ViewBag.SearchStartDate"
-                       class="form-control"
-                       type="date" />
-            </div>
-
-            <div class="col-md-6">
-                <label for="searchEndDate" class="form-label">Data Fim</label>
-                <input id="searchEndDate"
-                       name="searchEndDate"
-                       value="@ViewBag.SearchEndDate"
-                       class="form-control"
-                       type="date" />
+                       min="0" />
             </div>
 
             <!-- Botões -->
@@ -72,7 +83,7 @@
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="bi bi-search me-1"></i> Pesquisar
                 </button>
-                <a asp-action="History" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary flex-fill">
+                <a asp-action="Consumables" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary flex-fill">
                     <i class="bi bi-x-circle me-1"></i> Limpar
                 </a>
             </div>
@@ -80,39 +91,49 @@
     </div>
 </div>
 
+<!-- TABELA -->
 <div class="table-responsive">
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
             <tr>
-                <th>Id</th>
-                <th>Início</th>
-                <th>Fim</th>
-                <th>Responsável</th>
-                <th>Id do Responsável</th>
-                <th>Observação</th>
-                <th class="text-center">Ações</th> <!-- nova coluna -->
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Nota</th>
+                <th class="text-center">Ações</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Items)
+            @if (!Model.Items.Any())
             {
                 <tr>
-                    <td>@item.RoomHistoryId.ToString("D3")</td>
-                    <td>@item.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@item.EndDate.ToString("dd/MM/yyyy HH:mm")</td>
-                    <td>@item.Responsible</td>
-                    <td>@item.ResponsibleId.ToString("D4")</td>
-                    <td>@item.Note</td>
-                    <td class="text-center align-middle">
-                        <a asp-action="HistoryDetails"
-                           asp-route-id="@item.RoomHistoryId"
-                           asp-route-roomId="@ViewBag.RoomId"
-                           class="btn btn-info px-4">
-                            <i class="bi bi-info-circle me-1"></i> Detalhes
-                        </a>
-
+                    <td colspan="5" class="text-center">
+                        <span class="alert alert-info d-block mb-0" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            Nenhum consumível associado a esta sala.
+                        </span>
                     </td>
                 </tr>
+            }
+            else
+            {
+                @foreach (var consumivel in Model.Items)
+                {
+                    <tr>
+                        <td>@consumivel.Name</td>
+                        <td>@consumivel.Category</td>
+                        <td>@consumivel.Quantity</td>
+                        <td>@consumivel.Note</td>
+                        <td class="text-center align-middle">
+                            <a asp-controller="RoomConsumable"
+                               asp-action="Details"
+                               asp-route-id="@consumivel.RoomConsumableId"
+                               class="btn btn-info px-4">
+                                <i class="bi bi-info-circle me-1"></i> Detalhes
+                            </a>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -130,7 +151,7 @@
 </div>
 
 <!-- PAGINAÇÃO AO FINAL -->
-<nav aria-label="RoomHistory page" class="d-flex justify-content-between align-items-center mt-4">
+<nav aria-label="RoomConsumable page" class="d-flex justify-content-between align-items-center mt-4">
     @if (Model.TotalItems > 0)
     {
         <span class="text-muted">
@@ -158,7 +179,7 @@
         {
             <li class="page-item">
                 <a class="page-link"
-                   asp-action="History"
+                   asp-action="Consumables"
                    asp-route-id="@ViewBag.RoomId"
                    asp-route-page="1">
                     <i class="bi bi-chevron-double-left"></i> Primeira
@@ -179,7 +200,7 @@
             {
                 <li class="page-item">
                     <a class="page-link"
-                       asp-action="History"
+                       asp-action="Consumables"
                        asp-route-id="@ViewBag.RoomId"
                        asp-route-page="@p">
                         @p
@@ -199,7 +220,7 @@
         {
             <li class="page-item">
                 <a class="page-link"
-                   asp-action="History"
+                   asp-action="Consumables"
                    asp-route-id="@ViewBag.RoomId"
                    asp-route-page="@Model.TotalPages">
                     Última <i class="bi bi-chevron-double-right"></i>

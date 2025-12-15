@@ -3,6 +3,9 @@
 
 @{
     ViewData["Title"] = "Dispositivos Médicos Registados";
+
+    // Verifica se o utilizador tem permissão de Logística
+    bool isLogistica = User.IsInRole("logisticsTechnician");
 }
 
 @* --- Secção de Mensagem de Sucesso --- *@
@@ -26,13 +29,16 @@
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Registar Novo
-        </a>
+        @if (isLogistica)
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+            </a>
+        }
     </div>
 </div>
 
-@* --- FORMULÁRIO DE PESQUISA (Seu código existente) --- *@
+@* --- FORMULÁRIO DE PESQUISA --- *@
 <div class="collapse mt-2 mb-2" id="postSearch">
     <div class="card card-body">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
@@ -89,7 +95,7 @@
 }
 else
 {
-    @* --- TABELA DE ITENS (Seu código existente) --- *@
+    @* --- TABELA DE ITENS --- *@
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="table-light">
@@ -158,44 +164,53 @@ else
                                 bool podeEliminar = dispositivo.CurrentStatus == "Em Armazenamento";
                             }
 
-                            @* --- BOTÃO MOVER --- *@
-                            @if (podeMover)
+                            @* --- BOTÃO MOVER (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <a asp-controller="LocationMedDevice" asp-action="Create"
-                                   asp-route-id="@dispositivo.MedicalDeviceID"
-                                   class="btn btn-sm btn-success me-1">
-                                    <i class="bi bi-geo-alt"></i> Mover
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
-                                    <i class="bi bi-x-octagon"></i> Mover
-                                </span>
+                                @if (podeMover)
+                                {
+                                    <a asp-controller="LocationMedDevice" asp-action="Create"
+                                       asp-route-id="@dispositivo.MedicalDeviceID"
+                                       class="btn btn-sm btn-success me-1">
+                                        <i class="bi bi-geo-alt"></i> Mover
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
+                                        <i class="bi bi-x-octagon"></i> Mover
+                                    </span>
+                                }
                             }
 
-                            @* --- BOTÃO DETALHES --- *@
+                            @* --- BOTÃO DETALHES (Visível para todos) --- *@
                             <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-info me-1">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
 
-                            @* --- BOTÃO EDITAR --- *@
-                            <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-
-                            @* --- BOTÃO ELIMINAR --- *@
-                            @if (podeEliminar)
+                            @* --- BOTÃO EDITAR (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
                                 </a>
                             }
-                            else
+
+                            @* --- BOTÃO ELIMINAR (Apenas Logística) --- *@
+                            @if (isLogistica)
                             {
-                                <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </span>
+                                @if (podeEliminar)
+                                {
+                                    <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </span>
+                                }
                             }
                         </td>
                     </tr>
@@ -203,7 +218,7 @@ else
             </tbody>
         </table>
 
-        @* --- Secção de Paginação (Seu código existente) --- *@
+        @* --- Secção de Paginação --- *@
         <nav aria-label="Medical Device page" class="d-flex justify-content-between align-items-center">
             @* Model.Items.Count() mostra quantos itens estão na página atual *@
             <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
