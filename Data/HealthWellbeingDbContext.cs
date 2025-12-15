@@ -64,9 +64,9 @@ namespace HealthWellbeing.Data
         public DbSet<Equipment> Equipment { get; set; } = default!;
         public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
         public DbSet<Room> Room { get; set; } = default!;
-        public DbSet<Alergia> Alergia { get; set; } = default!;
-        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<Receita> Receita { get; set; } = default!;
+        //public DbSet<Alergia> Alergia { get; set; } = default!;
+        //public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        //public DbSet<Receita> Receita { get; set; } = default!;
         public DbSet<RoomHistory> RoomHistories { get; set; }
 
         // Novos DbSets
