@@ -166,5 +166,6 @@ namespace HealthWellbeing.Data
 
 
         }
+        public DbSet<HealthWellbeing.Models.LimitacaoMedica> LimitacaoMedica { get; set; } = default!;
     }
 }
