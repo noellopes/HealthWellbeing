@@ -29,6 +29,12 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.EventType)
+                .WithMany()
+                .HasForeignKey(e => e.EventTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // Configuração da relação auto-referenciada Alimento ↔ AlimentoSubstituto
 
             modelBuilder.Entity<AlimentoSubstituto>()
@@ -78,14 +84,12 @@ namespace HealthWellbeing.Data
                 .WithMany(r => r.Componentes)
                 .HasForeignKey(c => c.ReceitaId)
                 .OnDelete(DeleteBehavior.Cascade);
+        }
 
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Level { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Activity_> Activity { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UtenteSaude> UtenteSaude { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Consulta> Consulta { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Doctor> Doctor{ get; set; } = default!;
@@ -104,14 +108,5 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
-
-            modelBuilder.Entity<Event>()
-                .HasOne(e => e.EventType)
-                .WithMany()
-                .HasForeignKey(e => e.EventTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
-        }
     }
 }
