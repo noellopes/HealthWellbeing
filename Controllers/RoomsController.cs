@@ -749,11 +749,18 @@ namespace HealthWellbeingRoom.Controllers
 
             // Procurar o histórico pelo ID e RoomId
             var history = fakeData.FirstOrDefault(h => h.RoomHistoryId == id && h.RoomId == roomId);
-
             if (history == null)
                 return NotFound();
 
-            ViewBag.RoomId = roomId;
+            // Calcular IDs anterior e próximo
+            var orderedIds = fakeData.OrderBy(h => h.RoomHistoryId).Select(h => h.RoomHistoryId).ToList();
+            int currentIndex = orderedIds.IndexOf(id);
+            int? previousId = currentIndex > 0 ? orderedIds[currentIndex - 1] : (int?)null;
+            int? nextId = currentIndex < orderedIds.Count - 1 ? orderedIds[currentIndex + 1] : (int?)null;
+
+            ViewBag.PreviousHistoryId = previousId;
+            ViewBag.NextHistoryId = nextId;
+
             ViewData["Title"] = "Detalhes do Histórico da Sala";
 
             return View(history); // envia para HistoryDetails.cshtml
