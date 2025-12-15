@@ -91,7 +91,7 @@
                 </h5>
                 <canvas id="dailyDonutChart" height="220"></canvas>
 
-                <div class="mt-3">
+                <div class="mt-3 d-flex justify-content-center gap-2">
                     <span class="badge bg-success me-2">
                         @consumedPercentage% consumed
                     </span>
@@ -184,28 +184,23 @@
         // ---------- Donut ----------
         const donutCtx = document.getElementById('dailyDonutChart').getContext('2d');
 
-        const consumed = @consumedCount;
-        const notConsumed = @notConsumedCount;
+        const consumed = @consumedPercentage;
+        const notConsumed = @notConsumedPercentage;
+
 
         new Chart(donutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Consumed', 'Not consumed'],
-                datasets: [{
-                    data: [consumed, notConsumed],
-                    backgroundColor: ['#28a745', '#dc3545'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                cutout: '65%',
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }
+          type: 'doughnut',
+          data: {
+            datasets: [{
+              data: [consumed, notConsumed],
+              backgroundColor: ['#28a745', '#e3050c'], // verde e vermelho
+              borderColor: ['#28a745', '#e3050c'],
+              borderWidth: 2
+            }]
+          }
+
         });
+
 
         // ---------- Line chart ----------
         const lineCtx = document.getElementById('progressLineChart').getContext('2d');
