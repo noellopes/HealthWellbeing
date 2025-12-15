@@ -19,32 +19,31 @@ internal static class SeedData
         if (!db.Client.Any())
         {
             var clients = new List<Client>
-            {
-                
-                new Client
-                {
-                    Name      = "Alice Wonder",
-                    Email     = "alice@example.com",
-                    BirthDate = new DateTime(1992, 5, 14),
-                    Gender    = "Female"
-                },
-                new Client
-                {
-                    Name      = "Bob Strong",
-                    Email     = "bob@example.com",
-                    BirthDate = new DateTime(1987, 2, 8),
-                    Gender    = "Male"
-                },
-                new Client
-                {
-                    Name      = "Charlie Fit",
-                    Email     = "charlie@example.com",
-                    BirthDate = new DateTime(1998, 10, 20),
-                    Gender    = "Male"
-                }
-            };
+    {
+        new Client
+        {
+            Name      = "Alice Wonder",
+            Email     = "alice@example.com",
+            BirthDate = new DateTime(1992, 5, 14),
+            Gender    = "Female"
+        },
+        new Client
+        {
+            Name      = "Bob Strong",
+            Email     = "bob@example.com",
+            BirthDate = new DateTime(1987, 2, 8),
+            Gender    = "Male"
+        },
+        new Client
+        {
+            Name      = "Charlie Fit",
+            Email     = "charlie@example.com",
+            BirthDate = new DateTime(1998, 10, 20),
+            Gender    = "Male"
+        }
+    };
 
-            
+            // Criar clientes de teste 4–30
             for (int i = 4; i <= 30; i++)
             {
                 clients.Add(new Client
@@ -58,12 +57,67 @@ internal static class SeedData
 
             db.Client.AddRange(clients);
             db.SaveChanges();
+
+            // =====================================================================
+            // GOALS AUTOMÁTICOS (1 por cliente) – estilo antigo
+            // =====================================================================
+            if (db.Goal != null && !db.Goal.Any())
+            {
+                var allclients = db.Client.OrderBy(c => c.ClientId).ToList();
+
+                if (clients.Any())
+                {
+
+                    var rng = new Random();
+                    double RandomWeight() => rng.Next(55, 95); // 55–95 kg
+
+                    var goals = new List<Goal>();
+                    int index = 0;
+
+                    foreach (var client in clients)
+                    {
+                        double weight = RandomWeight();
+
+                        string goalName =
+                            index % 3 == 0 ? "Weight Loss"
+                          : index % 3 == 1 ? "Muscle Gain"
+                          : "Maintenance";
+
+                        double activity =
+                            goalName == "Weight Loss" ? 1.3 :
+                            goalName == "Muscle Gain" ? 1.7 :
+                            1.5;
+
+                        double calories = weight * 22 * activity;
+                        double protein = weight * 1.6;
+                        double fat = calories * 0.27 / 9;
+                        double proteinCal = protein * 4;
+                        double hydrates = (calories - proteinCal - (fat * 9)) / 4;
+
+                        goals.Add(new Goal
+                        {
+                            ClientId = client.ClientId,
+                            GoalName = goalName,
+                            DailyCalories = (int)calories,
+                            DailyProtein = (int)protein,
+                            DailyFat = (int)fat,
+                            DailyHydrates = (int)hydrates,
+                        });
+
+                        index++;
+                    }
+
+                    db.Goal.AddRange(goals);
+                    db.SaveChanges();
+                }
+            }
         }
 
-        // =====================================================================
-        // NUTRITIONISTS (≈ 30)
-        // =====================================================================
-        if (!db.Nutritionist.Any())
+
+            // =====================================================================
+            // NUTRITIONISTS (≈ 30)
+            // =====================================================================
+            if (!db.Nutritionist.Any())
         {
             var nutritionists = new List<Nutritionist>
             {
@@ -303,43 +357,6 @@ internal static class SeedData
 
             db.Plan.AddRange(plans);
             db.SaveChanges();
-        }
-
-        // =====================================================================
-        // GOALS (≈ 30)
-        // =====================================================================
-        if (db.Goal != null && !db.Goal.Any())
-        {
-            var clients = db.Client.OrderBy(c => c.ClientId).ToList();
-            if (clients.Any())
-            {
-                var goals = new List<Goal>();
-                int index = 0;
-
-                foreach (var client in clients)
-                {
-                    goals.Add(new Goal
-                    {
-                        ClientId = client.ClientId,
-                        GoalName = index % 3 == 0 ? "Weight Loss"
-                                        : index % 3 == 1 ? "Muscle Gain"
-                                        : "Maintenance",
-                        DailyCalories = 1600 + (index % 5) * 200,
-                        DailyProtein = 70 + (index % 4) * 10,
-                        DailyFat = 50 + (index % 3) * 5,
-                        DailyHydrates = 150 + (index % 4) * 20,
-                        DailyVitamins = 100,
-                        DailyMinerals = 100,
-                        DailyFibers = 25
-                    });
-
-                    index++;
-                    if (index >= 30) break;
-                }
-
-                db.Goal.AddRange(goals);
-                db.SaveChanges();
-            }
         }
 
         // =====================================================================
