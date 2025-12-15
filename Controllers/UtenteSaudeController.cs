@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Humanizer.Localisation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -164,7 +165,7 @@ namespace HealthWellbeing.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Msg"] = "Utente criado com sucesso.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id = u.UtenteSaudeId });
         }
 
         // ================================
@@ -215,7 +216,7 @@ namespace HealthWellbeing.Controllers
                 throw;
             }
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details), new { id = u.UtenteSaudeId });
         }
 
         // ================================
