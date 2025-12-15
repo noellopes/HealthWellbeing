@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
 
 internal class SeedData
 {
@@ -19,6 +20,54 @@ internal class SeedData
         PopulateAlimentoSubstitutos(context);
         PopulateReceitas(context);
         PopulateComponentesReceita(context);
+    }
+
+
+    internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
+    {
+        EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Cliente").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Nutricionista").Wait();
+    }
+
+    private static async Task EnsureRoleIsCreatedAsync(RoleManager<IdentityRole> roleManager, string role)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    internal static void SeedUsers(UserManager<IdentityUser> userManager)
+    {
+        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+    }
+
+    private static async Task EnsureUserIsCreatedAsync(
+        UserManager<IdentityUser> userManager,
+        string username,
+        string password,
+        string[] roles)
+    {
+        var user = await userManager.FindByNameAsync(username);
+
+        if (user == null)
+        {
+            user = new IdentityUser(username) { Email = username, EmailConfirmed = true };
+            await userManager.CreateAsync(user, password);
+        }
+
+        foreach (var role in roles)
+        {
+            if (!await userManager.IsInRoleAsync(user, role))
+                await userManager.AddToRoleAsync(user, role);
+        }
+    }
+
+    internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
+    {
+        EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Administrator"]).Wait();
     }
 
     private static void PopulateCategorias(HealthWellbeingDbContext context)
