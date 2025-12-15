@@ -31,7 +31,6 @@ namespace HealthWellbeing.Models {
 
         [Display(Name = "Activity Type")]
         public int ActivityTypeId { get; set; }
-        public virtual ActivityType? ActivityTypes { get; set;
-
-        }
+        public virtual ActivityType? ActivityTypes { get; set; }
+    }
 }

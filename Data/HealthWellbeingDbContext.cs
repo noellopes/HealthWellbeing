@@ -71,7 +71,7 @@ namespace HealthWellbeing.Data
                 .HasOne(br => br.Badge)
                 .WithMany(b => b.BadgeRequirements)
                 .HasForeignKey(br => br.BadgeId)
-                .OnDelete(DeleteBehavior.Cascade)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<CustomerBadge>(entity =>
             {
