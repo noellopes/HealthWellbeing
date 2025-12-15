@@ -103,6 +103,23 @@
 
     </div>
 
+    <div class="btn-group" role="group">
+        @if (ViewBag.PreviousRoomId != null)
+        {
+            <a class="btn btn-outline-primary"
+               href="@Url.Action("Details", new { id = ViewBag.PreviousRoomId, fromCreation = ViewBag.FromCreation })">
+                ← Sala Anterior
+            </a>
+        }
+        @if (ViewBag.NextRoomId != null)
+        {
+            <a class="btn btn-outline-primary"
+               href="@Url.Action("Details", new { id = ViewBag.NextRoomId, fromCreation = ViewBag.FromCreation })">
+                Próxima Sala →
+            </a>
+        }
+    </div>
+
     <div class="card-footer d-flex justify-content-end gap-2">
         @if (isAdmin)
         {

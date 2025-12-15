@@ -207,6 +207,18 @@ namespace HealthWellbeingRoom.Controllers
             if (room == null) return NotFound();
 
             ViewBag.FromCreation = fromCreation;
+
+            // Navegação entre salas
+            var orderedIds = await _context.Room
+                .OrderBy(r => r.RoomId)
+                .Select(r => r.RoomId)
+                .ToListAsync();
+            int currentIndex = orderedIds.IndexOf(id.Value);
+            int? previousId = currentIndex > 0 ? orderedIds[currentIndex - 1] : (int?)null;
+            int? nextId = currentIndex < orderedIds.Count - 1 ? orderedIds[currentIndex + 1] : (int?)null;
+            ViewBag.PreviousRoomId = previousId;
+            ViewBag.NextRoomId = nextId;
+
             return View(room);
         }
 
