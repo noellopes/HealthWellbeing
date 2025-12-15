@@ -4,7 +4,6 @@ using HealthWellbeing.Utils.Group1.DTOs;
 using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Data;
 using System.Security.Claims;
 
@@ -27,6 +26,8 @@ namespace HealthWellbeing.Utils.Group1.Repositories
         );
 
         Task<bool> RemoveAsync(Guid id);
+
+        Task<bool> ForceRemoveAsync(Guid id);
     }
 
     public class TreatmentRecordRepository : ITreatmentRecordRepository
@@ -100,7 +101,6 @@ namespace HealthWellbeing.Utils.Group1.Repositories
                             ]);
                         break;
                     case var currentUser when currentUser.IsInRole("Administrator") || currentUser.IsInRole("TreatmentOfficeManager"):
-                        //baseQuery = baseQuery.FirstOrDefaultAsync(m => m.Id == id);
                         selector = new(t => new TreatmentRecordListDTO
                         {
                             Id = t.Id,
@@ -260,6 +260,18 @@ namespace HealthWellbeing.Utils.Group1.Repositories
             if (TreatmentRecordExists(id))
             {
                 await _context.TreatmentRecord.Where(c => c.Id == id).ExecuteDeleteAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        // Hard Delete
+        async Task<bool> ITreatmentRecordRepository.ForceRemoveAsync(Guid id)
+        {
+            if (TreatmentRecordExists(id))
+            {
+                await Functions.HardDeleteByIdAsync<TreatmentRecord, Guid>(_context, id);
                 return true;
             }
 

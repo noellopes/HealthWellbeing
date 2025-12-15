@@ -27,7 +27,7 @@ namespace HealthWellbeing.Utils.Group1
         /// This method is intended for administrative use only, as it permanently deletes data from the database.
         /// Ensure proper authorization checks are in place before calling this method.
         /// </remarks>
-        public static async Task HardDeleteByIdAsync<TEntity>(HealthWellbeingDbContext _context, int id) where TEntity : class
+        public static async Task HardDeleteByIdAsync<TEntity, Tkey>(HealthWellbeingDbContext _context, Tkey id) where TEntity : class
         {
             // Validate entity type and table name
             var entityType = _context.Model.FindEntityType(typeof(TEntity));

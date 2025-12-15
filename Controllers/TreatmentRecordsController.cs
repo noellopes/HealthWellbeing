@@ -108,7 +108,7 @@ namespace HealthWellbeing.Controllers
             ViewData["Title"] = "Editar marcação de tratamento";
             ViewBag.PathologyId = new SelectList(_context.Pathology, "Id", "Name");
             ViewBag.TreatmentId = new SelectList(_context.TreatmentType, "Id", "Name");
-            return View("Request", treatmentRecord.Data);
+            return View("Edit/User", treatmentRecord.Data);
         }
 
         // POST: TreatmentRecords/Edit/<GUID>
@@ -197,9 +197,6 @@ namespace HealthWellbeing.Controllers
                 {
                     TempData["Alert"] = AlertItem.CreateAlert("warning", "bi bi-exclamation-triangle", "Não foi possivel remover o registo do tratamento", true);
                 }
-
-                // Hard Delete
-                //await Functions.HardDeleteByIdAsync<TreatmentRecord>(_context, treatmentRecord.Id);
 
                 return RedirectToAction(nameof(Index));
             }
