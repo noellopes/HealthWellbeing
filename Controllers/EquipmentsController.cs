@@ -28,12 +28,19 @@ namespace HealthWellbeingRoom.Controllers
         // GET: Equipments
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchSerie = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
+            var statusIdExcluido = _context.EquipmentStatus
+                    .Where(es => es.Name == "Excluído")
+                    .Select(es => es.EquipmentStatusId)
+                    .FirstOrDefault();
+
+
             // Construir a consulta inicial incluindo as entidades relacionadas
             var equipmentQuery = _context.Equipment
                 .Include(r => r.Room)
                 .Include(et => et.EquipmentType)
                 .Include(es => es.EquipmentStatus)
-                .AsQueryable();
+                .AsQueryable()
+                .Where(e => e.EquipmentStatusId != statusIdExcluido);
 
             // Validar se os parâmetros de pesquisa não estão vazios e aplicar os filtros correspondentes
             if (!string.IsNullOrEmpty(searchName))
@@ -71,7 +78,8 @@ namespace HealthWellbeingRoom.Controllers
             // Buscar dados para os filtros ordenados alfabeticamente
             var rooms = await _context.Set<Room>().OrderBy(e => e.Name).ToListAsync();
             var types = await _context.Set<EquipmentType>().OrderBy(e => e.Name).ToListAsync();
-            var status = await _context.Set<EquipmentStatus>().OrderBy(e => e.Name).ToListAsync();
+            // Retornar os estados sem o Excluído
+            var status = await _context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído").OrderBy(e => e.Name).ToListAsync();
 
             // Atribuir 1ª opção "Todos" aos filtros
             rooms.Insert(0, new Room { RoomId = -1, Name = "-- Todas Salas --" });
@@ -129,7 +137,7 @@ namespace HealthWellbeingRoom.Controllers
         {
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
-            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name");
             return View();
         }
 
@@ -162,7 +170,7 @@ namespace HealthWellbeingRoom.Controllers
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
-            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -183,7 +191,7 @@ namespace HealthWellbeingRoom.Controllers
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
-            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -232,10 +240,9 @@ namespace HealthWellbeingRoom.Controllers
                         ModelState.AddModelError(string.Empty, "Nenhuma alteração foi feita nos dados do equipamento.");
                         ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name", equipment.RoomId);
                         ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name", equipment.EquipmentTypeId);
-                        ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name", equipment.EquipmentStatusId);
+                        ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name", equipment.EquipmentStatusId);
                         return View(equipment);
                     }
-
 
                     // Salvar as alteraçoes no equipamento
                     _context.Update(equipment);
@@ -265,7 +272,7 @@ namespace HealthWellbeingRoom.Controllers
             }
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
             ViewData["EquipmentTypeId"] = new SelectList(_context.Set<EquipmentType>(), "EquipmentTypeId", "Name");
-            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>(), "EquipmentStatusId", "Name");
+            ViewData["EquipmentStatusId"] = new SelectList(_context.Set<EquipmentStatus>().Where(e => e.Name != "Excluído"), "EquipmentStatusId", "Name");
             return View(equipment);
         }
 
@@ -300,7 +307,15 @@ namespace HealthWellbeingRoom.Controllers
             var equipment = await _context.Equipment.FindAsync(id);
             if (equipment != null)
             {
-                _context.Equipment.Remove(equipment);
+                //_context.Equipment.Remove(equipment);
+
+
+                // Alterar o estado para "Excluído"
+                equipment.EquipmentStatusId = _context.EquipmentStatus
+                    .Where(es => es.Name == "Excluído")
+                    .Select(es => es.EquipmentStatusId)
+                    .FirstOrDefault();
+                _context.Update(equipment);
                 await _context.SaveChangesAsync();
             }
 

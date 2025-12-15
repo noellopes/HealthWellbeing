@@ -425,7 +425,8 @@ namespace HealthWellBeingRoom.Data
                 {
                     new EquipmentStatus { Name = "Operacional" },
                     new EquipmentStatus { Name = "Em Manutenção" },
-                    new EquipmentStatus { Name = "Fora de Uso" }
+                    new EquipmentStatus { Name = "Fora de Uso" },
+                    new EquipmentStatus { Name = "Excluído" }
                 };
                 dbContext.EquipmentStatus.AddRange(equipmentStatuses);
                 dbContext.SaveChanges();
