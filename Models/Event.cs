@@ -22,10 +22,18 @@ namespace HealthWellbeing.Models
         public string EventDescription { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Event Type is required.")]
-        [Display(Name = "Event Type")]
+        [Display(Name = "Event Category")]
         public int EventTypeId { get; set; }
 
         public virtual EventType? EventType { get; set; }
+
+        [Display(Name = "Activity Focus")]
+        public int? ActivityTypeId { get; set; }
+
+        [ForeignKey("ActivityTypeId")]
+        public virtual ActivityType? ActivityType { get; set; }
+
+        public virtual ICollection<EventActivity> EventActivities { get; set; } = new List<EventActivity>();
 
         [Required(ErrorMessage = "Start Date is required.")]
         [Display(Name = "Event Start")]
@@ -37,9 +45,7 @@ namespace HealthWellbeing.Models
         [DataType(DataType.DateTime)]
         public DateTime EventEnd { get; set; }
 
-        [Required(ErrorMessage = "Points are required.")]
         [Display(Name = "Points")]
-        [Range(0, 10000, ErrorMessage = "Points must be between 0 and 10000.")]
         public int EventPoints { get; set; }
 
         [Required(ErrorMessage = "Minimum Level is required.")]
@@ -99,14 +105,6 @@ namespace HealthWellbeing.Models
                 yield return new ValidationResult(
                     "The event must occur during operating hours (06:00 - 23:00).",
                     new[] { nameof(EventStart) }
-                );
-            }
-
-            if (MinLevel <= 5 && EventPoints > 1000)
-            {
-                yield return new ValidationResult(
-                    "Low level events (1-5) cannot exceed 1000 points.",
-                    new[] { nameof(EventPoints) }
                 );
             }
         }

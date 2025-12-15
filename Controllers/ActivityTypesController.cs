@@ -10,21 +10,22 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class ActivitiesController : Controller
+    public class ActivityTypesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public ActivitiesController(HealthWellbeingDbContext context)
+        public ActivityTypesController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
+        // GET: ActivityTypes
         public async Task<IActionResult> Index()
         {
-            var healthWellbeingDbContext = _context.Activity.Include(a => a.ActivityType);
-            return View(await healthWellbeingDbContext.ToListAsync());
+            return View(await _context.ActivityType.ToListAsync());
         }
 
+        // GET: ActivityTypes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,38 +33,39 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity
-                .Include(a => a.ActivityType)
-                .FirstOrDefaultAsync(m => m.ActivityId == id);
-
-            if (activity == null)
+            var activityType = await _context.ActivityType
+                .FirstOrDefaultAsync(m => m.ActivityTypeId == id);
+            if (activityType == null)
             {
                 return NotFound();
             }
 
-            return View(activity);
+            return View(activityType);
         }
 
+        // GET: ActivityTypes/Create
         public IActionResult Create()
         {
-            ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name");
             return View();
         }
 
+        // POST: ActivityTypes/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity)
+        public async Task<IActionResult> Create([Bind("ActivityTypeId,Name,Description")] ActivityType activityType)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(activity);
+                _context.Add(activityType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name", activity.ActivityTypeId);
-            return View(activity);
+            return View(activityType);
         }
 
+        // GET: ActivityTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -71,20 +73,22 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity.FindAsync(id);
-            if (activity == null)
+            var activityType = await _context.ActivityType.FindAsync(id);
+            if (activityType == null)
             {
                 return NotFound();
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name", activity.ActivityTypeId);
-            return View(activity);
+            return View(activityType);
         }
 
+        // POST: ActivityTypes/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity)
+        public async Task<IActionResult> Edit(int id, [Bind("ActivityTypeId,Name,Description")] ActivityType activityType)
         {
-            if (id != activity.ActivityId)
+            if (id != activityType.ActivityTypeId)
             {
                 return NotFound();
             }
@@ -93,12 +97,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(activity);
+                    _context.Update(activityType);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ActivityExists(activity.ActivityId))
+                    if (!ActivityTypeExists(activityType.ActivityTypeId))
                     {
                         return NotFound();
                     }
@@ -109,10 +113,10 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name", activity.ActivityTypeId);
-            return View(activity);
+            return View(activityType);
         }
 
+        // GET: ActivityTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -120,35 +124,34 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var activity = await _context.Activity
-                .Include(a => a.ActivityType)
-                .FirstOrDefaultAsync(m => m.ActivityId == id);
-
-            if (activity == null)
+            var activityType = await _context.ActivityType
+                .FirstOrDefaultAsync(m => m.ActivityTypeId == id);
+            if (activityType == null)
             {
                 return NotFound();
             }
 
-            return View(activity);
+            return View(activityType);
         }
 
+        // POST: ActivityTypes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var activity = await _context.Activity.FindAsync(id);
-            if (activity != null)
+            var activityType = await _context.ActivityType.FindAsync(id);
+            if (activityType != null)
             {
-                _context.Activity.Remove(activity);
-                await _context.SaveChangesAsync();
+                _context.ActivityType.Remove(activityType);
             }
 
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ActivityExists(int id)
+        private bool ActivityTypeExists(int id)
         {
-            return _context.Activity.Any(e => e.ActivityId == id);
+            return _context.ActivityType.Any(e => e.ActivityTypeId == id);
         }
     }
 }
