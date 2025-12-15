@@ -13,7 +13,7 @@ using static HealthWellbeing.Data.SeedData;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
+    [Authorize]
     public class ExerciciosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -128,6 +128,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercicios/Create
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public IActionResult Create()
         {
             ViewBag.Generos = new SelectList(_context.Genero, "GeneroId", "NomeGenero");
@@ -145,6 +146,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exercicios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Create(
             [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,Repeticoes,Series")] Exercicio exercicio,
             int[] generosIds,
@@ -242,6 +244,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercicios/Edit/5
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -282,6 +285,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exercicios/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Edit(
             int id,
             [Bind("ExercicioId,ExercicioNome,Descricao,Duracao,Intencidade,CaloriasGastas,Instrucoes,Repeticoes,Series")] Exercicio exercicio,
@@ -419,6 +423,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exercicios/Delete/5
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -443,8 +448,9 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Exercicios/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exercicio = await _context.Exercicio

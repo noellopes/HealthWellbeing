@@ -1,8 +1,10 @@
 ﻿@model HealthWellbeing.Models.Exercicio
+@using HealthWellbeing.Data
 
 @{
     ViewData["Title"] = "Detalhes do Exercício";
     string? successMessage = Context.Request.Query["SuccessMessage"];
+    bool podeEditar = User.IsInRole(SeedData.Roles.Administrador) || User.IsInRole(SeedData.Roles.Profissional);
 }
 
 <div class="container mt-4">
@@ -12,12 +14,14 @@
             <a asp-action="Index" class="btn btn-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Voltar à Lista
             </a>
+            @if (podeEditar){
             <a asp-action="Edit" asp-route-id="@Model.ExercicioId" class="btn btn-warning me-2">
                 <i class="fas fa-edit"></i> Editar
             </a>
             <a asp-action="Delete" asp-route-id="@Model.ExercicioId" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Apagar
             </a>
+            }
         </div>
     </div>
 
