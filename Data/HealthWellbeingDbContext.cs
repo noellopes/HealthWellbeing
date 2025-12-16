@@ -1,4 +1,5 @@
-﻿using HealthWellbeing.Utils.Group1.Interfaces;
+﻿using HealthWellbeing.Models;
+using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -54,6 +55,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.UsoConsumivel> UsoConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.CompraOpcao> CompraOpcao { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Compra> Compra { get; set; } = default!;
+
 
     }
 

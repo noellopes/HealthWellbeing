@@ -330,6 +330,43 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Compra",
+                columns: table => new
+                {
+                    CompraId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    ZonaId = table.Column<int>(type: "int", nullable: false),
+                    FornecedorId = table.Column<int>(type: "int", nullable: false),
+                    Quantidade = table.Column<int>(type: "int", nullable: false),
+                    PrecoUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TempoEntrega = table.Column<int>(type: "int", nullable: false),
+                    DataCompra = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Compra", x => x.CompraId);
+                    table.ForeignKey(
+                        name: "FK_Compra_Consumivel_ConsumivelId",
+                        column: x => x.ConsumivelId,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Compra_Fornecedor_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedor",
+                        principalColumn: "FornecedorId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Compra_ZonaArmazenamento_ZonaId",
+                        column: x => x.ZonaId,
+                        principalTable: "ZonaArmazenamento",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Stock",
                 columns: table => new
                 {
@@ -434,6 +471,21 @@ namespace HealthWellbeing.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Compra_ConsumivelId",
+                table: "Compra",
+                column: "ConsumivelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Compra_FornecedorId",
+                table: "Compra",
+                column: "FornecedorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Compra_ZonaId",
+                table: "Compra",
+                column: "ZonaId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CompraOpcao_ConsumivelId",
                 table: "CompraOpcao",
                 column: "ConsumivelId");
@@ -504,6 +556,9 @@ namespace HealthWellbeing.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Alergia");
+
+            migrationBuilder.DropTable(
+                name: "Compra");
 
             migrationBuilder.DropTable(
                 name: "CompraOpcao");

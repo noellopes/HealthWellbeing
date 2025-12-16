@@ -147,6 +147,46 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("CategoriaConsumivel");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Compra", b =>
+                {
+                    b.Property<int>("CompraId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraId"));
+
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCompra")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PrecoUnitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TempoEntrega")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ZonaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompraId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.HasIndex("ZonaId");
+
+                    b.ToTable("Compra");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.CompraOpcao", b =>
                 {
                     b.Property<int>("CompraOpcaoId")
@@ -676,6 +716,33 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Compra", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.ZonaArmazenamento", "Zona")
+                        .WithMany()
+                        .HasForeignKey("ZonaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Fornecedor");
+
+                    b.Navigation("Zona");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.CompraOpcao", b =>
