@@ -1,0 +1,55 @@
+﻿@model HealthWellbeingRoom.Models.RoomReservation
+
+@{
+    ViewData["Title"] = "Detalhes da Reserva";
+}
+
+<h1 class="mb-4 text-primary">
+    <i class="bi bi-info-circle-fill"></i> Detalhes da Reserva da Sala "@Model.Room?.Name"
+</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ResponsibleName)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ResponsibleName)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Room)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Room.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationId)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationType)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationType)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.PatientId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.PatientId)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Specialty)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.StartTime)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartTime)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.EndTime)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndTime)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Notes)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+        </dl>
+
+        <!-- Botões -->
+        <div class="text-end mt-4 gap-2 border-top pt-3">
+            <a asp-action="Edit" asp-route-id="@Model?.RoomReservationId" class="btn btn-primary btn-sm" style="min-width:150px">
+                <i class="bi bi-pencil-square me-1"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
+                <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+            </a>
+        </div>
+    </div>
+</div>
