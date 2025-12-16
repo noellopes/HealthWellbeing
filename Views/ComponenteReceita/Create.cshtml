@@ -19,58 +19,67 @@
 
 <hr />
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <form asp-action="Create">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@if (User.IsInRole("Nutricionista"))
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="AlimentoId" class="form-label">Alimento</label>
-                        <select asp-for="AlimentoId" class="form-select" asp-items="ViewBag.AlimentoId"></select>
-                        <span asp-validation-for="AlimentoId" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="AlimentoId" class="form-label">Alimento</label>
+                            <select asp-for="AlimentoId" class="form-select" asp-items="ViewBag.AlimentoId"></select>
+                            <span asp-validation-for="AlimentoId" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="ReceitaId" class="form-label">Receita</label>
-                        <select asp-for="ReceitaId" class="form-select" asp-items="ViewBag.ReceitaId"></select>
-                        <span asp-validation-for="ReceitaId" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="ReceitaId" class="form-label">Receita</label>
+                            <select asp-for="ReceitaId" class="form-select" asp-items="ViewBag.ReceitaId"></select>
+                            <span asp-validation-for="ReceitaId" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="UnidadeMedida" class="form-label"></label>
-                        <select asp-for="UnidadeMedida" class="form-select"
-                            asp-items="Html.GetEnumSelectList<UnidadeMedidaEnum>()">
-                            <option value="">-- Selecione a Unidade Medida --</option>
-                        </select>
-                        <span asp-validation-for="UnidadeMedida" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="UnidadeMedida" class="form-label"></label>
+                            <select asp-for="UnidadeMedida" class="form-select"
+                                asp-items="Html.GetEnumSelectList<UnidadeMedidaEnum>()">
+                                <option value="">-- Selecione a Unidade Medida --</option>
+                            </select>
+                            <span asp-validation-for="UnidadeMedida" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Quantidade" class="form-label"></label>
-                        <input asp-for="Quantidade" class="form-control" />
-                        <span asp-validation-for="Quantidade" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Quantidade" class="form-label"></label>
+                            <input asp-for="Quantidade" class="form-control" />
+                            <span asp-validation-for="Quantidade" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="IsOpcional" class="form-label"></label>
-                        <select asp-for="IsOpcional" class="form-select">
-                            <option value="true">Sim</option>
-                            <option value="false" selected>Não</option>
-                        </select>
-                        <span asp-validation-for="IsOpcional" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="IsOpcional" class="form-label"></label>
+                            <select asp-for="IsOpcional" class="form-select">
+                                <option value="true">Sim</option>
+                                <option value="false" selected>Não</option>
+                            </select>
+                            <span asp-validation-for="IsOpcional" class="text-danger"></span>
+                        </div>
 
-                    <div class="d-flex justify-content-end">
-                        <input type="submit" value="Criar" class="btn btn-primary me-2" />
-                        <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end">
+                            <input type="submit" value="Criar" class="btn btn-primary me-2" />
+                            <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="alert alert-danger">
+        Apenas usuários com a role <strong>Nutricionista</strong> podem criar componentes de receita.
+    </div>
+}
 
 @section Scripts {
     @{
