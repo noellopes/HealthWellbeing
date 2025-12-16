@@ -4,77 +4,44 @@
     ViewData["Title"] = "Apagar Exame";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
+        <div class="col-lg-6 col-md-8">
 
-            <div class="card border-danger shadow-lg">
-                <div class="card-header bg-danger text-white">
-                    <h1 class="h4 mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Exame</h1>
-                </div>
+            <div class="card shadow border-0 rounded-3 text-center">
+                <div class="card-body p-5">
+                    <div class="mb-4 text-danger">
+                        <i class="bi bi-trash3-fill display-1"></i>
+                    </div>
 
-                <div class="card-body">
-                    <h4 class="card-title text-danger mb-4">Tem a certeza que deseja apagar este exame?</h4>
-                    <p class="card-text text-muted">Esta ação não pode ser revertida se o exame for apagado.</p>
+                    <h2 class="h4 fw-bold text-danger mb-3">Eliminar Marcação?</h2>
+                    <p class="text-muted mb-4">Esta ação é irreversível. Por favor, confirme os dados abaixo antes de continuar.</p>
 
-                    <hr class="my-3" />
+                    <div class="bg-light p-3 rounded-3 text-start mb-4">
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small text-uppercase fw-bold">Data:</div>
+                            <div class="col-8 fw-bold">@Model.DataHoraMarcacao.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small text-uppercase fw-bold">Utente:</div>
+                            <div class="col-8">@Model.Utente?.Nome</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted small text-uppercase fw-bold">Exame:</div>
+                            <div class="col-8">@Model.ExameTipo?.Nome</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 text-muted small text-uppercase fw-bold">Estado:</div>
+                            <div class="col-8">
+                                <span class="badge bg-secondary rounded-pill">@Model.Estado</span>
+                            </div>
+                        </div>
+                    </div>
 
-                    <dl class="row mb-0">
-                        @* Data e Hora *@
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.DataHoraMarcacao)
-                        </dt>
-                        <dd class="col-sm-8 fw-bold">
-                            @Html.DisplayFor(model => model.DataHoraMarcacao)
-                        </dd>
-
-                        @* Estado *@
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.Estado)
-                        </dt>
-                        <dd class="col-sm-8">
-                            <span class="badge @(Model.Estado == "Realizado" ? "bg-success" : Model.Estado == "Cancelado" ? "bg-danger" : "bg-primary")">
-                                @Html.DisplayFor(model => model.Estado)
-                            </span>
-                        </dd>
-
-                        @* Utente *@
-                        <dt class="col-sm-4 text-muted">
-                            Utente
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Utente!.Nome)
-                        </dd>
-
-                        @* Tipo de Exame *@
-                        <dt class="col-sm-4 text-muted">
-                            Tipo de Exame
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.ExameTipo!.Nome)
-                        </dd>
-
-                        @* Médico *@
-                        <dt class="col-sm-4 text-muted">
-                            Médico Solicitante
-                        </dt>
-                        <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.MedicoSolicitante!.Nome)
-                        </dd>
-                    </dl>
-                </div>
-
-                <div class="card-footer d-flex justify-content-between align-items-center bg-light">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left-circle me-1"></i> Cancelar
-                    </a>
-
-                    <form asp-action="Delete" method="post">
-                        @* MUITO IMPORTANTE: O ID tem de ser o ExameId *@
+                    <form asp-action="Delete" method="post" class="d-flex justify-content-center gap-3">
                         <input type="hidden" asp-for="ExameId" />
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash-fill me-1"></i> Confirmar Eliminação
-                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                        <button type="submit" class="btn btn-danger px-4">Sim, Eliminar</button>
                     </form>
                 </div>
             </div>

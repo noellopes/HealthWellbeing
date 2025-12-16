@@ -2,59 +2,159 @@
 
 @{
     ViewData["Title"] = "Detalhes do Exame";
+    string? successMessage = ViewBag.SuccessMessage as string;
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
+<div class="container mt-4">
 
-@* Exibe Mensagem de Sucesso (Do PDF de Success Messages) *@
-@if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        @ViewBag.SuccessMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    @* --- Mensagem de Sucesso --- *@
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* --- Cabeçalho da Página --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-secondary">Detalhes da Marcação <span class="fs-6 text-muted">#@Model.ExameId</span></h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+        </a>
     </div>
-}
 
-<div class="card">
-    <div class="card-header">
-        Detalhes da Marcação #@Model.ExameId
+    @* --- Cartão Principal --- *@
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <div class="card-header bg-info text-white py-3">
+            <h5 class="card-title mb-0 text-white">
+                <i class="bi bi-info-circle-fill me-2"></i> Informação Detalhada
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+
+            @* Lógica para a cor do Badge do Estado *@
+            @{
+                var badgeClass = Model.Estado switch
+                {
+                    "Realizado" => "bg-success",
+                    "Marcado" => "bg-primary",
+                    "Cancelado" => "bg-danger",
+                    "Pendente" => "bg-warning text-dark",
+                    _ => "bg-secondary"
+                };
+            }
+
+            <div class="row g-5">
+                @* --- COLUNA ESQUERDA: Dados Principais --- *@
+                <div class="col-md-6 border-end-md">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-4 border-bottom pb-2">Dados da Marcação</h6>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Utente</label>
+                        <div class="fs-5 fw-normal text-dark d-flex align-items-center">
+                            <i class="bi bi-person-circle text-secondary me-2"></i>
+                            @Html.DisplayFor(model => model.Utente!.Nome)
+                        </div>
+                        <small class="text-muted ms-4">SNS: @Model.Utente?.UtenteSNS</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Data e Hora</label>
+                        <div class="fs-5 text-dark">
+                            <i class="bi bi-calendar-event text-secondary me-2"></i>
+                            @Model.DataHoraMarcacao.ToString("dd 'de' MMMM 'de' yyyy")
+                            <span class="text-muted mx-2">às</span>
+                            @Model.DataHoraMarcacao.ToString("HH:mm")
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Tipo de Exame</label>
+                        <div class="fs-5 text-dark">
+                            <i class="bi bi-activity text-secondary me-2"></i>
+                            @Html.DisplayFor(model => model.ExameTipo!.Nome)
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block mb-1">Estado Atual</label>
+                        <span class="badge @badgeClass rounded-pill px-3 py-2 fs-6">
+                            @Html.DisplayFor(model => model.Estado)
+                        </span>
+                    </div>
+                </div>
+
+                @* --- COLUNA DIREITA: Recursos Clínicos --- *@
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-4 border-bottom pb-2">Recursos Clínicos</h6>
+
+                    <div class="row mb-4">
+                        <div class="col-12 mb-3">
+                            <label class="text-muted small text-uppercase fw-bold d-block">Médico Solicitante</label>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-heart-pulse text-secondary me-2"></i>
+                                <span class="fw-medium">@Html.DisplayFor(model => model.MedicoSolicitante!.Nome)</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-muted small text-uppercase fw-bold d-block">Profissional Executante</label>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-badge text-secondary me-2"></i>
+                                <span class="fw-medium">@Html.DisplayFor(model => model.ProfissionalExecutante!.Nome)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Localização (Sala)</label>
+                        <div class="d-flex align-items-start">
+                            <i class="bi bi-geo-alt-fill text-danger me-2 mt-1"></i>
+                            <div>
+                                <div class="fw-bold">@Html.DisplayFor(model => model.SalaDeExame!.TipoSala)</div>
+                                <div class="small text-muted">@Html.DisplayFor(model => model.SalaDeExame!.Laboratorio)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small text-uppercase fw-bold d-block">Equipamento Associado</label>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-tools text-secondary me-2"></i>
+                            <span>@Html.DisplayFor(model => model.MaterialEquipamentoAssociado!.NomeEquipamento)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* --- Secção de Notas (Fundo cinza para destacar) --- *@
+            <div class="bg-light p-3 rounded-3 mt-2 border border-light-subtle">
+                <label class="text-muted small text-uppercase fw-bold mb-2">
+                    <i class="bi bi-journal-text me-1"></i> Notas e Observações
+                </label>
+                <p class="mb-0 text-dark fst-italic">
+                    @if (!string.IsNullOrWhiteSpace(Model.Notas))
+                    {
+                        @Model.Notas
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhuma nota registada para este exame.</span>
+                    }
+                </p>
+            </div>
+
+        </div>
+
+        @* --- Rodapé com Botões --- *@
+        <div class="card-footer bg-white p-3 d-flex justify-content-end gap-2 border-top-0">
+            <a asp-action="Edit" asp-route-id="@Model.ExameId" class="btn btn-primary px-4">
+                <i class="bi bi-pencil-square me-1"></i> Editar
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.ExameId" class="btn btn-danger px-4">
+                <i class="bi bi-trash me-1"></i> Eliminar
+            </a>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.DataHoraMarcacao)</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.DataHoraMarcacao)</dd>
-
-            <dt class="col-sm-4">Utente</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.Utente!.Nome)</dd>
-
-            <dt class="col-sm-4">Tipo de Exame</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.ExameTipo!.Nome)</dd>
-
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Estado)</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.Estado)</dd>
-
-            <dt class="col-sm-4">Médico Solicitante</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.MedicoSolicitante!.Nome)</dd>
-
-            <dt class="col-sm-4">Profissional Executante</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.ProfissionalExecutante!.Nome)</dd>
-
-            <dt class="col-sm-4">Sala</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.SalaDeExame!.Laboratorio)</dd>
-
-            <dt class="col-sm-4">Equipamento</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.MaterialEquipamentoAssociado!.NomeEquipamento)</dd>
-
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Notas)</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.Notas)</dd>
-        </dl>
-    </div>
-</div>
-
-<div class="mt-4">
-    <a asp-action="Edit" asp-route-id="@Model.ExameId" class="btn btn-primary"><i class="bi bi-pencil me-1"></i> Editar</a>
-    <a asp-action="Delete" asp-route-id="@Model.ExameId" class="btn btn-danger"><i class="bi bi-trash me-1"></i> Eliminar</a>
-    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista</a>
 </div>

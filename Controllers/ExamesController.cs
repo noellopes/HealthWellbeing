@@ -21,13 +21,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exames
-        // CORREÇÃO: Os nomes 'pesquisaUtente' e 'pesquisaTipo' AGORA batem certo com o teu Index.cshtml
-        public async Task<IActionResult> Index(int pagina = 1, string pesquisaUtente = "", string pesquisaTipo = "")
+        public async Task<IActionResult> Index(int pagina = 1, string pesquisaUtente = "", DateTime? pesquisaData = null)
         {
-            ViewBag.PesquisaUtente = pesquisaUtente;
-            ViewBag.PesquisaTipo = pesquisaTipo;
+            // REMOVIDO O FILTRO POR DEFEITO.
+            // Agora, se não escolheres data, ele mostra TUDO.
 
-            // Query base com todos os Includes para mostrar nomes na tabela
+            ViewBag.PesquisaUtente = pesquisaUtente;
+            ViewBag.PesquisaData = pesquisaData;
+
             var examesQuery = _context.Exames
                 .Include(e => e.ExameTipo)
                 .Include(e => e.MaterialEquipamentoAssociado)
@@ -37,23 +38,24 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.Utente)
                 .AsQueryable();
 
-            // Filtros
+            // Filtro por Utente
             if (!string.IsNullOrEmpty(pesquisaUtente))
             {
                 examesQuery = examesQuery.Where(e => e.Utente.Nome.Contains(pesquisaUtente));
             }
 
-            if (!string.IsNullOrEmpty(pesquisaTipo))
+            // Filtro por Data (Só filtra se o utilizador tiver escolhido uma data)
+            if (pesquisaData.HasValue)
             {
-                examesQuery = examesQuery.Where(e => e.ExameTipo.Nome.Contains(pesquisaTipo));
+                examesQuery = examesQuery.Where(e => e.DataHoraMarcacao.Date == pesquisaData.Value.Date);
             }
 
             // Paginação
             int totalExames = await examesQuery.CountAsync();
-            var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, itemsPerPage: 5);
+            var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, itemsPerPage: 10); // Aumentei para 10 por página
 
             paginationInfo.Items = await examesQuery
-                .OrderByDescending(e => e.DataHoraMarcacao)
+                .OrderByDescending(e => e.DataHoraMarcacao) // Ordenado do mais recente para o mais antigo
                 .Skip(paginationInfo.ItemsToSkip)
                 .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
@@ -65,18 +67,11 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
             var exame = await _context.Exames
-                .Include(e => e.ExameTipo)
-                .Include(e => e.MaterialEquipamentoAssociado)
-                .Include(e => e.MedicoSolicitante)
-                .Include(e => e.ProfissionalExecutante)
-                .Include(e => e.SalaDeExame)
-                .Include(e => e.Utente)
+                .Include(e => e.ExameTipo).Include(e => e.MaterialEquipamentoAssociado).Include(e => e.MedicoSolicitante)
+                .Include(e => e.ProfissionalExecutante).Include(e => e.SalaDeExame).Include(e => e.Utente)
                 .FirstOrDefaultAsync(m => m.ExameId == id);
-
             if (exame == null) return NotFound();
-
             return View(exame);
         }
 
@@ -92,14 +87,8 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
-            bool salaOcupada = await _context.Exames.AnyAsync(e =>
-                e.SalaDeExameId == exame.SalaDeExameId &&
-                e.DataHoraMarcacao == exame.DataHoraMarcacao);
-
-            if (salaOcupada)
-            {
-                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
-            }
+            bool salaOcupada = await _context.Exames.AnyAsync(e => e.SalaDeExameId == exame.SalaDeExameId && e.DataHoraMarcacao == exame.DataHoraMarcacao);
+            if (salaOcupada) ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
 
             if (ModelState.IsValid)
             {
@@ -108,7 +97,6 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = "Exame marcado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
@@ -117,10 +105,8 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var exame = await _context.Exames.FindAsync(id);
             if (exame == null) return NotFound();
-
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
@@ -131,16 +117,8 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
             if (id != exame.ExameId) return NotFound();
-
-            bool salaOcupadaOutro = await _context.Exames.AnyAsync(e =>
-                e.SalaDeExameId == exame.SalaDeExameId &&
-                e.DataHoraMarcacao == exame.DataHoraMarcacao &&
-                e.ExameId != id);
-
-            if (salaOcupadaOutro)
-            {
-                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
-            }
+            bool salaOcupadaOutro = await _context.Exames.AnyAsync(e => e.SalaDeExameId == exame.SalaDeExameId && e.DataHoraMarcacao == exame.DataHoraMarcacao && e.ExameId != id);
+            if (salaOcupadaOutro) ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
 
             if (ModelState.IsValid)
             {
@@ -149,7 +127,6 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
@@ -158,25 +135,15 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-
-            var exame = await _context.Exames
-                .Include(e => e.ExameTipo)
-                .Include(e => e.MaterialEquipamentoAssociado)
-                .Include(e => e.MedicoSolicitante)
-                .Include(e => e.ProfissionalExecutante)
-                .Include(e => e.SalaDeExame)
-                .Include(e => e.Utente)
-                .FirstOrDefaultAsync(m => m.ExameId == id);
-
+            var exame = await _context.Exames.Include(e => e.ExameTipo).Include(e => e.Utente).FirstOrDefaultAsync(m => m.ExameId == id);
             if (exame == null) return NotFound();
-
             return View(exame);
         }
 
         // POST: Exames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id) // O nome aqui deve ser 'id' para bater certo com a rota padrão
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exame = await _context.Exames.FindAsync(id);
             if (exame != null)
@@ -186,7 +153,6 @@ namespace HealthWellbeing.Controllers
                     TempData["ErrorMessage"] = "Não é possível apagar um exame já realizado.";
                     return RedirectToAction(nameof(Index));
                 }
-
                 _context.Exames.Remove(exame);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Exame eliminado com sucesso!";

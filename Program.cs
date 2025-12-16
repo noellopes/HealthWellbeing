@@ -1,4 +1,6 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellBeing.Models; // Adicionado para garantir compatibilidade de namespaces
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +14,14 @@ internal class Program
         // 1. CONFIGURAÇÃO DOS SERVIÇOS (DI)
         // ==========================================
 
-        // Configuração do HealthWellbeingDbContext (Dados de Negócio: Exames, Utentes, etc.)
+        // Configuração do HealthWellbeingDbContext (Dados de Negócio)
         var healthConnection = builder.Configuration.GetConnectionString("HealthWellBeingConnection")
             ?? throw new InvalidOperationException("Connection string 'HealthWellBeingConnection' not found.");
 
         builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
             options.UseSqlServer(healthConnection));
 
-        // Configuração do ApplicationDbContext (Dados de Identidade: Users, Roles)
+        // Configuração do ApplicationDbContext (Identity)
         var identityConnection = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -28,17 +30,16 @@ internal class Program
 
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        // Configuração do Identity (Users e Roles)
+        // Configuração do Identity
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
-            // Configurações extra de password (opcional)
             options.Password.RequireDigit = false;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
             options.Password.RequiredLength = 6;
         })
-        .AddRoles<IdentityRole>() // IMPORTANTE: Permite o uso de Roles (Admin, Medico, etc.)
+        .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
         builder.Services.AddControllersWithViews();
@@ -56,7 +57,6 @@ internal class Program
         else
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days.
             app.UseHsts();
         }
 
@@ -65,7 +65,7 @@ internal class Program
 
         app.UseRouting();
 
-        app.UseAuthentication(); // Obrigatório antes do Authorization
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllerRoute(
@@ -83,19 +83,16 @@ internal class Program
             var services = scope.ServiceProvider;
             try
             {
-                // Obter os serviços necessários
                 var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
                 var contextHealth = services.GetRequiredService<HealthWellbeingDbContext>();
                 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-                // 1. MIGRAR AS BASES DE DADOS AUTOMATICAMENTE
-                // Isto garante que as tabelas são criadas se não existirem
+                // 1. Migrar BDs (Cria as tabelas se não existirem)
                 await contextIdentity.Database.MigrateAsync();
                 await contextHealth.Database.MigrateAsync();
 
-                // 2. EXECUTAR O SEEDING
-                // Chama a classe SeedDataG6 que criámos anteriormente
+                // 2. Executar Seeding (Preenche com dados falsos)
                 await SeedDataG6.Populate(contextHealth, userManager, roleManager);
             }
             catch (Exception ex)
@@ -105,9 +102,6 @@ internal class Program
             }
         }
 
-        // ==========================================
-        // 4. INICIAR A APLICAÇÃO
-        // ==========================================
         app.Run();
     }
 }
