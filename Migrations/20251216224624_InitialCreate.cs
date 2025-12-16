@@ -330,6 +330,34 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Fornecedor_Consumivel",
+                columns: table => new
+                {
+                    FornecedorConsumivelId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FornecedorId = table.Column<int>(type: "int", nullable: false),
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    TempoEntrega = table.Column<int>(type: "int", nullable: true),
+                    Preco = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fornecedor_Consumivel", x => x.FornecedorConsumivelId);
+                    table.ForeignKey(
+                        name: "FK_Fornecedor_Consumivel_Consumivel_ConsumivelId",
+                        column: x => x.ConsumivelId,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Fornecedor_Consumivel_Fornecedor_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedor",
+                        principalColumn: "FornecedorId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Compra",
                 columns: table => new
                 {
@@ -501,6 +529,16 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Fornecedor_Consumivel_ConsumivelId",
+                table: "Fornecedor_Consumivel",
+                column: "ConsumivelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fornecedor_Consumivel_FornecedorId",
+                table: "Fornecedor_Consumivel",
+                column: "FornecedorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stock_ConsumivelID",
                 table: "Stock",
                 column: "ConsumivelID");
@@ -562,6 +600,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "CompraOpcao");
+
+            migrationBuilder.DropTable(
+                name: "Fornecedor_Consumivel");
 
             migrationBuilder.DropTable(
                 name: "Receita");

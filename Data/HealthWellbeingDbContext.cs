@@ -57,6 +57,10 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.CompraOpcao> CompraOpcao { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Compra> Compra { get; set; } = default!;
 
+        public DbSet<Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;
+
+
+
 
     }
 
