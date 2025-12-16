@@ -6,7 +6,7 @@ internal class SeedData
 {
     public static void Populate(HealthWellbeingDbContext? context)
     {
-        if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
         context.Database.EnsureCreated();
 
@@ -18,28 +18,28 @@ internal class SeedData
         PopulateReceitas(context);
         PopulateComponentesReceita(context);
 
-        PopulateSpecialities(dbContext);
+        PopulateSpecialities(context);
         // PopulateConsultas IS NOT WORKING
-        // PopulateConsultas(dbContext);
-        PopulateDoctor(dbContext);
-        PopulateUtenteSaude(dbContext);
+        // PopulateConsultas(context);
+        PopulateDoctor(context);
+        PopulateUtenteSaude(context);
 
-        var clients = PopulateClients(dbContext);
-        PopulateMember(dbContext, clients);
-        PopulateTrainingType(dbContext);
-        PopulatePlan(dbContext);
+        var clients = PopulateClients(context);
+        PopulateMember(context, clients);
+        PopulateTrainingType(context);
+        PopulatePlan(context);
 
         // --- ALTERAÇÃO AQUI: Capturamos a lista de Trainers ---
-        var trainers = PopulateTrainer(dbContext);
+        var trainers = PopulateTrainer(context);
 
         // --- NOVO MÉTODO: Povoamento dos Treinos Agendados ---
-        PopulateTraining(dbContext, trainers);
+        PopulateTraining(context, trainers);
 
-        PopulateEventTypes(dbContext);
-        PopulateEvents(dbContext);
-        PopulateLevels(dbContext);
+        PopulateEventTypes(context);
+        PopulateEvents(context);
+        PopulateLevels(context);
 
-        Initialize(dbContext);
+        Initialize(context);
     }
 
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
