@@ -1,5 +1,132 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HealthWellbeing.Models.Compra
+@using HealthWellbeing.Models
+
 @{
+    ViewData["Title"] = "Nova Compra";
+    var consumiveis = ViewBag.Consumiveis as List<Consumivel> ?? new List<Consumivel>();
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold text-primary mb-4">
+        📦 Nova Compra
+    </h2>
+
+    @if (!consumiveis.Any())
+    {
+        <div class="alert alert-warning">
+            Não existem consumíveis registados no sistema.
+        </div>
+    }
+    else
+    {
+        <form asp-action="SubmeterCompra" method="post">
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <!-- CONSUMÍVEL -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Consumível</label>
+                        <select asp-for="ConsumivelId"
+                                id="consumivelSelect"
+                                class="form-select"
+                                required>
+                            <option value="">-- Selecionar Consumível --</option>
+
+                            @foreach (var c in consumiveis)
+                            {
+                                <option value="@c.ConsumivelId"
+                                        data-atual="@c.QuantidadeAtual"
+                                        data-min="@c.QuantidadeMinima"
+                                        data-max="@c.QuantidadeMaxima">
+                                    @c.Nome
+                                </option>
+                            }
+                        </select>
+
+                        <span asp-validation-for="ConsumivelId"
+                              class="text-danger"></span>
+                    </div>
+
+                    <!-- QUANTIDADES -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Quantidade Atual</label>
+                            <input id="qtdAtual" class="form-control" disabled />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Quantidade Mínima</label>
+                            <input id="qtdMin" class="form-control" disabled />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Quantidade Máxima</label>
+                            <input id="qtdMax" class="form-control" disabled />
+                        </div>
+                    </div>
+
+                    <!-- QUANTIDADE A COMPRAR -->
+                    <div class="mb-3">
+                        <label class="form-label">Quantidade a Comprar</label>
+
+                        <input asp-for="Quantidade"
+                               id="qtdComprar"
+                               type="hidden" />
+
+                        <input id="qtdComprarView"
+                               class="form-control"
+                               disabled />
+                    </div>
+
+                    <p id="infoCompra" class="text-muted small"></p>
+
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <button type="submit"
+                        class="btn btn-success px-4">
+                    ✔ Continuar para Registo de Compras
+                </button>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const select = document.getElementById("consumivelSelect");
+
+        if (select) {
+            select.addEventListener("change", function () {
+
+                const opt = select.options[select.selectedIndex];
+                if (!opt || !opt.dataset) return;
+
+                const atual = parseInt(opt.dataset.atual || 0);
+                const min = parseInt(opt.dataset.min || 0);
+                const max = parseInt(opt.dataset.max || 0);
+
+                document.getElementById("qtdAtual").value = atual;
+                document.getElementById("qtdMin").value = min;
+                document.getElementById("qtdMax").value = max;
+
+                let quantidadeComprar = 0;
+
+                if (atual < min) {
+                    quantidadeComprar = max - atual;
+                }
+
+                document.getElementById("qtdComprar").value = quantidadeComprar;
+                document.getElementById("qtdComprarView").value = quantidadeComprar;
+
+                document.getElementById("infoCompra").innerText =
+                    quantidadeComprar > 0
+                        ? "Compra calculada automaticamente com base no stock mínimo."
+                        : "O stock encontra-se dentro dos valores normais.";
+            });
+        }
+    </script>
 }
