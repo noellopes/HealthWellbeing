@@ -47,6 +47,12 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Event>()
+                .HasOne(e => e.EventType)
+                .WithMany()
+                .HasForeignKey(e => e.EventTypeId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             // Configuração da relação auto-referenciada Alimento ↔ AlimentoSubstituto
 
             modelBuilder.Entity<AlimentoSubstituto>()
@@ -96,6 +102,7 @@ namespace HealthWellbeing.Data
                 .WithMany(r => r.Componentes)
                 .HasForeignKey(c => c.ReceitaId)
                 .OnDelete(DeleteBehavior.Cascade);
+        }
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
