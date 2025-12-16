@@ -103,14 +103,5 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(c => c.ReceitaId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-
-            modelBuilder.Entity<Event>()
-                .HasOne(e => e.EventType)
-                .WithMany()
-                .HasForeignKey(e => e.EventTypeId)
-                .OnDelete(DeleteBehavior.NoAction);
-        }
-
- 
     }
 }
