@@ -14,199 +14,208 @@
         </div>
     </div>
 
-    <form asp-action="Edit" id="receitaForm">
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-        <input type="hidden" asp-for="ReceitaId" />
+    @if (User.IsInRole("Nutricionista"))
+    {
+        <form asp-action="Edit" id="receitaForm">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <input type="hidden" asp-for="ReceitaId" />
 
-        <div class="row">
-            <!-- Coluna Esquerda - Informações Básicas -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações Básicas</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label asp-for="Nome" class="form-label fw-bold"></label>
-                            <input asp-for="Nome" class="form-control" placeholder="Ex: Bolo de Chocolate" />
-                            <span asp-validation-for="Nome" class="text-danger small"></span>
+            <div class="row">
+                <!-- Coluna Esquerda - Informações Básicas -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações Básicas</h5>
                         </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Descricao" class="form-label fw-bold"></label>
-                            <textarea asp-for="Descricao" class="form-control" rows="3" 
-                                      placeholder="Descrição breve da receita..."></textarea>
-                            <span asp-validation-for="Descricao" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="ModoPreparo" class="form-label fw-bold"></label>
-                            <textarea asp-for="ModoPreparo" class="form-control" rows="6" 
-                                      placeholder="Descreva o passo a passo do preparo..."></textarea>
-                            <span asp-validation-for="ModoPreparo" class="text-danger small"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="TempoPreparo" class="form-label fw-bold"></label>
-                                <div class="input-group">
-                                    <input asp-for="TempoPreparo" class="form-control" type="number" min="1" />
-                                    <span class="input-group-text">min</span>
-                                </div>
-                                <span asp-validation-for="TempoPreparo" class="text-danger small"></span>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="Nome" class="form-label fw-bold"></label>
+                                <input asp-for="Nome" class="form-control" placeholder="Ex: Bolo de Chocolate" />
+                                <span asp-validation-for="Nome" class="text-danger small"></span>
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Porcoes" class="form-label fw-bold"></label>
-                                <div class="input-group">
-                                    <input asp-for="Porcoes" class="form-control" type="number" min="1" />
-                                    <span class="input-group-text">porções</span>
-                                </div>
-                                <span asp-validation-for="Porcoes" class="text-danger small"></span>
+                            <div class="mb-3">
+                                <label asp-for="Descricao" class="form-label fw-bold"></label>
+                                <textarea asp-for="Descricao" class="form-control" rows="3" 
+                                          placeholder="Descrição breve da receita..."></textarea>
+                                <span asp-validation-for="Descricao" class="text-danger small"></span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Coluna Direita - Informações Nutricionais -->
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="bi bi-heart-pulse"></i> Informações Nutricionais (por porção)</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label asp-for="Calorias" class="form-label fw-bold"></label>
-                            <div class="input-group">
-                                <input asp-for="Calorias" class="form-control" type="number" step="0.01" min="0" />
-                                <span class="input-group-text">kcal</span>
+                            <div class="mb-3">
+                                <label asp-for="ModoPreparo" class="form-label fw-bold"></label>
+                                <textarea asp-for="ModoPreparo" class="form-control" rows="6" 
+                                          placeholder="Descreva o passo a passo do preparo..."></textarea>
+                                <span asp-validation-for="ModoPreparo" class="text-danger small"></span>
                             </div>
-                            <span asp-validation-for="Calorias" class="text-danger small"></span>
-                        </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Proteinas" class="form-label fw-bold"></label>
-                            <div class="input-group">
-                                <input asp-for="Proteinas" class="form-control" type="number" step="0.01" min="0" />
-                                <span class="input-group-text">g</span>
-                            </div>
-                            <span asp-validation-for="Proteinas" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="HidratosCarbono" class="form-label fw-bold"></label>
-                            <div class="input-group">
-                                <input asp-for="HidratosCarbono" class="form-control" type="number" step="0.01" min="0" />
-                                <span class="input-group-text">g</span>
-                            </div>
-                            <span asp-validation-for="HidratosCarbono" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Gorduras" class="form-label fw-bold"></label>
-                            <div class="input-group">
-                                <input asp-for="Gorduras" class="form-control" type="number" step="0.01" min="0" />
-                                <span class="input-group-text">g</span>
-                            </div>
-                            <span asp-validation-for="Gorduras" class="text-danger small"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seção de Componentes e Restrições -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-warning">
-                        <h5 class="mb-0"><i class="bi bi-list-check"></i> Componentes da Receita</h5>
-                    </div>
-                    <div class="card-body">
-                        @if (Model.Componentes != null && Model.Componentes.Any())
-                        {
-                            <ul class="list-group">
-                                @foreach (var c in Model.Componentes)
-                                {
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>@(c.Alimento?.Name ?? "Alimento")</strong>
-                                            <div class="small text-muted">@c.Quantidade @c.UnidadeMedida</div>
-                                        </div>
-                                        <div>
-                                            <a asp-controller="ComponenteReceita" asp-action="Details"
-                                                asp-route-id="@c.ComponenteReceitaId"
-                                                class="btn btn-sm btn-secondary me-1">Ver</a>
-                                            <a asp-controller="ComponenteReceita" asp-action="Edit"
-                                                asp-route-id="@c.ComponenteReceitaId"
-                                                class="btn btn-sm btn-warning me-1">Editar</a>
-                                            <a asp-controller="ComponenteReceita" asp-action="Delete"
-                                                asp-route-id="@c.ComponenteReceitaId" class="btn btn-sm btn-danger">Apagar</a>
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <p class="text-muted small">Nenhum componente associado.</p>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted small mb-3">Marque as restrições aplicáveis a esta receita:</p>
-                        <div class="form-check-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                            @if (ViewBag.RestricoesAlimentares != null)
-                            {
-                                var selectedRestrictions = Model.RestricoesAlimentarId ?? new List<int>();
-                                @foreach (var item in (MultiSelectList)ViewBag.RestricoesAlimentares)
-                                {
-                                    var isChecked = selectedRestrictions.Contains(int.Parse(item.Value));
-                                    <div class="form-check mb-2 p-2 @(isChecked ? "bg-light border border-danger rounded" : "")">
-                                        <input class="form-check-input" type="checkbox" 
-                                               name="RestricoesAlimentarId" 
-                                               value="@item.Value" 
-                                               id="rest_@item.Value"
-                                               @(isChecked ? "checked" : "") />
-                                        <label class="form-check-label w-100" for="rest_@item.Value">
-                                            <strong>@item.Text</strong>
-                                            @if (isChecked)
-                                            {
-                                                <span class="badge bg-danger float-end">Selecionado</span>
-                                            }
-                                        </label>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="TempoPreparo" class="form-label fw-bold"></label>
+                                    <div class="input-group">
+                                        <input asp-for="TempoPreparo" class="form-control" type="number" min="1" />
+                                        <span class="input-group-text">min</span>
                                     </div>
-                                }
+                                    <span asp-validation-for="TempoPreparo" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Porcoes" class="form-label fw-bold"></label>
+                                    <div class="input-group">
+                                        <input asp-for="Porcoes" class="form-control" type="number" min="1" />
+                                        <span class="input-group-text">porções</span>
+                                    </div>
+                                    <span asp-validation-for="Porcoes" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita - Informações Nutricionais -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-heart-pulse"></i> Informações Nutricionais (por porção)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label asp-for="Calorias" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <input asp-for="Calorias" class="form-control" type="number" step="0.01" min="0" />
+                                    <span class="input-group-text">kcal</span>
+                                </div>
+                                <span asp-validation-for="Calorias" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Proteinas" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <input asp-for="Proteinas" class="form-control" type="number" step="0.01" min="0" />
+                                    <span class="input-group-text">g</span>
+                                </div>
+                                <span asp-validation-for="Proteinas" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="HidratosCarbono" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <input asp-for="HidratosCarbono" class="form-control" type="number" step="0.01" min="0" />
+                                    <span class="input-group-text">g</span>
+                                </div>
+                                <span asp-validation-for="HidratosCarbono" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Gorduras" class="form-label fw-bold"></label>
+                                <div class="input-group">
+                                    <input asp-for="Gorduras" class="form-control" type="number" step="0.01" min="0" />
+                                    <span class="input-group-text">g</span>
+                                </div>
+                                <span asp-validation-for="Gorduras" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Componentes e Restrições -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0"><i class="bi bi-list-check"></i> Componentes da Receita</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Componentes != null && Model.Componentes.Any())
+                            {
+                                <ul class="list-group">
+                                    @foreach (var c in Model.Componentes)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>@(c.Alimento?.Name ?? "Alimento")</strong>
+                                                <div class="small text-muted">@c.Quantidade @c.UnidadeMedida</div>
+                                            </div>
+                                            <div>
+                                                <a asp-controller="ComponenteReceita" asp-action="Details"
+                                                    asp-route-id="@c.ComponenteReceitaId"
+                                                    class="btn btn-sm btn-secondary me-1">Ver</a>
+                                                <a asp-controller="ComponenteReceita" asp-action="Edit"
+                                                    asp-route-id="@c.ComponenteReceitaId"
+                                                    class="btn btn-sm btn-warning me-1">Editar</a>
+                                                <a asp-controller="ComponenteReceita" asp-action="Delete"
+                                                    asp-route-id="@c.ComponenteReceitaId" class="btn btn-sm btn-danger">Apagar</a>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-muted small">Nenhum componente associado.</p>
                             }
                         </div>
-                        <span asp-validation-for="RestricoesAlimentarId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">Marque as restrições aplicáveis a esta receita:</p>
+                            <div class="form-check-list" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                                @if (ViewBag.RestricoesAlimentares != null)
+                                {
+                                    var selectedRestrictions = Model.RestricoesAlimentarId ?? new List<int>();
+                                    @foreach (var item in (MultiSelectList)ViewBag.RestricoesAlimentares)
+                                    {
+                                        var isChecked = selectedRestrictions.Contains(int.Parse(item.Value));
+                                        <div class="form-check mb-2 p-2 @(isChecked ? "bg-light border border-danger rounded" : "")">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   name="RestricoesAlimentarId" 
+                                                   value="@item.Value" 
+                                                   id="rest_@item.Value"
+                                                   @(isChecked ? "checked" : "") />
+                                            <label class="form-check-label w-100" for="rest_@item.Value">
+                                                <strong>@item.Text</strong>
+                                                @if (isChecked)
+                                                {
+                                                    <span class="badge bg-danger float-end">Selecionado</span>
+                                                }
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <span asp-validation-for="RestricoesAlimentarId" class="text-danger small"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Botões de Ação -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Voltar para Lista
-                    </a>
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="bi bi-save"></i> Salvar Alterações
-                    </button>
+            <!-- Botões de Ação -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar para Lista
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-save"></i> Salvar Alterações
+                        </button>
+                    </div>
                 </div>
             </div>
+        </form>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            Apenas usuários com a role <strong>Nutricionista</strong> podem editar receitas.
         </div>
-    </form>
+    }
 </div>
 
 @section Scripts {

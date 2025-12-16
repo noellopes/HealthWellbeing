@@ -20,63 +20,72 @@
 
 <hr />
 
-<div class="alert alert-warning">
-    <h5>Tem certeza que deseja excluir esta restrição?</h5>
-    <p class="mb-0">Esta ação não pode ser desfeita.</p>
-</div>
-
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title mb-3">Informações da Restrição</h5>
-
-        <dl class="row">
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tipo)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Tipo)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Gravidade)</dt>
-            <dd class="col-sm-9">
-                @{
-                    var gravidadeClass = Model.Gravidade switch
-                    {
-                        GravidadeRestricao.Leve => "badge bg-success",
-                        GravidadeRestricao.Moderada => "badge bg-warning",
-                        GravidadeRestricao.Grave => "badge bg-danger",
-                        _ => "badge bg-secondary"
-                    };
-                }
-                <span class="@gravidadeClass">@Html.DisplayFor(model => model.Gravidade)</span>
-            </dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descricao)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
-
-            <dt class="col-sm-3">Alimentos Relacionados</dt>
-            <dd class="col-sm-9">
-                @if (Model?.AlimentosAssociados?.Any() == true)
-                {
-                    <div class="d-flex flex-wrap gap-1">
-                        @foreach (var aa in Model.AlimentosAssociados)
-                        {
-                            <span class="badge bg-primary">@aa.Alimento?.Name</span>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <span class="text-muted">Nenhum alimento associado</span>
-                }
-            </dd>
-        </dl>
-
-        <form asp-action="Delete" method="post">
-            <input type="hidden" asp-for="RestricaoAlimentarId" />
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-danger">Excluir</button>
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+@if (User.IsInRole("Nutricionista"))
+{
+    <div class="alert alert-warning">
+        <h5>Tem certeza que deseja excluir esta restrição?</h5>
+        <p class="mb-0">Esta ação não pode ser desfeita.</p>
     </div>
-</div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Informações da Restrição</h5>
+
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nome)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nome)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Tipo)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Tipo)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Gravidade)</dt>
+                <dd class="col-sm-9">
+                    @{
+                        var gravidadeClass = Model.Gravidade switch
+                        {
+                            GravidadeRestricao.Leve => "badge bg-success",
+                            GravidadeRestricao.Moderada => "badge bg-warning",
+                            GravidadeRestricao.Grave => "badge bg-danger",
+                            _ => "badge bg-secondary"
+                        };
+                    }
+                    <span class="@gravidadeClass">@Html.DisplayFor(model => model.Gravidade)</span>
+                </dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Descricao)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Descricao)</dd>
+
+                <dt class="col-sm-3">Alimentos Relacionados</dt>
+                <dd class="col-sm-9">
+                    @if (Model?.AlimentosAssociados?.Any() == true)
+                    {
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var aa in Model.AlimentosAssociados)
+                            {
+                                <span class="badge bg-primary">@aa.Alimento?.Name</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum alimento associado</span>
+                    }
+                </dd>
+            </dl>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="RestricaoAlimentarId" />
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        Apenas usuários com a role <strong>Nutricionista</strong> podem excluir restrições alimentares.
+    </div>
+}

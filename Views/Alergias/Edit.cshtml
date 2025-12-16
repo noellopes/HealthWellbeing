@@ -6,6 +6,8 @@
 
 <h1>Editar Alergia</h1>
 
+@if (User.IsInRole("Nutricionista"))
+{
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Edit" method="post">
@@ -59,6 +61,13 @@
         </form>
     </div>
 </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        Apenas usuários com a role <strong>Nutricionista</strong> podem editar alergias.
+    </div>
+}
 
 @section Scripts {
     <script>

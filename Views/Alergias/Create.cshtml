@@ -4,110 +4,119 @@
     ViewData["Title"] = "Criar Alergia";
 }
 
-@if (TempData["AlertMessage"] != null)
+@if (User.IsInRole("Nutricionista"))
 {
-    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
-        @TempData["AlertMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-<h1>Criar Alergia</h1>
-
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Gravidade" class="control-label"></label>
-                <select asp-for="Gravidade" asp-items="ViewBag.Gravidades" class="form-control"></select>
-                <span asp-validation-for="Gravidade" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Sintomas" class="control-label"></label>
-                <input asp-for="Sintomas" class="form-control" />
-                <span asp-validation-for="Sintomas" class="text-danger"></span>
-            </div>
-
-            <!-- SELEÇÃO DE ALIMENTOS -->
-            <div class="form-group mb-3">
-                <label>Alimentos relacionados</label>
-                <select id="alimentosSelect" class="form-control">
-                    <option value="">-- Selecione um alimento --</option>
-                    @foreach (var a in ViewBag.Alimentos)
-                    {
-                        <option value="@a.id">@a.nome</option>
-                    }
-                </select>
-            </div>
-
-            <div id="selectedAlimentos" class="mb-2"></div>
-
-            <input type="hidden" id="selectedAlimentosInput" name="selectedAlimentosIds" />
-
-            <div class="form-group">
-                <input type="submit" value="Criar" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        const select = document.getElementById("alimentosSelect");
-        const selectedContainer = document.getElementById("selectedAlimentos");
-        const hiddenInput = document.getElementById("selectedAlimentosInput");
-
-        const selected = [];
-
-        select.addEventListener("change", () => {
-            const selectedOption = select.options[select.selectedIndex];
-            const id = parseInt(selectedOption.value);
-            const nome = selectedOption.text;
-
-            if (id && !selected.some(a => a.id === id)) {
-                selected.push({ id, nome });
-                renderSelected();
-            }
-
-            select.selectedIndex = 0;
-        });
-
-        function removeAlimento(id) {
-            const index = selected.findIndex(a => a.id === id);
-            if (index > -1) {
-                selected.splice(index, 1);
-                renderSelected();
-            }
-        }
-
-        function renderSelected() {
-            selectedContainer.innerHTML = "";
-            selected.forEach(a => {
-                const badge = document.createElement("div");
-                badge.classList.add("badge", "bg-success", "me-2", "mb-2");
-                badge.innerHTML = `${a.nome} <span style="cursor:pointer" onclick="removeAlimento(${a.id})">❌</span>`;
-                selectedContainer.appendChild(badge);
-            });
-            hiddenInput.value = selected.map(a => a.id).join(",");
-        }
-    </script>
-
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    if (TempData["AlertMessage"] != null)
+    {
+        <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+            @TempData["AlertMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
+
+    <h1>Criar Alergia</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Nome" class="control-label"></label>
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Descricao" class="control-label"></label>
+                    <input asp-for="Descricao" class="form-control" />
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Gravidade" class="control-label"></label>
+                    <select asp-for="Gravidade" asp-items="ViewBag.Gravidades" class="form-control"></select>
+                    <span asp-validation-for="Gravidade" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Sintomas" class="control-label"></label>
+                    <input asp-for="Sintomas" class="form-control" />
+                    <span asp-validation-for="Sintomas" class="text-danger"></span>
+                </div>
+
+                <!-- SELEÇÃO DE ALIMENTOS -->
+                <div class="form-group mb-3">
+                    <label>Alimentos relacionados</label>
+                    <select id="alimentosSelect" class="form-control">
+                        <option value="">-- Selecione um alimento --</option>
+                        @foreach (var a in ViewBag.Alimentos)
+                        {
+                            <option value="@a.id">@a.nome</option>
+                        }
+                    </select>
+                </div>
+
+                <div id="selectedAlimentos" class="mb-2"></div>
+
+                <input type="hidden" id="selectedAlimentosInput" name="selectedAlimentosIds" />
+
+                <div class="form-group">
+                    <input type="submit" value="Criar" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            const select = document.getElementById("alimentosSelect");
+            const selectedContainer = document.getElementById("selectedAlimentos");
+            const hiddenInput = document.getElementById("selectedAlimentosInput");
+
+            const selected = [];
+
+            select.addEventListener("change", () => {
+                const selectedOption = select.options[select.selectedIndex];
+                const id = parseInt(selectedOption.value);
+                const nome = selectedOption.text;
+
+                if (id && !selected.some(a => a.id === id)) {
+                    selected.push({ id, nome });
+                    renderSelected();
+                }
+
+                select.selectedIndex = 0;
+            });
+
+            function removeAlimento(id) {
+                const index = selected.findIndex(a => a.id === id);
+                if (index > -1) {
+                    selected.splice(index, 1);
+                    renderSelected();
+                }
+            }
+
+            function renderSelected() {
+                selectedContainer.innerHTML = "";
+                selected.forEach(a => {
+                    const badge = document.createElement("div");
+                    badge.classList.add("badge", "bg-success", "me-2", "mb-2");
+                    badge.innerHTML = `${a.nome} <span style="cursor:pointer" onclick="removeAlimento(${a.id})">❌</span>`;
+                    selectedContainer.appendChild(badge);
+                });
+                hiddenInput.value = selected.map(a => a.id).join(",");
+            }
+        </script>
+
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+}
+else
+{
+    <div class="alert alert-danger">
+        Apenas usuários com a role <strong>Nutricionista</strong> podem criar alergias.
+    </div>
 }

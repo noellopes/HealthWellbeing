@@ -215,19 +215,20 @@
     <!-- Botões de Ação -->
     <div class="row">
         <div class="col-md-12">
-            <div class="d-flex justify-content-between">
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Voltar para Lista
-                </a>
-                <div>
-                    <a asp-action="Edit" asp-route-id="@Model.ReceitaId" class="btn btn-warning">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@Model.ReceitaId" class="btn btn-danger">
-                        <i class="bi bi-trash"></i> Excluir
-                    </a>
+            @if (User.IsInRole("Nutricionista"))
+            {
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="Edit" asp-route-id="@Model?.ReceitaId" class="btn btn-warning me-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@Model?.ReceitaId" class="btn btn-danger me-2">Excluir</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Apenas usuários com a role <strong>Nutricionista</strong> podem editar ou excluir esta receita.
+                </div>
+            }
         </div>
     </div>
 </div>

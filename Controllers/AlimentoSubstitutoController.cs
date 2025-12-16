@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class AlimentoSubstitutoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -116,6 +118,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: AlimentoSubstituto/Details/5
+        [Authorize(Roles = "Cliente,Nutricionista")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -136,6 +139,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: AlimentoSubstituto/Create
+        [Authorize(Roles = "Nutricionista")]
         public IActionResult Create()
         {
             ViewData["AlimentoOriginalId"] = new SelectList(_context.Alimentos, "AlimentoId", "Name");
@@ -146,6 +150,7 @@ namespace HealthWellbeing.Controllers
         // POST: AlimentoSubstituto/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AlimentoSubstitutoId,AlimentoOriginalId,AlimentoSubstitutoRefId,Motivo,ProporcaoEquivalente,Observacoes,FatorSimilaridade")] AlimentoSubstituto alimentoSubstituto)
@@ -165,6 +170,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: AlimentoSubstituto/Edit/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -185,6 +191,7 @@ namespace HealthWellbeing.Controllers
         // POST: AlimentoSubstituto/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AlimentoSubstitutoId,AlimentoOriginalId,AlimentoSubstitutoRefId,Motivo,ProporcaoEquivalente,Observacoes,FatorSimilaridade")] AlimentoSubstituto alimentoSubstituto)
@@ -223,6 +230,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: AlimentoSubstituto/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -243,6 +251,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: AlimentoSubstituto/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

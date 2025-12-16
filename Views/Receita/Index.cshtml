@@ -7,9 +7,23 @@
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-12">
-            <h1 class="mb-3">
-                <i class="bi bi-book"></i> Receitas
-            </h1>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-book"></i> Receitas
+                </h1>
+                <div class="d-flex">
+                    <a class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" href="#searchPanel" role="button"
+                       aria-expanded="false" aria-controls="searchPanel">
+                        Pesquisar
+                    </a>
+                    @if (User.IsInRole("Nutricionista"))
+                    {
+                        <a class="btn btn-primary" asp-action="Create">
+                            <i class="bi bi-plus-circle"></i> Nova Receita
+                        </a>
+                    }
+                </div>
+            </div>
             <hr />
         </div>
     </div>
@@ -41,7 +55,7 @@
     }
 
     <!-- Search and Filter Form -->
-    <div class="card mb-4">
+    <div class="card mb-4 collapse" id="searchPanel">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="bi bi-search"></i> Pesquisar Receitas</h5>
         </div>
@@ -102,11 +116,6 @@
                     <span> | Pesquisa: <strong>@ViewBag.SearchNome</strong></span>
                 }
             </p>
-        </div>
-        <div class="col-md-6 text-end">
-            <a class="btn btn-success" asp-action="Create">
-                <i class="bi bi-plus-circle"></i> Nova Receita
-            </a>
         </div>
     </div>
 
@@ -169,26 +178,20 @@
                                     <td class="text-center">
                                         <span class="badge bg-warning text-dark">@item.Calorias kcal</span>
                                     </td>
-                                    <td class="text-center">
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" 
-                                               asp-route-id="@item.ReceitaId" 
-                                               class="btn btn-sm btn-secondary" 
-                                               title="Ver Detalhes">
-                                                <i>Ver</i>
+                                    <td class="text-end">
+                                        <div class="d-flex gap-2 justify-content-end">
+                                            <a class="btn btn-sm btn-secondary" asp-action="Details" asp-route-id="@item.ReceitaId">
+                                                Ver
                                             </a>
-                                            <a asp-action="Edit" 
-                                               asp-route-id="@item.ReceitaId" 
-                                               class="btn btn-sm btn-warning" 
-                                               title="Editar">
-                                                <i>Editar</i>
-                                            </a>
-                                            <a asp-action="Delete" 
-                                               asp-route-id="@item.ReceitaId" 
-                                               class="btn btn-sm btn-danger" 
-                                               title="Apagar">
-                                                <i>Apagar</i>
-                                            </a>
+                                            @if (User.IsInRole("Nutricionista"))
+                                            {
+                                                <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.ReceitaId">
+                                                    Editar
+                                                </a>
+                                                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.ReceitaId">
+                                                    Excluir
+                                                </a>
+                                            }
                                         </div>
                                     </td>
                                 </tr>

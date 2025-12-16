@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class AlergiasController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -91,6 +93,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Alergias/Create
+        [Authorize(Roles = "Nutricionista")]
         public IActionResult Create()
         {
             var alimentos = _context.Alimentos
@@ -113,6 +116,7 @@ namespace HealthWellbeing.Controllers
 
 
         // POST: Alergias/Create
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Alergia alergia, string selectedAlimentosIds)
@@ -149,6 +153,7 @@ namespace HealthWellbeing.Controllers
 
 
         // GET: Alergias/Edit/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -184,6 +189,7 @@ namespace HealthWellbeing.Controllers
 
 
         // POST: Alergias/Edit/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Alergia alergia, string selectedAlimentosIds)
@@ -254,6 +260,7 @@ namespace HealthWellbeing.Controllers
 
 
         // GET: Alergias/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -269,6 +276,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Alergias/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

@@ -68,13 +68,20 @@
                     </dd>
                 </dl>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <a asp-action="Edit" asp-route-id="@Model?.RestricaoAlimentarId" 
-                       class="btn btn-warning me-2">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@Model?.RestricaoAlimentarId" 
-                       class="btn btn-danger me-2">Excluir</a>
-                    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
-                </div>
+                @if (User.IsInRole("Nutricionista"))
+                {
+                    <div class="d-flex justify-content-end mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model?.RestricaoAlimentarId" class="btn btn-warning me-2">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@Model?.RestricaoAlimentarId" class="btn btn-danger me-2">Excluir</a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Apenas usuários com a role <strong>Nutricionista</strong> podem editar ou excluir esta restrição alimentar.
+                    </div>
+                }
             </div>
         </div>
     </div>

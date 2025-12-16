@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class RestricaoAlimentarController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -73,6 +75,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: RestricaoAlimentar/Create
+        [Authorize(Roles = "Nutricionista")]
         public IActionResult Create()
         {
             ViewBag.Alimentos = _context.Alimentos
@@ -88,6 +91,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: RestricaoAlimentar/Create
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RestricaoAlimentar restricao, string selectedAlimentosIds)
@@ -133,6 +137,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: RestricaoAlimentar/Edit/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -162,6 +167,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: RestricaoAlimentar/Edit/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RestricaoAlimentar restricao, string selectedAlimentosIds)
@@ -243,6 +249,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: RestricaoAlimentar/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -258,6 +265,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: RestricaoAlimentar/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

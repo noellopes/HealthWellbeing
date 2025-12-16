@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using System.Text.Json;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class ReceitaController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -127,6 +129,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita/Create
+        [Authorize(Roles = "Nutricionista")]
         public IActionResult Create()
         {
             // Carregar restrições com tipo e gravidade
@@ -144,6 +147,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Receita/Create
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita, string? PendingComponentesJson)
@@ -199,6 +203,7 @@ namespace HealthWellbeing.Controllers
 
         private record PendingCompDto(int AlimentoId, string UnidadeMedida, int Quantidade, bool IsOpcional);
 
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -235,6 +240,7 @@ namespace HealthWellbeing.Controllers
         // POST: Receita/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ReceitaId,Nome,Descricao,ModoPreparo,TempoPreparo,Porcoes,Calorias,Proteinas,HidratosCarbono,Gorduras,RestricoesAlimentarId")] Receita receita)
@@ -272,6 +278,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -292,6 +299,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Receita/Delete/5
+        [Authorize(Roles = "Nutricionista")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
