@@ -105,28 +105,47 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         //  INDEX
         // =====================================================
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index(int page = 1, string? search = "")
         {
+            const int pageSize = 10;
+
+            if (page < 1) page = 1;
+
             var query = _context.Goal
                 .Include(g => g.Client)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                search = search.ToLower().Trim();
+                search = search.Trim().ToLower();
                 query = query.Where(g =>
                     g.GoalName.ToLower().Contains(search) ||
                     (g.Client != null && g.Client.Name.ToLower().Contains(search))
                 );
             }
 
-            var goals = await query
+            ViewBag.Search = search ?? "";
+
+            int totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (totalPages < 1) totalPages = 1;
+
+            if (page > totalPages) page = totalPages;
+
+            var items = await query
                 .OrderBy(g => g.Client!.Name)
                 .ThenBy(g => g.GoalName)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
-            return View(goals);
+            var model = new PaginationInfo<Goal>(items, totalItems, page, pageSize);
+
+            return View(model);
         }
+
+
+
 
         // =====================================================
         // DETAILS
