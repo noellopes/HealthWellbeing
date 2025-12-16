@@ -30,7 +30,7 @@
                 <span asp-validation-for="Notas" class="text-danger small"></span>
             </div>
 
-            @* --- Campo Estado (Opções Fixas, com valor atual selecionado) --- *@
+            @* --- Campo Estado (Opções Fixas) --- *@
             <div class="mb-3">
                 <label asp-for="Estado" class="form-label">Estado da Marcação</label>
                 <select asp-for="Estado" class="form-select">
@@ -43,51 +43,62 @@
                 <span asp-validation-for="Estado" class="text-danger small"></span>
             </div>
 
-            @* --- Chaves Estrangeiras (Dropdowns com ViewData e valor selecionado) --- *@
-
-            @* Os SelectList no Controller (Edit GET) garantem que o valor atual está pré-selecionado *@
+            @* --- Chaves Estrangeiras (Corrigido com a sintaxe @(...) as SelectList) --- *@
 
             <div class="mb-3">
                 <label asp-for="UtenteId" class="form-label">Utente (Paciente)</label>
-                <select asp-for="UtenteId" class="form-select" asp-items="@(ViewData[" UtenteId"] as SelectList)"></select>
+                <select asp-for="UtenteId" class="form-select" asp-items="@(ViewData["UtenteId"] as SelectList)">
+                    <option value="">-- Selecione o Utente --</option>
+                </select>
                 <span asp-validation-for="UtenteId" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="ExameTipoId" class="form-label">Tipo de Exame</label>
-                <select asp-for="ExameTipoId" class="form-select" asp-items="@(ViewData[" ExameTipoId"] as SelectList)"></select>
+                <select asp-for="ExameTipoId" class="form-select" asp-items="@(ViewData["ExameTipoId"] as SelectList)">
+                    <option value="">-- Selecione o Tipo --</option>
+                </select>
                 <span asp-validation-for="ExameTipoId" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="MedicoSolicitanteId" class="form-label">Médico Solicitante</label>
-                <select asp-for="MedicoSolicitanteId" class="form-select" asp-items="@(ViewData[" MedicoSolicitanteId"] as SelectList)"></select>
+                <select asp-for="MedicoSolicitanteId" class="form-select" asp-items="@(ViewData["MedicoSolicitanteId"] as SelectList)">
+                    <option value="">-- Selecione o Médico --</option>
+                </select>
                 <span asp-validation-for="MedicoSolicitanteId" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="ProfissionalExecutanteId" class="form-label">Profissional Executante</label>
-                <select asp-for="ProfissionalExecutanteId" class="form-select" asp-items="@(ViewData[" ProfissionalExecutanteId"] as SelectList)"></select>
+                <select asp-for="ProfissionalExecutanteId" class="form-select" asp-items="@(ViewData["ProfissionalExecutanteId"] as SelectList)">
+                    <option value="">-- Selecione o Profissional --</option>
+                </select>
                 <span asp-validation-for="ProfissionalExecutanteId" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="SalaDeExameId" class="form-label">Sala de Exames</label>
-                <select asp-for="SalaDeExameId" class="form-select" asp-items="@(ViewData[" SalaDeExameId"] as SelectList)"></select>
+                <select asp-for="SalaDeExameId" class="form-select" asp-items="@(ViewData["SalaDeExameId"] as SelectList)">
+                    <option value="">-- Selecione a Sala --</option>
+                </select>
                 <span asp-validation-for="SalaDeExameId" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="MaterialEquipamentoAssociadoId" class="form-label">Equipamento</label>
-                <select asp-for="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData[" MaterialEquipamentoAssociadoId"] as SelectList)"></select>
+                <select asp-for="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData["MaterialEquipamentoAssociadoId"] as SelectList)">
+                    <option value="">-- Selecione o Equipamento --</option>
+                </select>
                 <span asp-validation-for="MaterialEquipamentoAssociadoId" class="text-danger small"></span>
             </div>
 
-            @* --- Botões de Ação (Do PDF de Edit Book) --- *@
+            @* --- Botões de Ação --- *@
             <div class="mt-4">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Guardar Alterações</button>
+                <button type="submit" class="btn btn-success"><i class="bi bi-save me-1"></i> Criar Marcação</button>
                 <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista</a>
             </div>
         </form>
     </div>
 </div>
+
