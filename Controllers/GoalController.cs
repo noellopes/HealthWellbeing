@@ -99,7 +99,6 @@ namespace HealthWellbeing.Controllers
 
             goal.DailyHydrates = (int)Math.Round(carbsKcal / 4);
 
-            goal.DailyFibers = goal.GoalName == "lose" ? 30 : 25;
         }
 
         // =====================================================

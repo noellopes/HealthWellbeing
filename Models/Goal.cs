@@ -33,10 +33,5 @@ namespace HealthWellbeing.Models
         [Range(0, 1000, ErrorMessage = "Daily vitamins must be a positive value.")]
         public int DailyVitamins { get; set; }
 
-        [Range(0, 1000, ErrorMessage = "Daily minerals must be a positive value.")]
-        public int DailyMinerals { get; set; }
-
-        [Range(0, 1000, ErrorMessage = "Daily fibers must be a positive value.")]
-        public int DailyFibers { get; set; }
     }
 }
