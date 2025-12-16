@@ -1,0 +1,53 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Fornecedor_Consumivel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Fornecedor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Consumivel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TempoEntrega)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Preco)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fornecedor.NomeEmpresa)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Consumivel.Nome)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TempoEntrega)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Preco)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.FornecedorConsumivelId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.FornecedorConsumivelId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.FornecedorConsumivelId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

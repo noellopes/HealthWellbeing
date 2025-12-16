@@ -2,6 +2,7 @@
 using HealthWellbeing.Utils.Group1.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
 {
@@ -54,6 +55,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<HealthWellbeing.Models.UsoConsumivel> UsoConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; }
+        public DbSet<HealthWellbeing.Models.Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;
 
     }
 
