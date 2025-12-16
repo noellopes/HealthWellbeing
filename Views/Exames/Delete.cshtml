@@ -1,61 +1,81 @@
-﻿@model HealthWellbeing.Models.ExameTipo
+﻿@model HealthWellBeing.Models.Exame
 
 @{
-    ViewData["Title"] = "Apagar Tipo de Exame";
+    ViewData["Title"] = "Apagar Exame";
 }
 
 <div class="container mt-4">
-
     <div class="row justify-content-center">
-        <div class="col-lg-7 col-md-9">
+        <div class="col-lg-8 col-md-10">
 
             <div class="card border-danger shadow-lg">
-
                 <div class="card-header bg-danger text-white">
-                    <h1 class="h4 mb-0">⚠️ Apagar Tipo de Exame</h1>
+                    <h1 class="h4 mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Exame</h1>
                 </div>
 
                 <div class="card-body">
-                    <h3 class="card-title text-danger mb-4">Tem certeza de que deseja apagar este tipo de exame?</h3>
-                    <p class="card-text">A exclusão deste item é **irreversível**.</p>
+                    <h4 class="card-title text-danger mb-4">Tem a certeza que deseja apagar este exame?</h4>
+                    <p class="card-text text-muted">Esta ação não pode ser revertida se o exame for apagado.</p>
 
                     <hr class="my-3" />
 
                     <dl class="row mb-0">
+                        @* Data e Hora *@
                         <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.Nome)
+                            @Html.DisplayNameFor(model => model.DataHoraMarcacao)
                         </dt>
                         <dd class="col-sm-8 fw-bold">
-                            @Html.DisplayFor(model => model.Nome)
+                            @Html.DisplayFor(model => model.DataHoraMarcacao)
                         </dd>
 
+                        @* Estado *@
                         <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.Descricao)
+                            @Html.DisplayNameFor(model => model.Estado)
                         </dt>
                         <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Descricao)
+                            <span class="badge @(Model.Estado == "Realizado" ? "bg-success" : Model.Estado == "Cancelado" ? "bg-danger" : "bg-primary")">
+                                @Html.DisplayFor(model => model.Estado)
+                            </span>
                         </dd>
 
+                        @* Utente *@
                         <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(model => model.Especialidade!.Nome)
+                            Utente
                         </dt>
                         <dd class="col-sm-8">
-                            @Html.DisplayFor(model => model.Especialidade!.Nome)
+                            @Html.DisplayFor(model => model.Utente!.Nome)
+                        </dd>
+
+                        @* Tipo de Exame *@
+                        <dt class="col-sm-4 text-muted">
+                            Tipo de Exame
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.ExameTipo!.Nome)
+                        </dd>
+
+                        @* Médico *@
+                        <dt class="col-sm-4 text-muted">
+                            Médico Solicitante
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Html.DisplayFor(model => model.MedicoSolicitante!.Nome)
                         </dd>
                     </dl>
                 </div>
 
-                <div class="card-footer d-flex justify-content-between">
+                <div class="card-footer d-flex justify-content-between align-items-center bg-light">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Cancelar
+                    </a>
+
                     <form asp-action="Delete" method="post">
-                        <input type="hidden" asp-for="ExameTipoId" />
-                        <button type="submit" value="Delete" class="btn btn-danger shadow-sm">
-                            <i class="bi bi-trash"></i> Sim, Apagar
+                        @* MUITO IMPORTANTE: O ID tem de ser o ExameId *@
+                        <input type="hidden" asp-for="ExameId" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-1"></i> Confirmar Eliminação
                         </button>
                     </form>
-
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i> Cancelar
-                    </a>
                 </div>
             </div>
 
