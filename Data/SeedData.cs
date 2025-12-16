@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.Identity;
 
 internal class SeedData
 {
-    public static void Populate(HealthWellbeingDbContext? context)
+    public static void Populate(HealthWellbeingDbContext? dbContext)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        context.Database.EnsureCreated();
+        dbContext.Database.EnsureCreated();
 
-        PopulateCategorias(context);
-        PopulateAlimentos(context);
-        PopulateAlergias(context);
-        PopulateRestricoesAlimentares(context);
-        PopulateAlimentoSubstitutos(context);
-        PopulateReceitas(context);
-        PopulateComponentesReceita(context);
+        PopulateCategorias(dbContext);
+        PopulateAlimentos(dbContext);
+        PopulateAlergias(dbContext);
+        PopulateRestricoesAlimentares(dbContext);
+        PopulateAlimentoSubstitutos(dbContext);
+        PopulateReceitas(dbContext);
+        PopulateComponentesReceita(dbContext);
 
         PopulateSpecialities(context);
         // PopulateConsultas IS NOT WORKING
