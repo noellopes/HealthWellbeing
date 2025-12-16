@@ -1,0 +1,71 @@
+﻿@model HealthWellbeingRoom.Models.RoomReservation
+
+@{
+    ViewData["Title"] = "Eliminar Reserva";
+}
+
+<h1 class="mb-4 text-danger"><i class="bi bi-trash-fill"></i> Eliminar Reserva da sala "@Model.Room?.Name"</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="mb-3">Tem a certeza que deseja eliminar esta reserva?</h5>
+        <hr />
+
+        <dl class="row">
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ResponsibleName)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ResponsibleName)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Room)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Room.Name)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationId)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationType)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationType)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.PatientId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.PatientId)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Specialty)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty.SpecialtyId)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.StartTime)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartTime)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.EndTime)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndTime)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Notes)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post" class="mt-4 border-top pt-3 text-end">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RoomReservationId" />
+
+            <button type="submit" class="btn btn-danger btn-sm me-2" style="min-width:150px">
+                <i class="bi bi-trash me-1"></i> Eliminar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
+                <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+            </a>
+        </form>
+
+        <div class="alert alert-warning d-flex align-items-start mt-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>
+                Esta ação é irreversível. A reserva será removida permanentemente do sistema.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

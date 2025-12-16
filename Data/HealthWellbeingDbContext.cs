@@ -76,6 +76,7 @@ namespace HealthWellbeing.Data
         public DbSet<RoomType> RoomType { get; set; } = default!;
         public DbSet<RoomLocation> RoomLocation { get; set; }
         //public DbSet<RoomConsumable> RoomConsumable { get; set; }
+        public DbSet<RoomReservation> RoomReservations { get; set; }
 
     }
 }
