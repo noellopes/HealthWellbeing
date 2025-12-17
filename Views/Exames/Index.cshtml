@@ -2,14 +2,21 @@
 
 @{
     ViewData["Title"] = "Lista de Exames";
+
+    // Captura as mensagens da TempData
     string? sucessoMensagem = TempData["SuccessMessage"] as string;
+    string? erroMensagem = TempData["ErrorMessage"] as string;
 
     var dataVal = ViewBag.PesquisaData as DateTime?;
     string dataFormatada = dataVal.HasValue ? dataVal.Value.ToString("yyyy-MM-dd") : "";
 }
 
 <div class="container mt-4">
-    @if (sucessoMensagem != null)
+
+    @* --- BLOCO DE AVISOS --- *@
+
+    @* Aviso de Sucesso (Verde) *@
+    @if (!string.IsNullOrEmpty(sucessoMensagem))
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> @sucessoMensagem
@@ -17,15 +24,21 @@
         </div>
     }
 
-    @* --- Cabeçalho com CONTADOR --- *@
+    @* Aviso de Erro (Vermelho) *@
+    @if (!string.IsNullOrEmpty(erroMensagem))
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @erroMensagem
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @* ----------------------- *@
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0 text-secondary">
                 Exames Marcados
-                @* Badge com o Total de Itens *@
-                <span class="badge bg-secondary fs-6 align-middle ms-2" title="Total de Exames listados">
-                    @Model.TotalItems
-                </span>
+                <span class="badge bg-secondary fs-6 align-middle ms-2" title="Total de Exames">@Model.TotalItems</span>
             </h1>
             <p class="text-muted small mb-0">Gerencie todas as marcações da clínica</p>
         </div>
@@ -55,8 +68,6 @@
                     <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
                         <i class="bi bi-funnel me-1"></i> Filtrar
                     </button>
-
-                    @* Botão Limpar com asp-route-pesquisaData="" para forçar ver tudo *@
                     <a asp-action="Index" asp-route-pesquisaData="" class="btn btn-outline-secondary px-3" title="Limpar Filtros">
                         <i class="bi bi-x-lg me-1"></i> Limpar
                     </a>

@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin")] // Só Admins entram
+    [Authorize(Roles = "Admin")]
     public class ExamesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -25,17 +25,11 @@ namespace HealthWellbeing.Controllers
         // GET: Exames
         public async Task<IActionResult> Index(int pagina = 1, string pesquisaUtente = "", DateTime? pesquisaData = null)
         {
-            // --- LÓGICA DE FILTRO "SÓ NA PRIMEIRA VEZ" ---
-            // Usamos a sessão para marcar que o utilizador já visitou esta página nesta sessão.
+            // Lógica do filtro "Hoje na primeira vez"
             string sessaoKey = "FiltroInicialRealizado";
-
-            // Verifica: Se a sessão está vazia (nunca veio aqui) E não pediu uma data específica
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(sessaoKey)) && !pesquisaData.HasValue && !Request.Query.ContainsKey("pesquisaData"))
             {
-                // Aplica o filtro de HOJE automaticamente
                 pesquisaData = DateTime.Today;
-
-                // Marca na sessão que já entrámos. Da próxima vez (F5, voltar, ou limpar), isto é ignorado.
                 HttpContext.Session.SetString(sessaoKey, "true");
             }
 
@@ -73,9 +67,6 @@ namespace HealthWellbeing.Controllers
             return View(paginationInfo);
         }
 
-        // --- RESTANTES MÉTODOS (Create, Edit, Delete, Details) MANTÊM-SE IGUAIS ---
-        // (Estão omitidos aqui para poupar espaço, mas deves manter o código que já tinhas para eles)
-
         // GET: Exames/Create
         public IActionResult Create()
         {
@@ -83,17 +74,34 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // POST: Exames/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Exame exame)
+        public async Task<IActionResult> Create([Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
-            // ... (Código igual ao anterior) ...
-            if (ModelState.IsValid) { _context.Add(exame); await _context.SaveChangesAsync(); return RedirectToAction(nameof(Index)); }
-            CarregarViewBagDropdowns(exame); return View(exame);
+            bool salaOcupada = await _context.Exames.AnyAsync(e =>
+                e.SalaDeExameId == exame.SalaDeExameId &&
+                e.DataHoraMarcacao == exame.DataHoraMarcacao);
+
+            if (salaOcupada)
+            {
+                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(exame);
+                await _context.SaveChangesAsync();
+                // AVISO DE CRIAÇÃO
+                TempData["SuccessMessage"] = "Exame marcado com sucesso!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            CarregarViewBagDropdowns(exame);
+            return View(exame);
         }
 
-        // ... Incluir aqui Edit, Details, Delete e CarregarViewBagDropdowns ...
-
+        // GET: Exames/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -103,38 +111,77 @@ namespace HealthWellbeing.Controllers
             return View(exame);
         }
 
+        // POST: Exames/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Exame exame)
+        public async Task<IActionResult> Edit(int id, [Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
             if (id != exame.ExameId) return NotFound();
-            if (ModelState.IsValid) { _context.Update(exame); await _context.SaveChangesAsync(); return RedirectToAction(nameof(Index)); }
-            CarregarViewBagDropdowns(exame); return View(exame);
+
+            bool salaOcupadaOutro = await _context.Exames.AnyAsync(e =>
+                e.SalaDeExameId == exame.SalaDeExameId &&
+                e.DataHoraMarcacao == exame.DataHoraMarcacao &&
+                e.ExameId != id);
+
+            if (salaOcupadaOutro)
+            {
+                ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(exame);
+                await _context.SaveChangesAsync();
+                // AVISO DE EDIÇÃO
+                TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            CarregarViewBagDropdowns(exame);
+            return View(exame);
         }
 
+        // GET: Exames/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            var exame = await _context.Exames
+                .Include(e => e.ExameTipo).Include(e => e.Utente)
+                .FirstOrDefaultAsync(m => m.ExameId == id);
+            if (exame == null) return NotFound();
+            return View(exame);
+        }
+
+        // POST: Exames/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var exame = await _context.Exames.FindAsync(id);
+            if (exame != null)
+            {
+                if (exame.Estado == "Realizado")
+                {
+                    // AVISO DE ERRO (IMPEDIMENTO)
+                    TempData["ErrorMessage"] = "Não é possível apagar um exame já realizado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Exames.Remove(exame);
+                await _context.SaveChangesAsync();
+                // AVISO DE ELIMINAÇÃO
+                TempData["SuccessMessage"] = "Exame eliminado com sucesso!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Exames/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
             var exame = await _context.Exames.Include(e => e.Utente).Include(e => e.ExameTipo).Include(e => e.SalaDeExame).Include(e => e.MedicoSolicitante).Include(e => e.ProfissionalExecutante).Include(e => e.MaterialEquipamentoAssociado).FirstOrDefaultAsync(m => m.ExameId == id);
             if (exame == null) return NotFound();
             return View(exame);
-        }
-
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-            var exame = await _context.Exames.Include(e => e.Utente).Include(e => e.ExameTipo).FirstOrDefaultAsync(m => m.ExameId == id);
-            if (exame == null) return NotFound();
-            return View(exame);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var exame = await _context.Exames.FindAsync(id);
-            if (exame != null) { _context.Exames.Remove(exame); await _context.SaveChangesAsync(); }
-            return RedirectToAction(nameof(Index));
         }
 
         private void CarregarViewBagDropdowns(Exame exame = null)
