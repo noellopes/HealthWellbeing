@@ -9,7 +9,6 @@
 }
 
 <div class="container mt-4">
-    @* --- Mensagem de Sucesso --- *@
     @if (sucessoMensagem != null)
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -18,10 +17,16 @@
         </div>
     }
 
-    @* --- Cabeçalho --- *@
+    @* --- Cabeçalho com CONTADOR --- *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-secondary">Exames Marcados</h1>
+            <h1 class="h3 mb-0 text-secondary">
+                Exames Marcados
+                @* Badge com o Total de Itens *@
+                <span class="badge bg-secondary fs-6 align-middle ms-2" title="Total de Exames listados">
+                    @Model.TotalItems
+                </span>
+            </h1>
             <p class="text-muted small mb-0">Gerencie todas as marcações da clínica</p>
         </div>
         <a asp-action="Create" class="btn btn-success shadow-sm">
@@ -29,11 +34,10 @@
         </a>
     </div>
 
-    @* --- Filtros (AJUSTADO PARA CABEREM OS BOTÕES) --- *@
+    @* --- Filtros --- *@
     <div class="card shadow-sm border-0 mb-4 bg-light">
         <div class="card-body">
             <form asp-action="Index" method="get" class="row g-2 align-items-end">
-                @* 1. Diminuí a largura do Utente para col-md-4 *@
                 <div class="col-md-4">
                     <label for="pesquisaUtente" class="form-label fw-bold text-muted small">Pesquisar Utente</label>
                     <div class="input-group">
@@ -42,19 +46,18 @@
                     </div>
                 </div>
 
-                @* 2. Diminuí a largura da Data para col-md-3 *@
                 <div class="col-md-3">
                     <label for="pesquisaData" class="form-label fw-bold text-muted small">Data</label>
                     <input id="pesquisaData" name="pesquisaData" type="date" class="form-control" value="@dataFormatada" />
                 </div>
 
-                @* 3. Aumentei o espaço dos botões para col-md-5 para caberem bem *@
                 <div class="col-md-5 d-flex gap-2">
                     <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">
                         <i class="bi bi-funnel me-1"></i> Filtrar
                     </button>
-                    @* Botão Limpar claro e visível *@
-                    <a asp-action="Index" class="btn btn-outline-secondary px-3" title="Limpar Filtros">
+
+                    @* Botão Limpar com asp-route-pesquisaData="" para forçar ver tudo *@
+                    <a asp-action="Index" asp-route-pesquisaData="" class="btn btn-outline-secondary px-3" title="Limpar Filtros">
                         <i class="bi bi-x-lg me-1"></i> Limpar
                     </a>
                 </div>
@@ -83,7 +86,6 @@
                             <th>Tipo de Exame</th>
                             <th>Sala</th>
                             <th>Estado</th>
-                            @* Largura fixa para garantir que os botões não partem *@
                             <th class="text-end pe-4" style="min-width: 280px;">Ações</th>
                         </tr>
                     </thead>
@@ -118,7 +120,6 @@
                                     }
                                     <span class="badge @badgeClass rounded-pill px-3">@exame.Estado</span>
                                 </td>
-                                @* Célula de Ações com text-nowrap para não quebrar linha *@
                                 <td class="text-end pe-4 text-nowrap">
                                     <a asp-action="Edit" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-primary me-1" title="Editar">
                                         <i class="bi bi-pencil-square"></i> Editar

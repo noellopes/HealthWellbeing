@@ -1,6 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellBeing.Models; // Adicionado para garantir compatibilidade de namespaces
+using HealthWellBeing.Models; // Garante compatibilidade de namespaces
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +14,14 @@ internal class Program
         // 1. CONFIGURAÇÃO DOS SERVIÇOS (DI)
         // ==========================================
 
-        // Configuração do HealthWellbeingDbContext (Dados de Negócio)
+        // Base de Dados de Negócio
         var healthConnection = builder.Configuration.GetConnectionString("HealthWellBeingConnection")
             ?? throw new InvalidOperationException("Connection string 'HealthWellBeingConnection' not found.");
 
         builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
             options.UseSqlServer(healthConnection));
 
-        // Configuração do ApplicationDbContext (Identity)
+        // Base de Dados de Identidade
         var identityConnection = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -30,7 +30,7 @@ internal class Program
 
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        // Configuração do Identity
+        // Identity
         builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
@@ -41,6 +41,15 @@ internal class Program
         })
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        // ADICIONADO: Serviço de Sessão
+        builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30); // Sessão dura 30 min
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
 
         builder.Services.AddControllersWithViews();
 
@@ -68,6 +77,9 @@ internal class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        // ADICIONADO: Ativar Sessão (Deve estar depois de UseRouting e antes de MapControllerRoute)
+        app.UseSession();
+
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -75,7 +87,7 @@ internal class Program
         app.MapRazorPages();
 
         // ==========================================
-        // 3. ÁREA DE INICIALIZAÇÃO DA BASE DE DADOS (SEEDING)
+        // 3. SEEDING (INICIALIZAÇÃO DE DADOS)
         // ==========================================
 
         using (var scope = app.Services.CreateScope())
@@ -88,11 +100,9 @@ internal class Program
                 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-                // 1. Migrar BDs (Cria as tabelas se não existirem)
                 await contextIdentity.Database.MigrateAsync();
                 await contextHealth.Database.MigrateAsync();
 
-                // 2. Executar Seeding (Preenche com dados falsos)
                 await SeedDataG6.Populate(contextHealth, userManager, roleManager);
             }
             catch (Exception ex)
