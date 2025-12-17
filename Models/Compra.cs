@@ -8,14 +8,14 @@
         public Consumivel Consumivel { get; set; }
 
         public int ZonaId { get; set; }
-        public ZonaArmazenamento Zona { get; set; }
+        
 
         public int FornecedorId { get; set; }
         public Fornecedor Fornecedor { get; set; }
 
         public int Quantidade { get; set; }
 
-        public decimal PrecoUnitario { get; set; }
+        public float PrecoUnitario { get; set; }
         public int TempoEntrega { get; set; }
 
         public DateTime DataCompra { get; set; } = DateTime.Now;

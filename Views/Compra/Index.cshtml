@@ -1,9 +1,8 @@
-﻿@model HealthWellbeing.Models.Compra
-@using HealthWellbeing.Models
+﻿@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Nova Compra";
-    var consumiveis = ViewBag.Consumiveis as List<Consumivel> ?? new List<Consumivel>();
+    var consumiveis = ViewBag.Consumiveis as List<Consumivel> ?? new();
 }
 
 <div class="container mt-4">
@@ -20,15 +19,15 @@
     }
     else
     {
-        <form asp-action="SubmeterCompra" method="post">
+        <form asp-action="CriarRegistoCompra" method="post">
+            @Html.AntiForgeryToken()
 
             <div class="card shadow-sm">
                 <div class="card-body">
 
-                    <!-- CONSUMÍVEL -->
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Consumível</label>
-                        <select asp-for="ConsumivelId"
+                        <select name="consumivelId"
                                 id="consumivelSelect"
                                 class="form-select"
                                 required>
@@ -38,27 +37,17 @@
                             {
                                 <option value="@c.ConsumivelId"
                                         data-atual="@c.QuantidadeAtual"
-                                        data-min="@c.QuantidadeMinima"
                                         data-max="@c.QuantidadeMaxima">
                                     @c.Nome
                                 </option>
                             }
                         </select>
-
-                        <span asp-validation-for="ConsumivelId"
-                              class="text-danger"></span>
                     </div>
 
-                    <!-- QUANTIDADES -->
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <label class="form-label">Quantidade Atual</label>
                             <input id="qtdAtual" class="form-control" disabled />
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Quantidade Mínima</label>
-                            <input id="qtdMin" class="form-control" disabled />
                         </div>
 
                         <div class="col-md-4">
@@ -67,31 +56,23 @@
                         </div>
                     </div>
 
-                    <!-- QUANTIDADE A COMPRAR -->
                     <div class="mb-3">
                         <label class="form-label">Quantidade a Comprar</label>
-
-                        <!-- valor enviado no POST -->
-                        <input asp-for="Quantidade"
-                               id="qtdComprar"
-                               type="hidden" />
-
-                        <!-- valor editável pelo utilizador -->
-                        <input id="qtdComprarView"
+                        <input id="qtdComprar"
+                               name="quantidade"
                                type="number"
-                               min="0"
-                               class="form-control" />
+                               min="1"
+                               class="form-control"
+                               required />
                     </div>
 
                     <p id="infoCompra" class="text-muted small"></p>
-
                 </div>
             </div>
 
             <div class="mt-4 text-end">
-                <button type="submit"
-                        class="btn btn-success px-4">
-                    ✔ Continuar para Registo de Compras
+                <button type="submit" class="btn btn-success px-4">
+                    ✔ Continuar para Registo de Encomendas
                 </button>
             </div>
         </form>
@@ -102,45 +83,25 @@
     <script>
         const select = document.getElementById("consumivelSelect");
         const qtdAtualInput = document.getElementById("qtdAtual");
-        const qtdMinInput = document.getElementById("qtdMin");
         const qtdMaxInput = document.getElementById("qtdMax");
-        const qtdComprarView = document.getElementById("qtdComprarView");
-        const qtdComprarHidden = document.getElementById("qtdComprar");
+        const qtdComprarInput = document.getElementById("qtdComprar");
         const infoCompra = document.getElementById("infoCompra");
 
-        if (select) {
-            select.addEventListener("change", function () {
+        select?.addEventListener("change", () => {
+            const opt = select.selectedOptions[0];
+            if (!opt) return;
 
-                const opt = select.options[select.selectedIndex];
-                if (!opt || !opt.dataset) return;
+            const atual = parseInt(opt.dataset.atual || 0);
+            const max = parseInt(opt.dataset.max || 0);
 
-                const atual = parseInt(opt.dataset.atual || 0);
-                const min = parseInt(opt.dataset.min || 0);
-                const max = parseInt(opt.dataset.max || 0);
+            qtdAtualInput.value = atual;
+            qtdMaxInput.value = max;
 
-                qtdAtualInput.value = atual;
-                qtdMinInput.value = min;
-                qtdMaxInput.value = max;
+            const sugestao = Math.max(0, max - atual);
+            qtdComprarInput.value = sugestao;
 
-                // 🔹 sugestão automática (max - atual)
-                let sugestao = 0;
-                if (atual < min) {
-                    sugestao = max - atual;
-                }
-
-                qtdComprarView.value = sugestao;
-                qtdComprarHidden.value = sugestao;
-
-                infoCompra.innerText =
-                    sugestao > 0
-                        ? "Sugestão automática baseada na diferença entre o stock atual e o máximo."
-                        : "O stock encontra-se dentro dos valores normais.";
-            });
-        }
-
-        // 🔹 sincroniza valor editado com o hidden
-        qtdComprarView.addEventListener("input", function () {
-            qtdComprarHidden.value = qtdComprarView.value;
+            infoCompra.innerText =
+                "Sugestão automática: diferença entre a quantidade máxima e a atual.";
         });
     </script>
 }

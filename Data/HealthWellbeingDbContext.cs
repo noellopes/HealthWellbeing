@@ -54,7 +54,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.StockMovimento> StockMovimento { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UsoConsumivel> UsoConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.CompraOpcao> CompraOpcao { get; set; } = default!;
+        
         public DbSet<HealthWellbeing.Models.Compra> Compra { get; set; } = default!;
 
         public DbSet<Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;

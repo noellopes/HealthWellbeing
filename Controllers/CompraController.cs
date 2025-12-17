@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,87 +15,77 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // INDEX — Página principal de Compras
-        // =====================================================
+        [HttpGet]
         public IActionResult Index()
         {
             ViewBag.Consumiveis = _context.Consumivel.ToList();
-            ViewBag.Zonas = _context.ZonaArmazenamento.ToList();
-
-            return View(new Compra());
+            return View();
         }
 
-        // =====================================================
-        // SUBMETER COMPRA (POST)
-        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult SubmeterCompra(Compra model)
+        public IActionResult CriarRegistoCompra(int consumivelId, int quantidade)
         {
-            if (!ModelState.IsValid)
-                return View("Index", model);
-
-            var fornecedor = _context.Fornecedor.FirstOrDefault();
-            if (fornecedor == null)
+            if (consumivelId == 0 || quantidade <= 0)
             {
-                ModelState.AddModelError("", "Não existe fornecedor registado.");
-                return View("Index", model);
+                ViewBag.Consumiveis = _context.Consumivel.ToList();
+                return View("Index");
             }
 
-            var compra = new Compra
+            return RedirectToAction("RegistoCompra", new { consumivelId, quantidade });
+        }
+
+        [HttpGet]
+        public IActionResult RegistoCompra(int consumivelId, int quantidade)
+        {
+            var fornecedores = _context.Fornecedor_Consumivel
+                .Where(fc => fc.ConsumivelId == consumivelId)
+                .Include(fc => fc.Fornecedor)
+                .OrderBy(fc => fc.Preco)
+                .ThenBy(fc => fc.TempoEntrega)
+                .ToList();
+
+            var vm = new RegistoCompra
             {
-                ConsumivelId = model.ConsumivelId,
-                ZonaId = model.ZonaId,
-                FornecedorId = fornecedor.FornecedorId,
-                Quantidade = model.Quantidade,
-                PrecoUnitario = 0,
-                TempoEntrega = 0,
-                DataCompra = DateTime.Now
+                ConsumivelId = consumivelId,
+                Quantidade = quantidade,
+                Fornecedores = fornecedores
             };
 
-            _context.Compra.Add(compra);
+            return View(vm);
+        }
 
-            var stock = _context.Stock.FirstOrDefault(s =>
-                s.ConsumivelID == model.ConsumivelId &&
-                s.ZonaID == model.ZonaId);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmarRegisto(RegistoCompra model)
+        {
+            var fornecedor = _context.Fornecedor_Consumivel
+                .First(fc => fc.FornecedorId == model.FornecedorId
+                          && fc.ConsumivelId == model.ConsumivelId);
 
-            if (stock == null)
+            _context.Compra.Add(new Compra
             {
-                ModelState.AddModelError("", "Stock não encontrado para a zona selecionada.");
-                return View("Index", model);
-            }
-
-            stock.QuantidadeAtual += model.Quantidade;
-            stock.DataUltimaAtualizacao = DateTime.Now;
-
-            _context.StockMovimento.Add(new StockMovimento
-            {
-                StockId = stock.StockId,
+                ConsumivelId = model.ConsumivelId,
+                FornecedorId = fornecedor.FornecedorId,
                 Quantidade = model.Quantidade,
-                Tipo = "Entrada",
-                Data = DateTime.Now,
-                Descricao = "Compra registada via módulo de compras"
+                PrecoUnitario = fornecedor.Preco,
+                TempoEntrega = fornecedor.TempoEntrega ?? 0
             });
+
+            var consumivel = _context.Consumivel.Find(model.ConsumivelId);
+            consumivel.QuantidadeAtual += model.Quantidade;
 
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Historico));
         }
 
-        // =====================================================
-        // HISTÓRICO DE COMPRAS
-        // =====================================================
         public IActionResult Historico()
         {
-            var compras = _context.Compra
+            return View(_context.Compra
                 .Include(c => c.Consumivel)
-                .Include(c => c.Zona)
                 .Include(c => c.Fornecedor)
-                .OrderByDescending(c => c.DataCompra)
-                .ToList();
-
-            return View(compras);
+                .ToList());
         }
     }
 }
