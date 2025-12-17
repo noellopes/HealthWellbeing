@@ -71,13 +71,16 @@
                     <div class="mb-3">
                         <label class="form-label">Quantidade a Comprar</label>
 
+                        <!-- valor enviado no POST -->
                         <input asp-for="Quantidade"
                                id="qtdComprar"
                                type="hidden" />
 
+                        <!-- valor editável pelo utilizador -->
                         <input id="qtdComprarView"
-                               class="form-control"
-                               disabled />
+                               type="number"
+                               min="0"
+                               class="form-control" />
                     </div>
 
                     <p id="infoCompra" class="text-muted small"></p>
@@ -98,6 +101,12 @@
 @section Scripts {
     <script>
         const select = document.getElementById("consumivelSelect");
+        const qtdAtualInput = document.getElementById("qtdAtual");
+        const qtdMinInput = document.getElementById("qtdMin");
+        const qtdMaxInput = document.getElementById("qtdMax");
+        const qtdComprarView = document.getElementById("qtdComprarView");
+        const qtdComprarHidden = document.getElementById("qtdComprar");
+        const infoCompra = document.getElementById("infoCompra");
 
         if (select) {
             select.addEventListener("change", function () {
@@ -109,24 +118,29 @@
                 const min = parseInt(opt.dataset.min || 0);
                 const max = parseInt(opt.dataset.max || 0);
 
-                document.getElementById("qtdAtual").value = atual;
-                document.getElementById("qtdMin").value = min;
-                document.getElementById("qtdMax").value = max;
+                qtdAtualInput.value = atual;
+                qtdMinInput.value = min;
+                qtdMaxInput.value = max;
 
-                let quantidadeComprar = 0;
-
+                // 🔹 sugestão automática (max - atual)
+                let sugestao = 0;
                 if (atual < min) {
-                    quantidadeComprar = max - atual;
+                    sugestao = max - atual;
                 }
 
-                document.getElementById("qtdComprar").value = quantidadeComprar;
-                document.getElementById("qtdComprarView").value = quantidadeComprar;
+                qtdComprarView.value = sugestao;
+                qtdComprarHidden.value = sugestao;
 
-                document.getElementById("infoCompra").innerText =
-                    quantidadeComprar > 0
-                        ? "Compra calculada automaticamente com base no stock mínimo."
+                infoCompra.innerText =
+                    sugestao > 0
+                        ? "Sugestão automática baseada na diferença entre o stock atual e o máximo."
                         : "O stock encontra-se dentro dos valores normais.";
             });
         }
+
+        // 🔹 sincroniza valor editado com o hidden
+        qtdComprarView.addEventListener("input", function () {
+            qtdComprarHidden.value = qtdComprarView.value;
+        });
     </script>
 }
