@@ -1,43 +1,62 @@
-﻿@model HealthWellbeing.Models.ProfissionalExecutante
+﻿@model HealthWellbeing.Models.ProfissionalExecutante;
 
 @{
-    ViewData["Title"] = "Apagar Profissional Executante";
+    ViewData["Title"] = "Eliminar Profissional";
 }
 
 <div class="container mt-4">
 
-    <h2 class="text-center mb-4"><i class="bi bi-person-x-fill text-danger me-2"></i> @ViewData["Title"]</h2>
+    <h2 class="text-danger mb-4"><i class="bi bi-trash-fill"></i> Eliminar Profissional</h2>
 
-    <div class="alert alert-danger text-center shadow">
-        <h5 class="mb-0">Tens a certeza que pretendes apagar este profissional? Esta ação não pode ser desfeita.</h5>
+    <p class="lead">Tem certeza que deseja eliminar o profissional <strong>@Model.Nome</strong>?</p>
+    <p class="text-danger small">Esta ação não pode ser desfeita.</p>
+
+    <div class="card shadow-sm mt-4">
+
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Detalhes do Profissional</h5>
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-0">
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Nome)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Nome)
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    Função
+                </dt>
+                <dd class="col-sm-9">
+                    @Model.Funcao?.NomeFuncao
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">
+                    @Html.DisplayNameFor(model => model.Email)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Email)
+                </dd>
+
+            </dl>
+        </div>
     </div>
 
-    <div class="card shadow-sm p-4 mb-4">
-        <dl class="row">
-            <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
-            <dd class="col-sm-9">@Model.Nome</dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">Função</dt>
-            <dd class="col-sm-9">@Model.Funcao?.NomeFuncao</dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">Telefone</dt>
-            <dd class="col-sm-9">@Model.Telefone</dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">Email</dt>
-            <dd class="col-sm-9">@Model.Email</dd>
-        </dl>
-    </div>
-
-    <form asp-action="Delete" method="post">
+    <form asp-action="Delete" method="post" class="mt-4">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="ProfissionalExecutanteId" />
-        <div class="d-flex justify-content-between mt-4">
+
+        <div class="d-flex justify-content-end gap-2">
 
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle-fill me-1"></i> Cancelar
+                <i class="bi bi-arrow-left-circle-fill"></i> Cancelar
             </a>
 
             <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash-fill me-1"></i> Apagar
+                <i class="bi bi-trash-fill"></i> Confirmar Eliminação
             </button>
         </div>
     </form>

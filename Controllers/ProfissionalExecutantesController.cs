@@ -1,12 +1,23 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class ProfissionalExecutantesController : Controller
+namespace HealthWellbeing.Controllers
 {
+    // Restringe todo o controller a quem tem permissão
+    [Authorize(Roles = "Admin, Gestor,Tecnico")]
+    public class ProfissionalExecutantesController : Controller
+    {
+
+
     private readonly HealthWellbeingDbContext _context;
 
     public ProfissionalExecutantesController(HealthWellbeingDbContext context)
@@ -31,6 +42,11 @@ public class ProfissionalExecutantesController : Controller
 
         int totalItems = await profissionaisQuery.CountAsync();
         var paginationInfo = new PaginationInfo<ProfissionalExecutante>(page, totalItems, itemsPerPage);
+
+
+        ViewBag.TotalProfissionais = await _context.ProfissionalExecutante.CountAsync();
+        ViewBag.TotalFuncoes = await _context.Funcoes.CountAsync();
+
 
         paginationInfo.Items = await profissionaisQuery
             .Skip(paginationInfo.ItemsToSkip)
@@ -63,10 +79,14 @@ public class ProfissionalExecutantesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
     {
+        Console.WriteLine(">>> ENTROU NO POST DO CREATE <<<");
+
         if (ModelState.IsValid)
         {
             _context.Add(profissionalExecutante);
             await _context.SaveChangesAsync();
+            // >> MENSAGEM DE SUCESSO PARA CRIAÇÃO <<
+            TempData["SuccessMessage"] = "Novo profissional executante criado!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -88,35 +108,56 @@ public class ProfissionalExecutantesController : Controller
         return View(profissional);
     }
 
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, [Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
     {
-        if (id != profissionalExecutante.ProfissionalExecutanteId) return NotFound();
+        if (id != profissionalExecutante.ProfissionalExecutanteId)
+            return NotFound();
+
+        // Código de Diagnóstico removido para simplificar, mas mantive a lógica principal
 
         if (ModelState.IsValid)
         {
-            _context.Update(profissionalExecutante);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.Update(profissionalExecutante);
+                await _context.SaveChangesAsync();
+                // >> MENSAGEM DE SUCESSO PARA EDIÇÃO <<
+                TempData["SuccessMessage"] = "Dados do Profissional editados!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.ProfissionalExecutante.Any(e => e.ProfissionalExecutanteId == profissionalExecutante.ProfissionalExecutanteId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
+        // Se a validação falhar, volta para a View para mostrar os erros.
         ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao", profissionalExecutante.FuncaoId);
         return View(profissionalExecutante);
     }
 
-    // GET opcional apenas para confirmação, pode remover se não precisar
+    // Ação GET para exibir a confirmação de exclusão
     public async Task<IActionResult> Delete(int? id)
     {
         if (id == null) return NotFound();
 
         var profissional = await _context.ProfissionalExecutante
             .Include(p => p.Funcao)
-            .FirstOrDefaultAsync(p => p.ProfissionalExecutanteId == id);
+            .FirstOrDefaultAsync(m => m.ProfissionalExecutanteId == id);
 
         if (profissional == null) return NotFound();
 
-        return View(profissional); // se tiver view de confirmação
+        return View(profissional);
     }
 
     [HttpPost, ActionName("Delete")]
@@ -128,8 +169,11 @@ public class ProfissionalExecutantesController : Controller
         {
             _context.ProfissionalExecutante.Remove(profissional);
             await _context.SaveChangesAsync();
+            // >> MENSAGEM DE SUCESSO PARA EXCLUSÃO <<
+            TempData["SuccessMessage"] = "Profissional executante removido!";
         }
 
         return RedirectToAction(nameof(Index));
+    }
     }
 }

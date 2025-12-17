@@ -18,14 +18,13 @@ namespace HealthWellbeing.Models
         public int FuncaoId { get; set; }
 
         // 2. Propriedade de Navegação para a entidade Funcao
-        public Funcao Funcao { get; set; }
+        public Funcao? Funcao { get; set; }
 
         // ------------------------------------------------------------------
-
-        [Required(ErrorMessage = "O numero é obrigatório")]
-        [Phone(ErrorMessage = "Formato de telefone inválido.")]
-        [StringLength(15)]
+        [Required(ErrorMessage = "O número é obrigatório")]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "O número deve ter 9 dígitos.")]
         public string Telefone { get; set; }
+
 
         [Required(ErrorMessage = "O email é obrigatório")]
         [EmailAddress(ErrorMessage = "Formato de e-mail inválido.")]
