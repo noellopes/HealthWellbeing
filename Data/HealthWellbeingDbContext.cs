@@ -30,5 +30,8 @@ namespace HealthWellbeing.Data
         public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
         public DbSet<RoomType> RoomType { get; set; } = default!;
         public DbSet<RoomLocation> RoomLocation { get; set; }
+
+        public DbSet<TypeMaterialHistory> TypeMaterialHistories { get; set; }
+
     }
 }
