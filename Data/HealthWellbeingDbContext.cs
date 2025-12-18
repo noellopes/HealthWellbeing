@@ -189,5 +189,6 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(eo => eo.ObjetivoFisicoId);
 
         }
+        public DbSet<HealthWellbeing.Models.LimitacaoMedica> LimitacaoMedica { get; set; } = default!;
     }
 }

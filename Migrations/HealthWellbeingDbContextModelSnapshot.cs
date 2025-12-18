@@ -452,6 +452,32 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("HistoricoAtividades");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.LimitacaoMedica", b =>
+                {
+                    b.Property<int>("LimitacaoMedicaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LimitacaoMedicaId"));
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TipoLimitacao")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("LimitacaoMedicaId");
+
+                    b.ToTable("LimitacaoMedica");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Musculo", b =>
                 {
                     b.Property<int>("MusculoId")

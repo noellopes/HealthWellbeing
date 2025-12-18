@@ -100,6 +100,21 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LimitacaoMedica",
+                columns: table => new
+                {
+                    LimitacaoMedicaId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Descricao = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    TipoLimitacao = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Observacoes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LimitacaoMedica", x => x.LimitacaoMedicaId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ObjetivoFisico",
                 columns: table => new
                 {
@@ -825,6 +840,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "HistoricoAtividades");
+
+            migrationBuilder.DropTable(
+                name: "LimitacaoMedica");
 
             migrationBuilder.DropTable(
                 name: "Musculo");
