@@ -19,8 +19,9 @@
                    name="q"
                    value="@q"
                    class="form-control"
-                   placeholder="Procurar por nome ou descrição..." />
+                   placeholder="Procurar por nome..." />
             <button type="submit" class="btn btn-outline-secondary">Pesquisar</button>
+
             @if (!string.IsNullOrWhiteSpace(q))
             {
                 <a asp-action="Index" class="btn btn-outline-light border">Limpar</a>
@@ -28,68 +29,66 @@
         </form>
     </div>
 
-    <div class="card-body p-0">
+    <div class="card-body">
         @if (Model.Items == null || !Model.Items.Any())
         {
-            <div class="p-4 text-center text-muted">
-                <div class="mb-2 fw-semibold">Sem especialidades para mostrar.</div>
-                <a asp-action="Create" class="btn btn-sm btn-primary">Criar a primeira</a>
+            <div class="text-muted">
+                @if (!string.IsNullOrWhiteSpace(q))
+                {
+                    <p class="mb-1">
+                        Não foram encontradas especialidades para
+                        <strong>"@q"</strong>.
+                    </p>
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-2">Ver todas</a>
+                }
+                else
+                {
+                    <p class="mb-0">De momento não existem especialidades registadas.</p>
+                }
             </div>
         }
         else
         {
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 25%">
-                                @Html.DisplayNameFor(m => m.Items.First().Nome)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(m => m.Items.First().Descricao)
-                            </th>
-                            <th class="text-end" style="width: 260px;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Items)
-                        {
-                            <tr>
-                                <td class="fw-semibold">@item.Nome</td>
-                                <td>
-                                    <div class="text-truncate" style="max-width: 640px;">
-                                        @item.Descricao
-                                    </div>
-                                </td>
-                                <td class="text-end">
-                                    <div class="btn-group btn-group-sm" role="group" style="white-space: nowrap;">
-                                        <a asp-action="Details"
-                                           asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-primary">
-                                            <i class="bi bi-info-circle"></i> Detalhes
-                                        </a>
+            <div class="row g-3">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm"
+                             role="button"
+                             style="cursor: pointer;"
+                             onclick="location.href='@Url.Action("Details", new { id = item.IdEspecialidade })'">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">@item.Nome</h5>
+
+                                    <div class="btn-group btn-group-sm">
                                         <a asp-action="Edit"
                                            asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-warning text-white">
-                                            <i class="bi bi-pencil-square"></i> Editar
+                                           class="btn btn-outline-secondary"
+                                           onclick="event.stopPropagation();">
+                                            Editar
                                         </a>
                                         <a asp-action="Delete"
                                            asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-danger">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                           class="btn btn-outline-danger"
+                                           onclick="event.stopPropagation();">
+                                            Eliminar
                                         </a>
                                     </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                </div>
+
+                                @* Se quiseres meter uma linha discreta de resumo no futuro, mete aqui *@
+                                @* <p class="text-muted small mb-0">@item.Descricao</p> *@
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
 
             @* PAGINAÇÃO *@
             @if (Model.TotalPages > 1)
             {
-                <nav aria-label="Navegação de páginas" class="p-3">
+                <nav aria-label="Navegação de páginas" class="mt-3">
                     <ul class="pagination justify-content-center mb-0">
 
                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">

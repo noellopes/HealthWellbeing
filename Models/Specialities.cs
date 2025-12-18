@@ -4,7 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class Specialities
     {
-        [Key] // PK porque o nome foge à convenção "Id"
+        [Key]
         public int IdEspecialidade { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório.")]
@@ -14,5 +14,10 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "A descrição é obrigatória.")]
         [StringLength(1500, ErrorMessage = "Máximo 1500 caracteres.")]
         public string Descricao { get; set; } = "";
+
+        [MaxLength(5000)]
+        public string? OqueEDescricao { get; set; }
+
+        
     }
 }

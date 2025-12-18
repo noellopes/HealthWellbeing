@@ -1,51 +1,158 @@
 ﻿@model HealthWellbeing.Models.Specialities
 
 @{
-    ViewData["Title"] = "Detalhes da Especialidade";
+    // Título da página passa a ser o nome da especialidade
+    ViewData["Title"] = Model.Nome;
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-    <div class="d-flex gap-2">
-        <a asp-action="Edit" asp-route-id="@Model?.IdEspecialidade" class="btn btn-outline-primary">Editar</a>
-        <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
-    </div>
-</div>
+<div class="container">
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between">
-            <span class="fw-semibold">Informação</span>
-            @if (Model is not null)
-            {
-                <span class="badge text-bg-light border">ID: @Model.IdEspecialidade</span>
-            }
+    <!-- Breadcrumb / caminho no topo -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index">Início</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-controller="Specialities" asp-action="Index">Especialidades</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                @Model.Nome
+            </li>
+        </ol>
+    </nav>
+
+    <!-- HERO: título + resumo + botões (inspirado na CUF) -->
+    <section class="bg-light border rounded-3 p-4 mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-6 mb-3">@Model.Nome</h1>
+
+                <p class="lead mb-0">
+                    @Html.DisplayFor(m => m.Descricao)
+                </p>
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="d-grid gap-2 d-md-block">
+                    <a asp-controller="Consultas" asp-action="Index"
+                       class="btn btn-primary me-md-2 mb-2">
+                        Marcar consulta
+                    </a>
+
+                    <a asp-controller="Exame" asp-action="Index"
+                       class="btn btn-outline-primary mb-2">
+                        Ver exames
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row">
+        <!-- COLUNA PRINCIPAL (texto/explicação) -->
+        <div class="col-lg-8">
+            <section class="mb-4">
+                <h2 class="h5 mb-3">O que é a especialidade de @Model.Nome?</h2>
+
+                @if (!string.IsNullOrWhiteSpace(Model.OqueEDescricao))
+                {
+                    <p>@Model.OqueEDescricao</p>
+                }
+                else
+                {
+                    <p class="text-muted">
+                        (Sem descrição detalhada. Pode adicionar no botão <strong>Editar</strong>.)
+                    </p>
+                }
+            </section>
+
+            <section class="mb-4">
+                <h2 class="h5 mb-3">Quando deve procurar esta especialidade?</h2>
+                <p class="mb-2">
+                    Procure esta especialidade sempre que tiver sintomas relacionados com esta área
+                    ou quando for encaminhado pelo seu médico assistente.
+                </p>
+                <p class="mb-0">
+                    Nesta página encontra informação geral sobre a especialidade e acesso rápido
+                    a consultas, exames e profissionais de saúde.
+                </p>
+            </section>
+
+            <section class="mb-4">
+                <h2 class="h5 mb-3">Como o HealthWellbeing o pode ajudar</h2>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2">✓ Consultas com médicos especializados nesta área</li>
+                    <li class="mb-2">✓ Exames complementares de diagnóstico</li>
+                    <li class="mb-2">✓ Acompanhamento personalizado ao longo do tratamento</li>
+                </ul>
+            </section>
+        </div>
+
+        <!-- COLUNA LATERAL (cards como na CUF) -->
+        <div class="col-lg-4">
+
+            <!-- Consultas e Exames -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Consultas e Exames</h3>
+                    <p class="small text-muted">
+                        Veja as consultas e exames relacionados com esta especialidade
+                        e faça a sua marcação.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Consultas" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm">
+                            Ver consultas
+                        </a>
+                        <a asp-controller="Exame" asp-action="Index"
+                           class="btn btn-outline-secondary btn-sm">
+                            Ver exames
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Corpo clínico -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Corpo clínico</h3>
+                    <p class="small text-muted">
+                        Consulte os médicos e outros profissionais de saúde
+                        associados ao HealthWellbeing.
+                    </p>
+                    <a asp-controller="Doctor" asp-action="Index"
+                       class="btn btn-outline-primary btn-sm w-100">
+                        Ver médicos
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informação extra (opcional) -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Informação adicional</h3>
+                    <p class="small text-muted mb-1">
+                        Traga sempre os seus exames anteriores e a lista de medicação
+                        que está a fazer para uma melhor avaliação.
+                    </p>
+                    <p class="small text-muted mb-0">
+                        Em caso de urgência, dirija-se ao serviço de atendimento permanente.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card-body">
-        @if (Model is null)
-        {
-            <div class="alert alert-warning mb-0">
-                Não foi possível carregar os detalhes desta especialidade.
-            </div>
-        }
-        else
-        {
-            <dl class="row mb-0">
-                <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Nome)</dt>
-                <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(m => m.Nome)</dd>
+    <!-- Links de navegação no fim da página -->
+    <div class="mt-4 d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-link p-0">
+            ← Voltar à lista de especialidades
+        </a>
 
-                <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Descricao)</dt>
-                <dd class="col-sm-9">
-                    <div class="text-wrap">@Html.DisplayFor(m => m.Descricao)</div>
-                </dd>
-            </dl>
-        }
-    </div>
-
-    <div class="card-footer d-flex justify-content-end gap-2">
-        <a asp-action="Edit" asp-route-id="@Model?.IdEspecialidade" class="btn btn-primary">Editar</a>
-        <a asp-action="Index" class="btn btn-light border">Voltar</a>
+        <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade"
+           class="btn btn-outline-secondary btn-sm">
+            Editar especialidade
+        </a>
     </div>
 </div>

@@ -24,10 +24,20 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Descricao" class="form-label"></label>
-                <textarea asp-for="Descricao" class="form-control" rows="4" placeholder="Breve descrição da especialidade"></textarea>
+                <label asp-for="Descricao" class="form-label">Texto abaixo do nome (resumo)</label>
+                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Pequeno resumo mostrado no topo da especialidade"></textarea>
                 <div class="form-text">Máx. 1500 caracteres.</div>
                 <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="mb-3">
+                <label asp-for="OqueEDescricao" class="form-label">O que é a especialidade?</label>
+                <textarea asp-for="OqueEDescricao" class="form-control" rows="4"
+                          placeholder="Texto da secção 'O que é a especialidade de ...'"></textarea>
+                <div class="form-text">Opcional (até 300 caracteres, se mantiveste o MaxLength(300)).</div>
+                <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
             </div>
 
             <div class="d-flex gap-2">
