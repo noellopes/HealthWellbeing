@@ -8,6 +8,7 @@
 
 <p>
     <a asp-action="Create">Create New</a>
+    <a asp-action="CreateAutomatico">Create New A</a>
 </p>
 <table class="table">
     <thead>
@@ -26,7 +27,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UtenteGrupo7.UtenteGrupo7Id)
+                    @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
                 </td>
                 <td>
                     @item.PlanoExerciciosId
