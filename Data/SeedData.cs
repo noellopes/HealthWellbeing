@@ -40,10 +40,6 @@ namespace HealthWellbeing.Data
 
         private static void PopulateDoctor(HealthWellbeingDbContext db)
         {
-            if (db.Doctor.Any())
-            {
-                return;
-            }
 
             var especialidades = db.Specialities
                 .ToDictionary(e => e.Nome, e => e);
@@ -73,143 +69,165 @@ namespace HealthWellbeing.Data
 
         private static void PopulateConsultas(HealthWellbeingDbContext db)
         {
-            if (db.Consulta.Any()) return;
-
             var hoje = DateTime.Today;
 
-            var consulta = new[]
+            // médicos disponíveis (para alternar)
+            var doctors = db.Doctor
+                .OrderBy(d => d.IdMedico)
+                .ToList();
+
+            if (!doctors.Any())
+                throw new InvalidOperationException("Não há médicos na BD. Corre primeiro o PopulateDoctor.");
+
+            // 15 consultas (datas/horas de exemplo) — SEM IdMedico/IdEspecialidade aqui
+            var consultas = new List<Consulta>
+    {
+        // Base
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(10, 30),
+            HoraFim      = new TimeOnly(11, 30),
+        },
+
+        // Futuras (Agendada)
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2026, 1, 5, 9, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(9, 0),
+            HoraFim      = new TimeOnly(9, 30),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2026, 1, 10, 11, 15, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(11, 15),
+            HoraFim      = new TimeOnly(12, 0),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(15, 0),
+            HoraFim      = new TimeOnly(15, 45),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(16, 30),
+            HoraFim      = new TimeOnly(17, 0),
+        },
+
+        // Hoje (para testar “Hoje”)
+        new Consulta
+        {
+            DataMarcacao = hoje.AddDays(-2).AddHours(10),
+            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(15, 30),
+            HoraFim      = new TimeOnly(16, 0),
+        },
+        new Consulta
+        {
+            DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
+            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(14, 0),
+            HoraFim      = new TimeOnly(14, 30),
+        },
+
+        // Expiradas
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 9, 15, 9, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(9, 0),
+            HoraFim      = new TimeOnly(9, 30),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 8, 20, 11, 25, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 9, 25, 11, 45, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(11, 45),
+            HoraFim      = new TimeOnly(12, 15),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 7, 5, 13, 10, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 8, 10, 16, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(16, 0),
+            HoraFim      = new TimeOnly(16, 30),
+        },
+
+        // Canceladas
+        new Consulta
+        {
+            DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
+            DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
+            DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio       = new TimeOnly(9, 0),
+            HoraFim          = new TimeOnly(9, 30),
+        },
+        new Consulta
+        {
+            DataMarcacao     = new DateTime(2025, 9, 15, 11, 30, 0, DateTimeKind.Unspecified),
+            DataConsulta     = new DateTime(2025, 10, 10, 15, 0, 0, DateTimeKind.Unspecified),
+            DataCancelamento = new DateTime(2025, 10, 8, 10, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio       = new TimeOnly(15, 0),
+            HoraFim          = new TimeOnly(15, 45),
+        },
+        new Consulta
+        {
+            DataMarcacao     = new DateTime(2025, 6, 10, 12, 0, 0, DateTimeKind.Unspecified),
+            DataConsulta     = new DateTime(2025, 7, 5, 10, 30, 0, DateTimeKind.Unspecified),
+            DataCancelamento = new DateTime(2025, 7, 3, 14, 15, 0, DateTimeKind.Unspecified),
+            HoraInicio       = new TimeOnly(10, 30),
+            HoraFim          = new TimeOnly(11, 0),
+        },
+
+        // Mais futuras (para fechar 15)
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(13, 30),
+            HoraFim      = new TimeOnly(14, 15),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 25, 8, 55, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(2025, 12, 12, 8, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(8, 30),
+            HoraFim      = new TimeOnly(9, 0),
+        },
+    };
+
+            // ✅ OPÇÃO A: alterna médicos (e especialidade) por consulta
+            for (int i = 0; i < consultas.Count; i++)
             {
-                // -- Exemplo base --
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(10, 30),
-                    HoraFim      = new TimeOnly(11, 30),
-                },
+                var d = doctors[i % doctors.Count];
 
-                // FUTURAS (Agendada)
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 5, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 12, 1, 11, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 15),
-                    HoraFim      = new TimeOnly(12, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(15, 0),
-                    HoraFim      = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 30),
-                    HoraFim      = new TimeOnly(17, 0),
-                },
+                consultas[i].IdMedico = d.IdMedico;
+                consultas[i].IdEspecialidade = d.IdEspecialidade;
+            }
 
-                // HOJE (para testar “Hoje”)
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-2).AddHours(10),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 30),
-                    HoraFim      = new TimeOnly(10, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(14, 0),
-                    HoraFim      = new TimeOnly(14, 30),
-                },
+            // Seed idempotente (evita duplicados)
+            foreach (var c in consultas)
+            {
+                bool exists = db.Consulta.Any(x =>
+                    x.IdMedico == c.IdMedico &&
+                    x.DataConsulta == c.DataConsulta &&
+                    x.HoraInicio == c.HoraInicio);
 
-                // EXPIRADAS
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 15, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 8, 20, 11, 25, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 25, 11, 45, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 45),
-                    HoraFim      = new TimeOnly(12, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 7, 5, 13, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 8, 10, 16, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 0),
-                    HoraFim      = new TimeOnly(16, 30),
-                },
+                if (!exists)
+                    db.Consulta.Add(c);
+            }
 
-                // CANCELADAS
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(9, 0),
-                    HoraFim          = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 9, 15, 11, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 8, 10, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(15, 0),
-                    HoraFim          = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 6, 10, 12, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 7, 5, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 7, 3, 14, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(10, 30),
-                    HoraFim          = new TimeOnly(11, 0),
-                },
-
-                // MAIS FUTURAS
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(13, 30),
-                    HoraFim      = new TimeOnly(14, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 25, 8, 55, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 12, 12, 8, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(8, 30),
-                    HoraFim      = new TimeOnly(9, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 27, 16, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 22, 17, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(17, 0),
-                    HoraFim      = new TimeOnly(17, 30),
-                }
-            };
-
-            db.Consulta.AddRange(consulta);
             db.SaveChanges();
         }
+
+
 
 
         private static void PopulateUtenteSaude(HealthWellbeingDbContext db)
