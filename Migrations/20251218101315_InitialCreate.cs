@@ -300,29 +300,30 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CompraOpcao",
+                name: "Compra",
                 columns: table => new
                 {
-                    CompraOpcaoId = table.Column<int>(type: "int", nullable: false)
+                    CompraId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    ZonaId = table.Column<int>(type: "int", nullable: false),
                     FornecedorId = table.Column<int>(type: "int", nullable: false),
-                    Preco = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TempoEntrega = table.Column<int>(type: "int", nullable: false),
                     Quantidade = table.Column<int>(type: "int", nullable: false),
-                    DataRegisto = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    PrecoUnitario = table.Column<float>(type: "real", nullable: false),
+                    TempoEntrega = table.Column<int>(type: "int", nullable: false),
+                    DataCompra = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompraOpcao", x => x.CompraOpcaoId);
+                    table.PrimaryKey("PK_Compra", x => x.CompraId);
                     table.ForeignKey(
-                        name: "FK_CompraOpcao_Consumivel_ConsumivelId",
+                        name: "FK_Compra_Consumivel_ConsumivelId",
                         column: x => x.ConsumivelId,
                         principalTable: "Consumivel",
                         principalColumn: "ConsumivelId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CompraOpcao_Fornecedor_FornecedorId",
+                        name: "FK_Compra_Fornecedor_FornecedorId",
                         column: x => x.FornecedorId,
                         principalTable: "Fornecedor",
                         principalColumn: "FornecedorId",
@@ -354,43 +355,6 @@ namespace HealthWellbeing.Migrations
                         column: x => x.FornecedorId,
                         principalTable: "Fornecedor",
                         principalColumn: "FornecedorId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Compra",
-                columns: table => new
-                {
-                    CompraId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
-                    ZonaId = table.Column<int>(type: "int", nullable: false),
-                    FornecedorId = table.Column<int>(type: "int", nullable: false),
-                    Quantidade = table.Column<int>(type: "int", nullable: false),
-                    PrecoUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TempoEntrega = table.Column<int>(type: "int", nullable: false),
-                    DataCompra = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Compra", x => x.CompraId);
-                    table.ForeignKey(
-                        name: "FK_Compra_Consumivel_ConsumivelId",
-                        column: x => x.ConsumivelId,
-                        principalTable: "Consumivel",
-                        principalColumn: "ConsumivelId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Compra_Fornecedor_FornecedorId",
-                        column: x => x.FornecedorId,
-                        principalTable: "Fornecedor",
-                        principalColumn: "FornecedorId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Compra_ZonaArmazenamento_ZonaId",
-                        column: x => x.ZonaId,
-                        principalTable: "ZonaArmazenamento",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -454,7 +418,7 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockMovimento",
+                name: "HistoricoCompras",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -468,14 +432,14 @@ namespace HealthWellbeing.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockMovimento", x => x.Id);
+                    table.PrimaryKey("PK_HistoricoCompras", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockMovimento_Fornecedor_FornecedorId",
+                        name: "FK_HistoricoCompras_Fornecedor_FornecedorId",
                         column: x => x.FornecedorId,
                         principalTable: "Fornecedor",
                         principalColumn: "FornecedorId");
                     table.ForeignKey(
-                        name: "FK_StockMovimento_Stock_StockId",
+                        name: "FK_HistoricoCompras_Stock_StockId",
                         column: x => x.StockId,
                         principalTable: "Stock",
                         principalColumn: "StockId",
@@ -509,21 +473,6 @@ namespace HealthWellbeing.Migrations
                 column: "FornecedorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Compra_ZonaId",
-                table: "Compra",
-                column: "ZonaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CompraOpcao_ConsumivelId",
-                table: "CompraOpcao",
-                column: "ConsumivelId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CompraOpcao_FornecedorId",
-                table: "CompraOpcao",
-                column: "FornecedorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Consumivel_CategoriaId",
                 table: "Consumivel",
                 column: "CategoriaId");
@@ -539,6 +488,16 @@ namespace HealthWellbeing.Migrations
                 column: "FornecedorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_HistoricoCompras_FornecedorId",
+                table: "HistoricoCompras",
+                column: "FornecedorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HistoricoCompras_StockId",
+                table: "HistoricoCompras",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Stock_ConsumivelID",
                 table: "Stock",
                 column: "ConsumivelID");
@@ -547,16 +506,6 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Stock_ZonaID",
                 table: "Stock",
                 column: "ZonaID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockMovimento_FornecedorId",
-                table: "StockMovimento",
-                column: "FornecedorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StockMovimento_StockId",
-                table: "StockMovimento",
-                column: "StockId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TreatmentRecord_NurseId",
@@ -599,19 +548,16 @@ namespace HealthWellbeing.Migrations
                 name: "Compra");
 
             migrationBuilder.DropTable(
-                name: "CompraOpcao");
+                name: "Fornecedor_Consumivel");
 
             migrationBuilder.DropTable(
-                name: "Fornecedor_Consumivel");
+                name: "HistoricoCompras");
 
             migrationBuilder.DropTable(
                 name: "Receita");
 
             migrationBuilder.DropTable(
                 name: "RestricaoAlimentar");
-
-            migrationBuilder.DropTable(
-                name: "StockMovimento");
 
             migrationBuilder.DropTable(
                 name: "UsoConsumivel");

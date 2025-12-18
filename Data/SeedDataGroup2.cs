@@ -21,7 +21,7 @@ namespace HealthWellbeing.Data
         }
         private static void PopulateHistoricoCompras(HealthWellbeingDbContext db)
         {
-            if (db.StockMovimento.Any()) return;
+            if (db.HistoricoCompras.Any()) return;
 
             var stocks = db.Stock
                 .Include(s => s.Consumivel)
@@ -29,12 +29,12 @@ namespace HealthWellbeing.Data
 
             if (!stocks.Any()) return;
 
-            var movimentos = new List<StockMovimento>();
+            var movimentos = new List<HistoricoCompras>();
 
             foreach (var stock in stocks)
             {
                 // simula uma compra inicial
-                movimentos.Add(new StockMovimento
+                movimentos.Add(new HistoricoCompras
                 {
                     StockId = stock.StockId,
                     Quantidade = stock.QuantidadeAtual,
@@ -43,7 +43,7 @@ namespace HealthWellbeing.Data
                 });
             }
 
-            db.StockMovimento.AddRange(movimentos);
+            db.HistoricoCompras.AddRange(movimentos);
             db.SaveChanges();
         }
 

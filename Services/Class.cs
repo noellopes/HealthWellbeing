@@ -34,7 +34,7 @@ namespace HealthWellbeing.Services
             stock.QuantidadeAtual -= quantidade;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
-            var movimento = new StockMovimento
+            var movimento = new HistoricoCompras
             {
                 StockId = stock.StockId,
                 Quantidade = quantidade,
@@ -42,7 +42,7 @@ namespace HealthWellbeing.Services
                 Data = DateTime.Now
             };
 
-            _context.StockMovimento.Add(movimento);
+            _context.HistoricoCompras.Add(movimento);
 
             await _context.SaveChangesAsync();
             return true;

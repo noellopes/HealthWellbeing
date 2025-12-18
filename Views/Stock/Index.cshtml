@@ -6,71 +6,84 @@
 
 <div class="container mt-4">
 
+    <!-- =============================== -->
+    <!-- TOPO: TÍTULO + BOTÕES -->
+    <!-- =============================== -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">🏭 Gestão de Stock</h2>
+
+        <h2 class="fw-bold text-primary mb-0">
+            🏭 Gestão de Stock
+        </h2>
 
         <div class="d-flex gap-2">
-            <a asp-controller="StockMovimento" asp-action="CreateEntrada" class="btn btn-success px-4">
+            <a asp-controller="Compra"
+               asp-action="Index"
+               class="btn btn-success px-4">
                 📥 Fazer Compra
             </a>
 
-            <a asp-controller="RegistoCompras" asp-action="Index" class="btn btn-success px-4">
-                📑 Registo de Compras
+            <a asp-controller="Compra"
+               asp-action="Historico"
+               class="btn btn-success px-4">
+                📑 Histórico de Compras
             </a>
         </div>
+
     </div>
 
-
     <!-- =============================== -->
-    <!-- MENSAGENS DE FILTRO / PESQUISA -->
+    <!-- MENSAGENS DE ESTADO -->
     <!-- =============================== -->
     @if (ViewBag.StockCritico == true)
     {
-        <div class="alert alert-warning d-flex align-items-center shadow-sm mb-3">
-            ⚠️ A mostrar apenas consumíveis que estão abaixo da quantidade mínima.
+        <div class="alert alert-warning shadow-sm mb-3">
+            ⚠️ A mostrar consumíveis em que a quantidade atual está próxima da quantidade mínima 
+
         </div>
     }
 
     @if (!string.IsNullOrWhiteSpace(ViewBag.SearchNome))
     {
         <div class="alert alert-info shadow-sm mb-2">
-            🔍 A pesquisar por nome contendo: <strong>@ViewBag.SearchNome</strong>
+            🔍 Pesquisa por consumível: <strong>@ViewBag.SearchNome</strong>
         </div>
     }
 
     @if (!string.IsNullOrWhiteSpace(ViewBag.SearchZona))
     {
         <div class="alert alert-info shadow-sm mb-3">
-            📍 A pesquisar por zona contendo: <strong>@ViewBag.SearchZona</strong>
+            📍 Pesquisa por zona: <strong>@ViewBag.SearchZona</strong>
         </div>
     }
 
-
     <!-- =============================== -->
-    <!-- FORMULÁRIO DE PESQUISA/OPÇÕES -->
+    <!-- FILTROS -->
     <!-- =============================== -->
     <form method="get" asp-action="Index" class="mb-4">
         <div class="row g-3">
 
-            <!-- PESQUISAR NOME -->
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">🔍</span>
-                    <input type="text" name="searchNome" value="@ViewBag.SearchNome"
-                           class="form-control" placeholder="Procurar por consumível..." />
+                    <input type="text"
+                           name="searchNome"
+                           value="@ViewBag.SearchNome"
+                           class="form-control"
+                           placeholder="Procurar por consumível..." />
                 </div>
             </div>
 
-            <!-- PESQUISAR ZONA -->
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">📍</span>
-                    <input type="text" name="searchZona" value="@ViewBag.SearchZona"
-                           class="form-control" placeholder="Procurar por zona..." />
+                    <input type="text"
+                           name="searchZona"
+                           value="@ViewBag.SearchZona"
+                           class="form-control"
+                           placeholder="Procurar por zona..." />
                 </div>
             </div>
 
-            <!-- CHECKBOX STOCK CRÍTICO -->
             <div class="col-md-2 d-flex align-items-center">
                 <input class="form-check-input me-2"
                        type="checkbox"
@@ -78,26 +91,27 @@
                        value="true"
                        @(ViewBag.StockCritico == true ? "checked" : "")
                        onchange="this.form.submit()" />
-
                 <label class="form-check-label">⚠️ Só stock crítico</label>
             </div>
 
-            <!-- BOTÕES -->
             <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
-                <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpar</a>
+                <button type="submit" class="btn btn-primary w-100">
+                    Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                    Limpar
+                </a>
             </div>
 
         </div>
     </form>
-
 
     <!-- =============================== -->
     <!-- TABELA DE STOCK -->
     <!-- =============================== -->
     <div class="table-responsive">
         <table class="table table-bordered table-striped shadow-sm">
-            <thead style="background-color: #d7e9ff;" class="fw-bold text-center">
+            <thead class="text-center fw-bold" style="background-color:#d7e9ff;">
                 <tr>
                     <th>Consumível</th>
                     <th>Zona</th>
@@ -105,7 +119,6 @@
                     <th>Quantidade Mínima</th>
                     <th>Quantidade Máxima</th>
                     <th>Última Atualização</th>
-                    <th style="width:170px;">Ações</th>
                 </tr>
             </thead>
 
@@ -113,8 +126,8 @@
                 @if (Model.Items == null || !Model.Items.Any())
                 {
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-4">
-                            <h5 class="fw-bold">Nenhum registo de stock encontrado.</h5>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <strong>Nenhum registo de stock encontrado.</strong>
                         </td>
                     </tr>
                 }
@@ -122,7 +135,6 @@
                 {
                     foreach (var item in Model.Items)
                     {
-                        // Determinar Min/Max CORRETOS
                         var min = item.UsaValoresDoConsumivel
                         ? item.Consumivel?.QuantidadeMinima ?? 0
                         : item.QuantidadeMinima;
@@ -136,7 +148,6 @@
                             <td>@item.Consumivel?.Nome</td>
                             <td>@item.Zona?.Nome</td>
 
-                            <!-- STOCK CRÍTICO COM O VALOR CERTO -->
                             <td class="fw-bold @(item.QuantidadeAtual < min ? "text-danger" : "")">
                                 @item.QuantidadeAtual
                                 @(item.QuantidadeAtual < min ? " ⚠️" : "")
@@ -145,19 +156,8 @@
                             <td>@min</td>
                             <td>@max</td>
 
-                            <td>@item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")</td>
-
                             <td>
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a asp-action="Details" asp-route-id="@item.StockId"
-                                       class="btn btn-info btn-sm text-white px-3">Ver</a>
-
-                                    <a asp-action="Edit" asp-route-id="@item.StockId"
-                                       class="btn btn-warning btn-sm px-3">Editar</a>
-
-                                    <a asp-action="Delete" asp-route-id="@item.StockId"
-                                       class="btn btn-danger btn-sm px-3">Eliminar</a>
-                                </div>
+                                @item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")
                             </td>
 
                         </tr>
@@ -166,7 +166,6 @@
             </tbody>
         </table>
     </div>
-
 
     <!-- =============================== -->
     <!-- PAGINAÇÃO -->
@@ -197,4 +196,5 @@
 
         </ul>
     </nav>
+
 </div>

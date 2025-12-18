@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
-    public class StockMovimentoController : Controller
+    public class HistoricoComprasController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public StockMovimentoController(HealthWellbeingDbContext context)
+        public HistoricoComprasController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         {
             int itemsPerPage = 10;
 
-            var query = _context.StockMovimento
+            var query = _context.HistoricoCompras
                 .Where(m => m.Tipo == "Entrada")
                 .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
                 .Include(m => m.Stock).ThenInclude(s => s.Zona)
@@ -36,7 +36,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToList();
 
-            var paginated = new PaginationInfo<StockMovimento>(page, totalMovimentos, itemsPerPage)
+            var paginated = new PaginationInfo<HistoricoCompras>(page, totalMovimentos, itemsPerPage)
             {
                 Items = movimentosPagina
             };
@@ -49,7 +49,7 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         public IActionResult Details(int id)
         {
-            var movimento = _context.StockMovimento
+            var movimento = _context.HistoricoCompras
                 .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
                 .Include(m => m.Stock).ThenInclude(s => s.Zona)
                 .FirstOrDefault(m => m.Id == id);
@@ -65,7 +65,7 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         public IActionResult Delete(int id)
         {
-            var movimento = _context.StockMovimento
+            var movimento = _context.HistoricoCompras
                 .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
                 .Include(m => m.Stock).ThenInclude(s => s.Zona)
                 .FirstOrDefault(m => m.Id == id);
@@ -83,7 +83,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var movimento = _context.StockMovimento
+            var movimento = _context.HistoricoCompras
                 .Include(m => m.Stock).ThenInclude(s => s.Consumivel)
                 .FirstOrDefault(m => m.Id == id);
 
@@ -94,7 +94,7 @@ namespace HealthWellbeing.Controllers
             TempData["Success"] =
                 $"Registo da compra de {movimento.Quantidade} unidades de '{movimento.Stock?.Consumivel?.Nome}' foi eliminado com sucesso!";
 
-            _context.StockMovimento.Remove(movimento);
+            _context.HistoricoCompras.Remove(movimento);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
@@ -119,7 +119,7 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateEntrada(StockMovimento movimento)
+        public IActionResult CreateEntrada(HistoricoCompras movimento)
         {
             ViewBag.Stocks = _context.Stock
                 .Include(s => s.Consumivel)
@@ -168,7 +168,7 @@ namespace HealthWellbeing.Controllers
             stock.QuantidadeAtual += movimento.Quantidade;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
-            _context.StockMovimento.Add(movimento);
+            _context.HistoricoCompras.Add(movimento);
             _context.SaveChanges();
 
             TempData["Success"] = "Compra registada com sucesso!";
@@ -194,7 +194,7 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateSaida(StockMovimento movimento)
+        public IActionResult CreateSaida(HistoricoCompras movimento)
         {
             ViewBag.Stocks = _context.Stock
                 .Include(s => s.Consumivel)
@@ -224,7 +224,7 @@ namespace HealthWellbeing.Controllers
             stock.QuantidadeAtual -= movimento.Quantidade;
             stock.DataUltimaAtualizacao = DateTime.Now;
 
-            _context.StockMovimento.Add(movimento);
+            _context.HistoricoCompras.Add(movimento);
             _context.SaveChanges();
 
             TempData["Success"] = "Saída registada com sucesso!";

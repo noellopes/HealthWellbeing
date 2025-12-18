@@ -51,6 +51,11 @@
                         </div>
 
                         <div class="col-md-4">
+                            <label class="form-label">Quantidade Mínima</label>
+                            <input id="qtdMin" class="form-control" disabled />
+                        </div>
+
+                        <div class="col-md-4">
                             <label class="form-label">Quantidade Máxima</label>
                             <input id="qtdMax" class="form-control" disabled />
                         </div>
@@ -83,6 +88,7 @@
     <script>
         const select = document.getElementById("consumivelSelect");
         const qtdAtualInput = document.getElementById("qtdAtual");
+        const qtdMinInput = document.getElementById("qtdMin");
         const qtdMaxInput = document.getElementById("qtdMax");
         const qtdComprarInput = document.getElementById("qtdComprar");
         const infoCompra = document.getElementById("infoCompra");
@@ -92,16 +98,26 @@
             if (!opt) return;
 
             const atual = parseInt(opt.dataset.atual || 0);
+            const min = parseInt(opt.dataset.min || 0);
             const max = parseInt(opt.dataset.max || 0);
 
             qtdAtualInput.value = atual;
+            qtdMinInput.value = min;
             qtdMaxInput.value = max;
 
-            const sugestao = Math.max(0, max - atual);
+            // sugestão principal
+            let sugestao = Math.max(0, max - atual);
             qtdComprarInput.value = sugestao;
 
-            infoCompra.innerText =
-                "Sugestão automática: diferença entre a quantidade máxima e a atual.";
+            // mensagem informativa
+            if (atual < min) {
+                infoCompra.innerText =
+                    "⚠ O stock está abaixo do mínimo. Sugestão baseada no máximo.";
+            } else {
+                infoCompra.innerText =
+                    "Sugestão automática: diferença entre a quantidade máxima e a atual.";
+            }
         });
     </script>
+
 }

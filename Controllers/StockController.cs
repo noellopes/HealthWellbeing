@@ -95,11 +95,23 @@ namespace HealthWellbeing.Controllers
                 .AsQueryable();
 
             // Stock crítico → usando Min DO STOCK (independente)
+            const int margemCritica = 10;
+
             if (stockCritico)
             {
-                query = query.Where(s => s.QuantidadeAtual < s.QuantidadeMinima);
+                query = query.Where(s =>
+                    s.QuantidadeAtual <=
+                    (
+                        (s.UsaValoresDoConsumivel
+                            ? s.Consumivel.QuantidadeMinima
+                            : s.QuantidadeMinima)
+                        + margemCritica
+                    )
+                );
+
                 ViewBag.StockCritico = true;
             }
+
 
             if (!string.IsNullOrWhiteSpace(searchNome))
             {
