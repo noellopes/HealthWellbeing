@@ -1634,12 +1634,13 @@ namespace HealthWellbeing.Data
             //EnsureUserIsCreatedAsync(userManager, "joao@jbma.pt", "Secret123$", ["DiretorClinico"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "anab@jbma.pt", "Secret123$", ["Utente"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "brunoMP@jbma.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "diretorClinico@Healthwellbeing.pt", "Secret123$", ["DiretorClinico"]).Wait();
         }
 
         internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             EnsureRoleIsCreatedAsync(roleManager, "Administrador").Wait();
-            EnsureRoleIsCreatedAsync(roleManager, "DiretorClinino").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "DiretorClinico").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Utente").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Medico").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Rececionista").Wait();

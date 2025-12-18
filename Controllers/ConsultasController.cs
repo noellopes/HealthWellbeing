@@ -26,32 +26,31 @@ namespace HealthWellbeing.Controllers
         // GET: Consultas
         public async Task<IActionResult> Index(int page = 1, string searchTerm = "")
         {
-
             var hoje = DateTime.Today;
 
             var consultasQuery = _context.Consulta
                 .Include(c => c.Doctor)
                 .Include(c => c.Speciality)
-                .Where(c =>
-                    !c.DataCancelamento.HasValue &&        
-                    c.DataConsulta.Date >= hoje           
-                )
                 .AsQueryable();
+
+            // ✅ Se NÃO for Diretor Clínico -> só agendadas a partir de hoje e não canceladas
+            if (!User.IsInRole("DiretorClinico"))
+            {
+                consultasQuery = consultasQuery.Where(c =>
+                    !c.DataCancelamento.HasValue &&
+                    c.DataConsulta.Date >= hoje
+                );
+            }
+            // ✅ Se for Diretor Clínico -> vê tudo (passadas, futuras, canceladas, etc.)
+            // (logo não aplicamos nenhum filtro aqui)
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                // Aceitar formatos comuns em PT
                 var culture = new CultureInfo("pt-PT");
                 var formats = new[] { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd" };
 
-                if (DateTime.TryParseExact(searchTerm.Trim(),
-                                           formats,
-                                           culture,
-                                           DateTimeStyles.None,
-                                           out var dataPesquisa))
-                    
+                if (DateTime.TryParseExact(searchTerm.Trim(), formats, culture, DateTimeStyles.None, out var dataPesquisa))
                 {
-                    // FILTRAR APENAS POR DATA (sem hora)
                     consultasQuery = consultasQuery.Where(c =>
                         c.DataMarcacao.Date == dataPesquisa.Date ||
                         c.DataConsulta.Date == dataPesquisa.Date
@@ -59,22 +58,16 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    // Se o utilizador escrever algo que não é data válida, podes:
-                    // - ou não filtrar (deixar tudo)
-                    // - ou devolver 0 resultados. Aqui vou devolver 0 resultados:
                     consultasQuery = consultasQuery.Where(c => false);
                 }
             }
 
-            // Aqui já não há nada "estranho" na query, CountAsync funciona
             int numberConsultas = await consultasQuery.CountAsync();
-
             var consultasInfo = new PaginationInfo<Consulta>(page, numberConsultas);
-
             var pageSize = consultasInfo.ItemsPerPage > 0 ? consultasInfo.ItemsPerPage : 10;
 
             consultasInfo.Items = await consultasQuery
-                .OrderBy(c => c.DataConsulta)
+                .OrderByDescending(c => c.DataConsulta) // histórico normalmente faz mais sentido desc
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -83,6 +76,8 @@ namespace HealthWellbeing.Controllers
 
             return View(consultasInfo);
         }
+
+
 
         // GET: Consultas/Details/5
         public async Task<IActionResult> Details(int? id)
