@@ -13,6 +13,11 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
+        public DbSet<HealthWellbeing.Models.AgendamentoModel> Agendamentos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Servico> Servicos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TipoServico> TipoServicos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Terapeuta> Terapeuta { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Level { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Event> Event { get; set; } = default!;

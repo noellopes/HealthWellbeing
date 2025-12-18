@@ -10,6 +10,9 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
+        public object Terapeutas { get; internal set; }
+        public object Agendamentos { get; internal set; }
     }
 }
 
