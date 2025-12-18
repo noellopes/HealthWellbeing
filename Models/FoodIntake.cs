@@ -19,9 +19,6 @@ namespace HealthWellbeing.Models
         public int PortionsPlanned { get; set; }
         public int PortionsEaten { get; set; }
 
-        [NotMapped]
-        public bool Eaten => PortionsEaten >= PortionsPlanned;
-
         public DateTime ScheduledTime { get; set; }
 
         public Food? Food { get; set; }

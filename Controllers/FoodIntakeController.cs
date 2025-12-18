@@ -32,7 +32,8 @@ namespace HealthWellbeing.Controllers
                 SelectedDate = selectedDate,
                 SelectedClientId = clientId,
                 Clients = await LoadClientsAsync(clientId),
-                AvailableFoods = await LoadFoodsAsync()
+                AvailableFoods = await LoadFoodsAsync(),
+                Items = new List<FoodIntakeCardVM>()
             };
 
             if (clientId <= 0)
@@ -43,78 +44,99 @@ namespace HealthWellbeing.Controllers
             var plan = await GetClientPlanAsync(clientId);
             if (plan == null)
             {
-                vm.Items = [];
-                // sem plano -> sem metas/progresso
+                // sem plano -> sem cards e sem dashboard
                 return View(vm);
             }
 
-            // Goal do cliente (assumo 1 goal ativo; escolho o "mais recente")
+            // Goal (assumo 1 goal ativo, escolho o mais recente)
             var goal = await _context.Goal
                 .AsNoTracking()
                 .Where(g => g.ClientId == clientId)
                 .OrderByDescending(g => g.GoalId)
                 .FirstOrDefaultAsync();
 
-            // 1) Plano do dia (FoodPlanDay)
+            if (goal != null)
+            {
+                vm.DailyCaloriesGoal = goal.DailyCalories;
+                vm.DailyProteinGoal = goal.DailyProtein;
+                vm.DailyFatGoal = goal.DailyFat;
+                vm.DailyHydratesGoal = goal.DailyHydrates;
+            }
+
+            // 1) Plan Validation
+            await EnsureDayPlanAsync(plan.PlanId, selectedDate);
+
+            // 1.5) Date validation
+            var today = DateTime.Today;
+
+            var range = await _context.FoodPlanDay
+                .AsNoTracking()
+                .Where(x => x.PlanId == plan.PlanId)
+                .GroupBy(x => 1)
+                .Select(g => new { Min = g.Min(a => a.Date), Max = g.Max(a => a.Date) })
+                .FirstOrDefaultAsync();
+
+            if (range != null)
+            {
+                var minDate = range.Min.Date;
+                var maxDate = range.Max.Date;
+
+                // pass to view (to set min/max in the calendar too)
+                ViewBag.MinPlanDate = minDate;
+                ViewBag.MaxPlanDate = maxDate;
+                ViewBag.Today = today;
+
+                var invalid =
+                    selectedDate > today ||
+                    selectedDate < minDate ||
+                    selectedDate > maxDate;
+
+                if (invalid)
+                {
+                    // show message and stop (no cards)
+                    vm.Items = new List<FoodIntakeCardVM>();
+                    ViewBag.DateError = "Choose a valid Date";
+                    return View(vm);
+                }
+            }
+            else
+            {
+                // no plan days at all -> invalid date selection in practice
+                vm.Items = new List<FoodIntakeCardVM>();
+                ViewBag.DateError = "Choose a valid Date";
+                return View(vm);
+            }
+
+
+            // 2) Load Daily Plan
             var dayPlan = await _context.FoodPlanDay
                 .AsNoTracking()
                 .Include(x => x.Food)
                 .Include(x => x.Portion)
-                .Where(x => x.PlanId == plan.PlanId && x.Date.Date == selectedDate)
+                .Where(x => x.PlanId == plan.PlanId && x.Date == selectedDate)
+
                 .OrderBy(x => x.ScheduledTime)
-                .ThenBy(x => x.Food!.Name)
+                .ThenBy(x => x.Food != null ? x.Food.Name : "")
                 .ToListAsync();
 
-            // 2) Intakes do dia
-            var dayIntakes = await _context.FoodIntake
-                .Where(x => x.PlanId == plan.PlanId && x.Date.Date == selectedDate)
+            // 3) FoodIntake Validation
+            var intakesMap = await EnsureDayIntakesAsync(plan.PlanId, selectedDate, dayPlan);
+
+            // 4) Portion list
+            vm.Portions = await _context.Portion
+                .AsNoTracking()
+                .OrderBy(p => p.PortionName)
+                .Select(p => new SelectListItem
+                {
+                    Value = p.PortionId.ToString(),
+                    Text = p.PortionName
+                })
                 .ToListAsync();
 
-            var intakeByFoodId = dayIntakes.ToDictionary(x => x.FoodId, x => x);
-
-            // 3) Merge: garantir que existe FoodIntake para cada linha do plano do dia
-            bool created = false;
-            foreach (var line in dayPlan)
-            {
-                if (!intakeByFoodId.TryGetValue(line.FoodId, out var fi))
-                {
-                    // cria intake
-                    fi = new FoodIntake
-                    {
-                        PlanId = plan.PlanId,
-                        FoodId = line.FoodId,
-                        PortionId = line.PortionId,
-                        Date = selectedDate,
-                        ScheduledTime = line.ScheduledTime ?? DateTime.Now,
-
-                        // se aplicaste a alteração recomendada:
-                        PortionsPlanned = line.PortionsPlanned,
-                        PortionsEaten = 0
-                    };
-
-                    _context.FoodIntake.Add(fi);
-                    intakeByFoodId[line.FoodId] = fi;
-                    created = true;
-                }
-                else
-                {
-                    // se mudou a quantidade planeada no plano, atualiza snapshot
-                    if (fi.PortionsPlanned != line.PortionsPlanned)
-                        fi.PortionsPlanned = line.PortionsPlanned;
-
-                    // se mudou porção no plano, alinha
-                    if (fi.PortionId != line.PortionId)
-                        fi.PortionId = line.PortionId;
-                }
-            }
-
-            if (created)
-                await _context.SaveChangesAsync();
-
-            // 4) Cards (base = dayPlan)
+            // 5) cards
             vm.Items = dayPlan.Select(line =>
             {
-                var fi = intakeByFoodId[line.FoodId];
+                var fi = intakesMap[line.FoodId];
 
                 return new FoodIntakeCardVM
                 {
@@ -122,51 +144,51 @@ namespace HealthWellbeing.Controllers
                     FoodId = line.FoodId,
                     FoodName = line.Food?.Name ?? "Food",
                     PortionName = line.Portion?.PortionName,
-                    IsConsumed = fi.PortionsEaten >= fi.PortionsPlanned,
+                    PortionsPlanned = fi.PortionsPlanned,
+                    PortionsEaten = fi.PortionsEaten,
+                    IsConsumed = fi.PortionsPlanned > 0 && fi.PortionsEaten >= fi.PortionsPlanned,
                     IconClass = GuessFoodIcon(line.Food?.Name),
-                    Note = $"Porções: {fi.PortionsEaten}/{fi.PortionsPlanned}"
+                    Note = $"Portions: {fi.PortionsEaten}/{fi.PortionsPlanned}"
                 };
             }).ToList();
 
-            // 5) Calcular progresso do Goal (planeado vs consumido)
-            var progress = await CalculateProgressAsync(plan.PlanId, selectedDate);
-
-            // passa no ViewBag (para não mexer no teu VM se não quiseres)
-            ViewBag.Goal = goal;
-            ViewBag.ProgressPlanned = progress.Planned;
-            ViewBag.ProgressEaten = progress.Eaten;
+            // 6) dashboard 
+            var totals = await CalculateDayTotalsAsync(plan.PlanId, selectedDate);
+            vm.CaloriesConsumed = totals.cal;
+            vm.ProteinConsumed = totals.prot;
+            vm.FatConsumed = totals.fat;
+            vm.HydratesConsumed = totals.carb;
 
             return View(vm);
         }
 
         // =========================================
-        // POST: FoodIntake/ToggleConsumed
+        // POST: FoodIntake/SetPortionsEaten
         // =========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleConsumed([FromBody] ToggleConsumedDto dto)
+        public async Task<IActionResult> SetPortionsEaten([FromBody] SetPortionsEatenDto dto)
         {
             if (dto.ClientId <= 0 || dto.FoodId <= 0)
-                return BadRequest("Dados inválidos.");
-
-            var plan = await GetClientPlanAsync(dto.ClientId);
-            if (plan == null) return NotFound("Cliente sem plano.");
+                return BadRequest("Invalid data.");
 
             var day = dto.Date.Date;
 
+            var plan = await GetClientPlanAsync(dto.ClientId);
+            if (plan == null) return NotFound("Client has no plan.");
+
+            // linha do plano do dia
+            var line = await _context.FoodPlanDay
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
+
+            if (line == null) return BadRequest("Food is not on the day plan.");
+
+            // intake
             var fi = await _context.FoodIntake
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.FoodId == dto.FoodId && x.Date.Date == day);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
 
             if (fi == null)
             {
-                // tem de existir no plano do dia
-                var line = await _context.FoodPlanDay
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.FoodId == dto.FoodId && x.Date.Date == day);
-
-                if (line == null)
-                    return BadRequest("Esse alimento não está no plano desse dia.");
-
                 fi = new FoodIntake
                 {
                     PlanId = plan.PlanId,
@@ -180,12 +202,33 @@ namespace HealthWellbeing.Controllers
                 _context.FoodIntake.Add(fi);
             }
 
-            // Toggle simples: Consumido = comeu todas as porções; Not = 0
-            fi.PortionsEaten = dto.Consumed ? fi.PortionsPlanned : 0;
+            // alinhar snapshot com plano do dia
+            fi.PortionId = line.PortionId;
+            fi.PortionsPlanned = line.PortionsPlanned;
+
+            // clamp
+            fi.PortionsEaten = Math.Max(0, Math.Min(dto.PortionsEaten, fi.PortionsPlanned));
 
             await _context.SaveChangesAsync();
 
-            return Json(new { foodIntakeId = fi.FoodIntakeId });
+            // recalcular dashboard
+            var totals = await CalculateDayTotalsAsync(plan.PlanId, day);
+
+            return Json(new
+            {
+                foodIntakeId = fi.FoodIntakeId,
+                portionsPlanned = fi.PortionsPlanned,
+                portionsEaten = fi.PortionsEaten,
+                isConsumed = fi.PortionsPlanned > 0 && fi.PortionsEaten >= fi.PortionsPlanned,
+                note = $"Portions: {fi.PortionsEaten}/{fi.PortionsPlanned}",
+                totals = new
+                {
+                    calories = totals.cal,
+                    protein = totals.prot,
+                    fat = totals.fat,
+                    hydrates = totals.carb
+                }
+            });
         }
 
         // =========================================
@@ -197,40 +240,49 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> AddFood([FromBody] AddFoodDto dto)
         {
             if (dto.ClientId <= 0 || dto.FoodId <= 0)
-                return BadRequest("Dados inválidos.");
+                return BadRequest("Invalid data.");
 
             var plan = await GetClientPlanAsync(dto.ClientId);
-            if (plan == null) return NotFound("Cliente sem plano.");
+            if (plan == null) return NotFound("Client has no plan.");
 
             var day = dto.Date.Date;
 
-            // Porção tem de existir
             if (!dto.PortionId.HasValue || dto.PortionId.Value <= 0)
-                return BadRequest("Tens de indicar a PortionId para adicionar.");
+                return BadRequest("PortionId is required.");
 
-            // 1) criar FoodPlanDay (evitar duplicados)
-            var existingDayLine = await _context.FoodPlanDay
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date.Date == day && x.FoodId == dto.FoodId);
+            var portionsPlanned = Math.Max(1, dto.PortionsPlanned);
 
-            if (existingDayLine == null)
+            // 1) FoodPlanDay (evitar duplicados)
+            var line = await _context.FoodPlanDay
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date == day && x.FoodId == dto.FoodId);
+
+
+            if (line == null)
             {
-                existingDayLine = new FoodPlanDay
+                line = new FoodPlanDay
                 {
                     PlanId = plan.PlanId,
                     FoodId = dto.FoodId,
                     PortionId = dto.PortionId.Value,
                     Date = day,
-                    PortionsPlanned = Math.Max(1, dto.PortionsPlanned),
+                    PortionsPlanned = portionsPlanned,
                     ScheduledTime = DateTime.Now
                 };
 
-                _context.FoodPlanDay.Add(existingDayLine);
+                _context.FoodPlanDay.Add(line);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // se já existe, alinha porção/porções se quiseres:
+                line.PortionId = dto.PortionId.Value;
+                line.PortionsPlanned = portionsPlanned;
                 await _context.SaveChangesAsync();
             }
 
-            // 2) criar/garantir FoodIntake do dia
+            // 2) FoodIntake do dia
             var fi = await _context.FoodIntake
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.FoodId == dto.FoodId && x.Date.Date == day);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.FoodId == dto.FoodId && x.Date == day);
 
             if (fi == null)
             {
@@ -238,13 +290,20 @@ namespace HealthWellbeing.Controllers
                 {
                     PlanId = plan.PlanId,
                     FoodId = dto.FoodId,
-                    PortionId = existingDayLine.PortionId,
+                    PortionId = line.PortionId,
                     Date = day,
-                    ScheduledTime = existingDayLine.ScheduledTime ?? DateTime.Now,
-                    PortionsPlanned = existingDayLine.PortionsPlanned,
+                    ScheduledTime = line.ScheduledTime ?? DateTime.Now,
+                    PortionsPlanned = line.PortionsPlanned,
                     PortionsEaten = 0
                 };
                 _context.FoodIntake.Add(fi);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // alinhar snapshot com o plano do dia
+                fi.PortionId = line.PortionId;
+                fi.PortionsPlanned = line.PortionsPlanned;
                 await _context.SaveChangesAsync();
             }
 
@@ -253,80 +312,239 @@ namespace HealthWellbeing.Controllers
                 .Select(p => p.PortionName)
                 .FirstOrDefaultAsync();
 
-            return Json(new { foodIntakeId = fi.FoodIntakeId, portionName });
+            return Json(new
+            {
+                foodIntakeId = fi.FoodIntakeId,
+                portionName,
+                portionsPlanned = fi.PortionsPlanned,
+                portionsEaten = fi.PortionsEaten,
+                note = $"Portions: {fi.PortionsEaten}/{fi.PortionsPlanned}"
+            });
         }
 
         // =========================
-        // Progress (Goal)
+        // Internals: Ensure Day Plan
         // =========================
-        private async Task<(MacroTotals Planned, MacroTotals Eaten)> CalculateProgressAsync(int planId, DateTime day)
+        private async Task EnsureDayPlanAsync(int planId, DateTime day)
         {
-            // buscar linhas do plano do dia e nutrientes
-            var lines = await _context.FoodPlanDay
+            day = day.Date;
+
+            var baseCount = await _context.FoodPlan
                 .AsNoTracking()
-                .Where(x => x.PlanId == planId && x.Date.Date == day.Date)
-                .Select(x => new { x.FoodId, x.PortionsPlanned })
+                .CountAsync(x => x.PlanId == planId);
+
+            if (baseCount <= 0) return;
+
+            var dayCount = await _context.FoodPlanDay
+                .AsNoTracking()
+                .CountAsync(x => x.PlanId == planId && x.Date == day);
+
+            if (dayCount >= baseCount) return;
+
+            var baseLines = await _context.FoodPlan
+                .AsNoTracking()
+                .Where(x => x.PlanId == planId)
                 .ToListAsync();
 
-            var foodIds = lines.Select(x => x.FoodId).Distinct().ToList();
+            var existingFoodIds = await _context.FoodPlanDay
+                .AsNoTracking()
+                .Where(x => x.PlanId == planId && x.Date == day)
+                .Select(x => x.FoodId)
+                .ToListAsync();
 
-            // Nutrientes por FoodId
-            var nutrients = await _context.FoodNutritionalComponent
+            var missing = baseLines
+                .Where(x => !existingFoodIds.Contains(x.FoodId))
+                .Select(x => new FoodPlanDay
+                {
+                    PlanId = planId,
+                    FoodId = x.FoodId,
+                    PortionId = x.PortionId,
+                    Date = day,
+                    PortionsPlanned = 1,
+                    ScheduledTime = DateTime.Now
+                })
+                .ToList();
+
+            if (missing.Count == 0) return;
+
+            _context.FoodPlanDay.AddRange(missing);
+            await _context.SaveChangesAsync();
+        }
+
+
+        // =========================
+        // Internals: Ensure Day Intakes
+        // =========================
+        private async Task<Dictionary<int, FoodIntake>> EnsureDayIntakesAsync(
+            int planId,
+            DateTime day,
+            List<FoodPlanDay> dayPlan)
+        {
+            var dayIntakes = await _context.FoodIntake
+                .Where(x => x.PlanId == planId && x.Date.Date == day.Date)
+                .ToListAsync();
+
+            var map = dayIntakes.ToDictionary(x => x.FoodId, x => x);
+
+            bool changed = false;
+
+            foreach (var line in dayPlan)
+            {
+                if (!map.TryGetValue(line.FoodId, out var fi))
+                {
+                    fi = new FoodIntake
+                    {
+                        PlanId = planId,
+                        FoodId = line.FoodId,
+                        PortionId = line.PortionId,
+                        Date = day.Date,
+                        ScheduledTime = line.ScheduledTime ?? DateTime.Now,
+                        PortionsPlanned = line.PortionsPlanned,
+                        PortionsEaten = 0
+                    };
+                    _context.FoodIntake.Add(fi);
+                    map[line.FoodId] = fi;
+                    changed = true;
+                }
+                else
+                {
+                    // alinhar snapshot com o plano do dia
+                    if (fi.PortionId != line.PortionId)
+                    {
+                        fi.PortionId = line.PortionId;
+                        changed = true;
+                    }
+
+                    if (fi.PortionsPlanned != line.PortionsPlanned)
+                    {
+                        fi.PortionsPlanned = line.PortionsPlanned;
+                        // clamp eaten se planeado diminuiu
+                        if (fi.PortionsEaten > fi.PortionsPlanned)
+                            fi.PortionsEaten = fi.PortionsPlanned;
+                        changed = true;
+                    }
+                }
+            }
+
+            if (changed)
+                await _context.SaveChangesAsync();
+
+            return map;
+        }
+
+
+
+        // =========================
+        // ToggleConsumed
+        // =========================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleConsumed([FromBody] ToggleConsumedDto dto)
+        {
+            if (dto.ClientId <= 0 || dto.FoodId <= 0)
+                return BadRequest("Invalid data.");
+
+            var plan = await GetClientPlanAsync(dto.ClientId);
+            if (plan == null) return NotFound("Client has no plan.");
+
+            var day = dto.Date.Date;
+
+            // Garantir que o alimento existe no plano do dia
+            var line = await _context.FoodPlanDay
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId
+                                      && x.FoodId == dto.FoodId
+                                      && x.Date.Date == day);
+
+            if (line == null)
+                return BadRequest("Food is not on the day plan.");
+
+            // Buscar (ou criar) o FoodIntake do dia
+            var fi = await _context.FoodIntake
+                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId
+                                      && x.FoodId == dto.FoodId
+                                      && x.Date.Date == day);
+
+            if (fi == null)
+            {
+                fi = new FoodIntake
+                {
+                    PlanId = plan.PlanId,
+                    FoodId = dto.FoodId,
+                    PortionId = line.PortionId,
+                    Date = day,
+                    ScheduledTime = line.ScheduledTime ?? DateTime.Now,
+                    PortionsPlanned = line.PortionsPlanned,
+                    PortionsEaten = 0
+                };
+                _context.FoodIntake.Add(fi);
+            }
+
+            // alinhar sempre com o plano do dia
+            fi.PortionId = line.PortionId;
+            fi.PortionsPlanned = line.PortionsPlanned;
+
+            // Toggle: se consumir => come tudo; se não => 0
+            fi.PortionsEaten = dto.Consumed ? fi.PortionsPlanned : 0;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new
+            {
+                foodIntakeId = fi.FoodIntakeId,
+                portionsPlanned = fi.PortionsPlanned,
+                portionsEaten = fi.PortionsEaten,
+                isConsumed = fi.PortionsEaten >= fi.PortionsPlanned,
+                note = $"Portions: {fi.PortionsEaten}/{fi.PortionsPlanned}"
+            });
+        }
+
+
+        // =========================
+        // Dashboard totals
+        // =========================
+        private async Task<(double cal, double prot, double fat, double carb)>
+        CalculateDayTotalsAsync(int planId, DateTime day)
+        {
+            var intakes = await _context.FoodIntake
+                .AsNoTracking()
+                .Where(x => x.PlanId == planId && x.Date.Date == day.Date)
+                .Select(x => new { x.FoodId, x.PortionsEaten })
+                .ToListAsync();
+
+            if (!intakes.Any())
+                return (0, 0, 0, 0);
+
+            var foodIds = intakes.Select(x => x.FoodId).Distinct().ToList();
+
+            var components = await _context.FoodNutritionalComponent
                 .AsNoTracking()
                 .Include(x => x.NutritionalComponent)
                 .Where(x => foodIds.Contains(x.FoodId))
                 .ToListAsync();
 
-            // intake (porções consumidas)
-            var intakes = await _context.FoodIntake
-                .AsNoTracking()
-                .Where(x => x.PlanId == planId && x.Date.Date == day.Date)
-                .Select(x => new { x.FoodId, x.PortionsPlanned, x.PortionsEaten })
-                .ToListAsync();
+            double cal = 0, prot = 0, fat = 0, carb = 0;
 
-            var intakeByFoodId = intakes.ToDictionary(x => x.FoodId, x => x);
-
-            // Mapeamento por nome
-            double GetValueFor(int foodId, string key)
+            foreach (var fi in intakes)
             {
-                return nutrients
-                    .Where(n => n.FoodId == foodId && n.NutritionalComponent != null)
-                    .Where(n => n.NutritionalComponent!.Name != null &&
-                                n.NutritionalComponent.Name.ToLower().Contains(key))
-                    .Select(n => n.Value)
-                    .FirstOrDefault();
+                if (fi.PortionsEaten <= 0) continue;
+
+                var foodComps = components.Where(c => c.FoodId == fi.FoodId);
+
+                foreach (var c in foodComps)
+                {
+                    var name = (c.NutritionalComponent?.Name ?? "").ToLowerInvariant();
+                    var v = c.Value * fi.PortionsEaten;
+
+                    // robust mapping
+                    if (name.Contains("energy") || name.Contains("calorie") || name == "kcal") cal += v;
+                    else if (name.Contains("protein")) prot += v;
+                    else if (name.Contains("fat") || name.Contains("lipid")) fat += v;
+                    else if (name.Contains("carb") || name.Contains("hydrate") || name.Contains("carbo")) carb += v;
+                }
             }
 
-            var planned = new MacroTotals();
-            var eaten = new MacroTotals();
-
-            foreach (var line in lines)
-            {
-                var fId = line.FoodId;
-                var plannedPortions = line.PortionsPlanned;
-
-                var calories = GetValueFor(fId, "cal");      // calories/energy
-                var protein = GetValueFor(fId, "protein");
-                var fat = GetValueFor(fId, "fat");
-                var carbs = GetValueFor(fId, "hydra");       // hydrates/carbs
-                var vitamins = GetValueFor(fId, "vit");      // vitamins
-
-                planned.Calories += calories * plannedPortions;
-                planned.Protein += protein * plannedPortions;
-                planned.Fat += fat * plannedPortions;
-                planned.Hydrates += carbs * plannedPortions;
-                planned.Vitamins += vitamins * plannedPortions;
-
-                var eatenPortions = intakeByFoodId.TryGetValue(fId, out var i) ? i.PortionsEaten : 0;
-
-                eaten.Calories += calories * eatenPortions;
-                eaten.Protein += protein * eatenPortions;
-                eaten.Fat += fat * eatenPortions;
-                eaten.Hydrates += carbs * eatenPortions;
-                eaten.Vitamins += vitamins * eatenPortions;
-            }
-
-            return (planned, eaten);
+            return (cal, prot, fat, carb);
         }
 
         // =========================
@@ -334,8 +552,7 @@ namespace HealthWellbeing.Controllers
         // =========================
         private async Task<Plan?> GetClientPlanAsync(int clientId)
         {
-            return await _context.Plan
-                .FirstOrDefaultAsync(p => p.ClientId == clientId);
+            return await _context.Plan.FirstOrDefaultAsync(p => p.ClientId == clientId);
         }
 
         private async Task<List<SelectListItem>> LoadClientsAsync(int selectedClientId)
@@ -386,9 +603,27 @@ namespace HealthWellbeing.Controllers
             if (n.Contains("salada") || n.Contains("legum")) return "bi-flower1";
             return "bi-egg-fried";
         }
+
+        // DTOs
+        public class SetPortionsEatenDto
+        {
+            public int ClientId { get; set; }
+            public int FoodId { get; set; }
+            public DateTime Date { get; set; }
+            public int PortionsEaten { get; set; }
+            public int? FoodIntakeId { get; set; }
+        }
+
+        public class AddFoodDto
+        {
+            public int ClientId { get; set; }
+            public int FoodId { get; set; }
+            public DateTime Date { get; set; }
+            public int? PortionId { get; set; }
+            public int PortionsPlanned { get; set; } = 1;
+        }
     }
 
-    // DTOs
     public class ToggleConsumedDto
     {
         public int ClientId { get; set; }
@@ -397,22 +632,5 @@ namespace HealthWellbeing.Controllers
         public bool Consumed { get; set; }
     }
 
-    public class AddFoodDto
-    {
-        public int ClientId { get; set; }
-        public int FoodId { get; set; }
-        public DateTime Date { get; set; }
 
-        public int? PortionId { get; set; }
-        public int PortionsPlanned { get; set; } = 1;
-    }
-
-    public class MacroTotals
-    {
-        public double Calories { get; set; }
-        public double Protein { get; set; }
-        public double Fat { get; set; }
-        public double Hydrates { get; set; }
-        public double Vitamins { get; set; }
-    }
 }

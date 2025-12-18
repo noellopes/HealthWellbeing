@@ -6,19 +6,17 @@ namespace HealthWellbeing.ViewModels
     {
         public int FoodId { get; set; }
 
-        // Id da linha na tabela FoodIntake (ou equivalente)
+        // Id da linha na tabela FoodIntake
         public int? FoodIntakeId { get; set; }
 
         public string FoodName { get; set; } = "";
-
         public string? PortionName { get; set; }
-
+        public int PortionsPlanned { get; set; }
+        public int PortionsEaten { get; set; }
         public bool IsConsumed { get; set; }
+        public string Note { get; set; } = "";
 
-        // Bootstrap icon (ex: "bi-egg-fried")
+        // Bootstrap icon
         public string? IconClass { get; set; }
-
-        // Opcional
-        public string? Note { get; set; }
     }
 }

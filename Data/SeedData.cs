@@ -59,7 +59,7 @@ internal static class SeedData
             db.SaveChanges();
 
             // =====================================================================
-            // GOALS AUTOMÁTICOS (1 por cliente) – estilo antigo
+            // GOALS AUTOMÁTICOS
             // =====================================================================
             if (db.Goal != null && !db.Goal.Any())
             {
@@ -284,38 +284,30 @@ internal static class SeedData
         }
 
         // =====================================================================
-        // PORTIONS (tabela mais fixa, mas com várias opções)
+        // PORTIONS
         // =====================================================================
         if (db.Portion != null && !db.Portion.Any())
         {
             var portions = new List<Portion>
             {
-                new Portion { PortionName = "1 small portion (50 g)" },
-                new Portion { PortionName = "1 medium portion (100 g)" },
-                new Portion { PortionName = "1 large portion (150 g)" },
-                new Portion { PortionName = "1 cup cooked" },
-                new Portion { PortionName = "1 cup raw" },
-                new Portion { PortionName = "1 slice" },
-                new Portion { PortionName = "2 slices" },
-                new Portion { PortionName = "1 glass (200 ml)" },
-                new Portion { PortionName = "1 tablespoon" },
-                new Portion { PortionName = "1 teaspoon" }
+                new Portion { PortionName = "Small portion (50 g)" },
+                new Portion { PortionName = "Medium portion (100 g)" },
+                new Portion { PortionName = "Large portion (150 g)" },
+                new Portion { PortionName = "Cup cooked" },
+                new Portion { PortionName = "Cup raw" },
+                new Portion { PortionName = "Slice(s)" },
+                new Portion { PortionName = "Glass (200 ml)" },
+                new Portion { PortionName = "Tablespoon" },
+                new Portion { PortionName = "Teaspoon" }
             };
 
-            for (int i = portions.Count + 1; i <= 30; i++)
-            {
-                portions.Add(new Portion
-                {
-                    PortionName = $"Portion {i}"
-                });
-            }
+                    db.Portion.AddRange(portions);
+                    db.SaveChanges();
+                }
 
-            db.Portion.AddRange(portions);
-            db.SaveChanges();
-        }
 
         // =====================================================================
-        // NUTRITIONAL COMPONENTS (tabela mais fixa, ≈ 10–15)
+        // NUTRITIONAL COMPONENTS
         // =====================================================================
         if (db.NutritionalComponent != null && !db.NutritionalComponent.Any())
         {
@@ -438,55 +430,113 @@ internal static class SeedData
         // =====================================================================
         // JOIN TABLES – FOOD PLANS  (PLAN + FOOD + PORTION)
         // =====================================================================
-
-    
-        // Se já houver dados, não faz nada
-        if (db.FoodPlan.Any()) return;
+        if (!db.FoodPlan.Any())
         {
-            // Buscar dados já criados
-            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();   // ou db.Plans
+            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
             var foods = db.Food.OrderBy(f => f.FoodId).ToList();
-            var portions = db.Portion.OrderBy(p => p.PortionId).ToList(); // ou db.Portions
+            var portions = db.Portion.OrderBy(p => p.PortionId).ToList();
 
-            if (!plans.Any() || !foods.Any() || !portions.Any())
-                return;
-
-            var defaultPortion = portions.First(); // usa a 1.ª porção por defeito
-
-            var foodPlans = new List<FoodPlan>();
-
-            // Função auxiliar para não repetir código
-            void AddFoodsToPlan(Plan plan, int startIndex, int count)
+            if (plans.Any() && foods.Any() && portions.Any())
             {
-                for (int i = 0; i < count && startIndex + i < foods.Count; i++)
-                {
-                    var food = foods[startIndex + i];
+                var defaultPortion = portions.First();
+                var foodPlans = new List<FoodPlan>();
 
-                    foodPlans.Add(new FoodPlan
+                void AddFoodsToPlan(Plan plan, int startIndex, int count)
+                {
+                    for (int i = 0; i < count && (startIndex + i) < foods.Count; i++)
                     {
-                        PlanId = plan.PlanId,
-                        FoodId = food.FoodId,
-                        PortionId = defaultPortion.PortionId
-                    });
+                        var food = foods[startIndex + i];
+
+                        foodPlans.Add(new FoodPlan
+                        {
+                            PlanId = plan.PlanId,
+                            FoodId = food.FoodId,
+                            PortionId = defaultPortion.PortionId
+                        });
+                    }
+                }
+
+                if (plans.Count >= 1) AddFoodsToPlan(plans[0], 0, 4);
+                if (plans.Count >= 2) AddFoodsToPlan(plans[1], 4, 5);
+                if (plans.Count >= 3) AddFoodsToPlan(plans[2], 9, 3);
+
+                db.FoodPlan.AddRange(foodPlans);
+                db.SaveChanges();
             }
         }
 
-        // Distribute foods across plans to be able to visualize and use the app
-        if (plans.Count >= 1)
-            AddFoodsToPlan(plans[0], 0, 4);   // Plan 1 → 4 foods (0..3)
+        
 
-        if (plans.Count >= 2)
-            AddFoodsToPlan(plans[1], 4, 5);   // Plan 2 → 5 foods (4..8)
+        // =====================================================================
+        // FOOD PLAN DAY (PlanId + Date + FoodId + PortionsPlanned)
+        // =====================================================================
+        if (db.FoodPlanDay != null && !db.FoodPlanDay.Any())
+        {
+            var today = DateTime.Today;
+            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var baseFoodPlans = db.FoodPlan
+                .AsNoTracking()
+                .OrderBy(fp => fp.PlanId)
+                .ThenBy(fp => fp.FoodId)
+                .ToList();
 
-        if (plans.Count >= 3)
-            AddFoodsToPlan(plans[2], 9, 3);   // Plan 3 → 3 foods (9..11)
+            if (plans.Any() && baseFoodPlans.Any())
+            {
+                var rng = new Random();
+                var list = new List<FoodPlanDay>();
 
-        // if (plans.Count >= 4) AddFoodsToPlan(plans[3], 12, 4); etc.
+                foreach (var plan in plans)
+                {
+                    var foodsForPlan = baseFoodPlans.Where(fp => fp.PlanId == plan.PlanId).ToList();
+                    if (!foodsForPlan.Any()) continue;
 
-        db.FoodPlan.AddRange(foodPlans);
-        db.SaveChanges();
-    }
+                    // cria 7 dias de plano
+                    for (int d = 0; d < 7; d++)
+                    {
+                        var date = today.AddDays(d).Date;
 
+                        foreach (var fp in foodsForPlan)
+                        {
+                            list.Add(new FoodPlanDay
+                            {
+                                PlanId = plan.PlanId,
+                                FoodId = fp.FoodId,
+                                PortionId = fp.PortionId,
+                                Date = date,
+                                PortionsPlanned = rng.Next(1, 4), // 1..3 porções
+                                ScheduledTime = date.AddHours(9), // opcional
+                                MealType = "Daily"
+                            });
+                        }
+                    }
+                }
+
+                db.FoodPlanDay.AddRange(list);
+                db.SaveChanges();
+            }
+        }
+
+        // =====================================================================
+        // FOOD INTAKE (pre-create from FoodPlanDay, not consumed)
+        // =====================================================================
+        if (db.FoodIntake != null && !db.FoodIntake.Any())
+        {
+            var days = db.FoodPlanDay.AsNoTracking().ToList();
+
+            var list = days.Select(x => new FoodIntake
+            {
+                PlanId = x.PlanId,
+                FoodId = x.FoodId,
+                PortionId = x.PortionId,
+                Date = x.Date,
+                ScheduledTime = x.ScheduledTime ?? x.Date.AddHours(9),
+                PortionsPlanned = x.PortionsPlanned,
+                PortionsEaten = 0
+            }).ToList();
+
+            db.FoodIntake.AddRange(list);
+            db.SaveChanges();
+        }
 
         // =====================================================================
         // JOIN TABLES – FOOD / NUTRITIONAL COMPONENT

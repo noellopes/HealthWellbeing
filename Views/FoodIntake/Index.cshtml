@@ -8,15 +8,14 @@
 
 <style>
     :root {
-        --fi-bg: #0f172a; /* slate-900 */
-        --fi-panel: #111827; /* gray-900 */
-        --fi-surface: #1f2937; /* gray-800 */
-        --fi-card: #111827; /* gray-900 */
+        --fi-bg: #0f172a;
+        --fi-panel: #111827;
+        --fi-surface: #1f2937;
         --fi-border: rgba(255,255,255,.10);
         --fi-text: rgba(255,255,255,.92);
         --fi-muted: rgba(255,255,255,.70);
-        --fi-cyan: #22d3ee; /* cyan-400 */
-        --fi-cyan2: #06b6d4; /* cyan-500 */
+        --fi-cyan: #22d3ee;
+        --fi-cyan2: #06b6d4;
     }
 
     .fi-wrapper {
@@ -60,38 +59,32 @@
     }
 
     .fi-toolbar .form-control,
-    .fi-toolbar .form-select {
-        background-color: #111827 !important;
-        color: #ffffff !important; 
-        border: 1px solid rgba(255,255,255,.18) !important;
-    }
-
-        .fi-toolbar .form-select option {
-            background-color: #111827 !important; 
-            color: #ffffff !important; 
-        }
-
-
-        .fi-toolbar .form-control:focus,
-        .fi-toolbar .form-select:focus {
-            border-color: rgba(34,211,238,.55);
-            box-shadow: 0 0 0 .2rem rgba(34,211,238,.15);
-        }
-    
-    .fi-toolbar input[type="date"].form-control {
+    .fi-toolbar .form-select,
+    .fi-add-card .form-control,
+    .fi-add-card .form-select {
         background-color: #111827 !important;
         color: #ffffff !important;
         border: 1px solid rgba(255,255,255,.18) !important;
+        border-radius: 12px;
     }
 
-    .fi-toolbar input[type="date"].form-control {
-        color-scheme: dark; 
-    }
-
-        .fi-toolbar input[type="date"].form-control::placeholder {
-            color: rgba(255,255,255,.70) !important;
+        .fi-toolbar .form-select option,
+        .fi-add-card .form-select option {
+            background-color: #111827 !important;
+            color: #ffffff !important;
         }
 
+    .fi-toolbar input[type="date"].form-control {
+        color-scheme: dark;
+    }
+
+    .fi-toolbar .form-control:focus,
+    .fi-toolbar .form-select:focus,
+    .fi-add-card .form-control:focus,
+    .fi-add-card .form-select:focus {
+        border-color: rgba(34,211,238,.55);
+        box-shadow: 0 0 0 .2rem rgba(34,211,238,.15);
+    }
 
     .fi-btn-primary {
         border-radius: 12px;
@@ -101,10 +94,6 @@
         color: #001018;
     }
 
-        .fi-btn-primary:hover {
-            filter: brightness(.97);
-        }
-
     .fi-panel {
         margin-top: 14px;
         background: rgba(255,255,255,.03);
@@ -113,26 +102,22 @@
         padding: 14px;
     }
 
+    /* ===== GRID: 2 colunas, Add no fundo ===== */
     .fi-grid {
         display: grid;
-        grid-template-columns: repeat(12, 1fr);
+        grid-template-columns: 1fr;
         gap: 14px;
     }
 
-    .fi-col {
-        grid-column: span 12;
-    }
-
-    @@media (min-width: 768px) {
-        .fi-col {
-            grid-column: span 6;
+    @@media (min-width: 992px) {
+        .fi-grid {
+            grid-template-columns: 1fr 1fr;
         }
-    }
 
-    @@media (min-width: 1200px) {
-        .fi-col {
-            grid-column: span 4;
+        .fi-add-col {
+            grid-column: 1 / -1;
         }
+        /* full width */
     }
 
     .fi-card {
@@ -178,17 +163,32 @@
         padding: 0 14px 14px 14px;
     }
 
-    .fi-note {
+    /* Linha: note + botão pequeno ao lado */
+    .fi-bottom-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
         margin-top: 10px;
-        color: var(--fi-muted);
-        font-size: .9rem;
     }
 
-    .btn-consumed {
+    .fi-note {
+        color: var(--fi-muted);
+        font-size: .92rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .btn-consumed-sm {
         border-radius: 12px;
         font-weight: 900;
-        width: 100%;
-        letter-spacing: .2px;
+        padding: .35rem .6rem;
+        font-size: .85rem;
+        line-height: 1;
+        white-space: nowrap;
     }
 
     .fi-empty {
@@ -204,18 +204,6 @@
         border: 1px dashed rgba(34,211,238,.30);
     }
 
-        .fi-add-card .form-select {
-            border-radius: 12px;
-            background: rgba(255,255,255,.04);
-            color: var(--fi-text);
-            border: 1px solid var(--fi-border);
-        }
-
-    .fi-add-actions .btn {
-        border-radius: 12px;
-        font-weight: 800;
-    }
-
     /* Bootstrap select arrow visibility on dark */
     select.form-select {
         background-image: linear-gradient(45deg, transparent 50%, rgba(255,255,255,.6) 50%), linear-gradient(135deg, rgba(255,255,255,.6) 50%, transparent 50%), linear-gradient(to right, transparent, transparent);
@@ -227,6 +215,7 @@
 
 <div class="container my-4">
     <div class="fi-wrapper">
+
         <!-- HEADER -->
         <div class="fi-header">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -251,7 +240,12 @@
                         <label class="form-label" for="date">Date</label>
                         <input id="date" name="date" type="date"
                                value="@selectedDate.ToString("yyyy-MM-dd")"
+                               min="@(ViewBag.MinPlanDate != null ? ((DateTime)ViewBag.MinPlanDate).ToString("yyyy-MM-dd") : null)"
+                               max="@(ViewBag.MaxPlanDate != null
+                                             ? (((DateTime)ViewBag.MaxPlanDate) < DateTime.Today ? ((DateTime)ViewBag.MaxPlanDate) : DateTime.Today).ToString("yyyy-MM-dd")
+                                             : DateTime.Today.ToString("yyyy-MM-dd"))"
                                class="form-control" />
+
                     </div>
 
                     <div>
@@ -278,6 +272,15 @@
 
         <!-- CONTENT -->
         <div class="fi-panel">
+            <div id="fiMsg" class="alert d-none" role="alert" style="border-radius:14px;"></div>
+            @if (ViewBag.DateError != null)
+            {
+                <div class="alert alert-warning" role="alert" style="border-radius:14px;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    @ViewBag.DateError
+                </div>
+            }
+
             @if (Model.SelectedClientId <= 0)
             {
                 <div class="alert alert-warning mb-0" role="alert" style="border-radius:14px;">
@@ -290,15 +293,13 @@
                 <div id="fiCards" class="fi-grid">
                     @if (Model.Items == null || !Model.Items.Any())
                     {
-                        <div class="fi-col">
-                            <div class="fi-empty">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-info-circle" style="color: var(--fi-cyan);"></i>
-                                    <strong>No foods found</strong>
-                                </div>
-                                <div class="mt-1" style="color: var(--fi-muted);">
-                                    There are no foods associated with the plan for this date (or they haven’t been generated yet).
-                                </div>
+                        <div class="fi-empty">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle" style="color: var(--fi-cyan);"></i>
+                                <strong>No foods found</strong>
+                            </div>
+                            <div class="mt-1" style="color: var(--fi-muted);">
+                                There are no foods associated with the plan for this date (or they haven’t been generated yet).
                             </div>
                         </div>
                     }
@@ -328,43 +329,49 @@
                                     </div>
 
                                     <div class="fi-card-body">
-                                        <button type="button"
-                                                class="btn @btnClass btn-consumed js-toggle-consumed"
-                                                data-consumed="@(isConsumed ? "1" : "0")"
-                                                data-food-intake-id="@item.FoodIntakeId"
-                                                data-food-id="@item.FoodId">
-                                            <i class="bi @btnIcon me-1"></i>@btnText
-                                        </button>
+                                        <div class="fi-bottom-row">
+                                            <p class="fi-note">
+                                                <i class="bi bi-chat-left-text"></i>
+                                                <span class="js-note-text">@item.Note</span>
+                                            </p>
 
-                                        @if (!string.IsNullOrWhiteSpace(item.Note))
-                                        {
-                                            <div class="fi-note">
-                                                <i class="bi bi-chat-left-text me-1"></i>@item.Note
-                                            </div>
-                                        }
+                                            <button type="button"
+                                                    class="btn @btnClass btn-consumed-sm js-toggle-consumed"
+                                                    data-consumed="@(isConsumed ? "1" : "0")"
+                                                    data-food-intake-id="@item.FoodIntakeId"
+                                                    data-food-id="@item.FoodId">
+                                                <i class="bi @btnIcon me-1"></i>@btnText
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         }
                     }
 
-                    <!-- ADD CARD -->
-                    <div class="fi-col">
-                        <div class="fi-card fi-add-card">
-                            <div class="fi-card-top">
-                                <div class="fi-icon">
-                                    <i class="bi bi-plus-circle" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                    <!-- ADD CARD (foldable) full width bottom -->
+                    <div class="fi-add-col">
+                        <div class="fi-card fi-add-card" id="fiAddCard">
+                            <div class="fi-card-top d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fi-icon">
+                                        <i class="bi bi-plus-circle" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="fi-food-name mb-0">Add</p>
+                                        <p class="fi-sub mb-0">Add a food to today’s plan</p>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <p class="fi-food-name mb-0">Add</p>
-                                    <p class="fi-sub">Add a food to today’s plan</p>
-                                </div>
+
+                                <button type="button" class="btn btn-sm fi-btn-primary js-toggle-add" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
                             </div>
 
-                            <div class="fi-card-body">
+                            <div class="fi-card-body d-none" id="fiAddBody">
                                 <div class="row g-2">
-                                    <div class="col-12">
-                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight: 800;">Food</label>
+                                    <div class="col-6 col-lg-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Food</label>
                                         <select id="fiAddFoodSelect" class="form-select">
                                             <option value="">— Select —</option>
                                             @foreach (var f in Model.AvailableFoods)
@@ -374,7 +381,24 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-12 d-flex gap-2 fi-add-actions">
+                                    <div class="col-6 col-lg-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Portion</label>
+                                        <select id="fiAddPortionSelect" class="form-select">
+                                            <option value="">— Select —</option>
+                                            @foreach (var p in Model.Portions)
+                                            {
+                                                <option value="@p.Value">@p.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    
+                                    <div class="col-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Quantity</label>
+                                        <input id="fiAddQty" type="number" min="1" value="1" class="form-control" />
+                                    </div>
+
+                                    <div class="col-6 d-flex gap-2 mt-2">
                                         <button type="button" id="fiAddBtn" class="btn fi-btn-primary" style="flex:1;">
                                             <i class="bi bi-plus-lg me-1"></i>Add
                                         </button>
@@ -383,10 +407,10 @@
                                             <i class="bi bi-eraser me-1"></i>Clear
                                         </button>
                                     </div>
-
-                                    <div class="col-12" style="color: var(--fi-muted); font-size: .92rem;">
+                                    
+                                    <div class="col-6" style="color: var(--fi-muted); font-size: .92rem;">
                                         <i class="bi bi-info-circle me-1" style="color: var(--fi-cyan);"></i>
-                                        Clicking “Add” creates a new card immediately.
+                                        Click “Add” to create a new card.
                                     </div>
                                 </div>
 
@@ -398,29 +422,42 @@
                 </div>
             }
         </div>
+
     </div>
 </div>
 
 @section Scripts {
     <script>
-        (function () {
+        (function(){
             const fiCards = document.getElementById("fiCards");
-            const addSelect = document.getElementById("fiAddFoodSelect");
-            const addBtn = document.getElementById("fiAddBtn");
-            const clearSelectBtn = document.getElementById("fiClearSelectBtn");
+            const msgBox  = document.getElementById("fiMsg");
 
-            function getAntiForgeryToken() {
+            const addSelect   = document.getElementById("fiAddFoodSelect");
+            const addPortion  = document.getElementById("fiAddPortionSelect");
+            const addQty      = document.getElementById("fiAddQty");
+            const addBtn      = document.getElementById("fiAddBtn");
+            const clearBtn    = document.getElementById("fiClearSelectBtn");
+
+            function getAntiForgeryToken(){
                 const el = document.querySelector('input[name="__RequestVerificationToken"]');
                 return el ? el.value : "";
             }
 
-            function escapeHtml(str) {
-                return (str ?? "").replace(/[&<>"']/g, function (m) {
-                    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[m];
-                });
+            function escapeHtml(str){
+                return (str ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" })[m]);
             }
 
-            function setConsumedButton(btn, consumed) {
+            function showMessage(type, text){
+                if(!msgBox) return;
+                msgBox.className = `alert alert-${type}`;
+                msgBox.innerHTML = `<i class="bi bi-info-circle me-1"></i>${escapeHtml(text)}`;
+                msgBox.classList.remove("d-none");
+
+                window.clearTimeout(showMessage._t);
+                showMessage._t = window.setTimeout(() => msgBox.classList.add("d-none"), 3500);
+            }
+
+            function setConsumedButton(btn, consumed){
                 btn.dataset.consumed = consumed ? "1" : "0";
                 btn.classList.toggle("btn-success", consumed);
                 btn.classList.toggle("btn-danger", !consumed);
@@ -429,7 +466,13 @@
                     : `<i class="bi bi-x-circle me-1"></i>Not consumed`;
             }
 
-            function makeFoodCardHtml(foodId, foodName) {
+            function updateNote(card, noteText){
+                const span = card.querySelector(".js-note-text");
+                if(span) span.textContent = noteText;
+            }
+
+            function makeFoodCardHtml(foodId, foodName, portionName, portionsPlanned){
+                const note = `Portions: 0/${portionsPlanned}`;
                 return `
                 <div class="fi-col" data-food-id="${foodId}" data-food-intake-id="">
                     <div class="fi-card">
@@ -439,35 +482,57 @@
                             </div>
                             <div class="flex-grow-1">
                                 <p class="fi-food-name">${escapeHtml(foodName)}</p>
-                                <p class="fi-sub"><i class="bi bi-box-seam me-1"></i>Portion —</p>
+                                <p class="fi-sub"><i class="bi bi-box-seam me-1"></i>${escapeHtml(portionName || "Portion —")}</p>
                             </div>
                         </div>
                         <div class="fi-card-body">
-                            <button type="button"
-                                    class="btn btn-danger btn-consumed js-toggle-consumed"
-                                    data-consumed="0"
-                                    data-food-intake-id=""
-                                    data-food-id="${foodId}">
-                                <i class="bi bi-x-circle me-1"></i>Not consumed
-                            </button>
+                            <div class="fi-bottom-row">
+                                <p class="fi-note"><i class="bi bi-chat-left-text"></i><span class="js-note-text">${escapeHtml(note)}</span></p>
+                                <button type="button"
+                                        class="btn btn-danger btn-consumed-sm js-toggle-consumed"
+                                        data-consumed="0"
+                                        data-food-intake-id=""
+                                        data-food-id="${foodId}">
+                                    <i class="bi bi-x-circle me-1"></i>Not consumed
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>`;
             }
 
-            // Toggle
-            document.addEventListener("click", async function (e) {
+            // foldable add
+            document.addEventListener("click", function(e){
+                const t = e.target.closest(".js-toggle-add");
+                if(!t) return;
+
+                const body = document.getElementById("fiAddBody");
+                if(!body) return;
+
+                const isHidden = body.classList.contains("d-none");
+                body.classList.toggle("d-none", !isHidden);
+
+                t.setAttribute("aria-expanded", isHidden ? "true" : "false");
+                t.innerHTML = isHidden
+                    ? `<i class="bi bi-chevron-up"></i>`
+                    : `<i class="bi bi-chevron-down"></i>`;
+            });
+
+            // TOGGLE consumed (persist + update note)  ✅ credentials same-origin
+            document.addEventListener("click", async function(e){
                 const btn = e.target.closest(".js-toggle-consumed");
-                if (!btn) return;
+                if(!btn) return;
 
                 const current = btn.dataset.consumed === "1";
-                const next = !current;
+                const next    = !current;
 
+                // UI optimista
                 setConsumedButton(btn, next);
 
-                try {
+                const card = btn.closest(".fi-col");
+
+                try{
                     const payload = {
-                        foodIntakeId: btn.dataset.foodIntakeId || null,
                         foodId: parseInt(btn.dataset.foodId, 10),
                         consumed: next,
                         date: "@selectedDate.ToString("yyyy-MM-dd")",
@@ -476,6 +541,7 @@
 
                     const res = await fetch("@Url.Action("ToggleConsumed", "FoodIntake")", {
                         method: "POST",
+                        credentials: "same-origin",
                         headers: {
                             "Content-Type": "application/json",
                             "RequestVerificationToken": getAntiForgeryToken()
@@ -483,44 +549,66 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!res.ok) throw new Error("Failed to save.");
+                    if(!res.ok) throw new Error("Failed to save.");
 
-                    const data = await res.json().catch(() => null);
-                    if (data && data.foodIntakeId) {
+                    const data = await res.json();
+
+                    // guardar id + atualizar note pelo que veio do servidor
+                    if(data && data.foodIntakeId){
                         btn.dataset.foodIntakeId = data.foodIntakeId;
-                        const host = btn.closest(".fi-col");
-                        if (host) host.dataset.foodIntakeId = data.foodIntakeId;
+                        if(card) card.dataset.foodIntakeId = data.foodIntakeId;
                     }
-                } catch (err) {
-                    setConsumedButton(btn, current);
+                    if(data && data.note && card){
+                        updateNote(card, data.note);
+                    }
+                    if(data && typeof data.isConsumed !== "undefined"){
+                        setConsumedButton(btn, !!data.isConsumed);
+                    }
+
+                    // mensagem (amarelo quando not consumed)
+                    showMessage(next ? "success" : "warning",
+                                next ? "Marked as consumed." : "Marked as not consumed.");
+
+                }catch(err){
                     console.error(err);
-                    alert("Could not save the change. Please check ToggleConsumed endpoint.");
+                    // reverter UI
+                    setConsumedButton(btn, current);
+                    showMessage("danger", "Could not save the change. Please try again.");
                 }
             });
 
-            // Add
-            addBtn?.addEventListener("click", async function () {
+            // ADD food (persist + create card in UI + keep add at bottom)
+            addBtn?.addEventListener("click", async function(){
                 const foodId = addSelect.value;
                 const foodName = addSelect.options[addSelect.selectedIndex]?.text || "";
 
-                if (!foodId) { alert("Please select a food first."); return; }
+                const portionId = addPortion.value;
+                const portionName = addPortion.options[addPortion.selectedIndex]?.text || "";
 
-                if (fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`)) {
-                    alert("That food is already on the list.");
+                const qty = parseInt(addQty.value || "1", 10);
+
+                if(!foodId){ showMessage("warning", "Please select a food."); return; }
+                if(!portionId){ showMessage("warning", "Please select a portion."); return; }
+                if(!qty || qty < 1){ showMessage("warning", "Quantity must be at least 1."); return; }
+
+                // Evitar duplicados na UI
+                if(fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`)){
+                    showMessage("warning", "That food is already on the list.");
                     return;
                 }
 
-                fiCards.insertAdjacentHTML("afterbegin", makeFoodCardHtml(foodId, foodName));
-
-                try {
+                try{
                     const payload = {
                         foodId: parseInt(foodId, 10),
+                        portionId: parseInt(portionId, 10),
+                        portionsPlanned: qty,
                         date: "@selectedDate.ToString("yyyy-MM-dd")",
                         clientId: @Model.SelectedClientId
                     };
 
                     const res = await fetch("@Url.Action("AddFood", "FoodIntake")", {
                         method: "POST",
+                        credentials: "same-origin",
                         headers: {
                             "Content-Type": "application/json",
                             "RequestVerificationToken": getAntiForgeryToken()
@@ -528,33 +616,51 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!res.ok) throw new Error("Failed to add.");
+                    if(!res.ok) throw new Error("Failed to add.");
 
                     const data = await res.json().catch(() => null);
-                    if (data) {
-                        const host = fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`);
-                        if (host) {
-                            host.dataset.foodIntakeId = data.foodIntakeId || "";
-                            const btn = host.querySelector(".js-toggle-consumed");
-                            if (btn && data.foodIntakeId) btn.dataset.foodIntakeId = data.foodIntakeId;
 
-                            if (data.portionName) {
-                                const sub = host.querySelector(".fi-sub");
-                                if (sub) sub.innerHTML = `<i class="bi bi-box-seam me-1"></i>${escapeHtml(data.portionName)}`;
-                            }
-                        }
+                    // inserir card (antes do add-card = fica no fundo)
+                    const addCol = fiCards.querySelector(".fi-add-col");
+                    const planned = data?.portionsPlanned ?? qty;
+                    const html = makeFoodCardHtml(foodId, foodName, (data?.portionName ?? portionName), planned);
+
+                    if(addCol){
+                        addCol.insertAdjacentHTML("beforebegin", html);
+                    }else{
+                        fiCards.insertAdjacentHTML("beforeend", html);
                     }
-                } catch (err) {
+
+                    // atualizar intakeId devolvido
+                    const newCard = fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`);
+                    if(newCard && data?.foodIntakeId){
+                        newCard.dataset.foodIntakeId = data.foodIntakeId;
+                        const b = newCard.querySelector(".js-toggle-consumed");
+                        if(b) b.dataset.foodIntakeId = data.foodIntakeId;
+                    }
+                    if(newCard && data?.note){
+                        updateNote(newCard, data.note);
+                    }
+
+                    showMessage("success", "Food added to the day plan.");
+
+                    // limpar
+                    addSelect.value = "";
+                    addPortion.value = "";
+                    addQty.value = "1";
+
+                }catch(err){
                     console.error(err);
-                    alert("The card was created, but saving failed. Please check AddFood endpoint.");
+                    showMessage("danger", "Could not add the food. Please try again.");
                 }
-
-                addSelect.value = "";
             });
 
-            clearSelectBtn?.addEventListener("click", function () {
+            clearBtn?.addEventListener("click", function(){
                 addSelect.value = "";
+                addPortion.value = "";
+                addQty.value = "1";
             });
+
         })();
     </script>
 }
