@@ -1,0 +1,56 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<LimitacaoMedica>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(_ => _.Items!.First().Descricao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(_ => _.Items!.First().TipoLimitacao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(_ => _.Items!.First().Observacoes)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items!)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
+                <td>@Html.DisplayFor(modelItem => item.TipoLimitacao)</td>
+                <td>@Html.DisplayFor(modelItem => item.Observacoes)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.LimitacaoMedicaId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.LimitacaoMedicaId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.LimitacaoMedicaId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i">
+                    @i
+                </a>
+            </li>
+        }
+    </ul>
+</nav>

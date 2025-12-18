@@ -52,7 +52,7 @@ namespace HealthWellbeing.Controllers
         // GET: PlanoExercicios/Create
         public IActionResult Create()
         {
-            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id");
+            ViewData["UtenteGrupo7Id"] = _context.UtenteGrupo7.Select(u => new SelectListItem{Value = u.UtenteGrupo7Id.ToString(),Text = $"{u.UtenteGrupo7Id} - {u.Nome}"}).ToList();
 
             ViewBag.Exercicio = _context.Exercicio
         .Select(e => new SelectListItem
@@ -71,6 +71,59 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
+    PlanoExercicios planoExercicios,
+    int[] exerciciosSelecionados)
+        {
+            if (exerciciosSelecionados == null || !exerciciosSelecionados.Any())
+            {
+                ModelState.AddModelError("", "Deve selecionar pelo menos um exercício.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                planoExercicios.Exercicios = _context.Exercicio
+                    .Where(e => exerciciosSelecionados.Contains(e.ExercicioId))
+                    .ToList();
+
+                _context.Add(planoExercicios);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "UtenteGrupo7Id", planoExercicios.UtenteGrupo7Id);
+
+            ViewBag.Exercicio = _context.Exercicio
+                .Select(e => new SelectListItem
+                {
+                    Value = e.ExercicioId.ToString(),
+                    Text = e.ExercicioNome
+                }).ToList();
+
+            return View(planoExercicios);
+        }
+
+        // GET: PlanoExerciciosAutomatico/Create
+        public IActionResult CreateAutomatico()
+        {
+            ViewData["UtenteGrupo7Id"] = _context.UtenteGrupo7.Select(u => new SelectListItem { Value = u.UtenteGrupo7Id.ToString(), Text = $"{u.UtenteGrupo7Id} - {u.Nome}" }).ToList();
+
+            ViewBag.Exercicio = _context.Exercicio
+        .Select(e => new SelectListItem
+        {
+            Value = e.ExercicioId.ToString(),
+            Text = e.ExercicioNome
+        })
+        .ToList();
+
+            return View();
+        }
+
+        // POST: PlanoExerciciosAutomatico/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAutomatico(
     PlanoExercicios planoExercicios,
     int[] exerciciosSelecionados)
         {
