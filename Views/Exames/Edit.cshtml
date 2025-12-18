@@ -66,7 +66,7 @@
 
                         <div class="mb-3">
                             <label asp-for="ExameTipoId" class="form-label fw-bold">Tipo de Exame</label>
-                            <select asp-for="ExameTipoId" class="form-select" asp-items="@(ViewData["ExameTipoId"] as SelectList)"></select>
+                            <select asp-for="ExameTipoId" id="ExameTipoId" class="form-select" asp-items="@(ViewData["ExameTipoId"] as SelectList)"></select>
                             <span asp-validation-for="ExameTipoId" class="text-danger small"></span>
                         </div>
 
@@ -91,7 +91,7 @@
 
                         <div class="mb-3">
                             <label asp-for="MaterialEquipamentoAssociadoId" class="form-label fw-bold">Equipamento</label>
-                            <select asp-for="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData["MaterialEquipamentoAssociadoId"] as SelectList)"></select>
+                            <select asp-for="MaterialEquipamentoAssociadoId" id="MaterialEquipamentoAssociadoId" class="form-select" asp-items="@(ViewData["MaterialEquipamentoAssociadoId"] as SelectList)"></select>
                         </div>
                     </div>
                 </div>
@@ -110,4 +110,58 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const dropdownTipo = document.getElementById("ExameTipoId");
+            const dropdownMaterial = document.getElementById("MaterialEquipamentoAssociadoId");
+            const materialSelecionadoInicialmente = dropdownMaterial.value; // Guardar valor inicial
+
+            function carregarMateriais() {
+                const tipoId = dropdownTipo.value;
+                dropdownMaterial.innerHTML = '<option value="">A verificar...</option>';
+                dropdownMaterial.disabled = true;
+
+                if (tipoId) {
+                    fetch(`/Exames/GetMateriaisPorTipo?id=${tipoId}`)
+                        .then(response => response.json())
+                        .then(resultado => {
+                            dropdownMaterial.innerHTML = '';
+
+                            if (!resultado.isFallback && resultado.data.length === 1) {
+                                const item = resultado.data[0];
+                                const option = document.createElement("option");
+                                option.value = item.value;
+                                option.text = item.text;
+                                option.selected = true;
+                                dropdownMaterial.add(option);
+                            } else {
+                                const defaultOption = document.createElement("option");
+                                defaultOption.value = "";
+                                defaultOption.text = resultado.isFallback ? "-- Selecione (Todos Disponíveis) --" : "-- Selecione (Recomendados) --";
+                                dropdownMaterial.add(defaultOption);
+
+                                resultado.data.forEach(item => {
+                                    const option = document.createElement("option");
+                                    option.value = item.value;
+                                    option.text = item.text;
+                                    if (item.value == materialSelecionadoInicialmente) option.selected = true;
+                                    dropdownMaterial.add(option);
+                                });
+                            }
+                            dropdownMaterial.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            dropdownMaterial.innerHTML = '<option value="">Erro ao carregar</option>';
+                        });
+                } else {
+                    dropdownMaterial.innerHTML = '<option value="">-- Selecione primeiro o Tipo --</option>';
+                    dropdownMaterial.disabled = true;
+                }
+            }
+
+            dropdownTipo.addEventListener("change", carregarMateriais);
+        });
+    </script>
 }

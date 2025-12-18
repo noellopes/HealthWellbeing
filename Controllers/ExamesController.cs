@@ -92,7 +92,6 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(exame);
                 await _context.SaveChangesAsync();
-                // AVISO DE CRIAÇÃO
                 TempData["SuccessMessage"] = "Exame marcado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
@@ -132,7 +131,6 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Update(exame);
                 await _context.SaveChangesAsync();
-                // AVISO DE EDIÇÃO
                 TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
@@ -162,14 +160,12 @@ namespace HealthWellbeing.Controllers
             {
                 if (exame.Estado == "Realizado")
                 {
-                    // AVISO DE ERRO (IMPEDIMENTO)
                     TempData["ErrorMessage"] = "Não é possível apagar um exame já realizado.";
                     return RedirectToAction(nameof(Index));
                 }
 
                 _context.Exames.Remove(exame);
                 await _context.SaveChangesAsync();
-                // AVISO DE ELIMINAÇÃO
                 TempData["SuccessMessage"] = "Exame eliminado com sucesso!";
             }
             return RedirectToAction(nameof(Index));
@@ -182,6 +178,48 @@ namespace HealthWellbeing.Controllers
             var exame = await _context.Exames.Include(e => e.Utente).Include(e => e.ExameTipo).Include(e => e.SalaDeExame).Include(e => e.MedicoSolicitante).Include(e => e.ProfissionalExecutante).Include(e => e.MaterialEquipamentoAssociado).FirstOrDefaultAsync(m => m.ExameId == id);
             if (exame == null) return NotFound();
             return View(exame);
+        }
+
+        // --- MÉTODO AJAX CORRIGIDO ---
+        [HttpGet]
+        public async Task<JsonResult> GetMateriaisPorTipo(int id)
+        {
+            try
+            {
+                // 1. Tenta buscar materiais específicos na tabela de ligação 'ExameTipoRecursos'
+                // CORREÇÃO AQUI: Usar a propriedade '.Recurso' conforme o teu Model
+                var materiaisEspecificos = await _context.ExameTipoRecursos
+                    .Where(x => x.ExameTipoId == id)
+                    .Include(x => x.Recurso) // <--- O teu model chama-lhe 'Recurso'
+                    .Select(x => new
+                    {
+                        // value = ID do material, text = Nome do material
+                        value = x.MaterialEquipamentoAssociadoId,
+                        text = x.Recurso.NomeEquipamento // <--- Aceder via 'Recurso'
+                    })
+                    .ToListAsync();
+
+                // Se encontrou, retorna
+                if (materiaisEspecificos.Any())
+                {
+                    return Json(new { isFallback = false, data = materiaisEspecificos });
+                }
+            }
+            catch
+            {
+                // Ignora erros (tabela vazia, etc) e usa fallback
+            }
+
+            // 2. FALLBACK: Retorna TODOS os materiais
+            var todosMateriais = await _context.MaterialEquipamentoAssociado
+                .Select(x => new
+                {
+                    value = x.MaterialEquipamentoAssociadoId,
+                    text = x.NomeEquipamento
+                })
+                .ToListAsync();
+
+            return Json(new { isFallback = true, data = todosMateriais });
         }
 
         private void CarregarViewBagDropdowns(Exame exame = null)
