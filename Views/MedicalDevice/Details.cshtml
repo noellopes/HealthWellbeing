@@ -7,14 +7,21 @@
     // Garante que pegamos a localização que ainda está aberta (EndDate == null)
     LocationMedDevice? localizacao = Model.LocalizacaoDispMedicoMovel
         .FirstOrDefault(l => l.EndDate == null);
-    string localizacaoNome = localizacao?.Room?.Name ?? "N/A"; //atribuido se não houver
+    string localizacaoNome = localizacao?.Room?.Name ?? "N/A";
 
-    // 2. Obtém o status calculado no modelo MedicalDevice.
+    // Obtém o status calculado no modelo MedicalDevice.
     string statusAtual = Model.CurrentStatus;
 
+    // --- DEFINIÇÃO DE PERMISSÕES ---
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogistica = User.IsInRole("logisticsTechnician");
+
+    // Lógica de Estado
+    bool podeMover = Model.CurrentStatus != "Em Manutenção";
+    bool podeEliminar = Model.CurrentStatus == "Em Armazenamento";
 }
 
-@* --- Secção de Mensagem de Sucesso (Usando TempData) --- *@
+@* --- Secção de Mensagem de Sucesso --- *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="container py-4">
@@ -53,8 +60,7 @@
                 <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.RegistrationDate)</dt>
                 <dd class="col-sm-9">@Html.DisplayFor(model => model.RegistrationDate)</dd>
 
-
-                @* ESTADO ATUAL (CurrentStatus)*@
+                @* ESTADO ATUAL *@
                 <dt class="col-sm-3 fw-bold text-muted">@Html.DisplayNameFor(model => model.CurrentStatus)</dt>
                 <dd class="col-sm-9">
                     @if (statusAtual.Contains("Em Manutenção"))
@@ -67,13 +73,11 @@
                     }
                     else
                     {
-                        @* "Em Armazenamento" *@
                         <span class="badge bg-success">@statusAtual</span>
                     }
                 </dd>
 
-
-                @*LOCALIZAÇÃO (Nome da Sala) *@
+                @* LOCALIZAÇÃO *@
                 <dt class="col-sm-3 fw-bold text-muted">Localização Atual</dt>
                 <dd class="col-sm-9">
                     @if (localizacaoNome != "N/A")
@@ -100,9 +104,10 @@
     </div>
 </div>
 
+@* --- BARRA DE BOTÕES (AÇÕES) --- *@
 <div class="mt-4 d-flex justify-content-end gap-2">
 
- @* Adicinado por nuno abre *@
+    @* Adicionado por nuno abre *@
     @if (ViewBag.Origem == "dispositivosAssociados")
     {
         <a asp-controller="Rooms"
@@ -112,65 +117,56 @@
             <i class="bi bi-arrow-left-circle me-1"></i> Voltar à lista de dispositivos médicos associados
         </a>
     }
- @* Adicionado por nuno fecha *@
+    @* Adicionado por nuno fecha *@
 
-    @{
-        //Pode mover se NÃO estiver em Manutenção
-        bool podeMover = Model.CurrentStatus != "Em Manutenção";
-
-        //Só pode eliminar se estiver "Em Armazenamento"
-        bool podeEliminar = Model.CurrentStatus == "Em Armazenamento";
-
-        // Apenas quem tem a Role "logisticsTechnician" pode ver os botões de ação
-        bool isLogistica = User.IsInRole("logisticsTechnician");
-    }
-
-    @* --- BOTÃO MOVER (Apenas Logística) --- *@
+    @* --- 1. MOVER (Apenas Logística) --- *@
     @if (isLogistica)
     {
         @if (podeMover)
         {
             <a asp-controller="LocationMedDevice" asp-action="Create"
                asp-route-id="@Model.MedicalDeviceID"
-               class="btn btn-sm btn-success me-1">
+               class="btn btn-success">
                 <i class="bi bi-geo-alt"></i> Mover
             </a>
         }
         else
         {
-            <span class="btn btn-sm btn-secondary me-1 disabled" title="Dispositivo em manutenção não pode ser movido">
+            <span class="btn btn-secondary disabled" title="Dispositivo em manutenção não pode ser movido">
                 <i class="bi bi-x-octagon"></i> Mover
             </span>
         }
     }
 
-    @* --- BOTÃO EDITAR (Apenas Logística) --- *@
-    @if (isLogistica)
+    @* --- 2. EDITAR (Admin E Logística) --- 
+       (Ambos podem editar, mas veem campos diferentes lá dentro) *@
+    @if (isAdmin || isLogistica)
     {
-        <a asp-action="Edit" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-warning me-1">
+        <a asp-action="Edit" asp-route-id="@Model.MedicalDeviceID" class="btn btn-warning">
             <i class="bi bi-pencil-square"></i> Editar
         </a>
     }
 
-    @* --- BOTÃO ELIMINAR (Apenas Logística) --- *@
-    @if (isLogistica)
+    @* --- 3. ELIMINAR (Apenas Administrador) --- *@
+    @if (isAdmin)
     {
         @if (podeEliminar)
         {
-            <a asp-action="Delete" asp-route-id="@Model.MedicalDeviceID" class="btn btn-sm btn-danger">
+            <a asp-action="Delete" asp-route-id="@Model.MedicalDeviceID" class="btn btn-danger">
                 <i class="bi bi-trash"></i> Eliminar
             </a>
         }
         else
         {
-            <span class="btn btn-sm btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
+            <span class="btn btn-secondary disabled" title="Apenas dispositivos em 'Armazenamento' podem ser eliminados">
                 <i class="bi bi-trash"></i> Eliminar
             </span>
         }
     }
 
-    @* --- BOTÃO VOLTAR (Visível para todos) --- *@
+    @* --- 4. VOLTAR (Todos) --- *@
     <a asp-action="DeviceGroupIndex" class="btn btn-secondary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
     </a>
+
 </div>

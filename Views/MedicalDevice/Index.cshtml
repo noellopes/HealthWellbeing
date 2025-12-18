@@ -16,6 +16,8 @@
         ViewData["Title"] = "Lista de Dispositivos";
     }
 
+    // --- DEFINIÇÃO DE PERMISSÕES ---
+    bool isAdmin = User.IsInRole("Administrator");
     bool isLogistica = User.IsInRole("logisticsTechnician");
 }
 
@@ -37,14 +39,14 @@
         <h1 class="h2 mb-0">@ViewData["Title"]</h1>
         @if (temFiltroNome)
         {
-            <p class="text-muted mb-0">A ver todas as unidades do tipo <strong>@nomeDispositivo</strong></p>
+            <p class="text-muted mb-0">A ver todas as unidades do <strong>@nomeDispositivo</strong></p>
         }
     </div>
 
     @* Lado Direito: Botões (Voltar, Pesquisar, Registar) *@
     <div class="d-flex align-items-center gap-2">
 
-        @* 1. BOTÃO VOLTAR (Agora aparece primeiro) *@
+        @* 1. BOTÃO VOLTAR *@
         <a asp-action="DeviceGroupIndex" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Voltar
         </a>
@@ -54,11 +56,11 @@
             <i class="bi bi-search me-1"></i> Pesquisar
         </button>
 
-        @* 3. BOTÃO REGISTAR (Só Logística) *@
-        @if (isLogistica)
+        @* 3. BOTÃO REGISTAR (Apenas Administrador) *@
+        @if (isAdmin)
         {
             <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i> Registar
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
             </a>
         }
     </div>
@@ -145,7 +147,6 @@ else
                         string status = dispositivo.CurrentStatus;
 
                         <tr>
-                            @* 1. NOME (Sem Negrito) *@
                             <td>@dispositivo.Name</td>
 
                             <td>@(dispositivo.TypeMaterial?.Name ?? "N/A")</td>
@@ -157,12 +158,10 @@ else
                                 }
                                 else if (status == "Em Manutenção")
                                 {
-
                                     <span class="badge bg-warning text-dark">@status</span>
                                 }
                                 else
                                 {
-
                                     <span class="badge bg-danger">@status</span>
                                 }
                             </td>
@@ -174,7 +173,6 @@ else
                                 }
                                 else
                                 {
-
                                     <span class="text-muted">...</span>
                                 }
                             </td>
@@ -185,47 +183,51 @@ else
                                     bool podeEliminar = status == "Em Armazenamento";
                                 }
 
-                                @* 2. BOTÕES COLORIDOS COM TEXTO *@
                                 <div class="btn-group btn-group-sm" role="group">
-                                    @* MOVER (Verde) *@
+
+                                    @* 1. MOVER (Apenas Logística) *@
                                     @if (isLogistica)
                                     {
                                         @if (podeMover)
                                         {
-                                            <a asp-controller="LocationMedDevice" asp-action="Create" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-success me-1 rounded">
+                                            <a asp-controller="LocationMedDevice" asp-action="Create" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-success me-1 rounded" title="Mover Dispositivo">
                                                 <i class="bi bi-geo-alt"></i> Mover
                                             </a>
                                         }
                                         else
                                         {
-                                            <span class="btn btn-secondary me-1 rounded disabled">
+                                            <span class="btn btn-secondary me-1 rounded disabled" title="Em Manutenção">
                                                 <i class="bi bi-geo-alt"></i> Mover
                                             </span>
                                         }
                                     }
 
-                                    @* DETALHES (Azul Claro) *@
-                                    <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-info me-1 rounded text-black">
+                                    @* 2. DETALHES (Todos) *@
+                                    <a asp-action="Details" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-info me-1 rounded text-black" title="Ver Detalhes">
                                         <i class="bi bi-info-circle"></i> Detalhes
                                     </a>
 
-                                    @if (isLogistica)
+                                    @* 3. EDITAR (Admin OU Logística) *@
+                                    @* Ambos podem editar, mas veem campos diferentes lá dentro *@
+                                    @if (isAdmin || isLogistica)
                                     {
-                                        @* EDITAR (Amarelo) *@
-                                        <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-warning me-1 rounded">
+                                        <a asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-warning me-1 rounded" title="Editar">
                                             <i class="bi bi-pencil-square"></i> Editar
                                         </a>
+                                    }
 
-                                        @* ELIMINAR (Vermelho) *@
+                                    @* 4. ELIMINAR (Apenas Admin) *@
+                                    @if (isAdmin)
+                                    {
                                         @if (podeEliminar)
                                         {
-                                            <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-danger rounded">
+                                            <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceID" class="btn btn-danger rounded" title="Eliminar">
                                                 <i class="bi bi-trash"></i> Eliminar
                                             </a>
                                         }
                                         else
                                         {
-                                            <span class="btn btn-secondary rounded disabled">
+                                            <span class="btn btn-secondary rounded disabled" title="Apenas 'Em Armazenamento' pode ser eliminado">
                                                 <i class="bi bi-trash"></i> Eliminar
                                             </span>
                                         }

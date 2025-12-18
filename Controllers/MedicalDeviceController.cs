@@ -150,7 +150,7 @@ namespace HealthWellBeingRoom.Controllers
         }
 
         // --- 3. CRIAR (Create) - GET ---
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewBag.TypeMaterialID = new SelectList(_context.Set<TypeMaterial>().OrderBy(t => t.Name), "TypeMaterialID", "Name");
@@ -160,7 +160,7 @@ namespace HealthWellBeingRoom.Controllers
         // POST: MedicalDevice/Create 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "Administrator")]
         // BIND: Inclui SerialNumber e ManufacturerId
         public async Task<IActionResult> Create([Bind("MedicalDeviceID,Name,SerialNumber,Observation,TypeMaterialID,IsUnderMaintenance")] MedicalDevice medicalDevices)
         {
@@ -219,7 +219,7 @@ namespace HealthWellBeingRoom.Controllers
         }
 
         // --- 4. EDITAR (Edit) - GET ---
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -244,120 +244,126 @@ namespace HealthWellBeingRoom.Controllers
         // POST: MedicalDevice/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("MedicalDeviceID,Name,SerialNumber,RegistrationDate,Observation,TypeMaterialID,IsUnderMaintenance")] MedicalDevice medicalDevices)
         {
-            if (id != medicalDevices.MedicalDeviceID)
-            {
-                return View("NotFound");
-            }
+            if (id != medicalDevices.MedicalDeviceID) return View("NotFound");
 
-            // Verifica se já existe esse Serial, mas que NÃO SEJA este dispositivo
-            bool serialExiste = await _context.MedicalDevices
-                .AnyAsync(d => d.SerialNumber == medicalDevices.SerialNumber && d.MedicalDeviceID != id);
+            // 1. Buscar o objeto REAl da base de dados
+            var dispositivoDB = await _context.MedicalDevices
+                .Include(m => m.LocalizacaoDispMedicoMovel)
+                .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
 
-            if (serialExiste)
+            if (dispositivoDB == null) return View("NotFound");
+
+            // 2. Definição de Permissões (Quem é o utilizador?)
+            bool isAdmin = User.IsInRole("Administrator");
+            bool isLogistica = User.IsInRole("logisticsTechnician");
+
+            // 3. Validação de Unicidade do Serial (Apenas se quem está a mexer for Logística, pois Admin não muda Serial)
+            if (isLogistica)
             {
-                ModelState.AddModelError("SerialNumber", "Este Número de Série já está registado noutro dispositivo.");
+                // Se o serial mudou, verifica se já existe noutro
+                if (dispositivoDB.SerialNumber != medicalDevices.SerialNumber)
+                {
+                    bool serialExiste = await _context.MedicalDevices
+                        .AnyAsync(d => d.SerialNumber == medicalDevices.SerialNumber && d.MedicalDeviceID != id);
+
+                    if (serialExiste) ModelState.AddModelError("SerialNumber", "Este Número de Série já está registado.");
+                }
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Busca o original apenas para leitura (comparar estados)
-                    // AsNoTracking é importante aqui porque vamos usar o _context.Update
-                    var dispositivoOriginal = await _context.MedicalDevices
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(m => m.MedicalDeviceID == id);
-
-                    if (dispositivoOriginal == null) return View("NotFound");
-
-                    // Detetar Mudanças de Estado
-                    bool entrouEmManutencao = !dispositivoOriginal.IsUnderMaintenance && medicalDevices.IsUnderMaintenance;
-                    bool saiuDeManutencao = dispositivoOriginal.IsUnderMaintenance && !medicalDevices.IsUnderMaintenance;
-
-                    // O _context.Update vai marcar esse objeto como "Modificado" e o EF vai gerar o SQL para gravar tudo
-                    _context.Update(medicalDevices);
-
-                    // Lógica de Manutenção
-                    if (entrouEmManutencao)
+                    // --- CENÁRIO ADMINISTRADOR ---
+                    // Edita: Nome, Tipo, Observação. 
+                    // NÃO Edita: Serial, Manutenção.
+                    if (isAdmin)
                     {
-                        var localizacaoAtiva = await _context.LocationMedDevice
-                            .FirstOrDefaultAsync(l => l.MedicalDeviceID == id && l.EndDate == null);
-
-                        if (localizacaoAtiva != null)
-                        {
-                            localizacaoAtiva.EndDate = DateTime.Now;
-                            _context.Update(localizacaoAtiva);
-                        }
-                        TempData["SuccessMessage"] = $"Dispositivo '{medicalDevices.Name}' atualizado e colocado em Manutenção.";
+                        dispositivoDB.Name = medicalDevices.Name;
+                        dispositivoDB.Observation = medicalDevices.Observation;
+                        dispositivoDB.TypeMaterialID = medicalDevices.TypeMaterialID;
+                        // Ignoramos alterações ao SerialNumber e IsUnderMaintenance vindas do formulário
                     }
-                    else if (saiuDeManutencao)
+
+                    // --- CENÁRIO LOGÍSTICA ---
+                    // Edita: Serial, Manutenção.
+                    // NÃO Edita: Nome, Tipo, Observação.
+                    else if (isLogistica)
                     {
-                        var salaDeposito = await _context.Room
-                            .Include(r => r.RoomStatus)
-                            .Where(r => r.Name.Contains("Depósito") &&
-                                        r.RoomStatus != null &&
-                                        r.RoomStatus.Name == "Disponível")
-                            .FirstOrDefaultAsync();
+                        dispositivoDB.SerialNumber = medicalDevices.SerialNumber;
 
-                        if (salaDeposito != null)
+                        // Lógica complexa de Manutenção (Só Logística pode fazer isto)
+                        bool entrouEmManutencao = !dispositivoDB.IsUnderMaintenance && medicalDevices.IsUnderMaintenance;
+                        bool saiuDeManutencao = dispositivoDB.IsUnderMaintenance && !medicalDevices.IsUnderMaintenance;
+
+                        // Atualiza o estado na BD
+                        dispositivoDB.IsUnderMaintenance = medicalDevices.IsUnderMaintenance;
+
+                        if (entrouEmManutencao)
                         {
-                            var locsAntigas = await _context.LocationMedDevice
-                                .Where(l => l.MedicalDeviceID == id && l.EndDate == null)
-                                .ToListAsync();
-
-                            locsAntigas.ForEach(l => l.EndDate = DateTime.Now);
-
-                            var novaLocalizacao = new LocationMedDevice
+                            var localizacaoAtiva = dispositivoDB.LocalizacaoDispMedicoMovel.FirstOrDefault(l => l.EndDate == null);
+                            if (localizacaoAtiva != null)
                             {
-                                MedicalDeviceID = id,
-                                RoomId = salaDeposito.RoomId,
-                                InitialDate = DateTime.Now,
-                                EndDate = null,
-                                IsCurrent = true
-                            };
-                            _context.Add(novaLocalizacao);
+                                localizacaoAtiva.EndDate = DateTime.Now;
+                            }
+                            TempData["SuccessMessage"] = $"Nº Série atualizado e dispositivo colocado em Manutenção.";
+                        }
+                        else if (saiuDeManutencao)
+                        {
+                            // Lógica de mover para depósito
+                            var salaDeposito = await _context.Room
+                                .Include(r => r.RoomStatus)
+                                .Where(r => r.Name.Contains("Depósito") && r.RoomStatus.Name == "Disponível")
+                                .FirstOrDefaultAsync();
 
-                            TempData["SuccessMessage"] = $"Manutenção concluída! Movido para {salaDeposito.Name}.";
+                            if (salaDeposito != null)
+                            {
+                                // Fecha localizações antigas (segurança)
+                                var locsAntigas = _context.LocationMedDevice.Where(l => l.MedicalDeviceID == id && l.EndDate == null);
+                                foreach (var l in locsAntigas) l.EndDate = DateTime.Now;
+
+                                var novaLocalizacao = new LocationMedDevice
+                                {
+                                    MedicalDeviceID = id,
+                                    RoomId = salaDeposito.RoomId,
+                                    InitialDate = DateTime.Now,
+                                    EndDate = null,
+                                    IsCurrent = true
+                                };
+                                _context.Add(novaLocalizacao);
+                                TempData["SuccessMessage"] = $"Manutenção concluída! Movido para {salaDeposito.Name}.";
+                            }
+                            else
+                            {
+                                TempData["WarningMessage"] = $"Manutenção concluída, mas Depósito não encontrado.";
+                            }
                         }
                         else
                         {
-                            TempData["WarningMessage"] = $"Manutenção concluída, mas não foi possível alocar para o Depósito.";
+                            TempData["SuccessMessage"] = $"Número de série atualizado com sucesso.";
                         }
                     }
-                    else
-                    {
-                        TempData["SuccessMessage"] = $"As alterações no dispositivo '{medicalDevices.Name}' foram salvas com sucesso!";
-                    }
 
-                    // SALVAR TUDO
+                    // Gravar alterações
                     await _context.SaveChangesAsync();
-
-                    return RedirectToAction(nameof(Details), new { id = medicalDevices.MedicalDeviceID });
+                    return RedirectToAction(nameof(Details), new { id = dispositivoDB.MedicalDeviceID });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID))
-                    {
-                        return View("NotFound");
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!MedicalDevicesExists(medicalDevices.MedicalDeviceID)) return View("NotFound");
+                    else throw;
                 }
             }
 
-            // Se falhar, recarregar ViewBags
             ViewBag.TypeMaterialID = new SelectList(_context.Set<TypeMaterial>(), "TypeMaterialID", "Name", medicalDevices.TypeMaterialID);
-
             return View(medicalDevices);
         }
 
         // --- 5. APAGAR (Delete) - GET ---
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -387,7 +393,7 @@ namespace HealthWellBeingRoom.Controllers
         // POST: MedicalDevice/Delete/5 (Substitui o seu DeleteConfirmed POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "logisticsTechnician")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var medicalDevices = await _context.MedicalDevices.FindAsync(id);
