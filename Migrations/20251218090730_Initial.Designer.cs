@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251218090730_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,123 +124,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("CategoriaAlimento");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.CategoriaConsumivel", b =>
-                {
-                    b.Property<int>("CategoriaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoriaId"));
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("CategoriaId");
-
-                    b.HasIndex("Nome")
-                        .IsUnique();
-
-                    b.ToTable("CategoriaConsumivel");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
-                {
-                    b.Property<int>("ConsumivelId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConsumivelId"));
-
-                    b.Property<int>("CategoriaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("QuantidadeAtual")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantidadeMaxima")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantidadeMinima")
-                        .HasColumnType("int");
-
-                    b.HasKey("ConsumivelId");
-
-                    b.HasIndex("CategoriaId");
-
-                    b.ToTable("Consumivel");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Fornecedor", b =>
-                {
-                    b.Property<int>("FornecedorId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FornecedorId"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Morada")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NIF")
-                        .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
-
-                    b.Property<string>("NomeEmpresa")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Telefone")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
-                    b.HasKey("FornecedorId");
-
-                    b.ToTable("Fornecedor");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.LocalizacaoZonaArmazenamento", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("LocalizacaoZonaArmazenamento");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
                 {
                     b.Property<int>("LocationMedDeviceID")
@@ -261,84 +147,13 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RoomReservationId")
-                        .HasColumnType("int");
-
                     b.HasKey("LocationMedDeviceID");
 
                     b.HasIndex("MedicalDeviceID");
 
                     b.HasIndex("RoomId");
 
-                    b.HasIndex("RoomReservationId");
-
                     b.ToTable("LocationMedDevice");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Nurse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NIF")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProfessionalLicense")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Specialty")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Nurse");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.Pathology", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Severity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Pathology");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Receita", b =>
@@ -469,134 +284,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("Room");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Stock", b =>
-                {
-                    b.Property<int>("StockId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StockId"));
-
-                    b.Property<int>("ConsumivelID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataUltimaAtualizacao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("QuantidadeAtual")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantidadeMinima")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ZonaID")
-                        .HasColumnType("int");
-
-                    b.HasKey("StockId");
-
-                    b.ToTable("Stock");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TreatmentRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AdditionalNotes")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<DateTime?>("CanceledAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CanceledReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("CompletedDuration")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int?>("EstimatedDuration")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NurseId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observations")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int?>("PathologyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TreatmentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TreatmentTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NurseId");
-
-                    b.HasIndex("PathologyId");
-
-                    b.HasIndex("TreatmentTypeId");
-
-                    b.ToTable("TreatmentRecord");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TreatmentType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<int>("EstimatedDuration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Priority")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TreatmentType");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.TypeMaterial", b =>
                 {
                     b.Property<int>("TypeMaterialID")
@@ -618,47 +305,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasKey("TypeMaterialID");
 
                     b.ToTable("TypeMaterial");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterialHistory", b =>
-                {
-                    b.Property<int>("TypeMaterialHistoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeMaterialHistoryId"));
-
-                    b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ChangedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TypeMaterialID")
-                        .HasColumnType("int");
-
-                    b.HasKey("TypeMaterialHistoryId");
-
-                    b.HasIndex("TypeMaterialID");
-
-                    b.ToTable("TypeMaterialHistories");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
@@ -816,57 +462,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("RoomLocation");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomReservation", b =>
-                {
-                    b.Property<int>("RoomReservationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomReservationId"));
-
-                    b.Property<int?>("ConsultationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConsultationType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("PatientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ResponsibleName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SpecialtyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("RoomReservationId");
-
-                    b.HasIndex("RoomId");
-
-                    b.HasIndex("SpecialtyId");
-
-                    b.ToTable("RoomReservations");
-                });
-
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomStatus", b =>
                 {
                     b.Property<int>("RoomStatusId")
@@ -946,17 +541,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Categoria");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.CategoriaConsumivel", "CategoriaConsumivel")
-                        .WithMany()
-                        .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CategoriaConsumivel");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
                 {
                     b.HasOne("HealthWellbeingRoom.Models.MedicalDevice", "MedicalDevice")
@@ -970,10 +554,6 @@ namespace HealthWellbeingRoom.Migrations
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("HealthWellbeingRoom.Models.RoomReservation", null)
-                        .WithMany("MedicalDevices")
-                        .HasForeignKey("RoomReservationId");
 
                     b.Navigation("MedicalDevice");
 
@@ -1009,17 +589,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("RoomType");
 
                     b.Navigation("Specialty");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterialHistory", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.TypeMaterial", "TypeMaterial")
-                        .WithMany()
-                        .HasForeignKey("TypeMaterialID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TypeMaterial");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.Equipment", b =>
@@ -1081,8 +650,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Equipments");
 
                     b.Navigation("LocalizacaoDispMedicoMovel");
-
-                    b.Navigation("RoomConsumables");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
@@ -1093,13 +660,6 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomLocation", b =>
                 {
                     b.Navigation("Rooms");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomReservation", b =>
-                {
-                    b.Navigation("Consumables");
-
-                    b.Navigation("MedicalDevices");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomStatus", b =>

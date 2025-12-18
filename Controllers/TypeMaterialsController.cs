@@ -127,41 +127,54 @@ namespace HealthWellbeingRoom.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("TypeMaterialID,Name,Description")] TypeMaterial typeMaterial)
         {
-            if (id != typeMaterial.TypeMaterialID) return NotFound();
+            if (id != typeMaterial.TypeMaterialID)
+                return NotFound();
 
-            // Normalizar nome
+            var original = await _context.TypeMaterial
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TypeMaterialID == id);
+
+            if (original == null)
+                return NotFound();
+
             string normalizedName = typeMaterial.Name.Trim().ToLower();
 
-            // Verificar duplicados (ignorando o próprio registro)
             bool exists = await _context.TypeMaterial
                 .AnyAsync(t => t.Name.Trim().ToLower() == normalizedName && t.TypeMaterialID != id);
 
             if (exists)
             {
-                ModelState.AddModelError("Name", "Já existe um tipo com este nome. Escolha outro.");
+                ModelState.AddModelError("Name", "Já existe um tipo com este nome.");
                 return View(typeMaterial);
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(typeMaterial);
+
+            // 👉 Guardar histórico APENAS se houve alterações
+            if (original.Name != typeMaterial.Name || original.Description != typeMaterial.Description)
             {
-                try
+                var history = new TypeMaterialHistory
                 {
-                    _context.Update(typeMaterial);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Tipo de material atualizado com sucesso!";
-                    return RedirectToAction(nameof(Details), new { id = typeMaterial.TypeMaterialID });
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.TypeMaterial.Any(e => e.TypeMaterialID == typeMaterial.TypeMaterialID))
-                        return NotFound();
-                    else
-                        throw;
-                }
+                    TypeMaterialID = id,
+                    OldName = original.Name,
+                    NewName = typeMaterial.Name,
+                    OldDescription = original.Description,
+                    NewDescription = typeMaterial.Description,
+                    ChangedBy = User.Identity.Name,
+                    ChangedAt = DateTime.Now
+                };
+
+                _context.TypeMaterialHistories.Add(history);
             }
 
-            return View(typeMaterial);
+            _context.Update(typeMaterial);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Tipo de material atualizado com sucesso!";
+            return RedirectToAction(nameof(Details), new { id });
         }
+
 
 
         // GET: TypeMaterials/Delete/5
@@ -192,6 +205,19 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(viewModel);
         }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> History(int id)
+        {
+            var histories = await _context.TypeMaterialHistories
+                .Where(h => h.TypeMaterialID == id)
+                .OrderByDescending(h => h.ChangedAt)
+                .ToListAsync();
+
+            ViewBag.TypeMaterialId = id;
+            return View(histories);
+        }
+
 
         // POST: TypeMaterials/Delete/5
         [HttpPost, ActionName("Delete")]
