@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+
+namespace HealthWellbeing.Controllers
+{
+    public class LimitacaoMedicaController : Controller
+    {
+        private readonly HealthWellbeingDbContext _context;
+
+        public LimitacaoMedicaController(HealthWellbeingDbContext context)
+        {
+            _context = context;
+        }
+
+        // GET: LimitacaoMedica
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.LimitacaoMedica.ToListAsync());
+        }
+
+        // GET: LimitacaoMedica/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var limitacaoMedica = await _context.LimitacaoMedica
+                .FirstOrDefaultAsync(m => m.LimitacaoMedicaId == id);
+            if (limitacaoMedica == null)
+            {
+                return NotFound();
+            }
+
+            return View(limitacaoMedica);
+        }
+
+        // GET: LimitacaoMedica/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: LimitacaoMedica/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("LimitacaoMedicaId,Descricao,TipoLimitacao,Observacoes")] LimitacaoMedica limitacaoMedica)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(limitacaoMedica);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(limitacaoMedica);
+        }
+
+        // GET: LimitacaoMedica/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var limitacaoMedica = await _context.LimitacaoMedica.FindAsync(id);
+            if (limitacaoMedica == null)
+            {
+                return NotFound();
+            }
+            return View(limitacaoMedica);
+        }
+
+        // POST: LimitacaoMedica/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("LimitacaoMedicaId,Descricao,TipoLimitacao,Observacoes")] LimitacaoMedica limitacaoMedica)
+        {
+            if (id != limitacaoMedica.LimitacaoMedicaId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(limitacaoMedica);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!LimitacaoMedicaExists(limitacaoMedica.LimitacaoMedicaId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(limitacaoMedica);
+        }
+
+        // GET: LimitacaoMedica/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var limitacaoMedica = await _context.LimitacaoMedica
+                .FirstOrDefaultAsync(m => m.LimitacaoMedicaId == id);
+            if (limitacaoMedica == null)
+            {
+                return NotFound();
+            }
+
+            return View(limitacaoMedica);
+        }
+
+        // POST: LimitacaoMedica/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var limitacaoMedica = await _context.LimitacaoMedica.FindAsync(id);
+            if (limitacaoMedica != null)
+            {
+                _context.LimitacaoMedica.Remove(limitacaoMedica);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool LimitacaoMedicaExists(int id)
+        {
+            return _context.LimitacaoMedica.Any(e => e.LimitacaoMedicaId == id);
+        }
+    }
+}
