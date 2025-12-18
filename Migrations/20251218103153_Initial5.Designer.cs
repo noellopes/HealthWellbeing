@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251215134107_initialGrupo5")]
-    partial class initialGrupo5
+    [Migration("20251218103153_Initial5")]
+    partial class Initial5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -264,11 +264,16 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RoomReservationId")
+                        .HasColumnType("int");
+
                     b.HasKey("LocationMedDeviceID");
 
                     b.HasIndex("MedicalDeviceID");
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("RoomReservationId");
 
                     b.ToTable("LocationMedDevice");
                 });
@@ -618,6 +623,47 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("TypeMaterial");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterialHistory", b =>
+                {
+                    b.Property<int>("TypeMaterialHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeMaterialHistoryId"));
+
+                    b.Property<DateTime>("ChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ChangedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TypeMaterialID")
+                        .HasColumnType("int");
+
+                    b.HasKey("TypeMaterialHistoryId");
+
+                    b.HasIndex("TypeMaterialID");
+
+                    b.ToTable("TypeMaterialHistories");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.UsoConsumivel", b =>
                 {
                     b.Property<int>("UsoConsumivelId")
@@ -843,11 +889,16 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RoomReservationId")
+                        .HasColumnType("int");
+
                     b.HasKey("RoomConsumableId");
 
                     b.HasIndex("ConsumivelId");
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("RoomReservationId");
 
                     b.ToTable("RoomConsumable");
                 });
@@ -901,6 +952,57 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasKey("RoomLocationId");
 
                     b.ToTable("RoomLocation");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomReservation", b =>
+                {
+                    b.Property<int>("RoomReservationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomReservationId"));
+
+                    b.Property<int?>("ConsultationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConsultationType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponsibleName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SpecialtyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("RoomReservationId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("SpecialtyId");
+
+                    b.ToTable("RoomReservations");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomStatus", b =>
@@ -1007,6 +1109,10 @@ namespace HealthWellbeingRoom.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeingRoom.Models.RoomReservation", null)
+                        .WithMany("MedicalDevices")
+                        .HasForeignKey("RoomReservationId");
+
                     b.Navigation("MedicalDevice");
 
                     b.Navigation("Room");
@@ -1066,6 +1172,17 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Pathology");
 
                     b.Navigation("TreatmentType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TypeMaterialHistory", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.TypeMaterial", "TypeMaterial")
+                        .WithMany()
+                        .HasForeignKey("TypeMaterialID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TypeMaterial");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UsoConsumivel", b =>
@@ -1169,6 +1286,10 @@ namespace HealthWellbeingRoom.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeingRoom.Models.RoomReservation", null)
+                        .WithMany("Consumables")
+                        .HasForeignKey("RoomReservationId");
+
                     b.Navigation("Consumivel");
 
                     b.Navigation("Room");
@@ -1183,6 +1304,23 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomReservation", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeingRoom.Models.Specialty", "Specialty")
+                        .WithMany()
+                        .HasForeignKey("SpecialtyId");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
@@ -1207,6 +1345,13 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomLocation", b =>
                 {
                     b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("HealthWellbeingRoom.Models.RoomReservation", b =>
+                {
+                    b.Navigation("Consumables");
+
+                    b.Navigation("MedicalDevices");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.RoomStatus", b =>

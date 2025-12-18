@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeingRoom.Migrations
 {
     /// <inheritdoc />
-    public partial class initialGrupo5 : Migration
+    public partial class Initial5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -453,6 +453,31 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TypeMaterialHistories",
+                columns: table => new
+                {
+                    TypeMaterialHistoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TypeMaterialID = table.Column<int>(type: "int", nullable: false),
+                    OldName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OldDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChangedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ChangedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TypeMaterialHistories", x => x.TypeMaterialHistoryId);
+                    table.ForeignKey(
+                        name: "FK_TypeMaterialHistories_TypeMaterial_TypeMaterialID",
+                        column: x => x.TypeMaterialID,
+                        principalTable: "TypeMaterial",
+                        principalColumn: "TypeMaterialID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alergia",
                 columns: table => new
                 {
@@ -512,34 +537,6 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RoomConsumable",
-                columns: table => new
-                {
-                    RoomConsumableId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoomId = table.Column<int>(type: "int", nullable: false),
-                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoomConsumable", x => x.RoomConsumableId);
-                    table.ForeignKey(
-                        name: "FK_RoomConsumable_Consumivel_ConsumivelId",
-                        column: x => x.ConsumivelId,
-                        principalTable: "Consumivel",
-                        principalColumn: "ConsumivelId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RoomConsumable_Room_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Room",
-                        principalColumn: "RoomId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RoomHistories",
                 columns: table => new
                 {
@@ -561,6 +558,39 @@ namespace HealthWellbeingRoom.Migrations
                         principalTable: "Room",
                         principalColumn: "RoomId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoomReservations",
+                columns: table => new
+                {
+                    RoomReservationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ResponsibleName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    ConsultationId = table.Column<int>(type: "int", nullable: true),
+                    ConsultationType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PatientId = table.Column<int>(type: "int", nullable: true),
+                    SpecialtyId = table.Column<int>(type: "int", nullable: true),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomReservations", x => x.RoomReservationId);
+                    table.ForeignKey(
+                        name: "FK_RoomReservations_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoomReservations_Specialty_SpecialtyId",
+                        column: x => x.SpecialtyId,
+                        principalTable: "Specialty",
+                        principalColumn: "SpecialtyId");
                 });
 
             migrationBuilder.CreateTable(
@@ -631,7 +661,8 @@ namespace HealthWellbeingRoom.Migrations
                     RoomId = table.Column<int>(type: "int", nullable: false),
                     InitialDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsCurrent = table.Column<bool>(type: "bit", nullable: false)
+                    IsCurrent = table.Column<bool>(type: "bit", nullable: false),
+                    RoomReservationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -643,7 +674,46 @@ namespace HealthWellbeingRoom.Migrations
                         principalColumn: "MedicalDeviceID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_LocationMedDevice_RoomReservations_RoomReservationId",
+                        column: x => x.RoomReservationId,
+                        principalTable: "RoomReservations",
+                        principalColumn: "RoomReservationId");
+                    table.ForeignKey(
                         name: "FK_LocationMedDevice_Room_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "Room",
+                        principalColumn: "RoomId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RoomConsumable",
+                columns: table => new
+                {
+                    RoomConsumableId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoomId = table.Column<int>(type: "int", nullable: false),
+                    ConsumivelId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RoomReservationId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomConsumable", x => x.RoomConsumableId);
+                    table.ForeignKey(
+                        name: "FK_RoomConsumable_Consumivel_ConsumivelId",
+                        column: x => x.ConsumivelId,
+                        principalTable: "Consumivel",
+                        principalColumn: "ConsumivelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoomConsumable_RoomReservations_RoomReservationId",
+                        column: x => x.RoomReservationId,
+                        principalTable: "RoomReservations",
+                        principalColumn: "RoomReservationId");
+                    table.ForeignKey(
+                        name: "FK_RoomConsumable_Room_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Room",
                         principalColumn: "RoomId",
@@ -702,6 +772,11 @@ namespace HealthWellbeingRoom.Migrations
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LocationMedDevice_RoomReservationId",
+                table: "LocationMedDevice",
+                column: "RoomReservationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MedicalDevices_SerialNumber",
                 table: "MedicalDevices",
                 column: "SerialNumber",
@@ -743,9 +818,24 @@ namespace HealthWellbeingRoom.Migrations
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RoomConsumable_RoomReservationId",
+                table: "RoomConsumable",
+                column: "RoomReservationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoomHistories_RoomId",
                 table: "RoomHistories",
                 column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomReservations_RoomId",
+                table: "RoomReservations",
+                column: "RoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RoomReservations_SpecialtyId",
+                table: "RoomReservations",
+                column: "SpecialtyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TreatmentRecord_NurseId",
@@ -761,6 +851,11 @@ namespace HealthWellbeingRoom.Migrations
                 name: "IX_TreatmentRecord_TreatmentTypeId",
                 table: "TreatmentRecord",
                 column: "TreatmentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TypeMaterialHistories_TypeMaterialID",
+                table: "TypeMaterialHistories",
+                column: "TypeMaterialID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsoConsumivel_ConsumivelID",
@@ -817,6 +912,9 @@ namespace HealthWellbeingRoom.Migrations
                 name: "Stock");
 
             migrationBuilder.DropTable(
+                name: "TypeMaterialHistories");
+
+            migrationBuilder.DropTable(
                 name: "UsoConsumivel");
 
             migrationBuilder.DropTable(
@@ -835,13 +933,13 @@ namespace HealthWellbeingRoom.Migrations
                 name: "MedicalDevices");
 
             migrationBuilder.DropTable(
+                name: "RoomReservations");
+
+            migrationBuilder.DropTable(
                 name: "TreatmentRecord");
 
             migrationBuilder.DropTable(
                 name: "Consumivel");
-
-            migrationBuilder.DropTable(
-                name: "Room");
 
             migrationBuilder.DropTable(
                 name: "CategoriaAlimento");
@@ -851,6 +949,9 @@ namespace HealthWellbeingRoom.Migrations
 
             migrationBuilder.DropTable(
                 name: "TypeMaterial");
+
+            migrationBuilder.DropTable(
+                name: "Room");
 
             migrationBuilder.DropTable(
                 name: "Nurse");
