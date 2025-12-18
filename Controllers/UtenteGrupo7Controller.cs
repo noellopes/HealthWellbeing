@@ -9,7 +9,7 @@ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization; // Necessário para [Authorize]
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
@@ -43,7 +43,6 @@ namespace HealthWellbeing.Controllers
             ViewBag.ObjetivoFisicoId = new SelectList(objetivos, "ObjetivoFisicoId", "NomeObjetivo", selectedId);
         }
 
-        // NOVO: Método para preencher dropdown de Profissionais (apenas para Admins)
         private async Task PopularProfissionaisDropDownList(object selectedId = null)
         {
             // Apenas carregamos esta lista se for Admin, para poupar recursos
@@ -152,6 +151,21 @@ namespace HealthWellbeing.Controllers
                 .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
+
+            // 1. Recolher os IDs únicos
+            var idsProfissionais = pagination.Items
+                .Where(u => !string.IsNullOrEmpty(u.ProfissionalSaudeId))
+                .Select(u => u.ProfissionalSaudeId)
+                .Distinct()
+                .ToList();
+
+            // 2. CORREÇÃO: Usa '_userManager.Users' em vez de '_context.Users'
+            var emailsDict = await _userManager.Users
+                .Where(u => idsProfissionais.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u.Email);
+
+            // 3. Passar para a View
+            ViewBag.ProfissionaisEmails = emailsDict;
 
             return View(pagination);
         }

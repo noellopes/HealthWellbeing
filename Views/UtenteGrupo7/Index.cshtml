@@ -4,6 +4,7 @@
     ViewData["Title"] = "Utentes";
     var successMessage = TempData["SuccessMessage"];
     var errorMessage = TempData["ErrorMessage"];
+    var emails = ViewBag.ProfissionaisEmails as Dictionary<string, string>;
 
     bool isAdmin = User.IsInRole("Administrador");
     bool isProf = User.IsInRole("ProfissionalSaude");
@@ -80,10 +81,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>Nome do Utente</th>
-                        @if (isAdmin)
-                        {
                             <th>ID Profissional</th>
-                        }
                         <th class="text-center" style="width: 220px;">Ações</th>
                     </tr>
                 </thead>
@@ -91,13 +89,12 @@
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            <td>@item.Nome</td>
-                            @if (isAdmin)
-                            {
+                            <td>@item.Nome</td>                         
                                 <td class="small text-muted">
-                                    @(item.ProfissionalSaudeId ?? "N/A")
+                                    @(emails != null && item.ProfissionalSaudeId != null && emails.ContainsKey(item.ProfissionalSaudeId)
+                                                            ? emails[item.ProfissionalSaudeId]
+                                                            : "N/A")
                                 </td>
-                            }
                             <td class="text-center">
                                 <a asp-action="Details" asp-route-id="@item.UtenteGrupo7Id" class="btn btn-primary btn-sm me-1" title="Ver Detalhes">
                                     <i class="fas fa-eye"></i>Ver
