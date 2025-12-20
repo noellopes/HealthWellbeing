@@ -746,5 +746,35 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(history); // envia para HistoryDetails.cshtml
         }
+        //----------------------------------------------------------ROOMRESERVATIONLIST---------------------------------------------------------------------------------
+
+        public IActionResult RoomReservationList(int id, int roomId)
+        {
+            // escolhe o id da sala (roomId tem prioridade, fallback para id)
+            var selectedRoomId = roomId != 0 ? roomId : id;
+            if (selectedRoomId == 0)
+            {
+                return BadRequest("Room id inválido.");
+            }
+
+            // busca a sala (opcional, só para mostrar o nome no topo)
+            var room = _context.Room
+                .AsNoTracking()
+                .FirstOrDefault(r => r.RoomId == selectedRoomId);
+
+            ViewBag.RoomName = room?.Name ?? $"Sala {selectedRoomId}";
+
+            // busca reservas da sala, inclui navegações e ordena por início
+            var reservations = _context.RoomReservations
+                .AsNoTracking()
+                .Include(rr => rr.Room)
+                .Include(rr => rr.Specialty)
+                .Where(rr => rr.RoomId == selectedRoomId)
+                .OrderBy(rr => rr.StartTime)
+                .ToList();
+
+            return View("RoomReservationList", reservations);
+        }
+
     }
 }

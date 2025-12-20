@@ -4,97 +4,50 @@
     ViewData["Title"] = "Nova Reserva de Sala";
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <strong>O modelo não é válido.</strong> Verifique os campos abaixo.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-    </div>
-
-    <ul class="text-danger">
-        @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors).DistinctBy(e => e.ErrorMessage))
-        {
-            <li>@modelError.ErrorMessage</li>
-        }
-    </ul>
-}
-
 <h1 class="mb-4 text-primary"><i class="bi bi-calendar-plus"></i> Criar Reserva da sala</h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <!-- Responsável -->
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
-                    <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
-                    <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
+            <div class="row g-3">
+                <!-- Row 1: ID da Consulta | Sala -->
+                <div class="col-md-6">
+                    <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
+                    <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 101" />
+                    <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
-            </div>
 
-            <!-- Sala e Especialidade -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
-                    <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId" required>
+                    <select asp-for="RoomId" class="form-select" asp-items="ViewBag.Rooms" required>
                         <option value="">Selecione a sala...</option>
                     </select>
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade(Opcional)</label>
-                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.SpecialtyId">
-                        <option value="">Sem especialidade</option>
-                    </select>
-                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
-                </div>
-            </div>
-
-            <!-- Consulta -->
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 101" />
-                    <span asp-validation-for="ConsultationId" class="text-danger small"></span>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="ConsultationType" class="form-label fw-bold">Tipo de Consulta</label>
-                    <input asp-for="ConsultationType" class="form-control" placeholder="Ex: Avaliação inicial" />
-                    <span asp-validation-for="ConsultationType" class="text-danger small"></span>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label asp-for="PatientId" class="form-label fw-bold">ID do Paciente</label>
-                    <input asp-for="PatientId" class="form-control" placeholder="Ex: 2001" />
-                    <span asp-validation-for="PatientId" class="text-danger small"></span>
-                </div>
-            </div>
-
-            <!-- Data e Hora -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="StartTime" class="form-label fw-bold">Início(**)</label>
+                <!-- Row 2: Início | Fim -->
+                <div class="col-md-6">
+                    <label asp-for="StartTime" class="form-label fw-bold">Início(*)</label>
                     <input asp-for="StartTime" type="datetime-local" class="form-control" required />
                     <span asp-validation-for="StartTime" class="text-danger small"></span>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="EndTime" class="form-label fw-bold">Fim</label>
+
+                <div class="col-md-6">
+                    <label asp-for="EndTime" class="form-label fw-bold">Fim(*)</label>
                     <input asp-for="EndTime" type="datetime-local" class="form-control" required />
                     <span asp-validation-for="EndTime" class="text-danger small"></span>
                 </div>
-            </div>
 
-            <!-- Estado e Observações -->
-            <div class="row mb-3">
+                <!-- Row 3: Responsável | Observação -->
                 <div class="col-md-6">
-                    <label asp-for="Status" class="form-label fw-bold">Estado</label>
-                    <input asp-for="Status" class="form-control" placeholder="Ex: Pendente" />
-                    <span asp-validation-for="Status" class="text-danger small"></span>
+                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
+                    <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
+                    <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
+
                 <div class="col-md-6">
                     <label asp-for="Notes" class="form-label fw-bold">Observações (Opcional)</label>
                     <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
@@ -102,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Botões -->
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
                     <i class="bi bi-check-circle me-1"></i> Criar Reserva
@@ -110,16 +62,6 @@
                 <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
                     <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
                 </a>
-            </div>
-
-            <!-- Alertas informativos -->
-            <div class="alert alert-info d-flex align-items-start mt-4" role="alert">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                <div>
-                    (*) - "Sala e responsável são obrigatórios";<br />
-                    (**) - "A data/hora de início deve ser menor que a de fim";<br />
-                    "Consultas podem estar ligadas a pacientes e especialidades específicas".
-                </div>
             </div>
         </form>
     </div>
