@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeingRoom.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeingRoom.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
@@ -22,41 +23,41 @@ namespace HealthWellbeingRoom.Controllers
         // GET: RoomReservations
         public async Task<IActionResult> Index()
         {
-            var healthWellbeingDbContext = _context.RoomReservations.Include(r => r.Room).Include(r => r.Specialty);
+            var healthWellbeingDbContext = _context.RoomReservations
+                .Include(r => r.Room)
+                .Include(r => r.Specialty);
             return View(await healthWellbeingDbContext.ToListAsync());
         }
 
         // GET: RoomReservations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var roomReservation = await _context.RoomReservations
                 .Include(r => r.Room)
                 .Include(r => r.Specialty)
                 .FirstOrDefaultAsync(m => m.RoomReservationId == id);
-            if (roomReservation == null)
-            {
-                return NotFound();
-            }
+
+            if (roomReservation == null) return NotFound();
 
             return View(roomReservation);
         }
 
         // GET: RoomReservations/Create
-        public IActionResult Create()
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Create(int? roomId)
         {
-            ViewData["RoomId"] = new SelectList(_context.Room, "RoomId", "Name");
-            ViewData["SpecialtyId"] = new SelectList(_context.Specialty, "SpecialtyId", "SpecialtyId");
-            return View();
+            await PreencherDropdowns(roomId, null);
+            var model = new RoomReservation();
+            if (roomId.HasValue) model.RoomId = roomId.Value;
+            return View(model);
         }
 
         // POST: RoomReservations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
         {
             if (ModelState.IsValid)
@@ -65,34 +66,55 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Room, "RoomId", "Name", roomReservation.RoomId);
-            ViewData["SpecialtyId"] = new SelectList(_context.Specialty, "SpecialtyId", "SpecialtyId", roomReservation.SpecialtyId);
+
+            // Se houver erro, repopula os dropdowns antes de retornar a view
+            await PreencherDropdowns(roomReservation.RoomId, roomReservation.SpecialtyId);
             return View(roomReservation);
+        }
+
+        // Método auxiliar para popular os SelectList usados nas views
+        private async Task PreencherDropdowns(int? selectedRoomId = null, int? selectedSpecialityId = null)
+        {
+            var rooms = await _context.Room
+                .AsNoTracking()
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            var specialities = await _context.Specialty
+                .AsNoTracking()
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+
+            // SelectList para salas (value = RoomId, text = Name)
+            var roomsSelect = new SelectList(rooms, "RoomId", "Name", selectedRoomId);
+            ViewData["RoomId"] = roomsSelect;
+            ViewBag.Rooms = roomsSelect; // compatibilidade com a view que usa ViewBag.Rooms
+
+            // SelectList para especialidades (value = SpecialityId, text = Name)
+            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", selectedSpecialityId);
+            ViewData["SpecialtyId"] = specialitySelect; // compatibilidade com variações de nome
+            ViewBag.RoomSpecialty = specialitySelect;    // compatibilidade com a view que usa ViewBag.RoomSpecialty
         }
 
         // GET: RoomReservations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var roomReservation = await _context.RoomReservations
-                .Include(r => r.Room)        // 🔹 carrega a sala associada
-                .Include(r => r.Specialty)   // 🔹 carrega a especialidade associada
+                .Include(r => r.Room)
+                .Include(r => r.Specialty)
                 .FirstOrDefaultAsync(r => r.RoomReservationId == id);
 
-            if (roomReservation == null)
-            {
-                return NotFound();
-            }
+            if (roomReservation == null) return NotFound();
 
-            // Dropdown de salas mostrando o Nome
-            ViewData["RoomId"] = new SelectList(_context.Room, "RoomId", "Name", roomReservation.RoomId);
+            var rooms = await _context.Room.OrderBy(r => r.Name).ToListAsync();
+            var specialities = await _context.Specialty.OrderBy(s => s.Name).ToListAsync();
 
-            // Dropdown de especialidades mostrando o Nome
-            ViewData["SpecialtyId"] = new SelectList(_context.Specialty, "SpecialtyId", "Name", roomReservation.SpecialtyId);
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", roomReservation.RoomId);
+            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", roomReservation.SpecialtyId);
+            ViewData["SpecialityId"] = specialitySelect;
+            ViewData["SpecialtyId"] = specialitySelect;
 
             return View(roomReservation);
         }
@@ -102,10 +124,7 @@ namespace HealthWellbeingRoom.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
         {
-            if (id != roomReservation.RoomReservationId)
-            {
-                return NotFound();
-            }
+            if (id != roomReservation.RoomReservationId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -116,38 +135,35 @@ namespace HealthWellbeingRoom.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoomReservationExists(roomReservation.RoomReservationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!RoomReservationExists(roomReservation.RoomReservationId)) return NotFound();
+                    throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoomId"] = new SelectList(_context.Room, "RoomId", "Name", roomReservation.RoomId);
-            ViewData["SpecialtyId"] = new SelectList(_context.Specialty, "SpecialtyId", "SpecialtyId", roomReservation.SpecialtyId);
+
+            // repopula selects em caso de erro
+            var rooms = await _context.Room.OrderBy(r => r.Name).ToListAsync();
+            var specialities = await _context.Specialty.OrderBy(s => s.Name).ToListAsync();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", roomReservation.RoomId);
+            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", roomReservation.SpecialtyId);
+            ViewData["SpecialityId"] = specialitySelect;
+            ViewData["SpecialtyId"] = specialitySelect;
+
             return View(roomReservation);
         }
 
         // GET: RoomReservations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var roomReservation = await _context.RoomReservations
                 .Include(r => r.Room)
                 .Include(r => r.Specialty)
                 .FirstOrDefaultAsync(m => m.RoomReservationId == id);
-            if (roomReservation == null)
-            {
-                return NotFound();
-            }
+
+            if (roomReservation == null) return NotFound();
 
             return View(roomReservation);
         }
@@ -161,9 +177,8 @@ namespace HealthWellbeingRoom.Controllers
             if (roomReservation != null)
             {
                 _context.RoomReservations.Remove(roomReservation);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
