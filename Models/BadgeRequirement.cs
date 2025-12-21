@@ -26,11 +26,11 @@ namespace HealthWellbeing.Models {
         public RequirementType RequirementType { get; set; }
 
         [Display(Name = "Event Type")]
-        public int EventTypeId { get; set; }
+        public int? EventTypeId { get; set; }
         public virtual EventType? EventTypes { get; set; }
 
         [Display(Name = "Activity Type")]
-        public int ActivityTypeId { get; set; }
+        public int? ActivityTypeId { get; set; }
         public virtual ActivityType? ActivityTypes { get; set; }
     }
 }

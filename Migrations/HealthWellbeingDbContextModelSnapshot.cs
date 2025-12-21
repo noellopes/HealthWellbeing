@@ -196,6 +196,101 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Alimento");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Badge", b =>
+                {
+                    b.Property<int>("BadgeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BadgeId"));
+
+                    b.Property<string>("BadgeDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("BadgeName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("BadgeTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RewardPoints")
+                        .HasColumnType("int");
+
+                    b.HasKey("BadgeId");
+
+                    b.HasIndex("BadgeTypeId");
+
+                    b.ToTable("Badge");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.BadgeRequirement", b =>
+                {
+                    b.Property<int>("BadgeRequirementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BadgeRequirementId"));
+
+                    b.Property<int?>("ActivityTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BadgeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BadgeRequirementName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("EventTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RequirementDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<int>("RequirementType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetValue")
+                        .HasColumnType("int");
+
+                    b.HasKey("BadgeRequirementId");
+
+                    b.HasIndex("ActivityTypeId");
+
+                    b.HasIndex("BadgeId");
+
+                    b.HasIndex("EventTypeId");
+
+                    b.ToTable("BadgeRequirement");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.BadgeType", b =>
+                {
+                    b.Property<int>("BadgeTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BadgeTypeId"));
+
+                    b.Property<string>("BadgeTypeDescription")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("BadgeTypeName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("BadgeTypeId");
+
+                    b.ToTable("BadgeType");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Beneficio", b =>
                 {
                     b.Property<int>("BeneficioId")
@@ -325,6 +420,24 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("LevelId");
 
                     b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerBadge", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BadgeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateAwarded")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CustomerId", "BadgeId");
+
+                    b.HasIndex("BadgeId");
+
+                    b.ToTable("CustomerBadge");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Employee", b =>
@@ -1052,6 +1165,40 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Categoria");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Badge", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.BadgeType", "BadgeType")
+                        .WithMany("Badges")
+                        .HasForeignKey("BadgeTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("BadgeType");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.BadgeRequirement", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.ActivityType", "ActivityTypes")
+                        .WithMany()
+                        .HasForeignKey("ActivityTypeId");
+
+                    b.HasOne("HealthWellbeing.Models.Badge", "Badge")
+                        .WithMany("BadgeRequirements")
+                        .HasForeignKey("BadgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.EventType", "EventTypes")
+                        .WithMany("BadgeRequirements")
+                        .HasForeignKey("EventTypeId");
+
+                    b.Navigation("ActivityTypes");
+
+                    b.Navigation("Badge");
+
+                    b.Navigation("EventTypes");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Customer", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Level", "Level")
@@ -1061,6 +1208,25 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("Level");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerBadge", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Badge", "Badge")
+                        .WithMany("CustomerBadges")
+                        .HasForeignKey("BadgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Customer", "Customer")
+                        .WithMany("CustomerBadges")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Badge");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
@@ -1196,9 +1362,26 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("AlergiasRelacionadas");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Badge", b =>
+                {
+                    b.Navigation("BadgeRequirements");
+
+                    b.Navigation("CustomerBadges");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.BadgeType", b =>
+                {
+                    b.Navigation("Badges");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
                     b.Navigation("Membership");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Customer", b =>
+                {
+                    b.Navigation("CustomerBadges");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
@@ -1208,6 +1391,8 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
                 {
+                    b.Navigation("BadgeRequirements");
+
                     b.Navigation("Events");
                 });
 

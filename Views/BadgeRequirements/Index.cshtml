@@ -1,0 +1,262 @@
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.BadgeRequirement>
+
+@{
+    ViewData["Title"] = "Badge Requirements";
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@* --- FEEDBACK MESSAGES --- *@
+@if (successMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+@if (errorMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@* --- EMPTY STATE --- *@
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && ViewBag.SearchType == null && ViewBag.SearchTargetValue == null && string.IsNullOrEmpty(Context.Request.Query["searchBadgeId"])) {
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">No Requirements Found</h4>
+            <p>No badge requirements are currently defined.</p>
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Create New Requirement
+    </a>
+}
+else {
+    @* --- HEADER & SEARCH TOGGLE --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 text-secondary">Overview</h2>
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-primary shadow-sm" data-bs-toggle="collapse" data-bs-target="#reqSearch" aria-expanded="false" aria-controls="reqSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Create New
+            </a>
+        </div>
+    </div>
+
+    @* --- SEARCH FORM --- *@
+    <div class="collapse mt-2 mb-4" id="reqSearch">
+        <div class="card card-body border-0 shadow-sm rounded-4 bg-light">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+                @* --- LINHA 1 --- *@
+                <div class="col-md-6">
+                    <label for="searchName" class="form-label fw-bold small text-muted">Requirement Name</label>
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search name..." type="search" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="searchBadgeId" class="form-label fw-bold small text-muted">Associated Badge</label>
+                    <select id="searchBadgeId" name="searchBadgeId" class="form-select bg-white" asp-items="ViewBag.Badges">
+                        <option value="">-- All Badges --</option>
+                    </select>
+                </div>
+
+                @* --- LINHA 2 --- *@
+                <div class="col-md-5">
+                    <label for="searchType" class="form-label fw-bold small text-muted">Requirement Type</label>
+                    @* Agora usa direto o ViewBag do Controller que já traz o selecionado *@
+                    <select id="searchType" name="searchType" class="form-select bg-white" asp-items="ViewBag.SearchTypes">
+                        <option value="">-- All Types --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="searchTargetValue" class="form-label fw-bold small text-muted">Target Value</label>
+                    <input type="number" id="searchTargetValue" name="searchTargetValue" class="form-control" placeholder="e.g. 10" min="1"
+                           value="@ViewBag.SearchTargetValue" />
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                        <i class="bi bi-search me-1"></i> Apply
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary w-100 shadow-sm text-decoration-none">
+                        <i class="bi bi-x-lg me-1"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* --- NO RESULTS --- *@
+    @if (!Model.Items.Any()) {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found for your search criteria.</h5>
+            </div>
+        </div>
+    }
+    else {
+        @* --- DATA TABLE --- *@
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%;">Requirement Name</th>
+                        <th style="width: 20%;">Associated Badge</th>
+                        <th style="width: 25%;">Requirement Type</th>
+                        <th style="width: 10%;" class="text-center">Target Value</th>
+                        <th style="width: 20%;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items) {
+                        <tr>
+                            @* 1. Requirement Name *@
+                            <td>
+                                <div class="fw-bold text-dark">@item.BadgeRequirementName</div>
+                            </td>
+
+                            @* 2. Associated Badge *@
+                            <td>
+                                <span class="fw-bold text-dark">
+                                    <i class="bi bi-trophy-fill me-1 text-secondary"></i> @Html.DisplayFor(modelItem => item.Badge.BadgeName)
+                                </span>
+                            </td>
+
+                            @* 3. Requirement Type (DESIGN NOVO: Leve vs Sólido) *@
+                            <td>
+                                @{
+                                    string badgeClass = "";
+                                    string iconClass = "";
+                                    string textDisplay = "";
+                                    string subText = "";
+
+                                    switch (item.RequirementType) {
+                                        // --- AZUL (EVENTOS) ---
+                                        case RequirementType.ParticipateAnyEvent:
+                                            // Leve
+                                            badgeClass = "bg-primary bg-opacity-10 text-primary border border-primary border-opacity-50";
+                                            iconClass = "bi-calendar-range";
+                                            textDisplay = "Any Event";
+                                            subText = "Global Counter";
+                                            break;
+
+                                        case RequirementType.ParticipateSpecificEventType:
+                                            // Sólido
+                                            badgeClass = "bg-primary text-white shadow-sm";
+                                            iconClass = "bi-calendar-check";
+                                            textDisplay = item.EventTypes?.EventTypeName ?? "Unknown Event";
+                                            subText = "Specific Event";
+                                            break;
+
+                                        // --- VERDE (ATIVIDADES) ---
+                                        case RequirementType.CompleteAnyActivity:
+                                            // Leve
+                                            badgeClass = "bg-success bg-opacity-10 text-success border border-success border-opacity-50";
+                                            iconClass = "bi-activity";
+                                            textDisplay = "Any Activity";
+                                            subText = "Global Counter";
+                                            break;
+
+                                        case RequirementType.CompleteSpecificActivityType:
+                                            // Sólido
+                                            badgeClass = "bg-success text-white shadow-sm";
+                                            iconClass = "bi-clipboard-check";
+                                            textDisplay = item.ActivityTypes?.Name ?? "Unknown Activity";
+                                            subText = "Specific Activity";
+                                            break;
+                                    }
+                                }
+                                <div class="d-flex flex-column align-items-start">
+                                    <span class="badge @badgeClass d-inline-flex align-items-center py-2 px-3 rounded-3 mb-1"
+                                          style="font-size: 0.85rem; font-weight: 600;">
+                                        <i class="bi @iconClass me-2"></i> @textDisplay
+                                    </span>
+                                    <small class="text-muted ms-1" style="font-size: 0.75rem;">@subText</small>
+                                </div>
+                            </td>
+
+                            @* 4. Target Value *@
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center">
+                                    <span class="d-flex align-items-center justify-content-center bg-secondary bg-opacity-10 text-dark fw-bold rounded-circle border border-secondary border-opacity-25"
+                                          style="width: 40px; height: 40px;">
+                                        @item.TargetValue
+                                    </span>
+                                </div>
+                            </td>
+
+                            @* 5. Actions *@
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@item.BadgeRequirementId" class="btn btn-sm btn-warning me-1 shadow-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.BadgeRequirementId" class="btn btn-sm btn-info me-1 shadow-sm">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.BadgeRequirementId" class="btn btn-sm btn-danger shadow-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @* --- PAGINATION FOOTER --- *@
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 border-top">
+                <div class="small text-muted">
+                    Showing @Model.FirstItemOnPage - @Model.LastItemOnPage of @Model.TotalItems
+                </div>
+
+                <nav aria-label="Badge Requirements page">
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchBadgeId="@Context.Request.Query["searchBadgeId"]"
+                               asp-route-searchType="@ViewBag.SearchType"
+                               asp-route-searchTargetValue="@ViewBag.SearchTargetValue">First</a>
+                        </li>
+
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchName="@ViewBag.SearchName"
+                                   asp-route-searchBadgeId="@Context.Request.Query["searchBadgeId"]"
+                                   asp-route-searchType="@ViewBag.SearchType"
+                                   asp-route-searchTargetValue="@ViewBag.SearchTargetValue">@p</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchBadgeId="@Context.Request.Query["searchBadgeId"]"
+                               asp-route-searchType="@ViewBag.SearchType"
+                               asp-route-searchTargetValue="@ViewBag.SearchTargetValue">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    }
+}

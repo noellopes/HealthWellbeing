@@ -1,0 +1,211 @@
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.BadgeRequirement
+
+@{
+    ViewData["Title"] = "Create Requirement";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            @* --- HEADER (Estilo Verde/Success para Criação) --- *@
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-success text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-plus-lg fs-4 text-success-emphasis"></i>
+                </div>
+                <div>
+                    <h2 class="h4 mb-0 fw-bold text-dark">Create Requirement</h2>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-success">
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-action="Create" id="createRequirementForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        @* --- 1. CONTEXTO --- *@
+                        <div class="mb-5">
+                            <label asp-for="BadgeId" class="form-label fw-bold text-uppercase small text-muted">Associated Badge</label>
+                            <div class="input-group">
+                                <select asp-for="BadgeId" class="form-select bg-light" asp-items="ViewBag.BadgeId">
+                                    <option value="">-- Select Badge --</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="BadgeId" class="text-danger small"></span>
+                        </div>
+
+                        @* --- 2. LOGIC TYPE --- *@
+                        <div class="mb-4">
+                            <label class="form-label fw-bold mb-3 text-uppercase small text-muted">Requirement Type</label>
+
+                            <div class="row g-3">
+                                @* COLUNA A: GENÉRICOS *@
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3 bg-light border h-100">
+                                        <small class="d-block text-uppercase text-muted fw-bold mb-3" style="font-size: 0.7rem;">General Type</small>
+
+                                        <div class="d-grid gap-2">
+                                            @* Opção 1: Qualquer Evento *@
+                                            <input type="radio" class="btn-check" name="RequirementType" id="type1" value="1" 
+                                                   onchange="toggleDynamicFields()" autocomplete="off"
+                                                   @(Model != null && (int)Model.RequirementType == 1 ? "checked" : "")>
+                                            <label class="btn btn-outline-secondary text-start p-3 border-secondary border-opacity-25" for="type1">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-calendar-range fs-4 me-3"></i>
+                                                    <span class="fw-bold">Any Event</span>
+                                                </div>
+                                            </label>
+
+                                            @* Opção 3: Qualquer Atividade *@
+                                            <input type="radio" class="btn-check" name="RequirementType" id="type3" value="3" 
+                                                   onchange="toggleDynamicFields()" autocomplete="off"
+                                                   @(Model != null && (int)Model.RequirementType == 3 ? "checked" : "")>
+                                            <label class="btn btn-outline-secondary text-start p-3 border-secondary border-opacity-25" for="type3">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-activity fs-4 me-3"></i>
+                                                    <span class="fw-bold">Any Activity</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @* COLUNA B: ESPECÍFICOS *@
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3 bg-white border h-100">
+                                        <small class="d-block text-uppercase text-primary fw-bold mb-3" style="font-size: 0.7rem;">Specific Type</small>
+
+                                        <div class="d-grid gap-2">
+                                            @* Opção 2: Evento Específico *@
+                                            <input type="radio" class="btn-check" name="RequirementType" id="type2" value="2" 
+                                                   onchange="toggleDynamicFields()" autocomplete="off"
+                                                   @(Model != null && (int)Model.RequirementType == 2 ? "checked" : "")>
+                                            <label class="btn btn-outline-primary text-start p-3 border-primary border-opacity-25 d-flex align-items-center justify-content-between" for="type2">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-calendar-check fs-4 me-3"></i>
+                                                    <span class="fw-bold">Specific Event</span>
+                                                </div>
+                                                <i class="bi bi-chevron-down small"></i>
+                                            </label>
+
+                                            @* Opção 4: Atividade Específica *@
+                                            <input type="radio" class="btn-check" name="RequirementType" id="type4" value="4" 
+                                                   onchange="toggleDynamicFields()" autocomplete="off"
+                                                   @(Model != null && (int)Model.RequirementType == 4 ? "checked" : "")>
+                                            <label class="btn btn-outline-success text-start p-3 border-success border-opacity-25 d-flex align-items-center justify-content-between" for="type4">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-clipboard-check fs-4 me-3"></i>
+                                                    <span class="fw-bold">Specific Activity</span>
+                                                </div>
+                                                <i class="bi bi-chevron-down small"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="RequirementType" class="text-danger small mt-1"></span>
+                        </div>
+
+                        @* --- 3. DROPDOWNS DINÂMICAS --- *@
+
+                        <div id="eventTypeSection" class="mb-4 d-none animate__animated animate__fadeIn">
+                            <div class="p-4 bg-white border border-primary border-opacity-25 rounded-3 shadow-sm">
+                                <label asp-for="EventTypeId" class="form-label fw-bold text-primary">Which Event Type is required?</label>
+                            
+                                <select asp-for="EventTypeId" class="form-select border-primary" style="background-color: #ffffff; color: #000000;" asp-items="ViewBag.EventTypeId">
+                                    <option value="">-- Choose Event --</option>
+                                </select>
+
+                                <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div id="activityTypeSection" class="mb-4 d-none animate__animated animate__fadeIn">
+                            <div class="p-4 bg-white border border-success border-opacity-25 rounded-3 shadow-sm">
+                                <label asp-for="ActivityTypeId" class="form-label fw-bold text-success">Which Activity Type is required?</label>
+   
+                                <select asp-for="ActivityTypeId" class="form-select border-success" style="background-color: #ffffff; color: #000000;" asp-items="ViewBag.ActivityTypeId">
+                                    <option value="">-- Choose Activity --</option>
+                                </select>
+
+                                <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        @* --- 4. DETALHES --- *@
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label asp-for="BadgeRequirementName" class="form-label fw-bold text-uppercase small text-muted">Name</label>
+                                <input asp-for="BadgeRequirementName" class="form-control" placeholder="e.g., Morning Run Routine" />
+                                <span asp-validation-for="BadgeRequirementName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="TargetValue" class="form-label fw-bold text-uppercase small text-muted">Target Value</label>
+                                <div class="input-group">
+                                    <input asp-for="TargetValue" class="form-control" type="number" min="1" value="1" />
+                                    <span class="input-group-text bg-light">Times</span>
+                                </div>
+                                <span asp-validation-for="TargetValue" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RequirementDescription" class="form-label fw-bold text-uppercase small text-muted">Description</label>
+                            <textarea asp-for="RequirementDescription" class="form-control" rows="3" placeholder="Briefly describe what the user needs to do..."></textarea>
+                            <span asp-validation-for="RequirementDescription" class="text-danger small"></span>
+                        </div>
+
+                        @* --- BOTÕES DE AÇÃO --- *@
+                        <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Back to List</a>
+                            <button type="submit" class="btn btn-success px-4 shadow-sm">Create Requirement</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Verifica o estado inicial (caso haja erro de validação e a página recarregue com dados)
+            toggleDynamicFields();
+        });
+
+        function toggleDynamicFields() {
+            var selectedRadio = document.querySelector('input[name="RequirementType"]:checked');
+            var selectedValue = selectedRadio ? parseInt(selectedRadio.value) : 0;
+
+            var eventSection = document.getElementById("eventTypeSection");
+            var activitySection = document.getElementById("activityTypeSection");
+
+            eventSection.classList.add("d-none");
+            activitySection.classList.add("d-none");
+
+            if (selectedValue === 2) {
+                eventSection.classList.remove("d-none");
+            }
+            else if (selectedValue === 4) {
+                activitySection.classList.remove("d-none");
+            }
+        }
+    </script>
+}

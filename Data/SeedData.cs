@@ -24,24 +24,21 @@ namespace HealthWellbeing.Data
             PopulateTraining(dbContext, trainers);
 
             PopulateScoringStrategies(dbContext);
-            PopulateEventTypes(dbContext); // Este tem de vir antes de Events
-
-            // --- ALTERAÇÃO AQUI: MOVER ESTES DOIS PARA CIMA ---
-            PopulateActivityTypes(dbContext); // Necessário para os Events
-            PopulateActivities(dbContext);    // Opcional, mas boa prática manter junto
-                                              // --------------------------------------------------
-
-            // Agora sim, pode criar os eventos porque os ActivityTypes já existem
+            PopulateEventTypes(dbContext);
+            PopulateBadgeTypes(dbContext);
+            PopulateActivityTypes(dbContext); 
+            PopulateActivities(dbContext);   
+            PopulateBadges(dbContext);
             PopulateEvents(dbContext);
-
             PopulateLevelCategories(dbContext);
             PopulateLevels(dbContext);
 
             PopulateEmployees(dbContext);
             PopulateCustomers(dbContext);
 
-            // PopulateEventActivities usa Events e Activities, por isso fica no fim
+
             PopulateEventActivities(dbContext);
+            PopulateBadgeRequirements(dbContext);
         }
 
 
@@ -994,6 +991,155 @@ namespace HealthWellbeing.Data
                     }
                 });
 
+                dbContext.SaveChanges();
+            }
+        }
+        private static void PopulateBadgeTypes(HealthWellbeingDbContext dbContext) {
+            // Se já existirem dados, não faz nada para evitar duplicados
+            if (dbContext.BadgeType.Any()) return;
+
+            dbContext.BadgeType.AddRange(new List<BadgeType>
+            {
+                // --- 1. Os Originais (Mantidos para compatibilidade com PopulateBadges) ---
+                new BadgeType { BadgeTypeName = "Consistência", BadgeTypeDescription = "Premiar a regularidade e criação de hábitos saudáveis." },
+                new BadgeType { BadgeTypeName = "Evento", BadgeTypeDescription = "Participação em eventos especiais do ginásio." },
+                new BadgeType { BadgeTypeName = "Performance", BadgeTypeDescription = "Atingir marcos de superação física." },
+                new BadgeType { BadgeTypeName = "Social", BadgeTypeDescription = "Interação e espírito de comunidade." },
+
+                // --- 2. Categorias de Treino Específico ---
+                new BadgeType { BadgeTypeName = "Força", BadgeTypeDescription = "Conquistas relacionadas com musculação, powerlifting e ganhos de força." },
+                new BadgeType { BadgeTypeName = "Cardio", BadgeTypeDescription = "Distinções para atividades de resistência cardiovascular (corrida, ciclismo, natação)." },
+                new BadgeType { BadgeTypeName = "Flexibilidade", BadgeTypeDescription = "Evolução em Yoga, Pilates e mobilidade geral." },
+                new BadgeType { BadgeTypeName = "Alta Intensidade", BadgeTypeDescription = "Domínio de treinos HIIT e Crossfit." },
+
+                // --- 3. Bem-Estar e Saúde Mental ---
+                new BadgeType { BadgeTypeName = "Mindfulness", BadgeTypeDescription = "Foco na saúde mental, meditação e gestão de stress." },
+                new BadgeType { BadgeTypeName = "Nutrição", BadgeTypeDescription = "Hábitos alimentares saudáveis, cozinha e escolhas inteligentes." },
+                new BadgeType { BadgeTypeName = "Hidratação", BadgeTypeDescription = "Foco exclusivo na ingestão correta de líquidos." },
+                new BadgeType { BadgeTypeName = "Sono & Recuperação", BadgeTypeDescription = "Qualidade do descanso e práticas de recuperação ativa." },
+
+                // --- 4. Gamification & Lifestyle ---
+                new BadgeType { BadgeTypeName = "Desafio", BadgeTypeDescription = "Conclusão de desafios temporários lançados pela plataforma." },
+                new BadgeType { BadgeTypeName = "Fidelidade", BadgeTypeDescription = "Recompensas por tempo de permanência e antiguidade no clube." },
+                new BadgeType { BadgeTypeName = "Iniciação", BadgeTypeDescription = "Passos iniciais para novos membros se ambientarem." },
+                new BadgeType { BadgeTypeName = "Exploração", BadgeTypeDescription = "Experimentar novas modalidades e sair da zona de conforto." },
+
+                // --- 5. Horários e Hábitos ---
+                new BadgeType { BadgeTypeName = "Madrugador", BadgeTypeDescription = "Para quem treina consistentemente nas primeiras horas do dia." },
+                new BadgeType { BadgeTypeName = "Notívago", BadgeTypeDescription = "Para quem prefere treinar ao final do dia ou noite." },
+                new BadgeType { BadgeTypeName = "Fim de Semana", BadgeTypeDescription = "Atividade física mantida aos sábados e domingos." },
+                new BadgeType { BadgeTypeName = "Ao Ar Livre", BadgeTypeDescription = "Conexão com a natureza, trilhos e desporto outdoor." }
+            });
+
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateBadges(HealthWellbeingDbContext dbContext) {
+            if (dbContext.Badge.Any()) return;
+
+            // 1. Buscar os IDs dos Pais (BadgeTypes) que acabámos de criar
+            var tConsistencia = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Consistência");
+            var tEvento = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Evento");
+            var tPerformance = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Performance");
+
+            // Safety Check: Se não encontrou os tipos, não pode criar badges
+            if (tConsistencia == null || tEvento == null || tPerformance == null) return;
+
+            dbContext.Badge.AddRange(new List<Badge>
+            {
+        // Badges de Consistência
+        new Badge {
+            BadgeName = "Rato de Ginásio",
+            BadgeDescription = "Participar ativamente na vida do clube.",
+            RewardPoints = 500,
+            BadgeTypeId = tConsistencia.BadgeTypeId
+        },
+        new Badge {
+            BadgeName = "Hidratação Mestra",
+            BadgeDescription = "Criar o hábito diário de beber água.",
+            RewardPoints = 300,
+            BadgeTypeId = tConsistencia.BadgeTypeId
+        },
+
+        // Badges de Evento
+        new Badge {
+            BadgeName = "Maratonista",
+            BadgeDescription = "Completar a grande prova de resistência.",
+            RewardPoints = 1000,
+            BadgeTypeId = tEvento.BadgeTypeId
+        },
+        new Badge {
+            BadgeName = "Yogi Master",
+            BadgeDescription = "Dedicação total à mente e corpo.",
+            RewardPoints = 600,
+            BadgeTypeId = tEvento.BadgeTypeId
+        },
+
+        // Badges de Performance
+        new Badge {
+            BadgeName = "Monstro do Cardio",
+            BadgeDescription = "Acumular quilómetros de corrida.",
+            RewardPoints = 800,
+            BadgeTypeId = tPerformance.BadgeTypeId
+        }
+    });
+
+            dbContext.SaveChanges();
+        }
+
+        private static void PopulateBadgeRequirements(HealthWellbeingDbContext dbContext) {
+            if (dbContext.BadgeRequirement.Any()) return;
+
+            // 1. Carregar referências para não termos NullReferenceExceptions
+            var bRato = dbContext.Badge.FirstOrDefault(b => b.BadgeName == "Rato de Ginásio");
+            var bHidra = dbContext.Badge.FirstOrDefault(b => b.BadgeName == "Hidratação Mestra");
+            var bMara = dbContext.Badge.FirstOrDefault(b => b.BadgeName == "Maratonista");
+            var bYogi = dbContext.Badge.FirstOrDefault(b => b.BadgeName == "Yogi Master");
+            var bCardio = dbContext.Badge.FirstOrDefault(b => b.BadgeName == "Monstro do Cardio");
+
+            var etYoga = dbContext.EventType.FirstOrDefault(e => e.EventTypeName == "Yoga Morning Flow");
+            var etMaratona = dbContext.EventType.FirstOrDefault(e => e.EventTypeName == "Maratona");
+            var etMeia = dbContext.EventType.FirstOrDefault(e => e.EventTypeName == "Meia Maratona");
+            var etZumba = dbContext.EventType.FirstOrDefault(e => e.EventTypeName == "Zumba Dance");
+            var etSpinning = dbContext.EventType.FirstOrDefault(e => e.EventTypeName == "Spinning / Cycling");
+
+            var atHabito = dbContext.ActivityType.FirstOrDefault(a => a.Name == "Hábito Diário");
+            var atTreino = dbContext.ActivityType.FirstOrDefault(a => a.Name == "Treino");
+            var atMind = dbContext.ActivityType.FirstOrDefault(a => a.Name == "Mindfulness");
+
+            // Validação de segurança básica
+            if (bRato == null || bHidra == null || bMara == null || bYogi == null || bCardio == null) return;
+
+            var requirements = new List<BadgeRequirement>
+            {
+                // --- RATO DE GINÁSIO (Consistência Geral) ---
+                new BadgeRequirement { BadgeId = bRato.BadgeId, BadgeRequirementName = "Presença Assídua", RequirementDescription = "Participar em qualquer evento do ginásio.", TargetValue = 20, RequirementType = RequirementType.ParticipateAnyEvent },
+                new BadgeRequirement { BadgeId = bRato.BadgeId, BadgeRequirementName = "Rei da Pista", RequirementDescription = "Participar nas aulas de Zumba.", TargetValue = 5, RequirementType = RequirementType.ParticipateSpecificEventType, EventTypeId = etZumba?.EventTypeId },
+                new BadgeRequirement { BadgeId = bRato.BadgeId, BadgeRequirementName = "Ativo e Saudável", RequirementDescription = "Completar qualquer tipo de atividade registada.", TargetValue = 50, RequirementType = RequirementType.CompleteAnyActivity },
+
+                // --- HIDRATAÇÃO MESTRA (Foco em Hábito) ---
+                new BadgeRequirement { BadgeId = bHidra.BadgeId, BadgeRequirementName = "Rotina de Água", RequirementDescription = "Registar atividades de Hábito Diário (ex: Beber Água).", TargetValue = 30, RequirementType = RequirementType.CompleteSpecificActivityType, ActivityTypeId = atHabito?.ActivityTypeId },
+                new BadgeRequirement { BadgeId = bHidra.BadgeId, BadgeRequirementName = "Persistência Hídrica", RequirementDescription = "Manter o registo de atividades por 60 vezes.", TargetValue = 60, RequirementType = RequirementType.CompleteAnyActivity },
+                new BadgeRequirement { BadgeId = bHidra.BadgeId, BadgeRequirementName = "Participação em Workshops", RequirementDescription = "Ir a qualquer evento para aprender mais.", TargetValue = 3, RequirementType = RequirementType.ParticipateAnyEvent },
+
+                // --- MARATONISTA (Foco em Eventos Específicos) ---
+                new BadgeRequirement { BadgeId = bMara.BadgeId, BadgeRequirementName = "A Grande Prova", RequirementDescription = "Completar a Maratona oficial.", TargetValue = 1, RequirementType = RequirementType.ParticipateSpecificEventType, EventTypeId = etMaratona?.EventTypeId },
+                new BadgeRequirement { BadgeId = bMara.BadgeId, BadgeRequirementName = "Preparação Meia Distância", RequirementDescription = "Completar a Meia Maratona.", TargetValue = 2, RequirementType = RequirementType.ParticipateSpecificEventType, EventTypeId = etMeia?.EventTypeId },
+                new BadgeRequirement { BadgeId = bMara.BadgeId, BadgeRequirementName = "Volume de Treino", RequirementDescription = "Registar 100 atividades de treino.", TargetValue = 100, RequirementType = RequirementType.CompleteSpecificActivityType, ActivityTypeId = atTreino?.ActivityTypeId },
+
+                // --- YOGI MASTER (Mente e Corpo) ---
+                new BadgeRequirement { BadgeId = bYogi.BadgeId, BadgeRequirementName = "Manhãs Zen", RequirementDescription = "Participar nas aulas de Yoga Morning Flow.", TargetValue = 10, RequirementType = RequirementType.ParticipateSpecificEventType, EventTypeId = etYoga?.EventTypeId },
+                new BadgeRequirement { BadgeId = bYogi.BadgeId, BadgeRequirementName = "Mente Sã", RequirementDescription = "Realizar atividades de Mindfulness.", TargetValue = 20, RequirementType = RequirementType.CompleteSpecificActivityType, ActivityTypeId = atMind?.ActivityTypeId },
+                new BadgeRequirement { BadgeId = bYogi.BadgeId, BadgeRequirementName = "Espírito de Grupo", RequirementDescription = "Participar num total de 15 eventos quaisquer.", TargetValue = 15, RequirementType = RequirementType.ParticipateAnyEvent },
+
+                // --- MONSTRO DO CARDIO (Intensidade) ---
+                new BadgeRequirement { BadgeId = bCardio.BadgeId, BadgeRequirementName = "Rei do Pedal", RequirementDescription = "Aulas de Spinning intensas.", TargetValue = 15, RequirementType = RequirementType.ParticipateSpecificEventType, EventTypeId = etSpinning?.EventTypeId },
+                new BadgeRequirement { BadgeId = bCardio.BadgeId, BadgeRequirementName = "Máquina de Treino", RequirementDescription = "Registar qualquer atividade de treino físico.", TargetValue = 50, RequirementType = RequirementType.CompleteSpecificActivityType, ActivityTypeId = atTreino?.ActivityTypeId },
+                new BadgeRequirement { BadgeId = bCardio.BadgeId, BadgeRequirementName = "Dedicação Total", RequirementDescription = "Completar 200 atividades no total.", TargetValue = 200, RequirementType = RequirementType.CompleteAnyActivity }
+            };
+
+            if (requirements.Any()) {
+                dbContext.BadgeRequirement.AddRange(requirements);
                 dbContext.SaveChanges();
             }
         }

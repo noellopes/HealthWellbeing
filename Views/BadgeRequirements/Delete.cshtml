@@ -1,0 +1,182 @@
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.BadgeRequirement
+
+@{
+    ViewData["Title"] = "Delete Requirement";
+
+    // --- LÓGICA VISUAL (Igual ao Details, para manter consistência) ---
+    string logicBorderClass = "border-secondary";
+    string logicBgClass = "bg-secondary";
+    string logicTextClass = "text-secondary";
+    string logicIcon = "bi-gear";
+    string typeLabel = "Generic Rule";
+    string specificTargetName = null;
+
+    switch (Model.RequirementType) {
+        case RequirementType.ParticipateAnyEvent:
+            logicBorderClass = "border-secondary";
+            logicBgClass = "bg-secondary";
+            logicTextClass = "text-secondary";
+            logicIcon = "bi-calendar-range";
+            typeLabel = "Any Event";
+            break;
+
+        case RequirementType.ParticipateSpecificEventType:
+            logicBorderClass = "border-primary";
+            logicBgClass = "bg-primary";
+            logicTextClass = "text-primary";
+            logicIcon = "bi-calendar-check";
+            typeLabel = "Specific Event Type";
+            specificTargetName = Model.EventTypes?.EventTypeName;
+            break;
+
+        case RequirementType.CompleteAnyActivity:
+            logicBorderClass = "border-secondary";
+            logicBgClass = "bg-secondary";
+            logicTextClass = "text-secondary";
+            logicIcon = "bi-activity";
+            typeLabel = "Any Activity";
+            break;
+
+        case RequirementType.CompleteSpecificActivityType:
+            logicBorderClass = "border-success";
+            logicBgClass = "bg-success";
+            logicTextClass = "text-success";
+            logicIcon = "bi-clipboard-check";
+            typeLabel = "Specific Activity Type";
+            specificTargetName = Model.ActivityTypes?.Name;
+            break;
+    }
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            @* --- HEADER (Estilo Vermelho/Danger) --- *@
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-danger text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-trash fs-4 text-danger-emphasis"></i>
+                </div>
+                <div>
+                    <h2 class="h4 mb-0 fw-bold text-dark">Delete Requirement</h2>
+                </div>
+            </div>
+
+            @* --- CARD PRINCIPAL --- *@
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-danger">
+                <div class="card-body p-4 p-md-5">
+
+                    @* --- MENSAGEM DE ALERTA --- *@
+                    @if (ViewBag.Error != null) {
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-0 mb-5 d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-3 fs-4"></i>
+                            <div>
+                                <span class="fw-bold text-danger">Are you sure?</span>
+                                <span class="text-danger opacity-75 d-block small">@ViewBag.Error</span>
+                            </div>
+                        </div>
+                    }
+                    else {
+                        <div class="alert alert-danger bg-danger bg-opacity-10 border-0 mb-5 d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill text-danger me-3 fs-4"></i>
+                            <div>
+                                <span class="fw-bold text-danger">Are you sure?</span>
+                                <span class="text-danger opacity-75 d-block small">This action cannot be undone.</span>
+                            </div>
+                        </div>
+                    }
+
+                    @* --- 1. TARGET BADGE --- *@
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase small text-muted mb-1">Associated Badge</label>
+                        <div class="border-bottom pb-2">
+                            <span class="fs-6 fw-medium text-dark">@Html.DisplayFor(model => model.Badge.BadgeName)</span>
+                        </div>
+                    </div>
+
+                    @* --- 2. LOGIC CONFIGURATION (Compacta e numa linha) --- *@
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase small text-muted mb-2">Requirement Type</label>
+
+                        <div class="row g-3">
+                            @* Cartão da Esquerda *@
+                            <div class="col-md-8">
+                                <div class="h-100 p-3 rounded-3 border @logicBorderClass border-opacity-25 bg-white d-flex align-items-center">
+                                    <div class="rounded-circle @logicBgClass bg-opacity-10 p-2 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <i class="bi @logicIcon fs-4 @logicTextClass"></i>
+                                    </div>
+
+                                    <div class="text-truncate">
+                                        <span class="fw-bold @logicTextClass">@typeLabel</span>
+                                        @if (specificTargetName != null) {
+                                            <span class="fw-bold text-dark">: @specificTargetName</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @* Cartão da Direita *@
+                            <div class="col-md-4">
+                                <div class="h-100 p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                                    <span class="text-muted small fw-bold text-uppercase">Target Value:</span>
+                                    <div class="d-flex align-items-baseline">
+                                        <span class="fs-4 fw-bold text-dark mb-0">@Model.TargetValue</span>
+                                        <span class="fs-6 text-dark ms-1">times</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- 3. NOME E DESCRIÇÃO --- *@
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-1">Name</label>
+                            <div class="border-bottom pb-2">
+                                <span class="fs-6 fw-medium text-dark">@Model.BadgeRequirementName</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-uppercase small text-muted mb-2">Description</label>
+                        <div class="p-3 bg-light bg-opacity-50 rounded-3 border border-light-subtle">
+                            <p class="mb-0 text-dark" style="font-size: 1rem;">
+                                @Html.DisplayFor(model => model.RequirementDescription)
+                            </p>
+                        </div>
+                    </div>
+
+                    @* --- FORM DE CONFIRMAÇÃO --- *@
+                    <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                        <form asp-action="Delete">
+                            <input type="hidden" asp-for="BadgeRequirementId" />
+
+                            @* Botão Cancel *@
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Cancel
+                            </a>
+
+                            @* Botão Delete (Danger) *@
+                            <button type="submit" class="btn btn-danger px-4 shadow-sm">
+                                Confirm Delete
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

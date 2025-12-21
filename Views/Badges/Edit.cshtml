@@ -1,0 +1,49 @@
+﻿@model HealthWellbeing.Models.Badge
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Badge</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BadgeId" />
+            <div class="form-group">
+                <label asp-for="BadgeTypeId" class="control-label"></label>
+                <select asp-for="BadgeTypeId" class="form-control" asp-items="ViewBag.BadgeTypeId"></select>
+                <span asp-validation-for="BadgeTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BadgeName" class="control-label"></label>
+                <input asp-for="BadgeName" class="form-control" />
+                <span asp-validation-for="BadgeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BadgeDescription" class="control-label"></label>
+                <input asp-for="BadgeDescription" class="form-control" />
+                <span asp-validation-for="BadgeDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RewardPoints" class="control-label"></label>
+                <input asp-for="RewardPoints" class="form-control" />
+                <span asp-validation-for="RewardPoints" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

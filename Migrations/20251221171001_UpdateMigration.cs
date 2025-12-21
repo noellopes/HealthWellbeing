@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:Migrations/20251215184811_FixEventStructure.cs
-    public partial class FixEventStructure : Migration
-========
-    public partial class InitialMig : Migration
->>>>>>>> Grupo-8:Migrations/20251215163210_InitialMig.cs
+    public partial class UpdateMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +23,20 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ActivityType", x => x.ActivityTypeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BadgeType",
+                columns: table => new
+                {
+                    BadgeTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BadgeTypeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    BadgeTypeDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BadgeType", x => x.BadgeTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -325,6 +335,27 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Badge",
+                columns: table => new
+                {
+                    BadgeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BadgeTypeId = table.Column<int>(type: "int", nullable: false),
+                    BadgeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    BadgeDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    RewardPoints = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Badge", x => x.BadgeId);
+                    table.ForeignKey(
+                        name: "FK_Badge_BadgeType_BadgeTypeId",
+                        column: x => x.BadgeTypeId,
+                        principalTable: "BadgeType",
+                        principalColumn: "BadgeTypeId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alimento",
                 columns: table => new
                 {
@@ -607,6 +638,41 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BadgeRequirement",
+                columns: table => new
+                {
+                    BadgeRequirementId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BadgeId = table.Column<int>(type: "int", nullable: false),
+                    BadgeRequirementName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    RequirementDescription = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    TargetValue = table.Column<int>(type: "int", nullable: false),
+                    RequirementType = table.Column<int>(type: "int", nullable: false),
+                    EventTypeId = table.Column<int>(type: "int", nullable: true),
+                    ActivityTypeId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BadgeRequirement", x => x.BadgeRequirementId);
+                    table.ForeignKey(
+                        name: "FK_BadgeRequirement_ActivityType_ActivityTypeId",
+                        column: x => x.ActivityTypeId,
+                        principalTable: "ActivityType",
+                        principalColumn: "ActivityTypeId");
+                    table.ForeignKey(
+                        name: "FK_BadgeRequirement_Badge_BadgeId",
+                        column: x => x.BadgeId,
+                        principalTable: "Badge",
+                        principalColumn: "BadgeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BadgeRequirement_EventType_EventTypeId",
+                        column: x => x.EventTypeId,
+                        principalTable: "EventType",
+                        principalColumn: "EventTypeId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Event",
                 columns: table => new
                 {
@@ -634,6 +700,31 @@ namespace HealthWellbeing.Migrations
                         column: x => x.EventTypeId,
                         principalTable: "EventType",
                         principalColumn: "EventTypeId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerBadge",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    BadgeId = table.Column<int>(type: "int", nullable: false),
+                    DateAwarded = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerBadge", x => new { x.CustomerId, x.BadgeId });
+                    table.ForeignKey(
+                        name: "FK_CustomerBadge_Badge_BadgeId",
+                        column: x => x.BadgeId,
+                        principalTable: "Badge",
+                        principalColumn: "BadgeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerBadge_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -682,6 +773,26 @@ namespace HealthWellbeing.Migrations
                 column: "CategoriaAlimentoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Badge_BadgeTypeId",
+                table: "Badge",
+                column: "BadgeTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BadgeRequirement_ActivityTypeId",
+                table: "BadgeRequirement",
+                column: "ActivityTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BadgeRequirement_BadgeId",
+                table: "BadgeRequirement",
+                column: "BadgeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BadgeRequirement_EventTypeId",
+                table: "BadgeRequirement",
+                column: "EventTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BeneficioTipoExercicio_TipoExercicioId",
                 table: "BeneficioTipoExercicio",
                 column: "TipoExercicioId");
@@ -696,6 +807,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Customer_LevelId",
                 table: "Customer",
                 column: "LevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerBadge_BadgeId",
+                table: "CustomerBadge",
+                column: "BadgeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_Email",
@@ -777,10 +893,13 @@ namespace HealthWellbeing.Migrations
                 name: "Alergia");
 
             migrationBuilder.DropTable(
+                name: "BadgeRequirement");
+
+            migrationBuilder.DropTable(
                 name: "BeneficioTipoExercicio");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "CustomerBadge");
 
             migrationBuilder.DropTable(
                 name: "Employee");
@@ -825,7 +944,10 @@ namespace HealthWellbeing.Migrations
                 name: "TipoExercicio");
 
             migrationBuilder.DropTable(
-                name: "Level");
+                name: "Badge");
+
+            migrationBuilder.DropTable(
+                name: "Customer");
 
             migrationBuilder.DropTable(
                 name: "Activity");
@@ -861,13 +983,19 @@ namespace HealthWellbeing.Migrations
                 name: "CategoriaAlimento");
 
             migrationBuilder.DropTable(
-                name: "LevelCategory");
+                name: "BadgeType");
+
+            migrationBuilder.DropTable(
+                name: "Level");
 
             migrationBuilder.DropTable(
                 name: "ActivityType");
 
             migrationBuilder.DropTable(
                 name: "EventType");
+
+            migrationBuilder.DropTable(
+                name: "LevelCategory");
 
             migrationBuilder.DropTable(
                 name: "ScoringStrategy");

@@ -80,8 +80,7 @@ namespace HealthWellbeing.Data
 
             modelBuilder.Entity<CustomerBadge>(entity =>
             {
-                entity.HasIndex(cb => new { cb.CustomerId, cb.BadgeId })
-                      .IsUnique();
+                entity.HasKey(cb => new { cb.CustomerId, cb.BadgeId });
 
                 entity.HasOne(cb => cb.Customer)
                       .WithMany(c => c.CustomerBadges)

@@ -1,0 +1,112 @@
+﻿@model HealthWellbeing.Models.BadgeType
+
+@{
+    ViewData["Title"] = "Badge Type Details";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            @* --- CARD CONTAINER --- *@
+            <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
+
+                @* --- HEADER (Estilo Top Level) --- *@
+                <div class="card-header bg-primary text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center gap-3">
+                        @* Icon Container *@
+                        <div class="bg-white bg-opacity-25 p-2 rounded-3">
+                            <i class="bi bi-file-earmark-text fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Badge Type Details</h5>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- BODY --- *@
+                <div class="card-body p-4">
+
+                    <dl class="row gy-4 mb-0">
+
+                        @* 1. Name *@
+                        <dt class="col-sm-4 text-secondary d-flex align-items-center">
+                            @Html.DisplayNameFor(model => model.BadgeTypeName)
+                        </dt>
+                        <dd class="col-sm-8 fs-5 fw-bold text-dark mb-0">
+                            @Html.DisplayFor(model => model.BadgeTypeName)
+                        </dd>
+
+                        @* 2. Description (Sem linha separadora) *@
+                        <dt class="col-sm-4 text-secondary d-flex align-items-center">
+                            @Html.DisplayNameFor(model => model.BadgeTypeDescription)
+                        </dt>
+                        <dd class="col-sm-8 mb-0">
+                            @if (string.IsNullOrEmpty(Model.BadgeTypeDescription)) {
+                                <span class="text-muted fst-italic small">No description provided</span>
+                            }
+                            else {
+                                <span class="text-dark">@Html.DisplayFor(model => model.BadgeTypeDescription)</span>
+                            }
+                        </dd>
+
+                        @* 3. Badges Associated (Lógica de contagem) *@
+                        <dt class="col-sm-4 text-secondary d-flex align-items-center">
+                            Badges Associated
+                        </dt>
+                        <dd class="col-sm-8 mb-0">
+                            @{
+                                // Assumindo que a propriedade de navegação se chama 'Badges'
+                                int count = Model.Badges?.Count ?? 0;
+                                string badgeClass;
+                                string badgeText;
+
+                                if (count > 0) {
+                                    badgeClass = "bg-info text-dark";
+                                    badgeText = $"{count} Badge" + (count != 1 ? "s" : "");
+                                }
+                                else {
+                                    badgeClass = "bg-secondary text-white";
+                                    badgeText = "No badges associated";
+                                }
+                            }
+
+                            <span class="badge @badgeClass rounded-pill" style="font-size: 0.9em; padding: 0.5em 1em;">
+                                @badgeText
+                            </span>
+                        </dd>
+
+                    </dl>
+
+                    @* --- ACTION BUTTONS --- *@
+                    <div class="d-flex justify-content-end gap-2 mt-5">
+
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                            Back to List
+                        </a>
+
+                        <a asp-action="Edit" asp-route-id="@Model?.BadgeTypeId" class="btn btn-warning px-4 shadow-sm">
+                            Edit
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@Model?.BadgeTypeId" class="btn btn-danger px-4 shadow-sm">
+                            Delete
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -5,13 +5,13 @@ namespace HealthWellbeing.Models {
         [Display(Name = "Participar em Qualquer Evento")]
         ParticipateAnyEvent = 1,
 
-        [Display(Name = "Participar em Evento Específico")]
-        ParticipateSpecificEvent = 2,
+        [Display(Name = "Participar em Tipo de Evento Específico")]
+        ParticipateSpecificEventType = 2,
 
         [Display(Name = "Completar Atividade (Geral)")]
-        CompleteActivityGeneral = 3,
+        CompleteAnyActivity = 3,
 
-        [Display(Name = "Completar Atividade Específica")]
-        CompleteActivitySpecific = 4
+        [Display(Name = "Completar Tipo de Atividade Específica")]
+        CompleteSpecificActivityType = 4
     }
 }
