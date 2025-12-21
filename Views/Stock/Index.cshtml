@@ -22,11 +22,12 @@
                 📥 Fazer Compra
             </a>
 
-            <a asp-controller="Compra"
-               asp-action="Historico"
+            <a asp-controller="HistoricoCompras" asp-action="Index"
                class="btn btn-success px-4">
                 📑 Histórico de Compras
             </a>
+
+
         </div>
 
     </div>
@@ -143,14 +144,31 @@
                         ? item.Consumivel?.QuantidadeMaxima ?? 0
                         : item.QuantidadeMaxima;
 
+                        string classe = "";
+                        string icon = "";
+
+                        var atual = item.Consumivel?.QuantidadeAtual ?? 0;
+
+                        if (atual <= min)
+                        {
+                            classe = "text-danger";
+                            icon = "⚠️";
+                        }
+                        else if (atual <= min + 10)
+                        {
+                            classe = "text-warning";
+                            icon = "⚠️";
+                        }
+
+
                         <tr class="text-center">
                             <td>@item.Consumivel?.Nome</td>
                             <td>@item.Zona?.Nome</td>
 
-                            <td class="fw-bold @(item.QuantidadeAtual < min ? "text-danger" : "")">
-                                @item.QuantidadeAtual
-                                @(item.QuantidadeAtual < min ? " ⚠️" : "")
+                            <td class="fw-bold @classe">
+                                @item.Consumivel?.QuantidadeAtual @icon
                             </td>
+
 
                             <td>@min</td>
                             <td>@max</td>
@@ -162,6 +180,7 @@
                     }
                 }
             </tbody>
+
         </table>
     </div>
 

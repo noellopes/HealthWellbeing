@@ -177,6 +177,8 @@ namespace HealthWellbeing.Data
                     new() { Nome = "Bloco C - Piso 2 - Armazenamento Especializado", Descricao = "Produtos técnicos especializados.", LocalizacaoZonaArmazenamentoId = Loc("Bloco C - Piso 2"), CapacidadeMaxima = 470, Ativa = false }
                 };
 
+            
+
             db.ZonaArmazenamento.AddRange(zonas);
             db.SaveChanges();
         }
