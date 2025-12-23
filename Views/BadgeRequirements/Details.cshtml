@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Requirement Details";
 
-    // --- LÓGICA VISUAL ---
+    // --- VISUAL LOGIC ---
     string logicBorderClass = "border-secondary";
     string logicBgClass = "bg-secondary";
     string logicTextClass = "text-secondary";
@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            @* --- CARD PRINCIPAL --- *@
+            @* --- PRINCIPAL CARD --- *@
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-info">
                 <div class="card-body p-4 p-md-5">
 
@@ -85,20 +85,17 @@
                         </div>
                     </div>
 
-                    @* --- 2. LOGIC CONFIGURATION (Compacto numa linha) --- *@
+                    @* --- 2. LOGIC CONFIGURATION --- *@
                     <div class="mb-4">
                         <label class="form-label fw-bold text-uppercase small text-muted mb-2">Requirement Type</label>
 
                         <div class="row g-3">
-                            @* Cartão da Esquerda: TIPO + ALVO numa linha *@
                             <div class="col-md-8">
                                 <div class="h-100 p-3 rounded-3 border @logicBorderClass border-opacity-25 bg-white d-flex align-items-center">
-                                    @* Ícone pequeno *@
                                     <div class="rounded-circle @logicBgClass bg-opacity-10 p-2 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                         <i class="bi @logicIcon fs-4 @logicTextClass"></i>
                                     </div>
 
-                                    @* Texto numa linha só *@
                                     <div class="text-truncate">
                                         <span class="fw-bold @logicTextClass">@typeLabel</span>
                                         @if (specificTargetName != null) {
@@ -121,7 +118,7 @@
                         </div>
                     </div>
 
-                    @* --- 3. NOME E DESCRIÇÃO --- *@
+                    @* --- 3. NAME & DESCRIPTION --- *@
                     <div class="row mb-4">
                         <div class="col-12">
                             <label class="form-label fw-bold text-uppercase small text-muted mb-1">Name</label>
@@ -140,7 +137,7 @@
                         </div>
                     </div>
 
-                    @* --- BOTÕES DE AÇÃO --- *@
+                    @* --- BUTTONS --- *@
                     <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
                         <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
                             Back to List

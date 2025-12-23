@@ -141,7 +141,7 @@ namespace HealthWellbeing.Controllers {
                 // 4. Validação de Integridade (Crucial para NoAction)
                 // Se já existirem Badges deste tipo, impedimos a eliminação.
                 if (badgeType.Badges != null && badgeType.Badges.Any()) {
-                    ViewBag.Error = "Unable to delete. This badge type is currently associated with active badges.";
+                    ViewBag.Error = "This badge type is currently associated with active badges.";
                     return View(badgeType); // Retorna à página de delete com o erro
                 }
 

@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Delete Requirement";
 
-    // --- LÓGICA VISUAL (Igual ao Details, para manter consistência) ---
+    // --- LOGIC VISUAL ---
     string logicBorderClass = "border-secondary";
     string logicBgClass = "bg-secondary";
     string logicTextClass = "text-secondary";
@@ -63,7 +63,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
-            @* --- HEADER (Estilo Vermelho/Danger) --- *@
+            @* --- HEADER --- *@
             <div class="d-flex align-items-center mb-4">
                 <div class="bg-danger text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
                     <i class="bi bi-trash fs-4 text-danger-emphasis"></i>
@@ -73,11 +73,11 @@
                 </div>
             </div>
 
-            @* --- CARD PRINCIPAL --- *@
+            @* --- PRINCIPAL CARD --- *@
             <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-danger">
                 <div class="card-body p-4 p-md-5">
 
-                    @* --- MENSAGEM DE ALERTA --- *@
+                    @* --- ALERT MESSAGE --- *@
                     @if (ViewBag.Error != null) {
                         <div class="alert alert-danger bg-danger bg-opacity-10 border-0 mb-5 d-flex align-items-center" role="alert">
                             <i class="bi bi-exclamation-triangle-fill text-danger me-3 fs-4"></i>
@@ -105,12 +105,11 @@
                         </div>
                     </div>
 
-                    @* --- 2. LOGIC CONFIGURATION (Compacta e numa linha) --- *@
+                    @* --- 2. LOGIC CONFIGURATION --- *@
                     <div class="mb-4">
                         <label class="form-label fw-bold text-uppercase small text-muted mb-2">Requirement Type</label>
 
                         <div class="row g-3">
-                            @* Cartão da Esquerda *@
                             <div class="col-md-8">
                                 <div class="h-100 p-3 rounded-3 border @logicBorderClass border-opacity-25 bg-white d-flex align-items-center">
                                     <div class="rounded-circle @logicBgClass bg-opacity-10 p-2 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
@@ -126,7 +125,6 @@
                                 </div>
                             </div>
 
-                            @* Cartão da Direita *@
                             <div class="col-md-4">
                                 <div class="h-100 p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
                                     <span class="text-muted small fw-bold text-uppercase">Target Value:</span>
@@ -139,7 +137,7 @@
                         </div>
                     </div>
 
-                    @* --- 3. NOME E DESCRIÇÃO --- *@
+                    @* --- 3. NAME & DESCRIPTION --- *@
                     <div class="row mb-4">
                         <div class="col-12">
                             <label class="form-label fw-bold text-uppercase small text-muted mb-1">Name</label>
@@ -158,17 +156,15 @@
                         </div>
                     </div>
 
-                    @* --- FORM DE CONFIRMAÇÃO --- *@
+                    @* --- CONFIRMATION FORM --- *@
                     <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
                         <form asp-action="Delete">
                             <input type="hidden" asp-for="BadgeRequirementId" />
 
-                            @* Botão Cancel *@
                             <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
                                 Cancel
                             </a>
 
-                            @* Botão Delete (Danger) *@
                             <button type="submit" class="btn btn-danger px-4 shadow-sm">
                                 Confirm Delete
                             </button>

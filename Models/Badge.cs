@@ -24,6 +24,9 @@ namespace HealthWellbeing.Models {
         [Range(1, 1000, ErrorMessage = "Reward points must be between {1} and {2}.")]
         public int RewardPoints { get; set; }
 
+        [Display(Name = "Activity Status")]
+        public bool IsActive { get; set; } = true;
+
         public virtual ICollection<BadgeRequirement>? BadgeRequirements { get; set; }
         public virtual ICollection<CustomerBadge>? CustomerBadges { get; set; }
 

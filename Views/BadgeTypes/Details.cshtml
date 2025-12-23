@@ -21,7 +21,7 @@
             @* --- CARD CONTAINER --- *@
             <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
 
-                @* --- HEADER (Estilo Top Level) --- *@
+                @* --- HEADER --- *@
                 <div class="card-header bg-primary text-white p-4 rounded-top-4">
                     <div class="d-flex align-items-center gap-3">
                         @* Icon Container *@
@@ -47,7 +47,7 @@
                             @Html.DisplayFor(model => model.BadgeTypeName)
                         </dd>
 
-                        @* 2. Description (Sem linha separadora) *@
+                        @* 2. Description *@
                         <dt class="col-sm-4 text-secondary d-flex align-items-center">
                             @Html.DisplayNameFor(model => model.BadgeTypeDescription)
                         </dt>
@@ -60,13 +60,12 @@
                             }
                         </dd>
 
-                        @* 3. Badges Associated (Lógica de contagem) *@
+                        @* 3. Associated Badges *@
                         <dt class="col-sm-4 text-secondary d-flex align-items-center">
                             Badges Associated
                         </dt>
                         <dd class="col-sm-8 mb-0">
                             @{
-                                // Assumindo que a propriedade de navegação se chama 'Badges'
                                 int count = Model.Badges?.Count ?? 0;
                                 string badgeClass;
                                 string badgeText;

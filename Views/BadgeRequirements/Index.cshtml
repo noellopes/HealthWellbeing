@@ -7,6 +7,16 @@
     var errorMessage = TempData["ErrorMessage"];
 }
 
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 @* --- FEEDBACK MESSAGES --- *@
@@ -60,7 +70,6 @@ else {
         <div class="card card-body border-0 shadow-sm rounded-4 bg-light">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
 
-                @* --- LINHA 1 --- *@
                 <div class="col-md-6">
                     <label for="searchName" class="form-label fw-bold small text-muted">Requirement Name</label>
                     <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search name..." type="search" />
@@ -73,10 +82,8 @@ else {
                     </select>
                 </div>
 
-                @* --- LINHA 2 --- *@
                 <div class="col-md-5">
                     <label for="searchType" class="form-label fw-bold small text-muted">Requirement Type</label>
-                    @* Agora usa direto o ViewBag do Controller que já traz o selecionado *@
                     <select id="searchType" name="searchType" class="form-select bg-white" asp-items="ViewBag.SearchTypes">
                         <option value="">-- All Types --</option>
                     </select>
@@ -90,11 +97,11 @@ else {
 
                 <div class="col-md-4 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100 shadow-sm">
-                        <i class="bi bi-search me-1"></i> Apply
+                        Apply
                     </button>
 
                     <a asp-action="Index" class="btn btn-secondary w-100 shadow-sm text-decoration-none">
-                        <i class="bi bi-x-lg me-1"></i> Clear
+                        Clear
                     </a>
                 </div>
             </form>
@@ -134,49 +141,38 @@ else {
                             @* 2. Associated Badge *@
                             <td>
                                 <span class="fw-bold text-dark">
-                                    <i class="bi bi-trophy-fill me-1 text-secondary"></i> @Html.DisplayFor(modelItem => item.Badge.BadgeName)
+                                    @Html.DisplayFor(modelItem => item.Badge.BadgeName)
                                 </span>
                             </td>
 
-                            @* 3. Requirement Type (DESIGN NOVO: Leve vs Sólido) *@
+                            @* 3. Requirement Type *@
                             <td>
                                 @{
                                     string badgeClass = "";
-                                    string iconClass = "";
                                     string textDisplay = "";
                                     string subText = "";
 
                                     switch (item.RequirementType) {
-                                        // --- AZUL (EVENTOS) ---
                                         case RequirementType.ParticipateAnyEvent:
-                                            // Leve
                                             badgeClass = "bg-primary bg-opacity-10 text-primary border border-primary border-opacity-50";
-                                            iconClass = "bi-calendar-range";
                                             textDisplay = "Any Event";
                                             subText = "Global Counter";
                                             break;
 
                                         case RequirementType.ParticipateSpecificEventType:
-                                            // Sólido
                                             badgeClass = "bg-primary text-white shadow-sm";
-                                            iconClass = "bi-calendar-check";
                                             textDisplay = item.EventTypes?.EventTypeName ?? "Unknown Event";
                                             subText = "Specific Event";
                                             break;
 
-                                        // --- VERDE (ATIVIDADES) ---
                                         case RequirementType.CompleteAnyActivity:
-                                            // Leve
                                             badgeClass = "bg-success bg-opacity-10 text-success border border-success border-opacity-50";
-                                            iconClass = "bi-activity";
                                             textDisplay = "Any Activity";
                                             subText = "Global Counter";
                                             break;
 
                                         case RequirementType.CompleteSpecificActivityType:
-                                            // Sólido
                                             badgeClass = "bg-success text-white shadow-sm";
-                                            iconClass = "bi-clipboard-check";
                                             textDisplay = item.ActivityTypes?.Name ?? "Unknown Activity";
                                             subText = "Specific Activity";
                                             break;
@@ -185,7 +181,7 @@ else {
                                 <div class="d-flex flex-column align-items-start">
                                     <span class="badge @badgeClass d-inline-flex align-items-center py-2 px-3 rounded-3 mb-1"
                                           style="font-size: 0.85rem; font-weight: 600;">
-                                        <i class="bi @iconClass me-2"></i> @textDisplay
+                                         @textDisplay
                                     </span>
                                     <small class="text-muted ms-1" style="font-size: 0.75rem;">@subText</small>
                                 </div>

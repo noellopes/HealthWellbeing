@@ -21,10 +21,9 @@
             @* --- CARD CONTAINER --- *@
             <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
 
-                @* --- HEADER (Verde para Create) --- *@
+                @* --- HEADER --- *@
                 <div class="card-header bg-success text-white p-4 rounded-top-4">
                     <div class="d-flex align-items-center gap-3">
-                        @* Icon em destaque *@
                         <div class="bg-white bg-opacity-25 p-2 rounded-3">
                             <i class="bi bi-folder-plus fs-4 text-white"></i>
                         </div>
@@ -39,10 +38,9 @@
                 <div class="card-body p-4">
                     <form asp-action="Create">
 
-                        @* Mensagem de Erro Geral *@
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
 
-                        @* 1. Type Name (Label Fora) *@
+                        @* 1. Type Name *@
                         <div class="mb-4">
                             <label asp-for="BadgeTypeName" class="form-label fw-bold text-dark mb-1">
                                 Type Name
@@ -51,7 +49,7 @@
                             <span asp-validation-for="BadgeTypeName" class="text-danger small"></span>
                         </div>
 
-                        @* 2. Description (Label Fora) *@
+                        @* 2. Description *@
                         <div class="mb-5">
                             <label asp-for="BadgeTypeDescription" class="form-label fw-bold text-dark mb-1">
                                 Description
@@ -63,12 +61,12 @@
                         @* --- ACTION BUTTONS --- *@
                         <div class="d-flex justify-content-end gap-2">
 
-                            @* Custom Back to List *@
+                            @* Back to List *@
                             <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
                                 Back to List
                             </a>
 
-                            @* Create Button (Verde, sem bold) *@
+                            @* Create Button  *@
                             <button type="submit" class="btn btn-success px-4 shadow-sm">
                                 Create
                             </button>

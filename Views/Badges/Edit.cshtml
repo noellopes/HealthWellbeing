@@ -1,49 +1,154 @@
 ﻿@model HealthWellbeing.Models.Badge
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Badge";
 }
 
-<h1>Edit</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
 
-<h4>Badge</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BadgeId" />
-            <div class="form-group">
-                <label asp-for="BadgeTypeId" class="control-label"></label>
-                <select asp-for="BadgeTypeId" class="form-control" asp-items="ViewBag.BadgeTypeId"></select>
-                <span asp-validation-for="BadgeTypeId" class="text-danger"></span>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+
+            @* --- CARD CONTAINER --- *@
+            <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
+
+                @* --- HEADER (Yellow) --- *@
+                <div class="card-header bg-warning text-dark p-4 rounded-top-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-3 border border-dark border-opacity-25">
+                            <i class="bi bi-pencil-square fs-4 text-dark"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Edit Badge</h5>
+                            <p class="mb-0 small text-dark opacity-75">Modify badge details</p>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- FORM BODY --- *@
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="BadgeId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
+
+                        @* --- ROW 1: NAME & TYPE --- *@
+                        <div class="row g-3 mb-3">
+                            @* Name *@
+                            <div class="col-md-8">
+                                <label asp-for="BadgeName" class="form-label fw-bold text-dark mb-1">Name</label>
+                                <input asp-for="BadgeName" class="form-control shadow-sm" placeholder="e.g. Marathon Runner" />
+                                <span asp-validation-for="BadgeName" class="text-danger small"></span>
+                            </div>
+
+                            @* Type *@
+                            <div class="col-md-4">
+                                <label asp-for="BadgeTypeId" class="form-label fw-bold text-dark mb-1">Type</label>
+                                <select asp-for="BadgeTypeId" class="form-select shadow-sm" asp-items="ViewBag.BadgeTypeId"></select>
+                                <span asp-validation-for="BadgeTypeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        @* --- ROW 2: POINTS & STATUS --- *@
+                        <div class="row g-3 mb-3 align-items-end">
+                            @* Reward Points *@
+                            <div class="col-md-6">
+                                <label asp-for="RewardPoints" class="form-label fw-bold text-dark mb-1">Reward Points</label>
+                                <div class="input-group shadow-sm">
+                                    <input asp-for="RewardPoints" class="form-control" type="number" min="1" />
+                                    <span class="input-group-text bg-light text-muted">pts</span>
+                                </div>
+                                <span asp-validation-for="RewardPoints" class="text-danger small"></span>
+                            </div>
+
+                            @* Status Switch (Dynamic Blue Visuals) *@
+                            <div class="col-md-6">
+                                @* Logic: Initial state classes matching the Blue Switch *@
+                                @{
+                                    // Use Primary (Blue) to match the switch button color
+                                    var containerClass = Model.IsActive
+                                    ? "border-primary border-opacity-25 bg-primary bg-opacity-10"
+                                    : "border-secondary border-opacity-25 bg-secondary bg-opacity-10";
+
+                                    var textClass = Model.IsActive ? "text-primary" : "text-secondary";
+                                    var labelText = Model.IsActive ? "Active" : "Archived";
+                                }
+
+                                <div id="statusContainer" class="p-2 border rounded-3 d-flex align-items-center justify-content-between h-100 @containerClass" style="transition: all 0.3s ease;">
+                                    <label class="form-check-label fw-bold small ms-2 @textClass" for="IsActiveSwitch" id="statusLabel">
+                                        @labelText
+                                    </label>
+                                    <div class="form-check form-switch mb-0 me-2">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="IsActiveSwitch" asp-for="IsActive" style="transform: scale(1.3); cursor: pointer;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* --- ROW 3: DESCRIPTION --- *@
+                        <div class="mb-4">
+                            <label asp-for="BadgeDescription" class="form-label fw-bold text-dark mb-1">Description</label>
+                            <textarea asp-for="BadgeDescription" class="form-control shadow-sm" style="height: 100px"></textarea>
+                            <span asp-validation-for="BadgeDescription" class="text-danger small"></span>
+                        </div>
+
+                        @* --- ACTIONS --- *@
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Back to List
+                            </a>
+                            <button type="submit" class="btn btn-warning px-4 shadow-sm">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="BadgeName" class="control-label"></label>
-                <input asp-for="BadgeName" class="form-control" />
-                <span asp-validation-for="BadgeName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BadgeDescription" class="control-label"></label>
-                <input asp-for="BadgeDescription" class="form-control" />
-                <span asp-validation-for="BadgeDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RewardPoints" class="control-label"></label>
-                <input asp-for="RewardPoints" class="form-control" />
-                <span asp-validation-for="RewardPoints" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    @* --- SCRIPT: Dynamic Status Toggle Color --- *@
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const switchInput = document.getElementById('IsActiveSwitch');
+            const container = document.getElementById('statusContainer');
+            const label = document.getElementById('statusLabel');
+
+            // Logic: Switch is Blue (Primary), so background should also be Primary to match.
+            switchInput.addEventListener('change', function () {
+                if (this.checked) {
+                    // Switch to Active Look (Blue/Primary)
+                    container.classList.remove('border-secondary', 'bg-secondary');
+                    container.classList.add('border-primary', 'bg-primary');
+
+                    label.classList.remove('text-secondary');
+                    label.classList.add('text-primary');
+                    label.innerText = 'Active';
+                } else {
+                    // Switch to Archived Look (Grey/Secondary)
+                    container.classList.remove('border-primary', 'bg-primary');
+                    container.classList.add('border-secondary', 'bg-secondary');
+
+                    label.classList.remove('text-primary');
+                    label.classList.add('text-secondary');
+                    label.innerText = 'Archived';
+                }
+            });
+        });
+    </script>
 }

@@ -39,6 +39,7 @@ namespace HealthWellbeing.Data
 
             PopulateEventActivities(dbContext);
             PopulateBadgeRequirements(dbContext);
+            PopulateCustomerBadges(dbContext);
         }
 
 
@@ -1142,6 +1143,97 @@ namespace HealthWellbeing.Data
                 dbContext.BadgeRequirement.AddRange(requirements);
                 dbContext.SaveChanges();
             }
+        }
+
+        private static void PopulateCustomerBadges(HealthWellbeingDbContext dbContext) {
+            // 1. Se já existirem associações, não faz nada
+            if (dbContext.CustomerBadge.Any()) return;
+
+            // 2. Carregar dados necessários (Customers e Badges)
+            var customers = dbContext.Customer.ToList();
+            var badges = dbContext.Badge.ToList();
+
+            if (!customers.Any() || !badges.Any()) return;
+
+            // Referências aos Badges criados anteriormente
+            var bRato = badges.FirstOrDefault(b => b.BadgeName == "Rato de Ginásio");
+            var bHidra = badges.FirstOrDefault(b => b.BadgeName == "Hidratação Mestra");
+            var bMara = badges.FirstOrDefault(b => b.BadgeName == "Maratonista");
+            var bYogi = badges.FirstOrDefault(b => b.BadgeName == "Yogi Master");
+            var bCardio = badges.FirstOrDefault(b => b.BadgeName == "Monstro do Cardio"); // Vamos deixar este vazio ou quase vazio para testes
+
+            var customerBadges = new List<CustomerBadge>();
+            var random = new Random();
+
+            // --- CENÁRIO A: "Rato de Ginásio" (MUITO POPULAR) ---
+            // Atribuir aos primeiros 20 clientes (quase toda a gente tem)
+            // Isto serve para testar o alerta vermelho no Delete.
+            if (bRato != null) {
+                foreach (var c in customers.Take(20)) {
+                    customerBadges.Add(new CustomerBadge {
+                        CustomerId = c.CustomerId,
+                        BadgeId = bRato.BadgeId,
+                        DateAwarded = DateTime.Now.AddDays(-random.Next(1, 100))
+                    });
+                }
+            }
+
+            // --- CENÁRIO B: "Hidratação Mestra" (MÉDIA POPULARIDADE) ---
+            // Atribuir a clientes alternados (índices pares)
+            if (bHidra != null) {
+                for (int i = 0; i < customers.Count; i += 2) {
+                    customerBadges.Add(new CustomerBadge {
+                        CustomerId = customers[i].CustomerId,
+                        BadgeId = bHidra.BadgeId,
+                        DateAwarded = DateTime.Now.AddDays(-random.Next(1, 50))
+                    });
+                }
+            }
+
+            // --- CENÁRIO C: "Maratonista" (ESPECÍFICO / ELITE) ---
+            // Atribuir apenas a perfis atléticos (Steve Rogers, Xena, etc.)
+            if (bMara != null) {
+                var athletes = customers.Where(c =>
+                    c.Name.Contains("Steve") ||
+                    c.Name.Contains("Xena") ||
+                    c.Name.Contains("Wonderland") ||
+                    c.Name.Contains("Inês")
+                ).ToList();
+
+                foreach (var a in athletes) {
+                    customerBadges.Add(new CustomerBadge {
+                        CustomerId = a.CustomerId,
+                        BadgeId = bMara.BadgeId,
+                        DateAwarded = DateTime.Now.AddDays(-10)
+                    });
+                }
+            }
+
+            // --- CENÁRIO D: "Yogi Master" (RARO) ---
+            // Atribuir apenas ao Yoda (testar "Used by 1 customer")
+            if (bYogi != null) {
+                var yoda = customers.FirstOrDefault(c => c.Name.Contains("Yoda"));
+                if (yoda != null) {
+                    customerBadges.Add(new CustomerBadge {
+                        CustomerId = yoda.CustomerId,
+                        BadgeId = bYogi.BadgeId,
+                        DateAwarded = DateTime.Now.AddYears(-2)
+                    });
+                }
+            }
+
+            // --- CENÁRIO E: "Monstro do Cardio" ---
+            // NÃO VAMOS ATRIBUIR A NINGUÉM (ou deixa vazio).
+            // Isto serve para quando fores ao Delete deste badge, veres a mensagem verde "Safe to Delete".
+
+            // Garantir que não há duplicados antes de adicionar (caso a lógica acima se sobreponha)
+            var uniqueBadges = customerBadges
+                .GroupBy(cb => new { cb.CustomerId, cb.BadgeId })
+                .Select(g => g.First())
+                .ToList();
+
+            dbContext.CustomerBadge.AddRange(uniqueBadges);
+            dbContext.SaveChanges();
         }
 
         internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager) {

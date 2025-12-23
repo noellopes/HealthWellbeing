@@ -19,7 +19,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
-            @* --- HEADER (Estilo Verde/Success para Criação) --- *@
+            @* --- HEADER --- *@
             <div class="d-flex align-items-center mb-4">
                 <div class="bg-success text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
                     <i class="bi bi-plus-lg fs-4 text-success-emphasis"></i>
@@ -35,7 +35,6 @@
                     <form asp-action="Create" id="createRequirementForm">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
-                        @* --- 1. CONTEXTO --- *@
                         <div class="mb-5">
                             <label asp-for="BadgeId" class="form-label fw-bold text-uppercase small text-muted">Associated Badge</label>
                             <div class="input-group">
@@ -51,13 +50,11 @@
                             <label class="form-label fw-bold mb-3 text-uppercase small text-muted">Requirement Type</label>
 
                             <div class="row g-3">
-                                @* COLUNA A: GENÉRICOS *@
                                 <div class="col-md-6">
                                     <div class="p-3 rounded-3 bg-light border h-100">
                                         <small class="d-block text-uppercase text-muted fw-bold mb-3" style="font-size: 0.7rem;">General Type</small>
 
                                         <div class="d-grid gap-2">
-                                            @* Opção 1: Qualquer Evento *@
                                             <input type="radio" class="btn-check" name="RequirementType" id="type1" value="1" 
                                                    onchange="toggleDynamicFields()" autocomplete="off"
                                                    @(Model != null && (int)Model.RequirementType == 1 ? "checked" : "")>
@@ -68,7 +65,6 @@
                                                 </div>
                                             </label>
 
-                                            @* Opção 3: Qualquer Atividade *@
                                             <input type="radio" class="btn-check" name="RequirementType" id="type3" value="3" 
                                                    onchange="toggleDynamicFields()" autocomplete="off"
                                                    @(Model != null && (int)Model.RequirementType == 3 ? "checked" : "")>
@@ -82,13 +78,11 @@
                                     </div>
                                 </div>
 
-                                @* COLUNA B: ESPECÍFICOS *@
                                 <div class="col-md-6">
                                     <div class="p-3 rounded-3 bg-white border h-100">
                                         <small class="d-block text-uppercase text-primary fw-bold mb-3" style="font-size: 0.7rem;">Specific Type</small>
 
                                         <div class="d-grid gap-2">
-                                            @* Opção 2: Evento Específico *@
                                             <input type="radio" class="btn-check" name="RequirementType" id="type2" value="2" 
                                                    onchange="toggleDynamicFields()" autocomplete="off"
                                                    @(Model != null && (int)Model.RequirementType == 2 ? "checked" : "")>
@@ -100,7 +94,6 @@
                                                 <i class="bi bi-chevron-down small"></i>
                                             </label>
 
-                                            @* Opção 4: Atividade Específica *@
                                             <input type="radio" class="btn-check" name="RequirementType" id="type4" value="4" 
                                                    onchange="toggleDynamicFields()" autocomplete="off"
                                                    @(Model != null && (int)Model.RequirementType == 4 ? "checked" : "")>
@@ -118,7 +111,7 @@
                             <span asp-validation-for="RequirementType" class="text-danger small mt-1"></span>
                         </div>
 
-                        @* --- 3. DROPDOWNS DINÂMICAS --- *@
+                        @* --- 3. DROPDOWNS --- *@
 
                         <div id="eventTypeSection" class="mb-4 d-none animate__animated animate__fadeIn">
                             <div class="p-4 bg-white border border-primary border-opacity-25 rounded-3 shadow-sm">
@@ -144,7 +137,7 @@
                             </div>
                         </div>
 
-                        @* --- 4. DETALHES --- *@
+                        @* --- 4. DETAILS --- *@
                         <div class="row mb-3">
                             <div class="col-md-8">
                                 <label asp-for="BadgeRequirementName" class="form-label fw-bold text-uppercase small text-muted">Name</label>
@@ -167,7 +160,7 @@
                             <span asp-validation-for="RequirementDescription" class="text-danger small"></span>
                         </div>
 
-                        @* --- BOTÕES DE AÇÃO --- *@
+                        @* --- BUTTONS --- *@
                         <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
                             <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Back to List</a>
                             <button type="submit" class="btn btn-success px-4 shadow-sm">Create Requirement</button>
@@ -186,7 +179,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Verifica o estado inicial (caso haja erro de validação e a página recarregue com dados)
             toggleDynamicFields();
         });
 
