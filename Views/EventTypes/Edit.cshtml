@@ -6,6 +6,7 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+@* Concurrency Error Alert *@
 @if (ViewBag.EventTypeWasDeleted != null) {
     <div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm mb-4" role="alert">
         <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-2"></i>
@@ -30,6 +31,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
 
+            @* Hide ID if we are editing. If concurrency error (Create New), we don't bind the ID *@
             @if (ViewBag.EventTypeWasDeleted == null) {
                 <input type="hidden" asp-for="EventTypeId" />
             }
@@ -46,25 +48,23 @@
                 <span asp-validation-for="EventTypeDescription" class="text-danger small"></span>
             </div>
 
+            @* Scoring Strategy Removed. Multiplier layout adjusted *@
             <div class="row mb-4">
-                <div class="col-md-6">
-                    <label asp-for="ScoringStrategyId" class="form-label fw-bold"></label>
-                    <select asp-for="ScoringStrategyId" class="form-select" asp-items="ViewBag.ScoringStrategyId">
-                        <option value="">-- Select Strategy --</option>
-                    </select>
-                    <span asp-validation-for="ScoringStrategyId" class="text-danger small"></span>
-                </div>
                 <div class="col-md-6">
                     <label asp-for="EventTypeMultiplier" class="form-label fw-bold"></label>
                     <div class="input-group">
                         <span class="input-group-text bg-light">x</span>
                         <input asp-for="EventTypeMultiplier" class="form-control" type="number" step="0.01" min="1" max="3" placeholder="1.00" />
                     </div>
+                    <div class="form-text text-muted">
+                        Set a value between 1.00 and 3.00 to multiply points for this event.
+                    </div>
                     <span asp-validation-for="EventTypeMultiplier" class="text-danger small"></span>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2">
+                @* Logic to handle "Save" vs "Create New" based on Concurrency *@
                 @if (ViewBag.EventTypeWasDeleted != null) {
                     <button type="submit" asp-action="Create" class="btn btn-success">
                         <i class="bi bi-save me-1"></i> Create as New

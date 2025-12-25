@@ -9,8 +9,8 @@ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using System.Reflection; // Necessário para ler o Enum
-using System.ComponentModel.DataAnnotations; // Necessário para ler o Display Name
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Controllers {
     [Authorize(Roles = "Gestor")]
@@ -35,7 +35,7 @@ namespace HealthWellbeing.Controllers {
                 .Include(b => b.ActivityTypes)
                 .AsQueryable();
 
-            // --- FILTROS ---
+            // --- FILTERS ---
             if (!string.IsNullOrEmpty(searchName)) {
                 requirementsQuery = requirementsQuery.Where(r => r.BadgeRequirementName.Contains(searchName));
             }
@@ -52,31 +52,30 @@ namespace HealthWellbeing.Controllers {
                 requirementsQuery = requirementsQuery.Where(r => r.TargetValue == searchTargetValue.Value);
             }
 
-            // --- PREPARAÇÃO DE DADOS PARA A VIEW ---
+            // --- DATA PREPARATION FOR VIEW ---
 
-            // 1. Valores Simples
             ViewBag.SearchName = searchName;
             ViewBag.SearchTargetValue = searchTargetValue;
 
-            // 2. Dropdown de Badges
+            // Badges Dropdown
             ViewData["Badges"] = new SelectList(_context.Badge, "BadgeId", "BadgeName", searchBadgeId);
 
-            // 3. Dropdown de Requirement Types (A CORREÇÃO ESTÁ AQUI)
-            // Transformamos o Enum numa lista para o SelectList funcionar
+            // Requirement Types Dropdown
+            // Convert Enum to a list for SelectList to work
             var enumList = Enum.GetValues(typeof(RequirementType))
                 .Cast<RequirementType>()
                 .Select(e => new {
                     Id = (int)e,
-                    // Tenta obter o nome do [Display] ou usa o nome do código
+                    // Try to get [Display] name or use code name
                     Name = e.GetType().GetMember(e.ToString()).First()
                             .GetCustomAttribute<DisplayAttribute>()?.Name ?? e.ToString()
                 });
 
-            // Passamos '(int?)searchType' no final para marcar o item selecionado
+            // Pass '(int?)searchType' at the end to mark selected item
             ViewBag.SearchTypes = new SelectList(enumList, "Id", "Name", (int?)searchType);
 
 
-            // --- PAGINAÇÃO ---
+            // --- PAGINATION ---
             int numberRequirements = await requirementsQuery.CountAsync();
             var paginationInfo = new ViewModels.PaginationInfo<BadgeRequirement>(page, numberRequirements);
 
@@ -92,7 +91,7 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeRequirements/Details/5
         public async Task<IActionResult> Details(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) return View("InvalidBadgeRequirement");
 
             var badgeRequirement = await _context.BadgeRequirement
                 .Include(b => b.Badge)
@@ -100,7 +99,7 @@ namespace HealthWellbeing.Controllers {
                 .Include(b => b.ActivityTypes)
                 .FirstOrDefaultAsync(m => m.BadgeRequirementId == id);
 
-            if (badgeRequirement == null) return NotFound();
+            if (badgeRequirement == null) return View("InvalidBadgeRequirement");
 
             return View(badgeRequirement);
         }
@@ -132,10 +131,10 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeRequirements/Edit/5
         public async Task<IActionResult> Edit(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) return View("InvalidBadgeRequirement");
 
             var badgeRequirement = await _context.BadgeRequirement.FindAsync(id);
-            if (badgeRequirement == null) return NotFound();
+            if (badgeRequirement == null) return View("InvalidBadgeRequirement");
 
             PopulateDropdowns(badgeRequirement);
             return View(badgeRequirement);
@@ -145,7 +144,7 @@ namespace HealthWellbeing.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BadgeRequirementId,BadgeId,BadgeRequirementName,RequirementDescription,TargetValue,RequirementType,EventTypeId,ActivityTypeId")] BadgeRequirement badgeRequirement) {
-            if (id != badgeRequirement.BadgeRequirementId) return NotFound();
+            if (id != badgeRequirement.BadgeRequirementId) return View("InvalidBadgeRequirement");
 
             EnsureCorrectIdsForType(badgeRequirement);
 
@@ -159,7 +158,7 @@ namespace HealthWellbeing.Controllers {
                     });
                 }
                 catch (DbUpdateConcurrencyException) {
-                    if (!BadgeRequirementExists(badgeRequirement.BadgeRequirementId)) return NotFound();
+                    if (!BadgeRequirementExists(badgeRequirement.BadgeRequirementId)) return View("InvalidBadgeRequirement");
                     else throw;
                 }
             }
@@ -170,7 +169,7 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeRequirements/Delete/5
         public async Task<IActionResult> Delete(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) return View("InvalidBadgeRequirement");
 
             var badgeRequirement = await _context.BadgeRequirement
                 .Include(b => b.Badge)

@@ -8,6 +8,7 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+@* Feedback Messages *@
 @if (successMessage != null) {
     <div class="container py-4">
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -25,7 +26,8 @@
     </div>
 }
 
-@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && string.IsNullOrEmpty(Context.Request.Query["searchScoringStrategyId"])) {
+@* Empty State (No items and no search active) *@
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && ViewBag.SearchMultiplier == null) {
     <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
         <div class="ps-3">
@@ -39,6 +41,7 @@
     </a>
 }
 else {
+    @* Search & Actions Bar *@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4 text-secondary">Overview</h2>
         <div class="d-flex justify-content-end">
@@ -51,19 +54,29 @@ else {
         </div>
     </div>
 
+    @* Search Form Collapse *@
     <div class="collapse mt-2 mb-3" id="eventTypeSearch">
         <div class="card card-body">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+                @* Filter: Name *@
                 <div class="col-md-6">
                     <label for="searchName" class="form-label">Event Type Name</label>
-                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name" type="search" />
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Search by name..." type="search" />
                 </div>
+
+                @* Filter: Multiplier (CORRIGIDO) *@
                 <div class="col-md-6">
-                    <label for="searchScoringStrategyId" class="form-label">Scoring Strategy</label>
-                    <select id="searchScoringStrategyId" name="searchScoringStrategyId" class="form-select" asp-items="ViewBag.ScoringStrategies">
-                        <option value="">All Strategies</option>
-                    </select>
+                    <label for="searchMultiplier" class="form-label">Multiplier</label>
+                    <input id="searchMultiplier"
+                           name="searchMultiplier"
+                           value="@(ViewBag.SearchMultiplier?.ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                           class="form-control"
+                           type="number"
+                           step="0.01"
+                           placeholder="e.g. 1.5" />
                 </div>
+
                 <div class="col-12 mt-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Search
@@ -76,6 +89,7 @@ else {
         </div>
     </div>
 
+    @* Results Table *@
     @if (!Model.Items.Any()) {
         <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
             <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
@@ -91,7 +105,6 @@ else {
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
-                        <th>Scoring Strategy</th>
                         <th class="text-center">Multiplier</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -108,44 +121,6 @@ else {
                                 else {
                                     @(string.IsNullOrEmpty(item.EventTypeDescription) ? "-" : item.EventTypeDescription)
                                 }
-                            </td>
-
-                            <td>
-                                @{
-                                    string styleStrategy;
-                                    string iconClass;
-
-                                    switch (item.ScoringStrategy.ScoringStrategyCode) {
-                                        case "FIXED":
-                                            styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
-                                            iconClass = "bi-pin-angle-fill";
-                                            break;
-                                        case "PROGRESSIVE":
-                                            styleStrategy = "background-color: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4;";
-                                            iconClass = "bi-graph-up-arrow";
-                                            break;
-                                        case "TIME_BASED":
-                                            styleStrategy = "background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
-                                            iconClass = "bi-stopwatch";
-                                            break;
-                                        case "COMPLETION":
-                                            styleStrategy = "background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
-                                            iconClass = "bi-check-circle";
-                                            break;
-                                        case "BINARY":
-                                            styleStrategy = "background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;";
-                                            iconClass = "bi-toggle-on";
-                                            break;
-                                        default:
-                                            styleStrategy = "background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;";
-                                            iconClass = "bi-tag";
-                                            break;
-                                    }
-                                }
-                                <span class="badge rounded-pill d-inline-flex align-items-center justify-content-center"
-                                      style="@styleStrategy font-weight: 500; width: 150px; padding: 0.5em 0;">
-                                    <i class="bi @iconClass me-2"></i> @item.ScoringStrategy.ScoringStrategyName
-                                </span>
                             </td>
 
                             <td class="text-center">
@@ -190,6 +165,7 @@ else {
                 </tbody>
             </table>
 
+            @* Pagination *@
             <div class="d-flex justify-content-between align-items-center bg-light p-3 border rounded-bottom">
 
                 <div class="small text-muted">
@@ -202,7 +178,7 @@ else {
                             <a class="page-link" asp-action="Index"
                                asp-route-page="1"
                                asp-route-searchName="@ViewBag.SearchName"
-                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">First</a>
+                               asp-route-searchMultiplier="@ViewBag.SearchMultiplier">First</a>
                         </li>
 
                         @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
@@ -210,7 +186,7 @@ else {
                                 <a class="page-link" asp-action="Index"
                                    asp-route-page="@p"
                                    asp-route-searchName="@ViewBag.SearchName"
-                                   asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">@p</a>
+                                   asp-route-searchMultiplier="@ViewBag.SearchMultiplier">@p</a>
                             </li>
                         }
 
@@ -218,7 +194,7 @@ else {
                             <a class="page-link" asp-action="Index"
                                asp-route-page="@Model.TotalPages"
                                asp-route-searchName="@ViewBag.SearchName"
-                               asp-route-searchScoringStrategyId="@Context.Request.Query["searchScoringStrategyId"]">Last</a>
+                               asp-route-searchMultiplier="@ViewBag.SearchMultiplier">Last</a>
                         </li>
                     </ul>
                 </nav>

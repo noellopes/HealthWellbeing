@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251221171001_UpdateMigration")]
+    [Migration("20251223235042_UpdateMigration")]
     partial class UpdateMigration
     {
         /// <inheritdoc />
@@ -218,6 +218,9 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<int>("BadgeTypeId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<int>("RewardPoints")
                         .HasColumnType("int");
@@ -564,8 +567,6 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("EventTypeId");
 
-                    b.HasIndex("ScoringStrategyId");
-
                     b.ToTable("EventType");
                 });
 
@@ -910,33 +911,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("RestricaoAlimentar");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.ScoringStrategy", b =>
-                {
-                    b.Property<int>("ScoringStrategyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScoringStrategyId"));
-
-                    b.Property<string>("ScoringStrategyCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ScoringStrategyDescription")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("ScoringStrategyName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("ScoringStrategyId");
-
-                    b.ToTable("ScoringStrategy");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.TipoExercicio", b =>
                 {
                     b.Property<int>("TipoExercicioId")
@@ -1272,17 +1246,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.EventType", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.ScoringStrategy", "ScoringStrategy")
-                        .WithMany("EventTypes")
-                        .HasForeignKey("ScoringStrategyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ScoringStrategy");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Level", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.LevelCategory", "Category")
@@ -1412,11 +1375,6 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.LevelCategory", b =>
                 {
                     b.Navigation("Levels");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.ScoringStrategy", b =>
-                {
-                    b.Navigation("EventTypes");
                 });
 #pragma warning restore 612, 618
         }

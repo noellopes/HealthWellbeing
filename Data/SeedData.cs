@@ -23,7 +23,6 @@ namespace HealthWellbeing.Data
             var trainers = PopulateTrainer(dbContext);
             PopulateTraining(dbContext, trainers);
 
-            PopulateScoringStrategies(dbContext);
             PopulateEventTypes(dbContext);
             PopulateBadgeTypes(dbContext);
             PopulateActivityTypes(dbContext); 
@@ -189,73 +188,58 @@ namespace HealthWellbeing.Data
         }
 
         private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
-            var strategies = dbContext.ScoringStrategy.ToDictionary(s => s.ScoringStrategyCode, s => s.ScoringStrategyId);
 
             if (dbContext.EventType.Any()) return;
 
             dbContext.EventType.AddRange(new List<EventType>() {
         
                 // --- Aulas de Grupo ---
-                new EventType { EventTypeName = "Yoga Morning Flow", EventTypeDescription = "Sessão matinal de Vinyasa Yoga.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.15m },
-                new EventType { EventTypeName = "Pilates Mat", EventTypeDescription = "Aula de Pilates no solo.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.12m },
-                new EventType { EventTypeName = "Zumba Dance", EventTypeDescription = "Aula de dança aeróbica.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.25m },
-                new EventType { EventTypeName = "BodyPump", EventTypeDescription = "Treino de resistência com pesos.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.45m },
-                new EventType { EventTypeName = "Spinning / Cycling", EventTypeDescription = "Ciclismo indoor intenso.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.55m },
-                new EventType { EventTypeName = "Boxe / Kickboxing", EventTypeDescription = "Treino de combate cardio.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.65m },
-                new EventType { EventTypeName = "Aula de Barre", EventTypeDescription = "Fusão de ballet e pilates.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.28m },
-                new EventType { EventTypeName = "Hidroginástica", EventTypeDescription = "Exercício na piscina.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.18m },
-                new EventType { EventTypeName = "Meditação Guiada", EventTypeDescription = "Prática de mindfulness.", ScoringStrategyId = strategies["COMPLETION"], EventTypeMultiplier = 1.05m },
-                new EventType { EventTypeName = "CrossFit WOD", EventTypeDescription = "Treino do dia funcional.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 1.95m },
+                new EventType { EventTypeName = "Yoga Morning Flow", EventTypeDescription = "Sessão matinal de Vinyasa Yoga.", EventTypeMultiplier = 1.15m },
+                new EventType { EventTypeName = "Pilates Mat", EventTypeDescription = "Aula de Pilates no solo.", EventTypeMultiplier = 1.12m },
+                new EventType { EventTypeName = "Zumba Dance", EventTypeDescription = "Aula de dança aeróbica.", EventTypeMultiplier = 1.25m },
+                new EventType { EventTypeName = "BodyPump", EventTypeDescription = "Treino de resistência com pesos.", EventTypeMultiplier = 1.45m },
+                new EventType { EventTypeName = "Spinning / Cycling", EventTypeDescription = "Ciclismo indoor intenso.", EventTypeMultiplier = 1.55m },
+                new EventType { EventTypeName = "Boxe / Kickboxing", EventTypeDescription = "Treino de combate cardio.", EventTypeMultiplier = 1.65m },
+                new EventType { EventTypeName = "Aula de Barre", EventTypeDescription = "Fusão de ballet e pilates.", EventTypeMultiplier = 1.28m },
+                new EventType { EventTypeName = "Hidroginástica", EventTypeDescription = "Exercício na piscina.", EventTypeMultiplier = 1.18m },
+                new EventType { EventTypeName = "Meditação Guiada", EventTypeDescription = "Prática de mindfulness.", EventTypeMultiplier = 1.05m },
+                new EventType { EventTypeName = "CrossFit WOD", EventTypeDescription = "Treino do dia funcional.", EventTypeMultiplier = 1.95m },
 
                 // --- Corrida e Cardio ---
-                new EventType { EventTypeName = "Caminhada 5K", EventTypeDescription = "Caminhada vigorosa.", ScoringStrategyId = strategies["COMPLETION"], EventTypeMultiplier = 1.10m },
-                new EventType { EventTypeName = "Corrida 5K", EventTypeDescription = "Corrida curta distância.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.45m },
-                new EventType { EventTypeName = "Corrida 10K", EventTypeDescription = "Corrida média distância.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.75m },
-                new EventType { EventTypeName = "Meia Maratona", EventTypeDescription = "Prova de 21km.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 2.45m },
-                new EventType { EventTypeName = "Maratona", EventTypeDescription = "Prova de 42km.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 2.95m },
-                new EventType { EventTypeName = "Natação Livre", EventTypeDescription = "Natação em piscina.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.62m },
-                new EventType { EventTypeName = "Ciclismo Estrada", EventTypeDescription = "Passeio de bicicleta.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.68m },
-                new EventType { EventTypeName = "Triatlo Sprint", EventTypeDescription = "Natação, bike e corrida.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 2.75m },
-                new EventType { EventTypeName = "Hiking / Trilho", EventTypeDescription = "Caminhada na natureza.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.35m },
-                new EventType { EventTypeName = "Trail Running", EventTypeDescription = "Corrida em trilhos.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 1.98m },
+                new EventType { EventTypeName = "Caminhada 5K", EventTypeDescription = "Caminhada vigorosa.", EventTypeMultiplier = 1.10m },
+                new EventType { EventTypeName = "Corrida 5K", EventTypeDescription = "Corrida curta distância.", EventTypeMultiplier = 1.45m },
+                new EventType { EventTypeName = "Corrida 10K", EventTypeDescription = "Corrida média distância.", EventTypeMultiplier = 1.75m },
+                new EventType { EventTypeName = "Meia Maratona", EventTypeDescription = "Prova de 21km.", EventTypeMultiplier = 2.45m },
+                new EventType { EventTypeName = "Maratona", EventTypeDescription = "Prova de 42km.", EventTypeMultiplier = 2.95m },
+                new EventType { EventTypeName = "Natação Livre", EventTypeDescription = "Natação em piscina.", EventTypeMultiplier = 1.62m },
+                new EventType { EventTypeName = "Ciclismo Estrada", EventTypeDescription = "Passeio de bicicleta.", EventTypeMultiplier = 1.68m },
+                new EventType { EventTypeName = "Triatlo Sprint", EventTypeDescription = "Natação, bike e corrida.", EventTypeMultiplier = 2.75m },
+                new EventType { EventTypeName = "Hiking / Trilho", EventTypeDescription = "Caminhada na natureza.", EventTypeMultiplier = 1.35m },
+                new EventType { EventTypeName = "Trail Running", EventTypeDescription = "Corrida em trilhos.", EventTypeMultiplier = 1.98m },
 
                 // --- Ginásio e Força ---
-                new EventType { EventTypeName = "Musculação (Hipertrofia)", EventTypeDescription = "Treino de força.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.48m },
-                new EventType { EventTypeName = "Powerlifting", EventTypeDescription = "Treino de força máxima.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 2.55m },
-                new EventType { EventTypeName = "Treino Funcional", EventTypeDescription = "Circuitos funcionais.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.38m },
-                new EventType { EventTypeName = "Personal Training", EventTypeDescription = "Sessão 1 para 1.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.95m },
-                new EventType { EventTypeName = "Calistenia", EventTypeDescription = "Peso do corpo.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 1.58m },
-                new EventType { EventTypeName = "Halterofilismo", EventTypeDescription = "Levantamento olímpico.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 2.15m },
-                new EventType { EventTypeName = "HIIT", EventTypeDescription = "Intervalado alta intensidade.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.72m },
-                new EventType { EventTypeName = "Core / Abdominais", EventTypeDescription = "Foco na zona média.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.15m },
-                new EventType { EventTypeName = "Mobilidade / alongamentos", EventTypeDescription = "Recuperação ativa.", ScoringStrategyId = strategies["COMPLETION"], EventTypeMultiplier = 1.02m },
-                new EventType { EventTypeName = "Kettlebell Flow", EventTypeDescription = "Treino com kettlebells.", ScoringStrategyId = strategies["FIXED"], EventTypeMultiplier = 1.42m },
+                new EventType { EventTypeName = "Musculação (Hipertrofia)", EventTypeDescription = "Treino de força.", EventTypeMultiplier = 1.48m },
+                new EventType { EventTypeName = "Powerlifting", EventTypeDescription = "Treino de força máxima.", EventTypeMultiplier = 2.55m },
+                new EventType { EventTypeName = "Treino Funcional", EventTypeDescription = "Circuitos funcionais.", EventTypeMultiplier = 1.38m },
+                new EventType { EventTypeName = "Personal Training", EventTypeDescription = "Sessão 1 para 1.", EventTypeMultiplier = 1.95m },
+                new EventType { EventTypeName = "Calistenia", EventTypeDescription = "Peso do corpo.", EventTypeMultiplier = 1.58m },
+                new EventType { EventTypeName = "Halterofilismo", EventTypeDescription = "Levantamento olímpico.", EventTypeMultiplier = 2.15m },
+                new EventType { EventTypeName = "HIIT", EventTypeDescription = "Intervalado alta intensidade.", EventTypeMultiplier = 1.72m },
+                new EventType { EventTypeName = "Core / Abdominais", EventTypeDescription = "Foco na zona média.", EventTypeMultiplier = 1.15m },
+                new EventType { EventTypeName = "Mobilidade / alongamentos", EventTypeDescription = "Recuperação ativa.", EventTypeMultiplier = 1.02m },
+                new EventType { EventTypeName = "Kettlebell Flow", EventTypeDescription = "Treino com kettlebells.", EventTypeMultiplier = 1.42m },
 
                 // --- Desportos e Bem-estar ---
-                new EventType { EventTypeName = "Futebol 5", EventTypeDescription = "Jogo com amigos.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.55m },
-                new EventType { EventTypeName = "Ténis", EventTypeDescription = "Partida de ténis.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.48m },
-                new EventType { EventTypeName = "Padel", EventTypeDescription = "Jogo de padel.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.38m },
-                new EventType { EventTypeName = "Basquetebol", EventTypeDescription = "Jogo de basquete.", ScoringStrategyId = strategies["TIME_BASED"], EventTypeMultiplier = 1.65m },
-                new EventType { EventTypeName = "Escalada Indoor", EventTypeDescription = "Bouldering ou corda.", ScoringStrategyId = strategies["PROGRESSIVE"], EventTypeMultiplier = 1.85m },
-                new EventType { EventTypeName = "Workshop Nutrição", EventTypeDescription = "Aprender a comer bem.", ScoringStrategyId = strategies["COMPLETION"], EventTypeMultiplier = 1.08m },
-                new EventType { EventTypeName = "Dia Zero Açúcar", EventTypeDescription = "Hábito saudável.", ScoringStrategyId = strategies["BINARY"], EventTypeMultiplier = 1.15m },
-                new EventType { EventTypeName = "Hidratação Meta", EventTypeDescription = "Beber 2L+ água.", ScoringStrategyId = strategies["BINARY"], EventTypeMultiplier = 1.05m },
-                new EventType { EventTypeName = "Higiene do Sono", EventTypeDescription = "Dormir 8 horas.", ScoringStrategyId = strategies["BINARY"], EventTypeMultiplier = 1.12m },
-                new EventType { EventTypeName = "Banho Gelado", EventTypeDescription = "Recuperação a frio.", ScoringStrategyId = strategies["BINARY"], EventTypeMultiplier = 1.25m }
-            });
-
-            dbContext.SaveChanges();
-        }
-
-        private static void PopulateScoringStrategies(HealthWellbeingDbContext dbContext) {
-            if (dbContext.ScoringStrategy.Any()) return;
-
-            dbContext.ScoringStrategy.AddRange(new List<ScoringStrategy>() {
-                new ScoringStrategy { ScoringStrategyName = "Fixed Score", ScoringStrategyCode = "FIXED", ScoringStrategyDescription = "A fixed score is awarded regardless of performance metrics." },
-                new ScoringStrategy { ScoringStrategyName = "Progressive Score", ScoringStrategyCode = "PROGRESSIVE", ScoringStrategyDescription = "Score increases based on the volume or intensity of the activity." },
-                new ScoringStrategy { ScoringStrategyName = "Time Based", ScoringStrategyCode = "TIME_BASED", ScoringStrategyDescription = "Score is calculated based on the duration of the event." },
-                new ScoringStrategy { ScoringStrategyName = "Completion Only", ScoringStrategyCode = "COMPLETION", ScoringStrategyDescription = "Points are awarded simply for completing the event." },
-                new ScoringStrategy { ScoringStrategyName = "Binary", ScoringStrategyCode = "BINARY", ScoringStrategyDescription = "Success or failure determines the score (e.g., habits)." }
+                new EventType { EventTypeName = "Futebol 5", EventTypeDescription = "Jogo com amigos.", EventTypeMultiplier = 1.55m },
+                new EventType { EventTypeName = "Ténis", EventTypeDescription = "Partida de ténis.", EventTypeMultiplier = 1.48m },
+                new EventType { EventTypeName = "Padel", EventTypeDescription = "Jogo de padel.", EventTypeMultiplier = 1.38m },
+                new EventType { EventTypeName = "Basquetebol", EventTypeDescription = "Jogo de basquete.", EventTypeMultiplier = 1.65m },
+                new EventType { EventTypeName = "Escalada Indoor", EventTypeDescription = "Bouldering ou corda.", EventTypeMultiplier = 1.85m },
+                new EventType { EventTypeName = "Workshop Nutrição", EventTypeDescription = "Aprender a comer bem.", EventTypeMultiplier = 1.08m },
+                new EventType { EventTypeName = "Dia Zero Açúcar", EventTypeDescription = "Hábito saudável.", EventTypeMultiplier = 1.15m },
+                new EventType { EventTypeName = "Hidratação Meta", EventTypeDescription = "Beber 2L+ água.", EventTypeMultiplier = 1.05m },
+                new EventType { EventTypeName = "Higiene do Sono", EventTypeDescription = "Dormir 8 horas.", EventTypeMultiplier = 1.12m },
+                new EventType { EventTypeName = "Banho Gelado", EventTypeDescription = "Recuperação a frio.", EventTypeMultiplier = 1.25m }
             });
 
             dbContext.SaveChanges();

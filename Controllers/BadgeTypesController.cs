@@ -10,7 +10,7 @@ using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers {
-    [Authorize(Roles = "Gestor")] // 1. Segurança aplicada
+    [Authorize(Roles = "Gestor")]
     public class BadgeTypesController : Controller {
         private readonly HealthWellbeingDbContext _context;
 
@@ -19,21 +19,21 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: BadgeTypes
-        // 2. Adicionada Pesquisa e Paginação
+        // Search and Pagination
         public async Task<IActionResult> Index(int page = 1, string searchName = "") {
             var query = _context.BadgeType
-                .AsNoTracking() // Otimização de performance para leitura
+                .AsNoTracking()
                 .AsQueryable();
 
-            // Filtro por nome
+            // Filter by name
             if (!string.IsNullOrEmpty(searchName)) {
                 query = query.Where(b => b.BadgeTypeName.Contains(searchName));
             }
 
-            // Persistir a pesquisa na View
+            // Persist search in View
             ViewBag.SearchName = searchName;
 
-            // Paginação
+            // Pagination
             int totalItems = await query.CountAsync();
             var paginationInfo = new ViewModels.PaginationInfo<BadgeType>(page, totalItems);
 
@@ -48,13 +48,17 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeTypes/Details/5
         public async Task<IActionResult> Details(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadgeType");
+            }
 
             var badgeType = await _context.BadgeType
-                .Include(bt => bt.Badges) // Incluir Badges para mostrar contagem se necessário
+                .Include(bt => bt.Badges)
                 .FirstOrDefaultAsync(m => m.BadgeTypeId == id);
 
-            if (badgeType == null) return NotFound();
+            if (badgeType == null) {
+                return View("InvalidBadgeType");
+            }
 
             return View(badgeType);
         }
@@ -72,7 +76,7 @@ namespace HealthWellbeing.Controllers {
                 _context.Add(badgeType);
                 await _context.SaveChangesAsync();
 
-                // 3. Mensagem de Feedback
+                // Feedback Message
                 TempData["SuccessMessage"] = "Badge Type created successfully.";
                 return RedirectToAction(nameof(Index));
             }
@@ -81,10 +85,14 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeTypes/Edit/5
         public async Task<IActionResult> Edit(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadgeType");
+            }
 
             var badgeType = await _context.BadgeType.FindAsync(id);
-            if (badgeType == null) return NotFound();
+            if (badgeType == null) {
+                return View("InvalidBadgeType");
+            }
 
             return View(badgeType);
         }
@@ -93,20 +101,26 @@ namespace HealthWellbeing.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BadgeTypeId,BadgeTypeName,BadgeTypeDescription")] BadgeType badgeType) {
-            if (id != badgeType.BadgeTypeId) return NotFound();
+            if (id != badgeType.BadgeTypeId) {
+                return View("InvalidBadgeType");
+            }
 
             if (ModelState.IsValid) {
                 try {
                     _context.Update(badgeType);
                     await _context.SaveChangesAsync();
 
-                    // 3. Mensagem de Feedback
+                    // Feedback Message
                     TempData["SuccessMessage"] = "Badge Type updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException) {
-                    if (!BadgeTypeExists(badgeType.BadgeTypeId)) return NotFound();
-                    else throw;
+                    if (!BadgeTypeExists(badgeType.BadgeTypeId)) {
+                        return View("InvalidBadgeType");
+                    }
+                    else {
+                        throw;
+                    }
                 }
             }
             return View(badgeType);
@@ -114,10 +128,12 @@ namespace HealthWellbeing.Controllers {
 
         // GET: BadgeTypes/Delete/5
         public async Task<IActionResult> Delete(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadgeType");
+            }
 
             var badgeType = await _context.BadgeType
-                .Include(bt => bt.Badges) // Incluir Badges para verificar dependências
+                .Include(bt => bt.Badges)
                 .FirstOrDefaultAsync(m => m.BadgeTypeId == id);
 
             if (badgeType == null) {
@@ -132,17 +148,17 @@ namespace HealthWellbeing.Controllers {
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id) {
-            // Carregamos com Include para verificar dependências
+            // Include related data to check dependencies
             var badgeType = await _context.BadgeType
                 .Include(bt => bt.Badges)
                 .FirstOrDefaultAsync(m => m.BadgeTypeId == id);
 
             if (badgeType != null) {
-                // 4. Validação de Integridade (Crucial para NoAction)
-                // Se já existirem Badges deste tipo, impedimos a eliminação.
+                // Integrity Validation (Crucial for NoAction)
+                // If Badges of this type exist, prevent deletion.
                 if (badgeType.Badges != null && badgeType.Badges.Any()) {
                     ViewBag.Error = "This badge type is currently associated with active badges.";
-                    return View(badgeType); // Retorna à página de delete com o erro
+                    return View(badgeType); // Returns to the delete page with the error
                 }
 
                 try {

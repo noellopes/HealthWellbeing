@@ -7,7 +7,6 @@ using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers {
@@ -20,28 +19,25 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: EventTypes
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", int? searchScoringStrategyId = null) {
-            // Preparar a Query base com o Include necessário
-            var eventTypesQuery = _context.EventType
-                .Include(e => e.ScoringStrategy)
-                .AsQueryable();
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", decimal? searchMultiplier = null) { 
+            // Prepare the base query
+            var eventTypesQuery = _context.EventType.AsQueryable();
 
-            // Aplicar filtros se existirem
+            // Filter by Name
             if (!string.IsNullOrEmpty(searchName)) {
                 eventTypesQuery = eventTypesQuery.Where(e => e.EventTypeName.Contains(searchName));
             }
 
-            if (searchScoringStrategyId.HasValue) {
-                eventTypesQuery = eventTypesQuery.Where(e => e.ScoringStrategyId == searchScoringStrategyId);
+            // Filter by Multiplier
+            if (searchMultiplier.HasValue) {
+                eventTypesQuery = eventTypesQuery.Where(e => e.EventTypeMultiplier == searchMultiplier.Value);
             }
 
-            // Guardar os valores de pesquisa na ViewBag para manter o formulário preenchido
+            // Persist search parameters in ViewBag
             ViewBag.SearchName = searchName;
+            ViewBag.SearchMultiplier = searchMultiplier;
 
-            // Carregar a lista de estratégias de classificação para o dropdown de pesquisa
-            ViewData["ScoringStrategies"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", searchScoringStrategyId);
-
-            // Paginação
+            // Handle pagination logic
             int numberEventTypes = await eventTypesQuery.CountAsync();
             var eventTypesInfo = new ViewModels.PaginationInfo<EventType>(page, numberEventTypes);
 
@@ -60,13 +56,12 @@ namespace HealthWellbeing.Controllers {
                 return NotFound();
             }
 
+            // Retrieve the event type including associated events for context
             var eventType = await _context.EventType
-                .Include(e => e.ScoringStrategy)
                 .Include(e => e.Events)
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
 
             if (eventType == null) {
-                
                 return View("InvalidEventType");
             }
 
@@ -75,8 +70,6 @@ namespace HealthWellbeing.Controllers {
 
         // GET: EventTypes/Create
         public IActionResult Create() {
-            // Dropdown para escolher a ScoringStrategy.
-            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName");
             return View();
         }
 
@@ -85,21 +78,19 @@ namespace HealthWellbeing.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeDescription,ScoringStrategyId,EventTypeMultiplier")] EventType eventType) {
+        public async Task<IActionResult> Create([Bind("EventTypeId,EventTypeName,EventTypeDescription,EventTypeMultiplier")] EventType eventType) {
             if (ModelState.IsValid) {
                 _context.Add(eventType);
                 await _context.SaveChangesAsync();
+
+                // Redirect with a success message
                 return RedirectToAction(nameof(Details),
                     new {
                         id = eventType.EventTypeId,
-                        // Feedback de sucesso
                         SuccessMessage = "Event type created successfully."
                     }
                 );
             }
-
-            // Se falhar, recarregar o dropdown
-            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
@@ -113,8 +104,6 @@ namespace HealthWellbeing.Controllers {
             if (eventType == null) {
                 return View("InvalidEventType");
             }
-
-            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
@@ -123,7 +112,7 @@ namespace HealthWellbeing.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeDescription,ScoringStrategyId,EventTypeMultiplier")] EventType eventType) {
+        public async Task<IActionResult> Edit(int id, [Bind("EventTypeId,EventTypeName,EventTypeDescription,EventTypeMultiplier")] EventType eventType) {
             if (id != eventType.EventTypeId) {
                 return NotFound();
             }
@@ -132,6 +121,7 @@ namespace HealthWellbeing.Controllers {
                 try {
                     _context.Update(eventType);
                     await _context.SaveChangesAsync();
+
                     return RedirectToAction(nameof(Details),
                         new {
                             id = eventType.EventTypeId,
@@ -140,6 +130,7 @@ namespace HealthWellbeing.Controllers {
                     );
                 }
                 catch (DbUpdateConcurrencyException) {
+                    // Check if the entity still exists in case of concurrent deletion
                     if (!EventTypeExists(eventType.EventTypeId)) {
                         ViewBag.EventTypeWasDeleted = true;
                     }
@@ -149,8 +140,6 @@ namespace HealthWellbeing.Controllers {
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            ViewData["ScoringStrategyId"] = new SelectList(_context.Set<ScoringStrategy>(), "ScoringStrategyId", "ScoringStrategyName", eventType.ScoringStrategyId);
             return View(eventType);
         }
 
@@ -161,7 +150,6 @@ namespace HealthWellbeing.Controllers {
             }
 
             var eventType = await _context.EventType
-                .Include(e => e.ScoringStrategy)
                 .Include(e => e.Events)
                 .FirstOrDefaultAsync(m => m.EventTypeId == id);
 
@@ -186,17 +174,17 @@ namespace HealthWellbeing.Controllers {
                     TempData["SuccessMessage"] = "Event Type deleted successfully.";
                 }
                 catch (Exception) {
+                    // Handle referential integrity ( existing associated events)
                     eventType = await _context.EventType
                         .AsNoTracking()
-                        .Include(e => e.ScoringStrategy)
                         .Include(e => e.Events)
                         .FirstOrDefaultAsync(e => e.EventTypeId == id);
 
-                    // Verifica se existem Eventos associados a este Tipo antes de apagar
                     int numberEvents = eventType?.Events?.Count ?? 0;
 
                     if (numberEvents > 0) {
-                        ViewBag.Error = $"Unable to delete Event Type. It is associated with {numberEvents} Events. Remove the events first.";
+                        string suffix = numberEvents == 1 ? "event" : "events";
+                        ViewBag.Error = $"This Event Type cannot be deleted because it is currently in use by {numberEvents} {suffix}.";
                     }
                     else {
                         ViewBag.Error = "An error occurred while deleting the Event Type.";

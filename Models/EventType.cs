@@ -20,8 +20,6 @@ namespace HealthWellbeing.Models {
         [Required(ErrorMessage = "Please select a scoring mode.")]
         public int ScoringStrategyId { get; set; }
 
-        [Display(Name = "Scoring Strategy")]
-        public virtual ScoringStrategy? ScoringStrategy { get; set; }
         public virtual ICollection<Event>? Events { get; set; }
 
         [Display(Name = "Multiplier")]

@@ -7,6 +7,7 @@
 <div class="container py-4">
     <h1 class="mb-4">@ViewData["Title"]</h1>
 
+    @* Error Feedback Section *@
     @if (ViewBag.Error != null) {
         <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
             <i class="bi bi-x-octagon-fill flex-shrink-0 me-3 fs-2"></i>
@@ -49,46 +50,7 @@
                     @(string.IsNullOrEmpty(Model.EventTypeDescription) ? "-" : Model.EventTypeDescription)
                 </dd>
 
-                <dt class="col-sm-3 text-muted d-flex align-items-center">
-                    @Html.DisplayNameFor(model => model.ScoringStrategy)
-                </dt>
-                <dd class="col-sm-9 mb-0">
-                    @{
-                        string styleStrategy;
-                        string iconClass;
-
-                        switch (Model.ScoringStrategy.ScoringStrategyCode) {
-                            case "FIXED":
-                                styleStrategy = "background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;";
-                                iconClass = "bi-pin-angle-fill";
-                                break;
-                            case "PROGRESSIVE":
-                                styleStrategy = "background-color: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4;";
-                                iconClass = "bi-graph-up-arrow";
-                                break;
-                            case "TIME_BASED":
-                                styleStrategy = "background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
-                                iconClass = "bi-stopwatch";
-                                break;
-                            case "COMPLETION":
-                                styleStrategy = "background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
-                                iconClass = "bi-check-circle";
-                                break;
-                            case "BINARY":
-                                styleStrategy = "background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe;";
-                                iconClass = "bi-toggle-on";
-                                break;
-                            default:
-                                styleStrategy = "background-color: #f8f9fa; color: #212529; border: 1px solid #dee2e6;";
-                                iconClass = "bi-tag";
-                                break;
-                        }
-                    }
-                    <span class="badge rounded-pill d-inline-flex align-items-center justify-content-center"
-                          style="@styleStrategy font-weight: 500; width: 150px; padding: 0.5em 0;">
-                        <i class="bi @iconClass me-2"></i> @Html.DisplayFor(model => model.ScoringStrategy.ScoringStrategyName)
-                    </span>
-                </dd>
+                @* ScoringStrategy Block Removed *@
 
                 <dt class="col-sm-3 text-muted d-flex align-items-center">
                     @Html.DisplayNameFor(model => model.EventTypeMultiplier)
@@ -98,6 +60,7 @@
                         var m = Model.EventTypeMultiplier;
                         string styleMulti;
 
+                        // Visual logic for multiplier intensity
                         if (m <= 1.0m) { styleMulti = "background-color: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6;"; }
                         else if (m <= 1.25m) { styleMulti = "background-color: #e7f1ff; color: #0d6efd; border: 1px solid #cce5ff;"; }
                         else if (m <= 1.5m) { styleMulti = "background-color: #cfe2ff; color: #084298; border: 1px solid #b6d4fe;"; }
@@ -116,13 +79,14 @@
                 <dd class="col-sm-9 mb-0">
                     @{
                         int count = Model.Events?.Count ?? 0;
-                        // Lógica de Delete: Se houver uso, é um aviso Laranja
+
+                        // Delete Safety Logic: Orange warning if used, Green if safe
                         string badgeClass = count > 0 ? "bg-warning text-dark border border-warning" : "bg-success text-white";
                         string icon = count > 0 ? "bi-exclamation-circle" : "bi-check-circle";
 
                         string badgeText = count > 0
                         ? $"Used by {count} Event" + (count != 1 ? "s" : "")
-                        : "Safe to delete (Unused)";// Confirmação visual
+                        : "Safe to delete (Unused)";
                     }
 
                     <span class="badge @badgeClass rounded-pill" style="font-size: 0.9em; padding: 0.5em 1em;">

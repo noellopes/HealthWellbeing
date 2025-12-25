@@ -26,22 +26,22 @@ namespace HealthWellbeing.Controllers {
                 .AsNoTracking()
                 .AsQueryable();
 
-            // Filtro por Nome
+            // Filter by Name
             if (!string.IsNullOrEmpty(searchName)) {
                 query = query.Where(b => b.BadgeName.Contains(searchName));
             }
 
-            // Filtro por Tipo
+            // Filter by Type
             if (searchTypeId.HasValue) {
                 query = query.Where(b => b.BadgeTypeId == searchTypeId);
             }
 
-            // Filtro por Pontos
+            // Filter by Points
             if (searchPoints.HasValue) {
                 query = query.Where(b => b.RewardPoints == searchPoints);
             }
 
-            // Filtro por Status
+            // Filter by Status
             if (!string.IsNullOrEmpty(searchStatus)) {
                 if (searchStatus == "active") {
                     query = query.Where(b => b.IsActive);
@@ -51,16 +51,16 @@ namespace HealthWellbeing.Controllers {
                 }
             }
 
-            // Manter Estado na View
+            // Persist State in View
             ViewBag.SearchName = searchName;
             ViewBag.SearchTypeId = searchTypeId;
             ViewBag.SearchPoints = searchPoints;
             ViewBag.SearchStatus = searchStatus;
 
-            // Popular Dropdown de Tipos
+            // Populate Types Dropdown
             ViewData["BadgeTypes"] = new SelectList(_context.BadgeType, "BadgeTypeId", "BadgeTypeName", searchTypeId);
 
-            // Paginação
+            // Pagination
             int totalItems = await query.CountAsync();
             var paginationInfo = new ViewModels.PaginationInfo<Badge>(page, totalItems);
 
@@ -75,16 +75,20 @@ namespace HealthWellbeing.Controllers {
 
         // GET: Badges/Details/5
         public async Task<IActionResult> Details(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadge");
+            }
 
             var badge = await _context.Badge
                 .Include(b => b.BadgeType)
-                .Include(b => b.BadgeRequirements) 
-                .Include(b => b.CustomerBadges)   
+                .Include(b => b.BadgeRequirements)
+                .Include(b => b.CustomerBadges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.BadgeId == id);
 
-            if (badge == null) return NotFound();
+            if (badge == null) {
+                return View("InvalidBadge");
+            }
 
             return View(badge);
         }
@@ -106,16 +110,22 @@ namespace HealthWellbeing.Controllers {
                 TempData["SuccessMessage"] = "Badge created successfully.";
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BadgeTypeId"] = new SelectList(_context.BadgeType, "BadgeTypeId", "BadgeTypeName", badge.BadgeTypeId);
             return View(badge);
         }
 
         // GET: Badges/Edit/5
         public async Task<IActionResult> Edit(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadge");
+            }
 
             var badge = await _context.Badge.FindAsync(id);
-            if (badge == null) return NotFound();
+
+            if (badge == null) {
+                return View("InvalidBadge");
+            }
 
             ViewData["BadgeTypeId"] = new SelectList(_context.BadgeType, "BadgeTypeId", "BadgeTypeName", badge.BadgeTypeId);
             return View(badge);
@@ -125,7 +135,9 @@ namespace HealthWellbeing.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BadgeId,BadgeTypeId,BadgeName,BadgeDescription,RewardPoints,IsActive")] Badge badge) {
-            if (id != badge.BadgeId) return NotFound();
+            if (id != badge.BadgeId) {
+                return View("InvalidBadge");
+            }
 
             if (ModelState.IsValid) {
                 try {
@@ -134,18 +146,25 @@ namespace HealthWellbeing.Controllers {
                     TempData["SuccessMessage"] = "Badge updated successfully.";
                 }
                 catch (DbUpdateConcurrencyException) {
-                    if (!BadgeExists(badge.BadgeId)) return NotFound();
-                    else throw;
+                    if (!BadgeExists(badge.BadgeId)) {
+                        return View("InvalidBadge");
+                    }
+                    else {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BadgeTypeId"] = new SelectList(_context.BadgeType, "BadgeTypeId", "BadgeTypeName", badge.BadgeTypeId);
             return View(badge);
         }
 
         // GET: Badges/Delete/5
         public async Task<IActionResult> Delete(int? id) {
-            if (id == null) return NotFound();
+            if (id == null) {
+                return View("InvalidBadge");
+            }
 
             var badge = await _context.Badge
                 .Include(b => b.BadgeType)
@@ -153,8 +172,7 @@ namespace HealthWellbeing.Controllers {
                 .FirstOrDefaultAsync(m => m.BadgeId == id);
 
             if (badge == null) {
-                TempData["ErrorMessage"] = "Badge not found.";
-                return RedirectToAction(nameof(Index));
+                return View("InvalidBadge");
             }
 
             return View(badge);
@@ -166,25 +184,27 @@ namespace HealthWellbeing.Controllers {
         public async Task<IActionResult> DeleteConfirmed(int id) {
             var badge = await _context.Badge
                 .Include(b => b.BadgeType)
-                .Include(b => b.CustomerBadges) 
+                .Include(b => b.CustomerBadges)
                 .FirstOrDefaultAsync(b => b.BadgeId == id);
 
-            if (badge != null) {
-                // Validação de Integridade: Clientes
-                if (badge.CustomerBadges != null && badge.CustomerBadges.Any()) {
-                    ViewBag.Error = "This badge has been awarded to customers. Please prefer deactivating it via the 'Edit' page to preserve user records.";
-                    return View(badge);
-                }
+            if (badge == null) {
+                return View("InvalidBadge");
+            }
 
-                try {
-                    _context.Badge.Remove(badge);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Badge deleted successfully.";
-                }
-                catch (DbUpdateException) {
-                    ViewBag.Error = "There are technical dependencies linked to this badge.";
-                    return View(badge);
-                }
+            // Integrity Validation: Customers
+            if (badge.CustomerBadges != null && badge.CustomerBadges.Any()) {
+                ViewBag.Error = "This badge has been awarded to customers. Please prefer deactivating it via the 'Edit' page to preserve user records.";
+                return View(badge);
+            }
+
+            try {
+                _context.Badge.Remove(badge);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Badge deleted successfully.";
+            }
+            catch (DbUpdateException) {
+                ViewBag.Error = "There are technical dependencies linked to this badge.";
+                return View(badge);
             }
 
             return RedirectToAction(nameof(Index));
