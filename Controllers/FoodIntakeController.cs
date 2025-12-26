@@ -48,7 +48,7 @@ namespace HealthWellbeing.Controllers
                 return View(vm);
             }
 
-            // Goal (assumo 1 goal ativo, escolho o mais recente)
+            // Goal
             var goal = await _context.Goal
                 .AsNoTracking()
                 .Where(g => g.ClientId == clientId)
