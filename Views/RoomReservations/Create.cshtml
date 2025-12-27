@@ -13,7 +13,6 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="row g-3">
-                <!-- Row 1: ID da Consulta | Sala -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
                     <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 101" />
@@ -22,26 +21,24 @@
 
                 <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
-                    <select asp-for="RoomId" class="form-select" asp-items="ViewBag.Rooms" required>
+                    <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" required>
                         <option value="">Selecione a sala...</option>
                     </select>
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <!-- Row 2: Início | Fim -->
                 <div class="col-md-6">
                     <label asp-for="StartTime" class="form-label fw-bold">Início(*)</label>
-                    <input asp-for="StartTime" type="datetime-local" class="form-control" required />
+                    <input asp-for="StartTime" type="datetime-local" class="form-control" value="@(Model?.StartTime.ToString("yyyy-MM-ddTHH:mm"))" required />
                     <span asp-validation-for="StartTime" class="text-danger small"></span>
                 </div>
 
                 <div class="col-md-6">
                     <label asp-for="EndTime" class="form-label fw-bold">Fim(*)</label>
-                    <input asp-for="EndTime" type="datetime-local" class="form-control" required />
+                    <input asp-for="EndTime" type="datetime-local" class="form-control" value="@(Model?.EndTime.ToString("yyyy-MM-ddTHH:mm"))" required />
                     <span asp-validation-for="EndTime" class="text-danger small"></span>
                 </div>
 
-                <!-- Row 3: Responsável | Observação -->
                 <div class="col-md-6">
                     <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
                     <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />

@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Reservas de Salas";
+
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
 }
 
 <h1 class="mb-4 text-primary">
@@ -14,13 +17,22 @@
     </a>
 </div>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
 <div class="card shadow-sm">
     <div class="card-body">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
+        <table class="table">
+            <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nome do responsável</th>
+                    <th>Responsável</th>
                     <th>Sala</th>
                     <th>Início</th>
                     <th>Fim</th>
@@ -32,43 +44,43 @@
                 {
                     <tr>
                         <td>@item.RoomReservationId</td>
-
                         <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
-
                         <td>@(item.Room?.Name ?? "—")</td>
-
-                        <td>
-                            @{
-                                var startText = item.StartTime != default
-                                ? item.StartTime.ToString("dd/MM/yyyy HH:mm")
-                                : "—";
-                            }
-                            @startText
-                        </td>
-
-                        <td>
-                            @{
-                                var endText = item.EndTime != default
-                                ? item.EndTime.ToString("dd/MM/yyyy HH:mm")
-                                : "—";
-                            }
-                            @endText
-                        </td>
+                        <td>@(item.StartTime == default ? "—" : item.StartTime.ToString("g"))</td>
+                        <td>@(item.EndTime == default ? "—" : item.EndTime.ToString("g"))</td>
 
                         <td class="text-center">
-                            <a asp-action="Edit" asp-route-id="@item.RoomReservationId" class="btn btn-primary btn-sm me-1" title="Editar">
-                                <i class="bi bi-pencil-square"></i>
+
+                            @if (isLogTech)
+                            {
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.RoomReservationId"
+                                   class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
+                                </a>
+                            }
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.RoomReservationId"
+                               asp-route-fromCreation="false"
+                               class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
                             </a>
-                            <a asp-action="Details" asp-route-id="@item.RoomReservationId" class="btn btn-info btn-sm me-1" title="Detalhes">
-                                <i class="bi bi-info-circle"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.RoomReservationId" class="btn btn-danger btn-sm" title="Eliminar">
-                                <i class="bi bi-trash"></i>
-                            </a>
+
+                            @if (isLogTech)
+                            {
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.RoomReservationId"
+                                   class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
+                                </a>
+                            }
+
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+
     </div>
 </div>

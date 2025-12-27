@@ -4,45 +4,49 @@
     ViewData["Title"] = "Detalhes da Reserva";
 }
 
-<h1 class="mb-4 text-primary">
-    <i class="bi bi-info-circle-fill"></i> Detalhes da Reserva da Sala "@Model.Room?.Name"
-</h1>
+<h1 class="mb-4 text-primary"><i class="bi bi-info-circle-fill"></i> Detalhes da Reserva da Sala</h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ResponsibleName)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.ResponsibleName)</dd>
+            <dt class="col-sm-3 fw-bold">ID</dt>
+            <dd class="col-sm-9">@Model?.RoomReservationId</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Room)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Room.Name)</dd>
+            <dt class="col-sm-3 fw-bold">Responsável</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model?.ResponsibleName) ? Model.ResponsibleName : "—")</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationId)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationId)</dd>
+            <dt class="col-sm-3 fw-bold">Sala</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Room.Name)</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationType)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationType)</dd>
+            <dt class="col-sm-3 fw-bold">ID da Consulta</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.ConsultationId)</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.PatientId)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.PatientId)</dd>
+            <dt class="col-sm-3 fw-bold">Tipo de Consulta</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.ConsultationType)</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Specialty)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty.Name)</dd>
+            <dt class="col-sm-3 fw-bold">Paciente (ID)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.PatientId)</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.StartTime)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartTime)</dd>
+            <dt class="col-sm-3 fw-bold">Especialidade</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Specialty.Name)</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.EndTime)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndTime)</dd>
+            <dt class="col-sm-3 fw-bold">Início</dt>
+            <dd class="col-sm-9">
+                @(Model?.StartTime == default ? "—" : Model.StartTime.ToString("g"))
+            </dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+            <dt class="col-sm-3 fw-bold">Fim</dt>
+            <dd class="col-sm-9">
+                @(Model?.EndTime == default ? "—" : Model.EndTime.ToString("g"))
+            </dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Notes)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+            <dt class="col-sm-3 fw-bold">Estado</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Status)</dd>
+
+            <dt class="col-sm-3 fw-bold">Observações</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model?.Notes) ? Model.Notes : "—")</dd>
         </dl>
 
-        <!-- Botões -->
         <div class="text-end mt-4 gap-2 border-top pt-3">
             <a asp-action="Edit" asp-route-id="@Model?.RoomReservationId" class="btn btn-primary btn-sm" style="min-width:150px">
                 <i class="bi bi-pencil-square me-1"></i> Editar

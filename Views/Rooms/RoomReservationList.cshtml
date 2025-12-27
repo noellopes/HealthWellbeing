@@ -2,10 +2,14 @@
 
 @{
     ViewData["Title"] = "Reservas da Sala";
+
+
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
 }
 
 <h1 class="mb-4 text-primary">
-    <i class="bi bi-calendar-check"></i> Reservas — @ViewBag.RoomName
+    <i class="bi bi-calendar-check"></i> Reservas da sala — @ViewBag.RoomName
 </h1>
 
 <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -58,15 +62,33 @@
                             <td>@(item.EndTime != default ? item.EndTime.ToString("dd/MM/yyyy HH:mm") : "—")</td>
 
                             <td class="text-center">
-                                <a asp-action="Edit" asp-route-id="@item.RoomReservationId" class="btn btn-primary btn-sm me-1" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
+
+                                @if (isLogTech)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.RoomReservationId"
+                                       class="btn btn-sm btn-warning me-1">
+                                        <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
+                                    </a>
+                                }
+
+                                <a asp-controller="RoomReservations" 
+                                   asp-action="Details"
+                                   asp-route-id="@item.RoomReservationId"
+                                   asp-route-fromCreation="false"
+                                   class="btn btn-sm btn-info me-1">
+                                    <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
                                 </a>
-                                <a asp-action="Details" asp-route-id="@item.RoomReservationId" class="btn btn-info btn-sm me-1" title="Detalhes">
-                                    <i class="bi bi-info-circle"></i>
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.RoomReservationId" class="btn btn-danger btn-sm" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </a>
+
+                                @if (isLogTech)
+                                {
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.RoomReservationId"
+                                       class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
+                                    </a>
+                                }
+
                             </td>
                         </tr>
                     }
