@@ -12,9 +12,10 @@ namespace HealthWellbeing.Controllers
 {
     public class ServicoController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public ServicoController(ApplicationDbContext context)
+        // Corrigido: Removido parênteses extra
+        public ServicoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -22,25 +23,26 @@ namespace HealthWellbeing.Controllers
         // GET: Servico
         public async Task<IActionResult> Index()
         {
-            var servicosContext = await _context.Servicos
+            // Otimizado: Carrega os dados com Include e retorna a variável correta
+            var servicos = await _context.Servicos
                 .Include(s => s.TipoServico)
                 .ToListAsync();
-            return View(await _context.Servicos.ToListAsync());
+
+            return View(servicos);
         }
 
         // GET: Servico/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var servico = await _context.Servicos
                 .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
+
             if (servico == null)
             {
+                // Certifique-se que esta View existe ou use NotFound()
                 return View("InvalidServico");
             }
 
@@ -50,6 +52,7 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Create
         public IActionResult Create()
         {
+            // Corrigido: Nome da FK e nomes da tabela consistentes
             ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
             return View();
         }
@@ -59,18 +62,17 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
         {
+            // Remove a validação do objeto de navegação para não dar erro de ModelState
             ModelState.Remove("TipoServico");
+
             if (ModelState.IsValid)
             {
                 _context.Add(servico);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index),
-                    new
-                    {
-                        id = servico.ServicoId,
-                        SuccessMessage = "Serviço criado com sucesso!"
-                    }
-                    );
+
+                // TempData é melhor para mensagens de sucesso que QueryStrings
+                TempData["SuccessMessage"] = "Serviço criado com sucesso!";
+                return RedirectToAction(nameof(Index));
             }
 
             ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
@@ -80,28 +82,23 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var servico = await _context.Servicos.FindAsync(id);
-            if (servico == null)
-            {
-                return NotFound();
-            }
+            if (servico == null) return NotFound();
+
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
             return View(servico);
         }
 
         // POST: Servico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] Servico servico)
+        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
         {
-            if (id != servico.ServicoId)
-            {
-                return NotFound();
-            }
+            if (id != servico.ServicoId) return NotFound();
+
+            ModelState.Remove("TipoServico");
 
             if (ModelState.IsValid)
             {
@@ -112,34 +109,26 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServicoExists(servico.ServicoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!ServicoExists(servico.ServicoId)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
             return View(servico);
         }
 
         // GET: Servico/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var servico = await _context.Servicos
+                .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servico == null)
-            {
-                return NotFound();
-            }
+
+            if (servico == null) return NotFound();
 
             return View(servico);
         }
@@ -153,6 +142,7 @@ namespace HealthWellbeing.Controllers
             if (servico != null)
             {
                 _context.Servicos.Remove(servico);
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Index));
