@@ -11,8 +11,6 @@ namespace HealthWellbeing.Data
         {
         }
 
-        public object Terapeutas { get; internal set; }
-        public object Agendamentos { get; internal set; }
     }
 }
 
