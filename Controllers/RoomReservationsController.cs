@@ -228,17 +228,32 @@ namespace HealthWellbeingRoom.Controllers
                 return View(roomReservation);
             }
 
-            // 6. Gravar reserva
+            // 6. Salvar reserva e atualizar estado da sala
             try
             {
                 _context.Add(roomReservation);
                 await _context.SaveChangesAsync();
+
+                // Atualizar estado da sala para Indisponível
+                var sala = await _context.Room.FindAsync(roomReservation.RoomId);
+                if (sala != null)
+                {
+                    var indisponivelStatus = await _context.RoomStatus
+                        .FirstOrDefaultAsync(s => s.Name == "Indisponível");
+
+                    if (indisponivelStatus != null)
+                    {
+                        sala.RoomStatusId = indisponivelStatus.RoomStatusId;
+                        _context.Update(sala);
+                        await _context.SaveChangesAsync();
+                    }
+                }
                 TempData["SuccessMessage"] = "Reserva criada com sucesso.";
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException)
             {
-                ModelState.AddModelError(string.Empty, "Ocorreu um erro ao gravar a reserva. Verifique se a sala ainda está disponível e tente novamente.");
+                ModelState.AddModelError(string.Empty, "Ocorreu um erro ao salvar a reserva. Verifique se a sala ainda está disponível e tente novamente.");
 
                 await PreencherDropdowns(
                     selectedRoomId: roomReservation.RoomId,

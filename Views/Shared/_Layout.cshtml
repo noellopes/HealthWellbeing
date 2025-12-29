@@ -53,6 +53,10 @@
                                         {
                                             <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista das reservas</a></li>
                                         }
+                                        @if (isLogTech || isAdmin)
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista de consumiveis</a></li>
+                                        }
                                     </ul>
                                 </li>
 
