@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Detalhes da Reserva";
+
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
 }
 
 <h1 class="mb-4 text-primary"><i class="bi bi-info-circle-fill"></i> Detalhes da Reserva da Sala - "@ViewData["RoomName"]"</h1>
@@ -45,9 +48,14 @@
         </dl>
 
         <div class="text-end mt-4 gap-2 border-top pt-3">
-            <a asp-action="Edit" asp-route-id="@Model?.RoomReservationId" class="btn btn-primary btn-sm" style="min-width:150px">
-                <i class="bi bi-pencil-square me-1"></i> Editar
-            </a>
+
+            @if (isLogTech)
+            {
+                <a asp-action="Edit" asp-route-id="@Model?.RoomReservationId" class="btn btn-primary btn-sm" style="min-width:150px">
+                    <i class="bi bi-pencil-square me-1"></i> Editar
+                </a>
+            }
+
             <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
                 <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
             </a>

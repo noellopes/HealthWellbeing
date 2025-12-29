@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
 </head>
+
+@{
+    bool isAdmin = User.IsInRole("Administrator");
+    bool isLogTech = User.IsInRole("logisticsTechnician");
+}
+
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -31,10 +37,22 @@
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Salas</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Create">Criar Salas</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Lista das Salas</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Create">Criar reservas</a></li>
-                                        <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista das reservas</a></li>
+                                        @if (isAdmin)
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Create">Criar Salas</a></li>
+                                        }
+                                        @if (isLogTech || isAdmin)
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Lista das Salas</a></li>
+                                        }
+                                        @if (isLogTech)
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Create">Criar reservas</a></li>
+                                        }
+                                        @if (isLogTech || isAdmin)
+                                        {
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista das reservas</a></li>
+                                        }
                                     </ul>
                                 </li>
 

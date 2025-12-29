@@ -116,6 +116,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Index()
         {
             var reservations = _context.RoomReservations
@@ -125,6 +126,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations/Details/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id, int roomId)
         {
             if (id == null) return NotFound();
@@ -144,7 +146,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations/Create
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Create(int? roomId)
         {
             await PreencherDropdowns(
@@ -166,7 +168,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: RoomReservations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Create([Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
         {
             // 1. Validar se a consulta existe
@@ -251,7 +253,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations/Edit/5
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -277,7 +279,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: RoomReservations/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Edit(int id, [Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
         {
             if (id != roomReservation.RoomReservationId) return NotFound();
@@ -344,7 +346,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations/Delete/5
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -362,7 +364,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: RoomReservations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var roomReservation = await _context.RoomReservations.FindAsync(id);

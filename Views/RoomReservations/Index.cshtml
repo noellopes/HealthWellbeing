@@ -11,11 +11,14 @@
     <i class="bi bi-calendar-check"></i> Lista das reservas de Salas
 </h1>
 
-<div class="mb-3 text-end">
-    <a asp-action="Create" class="btn btn-success btn-sm" style="min-width:150px">
-        <i class="bi bi-plus-circle me-1"></i> Nova Reserva
-    </a>
-</div>
+@if (isLogTech)
+{
+    <div class="mb-3 text-end">
+        <a asp-action="Create" class="btn btn-success btn-sm" style="min-width:150px">
+            <i class="bi bi-plus-circle me-1"></i> Nova Reserva
+        </a>
+    </div>
+}
 
 @if (TempData["SuccessMessage"] != null)
 {
