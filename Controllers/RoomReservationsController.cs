@@ -73,10 +73,19 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomReservations/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int roomId)
         {
+            // Carregar nome da sala
+            var reservation = await _context.RoomReservations
+                .Include(r => r.Room)
+                .FirstOrDefaultAsync(r => r.RoomReservationId == id);
+
+            if (reservation == null) return NotFound();
+            ViewData["RoomName"] = reservation.Room?.Name ?? "—";
+
             if (id == null) return NotFound();
 
+            // Carregar detalhes da reserva
             var roomReservation = await _context.RoomReservations
                 .Include(r => r.Room)
                 .Include(r => r.Specialty)

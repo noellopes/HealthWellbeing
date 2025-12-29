@@ -80,6 +80,7 @@ namespace HealthWellbeing.Data
 
         //public DbSet<RoomConsumable> RoomConsumable { get; set; }
         public DbSet<RoomReservation> RoomReservations { get; set; }
+        public DbSet<Consultation> Consultations { get; set; } = default!;
 
     }
 }

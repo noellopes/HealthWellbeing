@@ -30,6 +30,9 @@ namespace HealthWellBeingRoom.Data
             // 4 - Dispositivos e Localização médica
             PopulateMedicalDevices(dbContext);
             PopulateLocationMedDevices(dbContext);
+
+            // 5 - Infraestrutura de Consultation
+            PopulateConsultation(dbContext);
         }
 
         // 1 - Independentes
@@ -718,6 +721,82 @@ namespace HealthWellBeingRoom.Data
                 new LocationMedDevice { MedicalDeviceID = 20, RoomId = 23, InitialDate = DateTime.Now.AddMonths(-1), EndDate = null, IsCurrent = true }
             });
 
+            dbContext.SaveChanges();
+        }
+        // 5️ - Infraestrutura de Consultation
+        private static void PopulateConsultation(HealthWellbeingDbContext dbContext)
+        {
+            // Se já existirem consultas, não faz nada
+            if (dbContext.Consultations.Any())
+                return;
+
+            // Buscar as 5 primeiras especialidades existentes
+            var specialties = dbContext.Specialty.Take(5).ToList();
+
+            // Se não houver pelo menos 5, não cria consultas
+            if (specialties.Count < 5)
+                return;
+
+            var consultations = new List<Consultation>
+            {
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-2),
+                    ConsultationDate = DateTime.Today,
+                    StartTime = new TimeOnly(9, 0),
+                    EndTime = new TimeOnly(10, 0),
+                    Status = "Pendente",
+                    DoctorName = "Dr. João Silva",
+                    PatientName = "Maria Fernandes",
+                    SpecialtyId = specialties[0].SpecialtyId
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-1),
+                    ConsultationDate = DateTime.Today.AddDays(1),
+                    StartTime = new TimeOnly(14, 0),
+                    EndTime = new TimeOnly(15, 30),
+                    Status = "Confirmada",
+                    DoctorName = "Dra. Ana Costa",
+                    PatientName = "Ricardo Santos",
+                    SpecialtyId = specialties[1].SpecialtyId
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now,
+                    ConsultationDate = DateTime.Today.AddDays(2),
+                    StartTime = new TimeOnly(10, 0),
+                    EndTime = new TimeOnly(11, 0),
+                    Status = "Pendente",
+                    DoctorName = "Dr. Miguel Rocha",
+                    PatientName = "Carla Mendes",
+                    SpecialtyId = specialties[2].SpecialtyId
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-3),
+                    ConsultationDate = DateTime.Today.AddDays(4),
+                    StartTime = new TimeOnly(8, 30),
+                    EndTime = new TimeOnly(9, 30),
+                    Status = "Confirmada",
+                    DoctorName = "Dra. Sofia Almeida",
+                    PatientName = "Tiago Lopes",
+                    SpecialtyId = specialties[3].SpecialtyId
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-5),
+                    ConsultationDate = DateTime.Today.AddDays(5),
+                    StartTime = new TimeOnly(16, 0),
+                    EndTime = new TimeOnly(17, 0),
+                    Status = "Pendente",
+                    DoctorName = "Dr. Pedro Martins",
+                    PatientName = "Ana Ribeiro",
+                    SpecialtyId = specialties[4].SpecialtyId
+                }
+            };
+
+            dbContext.Consultations.AddRange(consultations);
             dbContext.SaveChanges();
         }
 
