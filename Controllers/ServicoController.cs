@@ -55,12 +55,9 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Servico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
-
         {
             ModelState.Remove("TipoServico");
             if (ModelState.IsValid)
@@ -97,8 +94,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Servico/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] Servico servico)
@@ -160,7 +155,6 @@ namespace HealthWellbeing.Controllers
                 _context.Servicos.Remove(servico);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
