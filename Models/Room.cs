@@ -62,7 +62,7 @@ namespace HealthWellbeing.Models
         // Propriedades de navegação para relacionamentos
         public ICollection<LocationMedDevice>? LocalizacaoDispMedicoMovel { get; set; }
         public ICollection<Equipment>? Equipments { get; set; }
-        public ICollection<RoomConsumable> RoomConsumables { get; set; }
+        public ICollection<RoomConsumable>? RoomConsumables { get; set; }
 
     }
 }

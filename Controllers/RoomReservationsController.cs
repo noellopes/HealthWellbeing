@@ -18,7 +18,8 @@ namespace HealthWellbeingRoom.Controllers
         {
             _context = context;
         }
-        //------------------------------------------------------PREENCHER DROPDOWNS-------------------------------------------------------------------------------------
+
+        //------------------------------------------------------PREENCHER DROPDOWNS (FILTRADO)-------------------------------------------------------------------------------------
         private async Task PreencherDropdowns(
             int? selectedRoomId = null,
             int? selectedSpecialityId = null,
@@ -27,10 +28,22 @@ namespace HealthWellbeingRoom.Controllers
             int? excludeReservationId = null
         )
         {
-            // --- Ler valores do Request (StartTime, EndTime, excludeReservationId) ---
-            var startRaw = Request.Form["StartTime"].FirstOrDefault() ?? Request.Query["start"].FirstOrDefault();
-            var endRaw = Request.Form["EndTime"].FirstOrDefault() ?? Request.Query["end"].FirstOrDefault();
-            var excludeRaw = Request.Form["RoomReservationId"].FirstOrDefault() ?? Request.Query["excludeReservationId"].FirstOrDefault();
+            string? startRaw = null;
+            string? endRaw = null;
+            string? excludeRaw = null;
+
+            // Só lê o Form em pedidos com content-type de formulário
+            if (Request.HasFormContentType)
+            {
+                startRaw = Request.Form["StartTime"].FirstOrDefault();
+                endRaw = Request.Form["EndTime"].FirstOrDefault();
+                excludeRaw = Request.Form["RoomReservationId"].FirstOrDefault();
+            }
+
+            // Fallback para query string
+            startRaw ??= Request.Query["start"].FirstOrDefault();
+            endRaw ??= Request.Query["end"].FirstOrDefault();
+            excludeRaw ??= Request.Query["excludeReservationId"].FirstOrDefault();
 
             if (!string.IsNullOrWhiteSpace(startRaw) && DateTime.TryParse(startRaw, out var s))
                 start = s;
@@ -41,8 +54,14 @@ namespace HealthWellbeingRoom.Controllers
             if (!string.IsNullOrWhiteSpace(excludeRaw) && int.TryParse(excludeRaw, out var ex))
                 excludeReservationId = ex;
 
-            // --- Query base de salas ---
-            IQueryable<Room> roomsQuery = _context.Room.AsNoTracking();
+            // --- Query base de salas (apenas Criado ou Disponível) ---
+            IQueryable<Room> roomsQuery = _context.Room
+                .AsNoTracking()
+                .Include(r => r.RoomStatus)
+                .Where(r =>
+                    r.RoomStatus.Name == "Criado" ||
+                    r.RoomStatus.Name == "Disponível"
+                );
 
             // --- Filtrar salas sem conflitos de horário ---
             if (start.HasValue && end.HasValue)
@@ -59,11 +78,27 @@ namespace HealthWellbeingRoom.Controllers
                 );
             }
 
-            // --- Carregar salas ---
-            var rooms = await roomsQuery.OrderBy(r => r.Name).ToListAsync();
-            ViewBag.Rooms = new SelectList(rooms, "RoomId", "Name", selectedRoomId);
+            // --- Carregar salas filtradas ---
+            var rooms = await roomsQuery
+                .OrderBy(r => r.Name)
+                .ToListAsync();
 
-            // --- Carregar Consultas (NOVO) ---
+            var roomsSelect = new SelectList(rooms, "RoomId", "Name", selectedRoomId);
+            ViewData["RoomId"] = roomsSelect;
+            ViewBag.Rooms = roomsSelect;
+
+            // --- Carregar Especialidades ---
+            var specialities = await _context.Specialty
+                .AsNoTracking()
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+
+            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", selectedSpecialityId);
+            ViewData["SpecialityId"] = specialitySelect;
+            ViewData["SpecialtyId"] = specialitySelect;
+            ViewBag.RoomSpecialty = specialitySelect;
+
+            // --- Carregar Consultas ---
             var consultations = await _context.Consultations
                 .OrderBy(c => c.ConsultationDate)
                 .Select(c => new
@@ -80,8 +115,6 @@ namespace HealthWellbeingRoom.Controllers
             );
         }
 
-
-
         // GET: RoomReservations
         public async Task<IActionResult> Index()
         {
@@ -94,40 +127,38 @@ namespace HealthWellbeingRoom.Controllers
         // GET: RoomReservations/Details/5
         public async Task<IActionResult> Details(int? id, int roomId)
         {
-            // Carregar nome da sala
+            if (id == null) return NotFound();
+
             var reservation = await _context.RoomReservations
                 .Include(r => r.Room)
                 .Include(r => r.Specialty)
-                .Include(r => r.Consultation)                // ← carregar consulta
-                .ThenInclude(c => c.Specialty)              // ← carregar especialidade da consulta
+                .Include(r => r.Consultation)
+                    .ThenInclude(c => c.Specialty)
                 .FirstOrDefaultAsync(m => m.RoomReservationId == id);
-
 
             if (reservation == null) return NotFound();
+
             ViewData["RoomName"] = reservation.Room?.Name ?? "—";
 
-            if (id == null) return NotFound();
-
-            // Carregar detalhes da reserva
-            var roomReservation = await _context.RoomReservations
-                .Include(r => r.Room)
-                .Include(r => r.Specialty)
-                .FirstOrDefaultAsync(m => m.RoomReservationId == id);
-
-            if (roomReservation == null) return NotFound();
-
-            return View(roomReservation);
+            return View(reservation);
         }
 
         // GET: RoomReservations/Create
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(int? roomId)
         {
-            await PreencherDropdowns(roomId, null);
+            await PreencherDropdowns(
+                selectedRoomId: roomId,
+                selectedSpecialityId: null,
+                start: null,
+                end: null,
+                excludeReservationId: null
+            );
 
-            var model = new RoomReservation();
-            if (roomId.HasValue)
-                model.RoomId = roomId.Value;
+            var model = new RoomReservation
+            {
+                RoomId = roomId ?? 0
+            };
 
             return View(model);
         }
@@ -138,18 +169,14 @@ namespace HealthWellbeingRoom.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
         {
-            // -----------------------------
             // 1. Validar se a consulta existe
-            // -----------------------------
             if (roomReservation.ConsultationId <= 0 ||
                 !await _context.Consultations.AnyAsync(c => c.ConsultationId == roomReservation.ConsultationId))
             {
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
 
-            // -----------------------------
             // 2. Validar datas
-            // -----------------------------
             if (roomReservation.StartTime == default)
                 ModelState.AddModelError(nameof(roomReservation.StartTime), "A data/hora de início é obrigatória.");
 
@@ -163,15 +190,11 @@ namespace HealthWellbeingRoom.Controllers
                 ModelState.AddModelError(string.Empty, "A data/hora de início deve ser anterior à data/hora de fim.");
             }
 
-            // -----------------------------
             // 3. Sala obrigatória
-            // -----------------------------
             if (roomReservation.RoomId <= 0)
                 ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala é obrigatória.");
 
-            // -----------------------------
             // 4. Validar conflito de reservas
-            // -----------------------------
             if (roomReservation.RoomId > 0 &&
                 roomReservation.StartTime != default &&
                 roomReservation.EndTime != default)
@@ -189,9 +212,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
             }
 
-            // -----------------------------
             // 5. Se houver erros, recarregar dropdowns
-            // -----------------------------
             if (!ModelState.IsValid)
             {
                 await PreencherDropdowns(
@@ -205,9 +226,7 @@ namespace HealthWellbeingRoom.Controllers
                 return View(roomReservation);
             }
 
-            // -----------------------------
             // 6. Gravar reserva
-            // -----------------------------
             try
             {
                 _context.Add(roomReservation);
@@ -244,7 +263,14 @@ namespace HealthWellbeingRoom.Controllers
 
             if (roomReservation == null) return NotFound();
 
-            await PreencherDropdowns(roomReservation.RoomId, roomReservation.SpecialtyId);
+            await PreencherDropdowns(
+                selectedRoomId: roomReservation.RoomId,
+                selectedSpecialityId: roomReservation.SpecialtyId,
+                start: roomReservation.StartTime,
+                end: roomReservation.EndTime,
+                excludeReservationId: roomReservation.RoomReservationId
+            );
+
             return View(roomReservation);
         }
 
@@ -257,15 +283,26 @@ namespace HealthWellbeingRoom.Controllers
             if (id != roomReservation.RoomReservationId) return NotFound();
 
             // Validações básicas
-            if (roomReservation.StartTime == default) ModelState.AddModelError(nameof(roomReservation.StartTime), "A data/hora de início é obrigatória.");
-            if (roomReservation.EndTime == default) ModelState.AddModelError(nameof(roomReservation.EndTime), "A data/hora de fim é obrigatória.");
-            if (roomReservation.StartTime != default && roomReservation.EndTime != default && roomReservation.StartTime >= roomReservation.EndTime)
-                ModelState.AddModelError(string.Empty, "A data/hora de início deve ser anterior à data/hora de fim.");
+            if (roomReservation.StartTime == default)
+                ModelState.AddModelError(nameof(roomReservation.StartTime), "A data/hora de início é obrigatória.");
 
-            if (roomReservation.RoomId <= 0) ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala é obrigatória.");
+            if (roomReservation.EndTime == default)
+                ModelState.AddModelError(nameof(roomReservation.EndTime), "A data/hora de fim é obrigatória.");
+
+            if (roomReservation.StartTime != default &&
+                roomReservation.EndTime != default &&
+                roomReservation.StartTime >= roomReservation.EndTime)
+            {
+                ModelState.AddModelError(string.Empty, "A data/hora de início deve ser anterior à data/hora de fim.");
+            }
+
+            if (roomReservation.RoomId <= 0)
+                ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala é obrigatória.");
 
             // Verifica conflito de horários (exclui a própria reserva)
-            if (roomReservation.RoomId > 0 && roomReservation.StartTime != default && roomReservation.EndTime != default)
+            if (roomReservation.RoomId > 0 &&
+                roomReservation.StartTime != default &&
+                roomReservation.EndTime != default)
             {
                 var hasConflict = await _context.RoomReservations
                     .AsNoTracking()
@@ -275,12 +312,20 @@ namespace HealthWellbeingRoom.Controllers
                         r.StartTime < roomReservation.EndTime &&
                         roomReservation.StartTime < r.EndTime);
 
-                if (hasConflict) ModelState.AddModelError(string.Empty, "Já existe uma reserva para esta sala no período selecionado.");
+                if (hasConflict)
+                    ModelState.AddModelError(string.Empty, "Já existe uma reserva para esta sala no período selecionado.");
             }
 
             if (!ModelState.IsValid)
             {
-                await PreencherDropdowns(roomReservation.RoomId, roomReservation.SpecialtyId);
+                await PreencherDropdowns(
+                    selectedRoomId: roomReservation.RoomId,
+                    selectedSpecialityId: roomReservation.SpecialtyId,
+                    start: roomReservation.StartTime,
+                    end: roomReservation.EndTime,
+                    excludeReservationId: roomReservation.RoomReservationId
+                );
+
                 return View(roomReservation);
             }
 
@@ -336,29 +381,6 @@ namespace HealthWellbeingRoom.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        // Preenche dropdowns usados em Create/Edit
-        private async Task PreencherDropdowns(int? selectedRoomId = null, int? selectedSpecialityId = null)
-        {
-            var rooms = await _context.Room
-                .AsNoTracking()
-                .OrderBy(r => r.Name)
-                .ToListAsync();
-
-            var specialities = await _context.Specialty
-                .AsNoTracking()
-                .OrderBy(s => s.Name)
-                .ToListAsync();
-
-            var roomsSelect = new SelectList(rooms, "RoomId", "Name", selectedRoomId);
-            ViewData["RoomId"] = roomsSelect;
-            ViewBag.Rooms = roomsSelect;
-
-            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", selectedSpecialityId);
-            ViewData["SpecialityId"] = specialitySelect;
-            ViewData["SpecialtyId"] = specialitySelect;
-            ViewBag.RoomSpecialty = specialitySelect;
         }
 
         private bool RoomReservationExists(int id)
