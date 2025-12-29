@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
-    public class TipoServico
+    public class TipoServicos
     {
         [Key]
-        public int TipoServicoId { get; set; }
+        public int TipoServicosId { get; set; }
 
         [Required(ErrorMessage = "O nome do tipo de serviço é obrigatório.")]
         [StringLength(100)]

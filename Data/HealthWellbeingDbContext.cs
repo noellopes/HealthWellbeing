@@ -16,7 +16,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<HealthWellbeing.Models.AgendamentoModel> Agendamentos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Servico> Servicos { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.TipoServico> TipoServicos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.TipoServicos> TipoServicos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Terapeuta> Terapeuta { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Level> Level { get; set; } = default!;
@@ -42,7 +42,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
-        public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 

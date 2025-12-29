@@ -31,10 +31,10 @@ namespace HealthWellbeing.Models
         public int DuracaoMinutos { get; set; }
 
         [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
-        [DisplayName("Tipo de Serviço")]
+        [DisplayName("Tipo de Serviços")]
         public int TipoServicoId { get; set; }
 
-        [ForeignKey("TipoServicoId")]
-        public TipoServico TipoServico { get; set; }
+        [ForeignKey("TipoServicosId")]
+        public TipoServicos TipoServico { get; set; }
     }
 }

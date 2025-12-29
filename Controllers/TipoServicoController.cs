@@ -5,16 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+using HealthWellbeing.Data; // Certifique-se que o DbContext está neste namespace
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class TipoServicoController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        // Alterado de ApplicationDbContext para HealthWellbeingDbContext
+        private readonly HealthWellbeingDbContext _context;
 
-        public TipoServicoController(ApplicationDbContext context)
+        public TipoServicoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -23,6 +24,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(string? successMessage = null)
         {
             ViewBag.SuccessMessage = successMessage;
+            // Certifique-se que o DbSet no seu Context se chama "TipoServicos"
             return View(await _context.TipoServicos.ToListAsync());
         }
 
@@ -35,7 +37,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
 
             if (tipoServico == null)
             {
@@ -55,7 +57,7 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicos tipoServico)
         {
             if (ModelState.IsValid)
             {
@@ -63,12 +65,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Details),
-                    new
-                    {
-                        id = tipoServico.TipoServicoId,
-                        successMessage = "Tipo de Serviço criado com sucesso!"
-                    }
-                );
+                    new { id = tipoServico.TipoServicosId, successMessage = "Tipo de Serviço criado com sucesso!" });
             }
             return View(tipoServico);
         }
@@ -92,9 +89,9 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServicos tipoServico)
         {
-            if (id != tipoServico.TipoServicoId)
+            if (id != tipoServico.TipoServicosId)
             {
                 return NotFound();
             }
@@ -108,7 +105,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoServicoExists(tipoServico.TipoServicoId))
+                    if (!TipoServicoExists(tipoServico.TipoServicosId))
                     {
                         return NotFound();
                     }
@@ -119,12 +116,7 @@ namespace HealthWellbeing.Controllers
                 }
 
                 return RedirectToAction(nameof(Details),
-                    new
-                    {
-                        id = tipoServico.TipoServicoId,
-                        successMessage = "Tipo de Serviço alterado com sucesso!"
-                    }
-                );
+                    new { id = tipoServico.TipoServicosId, successMessage = "Tipo de Serviço alterado com sucesso!" });
             }
             return View(tipoServico);
         }
@@ -138,7 +130,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
             if (tipoServico == null)
             {
                 return NotFound();
@@ -160,16 +152,12 @@ namespace HealthWellbeing.Controllers
             }
 
             return RedirectToAction(nameof(Index),
-                new
-                {
-                    successMessage = "Tipo de Serviço eliminado com sucesso!"
-                }
-            );
+                new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
         }
 
         private bool TipoServicoExists(int id)
         {
-            return _context.TipoServicos.Any(e => e.TipoServicoId == id);
+            return _context.TipoServicos.Any(e => e.TipoServicosId == id);
         }
     }
 }

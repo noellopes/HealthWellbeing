@@ -28,7 +28,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    SeedData.Initialize(services.GetRequiredService<ApplicationDbContext>());
+    SeedData.Initialize(services.GetRequiredService<HealthWellbeingDbContext>());
 }
 
 // Configure the HTTP request pipeline.
