@@ -45,7 +45,6 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(zona))
                 query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
 
-            // Filtro na tabela relacionada (Muitos-para-Muitos)
             if (!string.IsNullOrWhiteSpace(profissional))
             {
                 query = query.Where(p => p.ProfissionalExecutante.Any(
@@ -57,7 +56,6 @@ namespace HealthWellbeing.Controllers
                 query = query.Where(p => p.Gravidade.ToString() == gravidade);
 
             int totalItems = await query.CountAsync();
-
             var pagination = new PaginationInfoExercicios<ProblemaSaude>(page, totalItems, pageSize);
 
             pagination.Items = await query
@@ -75,27 +73,6 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // GET: ProblemaSaudes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            // Inclui os profissionais para mostrar nos detalhes
-            var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
-
-            if (problemaSaude == null)
-            {
-                return NotFound();
-            }
-
-            return View(problemaSaude);
-        }
-
         // GET: ProblemaSaudes/Create
         public IActionResult Create()
         {
@@ -104,7 +81,6 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: ProblemaSaudes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -131,8 +107,6 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, recarrega a lista de profissionais
             ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
             return View(problemaSaude);
         }
@@ -145,7 +119,6 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Carrega o problema de saúde E os profissionais já associados
             var problemaSaude = await _context.ProblemaSaude
                 .Include(p => p.ProfissionalExecutante)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
@@ -165,7 +138,6 @@ namespace HealthWellbeing.Controllers
             return View(problemaSaude);
         }
 
-        // POST: ProblemaSaudes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
@@ -203,7 +175,6 @@ namespace HealthWellbeing.Controllers
                     problemaSaudeExistente.ProfissionalExecutante?.Clear();
                     if (selectedProfissionais != null && selectedProfissionais.Any())
                     {
-                        problemaSaudeExistente.ProfissionalExecutante ??= new List<ProfissionalExecutante>();
                         foreach (var profId in selectedProfissionais)
                         {
                             var profissional = await _context.ProfissionalExecutante.FindAsync(profId);
@@ -230,31 +201,6 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, recarrega os dados para a View
-            ViewData["Profissionais"] = _context.ProfissionalExecutante.ToList();
-            ViewData["SelectedProfissionais"] = selectedProfissionais?.ToList() ?? new List<int>();
-            return View(problemaSaude);
-        }
-
-        // GET: ProblemaSaudes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            // Inclui profissionais para mostrar o que está associado
-            var problemaSaude = await _context.ProblemaSaude
-                .Include(p => p.ProfissionalExecutante)
-                .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
-
-            if (problemaSaude == null)
-            {
-                return NotFound();
-            }
-
             return View(problemaSaude);
         }
 
