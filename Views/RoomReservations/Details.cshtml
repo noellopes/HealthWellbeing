@@ -9,7 +9,7 @@
 <div class="card shadow-sm">
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-3 fw-bold">ID</dt>
+            <dt class="col-sm-3 fw-bold">Id da reserva</dt>
             <dd class="col-sm-9">@Model?.RoomReservationId</dd>
 
             <dt class="col-sm-3 fw-bold">Responsável</dt>
@@ -21,14 +21,11 @@
             <dt class="col-sm-3 fw-bold">ID da Consulta</dt>
             <dd class="col-sm-9">@Html.DisplayFor(m => m.ConsultationId)</dd>
 
-            <dt class="col-sm-3 fw-bold">Tipo de Consulta</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.ConsultationType)</dd>
+            <dt class="col-sm-3 fw-bold">Especialidade da Consulta</dt>
+            <dd class="col-sm-9">@Model?.Consultation?.Specialty?.Name</dd>
 
-            <dt class="col-sm-3 fw-bold">Paciente (ID)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.PatientId)</dd>
-
-            <dt class="col-sm-3 fw-bold">Especialidade</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.Specialty.Name)</dd>
+            <dt class="col-sm-3 fw-bold">Paciente</dt>
+            <dd class="col-sm-9">@Model?.Consultation?.PatientName</dd>
 
             <dt class="col-sm-3 fw-bold">Início</dt>
             <dd class="col-sm-9">

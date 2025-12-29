@@ -24,7 +24,9 @@ namespace HealthWellbeingRoom.Models
 
         //Consulta
         public int? ConsultationId { get; set; }
-        public string? ConsultationType { get; set; }
+        public Consultation? Consultation { get; set; }
+
+        //Paciente
         public int? PatientId { get; set; }
 
         //Especialidade

@@ -97,7 +97,11 @@ namespace HealthWellbeingRoom.Controllers
             // Carregar nome da sala
             var reservation = await _context.RoomReservations
                 .Include(r => r.Room)
-                .FirstOrDefaultAsync(r => r.RoomReservationId == id);
+                .Include(r => r.Specialty)
+                .Include(r => r.Consultation)                // ← carregar consulta
+                .ThenInclude(c => c.Specialty)              // ← carregar especialidade da consulta
+                .FirstOrDefaultAsync(m => m.RoomReservationId == id);
+
 
             if (reservation == null) return NotFound();
             ViewData["RoomName"] = reservation.Room?.Name ?? "—";
