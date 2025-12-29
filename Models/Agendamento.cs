@@ -2,7 +2,8 @@
 
 namespace HealthWellbeing.Models
 {
-    public class AgendamentoModel
+    public class Agendamento
+
     {
         [Key]
         public int AgendamentoId { get; set; }

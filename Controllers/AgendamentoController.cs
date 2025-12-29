@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: Agendamento
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Agendamentos.Include(a => a.Servico).Include(a => a.Terapeuta).Include(a => a.UtenteBalneario);
+            var applicationDbContext = _context.Agendamento.Include(a => a.Servico).Include(a => a.Terapeuta).Include(a => a.UtenteBalneario);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -34,7 +34,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamentoModel = await _context.Agendamentos
+            var agendamentoModel = await _context.Agendamento
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.UtenteBalneario)
