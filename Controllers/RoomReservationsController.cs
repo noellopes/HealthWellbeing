@@ -389,6 +389,21 @@ namespace HealthWellbeingRoom.Controllers
             {
                 _context.RoomReservations.Remove(roomReservation);
                 await _context.SaveChangesAsync();
+
+                // Atualizar estado da sala para Disponível
+                var sala = await _context.Room.FindAsync(roomReservation.RoomId);
+                if (sala != null)
+                {
+                    var disponivelStatus = await _context.RoomStatus
+                        .FirstOrDefaultAsync(s => s.Name == "Disponível");
+
+                    if (disponivelStatus != null)
+                    {
+                        sala.RoomStatusId = disponivelStatus.RoomStatusId;
+                        _context.Update(sala);
+                        await _context.SaveChangesAsync();
+                    }
+                }
                 TempData["SuccessMessage"] = "Reserva eliminada com sucesso.";
             }
             catch (DbUpdateException)
