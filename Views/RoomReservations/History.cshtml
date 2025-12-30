@@ -1,61 +1,78 @@
 ﻿@model IEnumerable<HealthWellbeingRoom.Models.RoomReservationHistory>
 
 @{
-    ViewData["Title"] = "History";
+    ViewData["Title"] = "Histórico da Sala";
 
-    // Obtém o nome da sala do primeiro item, se existir
     var roomName = Model.FirstOrDefault()?.Room?.Name ?? "Sala";
 }
 
-<h1>Histórico de reserva da sala - "@roomName"</h1>
+<h1 class="mb-4 text-primary">
+    <i class="bi bi-clock-history"></i> Histórico de reservas — @roomName
+</h1>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        Ainda não existem registos de histórico para esta sala.
-    </div>
-}
-else
-{
-    <style>
-        .linha-realizada {
-            background-color: #d4edda; /* verde claro */
-        }
+<div class="card shadow-sm">
+    <div class="card-body">
 
-        .linha-cancelada {
-            background-color: #f8d7da; /* vermelho claro */
-        }
-    </style>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id da Consulta</th>
-                <th>Início</th>
-                <th>Fim</th>
-                <th>Responsável</th>
-                <th>Estado Final</th>
-                <th>Registado em</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                var cssClass = item.FinalStatus == "Realizada"
-                ? "linha-realizada"
-                : item.FinalStatus == "Cancelada"
-                ? "linha-cancelada"
-                : "";
-
-                <tr class="@cssClass">
-                    <td>@item.ConsultationId.ToString("D3")</td>
-                    <td>@item.StartTime.ToString("g")</td>
-                    <td>@item.EndTime.ToString("g")</td>
-                    <td>@item.ResponsibleName</td>
-                    <td>@item.FinalStatus</td>
-                    <td>@item.RecordedAt.ToString("g")</td>
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Responsável</th>
+                    <th>Estado Final</th>
+                    <th>Registado em</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="bi bi-info-circle"></i> Ainda não existem registos de histórico para esta sala.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        var cssClass = item.FinalStatus == "Realizada"
+                        ? "table-success"
+                        : item.FinalStatus == "Cancelada"
+                        ? "table-danger"
+                        : "";
+
+                        <tr class="@cssClass">
+                            <td>@item.ConsultationId.ToString("D3")</td>
+                            <td>@item.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.EndTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.ResponsibleName</td>
+                            <td>@item.FinalStatus</td>
+                            <td>@item.RecordedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a asp-controller="Rooms"
+               asp-action="Details"
+               asp-route-id="@ViewBag.RoomId"
+               class="btn btn-primary btn-sm"
+               style="min-width:150px">
+                <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+            </a>
+
+            <a asp-controller="Rooms"
+               asp-action="Index"
+               class="btn btn-primary btn-sm"
+               style="min-width:150px">
+                <i class="bi bi-list-ul me-1"></i> Voltar à Lista
+            </a>
+        </div>
+
+    </div>
+</div>

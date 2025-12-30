@@ -560,6 +560,8 @@ namespace HealthWellbeingRoom.Controllers
 
             ViewBag.RoomName = historico.FirstOrDefault()?.Room?.Name ?? "Sala";
 
+            ViewBag.RoomId = roomId;
+
             return View(historico);
         }
         //----------------------------------------------------------ROOMRESERVATIONLIST---------------------------------------------------------------------------------
