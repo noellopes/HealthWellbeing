@@ -12,16 +12,112 @@ namespace HealthWellbeingRoom.Controllers
 {
     public class RoomReservationsController : Controller
     {
-        private readonly HealthWellbeingDbContext _context;
-
+        private readonly HealthWellbeingDbContext _context;         
         public RoomReservationsController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
-
+        //------------------------------------------------------VERIFICAR EXISTÊNCIA DE RESERVA PARA CONSULTA-------------------------------------------------------------------------------------
         private bool RoomReservationForConsultationExists(int consultationId)
         {
             return _context.RoomReservations.Any(r => r.ConsultationId == consultationId);
+        }
+        //------------------------------------------------------REGISTAR HISTÓRICO DE RESERVAS-------------------------------------------------------------------------------------
+        private async Task RegistrarHistorico(RoomReservation reserva, string finalStatus)
+        {
+            var historico = new RoomReservationHistory
+            {
+                RoomReservationId = reserva.RoomReservationId,
+                RoomId = reserva.RoomId,
+                ConsultationId = reserva.ConsultationId,
+                StartTime = reserva.StartTime,
+                EndTime = reserva.EndTime,
+                ResponsibleName = reserva.ResponsibleName,
+                FinalStatus = finalStatus,
+                Notes = reserva.Notes,
+                RecordedAt = DateTime.Now
+            };
+
+            _context.RoomReservationHistory.Add(historico);
+            await _context.SaveChangesAsync();
+        }
+
+
+        //------------------------------------------------------MARCAR RESERVA COMO REALIZADA-------------------------------------------------------------------------------------
+        public async Task<IActionResult> MarcarComoRealizada(int id)
+        {
+            var reserva = await _context.RoomReservations
+                .Include(r => r.Room)
+                .FirstOrDefaultAsync(r => r.RoomReservationId == id);
+
+            if (reserva == null)
+                return NotFound();
+
+            // 1. Atualizar estado da reserva
+            reserva.Status = "Realizada";
+            _context.Update(reserva);
+
+            // 2. Atualizar estado da sala para Disponível
+            var disponivelStatus = await _context.RoomStatus
+                .FirstOrDefaultAsync(s => s.Name == "Disponível");
+
+            if (disponivelStatus != null && reserva.Room != null)
+            {
+                reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
+                _context.Update(reserva.Room);
+            }
+
+            // 3. Gravar alterações
+            await _context.SaveChangesAsync();
+
+            // 4. Registar no histórico (com dados atualizados)
+            await RegistrarHistorico(reserva, "Realizada");
+
+            // 5. Remover reserva da BD
+            _context.RoomReservations.Remove(reserva);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Reserva marcada como realizada e sala liberada.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        //------------------------------------------------------CANCELAR RESERVA-------------------------------------------------------------------------------------
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelarReserva(int RoomReservationId)
+        {
+            var reserva = await _context.RoomReservations
+                .Include(r => r.Room)
+                .FirstOrDefaultAsync(r => r.RoomReservationId == RoomReservationId);
+
+            if (reserva == null)
+                return NotFound();
+
+            // 1. Atualizar estado da reserva
+            reserva.Status = "Cancelada";
+            _context.Update(reserva);
+
+            // 2. Libertar a sala (Disponível)
+            var disponivelStatus = await _context.RoomStatus
+                .FirstOrDefaultAsync(s => s.Name == "Disponível");
+
+            if (disponivelStatus != null && reserva.Room != null)
+            {
+                reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
+                _context.Update(reserva.Room);
+            }
+
+            // 3. Enviar para o histórico
+            await RegistrarHistorico(reserva, "Cancelada");
+
+            // 4. Remover da lista ativa (opcional: apagar da BD)
+            _context.RoomReservations.Remove(reserva);
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Reserva cancelada e registada no histórico.";
+            return RedirectToAction(nameof(Index));
         }
 
         //------------------------------------------------------PREENCHER DROPDOWNS (FILTRADO)-------------------------------------------------------------------------------------
@@ -119,6 +215,7 @@ namespace HealthWellbeingRoom.Controllers
                 "Display"
             );
         }
+        //------------------------------------------------------INDEX-------------------------------------------------------------------------------------
 
         // GET: RoomReservations
         [Authorize(Roles = "logisticsTechnician,Administrator")]
@@ -129,6 +226,8 @@ namespace HealthWellbeingRoom.Controllers
                 .Include(r => r.Specialty);
             return View(await reservations.ToListAsync());
         }
+
+        //------------------------------------------------------DETAILS-------------------------------------------------------------------------------------
 
         // GET: RoomReservations/Details/5
         [Authorize(Roles = "logisticsTechnician,Administrator")]
@@ -149,6 +248,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(reservation);
         }
+        //------------------------------------------------------CREATE-------------------------------------------------------------------------------------
 
         // GET: RoomReservations/Create
         [Authorize(Roles = "logisticsTechnician")]
@@ -169,6 +269,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(model);
         }
+        //------------------------------------------------------CREATE POST-------------------------------------------------------------------------------------
 
         // POST: RoomReservations/Create
         [HttpPost]
@@ -280,6 +381,7 @@ namespace HealthWellbeingRoom.Controllers
                 return View(roomReservation);
             }
         }
+        //------------------------------------------------------EDIT-------------------------------------------------------------------------------------
 
         // GET: RoomReservations/Edit/5
         [Authorize(Roles = "logisticsTechnician")]
@@ -304,7 +406,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(roomReservation);
         }
-
+        //------------------------------------------------------EDIT POST-------------------------------------------------------------------------------------
         // POST: RoomReservations/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -373,7 +475,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        //------------------------------------------------------DELETE-------------------------------------------------------------------------------------
         // GET: RoomReservations/Delete/5
         [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Delete(int? id)
@@ -389,7 +491,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(roomReservation);
         }
-
+        //------------------------------------------------------DELETE POST-------------------------------------------------------------------------------------
         // POST: RoomReservations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -428,7 +530,8 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        //------------------------------------------------------VIEWS CONSULTATION-------------------------------------------------------------------------------------
+         
         public async Task<IActionResult> Consultation(int? id)
         {
             var consultas = _context.Consultations
@@ -438,10 +541,67 @@ namespace HealthWellbeingRoom.Controllers
             return View(consultas);
 
         }
-
+        //------------------------------------------------------VIEWS CONSUMABLES EXPENSES-------------------------------------------------------------------------------------
+         
         public async Task<IActionResult> ConsumablesExpenses(int? id)
         {
 
+            return View();
+        }
+        //------------------------------------------------------HISTORY-------------------------------------------------------------------------------------
+        public async Task<IActionResult> History(int roomId)
+        {
+            var historico = await _context.RoomReservationHistory
+                .Include(h => h.Room)
+                .Include(h => h.Consultation)
+                .Where(h => h.RoomId == roomId)
+                .OrderByDescending(h => h.RecordedAt)
+                .ToListAsync();
+
+            ViewBag.RoomName = historico.FirstOrDefault()?.Room?.Name ?? "Sala";
+
+            return View(historico);
+        }
+        //----------------------------------------------------------ROOMRESERVATIONLIST---------------------------------------------------------------------------------
+        public IActionResult RoomReservationList(int id, int roomId)
+        {
+            // Escolhe o id da sala (roomId tem prioridade, fallback para id)
+            var selectedRoomId = roomId != 0 ? roomId : id;
+            if (selectedRoomId == 0)
+            {
+                return BadRequest("Room id inválido.");
+            }
+
+            // Busca a sala (para mostrar nome e permitir voltar aos detalhes)
+            var room = _context.Room
+                .AsNoTracking()
+                .FirstOrDefault(r => r.RoomId == selectedRoomId);
+
+            if (room == null)
+            {
+                return NotFound("Sala não encontrada.");
+            }
+
+            // Enviar dados para a View
+            ViewBag.RoomId = selectedRoomId;      // ← NECESSÁRIO para o botão Voltar
+            ViewBag.RoomName = room.Name;         // Nome da sala no título
+
+            // Busca reservas da sala
+            var reservations = _context.RoomReservations
+                .AsNoTracking()
+                .Include(rr => rr.Room)
+                .Include(rr => rr.Specialty)
+                .Where(rr => rr.RoomId == selectedRoomId)
+                .OrderBy(rr => rr.StartTime)
+                .ToList();
+
+            return View("RoomReservationList", reservations);
+        }
+
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
+        public IActionResult Reservations(int id)
+        {
+            ViewBag.RoomId = id;
             return View();
         }
 

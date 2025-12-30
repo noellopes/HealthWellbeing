@@ -1,14 +1,14 @@
 ﻿@model HealthWellbeingRoom.Models.RoomReservation
 
 @{
-    ViewData["Title"] = "Eliminar Reserva";
+    ViewData["Title"] = "Cancelar Reserva";
 }
 
-<h1 class="mb-4 text-danger"><i class="bi bi-trash-fill"></i> Eliminar Reserva da sala "@Model.Room?.Name"</h1>
+<h1 class="mb-4 text-danger"><i class="bi bi-trash-fill"></i> Cancelar Reserva da sala "@Model.Room?.Name"</h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <h5 class="mb-3">Tem a certeza que deseja eliminar esta reserva?</h5>
+        <h5 class="mb-3">Tem a certeza que deseja cancelar esta reserva?</h5>
         <hr />
 
         <dl class="row">
@@ -40,13 +40,14 @@
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
         </dl>
 
-        <form asp-action="Delete" method="post" class="mt-4 border-top pt-3 text-end">
+        <form asp-action="CancelarReserva" method="post" class="mt-4 border-top pt-3 text-end">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="RoomReservationId" />
 
             <button type="submit" class="btn btn-danger btn-sm me-2" style="min-width:150px">
-                <i class="bi bi-trash me-1"></i> Eliminar
+                <i class="bi bi-trash me-1"></i> Cancelar
             </button>
+
             <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
                 <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
             </a>

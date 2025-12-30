@@ -59,6 +59,10 @@
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="ZonaArmazenamento" asp-action="Index">Localização dos consumiveis</a></li>
+                                        }
+                                        @if (isLogTech || isAdmin)
+                                        {
                                             <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="ConsumablesExpenses">Lista de consumiveis gastos</a></li>
                                         }
                                         @if (isLogTech || isAdmin)

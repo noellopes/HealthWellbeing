@@ -23,7 +23,7 @@ namespace HealthWellbeingRoom.Models
         public Room? Room { get; set; }   // Navegação para entidade Room
 
         //Consulta
-        public int? ConsultationId { get; set; }
+        public int ConsultationId { get; set; }
         public Consultation? Consultation { get; set; }
 
         //Paciente

@@ -33,7 +33,7 @@
             <table class="table table-striped table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th>Id</th>
                         <th>Nome do responsável</th>
                         <th>Sala</th>
                         <th>Início</th>
@@ -45,7 +45,7 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.RoomReservationId</td>
+                            <td>@item.RoomReservationId.ToString("D3")</td>
 
                             <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
 

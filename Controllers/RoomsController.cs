@@ -398,7 +398,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(room);
         }
-        //----------------------------------------------------------DELETE---------------------------------------------------------------------------------
+        //----------------------------------------------------------DELETE POST---------------------------------------------------------------------------------
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -438,78 +438,6 @@ namespace HealthWellbeingRoom.Controllers
         private bool RoomExists(int id)
         {
             return _context.Room.Any(e => e.RoomId == id);
-        }
-
-        //----------------------------------------------------------HISTORY---------------------------------------------------------------------------------
-        [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult History(
-            int id,
-            int? searchHistoryId,
-            int? searchResponsibleId,
-            DateTime? searchStartDate,
-            DateTime? searchEndDate,
-            int page = 1)
-        {
-            ViewBag.RoomId = id;
-
-            var room = _context.Room.FirstOrDefault(r => r.RoomId == id);
-            if (room == null)
-                return NotFound();
-
-            ViewData["RoomName"] = room.Name;
-            ViewData["Title"] = "Histórico de utilização de Sala";
-
-
-            // Dados fictícios
-            var fakeData = new List<RoomHistory>
-            {
-                new RoomHistory { RoomHistoryId = 10, StartDate = DateTime.Now.AddHours(-2), EndDate = DateTime.Now, Responsible = "João Silva", ResponsibleId = 1, Note = "Limpeza completa" },
-                new RoomHistory { RoomHistoryId = 20, StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(-1).AddHours(1), Responsible = "Maria Costa", ResponsibleId = 2, Note = "Inspeção técnica" },
-                new RoomHistory { RoomHistoryId = 30, StartDate = DateTime.Now.AddDays(-3), EndDate = DateTime.Now.AddDays(-3).AddHours(2), Responsible = "Carlos Mendes", ResponsibleId = 3, Note = "Revisão elétrica" },
-                new RoomHistory { RoomHistoryId = 40, StartDate = DateTime.Now.AddDays(-5), EndDate = DateTime.Now.AddDays(-5).AddHours(1), Responsible = "Ana Ferreira", ResponsibleId = 4, Note = "Troca de lâmpadas" },
-                new RoomHistory { RoomHistoryId = 50, StartDate = DateTime.Now.AddDays(-7), EndDate = DateTime.Now.AddDays(-7).AddHours(3), Responsible = "Pedro Santos", ResponsibleId = 5, Note = "Limpeza de ar condicionado" },
-                new RoomHistory { RoomHistoryId = 60, StartDate = DateTime.Now.AddDays(-10), EndDate = DateTime.Now.AddDays(-10).AddHours(2), Responsible = "Sofia Almeida", ResponsibleId = 6, Note = "Inspeção de segurança" },
-                new RoomHistory { RoomHistoryId = 70, StartDate = DateTime.Now.AddDays(-12), EndDate = DateTime.Now.AddDays(-12).AddHours(1), Responsible = "Ricardo Lopes", ResponsibleId = 7, Note = "Revisão de portas" },
-                new RoomHistory { RoomHistoryId = 80, StartDate = DateTime.Now.AddDays(-15), EndDate = DateTime.Now.AddDays(-15).AddHours(2), Responsible = "Helena Costa", ResponsibleId = 8, Note = "Verificação de extintores" },
-                new RoomHistory { RoomHistoryId = 90, StartDate = DateTime.Now.AddDays(-18), EndDate = DateTime.Now.AddDays(-18).AddHours(1), Responsible = "Miguel Rocha", ResponsibleId = 9, Note = "Revisão de cablagem" },
-                new RoomHistory { RoomHistoryId = 100, StartDate = DateTime.Now.AddDays(-20), EndDate = DateTime.Now.AddDays(-20).AddHours(2), Responsible = "Patrícia Gomes", ResponsibleId = 10, Note = "Limpeza geral" },
-                new RoomHistory { RoomHistoryId = 110, StartDate = DateTime.Now.AddDays(-22), EndDate = DateTime.Now.AddDays(-22).AddHours(1), Responsible = "Tiago Martins", ResponsibleId = 11, Note = "Inspeção técnica" },
-                new RoomHistory { RoomHistoryId = 120, StartDate = DateTime.Now.AddDays(-25), EndDate = DateTime.Now.AddDays(-25).AddHours(2), Responsible = "Beatriz Silva", ResponsibleId = 12, Note = "Troca de filtros" },
-                new RoomHistory { RoomHistoryId = 130, StartDate = DateTime.Now.AddDays(-27), EndDate = DateTime.Now.AddDays(-27).AddHours(1), Responsible = "André Carvalho", ResponsibleId = 13, Note = "Revisão de iluminação" },
-                new RoomHistory { RoomHistoryId = 140, StartDate = DateTime.Now.AddDays(-30), EndDate = DateTime.Now.AddDays(-30).AddHours(2), Responsible = "Mariana Ribeiro", ResponsibleId = 14, Note = "Limpeza técnica" },
-                new RoomHistory { RoomHistoryId = 150, StartDate = DateTime.Now.AddDays(-32), EndDate = DateTime.Now.AddDays(-32).AddHours(1), Responsible = "João Costa", ResponsibleId = 15, Note = "Inspeção final" }
-            };
-
-            // Aplicar filtros
-            if (searchHistoryId.HasValue)
-                fakeData = fakeData.Where(h => h.RoomHistoryId == searchHistoryId.Value).ToList();
-
-            if (searchResponsibleId.HasValue)
-                fakeData = fakeData.Where(h => h.ResponsibleId == searchResponsibleId.Value).ToList();
-
-            if (searchStartDate.HasValue)
-                fakeData = fakeData.Where(h => h.StartDate >= searchStartDate.Value).ToList();
-
-            if (searchEndDate.HasValue)
-                fakeData = fakeData.Where(h => h.EndDate <= searchEndDate.Value).ToList();
-
-            // Paginação segura
-            int itemsPerPage = 10;
-            var pagination = new RPaginationInfo<RoomHistory>(page, fakeData.Count, itemsPerPage);
-
-            pagination.Items = fakeData
-                .OrderByDescending(h => h.StartDate)
-                .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage)
-                .ToList();
-
-            // Guardar filtros para preencher o formulário
-            ViewBag.SearchHistoryId = searchHistoryId;
-            ViewBag.SearchResponsibleId = searchResponsibleId;
-            ViewBag.SearchStartDate = searchStartDate?.ToString("yyyy-MM-dd");
-            ViewBag.SearchEndDate = searchEndDate?.ToString("yyyy-MM-dd");
-
-            return View(pagination);
         }
 
         //----------------------------------------------------------EQUIPMENTS---------------------------------------------------------------------------------
@@ -639,17 +567,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(pagination);
         }
 
-
-        //----------------------------------------------------------RESERVATIONS---------------------------------------------------------------------------------
-
-
-        [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult Reservations(int id)
-        {
-            ViewBag.RoomId = id;
-            return View();
-        }
-
         //----------------------------------------------------------CONSUMABLES---------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Consumables(
@@ -708,93 +625,5 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(pagination);
         }
-
-        //----------------------------------------------------------HISTORYDETAILS---------------------------------------------------------------------------------
-        [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult HistoryDetails(int id, int roomId)
-        {
-            // Buscar a sala
-            var room = _context.Room.FirstOrDefault(r => r.RoomId == roomId);
-            if (room == null)
-                return NotFound();
-
-            ViewBag.RoomId = roomId;
-            ViewData["RoomName"] = room.Name;
-
-            // Dados fictícios (mesmos do método History, mas agora com RoomId preenchido)
-            var fakeData = new List<RoomHistory>
-            {
-                new RoomHistory { RoomHistoryId = 10, RoomId = roomId, StartDate = DateTime.Now.AddHours(-2), EndDate = DateTime.Now, Responsible = "João Silva", ResponsibleId = 1, Note = "Limpeza completa" },
-                new RoomHistory { RoomHistoryId = 20, RoomId = roomId, StartDate = DateTime.Now.AddDays(-1), EndDate = DateTime.Now.AddDays(-1).AddHours(1), Responsible = "Maria Costa", ResponsibleId = 2, Note = "Inspeção técnica" },
-                new RoomHistory { RoomHistoryId = 30, RoomId = roomId, StartDate = DateTime.Now.AddDays(-3), EndDate = DateTime.Now.AddDays(-3).AddHours(2), Responsible = "Carlos Mendes", ResponsibleId = 3, Note = "Revisão elétrica" },
-                new RoomHistory { RoomHistoryId = 40, RoomId = roomId, StartDate = DateTime.Now.AddDays(-5), EndDate = DateTime.Now.AddDays(-5).AddHours(1), Responsible = "Ana Ferreira", ResponsibleId = 4, Note = "Troca de lâmpadas" },
-                new RoomHistory { RoomHistoryId = 50, RoomId = roomId, StartDate = DateTime.Now.AddDays(-7), EndDate = DateTime.Now.AddDays(-7).AddHours(3), Responsible = "Pedro Santos", ResponsibleId = 5, Note = "Limpeza de ar condicionado" },
-                new RoomHistory { RoomHistoryId = 60, RoomId = roomId, StartDate = DateTime.Now.AddDays(-10), EndDate = DateTime.Now.AddDays(-10).AddHours(2), Responsible = "Sofia Almeida", ResponsibleId = 6, Note = "Inspeção de segurança" },
-                new RoomHistory { RoomHistoryId = 70, RoomId = roomId, StartDate = DateTime.Now.AddDays(-12), EndDate = DateTime.Now.AddDays(-12).AddHours(1), Responsible = "Ricardo Lopes", ResponsibleId = 7, Note = "Revisão de portas" },
-                new RoomHistory { RoomHistoryId = 80, RoomId = roomId, StartDate = DateTime.Now.AddDays(-15), EndDate = DateTime.Now.AddDays(-15).AddHours(2), Responsible = "Helena Costa", ResponsibleId = 8, Note = "Verificação de extintores" },
-                new RoomHistory { RoomHistoryId = 90, RoomId = roomId, StartDate = DateTime.Now.AddDays(-18), EndDate = DateTime.Now.AddDays(-18).AddHours(1), Responsible = "Miguel Rocha", ResponsibleId = 9, Note = "Revisão de cablagem" },
-                new RoomHistory { RoomHistoryId = 100, RoomId = roomId, StartDate = DateTime.Now.AddDays(-20), EndDate = DateTime.Now.AddDays(-20).AddHours(2), Responsible = "Patrícia Gomes", ResponsibleId = 10, Note = "Limpeza geral" },
-                new RoomHistory { RoomHistoryId = 110, RoomId = roomId, StartDate = DateTime.Now.AddDays(-22), EndDate = DateTime.Now.AddDays(-22).AddHours(1), Responsible = "Tiago Martins", ResponsibleId = 11, Note = "Inspeção técnica" },
-                new RoomHistory { RoomHistoryId = 120, RoomId = roomId, StartDate = DateTime.Now.AddDays(-25), EndDate = DateTime.Now.AddDays(-25).AddHours(2), Responsible = "Beatriz Silva", ResponsibleId = 12, Note = "Troca de filtros" },
-                new RoomHistory { RoomHistoryId = 130, RoomId = roomId, StartDate = DateTime.Now.AddDays(-27), EndDate = DateTime.Now.AddDays(-27).AddHours(1), Responsible = "André Carvalho", ResponsibleId = 13, Note = "Revisão de iluminação" },
-                new RoomHistory { RoomHistoryId = 140, RoomId = roomId, StartDate = DateTime.Now.AddDays(-30), EndDate = DateTime.Now.AddDays(-30).AddHours(2), Responsible = "Mariana Ribeiro", ResponsibleId = 14, Note = "Limpeza técnica" },
-                new RoomHistory { RoomHistoryId = 150, RoomId = roomId, StartDate = DateTime.Now.AddDays(-32), EndDate = DateTime.Now.AddDays(-32).AddHours(1), Responsible = "João Costa", ResponsibleId = 15, Note = "Inspeção final" }
-            };
-
-            // Procurar o histórico pelo ID e RoomId
-            var history = fakeData.FirstOrDefault(h => h.RoomHistoryId == id && h.RoomId == roomId);
-            if (history == null)
-                return NotFound();
-
-            // Calcular IDs anterior e próximo
-            var orderedIds = fakeData.OrderBy(h => h.RoomHistoryId).Select(h => h.RoomHistoryId).ToList();
-            int currentIndex = orderedIds.IndexOf(id);
-            int? previousId = currentIndex > 0 ? orderedIds[currentIndex - 1] : (int?)null;
-            int? nextId = currentIndex < orderedIds.Count - 1 ? orderedIds[currentIndex + 1] : (int?)null;
-
-            ViewBag.PreviousHistoryId = previousId;
-            ViewBag.NextHistoryId = nextId;
-
-            ViewData["Title"] = "Detalhes do Histórico da Sala";
-
-            return View(history); // envia para HistoryDetails.cshtml
-        }
-        //----------------------------------------------------------ROOMRESERVATIONLIST---------------------------------------------------------------------------------
-
-        public IActionResult RoomReservationList(int id, int roomId)
-        {
-            // Escolhe o id da sala (roomId tem prioridade, fallback para id)
-            var selectedRoomId = roomId != 0 ? roomId : id;
-            if (selectedRoomId == 0)
-            {
-                return BadRequest("Room id inválido.");
-            }
-
-            // Busca a sala (para mostrar nome e permitir voltar aos detalhes)
-            var room = _context.Room
-                .AsNoTracking()
-                .FirstOrDefault(r => r.RoomId == selectedRoomId);
-
-            if (room == null)
-            {
-                return NotFound("Sala não encontrada.");
-            }
-
-            // Enviar dados para a View
-            ViewBag.RoomId = selectedRoomId;      // ← NECESSÁRIO para o botão Voltar
-            ViewBag.RoomName = room.Name;         // Nome da sala no título
-
-            // Busca reservas da sala
-            var reservations = _context.RoomReservations
-                .AsNoTracking()
-                .Include(rr => rr.Room)
-                .Include(rr => rr.Specialty)
-                .Where(rr => rr.RoomId == selectedRoomId)
-                .OrderBy(rr => rr.StartTime)
-                .ToList();
-
-            return View("RoomReservationList", reservations);
-        }
-
     }
 }
