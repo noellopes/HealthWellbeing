@@ -1,0 +1,55 @@
+﻿@model IEnumerable<HealthWellbeingRoom.Models.Consultation>
+
+@{
+    ViewData["Title"] = "Lista de Consultas";
+}
+
+<h2 class="mb-4">Consultas (dados fictícios)</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Id da consulta</th>
+            <th>Data da Marcação</th>
+            <th>Data da Consulta</th>
+            <th>Hora Início</th>
+            <th>Hora Fim</th>
+            <th>Status</th>
+            <th>Médico</th>
+            <th>Paciente</th>
+            <th>Especialidade</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ConsultationId.ToString("D3")</td>
+                <td>@item.BookingDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.ConsultationDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.StartTime.ToString("HH:mm")</td>
+                <td>@item.EndTime.ToString("HH:mm")</td>
+
+                <td>
+                    @if (item.Status == "Confirmada")
+                    {
+                        <span class="badge bg-success">Confirmada</span>
+                    }
+                    else if (item.Status == "Pendente")
+                    {
+                        <span class="badge bg-warning text-dark">Pendente</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@item.Status</span>
+                    }
+                </td>
+
+                <td>@item.DoctorName</td>
+                <td>@item.PatientName</td>
+                <td>@item.Specialty?.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

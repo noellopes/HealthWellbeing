@@ -31,59 +31,71 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Responsável</th>
-                    <th>Sala</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                Ainda não há reservas de salas.
+            </div>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>@item.RoomReservationId</td>
-                        <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
-                        <td>@(item.Room?.Name ?? "—")</td>
-                        <td>@(item.StartTime == default ? "—" : item.StartTime.ToString("g"))</td>
-                        <td>@(item.EndTime == default ? "—" : item.EndTime.ToString("g"))</td>
-
-                        <td class="text-center">
-
-                            @if (isLogTech)
-                            {
-                                <a asp-action="Edit"
-                                   asp-route-id="@item.RoomReservationId"
-                                   class="btn btn-sm btn-warning me-1">
-                                    <i class="bi bi-pencil-square" aria-label="Editar sala"></i> Editar
-                                </a>
-                            }
-
-                            <a asp-action="Details"
-                               asp-route-id="@item.RoomReservationId"
-                               asp-route-fromCreation="false"
-                               class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle-fill" aria-label="Ver detalhes da sala"></i> Detalhes
-                            </a>
-
-                            @if (isLogTech)
-                            {
-                                <a asp-action="Delete"
-                                   asp-route-id="@item.RoomReservationId"
-                                   class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash-fill" aria-label="Eliminar sala"></i> Eliminar
-                                </a>
-                            }
-
-                        </td>
+                        <th>Id da reserva</th>
+                        <th>Id da consulta</th>
+                        <th>Responsável</th>
+                        <th>Sala</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.RoomReservationId</td>
+                            <td>@item.ConsultationId</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
+                            <td>@(item.Room?.Name ?? "—")</td>
+                            <td>@(item.StartTime == default ? "—" : item.StartTime.ToString("g"))</td>
+                            <td>@(item.EndTime == default ? "—" : item.EndTime.ToString("g"))</td>
+
+                            <td class="text-center">
+
+                                @if (isLogTech)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.RoomReservationId"
+                                       class="btn btn-sm btn-warning me-1">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                }
+
+                                <a asp-action="Details"
+                                   asp-route-id="@item.RoomReservationId"
+                                   asp-route-fromCreation="false"
+                                   class="btn btn-sm btn-info me-1">
+                                    <i class="bi bi-info-circle-fill"></i> Detalhes
+                                </a>
+
+                                @if (isLogTech)
+                                {
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.RoomReservationId"
+                                       class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </a>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
 
     </div>
 </div>

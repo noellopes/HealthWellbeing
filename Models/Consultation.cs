@@ -6,6 +6,7 @@ namespace HealthWellbeingRoom.Models
 {
     public class Consultation
     {
+        [Key]
         public int ConsultationId { get; set; }
 
         public DateTime BookingDate { get; set; }

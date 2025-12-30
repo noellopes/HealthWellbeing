@@ -19,6 +19,11 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
+        private bool RoomReservationForConsultationExists(int consultationId)
+        {
+            return _context.RoomReservations.Any(r => r.ConsultationId == consultationId);
+        }
+
         //------------------------------------------------------PREENCHER DROPDOWNS (FILTRADO)-------------------------------------------------------------------------------------
         private async Task PreencherDropdowns(
             int? selectedRoomId = null,
@@ -178,6 +183,14 @@ namespace HealthWellbeingRoom.Controllers
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
 
+            // 1.1 Impedir duplicação de reserva para a mesma consulta
+            if (await _context.RoomReservations
+                .AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId))
+            {
+                ModelState.AddModelError(nameof(roomReservation.ConsultationId),
+                    "Esta consulta já tem uma reserva de sala associada.");
+            }
+
             // 2. Validar datas
             if (roomReservation.StartTime == default)
                 ModelState.AddModelError(nameof(roomReservation.StartTime), "A data/hora de início é obrigatória.");
@@ -248,6 +261,7 @@ namespace HealthWellbeingRoom.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
+
                 TempData["SuccessMessage"] = "Reserva criada com sucesso.";
                 return RedirectToAction(nameof(Index));
             }
@@ -413,6 +427,22 @@ namespace HealthWellbeingRoom.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Consultation(int? id)
+        {
+            var consultas = _context.Consultations
+                .Include(c => c.Specialty)
+                .ToList();
+
+            return View(consultas);
+
+        }
+
+        public async Task<IActionResult> ConsumablesExpenses(int? id)
+        {
+
+            return View();
         }
 
         private bool RoomReservationExists(int id)

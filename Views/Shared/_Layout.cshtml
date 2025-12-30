@@ -39,11 +39,11 @@
                                     <ul class="dropdown-menu">
                                         @if (isAdmin)
                                         {
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Create">Criar Salas</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Create">Criar salas</a></li>
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Lista das Salas</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Rooms" asp-action="Index">Lista das salas</a></li>
                                         }
                                         @if (isLogTech)
                                         {
@@ -55,7 +55,15 @@
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista de consumiveis</a></li>
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="Consumivel" asp-action="Index">Lista de consumiveis</a></li>
+                                        }
+                                        @if (isLogTech || isAdmin)
+                                        {
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="ConsumablesExpenses">Lista de consumiveis gastos</a></li>
+                                        }
+                                        @if (isLogTech || isAdmin)
+                                        {
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="Consultation">Lista de consultas/tratamentos</a></li>
                                         }
                                     </ul>
                                 </li>

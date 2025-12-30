@@ -197,11 +197,11 @@ namespace HealthWellbeingRoom.Controllers
             if (id == null) return NotFound();
 
             var room = await _context.Room
-                //.Include(r => r.Equipments)
                 .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
                 .Include(r => r.RoomType)
+                .Include(r => r.RoomReservations) // necessário para verificar reservas
                 .FirstOrDefaultAsync(m => m.RoomId == id);
 
             if (room == null) return NotFound();
@@ -213,11 +213,24 @@ namespace HealthWellbeingRoom.Controllers
                 .OrderBy(r => r.RoomId)
                 .Select(r => r.RoomId)
                 .ToListAsync();
+
             int currentIndex = orderedIds.IndexOf(id.Value);
             int? previousId = currentIndex > 0 ? orderedIds[currentIndex - 1] : (int?)null;
             int? nextId = currentIndex < orderedIds.Count - 1 ? orderedIds[currentIndex + 1] : (int?)null;
+
             ViewBag.PreviousRoomId = previousId;
             ViewBag.NextRoomId = nextId;
+
+            // Verificar reserva ativa se a sala estiver indisponível
+            if (room.RoomStatus?.Name == "Indisponível")
+            {
+                var reservaAtiva = room.RoomReservations
+                    .Where(r => r.StartTime >= DateTime.Now)
+                    .OrderBy(r => r.StartTime)
+                    .FirstOrDefault();
+
+                ViewBag.ReservaAtivaId = reservaAtiva?.RoomReservationId;
+            }
 
             return View(room);
         }
@@ -750,21 +763,28 @@ namespace HealthWellbeingRoom.Controllers
 
         public IActionResult RoomReservationList(int id, int roomId)
         {
-            // escolhe o id da sala (roomId tem prioridade, fallback para id)
+            // Escolhe o id da sala (roomId tem prioridade, fallback para id)
             var selectedRoomId = roomId != 0 ? roomId : id;
             if (selectedRoomId == 0)
             {
                 return BadRequest("Room id inválido.");
             }
 
-            // busca a sala (opcional, só para mostrar o nome no topo)
+            // Busca a sala (para mostrar nome e permitir voltar aos detalhes)
             var room = _context.Room
                 .AsNoTracking()
                 .FirstOrDefault(r => r.RoomId == selectedRoomId);
 
-            ViewBag.RoomName = room?.Name ?? $"Sala {selectedRoomId}";
+            if (room == null)
+            {
+                return NotFound("Sala não encontrada.");
+            }
 
-            // busca reservas da sala, inclui navegações e ordena por início
+            // Enviar dados para a View
+            ViewBag.RoomId = selectedRoomId;      // ← NECESSÁRIO para o botão Voltar
+            ViewBag.RoomName = room.Name;         // Nome da sala no título
+
+            // Busca reservas da sala
             var reservations = _context.RoomReservations
                 .AsNoTracking()
                 .Include(rr => rr.Room)

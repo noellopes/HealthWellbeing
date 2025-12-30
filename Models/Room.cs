@@ -63,6 +63,7 @@ namespace HealthWellbeing.Models
         public ICollection<LocationMedDevice>? LocalizacaoDispMedicoMovel { get; set; }
         public ICollection<Equipment>? Equipments { get; set; }
         public ICollection<RoomConsumable>? RoomConsumables { get; set; }
+        public ICollection<RoomReservation>? RoomReservations { get; set; }
 
     }
 }
