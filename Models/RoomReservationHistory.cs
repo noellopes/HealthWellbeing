@@ -1,4 +1,5 @@
 ﻿using HealthWellbeing.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -8,6 +9,8 @@ namespace HealthWellbeingRoom.Models
 
         public int RoomReservationId { get; set; }
         public int RoomId { get; set; }
+
+        [Required(ErrorMessage = "O campo Id da Consulta é obrigatório.")]
         public int ConsultationId { get; set; }
 
         public DateTime StartTime { get; set; }

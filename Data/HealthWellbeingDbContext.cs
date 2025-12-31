@@ -13,6 +13,7 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
         public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
@@ -23,12 +24,15 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.TreatmentRecord> TreatmentRecord { get; set; } = default!;
         public DbSet<RoomConsumable> RoomConsumable { get; set; }
 
-        // Adiciona capacidade de "Soft Delete" ao contexto
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
+        // Soft Delete interceptor
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Regista um filtro nas query dos modelos que implementam ISoftDeletable
+            base.OnModelCreating(modelBuilder);
+
+            // Filtro global para ISoftDeletable
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
@@ -40,7 +44,19 @@ namespace HealthWellbeing.Data
                     entityBuilder.HasQueryFilter(CreateIsDeletedFilter(entityType.ClrType));
                 }
             }
+
+            // =========================
+            // RELACIONAMENTOS EXPLÍCITOS
+            // =========================
+
+            // Consultation -> Room (evitar múltiplos caminhos de cascata)
+            modelBuilder.Entity<Consultation>()
+                .HasOne(c => c.Room)
+                .WithMany(r => r.Consultations)       
+                .HasForeignKey(c => c.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);   
         }
+
         private static LambdaExpression CreateIsDeletedFilter(Type entityType)
         {
             var param = Expression.Parameter(entityType, "x");
@@ -48,6 +64,7 @@ namespace HealthWellbeing.Data
             var condition = Expression.Equal(prop, Expression.Constant(false));
             return Expression.Lambda(condition, param);
         }
+
         public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Fornecedor> Fornecedor { get; set; } = default!;
@@ -55,7 +72,6 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Stock> Stock { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.UsoConsumivel> UsoConsumivel { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; }
-
 
         public DbSet<TypeMaterial> TypeMaterial { get; set; } = default!;
         public DbSet<LocationMedDevice> LocationMedDevice { get; set; } = default!;
@@ -65,9 +81,6 @@ namespace HealthWellbeing.Data
         public DbSet<Equipment> Equipment { get; set; } = default!;
         public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
         public DbSet<Room> Room { get; set; } = default!;
-        //public DbSet<Alergia> Alergia { get; set; } = default!;
-        //public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        //public DbSet<Receita> Receita { get; set; } = default!;
         public DbSet<RoomHistory> RoomHistories { get; set; }
         public DbSet<RoomReservationHistory> RoomReservationHistory { get; set; }
 
@@ -78,10 +91,7 @@ namespace HealthWellbeing.Data
         public DbSet<RoomLocation> RoomLocation { get; set; }
 
         public DbSet<TypeMaterialHistory> TypeMaterialHistories { get; set; }
-
-        //public DbSet<RoomConsumable> RoomConsumable { get; set; }
         public DbSet<RoomReservation> RoomReservations { get; set; }
         public DbSet<Consultation> Consultations { get; set; } = default!;
-
     }
 }

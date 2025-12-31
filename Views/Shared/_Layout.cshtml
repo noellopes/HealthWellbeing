@@ -47,11 +47,11 @@
                                         }
                                         @if (isLogTech)
                                         {
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Create">Criar reservas</a></li>
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="Create">Criar reservas</a></li>
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista das reservas</a></li>
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="Index">Lista das reservas</a></li>
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
@@ -67,7 +67,7 @@
                                         }
                                         @if (isLogTech || isAdmin)
                                         {
-                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="Consultation">Lista de consultas/tratamentos</a></li>
+                                            <li><a class="dropdown-item text-success" asp-area="" asp-controller="RoomReservations" asp-action="Consultation">Lista de consultas</a></li>
                                         }
                                     </ul>
                                 </li>

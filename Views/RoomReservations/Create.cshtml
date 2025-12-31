@@ -4,7 +4,9 @@
     ViewData["Title"] = "Nova Reserva de Sala";
 }
 
-<h1 class="mb-4 text-primary"><i class="bi bi-calendar-plus"></i> Criar Reserva da sala</h1>
+<h1 class="mb-4 text-success">
+    <i class="bi bi-calendar-plus"></i> Criar Reserva da sala
+</h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
@@ -14,8 +16,11 @@
 
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 101" />
+                    <label asp-for="ConsultationId" class="form-label fw-bold">Id da Consulta</label>
+                    <input asp-for="ConsultationId"
+                           class="form-control"
+                           placeholder="Ex: 001"
+                           value="" />
                     <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
 

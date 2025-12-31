@@ -9,6 +9,10 @@ namespace HealthWellbeingRoom.Models
         [Key]
         public int ConsultationId { get; set; }
 
+        [ForeignKey(nameof(Room))]
+        public int? RoomId { get; set; }
+        public Room? Room { get; set; }
+
         public DateTime BookingDate { get; set; }
 
         public DateTime ConsultationDate { get; set; }

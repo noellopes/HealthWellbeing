@@ -8,7 +8,10 @@
     var successMessage = TempData["SuccessMessage"];
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<h1 class="mb-4 text-success">
+    <i class="bi bi-box-seam me-2"></i>
+    @ViewData["Title"]
+</h1>
 
 @if (successMessage != null)
 {
@@ -30,6 +33,7 @@
             <p>Não existem consumíveis com os filtros selecionados.</p>
         </div>
     </div>
+
     <a asp-action="Create" class="btn btn-success">
         <i class="bi bi-plus-circle me-1"></i> Criar Novo
     </a>
@@ -37,7 +41,10 @@
 else
 {
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Consumíveis</h2>
+        <h2 class="h4">
+            <i class="bi bi-list-ul me-2"></i>
+            Lista de Consumíveis
+        </h2>
 
         <div class="d-flex justify-content-end">
             <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
@@ -78,15 +85,16 @@ else
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
+        <table class="table table-striped table-hover align-middle border">
+            <thead class="table-success">
                 <tr>
                     <th>Nome</th>
                     <th>Categoria</th>
                     <th>Qtd. Atual</th>
-                    <th class="text-end">Ações</th>
+                    <th class="text-center">Ações</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var item in Model.Items)
                 {
@@ -108,15 +116,17 @@ else
                             }
                         </td>
 
-                        <td class="text-end">
+                        <td class="text-center">
                             <a asp-action="Edit" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-warning me-1">
-                                <i class="bi bi-pencil-square"></i> Editar
+                                <i class="bi bi-pencil-square me-1"></i> Editar
                             </a>
+
                             <a asp-action="Details" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-info me-1">
-                                <i class="bi bi-info-circle"></i> Detalhes
+                                <i class="bi bi-info-circle me-1"></i> Detalhes
                             </a>
+
                             <a asp-action="Delete" asp-route-id="@item.ConsumivelId" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Apagar
+                                <i class="bi bi-trash me-1"></i> Apagar
                             </a>
                         </td>
                     </tr>
@@ -125,37 +135,39 @@ else
         </table>
 
         <nav aria-label="Consumíveis pages">
-            <ul class="pagination">
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
-                }
-
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
+            <div class="d-flex justify-content-end">
+                <ul class="pagination">
+                    @if (Model.CurrentPage == 1)
                     {
-                        <li class="page-item active"><a class="page-link">@p</a></li>
+                        <li class="page-item disabled"><a class="page-link">Primeira</a></li>
                     }
                     else
                     {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                        <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
                     }
-                }
 
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled"><a class="page-link">Última</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
-                }
-            </ul>
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <li class="page-item active"><a class="page-link">@p</a></li>
+                        }
+                        else
+                        {
+                            <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                        }
+                    }
+
+                    @if (Model.CurrentPage == Model.TotalPages)
+                    {
+                        <li class="page-item disabled"><a class="page-link">Última</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                    }
+                </ul>
+            </div>
         </nav>
     </div>
 }
