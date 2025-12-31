@@ -283,8 +283,21 @@ namespace HealthWellbeingRoom.Controllers
             {
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
+            // 1.2 Impedir reserva se a consulta estiver pendente
+            if (roomReservation.ConsultationId > 0)
+            {
+                var consulta = await _context.Consultations
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.ConsultationId == roomReservation.ConsultationId);
 
-            // 1.1 Impedir duplicação de reserva para a mesma consulta
+                if (consulta != null && consulta.Status == "Pendente")
+                {
+                    ModelState.AddModelError(nameof(roomReservation.ConsultationId),
+                        "Não é possível reservar sala para uma consulta pendente.");
+                }
+            }
+
+            // 1.3 Impedir duplicação de reserva para a mesma consulta
             if (await _context.RoomReservations
                 .AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId))
             {
