@@ -284,13 +284,6 @@ namespace HealthWellbeingRoom.Controllers
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
 
-            // 1.2 Impedir reserva se a consulta estiver cancelada
-            //if (consulta != null && consulta.Status == "Cancelada")
-            //{
-            //    ModelState.AddModelError(nameof(roomReservation.ConsultationId),
-            //        "Não é possível reservar sala para uma consulta cancelada.");
-            //}
-
             // 2. Validar campos separados de data e hora
             if (roomReservation.ConsultationDate == null)
                 ModelState.AddModelError(nameof(roomReservation.ConsultationDate), "A data da consulta é obrigatória.");
@@ -307,13 +300,26 @@ namespace HealthWellbeingRoom.Controllers
                 ModelState.AddModelError(string.Empty, "A hora de início deve ser anterior à hora de fim.");
             }
 
-            // 3. Construir StartTime e EndTime (a partir do que o utilizador inseriu)
+            // 3. Construir StartTime e EndTime
             if (roomReservation.ConsultationDate != null &&
                 roomReservation.StartHour != null &&
                 roomReservation.EndHour != null)
             {
                 roomReservation.StartTime = roomReservation.ConsultationDate.Value.Date + roomReservation.StartHour.Value;
                 roomReservation.EndTime = roomReservation.ConsultationDate.Value.Date + roomReservation.EndHour.Value;
+
+                // 3.1 Validar se a data é no passado
+                if (roomReservation.ConsultationDate < DateTime.Today)
+                {
+                    ModelState.AddModelError(nameof(roomReservation.ConsultationDate), "Não é possível agendar para uma data passada.");
+                }
+
+                // 3.2 Se for hoje, validar hora de início
+                if (roomReservation.ConsultationDate == DateTime.Today &&
+                    roomReservation.StartTime < DateTime.Now)
+                {
+                    ModelState.AddModelError(nameof(roomReservation.StartHour), "A hora de início não pode ser anterior ao momento atual.");
+                }
             }
 
             // 4. Sala obrigatória
