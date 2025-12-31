@@ -1,22 +1,16 @@
-﻿@model HealthWellbeing.Models.StockMovimento
+﻿@model HealthWellbeing.Models.HistoricoCompras
 @{
-    ViewData["Title"] = "Eliminar Registo";
+    ViewData["Title"] = "Detalhes da Compra";
 }
 
 <div class="container mt-4">
 
-    <h2 class="fw-bold text-danger mb-3">🗑 Eliminar Registo de Compra</h2>
+    <h2 class="fw-bold mb-4">🧾 Detalhes da Compra</h2>
 
-    <!-- Alerta suave -->
-    <div class="alert alert-warning shadow-sm mb-4">
-        <strong>Atenção:</strong> Está prestes a eliminar este registo.<br />
-        Esta ação <u>não pode ser desfeita</u>.
-    </div>
-
-    <!-- Cartão leve -->
+    <!-- Cartão suave e elegante -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-light text-dark py-3" style="border-bottom: 2px solid #e6e6e6;">
-            <h5 class="mb-0">🛒 Detalhes da Compra</h5>
+            <h5 class="mb-0">🛒 Informação da Entrada de Consumível</h5>
         </div>
 
         <div class="card-body p-4">
@@ -52,17 +46,11 @@
         </div>
     </div>
 
-    <!-- Botões -->
-    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-flex justify-content-end gap-3">
-
-        <button type="submit" class="btn btn-danger px-4">
-            🗑 Eliminar
-        </button>
-
+    <!-- Botão único -->
+    <div class="d-flex justify-content-end mt-3">
         <a asp-action="Index" class="btn btn-secondary px-4">
             ← Voltar à Lista
         </a>
-
-    </form>
+    </div>
 
 </div>

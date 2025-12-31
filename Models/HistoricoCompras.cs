@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
-    public class StockMovimento
+    public class HistoricoCompras
     {
         [Key]
         public int Id { get; set; }
