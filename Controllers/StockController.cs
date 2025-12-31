@@ -255,6 +255,7 @@ namespace HealthWellbeing.Controllers
                 .Include(s => s.Zona)
                 .FirstOrDefault(s => s.StockId == id);
 
+
             if (stock == null)
                 return RedirectToAction(nameof(Index));
 
