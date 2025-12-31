@@ -11,47 +11,64 @@ namespace HealthWellbeingRoom.Models
         [Key]
         public int RoomReservationId { get; set; }
 
-        //Responsável
+        // Responsável
         [Required(ErrorMessage = "O nome do responsável é obrigatório.")]
         [StringLength(100)]
         public string ResponsibleName { get; set; } = string.Empty;
 
-
-        //Sala
+        // Sala
         [Required(ErrorMessage = "A sala é obrigatória.")]
         public int RoomId { get; set; }
-        public Room? Room { get; set; }   // Navegação para entidade Room
+        public Room? Room { get; set; }
 
-        //Consulta
+        // Consulta
         public int ConsultationId { get; set; }
         public Consultation? Consultation { get; set; }
 
-        //Paciente
+        // Paciente
         public int? PatientId { get; set; }
 
-        //Especialidade
+        // Especialidade
         public int? SpecialtyId { get; set; }
         public Specialty? Specialty { get; set; }
 
-        //Data, Hora e duracao
-        [Required(ErrorMessage = "A data/hora de início é obrigatória.")]
+        // Data da consulta vai para a consulta
+        [NotMapped]
+        [Required(ErrorMessage = "A data da consulta é obrigatória.")]
+        [DataType(DataType.Date)]
+        public DateTime? ConsultationDate { get; set; }
+
+        // Hora de início vai para a consulta
+        [NotMapped]
+        [Required(ErrorMessage = "A hora de início é obrigatória.")]
+        [DataType(DataType.Time)]
+        public TimeSpan? StartHour { get; set; }
+
+        // Hora de fim vai para a consulta
+        [NotMapped]
+        [Required(ErrorMessage = "A hora de fim é obrigatória.")]
+        [DataType(DataType.Time)]
+        public TimeSpan? EndHour { get; set; }
+
+        // Campos reais gravados na BD
+        [Required]
         public DateTime StartTime { get; set; }
 
-        [Required(ErrorMessage = "A data/hora de fim é obrigatória.")]
+        [Required]
         public DateTime EndTime { get; set; }
 
         [NotMapped]
         public TimeSpan Duration => EndTime - StartTime;
 
-        //Recursos
+        // Recursos
         public ICollection<RoomConsumable>? Consumables { get; set; }
         public ICollection<LocationMedDevice>? MedicalDevices { get; set; }
 
-        //Estado da reserva
+        // Estado
         [StringLength(50)]
         public string Status { get; set; } = "Pendente";
 
-        //Observações adicionais
+        // Observações
         public string? Notes { get; set; }
     }
 }

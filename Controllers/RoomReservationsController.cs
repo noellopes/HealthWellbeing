@@ -270,60 +270,57 @@ namespace HealthWellbeingRoom.Controllers
             return View(model);
         }
         //------------------------------------------------------CREATE POST-------------------------------------------------------------------------------------
-        // POST: RoomReservations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "logisticsTechnician")]
-        public async Task<IActionResult> Create([Bind("RoomReservationId,ResponsibleName,RoomId,ConsultationId,ConsultationType,PatientId,SpecialtyId,StartTime,EndTime,Status,Notes")] RoomReservation roomReservation)
+        public async Task<IActionResult> Create(RoomReservation roomReservation)
         {
             // 1. Validar se a consulta existe
-            if (roomReservation.ConsultationId <= 0 ||
-                !await _context.Consultations.AnyAsync(c => c.ConsultationId == roomReservation.ConsultationId))
+            var consulta = await _context.Consultations
+                .FirstOrDefaultAsync(c => c.ConsultationId == roomReservation.ConsultationId);
+
+            if (consulta == null)
             {
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
 
-            // 1.2 Impedir reserva se a consulta estiver pendente
-            if (roomReservation.ConsultationId > 0)
-            {
-                var consulta = await _context.Consultations
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(c => c.ConsultationId == roomReservation.ConsultationId);
+            // 1.2 Impedir reserva se a consulta estiver cancelada
+            //if (consulta != null && consulta.Status == "Cancelada")
+            //{
+            //    ModelState.AddModelError(nameof(roomReservation.ConsultationId),
+            //        "Não é possível reservar sala para uma consulta cancelada.");
+            //}
 
-                if (consulta != null && consulta.Status == "Pendente")
-                {
-                    ModelState.AddModelError(nameof(roomReservation.ConsultationId),
-                        "Não é possível reservar sala para uma consulta pendente.");
-                }
+            // 2. Validar campos separados de data e hora
+            if (roomReservation.ConsultationDate == null)
+                ModelState.AddModelError(nameof(roomReservation.ConsultationDate), "A data da consulta é obrigatória.");
+
+            if (roomReservation.StartHour == null)
+                ModelState.AddModelError(nameof(roomReservation.StartHour), "A hora de início é obrigatória.");
+
+            if (roomReservation.EndHour == null)
+                ModelState.AddModelError(nameof(roomReservation.EndHour), "A hora de fim é obrigatória.");
+
+            if (roomReservation.StartHour != null && roomReservation.EndHour != null &&
+                roomReservation.StartHour >= roomReservation.EndHour)
+            {
+                ModelState.AddModelError(string.Empty, "A hora de início deve ser anterior à hora de fim.");
             }
 
-            // 1.3 Impedir duplicação de reserva para a mesma consulta (apenas se o ID for válido)
-            if (roomReservation.ConsultationId > 0 &&
-                await _context.RoomReservations.AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId))
+            // 3. Construir StartTime e EndTime (a partir do que o utilizador inseriu)
+            if (roomReservation.ConsultationDate != null &&
+                roomReservation.StartHour != null &&
+                roomReservation.EndHour != null)
             {
-                ModelState.AddModelError(nameof(roomReservation.ConsultationId),
-                    "Esta consulta já tem uma reserva de sala associada.");
+                roomReservation.StartTime = roomReservation.ConsultationDate.Value.Date + roomReservation.StartHour.Value;
+                roomReservation.EndTime = roomReservation.ConsultationDate.Value.Date + roomReservation.EndHour.Value;
             }
 
-            // 2. Validar datas
-            if (roomReservation.StartTime == default)
-                ModelState.AddModelError(nameof(roomReservation.StartTime), "A data/hora de início é obrigatória.");
-
-            if (roomReservation.EndTime == default)
-                ModelState.AddModelError(nameof(roomReservation.EndTime), "A data/hora de fim é obrigatória.");
-
-            if (roomReservation.StartTime != default &&
-                roomReservation.EndTime != default &&
-                roomReservation.StartTime >= roomReservation.EndTime)
-            {
-                ModelState.AddModelError(string.Empty, "A data/hora de início deve ser anterior à data/hora de fim.");
-            }
-
-            // 3. Sala obrigatória
+            // 4. Sala obrigatória
             if (roomReservation.RoomId <= 0)
                 ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala é obrigatória.");
 
-            // 4. Validar conflito de reservas
+            // 5. Validar conflito de reservas
             if (roomReservation.RoomId > 0 &&
                 roomReservation.StartTime != default &&
                 roomReservation.EndTime != default)
@@ -341,7 +338,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
             }
 
-            // 5. Se houver erros, recarregar dropdowns
+            // 6. Se houver erros, recarregar dropdowns
             if (!ModelState.IsValid)
             {
                 await PreencherDropdowns(
@@ -355,52 +352,40 @@ namespace HealthWellbeingRoom.Controllers
                 return View(roomReservation);
             }
 
-            // 6. Salvar reserva e atualizar estado da sala
-            try
+            // 7. Salvar reserva
+            _context.Add(roomReservation);
+            await _context.SaveChangesAsync();
+
+            // 8. Atualizar estado da sala
+            var sala = await _context.Room.FindAsync(roomReservation.RoomId);
+            if (sala != null)
             {
-                _context.Add(roomReservation);
-                await _context.SaveChangesAsync();
+                var indisponivelStatus = await _context.RoomStatus
+                    .FirstOrDefaultAsync(s => s.Name == "Indisponível");
 
-                // Atualizar estado da sala para Indisponível
-                var sala = await _context.Room.FindAsync(roomReservation.RoomId);
-                if (sala != null)
+                if (indisponivelStatus != null)
                 {
-                    var indisponivelStatus = await _context.RoomStatus
-                        .FirstOrDefaultAsync(s => s.Name == "Indisponível");
-
-                    if (indisponivelStatus != null)
-                    {
-                        sala.RoomStatusId = indisponivelStatus.RoomStatusId;
-                        _context.Update(sala);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                // Associar a sala à consulta
-                var consulta = await _context.Consultations.FindAsync(roomReservation.ConsultationId);
-                if (consulta != null)
-                {
-                    consulta.RoomId = roomReservation.RoomId;
-                    _context.Update(consulta);
+                    sala.RoomStatusId = indisponivelStatus.RoomStatusId;
+                    _context.Update(sala);
                     await _context.SaveChangesAsync();
                 }
-
-                TempData["SuccessMessage"] = "Reserva criada com sucesso.";
-                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateException)
+
+            // 9. Atualizar a consulta com a sala e com a data/hora inseridas pelo utilizador
+            if (consulta != null)
             {
-                ModelState.AddModelError(string.Empty, "Ocorreu um erro ao salvar a reserva. Verifique se a sala ainda está disponível e tente novamente.");
+                consulta.RoomId = roomReservation.RoomId;
+                consulta.ConsultationDate = roomReservation.ConsultationDate.Value;
+                consulta.StartTime = TimeOnly.FromTimeSpan(roomReservation.StartHour.Value);
+                consulta.EndTime = TimeOnly.FromTimeSpan(roomReservation.EndHour.Value);
+                consulta.Status = "Agendada";
 
-                await PreencherDropdowns(
-                    selectedRoomId: roomReservation.RoomId,
-                    selectedSpecialityId: roomReservation.SpecialtyId,
-                    start: roomReservation.StartTime,
-                    end: roomReservation.EndTime,
-                    excludeReservationId: null
-                );
-
-                return View(roomReservation);
+                _context.Update(consulta);
+                await _context.SaveChangesAsync();
             }
+
+            TempData["SuccessMessage"] = "Reserva criada com sucesso.";
+            return RedirectToAction(nameof(Index));
         }
         //------------------------------------------------------EDIT-------------------------------------------------------------------------------------
 

@@ -15,15 +15,17 @@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="row g-3">
+
+                <!-- ID da Consulta -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationId" class="form-label fw-bold">Id da Consulta</label>
                     <input asp-for="ConsultationId"
                            class="form-control"
-                           placeholder="Ex: 001"
-                           value="" />
+                           placeholder="Ex: 001" />
                     <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
 
+                <!-- Sala -->
                 <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
                     <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" required>
@@ -32,39 +34,52 @@
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-6">
-                    <label asp-for="StartTime" class="form-label fw-bold">Início(*)</label>
-                    <input asp-for="StartTime" type="datetime-local" class="form-control" value="@(Model?.StartTime.ToString("yyyy-MM-ddTHH:mm"))" required />
-                    <span asp-validation-for="StartTime" class="text-danger small"></span>
+                <!-- Data da Consulta -->
+                <div class="col-md-4">
+                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
+                    <input asp-for="ConsultationDate" type="date" class="form-control" />
+                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-6">
-                    <label asp-for="EndTime" class="form-label fw-bold">Fim(*)</label>
-                    <input asp-for="EndTime" type="datetime-local" class="form-control" value="@(Model?.EndTime.ToString("yyyy-MM-ddTHH:mm"))" required />
-                    <span asp-validation-for="EndTime" class="text-danger small"></span>
+                <!-- Hora de Início -->
+                <div class="col-md-4">
+                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
+                    <input asp-for="StartHour" type="time" class="form-control" />
+                    <span asp-validation-for="StartHour" class="text-danger small"></span>
                 </div>
 
+                <!-- Hora de Fim -->
+                <div class="col-md-4">
+                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
+                    <input asp-for="EndHour" type="time" class="form-control" />
+                    <span asp-validation-for="EndHour" class="text-danger small"></span>
+                </div>
+
+                <!-- Responsável -->
                 <div class="col-md-6">
                     <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
                     <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
                     <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
 
+                <!-- Observações -->
                 <div class="col-md-6">
                     <label asp-for="Notes" class="form-label fw-bold">Observações (Opcional)</label>
                     <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
                     <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
+
             </div>
 
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
                     <i class="bi bi-check-circle me-1"></i> Criar Reserva
                 </button>
-                <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
+                <a asp-action="Index" class="btn btn-success btn-sm" style="min-width:150px">
                     <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
                 </a>
             </div>
+
         </form>
     </div>
 </div>

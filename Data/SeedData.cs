@@ -737,183 +737,183 @@ namespace HealthWellBeingRoom.Data
             {
                 new Consultation
                 {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-2),
-                    ConsultationDate = DateTime.Today,
-                    StartTime = new TimeOnly(9, 0),
-                    EndTime = new TimeOnly(10, 0),
+                    BookingDate = DateTime.Now.AddDays(-7),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
                     Status = "Pendente",
                     DoctorName = "Dr. João Silva",
-                    PatientName = "Maria Fernandes",
-                    SpecialtyId = specialties[0].SpecialtyId
+                    PatientName = "Ana Costa",
+                    SpecialtyId = specialties[0].SpecialtyId,
+                    RoomId = null
                 },
                 new Consultation
                 {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-1),
-                    ConsultationDate = DateTime.Today.AddDays(1),
-                    StartTime = new TimeOnly(14, 0),
-                    EndTime = new TimeOnly(15, 30),
-                    Status = "Pendente",
-                    DoctorName = "Dra. Ana Costa",
-                    PatientName = "Ricardo Santos",
-                    SpecialtyId = specialties[1].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now,
-                    ConsultationDate = DateTime.Today.AddDays(2),
-                    StartTime = new TimeOnly(10, 0),
-                    EndTime = new TimeOnly(11, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Miguel Rocha",
-                    PatientName = "Carla Mendes",
-                    SpecialtyId = specialties[2].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-3),
-                    ConsultationDate = DateTime.Today.AddDays(4),
-                    StartTime = new TimeOnly(8, 30),
-                    EndTime = new TimeOnly(9, 30),
-                    Status = "Confirmada",
-                    DoctorName = "Dra. Sofia Almeida",
-                    PatientName = "Tiago Lopes",
-                    SpecialtyId = specialties[3].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
                     BookingDate = DateTime.Now.AddDays(-5),
-                    ConsultationDate = DateTime.Today.AddDays(5),
-                    StartTime = new TimeOnly(16, 0),
-                    EndTime = new TimeOnly(17, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Pedro Martins",
-                    PatientName = "Ana Ribeiro",
-                    SpecialtyId = specialties[4].SpecialtyId
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Marta Lopes",
+                    PatientName = "Bruno Santos",
+                    SpecialtyId = specialties[1].SpecialtyId,
+                    RoomId = null
                 },
                 new Consultation
                 {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-4),
-                    ConsultationDate = DateTime.Today.AddDays(6),
-                    StartTime = new TimeOnly(11, 0),
-                    EndTime = new TimeOnly(12, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Luís Carvalho",
-                    PatientName = "Bruno Nunes",
-                    SpecialtyId = specialties[0].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-6),
-                    ConsultationDate = DateTime.Today.AddDays(7),
-                    StartTime = new TimeOnly(15, 0),
-                    EndTime = new TimeOnly(16, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dra. Marta Figueiredo",
-                    PatientName = "Sónia Pereira",
-                    SpecialtyId = specialties[1].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-7),
-                    ConsultationDate = DateTime.Today.AddDays(3),
-                    StartTime = new TimeOnly(9, 30),
-                    EndTime = new TimeOnly(10, 30),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Rui Gomes",
-                    PatientName = "Paulo Correia",
-                    SpecialtyId = specialties[2].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-8),
-                    ConsultationDate = DateTime.Today.AddDays(8),
-                    StartTime = new TimeOnly(13, 0),
-                    EndTime = new TimeOnly(14, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dra. Helena Matos",
-                    PatientName = "Joana Marques",
-                    SpecialtyId = specialties[3].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-9),
-                    ConsultationDate = DateTime.Today.AddDays(9),
-                    StartTime = new TimeOnly(10, 30),
-                    EndTime = new TimeOnly(11, 30),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Nuno Ferreira",
-                    PatientName = "Rita Cardoso",
-                    SpecialtyId = specialties[4].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
                     BookingDate = DateTime.Now.AddDays(-10),
-                    ConsultationDate = DateTime.Today.AddDays(10),
-                    StartTime = new TimeOnly(17, 0),
-                    EndTime = new TimeOnly(18, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dra. Teresa Lopes",
-                    PatientName = "Hugo Batista",
-                    SpecialtyId = specialties[0].SpecialtyId
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Ricardo Gomes",
+                    PatientName = "Carla Ferreira",
+                    SpecialtyId = specialties[2].SpecialtyId,
+                    RoomId = null
                 },
                 new Consultation
                 {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-2),
-                    ConsultationDate = DateTime.Today.AddDays(11),
-                    StartTime = new TimeOnly(8, 0),
-                    EndTime = new TimeOnly(9, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. Paulo Barros",
-                    PatientName = "Luís Santos",
-                    SpecialtyId = specialties[1].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
-                    BookingDate = DateTime.Now.AddDays(-1),
-                    ConsultationDate = DateTime.Today.AddDays(12),
-                    StartTime = new TimeOnly(12, 0),
-                    EndTime = new TimeOnly(13, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dra. Inês Moreira",
-                    PatientName = "Patrícia Neves",
-                    SpecialtyId = specialties[2].SpecialtyId
-                },
-                new Consultation
-                {
-                    RoomId = null,
                     BookingDate = DateTime.Now.AddDays(-3),
-                    ConsultationDate = DateTime.Today.AddDays(13),
-                    StartTime = new TimeOnly(9, 0),
-                    EndTime = new TimeOnly(10, 0),
-                    Status = "Confirmada",
-                    DoctorName = "Dr. André Pinto",
-                    PatientName = "Fábio Almeida",
-                    SpecialtyId = specialties[3].SpecialtyId
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Sofia Almeida",
+                    PatientName = "Diogo Marques",
+                    SpecialtyId = specialties[3].SpecialtyId,
+                    RoomId = null
                 },
                 new Consultation
                 {
-                    RoomId = null,
+                    BookingDate = DateTime.Now.AddDays(-1),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Pedro Rocha",
+                    PatientName = "Inês Figueiredo",
+                    SpecialtyId = specialties[4].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-12),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Luís Moreira",
+                    PatientName = "Tiago Pinto",
+                    SpecialtyId = specialties[0].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-9),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Rita Fonseca",
+                    PatientName = "Mariana Lopes",
+                    SpecialtyId = specialties[1].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-8),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. André Carvalho",
+                    PatientName = "Hugo Nunes",
+                    SpecialtyId = specialties[2].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-6),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Filipa Sousa",
+                    PatientName = "Joana Matos",
+                    SpecialtyId = specialties[3].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
                     BookingDate = DateTime.Now.AddDays(-4),
-                    ConsultationDate = DateTime.Today.AddDays(14),
-                    StartTime = new TimeOnly(15, 30),
-                    EndTime = new TimeOnly(16, 30),
-                    Status = "Confirmada",
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Miguel Costa",
+                    PatientName = "Ricardo Tavares",
+                    SpecialtyId = specialties[4].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-15),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Helena Lopes",
+                    PatientName = "Paula Neves",
+                    SpecialtyId = specialties[0].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-11),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Nuno Faria",
+                    PatientName = "Rui Matos",
+                    SpecialtyId = specialties[1].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-13),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
                     DoctorName = "Dra. Cláudia Reis",
                     PatientName = "Sara Dias",
-                    SpecialtyId = specialties[4].SpecialtyId
+                    SpecialtyId = specialties[2].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-2),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dr. Bruno Almeida",
+                    PatientName = "Luís Santos",
+                    SpecialtyId = specialties[3].SpecialtyId,
+                    RoomId = null
+                },
+                new Consultation
+                {
+                    BookingDate = DateTime.Now.AddDays(-14),
+                    ConsultationDate = null,
+                    StartTime = null,
+                    EndTime = null,
+                    Status = "Pendente",
+                    DoctorName = "Dra. Ana Ribeiro",
+                    PatientName = "Catarina Gomes",
+                    SpecialtyId = specialties[4].SpecialtyId,
+                    RoomId = null
                 }
             };
 

@@ -14,12 +14,12 @@ namespace HealthWellbeingRoom.Models
         public Room? Room { get; set; }
 
         public DateTime BookingDate { get; set; }
-
-        public DateTime ConsultationDate { get; set; }
-
-        public TimeOnly StartTime { get; set; }
-
-        public TimeOnly EndTime { get; set; }
+        // Data da consulta, vem da reserva de sala
+        public DateTime? ConsultationDate { get; set; }
+        // Hora de início, vem da reserva de sala
+        public TimeOnly? StartTime { get; set; }
+        // Hora de fim, vem da reserva de sala
+        public TimeOnly? EndTime { get; set; }
 
         public string? Status { get; set; }
 
