@@ -270,7 +270,6 @@ namespace HealthWellbeingRoom.Controllers
             return View(model);
         }
         //------------------------------------------------------CREATE POST-------------------------------------------------------------------------------------
-
         // POST: RoomReservations/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -283,6 +282,7 @@ namespace HealthWellbeingRoom.Controllers
             {
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId), "A consulta indicada não existe.");
             }
+
             // 1.2 Impedir reserva se a consulta estiver pendente
             if (roomReservation.ConsultationId > 0)
             {
@@ -297,9 +297,9 @@ namespace HealthWellbeingRoom.Controllers
                 }
             }
 
-            // 1.3 Impedir duplicação de reserva para a mesma consulta
-            if (await _context.RoomReservations
-                .AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId))
+            // 1.3 Impedir duplicação de reserva para a mesma consulta (apenas se o ID for válido)
+            if (roomReservation.ConsultationId > 0 &&
+                await _context.RoomReservations.AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId))
             {
                 ModelState.AddModelError(nameof(roomReservation.ConsultationId),
                     "Esta consulta já tem uma reserva de sala associada.");
@@ -374,6 +374,14 @@ namespace HealthWellbeingRoom.Controllers
                         _context.Update(sala);
                         await _context.SaveChangesAsync();
                     }
+                }
+                // Associar a sala à consulta
+                var consulta = await _context.Consultations.FindAsync(roomReservation.ConsultationId);
+                if (consulta != null)
+                {
+                    consulta.RoomId = roomReservation.RoomId;
+                    _context.Update(consulta);
+                    await _context.SaveChangesAsync();
                 }
 
                 TempData["SuccessMessage"] = "Reserva criada com sucesso.";
@@ -549,6 +557,7 @@ namespace HealthWellbeingRoom.Controllers
         {
             var consultas = _context.Consultations
                 .Include(c => c.Specialty)
+                .Include(c => c.Room)
                 .ToList();
 
             return View(consultas);
