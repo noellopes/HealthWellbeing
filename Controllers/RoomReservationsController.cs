@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeingRoom.Models;
+using HealthWellbeingRoom.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -619,6 +620,39 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.RoomId = id;
             return View();
         }
+
+
+        public async Task<IActionResult> RoomMaterials(int id)
+        {
+            // Carregar a sala com os materiais associados
+            var room = await _context.Room
+                .Include(r => r.LocalizacaoDispMedicoMovel)
+                    .ThenInclude(l => l.MedicalDevice)
+                        .ThenInclude(d => d.TypeMaterial)
+                .Include(r => r.RoomConsumables)
+                    .ThenInclude(c => c.Consumivel)
+                .FirstOrDefaultAsync(r => r.RoomId == id);
+
+            if (room == null)
+                return NotFound();
+
+            // Filtrar apenas dispositivos ATUAIS (os que realmente estão na sala)
+            var dispositivosAtuais = room.LocalizacaoDispMedicoMovel
+                .Where(l => l.EndDate == null && l.IsCurrent)
+                .ToList();
+
+            // Construir ViewModel
+            var RoomMaterialviewModel = new RoomMaterial
+            {
+                RoomId = room.RoomId,
+                RoomName = room.Name,
+                MedicalDevices = dispositivosAtuais,
+                Consumables = room.RoomConsumables
+            };
+
+            return View(RoomMaterialviewModel);
+        }
+
 
         private bool RoomReservationExists(int id)
         {

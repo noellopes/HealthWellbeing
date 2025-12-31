@@ -15,7 +15,7 @@
     <div class="card-body">
         <dl class="row">
             <dt class="col-sm-3 fw-bold">Id da reserva</dt>
-            <dd class="col-sm-9">@Model?.RoomReservationId</dd>
+            <dd class="col-sm-9">@Model?.RoomReservationId.ToString("D3")</dd>
 
             <dt class="col-sm-3 fw-bold">Responsável</dt>
             <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model?.ResponsibleName) ? Model.ResponsibleName : "—")</dd>
@@ -23,8 +23,8 @@
             <dt class="col-sm-3 fw-bold">Sala</dt>
             <dd class="col-sm-9">@Html.DisplayFor(m => m.Room.Name)</dd>
 
-            <dt class="col-sm-3 fw-bold">ID da Consulta</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.ConsultationId)</dd>
+            <dt class="col-sm-3 fw-bold">Id da Consulta</dt>
+            <dd class="col-sm-9">@Model?.ConsultationId.ToString("D3")</dd>
 
             <dt class="col-sm-3 fw-bold">Especialidade da Consulta</dt>
             <dd class="col-sm-9">@Model?.Consultation?.Specialty?.Name</dd>
