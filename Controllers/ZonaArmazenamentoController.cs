@@ -19,7 +19,30 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: ZonaArmazenamento
+        // -----------------------------
+        // HELPERS
+        // -----------------------------
+        private void PreencherDropDowns(int? consumivelId = null, int? roomId = null)
+        {
+            ViewBag.Consumiveis = new SelectList(
+                _context.Consumivel.OrderBy(c => c.Nome),
+                "ConsumivelId",
+                "Nome",
+                consumivelId
+            );
+
+            // Se tiveres DbSet<Room> no contexto:
+            ViewBag.Rooms = new SelectList(
+                _context.Set<Room>().OrderBy(r => r.Name),
+                "RoomId",
+                "Name",
+                roomId
+            );
+        }
+
+        // -----------------------------
+        // GET: ZonaArmazenamento (Index)
+        // -----------------------------
         public async Task<IActionResult> Index(
             int page = 1,
             string searchNome = "",
@@ -27,18 +50,19 @@ namespace HealthWellbeing.Controllers
             string estado = "todas")
         {
             var zonasQuery = _context.ZonaArmazenamento
-                .Include(z => z.LocalizacaoZonaArmazenamento)
+                .Include(z => z.Consumivel)
+                .Include(z => z.Room)
                 .AsQueryable();
 
-            //  Pesquisa por nome
+            // Pesquisa por nome da zona
             if (!string.IsNullOrEmpty(searchNome))
-                zonasQuery = zonasQuery.Where(z => z.Nome.Contains(searchNome));
+                zonasQuery = zonasQuery.Where(z => z.NomeZona.Contains(searchNome));
 
-            //  Pesquisa por localização
+            // Pesquisa por sala (nome da sala)
             if (!string.IsNullOrEmpty(searchLocalizacao))
-                zonasQuery = zonasQuery.Where(z => z.LocalizacaoZonaArmazenamento.Nome.Contains(searchLocalizacao));
+                zonasQuery = zonasQuery.Where(z => z.Room.Name.Contains(searchLocalizacao));
 
-            //  Filtro por estado
+            // Filtro por estado
             switch (estado)
             {
                 case "ativas":
@@ -63,7 +87,7 @@ namespace HealthWellbeing.Controllers
             var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 10);
 
             pagination.Items = await zonasQuery
-                .OrderBy(z => z.Nome)
+                .OrderBy(z => z.NomeZona)
                 .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
@@ -71,15 +95,18 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // GET: Details
+        // -----------------------------
+        // GET: ZonaArmazenamento/Details/5
+        // -----------------------------
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
                 return NotFound();
 
             var zona = await _context.ZonaArmazenamento
-                .Include(z => z.LocalizacaoZonaArmazenamento)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(z => z.Consumivel)
+                .Include(z => z.Room)
+                .FirstOrDefaultAsync(m => m.ZonaId == id);
 
             if (zona == null)
                 return NotFound();
@@ -87,18 +114,28 @@ namespace HealthWellbeing.Controllers
             return View(zona);
         }
 
-        // GET: Create
+        // -----------------------------
+        // GET: ZonaArmazenamento/Create
+        // -----------------------------
         public IActionResult Create()
         {
-            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome");
+            PreencherDropDowns();
             return View();
         }
 
-        // POST: Create
+        // -----------------------------
+        // POST: ZonaArmazenamento/Create
+        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Descricao,LocalizacaoZonaArmazenamentoId,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
+        public async Task<IActionResult> Create([Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
+            // Regra de negócio: quantidade atual não pode exceder capacidade máxima
+            if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
+            {
+                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser superior à capacidade máxima.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(zona);
@@ -107,12 +144,14 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
             TempData["ErrorMessage"] = "❌ Erro ao criar a zona.";
+            PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // GET: Edit
+        // -----------------------------
+        // GET: ZonaArmazenamento/Edit/5
+        // -----------------------------
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -122,17 +161,24 @@ namespace HealthWellbeing.Controllers
             if (zona == null)
                 return NotFound();
 
-            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
+            PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // POST: Edit
+        // -----------------------------
+        // POST: ZonaArmazenamento/Edit/5
+        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Descricao,LocalizacaoZonaArmazenamentoId,CapacidadeMaxima,Ativa")] ZonaArmazenamento zona)
+        public async Task<IActionResult> Edit(int id, [Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
-            if (id != zona.Id)
+            if (id != zona.ZonaId)
                 return NotFound();
+
+            if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
+            {
+                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser superior à capacidade máxima.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -144,7 +190,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.ZonaArmazenamento.Any(e => e.Id == id))
+                    if (!_context.ZonaArmazenamento.Any(e => e.ZonaId == id))
                         return NotFound();
 
                     throw;
@@ -153,20 +199,23 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Localizacoes = new SelectList(_context.LocalizacaoZonaArmazenamento, "Id", "Nome", zona.LocalizacaoZonaArmazenamentoId);
             TempData["ErrorMessage"] = "❌ Erro ao editar a zona.";
+            PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // GET: Delete
+        // -----------------------------
+        // GET: ZonaArmazenamento/Delete/5
+        // -----------------------------
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
                 return NotFound();
 
             var zona = await _context.ZonaArmazenamento
-                .Include(z => z.LocalizacaoZonaArmazenamento)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(z => z.Consumivel)
+                .Include(z => z.Room)
+                .FirstOrDefaultAsync(m => m.ZonaId == id);
 
             if (zona == null)
                 return NotFound();
@@ -174,7 +223,9 @@ namespace HealthWellbeing.Controllers
             return View(zona);
         }
 
-        // POST: Delete
+        // -----------------------------
+        // POST: ZonaArmazenamento/Delete/5
+        // -----------------------------
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

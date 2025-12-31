@@ -1,0 +1,171 @@
+﻿@using HealthWellbeingRoom.Models
+
+@model RPaginationInfo<Equipment>
+
+@{
+    ViewData["Title"] = "Equipamentos Registados";
+    var successMessage = TempData["SuccessMessage"];
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Lista de Equipamentos</h2>
+    <div>
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Registar Novo
+        </a>
+    </div>
+</div>
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@* Search Form *@
+<div class="collapse mt-2 mb-2" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchName" class="form-label fw-bold">Nome</label>
+                <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control" placeholder="Pesquisar pelo nome" type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchSerie" class="form-label fw-bold">Nº de Série</label>
+                <input id="searchSerie" name="searchSerie" value="@ViewBag.SearchSerie" class="form-control" placeholder="Pesquisar pelo Nº de Série" type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchType" class="form-label fw-bold">Tipo</label>
+                <select id="searchType" name="searchType" value="@ViewBag.SearchType" class="form-select" asp-items="ViewBag.Types"></select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchRoom" class="form-label fw-bold">Sala</label>
+                <select id="searchRoom" name="searchRoom" class="form-select" asp-items="ViewBag.Rooms"></select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchStatus" class="form-label fw-bold">Estado</label>
+                <select id="searchStatus" name="searchStatus" value="@ViewBag.SearchStatus" class="form-select" asp-items="ViewBag.Status"></select>
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if(!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Nenhum Equipamento Encontrado</h4>
+            <p>Não há equipamentos registados, crie novos para poder visualizar.</p>
+        </div>
+    </div>
+} else
+{
+    /* Equipment Table */
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Nº Série</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Sala</th>
+                    <th scope="col">Estado</th>
+                    <th class="text-center" scope="col">Acções</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var equip in Model.Items)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => equip.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => equip.SerialNumber)</td>
+                        <td>@Html.DisplayFor(modelItem => equip.EquipmentType.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => equip.Room.Name)</td>
+                        <td>
+                            <span class="rounded-circle d-inline-block bg-@(
+                                     equip.EquipmentStatusId == 1 ? "success" : equip.EquipmentStatusId == 2 ? "warning" : "danger")"
+                                  style="width:10px; height:10px;"></span>
+                            @Html.DisplayFor(modelItem => equip.EquipmentStatus.Name)
+                        </td>
+
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-warning me-1">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+
+                            <a asp-action="Details" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-info me-1">
+                                <i class="bi bi-info-circle"></i> Detalhes
+                            </a>
+
+                            <a asp-action="Delete" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Equipment page" class="d-flex justify-content-between align-items-center">
+            <span>Mostrando @Model.Items.Count() dos @Model.TotalItems</span>
+
+            <ul class="pagination mb-0">
+                @if (Model.CurrentPage == 1)
+                {
+                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
+                }
+
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    if (p == Model.CurrentPage)
+                    {
+                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                    }
+                    else
+                    {
+                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                    }
+                }
+                @if (Model.CurrentPage == Model.TotalPages)
+                {
+                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                }
+                else
+                {
+                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+
+

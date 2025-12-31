@@ -33,18 +33,18 @@
     <form asp-action="Index" method="get" class="mb-4">
         <div class="row g-2">
 
-            <!-- Pesquisa Nome -->
+            <!-- Pesquisa Nome da Zona -->
             <div class="col-md-4">
                 <input type="text" name="searchNome" value="@ViewBag.SearchNome"
                        class="form-control shadow-sm"
-                       placeholder="🔍 Procurar por nome..." />
+                       placeholder="🔍 Procurar por nome da zona..." />
             </div>
 
-            <!-- Pesquisa Localização -->
+            <!-- Pesquisa Sala -->
             <div class="col-md-4">
                 <input type="text" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao"
                        class="form-control shadow-sm"
-                       placeholder="📍 Procurar por localização..." />
+                       placeholder="📍 Procurar por sala..." />
             </div>
 
             <!-- Dropdown Estado -->
@@ -58,15 +58,8 @@
 
             <!-- Botões -->
             <div class="col-md-2 d-flex justify-content-between">
-
-                <button type="submit" class="btn btn-primary w-50 me-2">
-                    OK
-                </button>
-
-                <a asp-action="Index" class="btn btn-outline-secondary w-50">
-                    Limpar
-                </a>
-
+                <button type="submit" class="btn btn-primary w-50 me-2">OK</button>
+                <a asp-action="Index" class="btn btn-outline-secondary w-50">Limpar</a>
             </div>
 
         </div>
@@ -106,9 +99,10 @@
             <table class="table table-hover align-middle">
                 <thead class="table-primary">
                     <tr>
-                        <th>Nome</th>
-                        <th>Localização</th>
-                        <th>Capacidade (m³)</th>
+                        <th>Nome da Zona</th>
+                        <th>Sala</th>
+                        <th>Consumível</th>
+                        <th>Quantidade</th>
                         <th>Ativa</th>
                         <th class="text-center" style="width: 250px;">Ações</th>
                     </tr>
@@ -117,9 +111,13 @@
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            <td class="fw-semibold">@item.Nome</td>
-                            <td>@item.LocalizacaoZonaArmazenamento?.Nome</td>
-                            <td>@item.CapacidadeMaxima m³</td>
+                            <td class="fw-semibold">@item.NomeZona</td>
+
+                            <td>@item.Room?.Name</td>
+
+                            <td>@item.Consumivel?.Nome</td>
+
+                            <td>@item.QuantidadeAtual / @item.CapacidadeMaxima</td>
 
                             <td>
                                 @if (item.Ativa)
@@ -133,9 +131,9 @@
                             </td>
 
                             <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger btn-acao">Eliminar</a>
+                                <a asp-action="Details" asp-route-id="@item.ZonaId" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
+                                <a asp-action="Edit" asp-route-id="@item.ZonaId" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
+                                <a asp-action="Delete" asp-route-id="@item.ZonaId" class="btn btn-sm btn-danger btn-acao">Eliminar</a>
                             </td>
                         </tr>
                     }

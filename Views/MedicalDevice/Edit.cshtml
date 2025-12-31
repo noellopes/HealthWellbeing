@@ -1,0 +1,141 @@
+﻿@using HealthWellbeingRoom.Models
+@model MedicalDevice;
+
+@{
+    ViewData["Title"] = "Editar Dispositivo";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (ViewBag.MedDeviceWasDeleted != null)
+{
+    <div class="alert alert-danger d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
+        <div class="ps-4">
+            <h4 class="alert-heading mb-2">Alteração Concorrente Detetada</h4>
+            <p class="mb-0">
+                O dispositivo médico que estava a editar foi eliminado por outro utilizador. As suas alterações atuais não podem ser guardadas no dispositivo original.
+                No entanto, pode criar um novo dispositivo com as informações que inseriu.
+            </p>
+        </div>
+    </div>
+}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Editar Dados
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+            @if (ViewBag.MedDeviceWasDeleted == null)
+            {
+                <input type="hidden" asp-for="MedicalDeviceID" />
+            }
+
+            <input type="hidden" asp-for="MedicalDeviceID" />
+            <input type="hidden" asp-for="RegistrationDate" />
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name" class="form-control">
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    @*o meu serialNumber aqui vai ser não editável -> (readonly)*@
+                    <div class="mb-3">
+                        <label asp-for="SerialNumber" class="form-label fw-bold"></label>
+                        <input asp-for="SerialNumber" class="form-control" readonly> 
+                        <span asp-validation-for="SerialNumber" class="text-danger small"></span>
+                        <div class="small text-muted">O Número de Série não deve ser alterado após o registo inicial.</div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="TypeMaterialID" class="form-label fw-bold"></label>
+                        <select asp-for="TypeMaterialID" class="form-control" asp-items="ViewBag.TypeMaterialID">
+                            <option value="">-- Selecione o Tipo --</option>
+                        </select>
+                        <span asp-validation-for="TypeMaterialID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Observation" class="form-label fw-bold"></label>
+                        <textarea asp-for="Observation" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Observation" class="text-danger small"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            @* Bloco de Controlo de Manutenção *@
+            <div class="row">
+                <div class="col-md-12">
+                    @* Borda e fundo leve para destacar esta zona *@
+                    <div class="form-check form-switch mt-3 mb-4 p-3 border rounded bg-light border-warning">
+
+                        @* Usei 'form-switch' para parecer um interruptor *@
+                        <input class="form-check-input" type="checkbox" role="switch" asp-for="IsUnderMaintenance" style="cursor: pointer;">
+
+                        <label class="form-check-label fw-bold text-danger ms-2" asp-for="IsUnderMaintenance">
+                            Estado: Em Manutenção
+                        </label>
+
+                        <div class="small text-muted mt-2">
+                            <ul class="mb-0 ps-3">
+                                <li><strong>Ativar (Marcar):</strong> O dispositivo fica em manutenção e a localização atual é encerrada.</li>
+                                <li><strong>Desativar (Desmarcar):</strong> A manutenção termina e o dispositivo volta para um <u>Depósito</u>.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+
+                @if (ViewBag.MedDeviceWasDeleted != null)
+                {
+                    <button type="submit" asp-action="Create" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Criar novo dispositivo
+                    </button>
+                    <a asp-action="Index" class="btn btn-danger">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar para a lista
+                    </a>
+                }
+                else
+                {
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i> Salvar Alterações
+                    </button>
+
+                    <a href="javascript:void(0);" onclick="history.back();" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar
+                    </a>
+                }
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -64,20 +64,20 @@
 
             <dl class="row mb-4">
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
+                <dt class="col-sm-4 details-label">Nome da Zona</dt>
+                <dd class="col-sm-8 details-value">@Model.NomeZona</dd>
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
+                <dt class="col-sm-4 details-label">Consumível</dt>
+                <dd class="col-sm-8 details-value">@Model.Consumivel?.Nome</dd>
 
-
-                <dt class="col-sm-4 details-label">Localização</dt>
-                <dd class="col-sm-8 details-value">
-                    @Model.LocalizacaoZonaArmazenamento?.Nome
-                </dd>
+                <dt class="col-sm-4 details-label">Sala</dt>
+                <dd class="col-sm-8 details-value">@Model.Room?.Name</dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
-                <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima m³</dd>
+                <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima</dd>
+
+                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.QuantidadeAtual)</dt>
+                <dd class="col-sm-8 details-value">@Model.QuantidadeAtual</dd>
 
                 <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
                 <dd class="col-sm-8 details-value">
@@ -94,7 +94,7 @@
             </dl>
 
             <form asp-action="Delete" class="d-flex justify-content-end mt-3">
-                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ZonaId" />
 
                 <button type="submit" class="btn btn-danger me-2">
                     Eliminar
