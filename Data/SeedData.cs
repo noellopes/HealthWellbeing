@@ -14,9 +14,9 @@ namespace HealthWellBeingRoom.Data
     {
         internal static void Populate(HealthWellbeingDbContext? dbContext)
         {
-            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext));
 
-            dbContext.Database.EnsureCreated();
 
             // 1 - Independentes
             PopulateTypeMaterial(dbContext);
@@ -34,13 +34,14 @@ namespace HealthWellBeingRoom.Data
             // 4 - Dispositivos e Localização médica
             PopulateMedicalDevices(dbContext);
             PopulateLocationMedDevices(dbContext);
+            
         }
 
         // 1 - Independentes
         private static void PopulateTypeMaterial(HealthWellbeingDbContext? dbContext)
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
-            dbContext.Database.EnsureCreated();
+            //dbContext.Database.EnsureCreated();
             var typeMaterials = new[]
 {
                 new TypeMaterial
@@ -156,7 +157,8 @@ namespace HealthWellBeingRoom.Data
             }
 
             dbContext.SaveChanges();
-        }
+        
+           }
 
         private static void PopulateManufacturer(HealthWellbeingDbContext dbContext)
         {

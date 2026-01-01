@@ -67,7 +67,7 @@ namespace HealthWellbeing.Data
                 stocks.Add(new Stock
                 {
                     ConsumivelID = c.ConsumivelId,
-                    ZonaID = zona.Id,
+                    ZonaID = zona.ZonaId,
 
                     // 🔑 COMEÇA NA QUANTIDADE MÍNIMA
                     QuantidadeAtual = c.QuantidadeMinima,

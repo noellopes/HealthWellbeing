@@ -17,7 +17,7 @@ namespace HealthWellbeingRoom.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.20")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -147,6 +147,44 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("CategoriaConsumivel");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Compra", b =>
+                {
+                    b.Property<int>("CompraId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompraId"));
+
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCompra")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("PrecoUnitario")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TempoEntrega")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ZonaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompraId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.ToTable("Compra");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
                 {
                     b.Property<int>("ConsumivelId")
@@ -218,6 +256,73 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasKey("FornecedorId");
 
                     b.ToTable("Fornecedor");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Fornecedor_Consumivel", b =>
+                {
+                    b.Property<int>("FornecedorConsumivelId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FornecedorConsumivelId"));
+
+                    b.Property<int>("ConsumivelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Preco")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("TempoEntrega")
+                        .HasColumnType("int");
+
+                    b.HasKey("FornecedorConsumivelId");
+
+                    b.HasIndex("ConsumivelId");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.ToTable("Fornecedor_Consumivel");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.HistoricoCompras", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Descricao")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("FornecedorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FornecedorId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("HistoricoCompras");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.LocalizacaoZonaArmazenamento", b =>
@@ -482,13 +587,23 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("QuantidadeAtual")
                         .HasColumnType("int");
 
+                    b.Property<int>("QuantidadeMaxima")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuantidadeMinima")
                         .HasColumnType("int");
+
+                    b.Property<bool>("UsaValoresDoConsumivel")
+                        .HasColumnType("bit");
 
                     b.Property<int>("ZonaID")
                         .HasColumnType("int");
 
                     b.HasKey("StockId");
+
+                    b.HasIndex("ConsumivelID");
+
+                    b.HasIndex("ZonaID");
 
                     b.ToTable("Stock");
                 });
@@ -951,6 +1066,25 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Categoria");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Compra", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Fornecedor");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.CategoriaConsumivel", "CategoriaConsumivel")
@@ -960,6 +1094,42 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("CategoriaConsumivel");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Fornecedor_Consumivel", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Fornecedor");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.HistoricoCompras", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
+                        .WithMany()
+                        .HasForeignKey("FornecedorId");
+
+                    b.HasOne("HealthWellbeing.Models.Stock", "Stock")
+                        .WithMany()
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Fornecedor");
+
+                    b.Navigation("Stock");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.LocationMedDevice", b =>
@@ -1010,6 +1180,25 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("RoomType");
 
                     b.Navigation("Specialty");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Stock", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
+                        .WithMany()
+                        .HasForeignKey("ConsumivelID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.ZonaArmazenamento", "Zona")
+                        .WithMany()
+                        .HasForeignKey("ZonaID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Consumivel");
+
+                    b.Navigation("Zona");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.TreatmentRecord", b =>
