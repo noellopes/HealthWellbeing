@@ -10,7 +10,7 @@ namespace HealthWellbeing.Data
         {
             if (db == null) throw new ArgumentNullException(nameof(db));
 
-            db.Database.EnsureCreated();
+            
 
             PopulateLocalizacoes(db);
             PopulateCategorias(db);
