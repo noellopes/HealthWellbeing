@@ -45,6 +45,11 @@
                     }
                 </tbody>
             </table>
+
+            <!-- Botão desativado quando há dispositivos -->
+            <button class="btn btn-secondary btn-sm mt-2" disabled>
+                <i class="bi bi-eye-slash"></i> Ver dispositivo em falta
+            </button>
         }
         else
         {
@@ -52,6 +57,12 @@
                 <i class="bi bi-x-circle-fill"></i>
                 A sala não contém dispositivos médicos associados.
             </p>
+
+            <!-- Botão ativo quando não há dispositivos -->
+            <a asp-action="VerDispositivosEmFalta" asp-route-roomId="@Model.RoomId"
+               class="btn btn-danger btn-sm mt-2">
+                <i class="bi bi-eye"></i> Ver dispositivo em falta
+            </a>
         }
     </div>
 </div>
@@ -76,7 +87,7 @@
                         <th>Nome</th>
                         <th>Categoria</th>
                         <th>Quantidade atual</th>
-                        <th>Quantidade maxima</th>
+                        <th>Quantidade máxima</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,6 +102,11 @@
                     }
                 </tbody>
             </table>
+
+            <!-- Botão desativado quando há consumíveis -->
+            <button class="btn btn-secondary btn-sm mt-2" disabled>
+                <i class="bi bi-eye-slash"></i> Ver consumíveis em falta
+            </button>
         }
         else
         {
@@ -98,6 +114,12 @@
                 <i class="bi bi-x-circle-fill"></i>
                 A sala não contém consumíveis associados.
             </p>
+
+            <!-- Botão ativo quando não há consumíveis -->
+            <a asp-action="VerConsumiveisEmFalta" asp-route-roomId="@Model.RoomId"
+               class="btn btn-danger btn-sm mt-2">
+                <i class="bi bi-eye"></i> Ver consumíveis em falta
+            </a>
         }
     </div>
 </div>

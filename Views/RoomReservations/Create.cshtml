@@ -25,8 +25,12 @@
 
                 <div class="col-md-6">
                     <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
-                    <input asp-for="ConsultationDate" type="date" class="form-control" id="consultation-date" />
-                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
+                    <input asp-for="ConsultationDate"
+                           type="date"
+                           class="form-control"
+                           id="consultation-date"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                     <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== LINHA 2 ===================== -->
@@ -79,19 +83,62 @@
     </div>
 </div>
 
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 
     <script>
-        function loadAvailableRooms() {
-            const date = document.getElementById('consultation-date').value;
-            const start = document.getElementById('StartHour').value;
-            const end = document.getElementById('EndHour').value;
+        // Bloquear datas anteriores a hoje
+        document.getElementById('consultation-date')
+                .setAttribute('min', new Date().toISOString().split('T')[0]);
 
-            if (!date || !start || !end)
-                return;
+        function updateHourLimits() {
+            const dateInput = document.getElementById('consultation-date');
+            const startInput = document.getElementById('StartHour');
+            const endInput = document.getElementById('EndHour');
+
+            if (!dateInput.value) return;
+
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            const nowTime = today.getHours().toString().padStart(2, '0') + ":" +
+                            today.getMinutes().toString().padStart(2, '0');
+
+            if (selectedDate.toDateString() === today.toDateString()) {
+                // Se a data for hoje → hora mínima = hora atual
+                startInput.min = nowTime;
+                endInput.min = nowTime;
+            } else {
+                // Se for futura → sem restrição
+                startInput.removeAttribute('min');
+                endInput.removeAttribute('min');
+            }
+
+            // EndHour nunca pode ser menor que StartHour
+            if (startInput.value) {
+                endInput.min = startInput.value;
+            }
+        }
+
+        // Eventos para atualizar limites e mensagens
+        const startInput = document.getElementById('StartHour');
+        const endInput = document.getElementById('EndHour');
+        const dateInput = document.getElementById('consultation-date');
+
+        dateInput.addEventListener('change', updateHourLimits);
+        startInput.addEventListener('focus', updateHourLimits);
+        endInput.addEventListener('focus', updateHourLimits);
+
+        aplicarMensagensPersonalizadas(startInput, "start");
+        aplicarMensagensPersonalizadas(endInput, "end");
+
+        // Script de carregar salas
+        function loadAvailableRooms() {
+            const date = dateInput.value;
+            const start = startInput.value;
+            const end = endInput.value;
+
+            if (!date || !start || !end) return;
 
             fetch(`/RoomReservations/GetAvailableRooms?date=${date}&start=${start}&end=${end}`)
                 .then(response => response.json())
@@ -109,8 +156,8 @@
                 .catch(error => console.error('Erro ao carregar salas:', error));
         }
 
-        document.getElementById('consultation-date').addEventListener('change', loadAvailableRooms);
-        document.getElementById('StartHour').addEventListener('change', loadAvailableRooms);
-        document.getElementById('EndHour').addEventListener('change', loadAvailableRooms);
+        dateInput.addEventListener('change', loadAvailableRooms);
+        startInput.addEventListener('change', loadAvailableRooms);
+        endInput.addEventListener('change', loadAvailableRooms);
     </script>
 }
