@@ -4,10 +4,7 @@ using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace HealthWellbeing.Controllers
 {
@@ -24,8 +21,9 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(int page = 1, string searchName = "" )
         {
             // Base query sem Includes (a menos que tenhas navegações para carregar)
-            var doctorQuery = _context.Doctor
-                .AsNoTracking();
+            IQueryable<Doctor> doctorQuery = _context.Doctor
+                .AsNoTracking()
+                .Include(d => d.Especialidade);
             if (!string.IsNullOrEmpty(searchName))
             {
                 doctorQuery = doctorQuery.Where(d => d.Nome.Contains(searchName));
@@ -91,13 +89,19 @@ namespace HealthWellbeing.Controllers
                 ModelState.AddModelError("Email", "Já existe um médico registado com este email.");
             }
 
+            var errors = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .Select(x => new { Field = x.Key, Errors = x.Value.Errors.Select(e => e.ErrorMessage) })
+                .ToList();
+
+
             if (ModelState.IsValid)
             {
                 _context.Add(doctor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
+           
             ViewData["IdEspecialidade"] = new SelectList(
                 _context.Specialities,
                 "IdEspecialidade",
@@ -107,6 +111,7 @@ namespace HealthWellbeing.Controllers
 
             return View(doctor);
         }
+
 
         // GET: Doctors/Edit
         public async Task<IActionResult> Edit(int? id)
@@ -121,13 +126,21 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+
+            ViewData["IdEspecialidade"] = new SelectList(
+                _context.Specialities,
+                "IdEspecialidade",
+                "Nome",
+                doctor.IdEspecialidade
+            );
+
             return View(doctor);
         }
 
         // POST: Doctors/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdMedico,Nome,Telemovel,Email")] Doctor doctor)
+        public async Task<IActionResult> Edit(int id, [Bind("IdMedico,Nome,Telemovel,Email, IdEspecialidade")] Doctor doctor)
         {
             if (id != doctor.IdMedico)
             {
@@ -176,7 +189,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

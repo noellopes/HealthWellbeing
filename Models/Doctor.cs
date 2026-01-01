@@ -25,7 +25,7 @@ namespace HealthWellbeing.Models{
         [Required(ErrorMessage = "Por favor selecione a especialidade")]
         [ForeignKey(nameof(Especialidade))]
         public int IdEspecialidade { get; set; }
-        public Specialities Especialidade { get; set; } = default!;
+        public Specialities? Especialidade { get; set; }
 
     }
 }
