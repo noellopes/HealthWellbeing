@@ -22,8 +22,12 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-1"></i>
+        @TempData["SuccessMessage"]
+    </div>
 }
+
 @if (TempData["ErrorMessage"] != null)
 {
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
@@ -135,3 +139,15 @@
     </a>
 
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alert = document.getElementById('success-alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }
+        }, 4000); // 4000 ms = 4 segundos
+    </script>
+}
