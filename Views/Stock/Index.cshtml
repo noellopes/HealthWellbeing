@@ -3,6 +3,50 @@
 @{
     ViewData["Title"] = "Gestão de Stock";
 }
+@{
+    var totalCriticos = Model.Items
+        .Count(s => s.QuantidadeAtual <= s.Consumivel.QuantidadeMinima + 10);
+}
+
+<div class="d-flex align-items-baseline mb-3">
+
+
+    <div class="d-flex align-items-baseline mb-3">
+        @if (totalCriticos > 0)
+        {
+            @if (ViewBag.StockCritico == true)
+            {
+                <!-- ESTÁS NO STOCK CRÍTICO → voltar ao normal -->
+                <a asp-action="Index"
+                   class="text-decoration-none d-inline-flex align-items-baseline gap-1"
+                   style="color:#000000; font-size:1rem; margin-left:15px;">
+                    <span style="font-size:14px; line-height:1;">▲</span>
+                    <span class="fw-semibold">
+                        Voltar a Gestao de Stock
+                    </span>
+                </a>
+            }
+            else
+            {
+                <!-- ESTÁS NO STOCK NORMAL → ir para crítico -->
+                <a asp-action="Index"
+                   asp-route-stockCritico="true"
+                   class="text-decoration-none d-inline-flex align-items-baseline gap-1"
+                   style="color:#d17b00; font-size:1rem; margin-left:15px;">
+                    <span style="font-size:14px; line-height:1;">▲</span>
+                    <span class="fw-semibold">
+                        Atenção: @totalCriticos consumíveis em stock crítico, clique para ver
+                    </span>
+
+                </a>
+            }
+
+
+        }
+    </div>
+
+</div>
+
 
 <div class="container mt-4">
 
@@ -111,6 +155,9 @@
     <!-- TABELA DE STOCK -->
     <!-- =============================== -->
     <div class="table-responsive">
+
+       
+
         <table class="table table-bordered table-striped shadow-sm">
             <thead class="text-center fw-bold" style="background-color:#d7e9ff;">
                 <tr>
