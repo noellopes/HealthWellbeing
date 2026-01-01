@@ -64,8 +64,16 @@
                             <td>@item.ConsultationId.ToString("D3")</td>
                             <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
                             <td>@(item.Room?.Name ?? "—")</td>
-                            <td>@(item.StartTime == default ? "—" : item.StartTime.ToString("g"))</td>
-                            <td>@(item.EndTime == default ? "—" : item.EndTime.ToString("g"))</td>
+
+                            <!-- INÍCIO -->
+                            <td>
+                                @item.StartHour.ToString(@"hh\:mm")
+                            </td>
+
+                            <!-- FIM -->
+                            <td>
+                                @item.EndHour.ToString(@"hh\:mm")
+                            </td>
 
                             <td class="text-center">
 
@@ -108,7 +116,7 @@
                                 }
 
                                 <a asp-controller="RoomReservations"
-                                    asp-action="RoomMaterials"
+                                   asp-action="RoomMaterials"
                                    asp-route-Id="@item.RoomId"
                                    class="btn btn-sm btn-warning">
                                     <i class="bi bi-box-seam"></i> Material
@@ -148,6 +156,6 @@
                 alert.classList.remove('show');
                 alert.classList.add('fade');
             }
-        }, 4000); // 4000 ms = 4 segundos
+        }, 4000);
     </script>
 }

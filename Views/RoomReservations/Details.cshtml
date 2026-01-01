@@ -32,14 +32,19 @@
             <dt class="col-sm-3 fw-bold">Paciente</dt>
             <dd class="col-sm-9">@Model?.Consultation?.PatientName</dd>
 
-            <dt class="col-sm-3 fw-bold">Início</dt>
+            <dt class="col-sm-3 fw-bold">Data</dt>
             <dd class="col-sm-9">
-                @(Model?.StartTime == default ? "—" : Model.StartTime.ToString("g"))
+                @(Model?.ConsultationDate == default ? "—" : Model.ConsultationDate.ToString("dd/MM/yyyy"))
             </dd>
 
-            <dt class="col-sm-3 fw-bold">Fim</dt>
+            <dt class="col-sm-3 fw-bold">Hora de Início</dt>
             <dd class="col-sm-9">
-                @(Model?.EndTime == default ? "—" : Model.EndTime.ToString("g"))
+                @Model.StartHour.ToString(@"hh\:mm")
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">Hora de Fim</dt>
+            <dd class="col-sm-9">
+                @Model.EndHour.ToString(@"hh\:mm")
             </dd>
 
             <dt class="col-sm-3 fw-bold">Estado</dt>

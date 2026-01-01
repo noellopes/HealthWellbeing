@@ -14,32 +14,38 @@
         <hr />
 
         <dl class="row">
+
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ResponsibleName)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.ResponsibleName)</dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Room)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Room.Name)</dd>
+            <dd class="col-sm-9">@Model.Room?.Name</dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.ConsultationId)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultationId)</dd>
+            <dd class="col-sm-9">@Model.ConsultationId</dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.PatientId)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.PatientId)</dd>
+            <dd class="col-sm-9">@Model.PatientId</dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Specialty)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.Specialty.SpecialtyId)</dd>
+            <dd class="col-sm-9">@Model.Specialty?.Name</dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.StartTime)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.StartTime)</dd>
+            <dt class="col-sm-3 fw-bold">Início</dt>
+            <dd class="col-sm-9">
+                @($"{Model.ConsultationDate:dd/MM/yyyy} {Model.StartHour:hh\\:mm}")
+            </dd>
 
-            <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.EndTime)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(model => model.EndTime)</dd>
+            <dt class="col-sm-3 fw-bold">Fim</dt>
+            <dd class="col-sm-9">
+                @($"{Model.ConsultationDate:dd/MM/yyyy} {Model.EndHour:hh\\:mm}")
+            </dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Status)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
 
             <dt class="col-sm-3 fw-bold">@Html.DisplayNameFor(model => model.Notes)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.Notes)</dd>
+
         </dl>
 
         <form asp-action="CancelarReserva" method="post" class="mt-4 border-top pt-3 text-end">

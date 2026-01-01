@@ -2,10 +2,11 @@
 
 <style>
     .missing-value {
-        color: rgba(0, 0, 0, 0.45); /* preto com 45% de opacidade */
+        color: rgba(0, 0, 0, 0.45);
         font-weight: 500;
     }
 </style>
+
 @{
     ViewData["Title"] = "Lista de Consultas";
 }
@@ -89,6 +90,7 @@
                         <span class="badge bg-secondary">@item.Status</span>
                     }
                 </td>
+
                 <td>@item.DoctorName</td>
                 <td>@item.PatientName</td>
                 <td>@item.Specialty?.Name</td>

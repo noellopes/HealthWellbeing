@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -32,33 +31,22 @@ namespace HealthWellbeingRoom.Models
         public int? SpecialtyId { get; set; }
         public Specialty? Specialty { get; set; }
 
-        // Data da consulta vai para a consulta
-        [NotMapped]
+        // Data da consulta (AGORA MAPEADA)
         [Required(ErrorMessage = "A data da consulta é obrigatória.")]
         [DataType(DataType.Date)]
-        public DateTime? ConsultationDate { get; set; }
+        public DateTime ConsultationDate { get; set; }
 
-        // Hora de início vai para a consulta
-        [NotMapped]
+
         [Required(ErrorMessage = "A hora de início é obrigatória.")]
         [DataType(DataType.Time)]
-        public TimeSpan? StartHour { get; set; }
+        public TimeSpan StartHour { get; set; }
 
-        // Hora de fim vai para a consulta
-        [NotMapped]
         [Required(ErrorMessage = "A hora de fim é obrigatória.")]
         [DataType(DataType.Time)]
-        public TimeSpan? EndHour { get; set; }
+        public TimeSpan EndHour { get; set; }
 
-        // Campos reais gravados na BD
-        [Required]
-        public DateTime StartTime { get; set; }
-
-        [Required]
-        public DateTime EndTime { get; set; }
-
-        [NotMapped]
-        public TimeSpan Duration => EndTime - StartTime;
+        // Duração calculada
+        public TimeSpan? Duration => EndHour - StartHour;
 
         // Recursos
         public ICollection<RoomConsumable>? Consumables { get; set; }

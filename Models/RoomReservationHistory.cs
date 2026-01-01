@@ -1,4 +1,5 @@
 ﻿using HealthWellbeing.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeingRoom.Models
@@ -13,8 +14,18 @@ namespace HealthWellbeingRoom.Models
         [Required(ErrorMessage = "O campo Id da Consulta é obrigatório.")]
         public int ConsultationId { get; set; }
 
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        // NOVOS CAMPOS (alinhados com RoomReservation)
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime ConsultationDate { get; set; }
+
+        [Required]
+        [DataType(DataType.Time)]
+        public TimeSpan StartHour { get; set; }
+
+        [Required]
+        [DataType(DataType.Time)]
+        public TimeSpan EndHour { get; set; }
 
         public string ResponsibleName { get; set; }
         public string FinalStatus { get; set; } // "Realizada" ou "Cancelada"
@@ -23,6 +34,7 @@ namespace HealthWellbeingRoom.Models
 
         public string? Notes { get; set; }
 
+        // Relações
         public Room Room { get; set; }
         public Consultation Consultation { get; set; }
     }

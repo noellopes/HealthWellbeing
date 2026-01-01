@@ -25,7 +25,7 @@
     };
 }
 
-<h1 class="mb-4 text-dark">
+<h1 class="mb-4 text-primary">
     <i class="bi bi-door-open-fill me-2"></i>Listas de Salas
 </h1>
 
@@ -294,12 +294,37 @@
         </tbody>
     </table>
 
+    <div class="text-end mt-4 border-top pt-3">
+
+        <a asp-controller="RoomReservations" asp-action="Index"
+           class="btn btn-success btn-sm me-2" style="min-width:180px">
+            <i class="bi bi-calendar-check me-1"></i> Lista de reservas
+        </a>
+
+        <a asp-controller="RoomReservations" asp-action="Consultation"
+           class="btn btn-success btn-sm me-2" style="min-width:180px">
+            <i class="bi bi-person-vcard me-1"></i> Lista de consultas
+        </a>
+
+        <a asp-controller="Consumivel" asp-action="Index"
+           class="btn btn-success btn-sm me-2" style="min-width:200px">
+            <i class="bi bi-box-seam me-1"></i> Lista de consumíveis
+        </a>
+
+        <a asp-controller="RoomReservations" asp-action="ConsumablesExpenses"
+           class="btn btn-success btn-sm" style="min-width:220px">
+            <i class="bi bi-receipt-cutoff me-1"></i> Lista de consumíveis gastos
+        </a>
+
+    </div>
+
     @if (ViewBag.ErrorMessage != null)
     {
         <div class="alert alert-warning text-center">
             @ViewBag.ErrorMessage
         </div>
     }
+
 </div>
 
 <!-- PAGINAÇÃO AO FINAL -->

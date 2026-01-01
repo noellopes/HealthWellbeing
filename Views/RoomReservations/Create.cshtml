@@ -17,14 +17,12 @@
             <div class="row g-3">
 
                 <!-- ===================== LINHA 1 ===================== -->
-                <!-- ID da Consulta -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationId" class="form-label fw-bold">Id da Consulta</label>
                     <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 001" />
                     <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
 
-                <!-- Data da Consulta -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
                     <input asp-for="ConsultationDate" type="date" class="form-control" id="consultation-date" />
@@ -32,22 +30,19 @@
                 </div>
 
                 <!-- ===================== LINHA 2 ===================== -->
-                <!-- Hora de Início -->
                 <div class="col-md-6">
                     <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
-                    <input asp-for="StartHour" type="time" class="form-control" />
+                    <input asp-for="StartHour" type="time" class="form-control" id="StartHour" />
                     <span asp-validation-for="StartHour" class="text-danger small"></span>
                 </div>
 
-                <!-- Hora de Fim -->
                 <div class="col-md-6">
                     <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
-                    <input asp-for="EndHour" type="time" class="form-control" />
+                    <input asp-for="EndHour" type="time" class="form-control" id="EndHour" />
                     <span asp-validation-for="EndHour" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== LINHA 3 ===================== -->
-                <!-- Sala -->
                 <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
                     <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" id="room-select" required>
@@ -56,7 +51,6 @@
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <!-- Responsável -->
                 <div class="col-md-6">
                     <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
                     <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
@@ -74,10 +68,10 @@
 
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
-                    <i class="bi bi-check-circle me-1"></i> Criar Reserva
+                    <i class="bi bi-check-circle me-1"></i> Criar
                 </button>
                 <a asp-action="Index" class="btn btn-success btn-sm" style="min-width:150px">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                    <i class="bi bi-arrow-left-circle me-1"></i> Lista de reservas
                 </a>
             </div>
 

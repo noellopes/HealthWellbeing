@@ -201,7 +201,7 @@ namespace HealthWellbeingRoom.Controllers
                 .Include(r => r.RoomStatus)
                 .Include(r => r.RoomLocation)
                 .Include(r => r.RoomType)
-                .Include(r => r.RoomReservations) // necessário para verificar reservas
+                .Include(r => r.RoomReservations)
                 .FirstOrDefaultAsync(m => m.RoomId == id);
 
             if (room == null) return NotFound();
@@ -224,9 +224,15 @@ namespace HealthWellbeingRoom.Controllers
             // Verificar reserva ativa se a sala estiver indisponível
             if (room.RoomStatus?.Name == "Indisponível")
             {
+                var now = DateTime.Now;
+
                 var reservaAtiva = room.RoomReservations
-                    .Where(r => r.StartTime >= DateTime.Now)
-                    .OrderBy(r => r.StartTime)
+                    .Where(r =>
+                        r.ConsultationDate > now.Date ||
+                        (r.ConsultationDate == now.Date && r.EndHour > now.TimeOfDay)
+                    )
+                    .OrderBy(r => r.ConsultationDate)
+                    .ThenBy(r => r.StartHour)
                     .FirstOrDefault();
 
                 ViewBag.ReservaAtivaId = reservaAtiva?.RoomReservationId;

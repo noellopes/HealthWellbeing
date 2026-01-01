@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Reservas da Sala";
 
-
     bool isAdmin = User.IsInRole("Administrator");
     bool isLogTech = User.IsInRole("logisticsTechnician");
 }
@@ -13,7 +12,6 @@
 </h1>
 
 <div class="mb-3 d-flex justify-content-end">
-
     @if (isLogTech)
     {
         <a asp-controller="RoomReservations"
@@ -22,7 +20,6 @@
             <i class="bi bi-plus-circle me-1"></i> Nova Reserva
         </a>
     }
-
 </div>
 
 <div class="card shadow-sm">
@@ -56,10 +53,19 @@
                             <td>@item.RoomReservationId.ToString("D3")</td>
                             <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
                             <td>@(item.Room?.Name ?? "—")</td>
-                            <td>@(item.StartTime != default ? item.StartTime.ToString("dd/MM/yyyy HH:mm") : "—")</td>
-                            <td>@(item.EndTime != default ? item.EndTime.ToString("dd/MM/yyyy HH:mm") : "—")</td>
+
+                            <!-- INÍCIO -->
+                            <td>
+                                @($"{item.ConsultationDate:dd/MM/yyyy} {item.StartHour:hh\\:mm}")
+                            </td>
+
+                            <!-- FIM -->
+                            <td>
+                                @($"{item.ConsultationDate:dd/MM/yyyy} {item.EndHour:hh\\:mm}")
+                            </td>
 
                             <td class="text-center">
+
                                 @if (isLogTech)
                                 {
                                     <a asp-action="Edit"
@@ -85,6 +91,7 @@
                                         <i class="bi bi-trash-fill"></i> Eliminar
                                     </a>
                                 }
+
                             </td>
                         </tr>
                     }

@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Histórico da Sala";
-
     var roomName = Model.FirstOrDefault()?.Room?.Name ?? "Sala";
 }
 
@@ -46,8 +45,8 @@
 
                         <tr class="@cssClass">
                             <td>@item.ConsultationId.ToString("D3")</td>
-                            <td>@item.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@item.EndTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.ConsultationDate.ToString("dd/MM/yyyy") @item.StartHour.ToString(@"hh\:mm")</td>
+                            <td>@item.ConsultationDate.ToString("dd/MM/yyyy") @item.EndHour.ToString(@"hh\:mm")</td>
                             <td>@item.ResponsibleName</td>
                             <td>@item.FinalStatus</td>
                             <td>@item.RecordedAt.ToString("dd/MM/yyyy HH:mm")</td>

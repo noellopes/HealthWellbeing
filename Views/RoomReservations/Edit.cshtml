@@ -5,24 +5,49 @@
 }
 
 <h1 class="mb-4 text-success">
-    <i class="bi bi-pencil-square"></i>Editar Reserva da Sala
+    <i class="bi bi-pencil-square"></i> Editar Reserva da Sala
 </h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" method="post" id="edit-form">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="RoomReservationId" />
 
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="row g-3">
+
+                <!-- ID da Consulta (desativado) -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" />
+                    <input asp-for="ConsultationId" class="form-control" disabled />
+                    <input type="hidden" asp-for="ConsultationId" />
                     <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
 
+                <!-- Data da Consulta -->
+                <div class="col-md-6">
+                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
+                    <input asp-for="ConsultationDate" type="date" class="form-control" required />
+                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
+                </div>
+
+                <!-- Hora de Início -->
+                <div class="col-md-6">
+                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
+                    <input asp-for="StartHour" type="time" class="form-control" required />
+                    <span asp-validation-for="StartHour" class="text-danger small"></span>
+                </div>
+
+                <!-- Hora de Fim -->
+                <div class="col-md-6">
+                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
+                    <input asp-for="EndHour" type="time" class="form-control" required />
+                    <span asp-validation-for="EndHour" class="text-danger small"></span>
+                </div>
+
+                <!-- Sala -->
                 <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
                     <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" required>
@@ -31,41 +56,31 @@
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-6">
-                    <label asp-for="StartTime" class="form-label fw-bold">Início(*)</label>
-                    <input asp-for="StartTime" type="datetime-local" class="form-control"
-                           value="@(Model?.StartTime.ToString("yyyy-MM-ddTHH:mm"))" required />
-                    <span asp-validation-for="StartTime" class="text-danger small"></span>
-                </div>
-
-                <div class="col-md-6">
-                    <label asp-for="EndTime" class="form-label fw-bold">Fim(*)</label>
-                    <input asp-for="EndTime" type="datetime-local" class="form-control"
-                           value="@(Model?.EndTime.ToString("yyyy-MM-ddTHH:mm"))" required />
-                    <span asp-validation-for="EndTime" class="text-danger small"></span>
-                </div>
-
+                <!-- Responsável -->
                 <div class="col-md-6">
                     <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
                     <input asp-for="ResponsibleName" class="form-control" required />
                     <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
 
-                <div class="col-md-6">
+                <!-- Observações -->
+                <div class="col-md-12">
                     <label asp-for="Notes" class="form-label fw-bold">Observações (Opcional)</label>
                     <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
                     <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
+
             </div>
 
             <div class="text-end mt-4 gap-2 border-top pt-3">
-                <button type="submit" class="btn btn-primary btn-sm" style="min-width:150px">
+                <button id="save-btn" type="submit" class="btn btn-primary btn-sm" style="min-width:150px">
                     <i class="bi bi-check-circle me-1"></i> Guardar Alterações
                 </button>
                 <a asp-action="Details" asp-route-id="@Model.RoomReservationId" class="btn btn-secondary btn-sm" style="min-width:150px">
                     <i class="bi bi-arrow-left-circle me-1"></i> Voltar
                 </a>
             </div>
+
         </form>
     </div>
 </div>
@@ -74,4 +89,36 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.getElementById("edit-form");
+            const saveBtn = document.getElementById("save-btn");
+
+            // Guardar valores iniciais
+            const initial = new FormData(form);
+
+            function checkChanges() {
+                const current = new FormData(form);
+                let changed = false;
+
+                for (let [key, value] of current.entries()) {
+                    if (initial.get(key) !== value) {
+                        changed = true;
+                        break;
+                    }
+                }
+
+                saveBtn.disabled = !changed;
+            }
+
+            // Monitorizar alterações
+            form.addEventListener("input", checkChanges);
+            form.addEventListener("change", checkChanges);
+
+            // Desativar botão ao carregar
+            saveBtn.disabled = true;
+        });
+    </script>
 }
