@@ -1,43 +1,72 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.PlanoExercicios>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Os Meus Planos";
+    var user = await UserManager.GetUserAsync(User);
+    // Verifica se é staff (podes ajustar as strings das Roles conforme a tua BD)
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>@(isStaff ? "Gestão de Planos de Exercício" : "Os Meus Planos de Treino")</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-    <a asp-action="CreateAutomatico">Create New A</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UtenteGrupo7)
-            </th>
-            <th>
-                PlanoExercicios Id
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+    <div>
+        @if (isStaff)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
-                </td>
-                <td>
-                    @item.PlanoExerciciosId
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId">Delete</a>
-                </td>
-            </tr>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Plano Manual
+            </a>
         }
-    </tbody>
-</table>
+        <a asp-action="CreateAutomatico" class="btn btn-success ms-2">
+            <i class="bi bi-magic"></i> Plano Automático
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.UtenteGrupo7)</th>
+                    <th>Nº de Exercícios</th>
+                    <th>ID do Plano</th>
+                    <th class="text-end">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="align-middle fw-bold">
+                            @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
+                        </td>
+                        <td class="align-middle">
+                            <span class="badge bg-info text-dark">
+                                @(item.Exercicios != null ? item.Exercicios.Count : 0) Exercícios
+                            </span>
+                        </td>
+                        <td class="align-middle">#@item.PlanoExerciciosId</td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-info" title="Detalhes">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+
+                            @if (isStaff)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-warning" title="Editar">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-danger" title="Apagar">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

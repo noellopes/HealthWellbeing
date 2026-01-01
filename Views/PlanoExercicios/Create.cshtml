@@ -1,82 +1,69 @@
 ﻿@model HealthWellbeing.Models.PlanoExercicios
 
 @{
-    ViewData["Title"] = "Criar Plano de Exercícios";
+    ViewData["Title"] = "Criar Plano Manual";
 }
 
-<h1 class="mb-3">Criar Plano de Exercícios</h1>
-
+<h1 class="mb-3">Criar Plano Manualmente</h1>
 <hr />
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <form asp-action="Create" method="post">
-
             <div asp-validation-summary="All" class="text-danger mb-3"></div>
-            <div class="form-group mb-4">
-                <label asp-for="UtenteGrupo7Id" class="control-label fw-bold"></label>
-                <select asp-for="UtenteGrupo7Id"
-                        class="form-control"
-                        asp-items="ViewBag.UtenteGrupo7Id">
-                    <option value="">-- Selecione um utente --</option>
-                </select>
-            </div>
-            <div class="form-group mb-4">
-                <label class="control-label fw-bold">Exercícios</label>
-                <small class="form-text text-muted d-block">
-                    Selecione um ou mais exercícios para este plano
-                </small>
 
-                <div class="border p-3 rounded mt-2">
-                    @if (ViewBag.Exercicio != null &&
-                                        ((IEnumerable<SelectListItem>)ViewBag.Exercicio).Any())
-                    {
-                        <div class="row">
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Exercicio)
-                            {
-                                <div class="col-md-4 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               name="exerciciosSelecionados"
-                                               value="@item.Value"
-                                               id="ex_@item.Value" />
-
-                                        <label class="form-check-label" for="ex_@item.Value">
-                                            <a href="@Url.Action("Details", "Exercicio", new { id = item.Value })"
-                                               target="_blank"
-                                               class="text-decoration-none">
-                                                @item.Text
-                                            </a>
-                                        </label>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning mb-0">
-                            Nenhum exercício encontrado no sistema.
-                        </div>
-                    }
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">1. Seleção do Utente</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="UtenteGrupo7Id" class="control-label fw-bold"></label>
+                        <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id">
+                            <option value="">-- Selecione um utente --</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">2. Seleção de Exercícios</div>
+                <div class="card-body">
+                    <small class="text-muted mb-2 d-block">Marque os exercícios desejados:</small>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">
-                    Criar Plano
-                </button>
-                <a asp-action="Index" class="btn btn-secondary ms-2">
-                    Voltar
-                </a>
+                    <div class="row" style="max-height: 400px; overflow-y: auto;">
+                        @if (ViewBag.Exercicio != null)
+                        {
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Exercicio)
+                            {
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check p-2 border rounded hover-bg">
+                                        <input class="form-check-input ms-1" type="checkbox"
+                                               name="exerciciosSelecionados"
+                                               value="@item.Value" id="ex_@item.Value" />
+                                        <label class="form-check-label ms-2 fw-bold" for="ex_@item.Value">
+                                            @item.Text
+                                        </label>
+                                        <br />
+                                        <a href="@Url.Action("Details", "Exercicio", new { id = item.Value })" target="_blank" class="ms-4 small text-primary">
+                                            <i class="bi bi-info-circle"></i> Ver detalhes
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
             </div>
 
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg">Gravar Plano</button>
+                <a asp-action="Index" class="btn btn-secondary btn-lg ms-2">Voltar</a>
+            </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

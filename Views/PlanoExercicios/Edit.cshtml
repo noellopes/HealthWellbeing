@@ -1,49 +1,61 @@
 ﻿@model HealthWellbeing.Models.PlanoExercicios
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Plano";
 }
 
-<h1>Edit</h1>
-
-<h4>PlanoExercicios</h4>
+<h1>Editar Plano #@Model.PlanoExerciciosId</h1>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-10">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
             <input type="hidden" asp-for="PlanoExerciciosId" />
-            <div class="form-group">
-                <label asp-for="UtenteGrupo7Id" class="control-label"></label>
-                <select asp-for="UtenteGrupo7Id" class="form-control" asp-items="ViewBag.UtenteGrupo7Id"></select>
+
+            <div class="form-group mb-4">
+                <label asp-for="UtenteGrupo7Id" class="control-label fw-bold"></label>
+                <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
                 <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label>Exercícios</label>
-                @foreach (var ex in ViewBag.Exercicio)
-                {
-                    var isChecked = Model.Exercicios != null && Model.Exercicios.Any(e => e.ExercicioId.ToString() == ex.Value);
 
-                    <div>
-                        <input type="checkbox"
-                               name="ExerciciosSelecionados"
-                               value="@ex.Value"
-                               @(isChecked ? "checked" : "") />
-                        @ex.Text
+            <div class="card mb-4">
+                <div class="card-header">Gerir Exercícios</div>
+                <div class="card-body">
+                    <div class="row">
+                        @if (ViewBag.Exercicio != null)
+                        {
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Exercicio)
+                            {
+                                
+                                bool isChecked = Model.Exercicios != null && Model.Exercicios.Any(e => e.ExercicioId.ToString() == item.Value);
+
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check border p-2 rounded @(isChecked ? "bg-light border-primary" : "")">
+                                        <input class="form-check-input ms-1"
+                                               type="checkbox"
+                                               name="exerciciosSelecionados"
+                                               value="@item.Value"
+                                               id="edit_ex_@item.Value"
+                                               @(isChecked ? "checked" : "") />
+
+                                        <label class="form-check-label ms-2" for="edit_ex_@item.Value">
+                                            @item.Text
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
-                }
+                </div>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <button type="submit" class="btn btn-primary">Guardar Alterações</button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
