@@ -16,11 +16,35 @@ namespace HealthWellbeing.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        [HttpGet]
+        public IActionResult Index(int? consumivelId)
         {
-            ViewBag.Consumiveis = _context.Consumivel.ToList();
+            var consumiveis = _context.Consumivel.ToList();
+
+            if (consumivelId == null)
+            {
+                ViewBag.Consumiveis = consumiveis;
+                return View();
+            }
+
+            var consumivel = _context.Consumivel
+                .FirstOrDefault(c => c.ConsumivelId == consumivelId);
+
+            if (consumivel == null)
+                return NotFound();
+
+            ViewBag.Consumiveis = consumiveis;
+
+            ViewBag.QuantidadeAtual = consumivel.QuantidadeAtual;
+            ViewBag.QuantidadeMinima = consumivel.QuantidadeMinima;
+            ViewBag.QuantidadeMaxima = consumivel.QuantidadeMaxima;
+
+            ViewBag.QuantidadeSugerida =
+                consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
+
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
