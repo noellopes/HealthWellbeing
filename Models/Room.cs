@@ -40,10 +40,10 @@ namespace HealthWellbeing.Models
 
         public string? Notes { get; set; }
 
-        public ICollection<LocationMedDevice>? LocalizacaoDispMedicoMovel { get; set; }
-        public ICollection<Equipment>? Equipments { get; set; }
-        public ICollection<RoomConsumable>? RoomConsumables { get; set; }
-        public ICollection<RoomReservation>? RoomReservations { get; set; }
+        public ICollection<LocationMedDevice> LocalizacaoDispMedicoMovel { get; set; } = new List<LocationMedDevice>();
+        public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
+        public ICollection<RoomConsumable> RoomConsumables { get; set; } = new List<RoomConsumable>();
+        public ICollection<RoomReservation> RoomReservations { get; set; } = new List<RoomReservation>();
 
         // Nova navegação: uma sala pode ter muitas consultas
         public ICollection<Consultation>? Consultations { get; set; }

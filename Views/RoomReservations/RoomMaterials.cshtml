@@ -75,8 +75,8 @@
                     <tr>
                         <th>Nome</th>
                         <th>Categoria</th>
-                        <th>Quantidade</th>
-                        <th>Observação</th>
+                        <th>Quantidade atual</th>
+                        <th>Quantidade maxima</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,9 +84,9 @@
                     {
                         <tr>
                             <td>@cons.Consumivel?.Nome</td>
-                            <td>@cons.Consumivel?.CategoriaConsumivel</td>
-                            <td>@cons.Quantity</td>
-                            <td>@(string.IsNullOrWhiteSpace(cons.Note) ? "—" : cons.Note)</td>
+                            <td>@cons.Consumivel?.CategoriaConsumivel?.Nome</td>
+                            <td>@cons.Consumivel?.QuantidadeAtual</td>
+                            <td>@cons.Consumivel?.QuantidadeMaxima</td>
                         </tr>
                     }
                 </tbody>

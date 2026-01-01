@@ -8,8 +8,8 @@ namespace HealthWellbeingRoom.ViewModels
         public int RoomId { get; set; }
         public string RoomName { get; set; } = string.Empty;
 
-        public IEnumerable<LocationMedDevice> MedicalDevices { get; set; } = Enumerable.Empty<LocationMedDevice>();
-        public IEnumerable<RoomConsumable> Consumables { get; set; } = Enumerable.Empty<RoomConsumable>();
+        public List<LocationMedDevice> MedicalDevices { get; set; } = new();
+        public List<RoomConsumable> Consumables { get; set; } = new();
     }
 
 }

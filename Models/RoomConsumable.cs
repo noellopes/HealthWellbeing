@@ -1,6 +1,5 @@
 ﻿using HealthWellbeing.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -9,16 +8,24 @@ namespace HealthWellbeingRoom.Models
         [Key]
         public int RoomConsumableId { get; set; }
 
-        [ForeignKey("Room")]
+        // FK para Room
+        [Required]
         public int RoomId { get; set; }
-        public Room Room { get; set; }
 
-        [ForeignKey("Consumivel")]
+        // Navegação para Room (opcional para evitar warnings; EF irá popular quando incluído)
+        public Room? Room { get; set; }
+
+        // FK para Consumivel
+        [Required]
         public int ConsumivelId { get; set; }
-        public Consumivel? Consumivel { get; set; }  // <-- Navegação obrigatória
 
+        // Navegação para Consumivel (opcional para evitar warnings; torna não anulável se a relação for sempre obrigatória)
+        public Consumivel? Consumivel { get; set; }
+
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade deve ser um número não negativo.")]
         public int Quantity { get; set; }
-        public string? Note { get; set; }
 
+        [StringLength(500)]
+        public string? Note { get; set; }
     }
 }

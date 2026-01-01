@@ -245,7 +245,13 @@ namespace HealthWellbeingRoom.Controllers
         {
             var reservations = _context.RoomReservations
                 .Include(r => r.Room)
+                    .ThenInclude(room => room.RoomConsumables)
+                        .ThenInclude(rc => rc.Consumivel)
+                .Include(r => r.Room)
+                    .ThenInclude(room => room.LocalizacaoDispMedicoMovel)
+                        .ThenInclude(ldm => ldm.MedicalDevice)
                 .Include(r => r.Specialty);
+
             return View(await reservations.ToListAsync());
         }
 
@@ -681,24 +687,33 @@ namespace HealthWellbeingRoom.Controllers
                         .ThenInclude(d => d.TypeMaterial)
                 .Include(r => r.RoomConsumables)
                     .ThenInclude(c => c.Consumivel)
+                        .ThenInclude(cons => cons!.CategoriaConsumivel)
                 .FirstOrDefaultAsync(r => r.RoomId == id);
 
             if (room == null)
                 return NotFound();
 
-            // Filtrar apenas dispositivos ATUAIS (os que realmente estão na sala)
-            var dispositivosAtuais = room.LocalizacaoDispMedicoMovel
-                .Where(l => l.EndDate == null && l.IsCurrent)
-                .ToList();
+            // DEBUG — quantos consumíveis foram carregados pelo EF?
+            Console.WriteLine("DEBUG - Consumíveis carregados: " + room.RoomConsumables?.Count);
+
+            // PONTO 1: Mostrar TODOS os dispositivos associados à sala
+            var dispositivos = room.LocalizacaoDispMedicoMovel?.ToList();
 
             // Construir ViewModel
             var RoomMaterialviewModel = new RoomMaterial
             {
                 RoomId = room.RoomId,
                 RoomName = room.Name,
-                MedicalDevices = dispositivosAtuais,
-                Consumables = room.RoomConsumables
+                MedicalDevices = dispositivos ?? new List<LocationMedDevice>(),
+                Consumables = room.RoomConsumables?.ToList() ?? new List<RoomConsumable>()
             };
+
+            Console.WriteLine("DEBUG - RoomConsumables count: " + room.RoomConsumables?.Count);
+
+            foreach (var rc in room.RoomConsumables ?? new List<RoomConsumable>())
+            {
+                Console.WriteLine($"DEBUG - RC ID={rc.RoomConsumableId}, ConsumivelId={rc.ConsumivelId}, Nome={rc.Consumivel?.Nome}");
+            }
 
             return View(RoomMaterialviewModel);
         }

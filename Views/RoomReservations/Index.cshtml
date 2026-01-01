@@ -104,21 +104,33 @@
 
                                 @if (isLogTech)
                                 {
-                                    <form asp-action="MarcarComoRealizada"
-                                          asp-route-id="@item.RoomReservationId"
-                                          method="post"
-                                          style="display:inline;">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-sm btn-success me-1">
+                                    bool aceitaClick = item.ConsultationDate.Date >= DateTime.Today
+                                    && item.StartHour < DateTime.Now.TimeOfDay;
+
+                                    if (aceitaClick)
+                                    {
+                                        <form asp-action="MarcarComoRealizada"
+                                              asp-route-id="@item.RoomReservationId"
+                                              method="post"
+                                              style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-primary me-1">
+                                                <i class="bi bi-check-circle-fill"></i> Realizada?
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-sm btn-secondary me-1" disabled>
                                             <i class="bi bi-check-circle-fill"></i> Realizada?
                                         </button>
-                                    </form>
+                                    }
                                 }
 
                                 <a asp-controller="RoomReservations"
                                    asp-action="RoomMaterials"
                                    asp-route-Id="@item.RoomId"
-                                   class="btn btn-sm btn-warning">
+                                   class="btn btn-sm @(item.Room?.LocalizacaoDispMedicoMovel != null && item.Room.LocalizacaoDispMedicoMovel.Any() ? "btn-success" : "btn-danger")">
                                     <i class="bi bi-box-seam"></i> Material
                                 </a>
 
