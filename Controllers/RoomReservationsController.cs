@@ -543,8 +543,41 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        //------------------------------------------------------JSON RESULT-------------------------------------------------------------------------------------
+        // Filtrar salas disponíveis para uma data e intervalo de horas
+        [HttpGet]
+        public JsonResult GetAvailableRooms(DateTime date, TimeSpan start, TimeSpan end)
+        {
+            var startDateTime = date.Date + start;
+            var endDateTime = date.Date + end;
+
+            var reservations = _context.RoomReservations
+                .Where(res => res.StartTime.Date == date.Date)
+                .ToList();
+
+            var occupiedRoomIds = reservations
+                .Where(res =>
+                    (startDateTime < res.EndTime && endDateTime > res.StartTime) ||
+                    (startDateTime <= res.StartTime && endDateTime >= res.EndTime)
+                )
+                .Select(res => res.RoomId)
+                .Distinct()
+                .ToList();
+
+            var availableRooms = _context.Room
+                .Where(room => !occupiedRoomIds.Contains(room.RoomId))
+                .Select(r => new
+                {
+                    Value = r.RoomId.ToString(),
+                    Text = r.Name
+                })
+                .ToList();
+
+            return Json(availableRooms);
+        }
         //------------------------------------------------------VIEWS CONSULTATION-------------------------------------------------------------------------------------
-         
+
         public async Task<IActionResult> Consultation(int? id)
         {
             var consultas = _context.Consultations
