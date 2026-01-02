@@ -14,8 +14,6 @@ namespace HealthWellbeing.Models
 
         [ForeignKey("UtenteGrupo7Id")]
         public UtenteGrupo7? UtenteGrupo7 { get; set; }
- 
-    
-        public ICollection<Exercicio>? Exercicios { get; set; }
+        public ICollection<PlanoExercicioExercicio>? PlanoExercicioExercicios { get; set; }
     }
 }

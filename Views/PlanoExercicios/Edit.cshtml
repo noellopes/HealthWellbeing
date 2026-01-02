@@ -2,44 +2,52 @@
 
 @{
     ViewData["Title"] = "Editar Plano";
+    var selecionados = ViewBag.ExerciciosSelecionados as int[] ?? new int[0];
 }
 
-<h1>Editar Plano #@Model.PlanoExerciciosId</h1>
+<h1>Editar Plano</h1>
 <hr />
 
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="PlanoExerciciosId" />
 
-            <div class="form-group mb-4">
-                <label asp-for="UtenteGrupo7Id" class="control-label fw-bold"></label>
-                <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
-                <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    Configurações do Plano
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="UtenteGrupo7Id" class="control-label fw-bold"></label>
+                        <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
+                        <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
 
             <div class="card mb-4">
-                <div class="card-header">Gerir Exercícios</div>
+                <div class="card-header bg-secondary text-white">
+                    Exercícios do Plano
+                </div>
                 <div class="card-body">
-                    <div class="row">
-                        @if (ViewBag.Exercicio != null)
+                    <div class="row" style="max-height: 500px; overflow-y: auto;">
+                        @if (ViewBag.TodosExercicios != null)
                         {
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.Exercicio)
+                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.TodosExercicios)
                             {
-                                
-                                bool isChecked = Model.Exercicios != null && Model.Exercicios.Any(e => e.ExercicioId.ToString() == item.Value);
+                                bool isChecked = selecionados.Contains(int.Parse(item.Value));
 
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check border p-2 rounded @(isChecked ? "bg-light border-primary" : "")">
-                                        <input class="form-check-input ms-1"
-                                               type="checkbox"
+                                <div class="col-md-4 mb-2">
+                                    <div class="form-check p-2 border rounded @(isChecked ? "bg-light border-primary" : "")">
+                                        <input class="form-check-input ms-1" type="checkbox"
                                                name="exerciciosSelecionados"
                                                value="@item.Value"
-                                               id="edit_ex_@item.Value"
+                                               id="ex_@item.Value"
                                                @(isChecked ? "checked" : "") />
 
-                                        <label class="form-check-label ms-2" for="edit_ex_@item.Value">
+                                        <label class="form-check-label ms-2" for="ex_@item.Value">
                                             @item.Text
                                         </label>
                                     </div>
@@ -51,8 +59,8 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Guardar Alterações</button>
-                <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                <input type="submit" value="Guardar Alterações" class="btn btn-primary btn-lg" />
+                <a asp-action="Index" class="btn btn-secondary btn-lg ms-2">Voltar</a>
             </div>
         </form>
     </div>
