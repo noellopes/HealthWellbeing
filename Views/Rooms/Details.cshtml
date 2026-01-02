@@ -4,22 +4,17 @@
 @{
     ViewData["Title"] = "Detalhes da Sala";
 
-    //Verifica se a URL vem de uma criacao de sala (duas versoes)
-    // bool fromCreation = Context.Request.Query["fromCreation"] == "True";
     bool fromCreation = bool.TryParse(Context.Request.Query["fromCreation"], out var result) && result;
 
-    // Verifica se o utilizador tem permissão de deministrador e de Logística
     bool isAdmin = User.IsInRole("Administrator");
     bool isLogTech = User.IsInRole("logisticsTechnician");
 }
 
-<!-- Título principal da página -->
 <h1 class="mb-4 text-info">
     <i class="bi bi-info-circle-fill me-2"></i>
     @ViewData["Title"]
 </h1>
 
-<!-- Mensagem de sucesso -->
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -37,9 +32,10 @@
     </div>
 
     <div class="card-body row">
-        <!-- Coluna com os detalhes -->
+
         <div class="col-md-8">
             <dl class="row mb-0 mt-4">
+
                 @if (User.IsInRole("Administrator"))
                 {
                     <dt class="col-sm-3 fw-bold text-muted">Id</dt>
@@ -67,32 +63,38 @@
             </dl>
         </div>
 
-        <!-- Coluna com os botões à direita para salas nao criadas de emidiato -->
         @if (!fromCreation)
         {
             <div class="col-md-4 d-flex flex-column align-items-start gap-2 mt-4">
 
-                <a asp-controller="RoomReservations" asp-action="History" asp-route-roomId="@Model.RoomId" class="btn btn-outline-primary w-100">
+                <a asp-controller="RoomReservations" asp-action="History" asp-route-roomId="@Model.RoomId"
+                   class="btn btn-outline-success w-100">
                     <i class="bi bi-clock-history me-1"></i> Ver histórico de utilização
                 </a>
 
-                <a asp-controller="RoomReservations" asp-action="RoomReservationList" asp-route-id="@Model.RoomId" class="btn btn-outline-info w-100">
+                <a asp-controller="RoomReservations" asp-action="RoomReservationList" asp-route-id="@Model.RoomId"
+                   class="btn btn-outline-success w-100">
                     <i class="bi bi-calendar-check me-1"></i> Ver reservas
                 </a>
 
-                <a asp-action="Equipments" asp-route-id="@Model.RoomId" class="btn btn-outline-secondary w-100">
+                <a asp-action="Equipments" asp-route-id="@Model.RoomId"
+                   class="btn btn-outline-success w-100">
                     <i class="bi bi-gear me-1"></i> Ver equipamentos associados
                 </a>
 
-                <a asp-action="MedicalDevices" asp-route-id="@Model.RoomId" class="btn btn-outline-success w-100">
+                <a asp-action="MedicalDevices" asp-route-id="@Model.RoomId"
+                   class="btn btn-outline-success w-100">
                     <i class="bi bi-heart-pulse me-1"></i> Ver Dispositivos médicos associados
                 </a>
-                <a asp-action="Consumables" asp-route-id="@Model.RoomId" class="btn btn-outline-success w-100">
+
+                <a asp-action="Consumables" asp-route-id="@Model.RoomId"
+                   class="btn btn-outline-success w-100">
                     <i class="bi bi-droplet me-1"></i> Ver consumíveis associados
                 </a>
 
             </div>
         }
+
         @if (fromCreation)
         {
             <div class="col-md-4 d-flex flex-column align-items-stretch mt-4">
@@ -122,30 +124,36 @@
             </a>
         }
     </div>
+</div>
 
-    <div class="card-footer d-flex justify-content-end gap-2">
-        @if (isAdmin)
-        {
-            <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning me-2">
-                <i class="bi bi-pencil-square me-1"></i> Editar
-            </a>
+<div class="card-footer d-flex justify-content-end gap-2">
+    @if (isAdmin)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.RoomId" class="btn btn-warning btn-sm me-2">
+            <i class="bi bi-pencil-square me-1"></i> Editar
+        </a>
 
-            <a asp-action="Delete" asp-route-id="@Model.RoomId" class="btn btn-danger me-2">
-                <i class="bi bi-trash me-1"></i> Eliminar
-            </a>
-        }
+        <a asp-action="Delete" asp-route-id="@Model.RoomId" class="btn btn-danger btn-sm me-2">
+            <i class="bi bi-trash me-1"></i> Eliminar
+        </a>
+    }
+</div>
 
-        @if (fromCreation)
-        {
-            <a asp-action="Index" class="btn btn-success">
-                <i class="bi bi-arrow-right-circle me-1"></i> Ir à Lista
-            </a>
-        }
-        else
-        {
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
-            </a>
-        }
-    </div>
+<div class="mt-4">
+    @if (fromCreation)
+    {
+        <a asp-controller="Rooms"
+           asp-action="Index"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-house-door-fill me-1"></i> Ir à Lista de Salas
+        </a>
+    }
+    else
+    {
+        <a asp-controller="Rooms"
+           asp-action="Index"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-house-door-fill me-1"></i> Voltar à Lista de Salas
+        </a>
+    }
 </div>
