@@ -1,7 +1,74 @@
-﻿
+﻿@model IEnumerable<HealthWellbeingRoom.Models.ConsumablesExpenses>
+
 @{
-    ViewData["Title"] = "ConsumablesExpenses";
+    ViewData["Title"] = "Consumíveis gastos";
 }
 
-<h1>ConsumablesExpenses</h1>
+<h1 class="mb-4 text-success">
+    <i class="bi bi-droplet-half"></i> Lista de consumíveis gastos
+</h1>
 
+<!-- Bloco da tabela com altura mínima grande -->
+<div class="border rounded p-3 shadow-sm d-flex flex-column" style="min-height: 60vh;">
+
+    <div class="table-responsive flex-grow-1">
+        <table class="table table-striped table-hover align-middle mb-0 h-100">
+            <thead class="table-light">
+                <tr>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Consumível</th>
+                    <th>Quantidade</th>
+                    <th>Sala</th>
+                    <th>Reserva</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted" style="height: 100%;">
+                            <div class="d-flex justify-content-center align-items-center" style="height: 40vh;">
+                                <span>
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Ainda não existem consumíveis registados como gastos.
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.UsedAt.ToString("dd/MM/yyyy")</td>
+                            <td>@item.UsedAt.ToString("HH:mm")</td>
+                            <td>@item.Consumable?.Nome</td>
+                            <td>@item.QuantityUsed</td>
+                            <td>@item.Room?.Name</td>
+                            <td>@item.RoomReservationId.ToString("D3")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Botões fora do bloco da tabela -->
+<div class="mt-4 d-flex justify-content-between">
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de salas
+    </a>
+
+    <a asp-controller="RoomReservations"
+       asp-action="Index"
+       class="btn btn-success btn-sm">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar às reservas
+    </a>
+</div>

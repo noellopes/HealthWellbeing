@@ -33,123 +33,131 @@
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
-<div class="card shadow-sm">
-    <div class="card-body">
+<div class="card shadow-sm" style="min-height: 60vh;">
+    <div class="card-body d-flex flex-column">
 
-        @if (!Model.Any())
-        {
-            <div class="alert alert-info text-center">
-                Ainda não há reservas de salas.
-            </div>
-        }
-        else
-        {
-            <table class="table">
+        <div class="table-responsive flex-grow-1">
+            <table class="table h-100">
                 <thead>
                     <tr>
-                        <th>Id da reserva</th>
-                        <th>Id da consulta</th>
+                        <th>Id da Consulta</th>
                         <th>Responsável</th>
                         <th>Sala</th>
+                        <th>Data da Reserva</th>
                         <th>Início</th>
                         <th>Fim</th>
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
+
                 <tbody>
-                    @foreach (var item in Model)
+                    @if (!Model.Any())
                     {
                         <tr>
-                            <td>@item.RoomReservationId.ToString("D3")</td>
-                            <td>@item.ConsultationId.ToString("D3")</td>
-                            <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
-                            <td>@(item.Room?.Name ?? "—")</td>
-
-                            <!-- INÍCIO -->
-                            <td>
-                                @item.StartHour.ToString(@"hh\:mm")
-                            </td>
-
-                            <!-- FIM -->
-                            <td>
-                                @item.EndHour.ToString(@"hh\:mm")
-                            </td>
-
-                            <td class="text-center">
-
-                                @if (isLogTech)
-                                {
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.RoomReservationId"
-                                       class="btn btn-sm btn-warning me-1">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                }
-
-                                <a asp-action="Details"
-                                   asp-route-id="@item.RoomReservationId"
-                                   asp-route-fromCreation="false"
-                                   class="btn btn-sm btn-info me-1">
-                                    <i class="bi bi-info-circle-fill"></i> Detalhes
-                                </a>
-
-                                @if (isLogTech)
-                                {
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.RoomReservationId"
-                                       class="btn btn-sm btn-danger me-1">
-                                        <i class="bi bi-trash-fill"></i> Cancelar
-                                    </a>
-                                }
-
-                                @if (isLogTech)
-                                {
-                                    bool aceitaClick = item.ConsultationDate.Date >= DateTime.Today
-                                    && item.StartHour < DateTime.Now.TimeOfDay;
-
-                                    if (aceitaClick)
-                                    {
-                                        <form asp-action="MarcarComoRealizada"
-                                              asp-route-id="@item.RoomReservationId"
-                                              method="post"
-                                              style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-primary me-1">
-                                                <i class="bi bi-check-circle-fill"></i> Realizada?
-                                            </button>
-                                        </form>
-                                    }
-                                    else
-                                    {
-                                        <button type="button" class="btn btn-sm btn-secondary me-1" disabled>
-                                            <i class="bi bi-check-circle-fill"></i> Realizada?
-                                        </button>
-                                    }
-                                }
-
-                                <a asp-controller="RoomReservations"
-                                   asp-action="RoomMaterials"
-                                   asp-route-Id="@item.RoomId"
-                                   class="btn btn-sm @(item.Room?.LocalizacaoDispMedicoMovel != null && item.Room.LocalizacaoDispMedicoMovel.Any() ? "btn-success" : "btn-danger")">
-                                    <i class="bi bi-box-seam"></i> Material
-                                </a>
-
+                            <td colspan="7" class="text-center text-muted py-5">
+                                Ainda não há reservas de salas.
                             </td>
                         </tr>
                     }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <!-- ID CONSULTA -->
+                                <td>@item.ConsultationId.ToString("D3")</td>
+
+                                <!-- RESPONSÁVEL -->
+                                <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
+
+                                <!-- SALA -->
+                                <td>@(item.Room?.Name ?? "—")</td>
+
+                                <!-- DATA DA RESERVA -->
+                                <td>@item.ConsultationDate.ToString("dd/MM/yyyy")</td>
+
+                                <!-- HORAS -->
+                                <td>@item.StartHour.ToString(@"hh\:mm")</td>
+                                <td>@item.EndHour.ToString(@"hh\:mm")</td>
+
+                                <!-- AÇÕES -->
+                                <td class="text-center">
+
+                                    @if (isLogTech)
+                                    {
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.RoomReservationId"
+                                           class="btn btn-sm btn-warning me-1">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                    }
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@item.RoomReservationId"
+                                       asp-route-fromCreation="false"
+                                       class="btn btn-sm btn-info me-1">
+                                        <i class="bi bi-info-circle-fill"></i> Detalhes
+                                    </a>
+
+                                    @if (isLogTech)
+                                    {
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.RoomReservationId"
+                                           class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-trash-fill"></i> Cancelar
+                                        </a>
+                                    }
+
+                                    @if (isLogTech)
+                                    {
+                                        bool aceitaClick =
+                                        item.ConsultationDate.Date == DateTime.Today &&
+                                        DateTime.Now.TimeOfDay >= item.StartHour;
+
+                                        if (aceitaClick)
+                                        {
+                                            <form asp-action="MarcarComoRealizada"
+                                                  asp-route-id="@item.RoomReservationId"
+                                                  method="post"
+                                                  style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-primary me-1">
+                                                    <i class="bi bi-check-circle-fill"></i> Realizada
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-secondary me-1" disabled>
+                                                <i class="bi bi-check-circle-fill"></i> Realizada
+                                            </button>
+                                        }
+                                    }
+
+                                    <a asp-controller="RoomReservations"
+                                       asp-action="RoomMaterials"
+                                       asp-route-Id="@item.RoomId"
+                                       class="btn btn-sm @(item.Room?.LocalizacaoDispMedicoMovel != null && item.Room.LocalizacaoDispMedicoMovel.Any() ? "btn-success" : "btn-danger")">
+                                        <i class="bi bi-box-seam"></i> Material
+                                    </a>
+
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
-        }
+        </div>
 
     </div>
 </div>
 
-<div class="mt-4 text-end">
+<div class="mt-4 d-flex justify-content-between">
 
     <a asp-controller="Rooms"
        asp-action="Index"
-       class="btn btn-success btn-sm me-2">
-        <i class="bi bi-door-open-fill me-1"></i> Ver Lista de Salas
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
 
     <a asp-controller="RoomReservations"

@@ -51,8 +51,11 @@ namespace HealthWellbeingRoom.Controllers
         //------------------------------------------------------MARCAR RESERVA COMO REALIZADA-------------------------------------------------------------------------------------
         public async Task<IActionResult> MarcarComoRealizada(int id)
         {
+            // Carregar a reserva com sala e consumíveis
             var reserva = await _context.RoomReservations
                 .Include(r => r.Room)
+                .ThenInclude(r => r.RoomConsumables)
+                .ThenInclude(rc => rc.Consumivel)
                 .FirstOrDefaultAsync(r => r.RoomReservationId == id);
 
             if (reserva == null)
@@ -60,9 +63,8 @@ namespace HealthWellbeingRoom.Controllers
 
             // 1. Atualizar estado da reserva
             reserva.Status = "Realizada";
-            _context.Update(reserva);
 
-            // 2. Atualizar estado da sala para Disponível
+            // 2. Atualizar estado da sala para "Disponível"
             var disponivelStatus = await _context.RoomStatus
                 .FirstOrDefaultAsync(s => s.Name == "Disponível");
 
@@ -72,17 +74,35 @@ namespace HealthWellbeingRoom.Controllers
                 _context.Update(reserva.Room);
             }
 
-            // 3. Gravar alterações
+            // 3. Registar consumíveis usados
+            foreach (var item in reserva.Room.RoomConsumables)
+            {
+                var gasto = new ConsumablesExpenses
+                {
+                    ConsumableId = item.ConsumivelId,
+                    RoomId = reserva.RoomId,
+                    RoomReservationId = reserva.RoomReservationId,
+                    QuantityUsed = 1, // ajustar se necessário
+                    UsedAt = DateTime.Now
+                };
+
+                _context.ConsumablesExpenses.Add(gasto);
+
+                // Atualizar stock
+                item.Consumivel.QuantidadeAtual -= gasto.QuantityUsed;
+            }
+
             await _context.SaveChangesAsync();
 
-            // 4. Registar no histórico (com dados atualizados)
+            // 4. Mover para histórico
             await RegistrarHistorico(reserva, "Realizada");
 
-            // 5. Remover reserva da BD
+            // 5. Remover da tabela principal
             _context.RoomReservations.Remove(reserva);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Reserva marcada como realizada e sala liberada.";
+            TempData["SuccessMessage"] = "Reserva marcada como realizada, consumíveis registados e sala libertada.";
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -244,6 +264,7 @@ namespace HealthWellbeingRoom.Controllers
         public async Task<IActionResult> Index()
         {
             var reservations = _context.RoomReservations
+                .Where(r => r.Status == "Ativa")
                 .Include(r => r.Room)
                     .ThenInclude(room => room.RoomConsumables)
                         .ThenInclude(rc => rc.Consumivel)
@@ -338,12 +359,20 @@ namespace HealthWellbeingRoom.Controllers
             if (roomReservation.RoomId <= 0)
                 ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala é obrigatória.");
 
-            // 5. Validar conflito de reservas
+            // 5A. Impedir duplicação de reservas para a mesma consulta
+            bool consultaJaReservada = await _context.RoomReservations
+                .AnyAsync(r => r.ConsultationId == roomReservation.ConsultationId && r.Status == "Ativa");
+
+            if (consultaJaReservada)
+                ModelState.AddModelError("", "Esta consulta já tem uma reserva associada.");
+
+            // 5B. Validar conflito de reservas (apenas reservas ativas)
             if (roomReservation.RoomId > 0)
             {
                 var hasConflict = await _context.RoomReservations
                     .AsNoTracking()
                     .AnyAsync(r =>
+                        r.Status == "Ativa" &&
                         r.RoomId == roomReservation.RoomId &&
                         r.ConsultationDate == roomReservation.ConsultationDate &&
                         r.StartHour < roomReservation.EndHour &&
@@ -388,7 +417,7 @@ namespace HealthWellbeingRoom.Controllers
                 }
             }
 
-            // 9. Atualizar a consulta com a sala e com a data/hora inseridas pelo utilizador
+            // 9. Atualizar consulta
             if (consulta != null)
             {
                 consulta.RoomId = roomReservation.RoomId;
@@ -613,11 +642,18 @@ namespace HealthWellbeingRoom.Controllers
 
         }
         //------------------------------------------------------VIEWS CONSUMABLES EXPENSES-------------------------------------------------------------------------------------
-         
+
         public async Task<IActionResult> ConsumablesExpenses(int? id)
         {
+            // Carregar todos os consumíveis gastos, incluindo relações
+            var lista = await _context.ConsumablesExpenses
+                .Include(e => e.Consumable)
+                .Include(e => e.Room)
+                .Include(e => e.RoomReservation)
+                .OrderByDescending(e => e.UsedAt)
+                .ToListAsync();
 
-            return View();
+            return View(lista);
         }
         //------------------------------------------------------HISTORY-------------------------------------------------------------------------------------
         public async Task<IActionResult> History(int roomId)
