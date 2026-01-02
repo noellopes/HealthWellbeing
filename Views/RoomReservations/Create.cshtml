@@ -20,7 +20,7 @@
                 <!-- ===================== LINHA 1 ===================== -->
                 <div class="col-md-6">
                     <label asp-for="ConsultationId" class="form-label fw-bold">Id da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" placeholder="Ex: 001" />
+                    <input asp-for="ConsultationId" class="form-control" type="number" min="1" placeholder="Ex: 123" />
                     <span asp-validation-for="ConsultationId" class="text-danger small"></span>
                 </div>
 
@@ -92,10 +92,17 @@
     </a>
 
     <!-- Lista de Reservas (DIREITA) -->
-    <a asp-action="Index"
-       class="btn btn-success btn-sm">
-        <i class="bi bi-list-ul me-1"></i> Lista de Reservas
-    </a>
+    <div class="text-end">
+        <a asp-action="Consultation"
+           class="btn btn-success btn-sm me-2">
+            <i class="bi bi-list-ul me-1"></i> Lista consultas
+        </a>
+
+        <a asp-action="Index"
+           class="btn btn-success btn-sm">
+            <i class="bi bi-list-ul me-1"></i> Lista de Reservas
+        </a>
+    </div>
 
 </div>
 

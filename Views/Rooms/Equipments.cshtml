@@ -74,79 +74,102 @@
 </div>
 
 <!-- Tabela -->
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Nome</th>
-                <th>Nº Série</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (!Model.Items.Any())
-            {
-                <tr>
-                    <td colspan="5" class="text-center">
-                        <span class="alert alert-info d-block mb-0" role="alert">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            Nenhum equipamento associado a esta sala.
-                        </span>
-                    </td>
-                </tr>
-            }
-            else
-            {
-                @foreach (var equipamento in Model.Items)
-                {
+<div class="card shadow-sm" style="min-height: 60vh;">
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
                     <tr>
-                        <td>@equipamento.Name</td>
-                        <td>@equipamento.SerialNumber</td>
-                        <td>@equipamento.EquipmentType?.Name</td>
-                        <td>
-                            @if (equipamento.EquipmentStatus?.Name == "Operacional")
-                            {
-                                <span class="text-success fw-bold">● Operacional</span>
-                            }
-                            else if (equipamento.EquipmentStatus?.Name == "Em Manutenção")
-                            {
-                                <span class="text-warning fw-bold">● Em Manutenção</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">● Desconhecido</span>
-                            }
-                        </td>
-                        <td class="text-center align-middle">
-                            <a asp-controller="Equipments"
-                               asp-action="Details"
-                               asp-route-id="@equipamento.EquipmentId"
-                               asp-route-roomId="@ViewBag.RoomId"
-                               asp-route-origem="equipamentosAssociados"
-                               class="btn btn-info px-4">
-                                <i class="bi bi-info-circle me-1"></i> Detalhes
-                            </a>
-                        </td>
+                        <th>Nome</th>
+                        <th>Nº Série</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                }
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                <span class="alert alert-info d-block mb-0" role="alert">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Nenhum equipamento associado a esta sala.
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var equipamento in Model.Items)
+                        {
+                            <tr>
+                                <td>@equipamento.Name</td>
+                                <td>@equipamento.SerialNumber</td>
+                                <td>@equipamento.EquipmentType?.Name</td>
+                                <td>
+                                    @if (equipamento.EquipmentStatus?.Name == "Operacional")
+                                    {
+                                        <span class="text-success fw-bold">● Operacional</span>
+                                    }
+                                    else if (equipamento.EquipmentStatus?.Name == "Em Manutenção")
+                                    {
+                                        <span class="text-warning fw-bold">● Em Manutenção</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">● Desconhecido</span>
+                                    }
+                                </td>
+                                <td class="text-center align-middle">
+                                    <a asp-controller="Equipments"
+                                       asp-action="Details"
+                                       asp-route-id="@equipamento.EquipmentId"
+                                       asp-route-roomId="@ViewBag.RoomId"
+                                       asp-route-origem="equipamentosAssociados"
+                                       class="btn btn-info px-4">
+                                        <i class="bi bi-info-circle me-1"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 
-<!-- Botões de navegação -->
-<div class="mt-4 d-flex justify-content-end gap-2">
-    <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+<!-- Botões fora da card -->
+<div class="mt-4 d-flex justify-content-between">
+
+    <!-- Botão Lista de Salas (Home) -->
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
-    <a asp-controller="Equipments" asp-action="Index" class="btn btn-primary">
-        <i class="bi bi-list-ul me-1"></i> Buscar equipamentos
-    </a>
-    <a asp-action="Index" class="btn btn-primary">
-        <i class="bi bi-list-ul me-1"></i> Voltar à Lista
-    </a>
+
+    <div class="d-flex gap-2">
+
+        <!-- Botão Voltar à Sala -->
+        <a asp-action="Details"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+        </a>
+
+        <!-- Botão Buscar Equipamentos (ícone atualizado) -->
+        <a asp-controller="Equipments"
+           asp-action="Index"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-search me-1"></i> Buscar Equipamentos
+        </a>
+
+    </div>
+
 </div>
 
 <!-- Paginação -->

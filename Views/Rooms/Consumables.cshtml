@@ -74,69 +74,92 @@
 </div>
 
 <!-- TABELA -->
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Zona</th>
-                <th>Consumível</th>
-                <th>Categoria</th>
-                <th>Stock</th>
-                <th>Capacidade Máxima</th>
-                <th>Ativa</th>
-                <th class="text-center">Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (!Model.Items.Any())
-            {
-                <tr>
-                    <td colspan="7" class="text-center">
-                        <span class="alert alert-info d-block mb-0" role="alert">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            Nenhum consumível associado a esta sala.
-                        </span>
-                    </td>
-                </tr>
-            }
-            else
-            {
-                @foreach (var zona in Model.Items)
-                {
-                    <tr>
-                        <td>@zona.NomeZona</td>
-                        <td>@zona.Consumivel?.Nome</td>
-                        <td>@zona.Consumivel?.CategoriaConsumivel?.Nome</td>
-                        <td>@zona.QuantidadeAtual</td>
-                        <td>@zona.CapacidadeMaxima</td>
-                        <td>@(zona.Ativa ? "Sim" : "Não")</td>
-                        <td class="text-center align-middle">
-                            <a asp-controller="ZonaArmazenamento"
-                               asp-action="Details"
-                               asp-route-id="@zona.ZonaId"
-                               class="btn btn-info px-4">
-                                <i class="bi bi-info-circle me-1"></i> Detalhes
-                            </a>
+<div class="card shadow-sm" style="min-height: 60vh;">
+    <div class="card-body">
 
-                        </td>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Zona</th>
+                        <th>Consumível</th>
+                        <th>Categoria</th>
+                        <th>Stock</th>
+                        <th>Capacidade Máxima</th>
+                        <th>Ativa</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                }
-            }
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <span class="alert alert-info d-block mb-0" role="alert">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    Nenhum consumível associado a esta sala.
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var zona in Model.Items)
+                        {
+                            <tr>
+                                <td>@zona.NomeZona</td>
+                                <td>@zona.Consumivel?.Nome</td>
+                                <td>@zona.Consumivel?.CategoriaConsumivel?.Nome</td>
+                                <td>@zona.QuantidadeAtual</td>
+                                <td>@zona.CapacidadeMaxima</td>
+                                <td>@(zona.Ativa ? "Sim" : "Não")</td>
+                                <td class="text-center align-middle">
+                                    <a asp-controller="ZonaArmazenamento"
+                                       asp-action="Details"
+                                       asp-route-id="@zona.ZonaId"
+                                       class="btn btn-info px-4">
+                                        <i class="bi bi-info-circle me-1"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 
-<!-- Botões de navegação -->
-<div class="mt-4 d-flex justify-content-end gap-2">
-    <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+<!-- Botões fora da card -->
+<div class="mt-4 d-flex justify-content-between">
+
+    <!-- Botão Lista de Salas (Home) -->
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
-    <a asp-controller="ZonaArmazenamento" asp-action="Index" asp-route-id="@ViewBag.RoomId" class="btn btn-primary">
-        <i class="bi bi-list-ul me-1" "></i> Buscar consumíveis
-    </a>
-    <a asp-action="Index" class="btn btn-primary">
-        <i class="bi bi-list-ul me-1"></i> Voltar à Lista
-    </a>
+
+    <div class="d-flex gap-2">
+
+        <!-- Botão Voltar à Sala -->
+        <a asp-action="Details"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+        </a>
+
+        <!-- Botão Buscar Consumíveis (ícone atualizado) -->
+        <a asp-controller="ZonaArmazenamento"
+           asp-action="Index"
+           asp-route-id="@ViewBag.RoomId"
+           class="btn btn-primary btn-sm">
+            <i class="bi bi-search me-1"></i> Buscar Consumíveis
+        </a>
+
+    </div>
+
 </div>
 
 <!-- PAGINAÇÃO -->
@@ -157,7 +180,6 @@
     }
 
     <ul class="pagination mb-0">
-        <!-- Primeira página -->
         @if (Model.CurrentPage == 1)
         {
             <li class="page-item disabled">
@@ -176,7 +198,6 @@
             </li>
         }
 
-        <!-- Números de página -->
         @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
         {
             if (p == Model.CurrentPage)
@@ -198,7 +219,6 @@
             }
         }
 
-        <!-- Última página -->
         @if (Model.CurrentPage == Model.TotalPages)
         {
             <li class="page-item disabled">

@@ -7,6 +7,7 @@ namespace HealthWellbeingRoom.Models
     public class Consultation
     {
         [Key]
+        [Range(1, int.MaxValue, ErrorMessage = "O Id da consulta deve ser um número positivo.")]
         public int ConsultationId { get; set; }
 
         [ForeignKey(nameof(Room))]
