@@ -1,88 +1,158 @@
 ﻿@model HealthWellbeing.Models.PlanoExercicios
 
 @{
-    ViewData["Title"] = "Detalhes do Plano";
+    ViewData["Title"] = "O Meu Treino";
+    bool mostrarAviso = ViewBag.MostrarAvisoReinicio == true;
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-journal-text"></i> Detalhes do Plano</h1>
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar à Lista
+@if (mostrarAviso)
+{
+    <div class="alert alert-danger shadow-sm mb-4" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Tem a certeza?</h4>
+        <p>Ao reiniciar o plano, <strong>todo o seu progresso (checkboxes) e as cargas registadas serão apagados</strong>. Esta ação não pode ser desfeita.</p>
+        <hr>
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-action="Details" asp-route-id="@Model.PlanoExerciciosId" class="btn btn-secondary">Cancelar</a>
+
+            <form asp-action="ReiniciarPlano" asp-route-id="@Model.PlanoExerciciosId" method="post">
+                <button type="submit" class="btn btn-danger">Confirmar Reinício</button>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Plano de Treino</h1>
+    <div class="d-flex gap-2">
+
+        <button type="submit" form="mainForm" class="btn btn-primary shadow-sm">
+            <i class="bi bi-save"></i> Guardar Tudo
+        </button>
+
+        <a asp-action="Details"
+           asp-route-id="@Model.PlanoExerciciosId"
+           asp-route-mostrarAviso="true"
+           class="btn btn-warning text-dark shadow-sm">
+            <i class="bi bi-arrow-counterclockwise"></i> Reiniciar
         </a>
-    </div>
 
-    <div class="card mb-4 shadow-sm border-start border-primary border-4">
-        <div class="card-body">
-            <h4 class="mb-0">
-                <i class="bi bi-person-circle"></i> Utente:
-                <span class="fw-bold">@(Model.UtenteGrupo7?.Nome ?? "N/A")</span>
-            </h4>
-        </div>
-    </div>
-
-    <h3 class="mt-4 mb-3 text-primary">Exercícios do Plano</h3>
-
-    @if (Model.Exercicios != null && Model.Exercicios.Any())
-    {
-        <div class="row">
-            @foreach (var ex in Model.Exercicios)
-            {
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm hover-effect">
-                        <div class="card-header bg-light fw-bold text-center border-bottom-0">
-                            @ex.ExercicioNome
-                        </div>
-
-                        <div class="card-body d-flex flex-column">
-                            <ul class="list-group list-group-flush small mb-3">
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="bi bi-stopwatch"></i> Duração:</span>
-                                    <span class="fw-bold">@ex.Duracao min</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="bi bi-repeat"></i> Séries/Reps:</span>
-                                    <span class="fw-bold">@ex.Series x @ex.Repeticoes</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span><i class="bi bi-lightning-charge"></i> Intensidade:</span>
-                                    <span class="badge bg-warning text-dark">@ex.Intencidade/10</span>
-                                </li>
-                            </ul>
-
-                            <hr class="text-muted my-2">
-
-                            <h6 class="fw-bold text-muted small mb-1">Descrição:</h6>
-                            <p class="card-text text-muted small flex-grow-1" style="white-space: pre-wrap;">@ex.Descricao</p>
-                        </div>
-
-                        <div class="card-footer bg-white text-center border-top-0 pb-3">
-                            <a asp-controller="Exercicios"
-                               asp-action="Details"
-                               asp-route-id="@ex.ExercicioId"
-                               class="btn btn-primary w-100">
-                                <i class="bi bi-eye"></i> Ver Instruções Completas
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-warning d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <div>Este plano ainda não contém exercícios registados.</div>
-        </div>
-    }
-
-    <div class="mt-3">
-        @if (User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude"))
-        {
-            <a asp-action="Edit" asp-route-id="@Model?.PlanoExerciciosId" class="btn btn-warning">
-                <i class="bi bi-pencil"></i> Editar Plano
-            </a>
-        }
+        <a asp-action="Index" class="btn btn-secondary shadow-sm">Voltar</a>
     </div>
 </div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Utente: @Model.UtenteGrupo7?.Nome</h5>
+        <div class="progress mt-2" style="height: 25px;">
+            @{
+                var total = Model.PlanoExercicioExercicios?.Count ?? 0;
+                var concluidos = Model.PlanoExercicioExercicios?.Count(x => x.Concluido) ?? 0;
+                var percentagem = total > 0 ? (concluidos * 100) / total : 0;
+            }
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: @percentagem%;" aria-valuenow="@percentagem" aria-valuemin="0" aria-valuemax="100">
+                @percentagem% Concluído
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.PlanoExercicioExercicios != null && Model.PlanoExercicioExercicios.Any())
+{
+    <form id="mainForm" asp-action="SalvarProgressoGlobal" method="post">
+
+        <div class="table-responsive card shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Exercício</th>
+                        <th>Séries x Reps</th>
+                        <th>Equipamento</th>
+                        <th style="width: 150px;">Carga (Kg)</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Detalhes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.PlanoExercicioExercicios.Count; i++)
+                    {
+                        var item = Model.PlanoExercicioExercicios.ElementAt(i);
+
+                        bool usaPesos = item.Exercicio.ExercicioEquipamentos != null &&
+                        item.Exercicio.ExercicioEquipamentos.Any(eq =>
+                        (eq.Equipamento.NomeEquipamento ?? "").Contains("Peso") ||
+                        (eq.Equipamento.NomeEquipamento ?? "").Contains("Halter") ||
+                        (eq.Equipamento.NomeEquipamento ?? "").Contains("Barra") ||
+                        (eq.Equipamento.NomeEquipamento ?? "").Contains("Máquina"));
+
+                        string rowClass = item.Concluido ? "table-success" : "";
+
+                        <tr class="@rowClass">
+                            <input type="hidden" name="[@i].PlanoExerciciosId" value="@item.PlanoExerciciosId" />
+                            <input type="hidden" name="[@i].ExercicioId" value="@item.ExercicioId" />
+
+                            <td>
+                                <strong>@item.Exercicio.ExercicioNome</strong><br />
+                                <small class="text-muted">@item.Exercicio.Descricao</small>
+                            </td>
+                            <td>@item.Exercicio.Series x @item.Exercicio.Repeticoes</td>
+                            <td>
+                                @if (item.Exercicio.ExercicioEquipamentos != null)
+                                {
+                                    foreach (var eq in item.Exercicio.ExercicioEquipamentos)
+                                    {
+                                        <span class="badge bg-secondary me-1">@eq.Equipamento.NomeEquipamento</span>
+                                    }
+                                }
+                            </td>
+
+                            <td>
+                                @if (usaPesos)
+                                {
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" step="0.5" min="0"
+                                               name="[@i].PesoUsado"
+                                               value="@(item.PesoUsado?.ToString("F1").Replace(",", "."))"
+                                               class="form-control" placeholder="0.0" />
+                                        <span class="input-group-text">kg</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">N/A</span>
+                                    <input type="hidden" name="[@i].PesoUsado" value="" />
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <div class="form-check d-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox"
+                                           name="[@i].Concluido"
+                                           value="true"
+                                           style="transform: scale(1.5); cursor: pointer;"
+                                           @(item.Concluido ? "checked" : "") />
+                                    <input type="hidden" name="[@i].Concluido" value="false" />
+                                </div>
+                                <small class="d-block mt-1">@(item.Concluido ? "Feito" : "Pendente")</small>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="@Url.Action("Details", "Exercicio", new { id = item.ExercicioId })"
+                                   target="_blank"
+                                   class="btn btn-sm btn-info text-white"
+                                   title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i> Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-info shadow-sm">
+        <i class="bi bi-info-circle"></i> Este plano ainda não tem exercícios associados.
+    </div>
+}
