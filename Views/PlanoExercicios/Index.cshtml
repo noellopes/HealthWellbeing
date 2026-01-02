@@ -1,72 +1,63 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.PlanoExercicios>
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<IdentityUser> UserManager
 
 @{
-    ViewData["Title"] = "Os Meus Planos";
-    var user = await UserManager.GetUserAsync(User);
-    // Verifica se é staff (podes ajustar as strings das Roles conforme a tua BD)
-    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
+    ViewData["Title"] = "Planos de Exercício";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>@(isStaff ? "Gestão de Planos de Exercício" : "Os Meus Planos de Treino")</h1>
+<h1>Planos de Exercício</h1>
 
-    <div>
-        @if (isStaff)
-        {
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Plano Manual
-            </a>
-        }
-        <a asp-action="CreateAutomatico" class="btn btn-success ms-2">
-            <i class="bi bi-magic"></i> Plano Automático
+<p>
+    @if (User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Criar Manual
         </a>
-    </div>
-</div>
+    }
+    <a asp-action="CreateAutomatico" class="btn btn-success ms-2">
+        <i class="bi bi-magic"></i> Gerar Automático
+    </a>
+</p>
 
-<div class="card shadow-sm">
-    <div class="card-body p-0">
-        <table class="table table-hover table-striped mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.UtenteGrupo7)</th>
-                    <th>Nº de Exercícios</th>
-                    <th>ID do Plano</th>
-                    <th class="text-end">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td class="align-middle fw-bold">
-                            @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
-                        </td>
-                        <td class="align-middle">
-                            <span class="badge bg-info text-dark">
-                                @(item.Exercicios != null ? item.Exercicios.Count : 0) Exercícios
-                            </span>
-                        </td>
-                        <td class="align-middle">#@item.PlanoExerciciosId</td>
-                        <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-info" title="Detalhes">
-                                <i class="bi bi-eye"></i> Ver
-                            </a>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Utente</th>
+            <th>Qtd. Exercícios</th>
+            <th>Progresso</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var qtd = item.PlanoExercicioExercicios?.Count ?? 0;
+            var concluidos = item.PlanoExercicioExercicios?.Count(x => x.Concluido) ?? 0;
+            var pct = qtd > 0 ? (concluidos * 100) / qtd : 0;
 
-                            @if (isStaff)
-                            {
-                                <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-warning" title="Editar">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-outline-danger" title="Apagar">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </a>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+            <tr>
+                <td>@item.PlanoExerciciosId</td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
+                </td>
+                <td>@qtd Exercícios</td>
+                <td style="width: 20%;">
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" style="width: @pct%;" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100">
+                            @pct%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-info text-white">Treinar / Ver</a>
+
+                    @if (User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-danger">Apagar</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

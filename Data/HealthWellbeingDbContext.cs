@@ -92,11 +92,6 @@ namespace HealthWellbeing.Data
                 .WithMany(g => g.ExercicioGeneros)
                 .HasForeignKey(eg => eg.GeneroId);
 
-            modelBuilder.Entity<PlanoExercicios>()
-                .HasMany(p => p.Exercicios)
-                .WithMany(e => e.PlanoExercicios)
-                .UsingEntity(j => j.ToTable("PlanoExerciciosExercicio"));
-
             modelBuilder.Entity<ExercicioGrupoMuscular>()
                 .HasKey(egm => new { egm.ExercicioId, egm.GrupoMuscularId });
 
@@ -187,6 +182,19 @@ namespace HealthWellbeing.Data
                 .HasOne(eo => eo.ObjetivoFisico)
                 .WithMany(o => o.ExercicioObjetivos)
                 .HasForeignKey(eo => eo.ObjetivoFisicoId);
+
+            modelBuilder.Entity<PlanoExercicioExercicio>()
+                .HasKey(pe => new { pe.PlanoExerciciosId, pe.ExercicioId });
+
+            modelBuilder.Entity<PlanoExercicioExercicio>()
+                .HasOne(pe => pe.PlanoExercicios)
+                .WithMany(p => p.PlanoExercicioExercicios)
+                .HasForeignKey(pe => pe.PlanoExerciciosId);
+
+            modelBuilder.Entity<PlanoExercicioExercicio>()
+                .HasOne(pe => pe.Exercicio)
+                .WithMany(e => e.PlanoExercicioExercicios)
+                .HasForeignKey(pe => pe.ExercicioId);
 
         }
         public DbSet<HealthWellbeing.Models.LimitacaoMedica> LimitacaoMedica { get; set; } = default!;

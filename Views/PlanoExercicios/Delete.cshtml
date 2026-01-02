@@ -4,17 +4,17 @@
     ViewData["Title"] = "Apagar Plano";
 }
 
-<div class="alert alert-danger">
-    <h3><i class="bi bi-exclamation-triangle"></i> Tem a certeza?</h3>
-    <p>Esta ação irá remover permanentemente o plano de exercícios. O histórico do utente poderá ser afetado.</p>
+<div class="alert alert-danger shadow-sm">
+    <h3 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Tem a certeza?</h3>
+    <p>Esta ação irá remover permanentemente o plano de exercícios. O histórico associado a este plano será perdido.</p>
 </div>
 
-<div class="card">
-    <div class="card-header">
-        Detalhes do Registo a Apagar
+<div class="card shadow">
+    <div class="card-header bg-danger text-white">
+        <strong>Detalhes do Registo a Apagar</strong>
     </div>
     <div class="card-body">
-        <dl class="row">
+        <dl class="row mb-0">
             <dt class="col-sm-3">Utente</dt>
             <dd class="col-sm-9">@Html.DisplayFor(model => model.UtenteGrupo7.Nome)</dd>
 
@@ -22,13 +22,16 @@
             <dd class="col-sm-9">@Html.DisplayFor(model => model.PlanoExerciciosId)</dd>
 
             <dt class="col-sm-3">Total Exercícios</dt>
-            <dd class="col-sm-9">@(Model.Exercicios?.Count ?? 0)</dd>
+            <dd class="col-sm-9">@(Model.PlanoExercicioExercicios?.Count ?? 0)</dd>
         </dl>
-
+    </div>
+    <div class="card-footer bg-white">
         <form asp-action="Delete">
             <input type="hidden" asp-for="PlanoExerciciosId" />
-            <button type="submit" class="btn btn-danger">Confirmar Eliminação</button> |
-            <a asp-action="Index" class="btn btn-secondary">Voltar</a>
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Confirmar Eliminação
+            </button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
         </form>
     </div>
 </div>

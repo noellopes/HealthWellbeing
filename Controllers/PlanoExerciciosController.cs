@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize] // Obriga a estar logado para aceder a qualquer parte
+    [Authorize]
     public class PlanoExerciciosController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -24,15 +24,17 @@ namespace HealthWellbeing.Controllers
             _userManager = userManager;
         }
 
-       
+        // GET: PlanoExercicios
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             bool isStaff = await IsStaff(user);
 
             var query = _context.PlanoExercicios
-                .Include(o => o.Exercicios)
                 .Include(p => p.UtenteGrupo7)
+                // Inclui a tabela de junção e depois o exercício
+                .Include(p => p.PlanoExercicioExercicios)
+                    .ThenInclude(pe => pe.Exercicio)
                 .AsQueryable();
 
             // Se for Utente normal (não é Admin nem Profissional), só vê os seus planos
@@ -44,8 +46,8 @@ namespace HealthWellbeing.Controllers
             return View(await query.ToListAsync());
         }
 
-        
-        public async Task<IActionResult> Details(int? id)
+        // GET: PlanoExercicios/Details/5
+        public async Task<IActionResult> Details(int? id, bool mostrarAviso = false)
         {
             if (id == null) return NotFound();
 
@@ -53,22 +55,93 @@ namespace HealthWellbeing.Controllers
             bool isStaff = await IsStaff(user);
 
             var plano = await _context.PlanoExercicios
-                .Include(o => o.Exercicios)
                 .Include(p => p.UtenteGrupo7)
+                .Include(p => p.PlanoExercicioExercicios)
+                    .ThenInclude(pe => pe.Exercicio)
+                        .ThenInclude(e => e.ExercicioEquipamentos)
+                            .ThenInclude(eq => eq.Equipamento)
                 .FirstOrDefaultAsync(m => m.PlanoExerciciosId == id);
 
             if (plano == null) return NotFound();
 
-           
             if (!isStaff && plano.UtenteGrupo7.UserId != user.Id)
             {
                 return NotFound();
             }
 
+            if (plano.PlanoExercicioExercicios != null)
+            {
+                plano.PlanoExercicioExercicios = plano.PlanoExercicioExercicios
+                    .OrderBy(x => x.Concluido)
+                    .ToList();
+            }
+
+            ViewBag.MostrarAvisoReinicio = mostrarAviso;
+
             return View(plano);
         }
 
-        
+        // POST: Atualizar estado do exercício (Checkbox e Peso)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AtualizarProgresso(int planoId, int exercicioId, bool concluido, double? pesoUsado)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var itemTreino = await _context.Set<PlanoExercicioExercicio>()
+                .Include(pe => pe.PlanoExercicios)
+                .ThenInclude(p => p.UtenteGrupo7)
+                .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == planoId && pe.ExercicioId == exercicioId);
+
+            if (itemTreino == null) return NotFound();
+
+            bool isStaff = await IsStaff(user);
+            if (!isStaff && itemTreino.PlanoExercicios.UtenteGrupo7.UserId != user.Id)
+            {
+                return Unauthorized();
+            }
+
+            itemTreino.Concluido = concluido;
+            itemTreino.PesoUsado = pesoUsado;
+
+            _context.Update(itemTreino);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = planoId });
+        }
+
+        // POST: Reiniciar todo o plano
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReiniciarPlano(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var plano = await _context.PlanoExercicios
+                .Include(p => p.UtenteGrupo7)
+                .FirstOrDefaultAsync(p => p.PlanoExerciciosId == id);
+
+            if (plano == null) return NotFound();
+
+            bool isStaff = await IsStaff(user);
+            if (!isStaff && plano.UtenteGrupo7.UserId != user.Id) return Unauthorized();
+
+            var itens = await _context.Set<PlanoExercicioExercicio>()
+                .Where(pe => pe.PlanoExerciciosId == id)
+                .ToListAsync();
+
+            foreach (var item in itens)
+            {
+                item.Concluido = false;
+            }
+
+            _context.UpdateRange(itens);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = id });
+        }
+
+        // GET: PlanoExercicios/Create
         [Authorize(Roles = "Administrador,ProfissionalSaude")]
         public IActionResult Create()
         {
@@ -76,6 +149,7 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // POST: PlanoExercicios/Create (Manual)
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,ProfissionalSaude")]
@@ -88,12 +162,26 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                planoExercicios.Exercicios = _context.Exercicio
-                    .Where(e => exerciciosSelecionados.Contains(e.ExercicioId))
-                    .ToList();
-
                 _context.Add(planoExercicios);
                 await _context.SaveChangesAsync();
+
+                if (exerciciosSelecionados != null)
+                {
+                    var juncoes = new List<PlanoExercicioExercicio>();
+                    foreach (var exId in exerciciosSelecionados)
+                    {
+                        juncoes.Add(new PlanoExercicioExercicio
+                        {
+                            PlanoExerciciosId = planoExercicios.PlanoExerciciosId,
+                            ExercicioId = exId,
+                            Concluido = false,
+                            PesoUsado = null
+                        });
+                    }
+                    _context.AddRange(juncoes);
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -101,8 +189,7 @@ namespace HealthWellbeing.Controllers
             return View(planoExercicios);
         }
 
-        
-        // GET
+        // GET: CreateAutomatico
         public async Task<IActionResult> CreateAutomatico()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -110,7 +197,6 @@ namespace HealthWellbeing.Controllers
 
             if (isStaff)
             {
-                
                 ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "Nome");
             }
             else
@@ -119,7 +205,6 @@ namespace HealthWellbeing.Controllers
 
                 if (utente == null)
                 {
-                    
                     TempData["MensagemErro"] = "Por favor, finalize o seu registo de Utente (objetivos e saúde) antes de gerar um plano.";
                     return RedirectToAction("Create", "UtenteGrupo7");
                 }
@@ -132,32 +217,28 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST
+        // POST: CreateAutomatico
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAutomatico(PlanoExercicios planoInput, int quantidadeExercicios)
         {
-            
             if (quantidadeExercicios <= 0) quantidadeExercicios = 5;
 
             var user = await _userManager.GetUserAsync(User);
             bool isStaff = await IsStaff(user);
             int targetUtenteId;
 
-            
             if (isStaff)
             {
                 targetUtenteId = planoInput.UtenteGrupo7Id;
             }
             else
             {
-               
                 var utenteDb = await _context.UtenteGrupo7.FirstOrDefaultAsync(u => u.UserId == user.Id);
                 if (utenteDb == null) return Unauthorized();
                 targetUtenteId = utenteDb.UtenteGrupo7Id;
             }
 
-            
             var utenteCompleto = await _context.UtenteGrupo7
                 .Include(u => u.UtenteProblemasSaude)
                 .Include(u => u.ObjetivoFisico)
@@ -166,23 +247,20 @@ namespace HealthWellbeing.Controllers
             if (utenteCompleto == null) return NotFound("Utente não encontrado.");
 
             var idsProblemasSaude = utenteCompleto.UtenteProblemasSaude
-                                        .Select(up => up.ProblemaSaudeId)
-                                        .ToList();
+                                                    .Select(up => up.ProblemaSaudeId)
+                                                    .ToList();
 
-            
             var exerciciosQuery = _context.Exercicio
                 .Include(e => e.Contraindicacoes)
                 .Include(e => e.ExercicioObjetivos)
                 .AsQueryable();
 
-            // FILTRO A: Segurança (Excluir exercícios com contraindicações iguais aos problemas do utente)
             if (idsProblemasSaude.Any())
             {
                 exerciciosQuery = exerciciosQuery.Where(e =>
                     !e.Contraindicacoes.Any(c => idsProblemasSaude.Contains(c.ProblemaSaudeId)));
             }
 
-            // FILTRO B: Objetivo (Priorizar exercícios do objetivo do utente)
             if (utenteCompleto.ObjetivoFisicoId.HasValue)
             {
                 exerciciosQuery = exerciciosQuery.Where(e =>
@@ -191,7 +269,6 @@ namespace HealthWellbeing.Controllers
 
             var candidatos = await exerciciosQuery.ToListAsync();
 
-            
             if (!candidatos.Any())
             {
                 candidatos = await _context.Exercicio
@@ -200,7 +277,6 @@ namespace HealthWellbeing.Controllers
                    .ToListAsync();
             }
 
-            // Selecionar N aleatórios (onde N é a quantidade escolhida)
             var selecionados = candidatos
                 .OrderBy(x => Guid.NewGuid())
                 .Take(quantidadeExercicios)
@@ -210,7 +286,6 @@ namespace HealthWellbeing.Controllers
             {
                 ModelState.AddModelError("", "Não existem exercícios compatíveis com as suas restrições médicas.");
 
-                
                 ViewBag.IsStaff = isStaff;
                 if (isStaff) ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "Nome");
                 else
@@ -221,35 +296,50 @@ namespace HealthWellbeing.Controllers
                 return View(planoInput);
             }
 
-            
             var novoPlano = new PlanoExercicios
             {
-                UtenteGrupo7Id = targetUtenteId,
-                Exercicios = selecionados
+                UtenteGrupo7Id = targetUtenteId
             };
 
             _context.Add(novoPlano);
             await _context.SaveChangesAsync();
 
+            var juncoes = selecionados.Select(ex => new PlanoExercicioExercicio
+            {
+                PlanoExerciciosId = novoPlano.PlanoExerciciosId,
+                ExercicioId = ex.ExercicioId,
+                Concluido = false,
+                PesoUsado = null
+            }).ToList();
+
+            _context.AddRange(juncoes);
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
-        
+        // GET: PlanoExercicios/Edit/5
         [Authorize(Roles = "Administrador,ProfissionalSaude")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
             var plano = await _context.PlanoExercicios
-                .Include(p => p.Exercicios)
+                .Include(p => p.PlanoExercicioExercicios)
                 .FirstOrDefaultAsync(p => p.PlanoExerciciosId == id);
 
             if (plano == null) return NotFound();
 
             CarregarViewBagsManual(plano.UtenteGrupo7Id);
+
+            ViewBag.ExerciciosSelecionados = plano.PlanoExercicioExercicios
+                .Select(pe => pe.ExercicioId)
+                .ToArray();
+
             return View(plano);
         }
 
+        // POST: PlanoExercicios/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador,ProfissionalSaude")]
@@ -262,24 +352,24 @@ namespace HealthWellbeing.Controllers
                 try
                 {
                     var planoDb = await _context.PlanoExercicios
-                        .Include(p => p.Exercicios)
+                        .Include(p => p.PlanoExercicioExercicios)
                         .FirstOrDefaultAsync(p => p.PlanoExerciciosId == id);
 
                     if (planoDb == null) return NotFound();
 
                     planoDb.UtenteGrupo7Id = plano.UtenteGrupo7Id;
 
-                    planoDb.Exercicios.Clear();
+                    _context.RemoveRange(planoDb.PlanoExercicioExercicios);
+
                     if (exerciciosSelecionados != null)
                     {
-                        var novosExercicios = _context.Exercicio
-                            .Where(e => exerciciosSelecionados.Contains(e.ExercicioId))
-                            .ToList();
-
-                        foreach (var ex in novosExercicios)
+                        var novasJuncoes = exerciciosSelecionados.Select(exId => new PlanoExercicioExercicio
                         {
-                            planoDb.Exercicios.Add(ex);
-                        }
+                            PlanoExerciciosId = id,
+                            ExercicioId = exId,
+                            Concluido = false
+                        });
+                        await _context.AddRangeAsync(novasJuncoes);
                     }
 
                     _context.Update(planoDb);
@@ -296,7 +386,7 @@ namespace HealthWellbeing.Controllers
             return View(plano);
         }
 
-        
+        // GET: PlanoExercicios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -310,7 +400,6 @@ namespace HealthWellbeing.Controllers
 
             if (plano == null) return NotFound();
 
-            
             if (!isStaff && plano.UtenteGrupo7.UserId != user.Id)
             {
                 return NotFound();
@@ -319,6 +408,7 @@ namespace HealthWellbeing.Controllers
             return View(plano);
         }
 
+        // POST: PlanoExercicios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -326,12 +416,12 @@ namespace HealthWellbeing.Controllers
             var plano = await _context.PlanoExercicios.FindAsync(id);
             if (plano != null)
             {
+
                 _context.PlanoExercicios.Remove(plano);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
-
 
         private bool PlanoExerciciosExists(int id)
         {
@@ -341,7 +431,6 @@ namespace HealthWellbeing.Controllers
         private async Task<bool> IsStaff(IdentityUser user)
         {
             if (user == null) return false;
-            
             return await _userManager.IsInRoleAsync(user, "Administrador") ||
                    await _userManager.IsInRoleAsync(user, "ProfissionalSaude");
         }
@@ -352,9 +441,40 @@ namespace HealthWellbeing.Controllers
                 _context.UtenteGrupo7.Select(u => new { u.UtenteGrupo7Id, Nome = $"{u.UtenteGrupo7Id} - {u.Nome}" }),
                 "UtenteGrupo7Id", "Nome", utenteSelecionado);
 
-            ViewBag.Exercicio = _context.Exercicio
+            ViewBag.TodosExercicios = _context.Exercicio
                 .Select(e => new SelectListItem { Value = e.ExercicioId.ToString(), Text = e.ExercicioNome })
                 .ToList();
+        }
+
+        // POST: SalvarProgressoGlobal
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarProgressoGlobal(List<PlanoExercicioExercicio> exercicios)
+        {
+            if (exercicios == null || !exercicios.Any())
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            int planoId = exercicios.First().PlanoExerciciosId;
+
+            foreach (var itemInput in exercicios)
+            {
+                var itemDb = await _context.Set<PlanoExercicioExercicio>()
+                    .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == itemInput.PlanoExerciciosId &&
+                                               pe.ExercicioId == itemInput.ExercicioId);
+
+                if (itemDb != null)
+                {
+                    itemDb.Concluido = itemInput.Concluido;
+                    itemDb.PesoUsado = itemInput.PesoUsado;
+                    _context.Update(itemDb);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = planoId });
         }
     }
 }

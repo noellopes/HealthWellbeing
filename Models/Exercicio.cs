@@ -42,9 +42,9 @@ namespace HealthWellbeing.Models
         public ICollection<ExercicioEquipamento>? ExercicioEquipamentos { get; set; }
         public ICollection<ExercicioProblemaSaude>? Contraindicacoes { get; set; }
         public ICollection<HistoricoAtividade>? HistoricoAtividades { get; set; }
-        public ICollection<PlanoExercicios>? PlanoExercicios { get; set; }
         public ICollection<ExercicioTipoExercicio>? ExercicioTipoExercicios { get; set; }
         public ICollection<ExercicioObjetivoFisico>? ExercicioObjetivos { get; set; }
+        public ICollection<PlanoExercicioExercicio>? PlanoExercicioExercicios { get; set; }
 
     }
 }
