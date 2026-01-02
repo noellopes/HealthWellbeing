@@ -116,8 +116,7 @@ namespace HealthWellbeingRoom.Controllers
             _context.RoomReservations.Remove(reserva);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Reserva marcada como realizada, consumíveis registados e sala libertada.";
-
+            TempData["SuccessMessage"] = $"Reserva {reserva.RoomReservationId.ToString("D3")} Reserva marcada como realizada, consumíveis registados e sala libertada.";
             return RedirectToAction(nameof(Index));
         }
         //------------------------------------------------------CANCELAR RESERVA-------------------------------------------------------------------------------------
@@ -169,8 +168,7 @@ namespace HealthWellbeingRoom.Controllers
     _context.RoomReservations.Remove(reserva);
     await _context.SaveChangesAsync();
 
-    TempData["SuccessMessage"] = "Reserva cancelada, sala libertada e consulta revertida para estado pendente.";
-
+    TempData["SuccessMessage"] = $"Reserva {reserva.RoomReservationId.ToString("D3")} cancelada com sucesso! sala libertada e consulta revertida para estado pendente.";
     return RedirectToAction(nameof(Index));
 }
 
@@ -528,7 +526,7 @@ namespace HealthWellbeingRoom.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            TempData["SuccessMessage"] = "Reserva criada com sucesso.";
+            TempData["SuccessMessage"] = $"Reserva {roomReservation.RoomReservationId.ToString("D3")} criada com sucesso.";
             return RedirectToAction(nameof(Index));
         }
         //------------------------------------------------------EDIT-------------------------------------------------------------------------------------
