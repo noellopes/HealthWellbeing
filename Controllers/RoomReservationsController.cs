@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using HealthWellbeingRoom.Models;
 using HealthWellbeingRoom.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -280,12 +281,16 @@ public async Task<IActionResult> CancelarReserva(int id)
             );
         }
         //------------------------------------------------------INDEX-------------------------------------------------------------------------------------
-
-        // GET: RoomReservations
         [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string? searchResponsible,
+            DateTime? searchDate,
+            int? searchRoom,
+            int page = 1,
+            int itemsPerPage = 10)
         {
-            var reservations = _context.RoomReservations
+            var query = _context.RoomReservations
+                .AsNoTracking()
                 .Where(r => r.Status == "Ativa")
                 .Include(r => r.Room)
                     .ThenInclude(room => room.RoomConsumables)
@@ -293,9 +298,59 @@ public async Task<IActionResult> CancelarReserva(int id)
                 .Include(r => r.Room)
                     .ThenInclude(room => room.LocalizacaoDispMedicoMovel)
                         .ThenInclude(ldm => ldm.MedicalDevice)
-                .Include(r => r.Specialty);
+                .Include(r => r.Specialty)
+                .AsQueryable();
 
-            return View(await reservations.ToListAsync());
+            // Filtros
+            if (!string.IsNullOrWhiteSpace(searchResponsible))
+            {
+                var term = searchResponsible.Trim();
+                query = query.Where(r => r.ResponsibleName != null &&
+                                         r.ResponsibleName.Contains(term));
+            }
+
+            if (searchDate.HasValue)
+            {
+                var date = searchDate.Value.Date;
+                query = query.Where(r => r.ConsultationDate.Date == date);
+            }
+
+            if (searchRoom.HasValue && searchRoom.Value > 0)
+            {
+                query = query.Where(r => r.RoomId == searchRoom.Value);
+            }
+
+            query = query
+                .OrderBy(r => r.ConsultationDate)
+                .ThenBy(r => r.StartHour);
+
+            // Paginação
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ToListAsync();
+
+            // Usa o construtor existente
+            var pagination = new RPaginationInfo<RoomReservation>(page, totalItems, itemsPerPage)
+            {
+                Items = items
+            };
+
+            // Dropdown salas + ViewBags
+            var rooms = await _context.Room
+                .AsNoTracking()
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            ViewBag.Rooms = new SelectList(rooms, "RoomId", "Name", searchRoom);
+
+            ViewBag.SearchResponsible = searchResponsible;
+            ViewBag.SearchDate = searchDate?.ToString("yyyy-MM-dd");
+            ViewBag.SearchRoom = searchRoom;
+
+            return View(pagination);
         }
 
         //------------------------------------------------------DETAILS-------------------------------------------------------------------------------------
