@@ -4,52 +4,49 @@
     ViewData["Title"] = "Problemas de Saúde";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<h1>Problemas de Saúde</h1>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4">Lista</h2>
-    <div>
+<p class="d-flex justify-content-between align-items-center">
+    <span></span>
+    <span>
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm"
            aria-expanded="false" aria-controls="searchForm">
-            <i class="bi bi-search me-1"></i> Pesquisa
+            <i class="bi bi-search"></i> Pesquisa
         </a>
         <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+            <i class="bi bi-plus-circle"></i> Criar Novo
         </a>
-    </div>
-</div>
+    </span>
+</p>
 
 <div class="collapse mb-3" id="searchForm">
     <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+        <form asp-action="Index" method="get" class="row g-3">
 
-            <div class="col-md-4">
-                <label for="categoria" class="form-label">Categoria</label>
-                <input id="categoria" name="categoria" value="@ViewBag.Categoria"
-                       class="form-control" placeholder="Procurar por categoria" />
+            <div class="col-md-3">
+                <label class="form-label">Categoria</label>
+                <input name="categoria" value="@ViewBag.Categoria" class="form-control" />
             </div>
 
-            <div class="col-md-4">
-                <label for="nome" class="form-label">Nome</label>
-                <input id="nome" name="nome" value="@ViewBag.Nome"
-                       class="form-control" placeholder="Procurar por nome" />
+            <div class="col-md-3">
+                <label class="form-label">Nome</label>
+                <input name="nome" value="@ViewBag.Nome" class="form-control" />
             </div>
 
-            <div class="col-md-4">
-                <label for="zona" class="form-label">Zona Atingida</label>
-                <input id="zona" name="zona" value="@ViewBag.Zona"
-                       class="form-control" placeholder="Procurar por zona" />
+            <div class="col-md-3">
+                <label class="form-label">Zona Atingida</label>
+                <input name="zona" value="@ViewBag.Zona" class="form-control" />
             </div>
 
             <div class="col-md-2">
-                <label for="gravidade" class="form-label">Gravidade</label>
-                <input id="gravidade" name="gravidade" type="number" min="1" max="10"
+                <label class="form-label">Gravidade</label>
+                <input type="number" min="1" max="10" name="gravidade"
                        value="@ViewBag.Gravidade" class="form-control" />
             </div>
 
-            <div class="col-12 mt-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Procurar
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search"></i> Procurar
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">Limpar</a>
             </div>
@@ -65,108 +62,79 @@
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead>
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Nome</th>
+                <th>Zona Atingida</th>
+                <th>Gravidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
                 <tr>
-                    <th>Categoria</th>
-                    <th>Nome</th>
-                    <th>Zona Atingida</th>
-                    <th>Gravidade</th>
-                    <th>Ações</th>
+                    <td>@item.ProblemaCategoria</td>
+                    <td>@item.ProblemaNome</td>
+                    <td>@item.ZonaAtingida</td>
+                    <td>@item.Gravidade / 10</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ProblemaSaudeId"
+                           class="btn btn-sm btn-info text-white">Detalhes</a>
+
+                        <a asp-action="Edit" asp-route-id="@item.ProblemaSaudeId"
+                           class="btn btn-sm btn-warning">Editar</a>
+
+                        <a asp-action="Delete" asp-route-id="@item.ProblemaSaudeId"
+                           class="btn btn-sm btn-danger">Apagar</a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.ProblemaCategoria</td>
-                        <td>@item.ProblemaNome</td>
-                        <td>@item.ZonaAtingida</td>
-                        <td>
-                            @item.Gravidade / 10
-                        </td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.ProblemaSaudeId" class="btn btn-sm btn-warning">Editar</a>
-                            <a asp-action="Details" asp-route-id="@item.ProblemaSaudeId" class="btn btn-sm btn-info">Detalhes</a>
-                            <a asp-action="Delete" asp-route-id="@item.ProblemaSaudeId" class="btn btn-sm btn-danger">Apagar</a>
-                        <td>@item.Gravidade / 10</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.ProblemaSaudeId"
-                               class="btn btn-sm btn-warning">Editar</a>
-                            <a asp-action="Details" asp-route-id="@item.ProblemaSaudeId"
-                               class="btn btn-sm btn-info">Detalhes</a>
-                            <a asp-action="Delete" asp-route-id="@item.ProblemaSaudeId"
-                               class="btn btn-sm btn-danger">Apagar</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
 
-        <nav>
-            <ul class="pagination">
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled">
-                        <a class="page-link">Primeira</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-route-page="1"
-                           asp-route-categoria="@ViewBag.Categoria"
-                           asp-route-nome="@ViewBag.Nome"
-                           asp-route-zona="@ViewBag.Zona"
-                           asp-route-gravidade="@ViewBag.Gravidade">
-                            Primeira
-                        </a>
-                    </li>
-                }
+    <nav>
+        <ul class="pagination">
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-categoria="@ViewBag.Categoria"
+                   asp-route-nome="@ViewBag.Nome"
+                   asp-route-zona="@ViewBag.Zona"
+                   asp-route-gravidade="@ViewBag.Gravidade">
+                    Primeira
+                </a>
+            </li>
 
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
-                    {
-                        <li class="page-item active">
-                            <a class="page-link" href="#">@p</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="page-item">
-                            <a class="page-link" asp-action="Index" asp-route-page="@p"
-                               asp-route-categoria="@ViewBag.Categoria"
-                               asp-route-nome="@ViewBag.Nome"
-                               asp-route-zona="@ViewBag.Zona"
-                               asp-route-gravidade="@ViewBag.Gravidade">
-                                @p
-                            </a>
-                        </li>
-                    }
-                }
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@p"
+                       asp-route-categoria="@ViewBag.Categoria"
+                       asp-route-nome="@ViewBag.Nome"
+                       asp-route-zona="@ViewBag.Zona"
+                       asp-route-gravidade="@ViewBag.Gravidade">
+                        @p
+                    </a>
+                </li>
+            }
 
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled">
-                        <a class="page-link">Última</a>
-                    </li>
-                }
-                else
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index"
-                           asp-route-page="@Model.TotalPages"
-                           asp-route-categoria="@ViewBag.Categoria"
-                           asp-route-nome="@ViewBag.Nome"
-                           asp-route-zona="@ViewBag.Zona"
-                           asp-route-gravidade="@ViewBag.Gravidade">
-                            Última
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    </div>
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@Model.TotalPages"
+                   asp-route-categoria="@ViewBag.Categoria"
+                   asp-route-nome="@ViewBag.Nome"
+                   asp-route-zona="@ViewBag.Zona"
+                   asp-route-gravidade="@ViewBag.Gravidade">
+                    Última
+                </a>
+            </li>
+        </ul>
+    </nav>
 }
