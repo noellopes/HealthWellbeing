@@ -29,6 +29,7 @@ namespace HealthWellBeingRoom.Data
             PolutateEquipment(dbContext);
             // 4 - Dispositivos e Localização médica
             PopulateMedicalDevices(dbContext);
+            PopulateMedDevSpecialtyRequirement(dbContext);
             PopulateLocationMedDevices(dbContext);
 
             // 5 - Infraestrutura de Consultation
@@ -689,6 +690,138 @@ namespace HealthWellBeingRoom.Data
             });
 
             dbContext.SaveChanges();
+        }
+
+        private static void PopulateMedDevSpecialtyRequirement(HealthWellbeingDbContext dbContext)
+        {
+            // Verifica se já existem requisitos para não duplicar
+            if (dbContext.MedDevSpecialtyRequirement.Any()) return;
+
+            var requirements = new List<MedDevSpecialtyRequirement>
+        {
+            // --- 1. Atendimento Ambulatorial (Consultas Gerais) ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 1,
+                RequiredDeviceName = "Tensiómetro Omron M7 Intelli IT",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 1,
+                RequiredDeviceName = "Termómetro Braun ThermoScan 7",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 1,
+                RequiredDeviceName = "Otoscópio Welch Allyn MacroView",
+                Quantity = 1
+            },
+
+            // --- 2. Cuidados Intensivos (UCI) ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 2,
+                RequiredDeviceName = "Monitor Philips IntelliVue X3",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 2,
+                RequiredDeviceName = "Bomba Seringa Alaris GH",
+                Quantity = 2 
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 2,
+                RequiredDeviceName = "Philips Respironics V60",
+                Quantity = 1
+            },
+
+            // --- 3. Procedimentos Cirúrgicos ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 3,
+                RequiredDeviceName = "Aspirador Medela Vario 18",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 3,
+                RequiredDeviceName = "Monitor Philips IntelliVue X3",
+                Quantity = 1
+            },
+
+            // --- 4. Exames Clínicos (Triagem) ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 4,
+                RequiredDeviceName = "Glicosímetro Accu-Chek Guide",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 4,
+                RequiredDeviceName = "Oxímetro Nonin Onyx Vantage",
+                Quantity = 1
+            },
+
+            // --- 6. Gestão de Medicamentos ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 6,
+                RequiredDeviceName = "Bomba B.Braun Space",
+                Quantity = 1
+            },
+
+            // --- 8. Pós-Operatório ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 8,
+                RequiredDeviceName = "Bomba B.Braun Space",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 8,
+                RequiredDeviceName = "Transmissor Telemetria Dräger Apex",
+                Quantity = 1
+            },
+
+            // --- 9. Atendimento Crítico (Emergência) ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 9,
+                RequiredDeviceName = "Desfibrilhador Zoll AED Plus",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 9,
+                RequiredDeviceName = "Ventilador Dräger Oxylog 3000",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 9,
+                RequiredDeviceName = "Capnógrafo Masimo EMMA",
+                Quantity = 1
+            },
+
+            // --- 10. Higienização de Instrumentos ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 10,
+                RequiredDeviceName = "Thor UVC Disinfection Robot",
+                Quantity = 1
+            },
+
+            // --- 11. Exames de Imagem ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 11,
+                RequiredDeviceName = "Ecógrafo Sonosite Edge II",
+                Quantity = 1
+            },
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 11,
+                RequiredDeviceName = "Retinógrafo Welch Allyn RetinaVue",
+                Quantity = 1
+            },
+
+            // --- 12. Exames Cardiológicos ---
+            new MedDevSpecialtyRequirement {
+                SpecialtyId = 12,
+                RequiredDeviceName = "Eletrocardiógrafo GE MAC 600",
+                Quantity = 1
+            }
+        };
+
+                dbContext.MedDevSpecialtyRequirement.AddRange(requirements);
+                dbContext.SaveChanges();
         }
 
         private static void PopulateLocationMedDevices(HealthWellbeingDbContext dbContext)

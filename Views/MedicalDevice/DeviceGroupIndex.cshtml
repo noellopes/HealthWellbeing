@@ -23,6 +23,11 @@
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
 
+        @* --- BOTÃO DE PLANEAMENTO --- *@
+        <a asp-action="PreparationList" class="btn btn-info me-2 text-white">
+            <i class="bi bi-calendar-week me-1"></i> Planeamento Diário
+        </a>
+
         @if (User.IsInRole("Administrator"))
         {
             <a asp-action="Create" class="btn btn-success">

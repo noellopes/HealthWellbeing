@@ -97,7 +97,7 @@ namespace HealthWellbeingRoom.Controllers
 
         // GET: LocationMedDevice/Create/16
         // O parâmetro 'id' é o ID do dispositivo que está a ser movido.
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Create(int? id)
         {
             if (id == null)
@@ -139,7 +139,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: LocationMedDevice/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "logisticsTechnician")]
         public async Task<IActionResult> Create([Bind("MedicalDeviceID,RoomId")] LocationMedDevice locationMedDevice)
         {
             if (ModelState.IsValid)
