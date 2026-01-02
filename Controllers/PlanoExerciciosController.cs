@@ -461,17 +461,42 @@ namespace HealthWellbeing.Controllers
             foreach (var itemInput in exercicios)
             {
                 var itemDb = await _context.Set<PlanoExercicioExercicio>()
+                    .Include(pe => pe.PlanoExercicios)
+                    .ThenInclude(p => p.UtenteGrupo7)
                     .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == itemInput.PlanoExerciciosId &&
-                                               pe.ExercicioId == itemInput.ExercicioId);
+                    pe.ExercicioId == itemInput.ExercicioId);
+
 
                 if (itemDb != null)
                 {
+                    bool estavaConcluido = itemDb.Concluido;
+
                     itemDb.Concluido = itemInput.Concluido;
                     itemDb.PesoUsado = itemInput.PesoUsado;
                     _context.Update(itemDb);
-                }
-            }
 
+                    if (!estavaConcluido && itemInput.Concluido)
+                    {
+                        bool jaExiste = await _context.HistoricoAtividades.AnyAsync(h =>
+                            h.ExercicioId == itemDb.ExercicioId &&
+                            h.PlanoExerciciosId == itemDb.PlanoExerciciosId);
+
+                        if (!jaExiste)
+                        {
+                            var historico = new HistoricoAtividade
+                            {
+                                ExercicioId = itemDb.ExercicioId,
+                                UtenteGrupo7Id = itemDb.PlanoExercicios.UtenteGrupo7Id,
+                                PlanoExerciciosId = itemDb.PlanoExerciciosId,
+                                DataRealizacao = DateTime.Now
+                            };
+
+                            _context.HistoricoAtividades.Add(historico);
+                        }
+                    }
+                }
+
+            }
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id = planoId });

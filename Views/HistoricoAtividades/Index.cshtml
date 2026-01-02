@@ -1,53 +1,46 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.HistoricoAtividade>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Histórico de Atividades";
+    bool isAdminOrProf =
+        User.IsInRole("Administrador") ||
+        User.IsInRole("Profissional");
 }
 
-<h1>Index</h1>
+<h1>Histórico de Atividades</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.UtenteGrupo7Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Exercicio)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlanoExercicios)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataHora)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.UtenteGrupo7Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Exercicio.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlanoExercicios.PlanoExerciciosId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataHora)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Ainda não existem atividades registadas.
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <table class="table table-striped table-hover align-middle">
+        <thead>
+            <tr>
+                @if (isAdminOrProf)
+                {
+                    <th>Utente</th>
+                }
+                <th>Exercício</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    @if (isAdminOrProf)
+                    {
+                        <td>@item.UtenteGrupo7.Nome</td>
+                    }
+                    <td>@item.Exercicio.ExercicioNome</td>
+                    <td>@item.DataRealizacao.ToString("dd/MM/yyyy HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
