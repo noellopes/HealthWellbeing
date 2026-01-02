@@ -531,5 +531,70 @@ namespace HealthWellBeingRoom.Controllers
 
             return View(paginationInfo);
         }
+
+
+        [Authorize(Roles = "logisticsTechnician, Administrator")]
+        public async Task<IActionResult> PreparationList(DateTime? dataAlvo)
+        {
+            //Se o utilizador não escolheu a data, usa data de Amanhã.
+            //Se escolheu, usa a data escolhida.
+            DateTime dataFiltro = dataAlvo ?? DateTime.Today.AddDays(1);
+
+            //Passamos a data para a View (para o calendário saber qual dia está selecionado)
+            ViewBag.DataSelecionada = dataFiltro.ToString("yyyy-MM-dd");
+
+            // 2. Buscar Consultas apenas desse dia
+            var consultas = await _context.Consultations
+                .Include(c => c.Room)       // Precisamos do nome da sala
+                .Include(c => c.Specialty)  
+                .Where(c => c.ConsultationDate.HasValue && c.ConsultationDate.Value.Date == dataFiltro.Date)
+                .OrderBy(c => c.StartTime)
+                .ToListAsync();
+
+            var listaFinal = new List<RoomPreparationMedicalDevice>();
+
+            foreach (var consulta in consultas)
+            {
+                // Se a consulta não tiver sala ou especialidade, saltamos (segurança)
+                if (consulta.RoomId == null || consulta.SpecialtyId == 0) continue;
+
+                var prep = new RoomPreparationMedicalDevice
+                {
+                    DataConsulta = consulta.ConsultationDate.Value,
+                    NomeSala = consulta.Room.Name,
+                    Especialidade = consulta.Specialty.Name,
+                    Medico = consulta.DoctorName
+                };
+
+                //O que esta especialidade precisa?
+                var requisitos = await _context.MedDevSpecialtyRequirement
+                    .Where(r => r.SpecialtyId == consulta.SpecialtyId) // <--- A LIGAÇÃO FEITA AQUI
+                    .ToListAsync();
+
+                //O que já está na sala? (Inventário)
+                var stockSala = await _context.LocationMedDevice
+                    .Include(l => l.MedicalDevice)
+                    .Where(l => l.RoomId == consulta.RoomId && l.EndDate == null)
+                    .ToListAsync();
+
+                //Cruzar os dados
+                foreach (var req in requisitos)
+                {
+                    // Conta quantos dispositivos com aquele NOME estão na sala
+                    int qtdNaSala = stockSala.Count(d => d.MedicalDevice.Name == req.RequiredDeviceName);
+
+                    prep.Dispositivo.Add(new MedicalDeviceStatus
+                    {
+                        NomeDispositivo = req.RequiredDeviceName,
+                        QtdNecessaria = req.Quantity,
+                        QtdNaSala = qtdNaSala
+                    });
+                }
+
+                listaFinal.Add(prep);
+            }
+
+            return View(listaFinal);
+        }
     }
 }

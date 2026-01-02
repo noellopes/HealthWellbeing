@@ -105,6 +105,7 @@ namespace HealthWellbeing.Data
         public DbSet<Manufacturer> Manufacturer { get; set; } = default!;
         public DbSet<Equipment> Equipment { get; set; } = default!;
         public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
+        public DbSet<MedDevSpecialtyRequirement> MedDevSpecialtyRequirement { get; set; } = default!;
         public DbSet<Room> Room { get; set; } = default!;
         public DbSet<RoomHistory> RoomHistories { get; set; }
         public DbSet<RoomReservationHistory> RoomReservationHistory { get; set; }
