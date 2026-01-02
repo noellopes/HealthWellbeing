@@ -72,17 +72,34 @@
 
             </div>
 
+            <!-- Botão Guardar (dentro da card) -->
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button id="save-btn" type="submit" class="btn btn-primary btn-sm" style="min-width:150px">
                     <i class="bi bi-check-circle me-1"></i> Guardar Alterações
                 </button>
-                <a asp-action="Details" asp-route-id="@Model.RoomReservationId" class="btn btn-secondary btn-sm" style="min-width:150px">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar
-                </a>
             </div>
 
         </form>
     </div>
+</div>
+
+<!-- Botões fora da card -->
+<div class="mt-4 d-flex justify-content-between">
+
+    <!-- Botão Lista de Salas (Home) -->
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
+    </a>
+
+    <!-- Botão Voltar à Reserva -->
+    <a asp-action="Index"
+       asp-route-id="@Model.RoomReservationId"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Reserva
+    </a>
+
 </div>
 
 @section Scripts {

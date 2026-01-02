@@ -52,7 +52,6 @@ namespace HealthWellbeingRoom.Controllers
         //------------------------------------------------------MARCAR RESERVA COMO REALIZADA-------------------------------------------------------------------------------------
         public async Task<IActionResult> MarcarComoRealizada(int id)
         {
-            // Carregar a reserva com sala e consumíveis
             var reserva = await _context.RoomReservations
                 .Include(r => r.Room)
                 .ThenInclude(r => r.RoomConsumables)
@@ -65,7 +64,7 @@ namespace HealthWellbeingRoom.Controllers
             // 1. Atualizar estado da reserva
             reserva.Status = "Realizada";
 
-            // 2. Atualizar estado da sala para "Disponível"
+            // 2. Atualizar estado da sala
             var disponivelStatus = await _context.RoomStatus
                 .FirstOrDefaultAsync(s => s.Name == "Disponível");
 
@@ -74,7 +73,8 @@ namespace HealthWellbeingRoom.Controllers
                 reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
                 _context.Update(reserva.Room);
             }
-            // 2.1 Atualizar estado da consulta para "Realizada"
+
+            // 2.1 Atualizar estado da consulta
             var consulta = await _context.Consultations
                 .FirstOrDefaultAsync(c => c.ConsultationId == reserva.ConsultationId);
 
@@ -92,7 +92,7 @@ namespace HealthWellbeingRoom.Controllers
                     ConsumableId = item.ConsumivelId,
                     RoomId = reserva.RoomId,
                     RoomReservationId = reserva.RoomReservationId,
-                    QuantityUsed = 1, // ajustar se necessário
+                    QuantityUsed = 1,
                     UsedAt = DateTime.Now
                 };
 
@@ -100,6 +100,11 @@ namespace HealthWellbeingRoom.Controllers
 
                 // Atualizar stock
                 item.Consumivel.QuantidadeAtual -= gasto.QuantityUsed;
+
+                if (item.Consumivel.QuantidadeAtual < 0)
+                    item.Consumivel.QuantidadeAtual = 0;
+
+                _context.Update(item.Consumivel);
             }
 
             await _context.SaveChangesAsync();
@@ -115,10 +120,9 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
         //------------------------------------------------------CANCELAR RESERVA-------------------------------------------------------------------------------------
 
-public async Task<IActionResult> CancelarReserva(int id)
+        public async Task<IActionResult> CancelarReserva(int id)
 {
     // Carregar a reserva com sala
     var reserva = await _context.RoomReservations
