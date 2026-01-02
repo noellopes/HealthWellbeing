@@ -73,6 +73,15 @@ namespace HealthWellbeingRoom.Controllers
                 reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
                 _context.Update(reserva.Room);
             }
+            // 2.1 Atualizar estado da consulta para "Realizada"
+            var consulta = await _context.Consultations
+                .FirstOrDefaultAsync(c => c.ConsultationId == reserva.ConsultationId);
+
+            if (consulta != null)
+            {
+                consulta.Status = "Realizada";
+                _context.Update(consulta);
+            }
 
             // 3. Registar consumíveis usados
             foreach (var item in reserva.Room.RoomConsumables)
@@ -108,44 +117,57 @@ namespace HealthWellbeingRoom.Controllers
 
         //------------------------------------------------------CANCELAR RESERVA-------------------------------------------------------------------------------------
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CancelarReserva(int RoomReservationId)
-        {
-            var reserva = await _context.RoomReservations
-                .Include(r => r.Room)
-                .FirstOrDefaultAsync(r => r.RoomReservationId == RoomReservationId);
+public async Task<IActionResult> CancelarReserva(int id)
+{
+    // Carregar a reserva com sala
+    var reserva = await _context.RoomReservations
+        .Include(r => r.Room)
+        .FirstOrDefaultAsync(r => r.RoomReservationId == id);
 
-            if (reserva == null)
-                return NotFound();
+    if (reserva == null)
+        return NotFound();
 
-            // 1. Atualizar estado da reserva
-            reserva.Status = "Cancelada";
-            _context.Update(reserva);
+    // 1. Atualizar estado da reserva
+    reserva.Status = "Cancelada";
 
-            // 2. Libertar a sala (Disponível)
-            var disponivelStatus = await _context.RoomStatus
-                .FirstOrDefaultAsync(s => s.Name == "Disponível");
+    // 2. Atualizar estado da sala para "Disponível"
+    var disponivelStatus = await _context.RoomStatus
+        .FirstOrDefaultAsync(s => s.Name == "Disponível");
 
-            if (disponivelStatus != null && reserva.Room != null)
-            {
-                reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
-                _context.Update(reserva.Room);
-            }
+    if (disponivelStatus != null && reserva.Room != null)
+    {
+        reserva.Room.RoomStatusId = disponivelStatus.RoomStatusId;
+        _context.Update(reserva.Room);
+    }
 
-            // 3. Gravar alterações antes de enviar para o histórico
-            await _context.SaveChangesAsync();
+    // 3. Atualizar a consulta associada → voltar a estado "Pendente" e limpar dados
+    var consulta = await _context.Consultations
+        .FirstOrDefaultAsync(c => c.ConsultationId == reserva.ConsultationId);
 
-            // 4. Enviar para o histórico (com os novos campos)
-            await RegistrarHistorico(reserva, "Cancelada");
+    if (consulta != null)
+    {
+        consulta.Status = "Pendente";
+        consulta.RoomId = null;
+        consulta.ConsultationDate = null;
+        consulta.StartTime = null;
+        consulta.EndTime = null;
 
-            // 5. Remover da lista ativa
-            _context.RoomReservations.Remove(reserva);
-            await _context.SaveChangesAsync();
+        _context.Update(consulta);
+    }
 
-            TempData["SuccessMessage"] = "Reserva cancelada e registada no histórico.";
-            return RedirectToAction(nameof(Index));
-        }
+    await _context.SaveChangesAsync();
+
+    // 4. Mover para histórico
+    await RegistrarHistorico(reserva, "Cancelada");
+
+    // 5. Remover da tabela principal
+    _context.RoomReservations.Remove(reserva);
+    await _context.SaveChangesAsync();
+
+    TempData["SuccessMessage"] = "Reserva cancelada, sala libertada e consulta revertida para estado pendente.";
+
+    return RedirectToAction(nameof(Index));
+}
 
         //------------------------------------------------------PREENCHER DROPDOWNS (FILTRADO)-------------------------------------------------------------------------------------
         private async Task PreencherDropdowns(

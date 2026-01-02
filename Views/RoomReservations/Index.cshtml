@@ -101,11 +101,15 @@
 
                                     @if (isLogTech)
                                     {
-                                        <a asp-action="Delete"
-                                           asp-route-id="@item.RoomReservationId"
-                                           class="btn btn-sm btn-danger me-1">
-                                            <i class="bi bi-trash-fill"></i> Cancelar
-                                        </a>
+                                        <form asp-action="CancelarReserva"
+                                              asp-route-id="@item.RoomReservationId"
+                                              method="post"
+                                              style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-danger me-1">
+                                                <i class="bi bi-x-circle-fill"></i> Cancelar
+                                            </button>
+                                        </form>
                                     }
 
                                     @if (isLogTech)

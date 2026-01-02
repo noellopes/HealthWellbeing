@@ -40,8 +40,8 @@
 
                 <td class="@(item.Room == null ? "missing-value" : "")">
                     @(item.Room != null
-                                    ? (item.Room.Name.Length > 16
-                                    ? item.Room.Name.Substring(0, 16) + "..."
+                                    ? (item.Room.Name.Length > 19
+                                    ? item.Room.Name.Substring(0, 19) + "..."
                                     : item.Room.Name)
                                     : "-- sem sala --")
                 </td>
@@ -67,13 +67,7 @@
                 </td>
 
                 <td>
-                    @if (item.Status == "Confirmada")
-                    {
-                        <span class="badge bg-success">
-                            <i class="bi bi-check-circle-fill me-1"></i> Confirmada
-                        </span>
-                    }
-                    else if (item.Status == "Pendente")
+                    @if (item.Status == "Pendente")
                     {
                         <span class="badge bg-warning text-dark">
                             <i class="bi bi-hourglass-split me-1"></i> Pendente
@@ -81,8 +75,14 @@
                     }
                     else if (item.Status == "Agendada")
                     {
+                        <span class="badge bg-primary">
+                            <i class="bi bi-calendar-check-fill me-1"></i> Agendada
+                        </span>
+                    }
+                    else if (item.Status == "Realizada")
+                    {
                         <span class="badge bg-success">
-                            <i class="bi bi-hand-thumbs-up-fill me-1"></i> Agendada
+                            <i class="bi bi-check-circle-fill me-1"></i> Realizada
                         </span>
                     }
                     else
