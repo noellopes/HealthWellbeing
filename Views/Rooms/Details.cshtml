@@ -157,3 +157,15 @@
         </a>
     }
 </div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alert = document.querySelector('.alert-success');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }
+        }, 4000);
+    </script>
+}

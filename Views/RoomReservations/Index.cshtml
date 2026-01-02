@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeingRoom.Models.RoomReservation>
+﻿@model RPaginationInfo<HealthWellbeingRoom.Models.RoomReservation>
 
 @{
     ViewData["Title"] = "Reservas de Salas";
@@ -11,14 +11,6 @@
     <i class="bi bi-calendar-check me-2"></i> Lista das reservas de Salas
 </h1>
 
-@if (isLogTech)
-{
-    <div class="mb-3 text-end">
-        <a asp-action="Create" class="btn btn-success btn-sm" style="min-width:150px">
-            <i class="bi bi-plus-circle me-1"></i> Nova Reserva
-        </a>
-    </div>
-}
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -32,6 +24,83 @@
 {
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Reservas de Salas</h2>
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-primary btn-sm"
+           style="min-width:150px"
+           data-bs-toggle="collapse"
+           data-bs-target="#postSearch"
+           aria-expanded="false"
+           aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisa
+        </a>
+
+        @if (isLogTech)
+        {
+            <a asp-action="Create"
+               class="btn btn-success btn-sm"
+               style="min-width:150px">
+                <i class="bi bi-plus-circle me-1"></i> Nova Reserva
+            </a>
+        }
+    </div>
+</div>
+
+
+
+
+<!-- FORMULÁRIO DE PESQUISA -->
+<div class="collapse mt-2 mb-3" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+
+            <div class="col-md-4">
+                <label for="searchResponsible" class="form-label">Responsável</label>
+                <input id="searchResponsible"
+                       name="searchResponsible"
+                       value="@ViewBag.SearchResponsible"
+                       class="form-control"
+                       placeholder="Nome do responsável"
+                       type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchDate" class="form-label">Data da Reserva</label>
+                <input id="searchDate"
+                       name="searchDate"
+                       value="@ViewBag.SearchDate"
+                       class="form-control"
+                       type="date" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchRoom" class="form-label">Sala</label>
+                @Html.DropDownList(
+                "searchRoom",
+                                ViewBag.Rooms as SelectList,
+                                "Todas as salas",
+                                new { @class = "form-select", @id = "searchRoom" }
+                                )
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <!-- Força page=1 ao pesquisar -->
+                <input type="hidden" name="page" value="1" />
+
+                <button type="submit" class="btn btn-outline-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisa
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary flex-fill">
+                    <i class="bi bi-x-circle me-1"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div class="card shadow-sm" style="min-height: 60vh;">
     <div class="card-body d-flex flex-column">
@@ -51,7 +120,7 @@
                 </thead>
 
                 <tbody>
-                    @if (!Model.Any())
+                    @if (!Model.Items.Any())
                     {
                         <tr>
                             <td colspan="7" class="text-center text-muted py-5">
@@ -61,7 +130,7 @@
                     }
                     else
                     {
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.Items)
                         {
                             <tr>
                                 <!-- ID CONSULTA -->
@@ -155,6 +224,92 @@
 
     </div>
 </div>
+
+<!-- PAGINAÇÃO -->
+<nav aria-label="Room reservations page" class="d-flex justify-content-between align-items-center mt-4">
+    @if (Model.TotalItems > 0)
+    {
+        <span class="text-muted">
+            Mostrando
+            <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
+            -
+            <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong>
+        </span>
+    }
+    else
+    {
+        <span class="text-muted">0 itens</span>
+    }
+
+    <ul class="pagination mb-0">
+        <!-- Primeira página -->
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                   asp-route-searchDate="@ViewBag.SearchDate"
+                   asp-route-searchRoom="@ViewBag.SearchRoom">
+                    <i class="bi bi-chevron-double-left"></i> Primeira
+                </a>
+            </li>
+        }
+
+        <!-- Números de página -->
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="#">@p</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@p"
+                       asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                       asp-route-searchDate="@ViewBag.SearchDate"
+                       asp-route-searchRoom="@ViewBag.SearchRoom">
+                        @p
+                    </a>
+                </li>
+            }
+        }
+
+        <!-- Última página -->
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Última <i class="bi bi-chevron-double-right"></i></a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@Model.TotalPages"
+                   asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                   asp-route-searchDate="@ViewBag.SearchDate"
+                   asp-route-searchRoom="@ViewBag.SearchRoom">
+                    Última <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
 
 <div class="mt-4 d-flex justify-content-between">
 
