@@ -464,6 +464,23 @@ namespace HealthWellbeingRoom.Controllers
                     ModelState.AddModelError(string.Empty, "Já existe uma reserva para esta sala no período selecionado.");
             }
 
+            // 5C. Validar estado da sala (somente "Disponível" ou "Criada")
+            if (roomReservation.RoomId > 0)
+            {
+                var salaEstado = await _context.Room
+                    .Include(r => r.RoomStatus)
+                    .FirstOrDefaultAsync(r => r.RoomId == roomReservation.RoomId);
+
+                if (salaEstado == null)
+                {
+                    ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala selecionada não existe.");
+                }
+                else if (salaEstado.RoomStatus.Name != "Disponível" && salaEstado.RoomStatus.Name != "Criada")
+                {
+                    ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala selecionada não está disponível para reserva.");
+                }
+            }
+
             // 6. Se houver erros, recarregar dropdowns
             if (!ModelState.IsValid)
             {
@@ -679,16 +696,23 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         //------------------------------------------------------JSON RESULT-------------------------------------------------------------------------------------
-        // Filtrar salas disponíveis para uma data e intervalo de horas
+        // Filtrar salas disponíveis para uma data e intervalo de horas e disponibilidade da sala
         [HttpGet]
-        public JsonResult GetAvailableRooms(DateTime date, TimeSpan start, TimeSpan end)
+        [HttpGet]
+        public JsonResult GetAvailableRooms(DateTime date, TimeSpan start, TimeSpan end, int? excludeReservationId = null)
         {
-            // 1. Obter reservas apenas da mesma data
+            var dateOnly = date.Date;
+
+            // 1) Obter reservas apenas da mesma data
             var reservations = _context.RoomReservations
-                .Where(res => res.ConsultationDate == date.Date)
+                .AsNoTracking()
+                .Where(res =>
+                    res.ConsultationDate == dateOnly &&
+                    (excludeReservationId == null || res.RoomReservationId != excludeReservationId.Value)
+                )
                 .ToList();
 
-            // 2. Identificar salas ocupadas no intervalo
+            // 2) Identificar salas ocupadas no intervalo
             var occupiedRoomIds = reservations
                 .Where(res =>
                     res.StartHour < end &&   // começa antes do fim pedido
@@ -698,18 +722,28 @@ namespace HealthWellbeingRoom.Controllers
                 .Distinct()
                 .ToList();
 
-            // 3. Salas disponíveis
+            // 3) Salas disponíveis, excluindo estados proibidos
             var availableRooms = _context.Room
-                .Where(room => !occupiedRoomIds.Contains(room.RoomId))
+                .AsNoTracking()
+                .Include(r => r.RoomStatus)
+                .Where(room =>
+                    !occupiedRoomIds.Contains(room.RoomId) &&
+                    room.RoomStatus != null &&
+                    room.RoomStatus.Name != "Em Limpeza" &&
+                    room.RoomStatus.Name != "Em Manutenção" &&
+                    room.RoomStatus.Name != "Fora de Serviço"
+                )
+                .OrderBy(r => r.Name)
                 .Select(r => new
                 {
-                    Value = r.RoomId.ToString(),
-                    Text = r.Name
+                    value = r.RoomId.ToString(),
+                    text = r.Name
                 })
                 .ToList();
 
             return Json(availableRooms);
         }
+
         //------------------------------------------------------VIEWS CONSULTATION-------------------------------------------------------------------------------------
 
         public async Task<IActionResult> Consultation(int? id)
