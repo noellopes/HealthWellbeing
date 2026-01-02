@@ -20,20 +20,21 @@
     </ul>
 }
 
-<h1 class="mb-4 text-dark">
-    <i class="bi bi-door-open-fill me-2"></i>
+<h1 class="mb-4 text-primary">
+    <i class="bi bi-house-door-fill me-2"></i>
     Criar Sala
 </h1>
 
 <div class="card shadow-sm">
     <div class="card-body">
+
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
 
             <!-- Tipo de Sala e Especialidade -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="RoomTypeId" class="form-label fw-bold">Tipo de Sala(*)</label>
+                    <label asp-for="RoomTypeId" class="form-label fw-bold">Tipo de Sala*</label>
                     <select asp-for="RoomTypeId" class="form-select" asp-items="ViewBag.RoomTypes" required>
                         <option value="">Selecione o tipo...</option>
                     </select>
@@ -42,7 +43,7 @@
 
                 <div class="col-md-6 mb-3">
                     <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade(Opcional)</label>
-                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty" @* required *@>
+                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty">
                         <option value="">Sem especialidade</option>
                     </select>
                     <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
@@ -52,7 +53,7 @@
             <!-- Nome e Localização -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="Name" class="form-label fw-bold">Nome(**)</label>
+                    <label asp-for="Name" class="form-label fw-bold">Nome**</label>
                     <input asp-for="Name" class="form-control" placeholder="Ex: Sala 101" required />
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
@@ -69,7 +70,7 @@
             <!-- Horário de Funcionamento -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label asp-for="OpeningTime" class="form-label fw-bold">Hora de Abertura(***)</label>
+                    <label asp-for="OpeningTime" class="form-label fw-bold">Hora de Abertura***</label>
                     <input asp-for="OpeningTime" type="time" class="form-control" required />
                     <span asp-validation-for="OpeningTime" class="text-danger small"></span>
                 </div>
@@ -84,36 +85,42 @@
             <!-- Observação -->
             <div class="row mb-3">
                 <div class="col-md-12 px-3">
-                    <!-- padding horizontal -->
                     <label asp-for="Notes" class="form-label fw-bold">Observação (Opcional)</label>
                     <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
                     <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
             </div>
 
-            <!-- Botões -->
-
+            <!-- Botão Criar -->
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
                     <i class="bi bi-check-circle me-1"></i> Criar Sala
                 </button>
-                <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
-                </a>
-            </div>
-
-            <div class="alert alert-info d-flex align-items-start mt-4" role="alert">
-                <i class="bi bi-info-circle-fill me-2"></i>
-                <div>
-                    (*) - "Alguns tipos de sala têm especialidade obrigatória";<br />
-                    (**) - "O nome da sala é obrigatório";<br />
-                    (***) - "A hora de abertura deve ser sempre menor do que a hora de encerramento".
-                </div>
             </div>
 
         </form>
+
     </div>
 </div>
+
+<div class="mt-4 d-flex justify-content-start">
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
+    </a>
+</div>
+
+<!-- ===================== ALERTA INFORMATIVO ===================== -->
+<div class="alert alert-info d-flex align-items-start mt-4" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    <div>
+        (*) - "Alguns tipos de sala têm especialidade obrigatória";<br />
+        (**) - "O nome da sala é obrigatório";<br />
+        (***) - "A hora de abertura deve ser sempre menor do que a hora de encerramento".
+    </div>
+</div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

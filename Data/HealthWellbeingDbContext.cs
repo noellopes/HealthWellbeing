@@ -32,29 +32,54 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // =====================================================
             // Filtro global para ISoftDeletable
+            // =====================================================
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
                 {
                     var method = typeof(ModelBuilder).GetMethods()
                         .First(m => m.Name == "Entity" && m.IsGenericMethod);
+
                     var genericMethod = method.MakeGenericMethod(entityType.ClrType);
                     dynamic entityBuilder = genericMethod.Invoke(modelBuilder, null);
+
                     entityBuilder.HasQueryFilter(CreateIsDeletedFilter(entityType.ClrType));
                 }
             }
 
-            // =========================
-            // RELACIONAMENTOS EXPLÍCITOS
-            // =========================
+            // =====================================================
+            // RELACIONAMENTOS EXPLÍCITOS (evitar múltiplos cascades)
+            // =====================================================
 
-            // Consultation -> Room (evitar múltiplos caminhos de cascata)
+            //Se uma Room for apagada, NÃO apagues Consultations automaticamente
             modelBuilder.Entity<Consultation>()
                 .HasOne(c => c.Room)
-                .WithMany(r => r.Consultations)       
+                .WithMany(r => r.Consultations)
                 .HasForeignKey(c => c.RoomId)
-                .OnDelete(DeleteBehavior.Restrict);   
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Se uma Room for apagada, NÃO apagues ConsumablesExpenses automaticamente
+            modelBuilder.Entity<ConsumablesExpenses>()
+                .HasOne(e => e.Room)
+                .WithMany()
+                .HasForeignKey(e => e.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Se uma Reserva for apagada, NÃO apagues ConsumablesExpenses automaticamente
+            modelBuilder.Entity<ConsumablesExpenses>()
+                .HasOne(e => e.RoomReservation)
+                .WithMany()
+                .HasForeignKey(e => e.RoomReservationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //Se um Consumível for apagado, NÃO apagues ConsumablesExpenses automaticamente
+            modelBuilder.Entity<ConsumablesExpenses>()
+                .HasOne(e => e.Consumable)
+                .WithMany()
+                .HasForeignKey(e => e.ConsumableId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static LambdaExpression CreateIsDeletedFilter(Type entityType)
@@ -93,5 +118,6 @@ namespace HealthWellbeing.Data
         public DbSet<TypeMaterialHistory> TypeMaterialHistories { get; set; }
         public DbSet<RoomReservation> RoomReservations { get; set; }
         public DbSet<Consultation> Consultations { get; set; } = default!;
+        public DbSet<ConsumablesExpenses> ConsumablesExpenses { get; set; }
     }
 }

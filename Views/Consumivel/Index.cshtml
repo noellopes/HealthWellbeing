@@ -169,5 +169,25 @@ else
                 </ul>
             </div>
         </nav>
+
+        <!-- Botões adicionais -->
+        <div class="mt-4 d-flex justify-content-between">
+
+            <!-- Botão Lista de Salas -->
+            <a asp-controller="Rooms"
+               asp-action="Index"
+               class="btn btn-primary btn-sm">
+                <i class="bi bi-house-door-fill me-1"></i> Lista de salas
+            </a>
+
+            <!-- Botão Dispositivos Médicos -->
+            <a asp-controller="MedicalDevice"
+               asp-action="DeviceGroupIndex"
+               class="btn btn-info btn-sm">
+                <i class="bi bi-pc-display-horizontal me-1"></i> Lista de dispositivos médicos
+            </a>
+
+        </div>
+
     </div>
 }

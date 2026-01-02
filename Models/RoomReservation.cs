@@ -1,6 +1,4 @@
 ﻿using HealthWellbeing.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeingRoom.Models
@@ -31,11 +29,10 @@ namespace HealthWellbeingRoom.Models
         public int? SpecialtyId { get; set; }
         public Specialty? Specialty { get; set; }
 
-        // Data da consulta (AGORA MAPEADA)
+        // Data da consulta
         [Required(ErrorMessage = "A data da consulta é obrigatória.")]
         [DataType(DataType.Date)]
         public DateTime ConsultationDate { get; set; }
-
 
         [Required(ErrorMessage = "A hora de início é obrigatória.")]
         [DataType(DataType.Time)]
@@ -52,9 +49,8 @@ namespace HealthWellbeingRoom.Models
         public ICollection<RoomConsumable>? Consumables { get; set; }
         public ICollection<LocationMedDevice>? MedicalDevices { get; set; }
 
-        // Estado
-        [StringLength(50)]
-        public string Status { get; set; } = "Pendente";
+        // O estado da reserva
+        public string Status { get; set; } = "Ativa";
 
         // Observações
         public string? Notes { get; set; }

@@ -10,6 +10,7 @@
 
 <div class="card shadow-sm">
     <div class="card-body">
+
         <form asp-action="Create" method="post">
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -24,31 +25,31 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
+                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta*</label>
                     <input asp-for="ConsultationDate"
                            type="date"
                            class="form-control"
                            id="consultation-date"
                            min="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                     <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
+                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== LINHA 2 ===================== -->
                 <div class="col-md-6">
-                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
+                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início**</label>
                     <input asp-for="StartHour" type="time" class="form-control" id="StartHour" />
                     <span asp-validation-for="StartHour" class="text-danger small"></span>
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
+                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim***</label>
                     <input asp-for="EndHour" type="time" class="form-control" id="EndHour" />
                     <span asp-validation-for="EndHour" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== LINHA 3 ===================== -->
                 <div class="col-md-6">
-                    <label asp-for="RoomId" class="form-label fw-bold">Sala(*)</label>
+                    <label asp-for="RoomId" class="form-label fw-bold">Sala****</label>
                     <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" id="room-select" required>
                         <option value="">Selecione a sala...</option>
                     </select>
@@ -56,7 +57,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
+                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável</label>
                     <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
                     <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
@@ -72,20 +73,47 @@
 
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
-                    <i class="bi bi-check-circle me-1"></i> Criar
+                    <i class="bi bi-check-circle me-1"></i> Criar reserva
                 </button>
-                <a asp-action="Index" class="btn btn-success btn-sm" style="min-width:150px">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Lista de reservas
-                </a>
             </div>
 
         </form>
+
     </div>
 </div>
 
+<div class="mt-4 d-flex justify-content-between">
+
+    <!-- Lista de Salas (ESQUERDA) -->
+    <a asp-controller="Rooms"
+       asp-action="Index"
+       class="btn btn-primary btn-sm">
+        <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
+    </a>
+
+    <!-- Lista de Reservas (DIREITA) -->
+    <a asp-action="Index"
+       class="btn btn-success btn-sm">
+        <i class="bi bi-list-ul me-1"></i> Lista de Reservas
+    </a>
+
+</div>
+
+<!-- ===================== ALERTA INFORMATIVO ===================== -->
+<div class="alert alert-info d-flex align-items-start mt-4" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>
+    <div>
+        (*) - "Data da consulta não pode ser no passado";<br />
+        (**) - "A hora de início deve ser igual ou superior à hora atual (se a data for hoje)";<br />
+        (***) - "A hora de fim deve ser sempre maior do que a hora de início";<br />
+        (****) - "Introduzir primeiro Data e horas de início e fim para filtrar a sala disponível".
+    </div>
+</div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
         // Bloquear datas anteriores a hoje
@@ -105,22 +133,18 @@
                             today.getMinutes().toString().padStart(2, '0');
 
             if (selectedDate.toDateString() === today.toDateString()) {
-                // Se a data for hoje → hora mínima = hora atual
                 startInput.min = nowTime;
                 endInput.min = nowTime;
             } else {
-                // Se for futura → sem restrição
                 startInput.removeAttribute('min');
                 endInput.removeAttribute('min');
             }
 
-            // EndHour nunca pode ser menor que StartHour
             if (startInput.value) {
                 endInput.min = startInput.value;
             }
         }
 
-        // Eventos para atualizar limites e mensagens
         const startInput = document.getElementById('StartHour');
         const endInput = document.getElementById('EndHour');
         const dateInput = document.getElementById('consultation-date');
@@ -129,10 +153,6 @@
         startInput.addEventListener('focus', updateHourLimits);
         endInput.addEventListener('focus', updateHourLimits);
 
-        aplicarMensagensPersonalizadas(startInput, "start");
-        aplicarMensagensPersonalizadas(endInput, "end");
-
-        // Script de carregar salas
         function loadAvailableRooms() {
             const date = dateInput.value;
             const start = startInput.value;
