@@ -753,7 +753,7 @@ namespace HealthWellbeingRoom.Controllers
             return View(historico);
         }
         //----------------------------------------------------------ROOMRESERVATIONLIST---------------------------------------------------------------------------------
-        public IActionResult RoomReservationList(int id, int roomId)
+        public IActionResult RoomReservationList(int id, int roomId, int page = 1, int itemsPerPage = 10)
         {
             // Escolhe o id da sala (roomId tem prioridade, fallback para id)
             var selectedRoomId = roomId != 0 ? roomId : id;
@@ -768,22 +768,33 @@ namespace HealthWellbeingRoom.Controllers
             if (room == null)
                 return NotFound("Sala não encontrada.");
 
-            // Enviar dados para a View
             ViewBag.RoomId = selectedRoomId;
             ViewBag.RoomName = room.Name;
 
-            // Busca reservas da sala (ordenadas por data + hora)
-            var reservations = _context.RoomReservations
+            // Query base das reservas da sala
+            var query = _context.RoomReservations
                 .AsNoTracking()
                 .Include(rr => rr.Room)
                 .Include(rr => rr.Specialty)
-                .Where(rr => rr.RoomId == selectedRoomId)
-                .OrderBy(rr => rr.ConsultationDate)
-                .ThenBy(rr => rr.StartHour)
-                .ToList();
+                .Where(rr => rr.RoomId == selectedRoomId);
 
-            return View("RoomReservationList", reservations);
+            // Total de itens para paginação
+            var totalItems = query.Count();
+
+            // Cria objeto de paginação
+            var pagination = new RPaginationInfo<RoomReservation>(page, totalItems, itemsPerPage)
+            {
+                Items = query
+                    .OrderBy(rr => rr.ConsultationDate)
+                    .ThenBy(rr => rr.StartHour)
+                    .Skip((page - 1) * itemsPerPage)   // ou pagination.ItemsToSkip
+                    .Take(itemsPerPage)
+                    .ToList()
+            };
+
+            return View("RoomReservationList", pagination);
         }
+
         //----------------------------------------------------------ROOMRESERVATION---------------------------------------------------------------------------------
 
         [Authorize(Roles = "logisticsTechnician,Administrator")]

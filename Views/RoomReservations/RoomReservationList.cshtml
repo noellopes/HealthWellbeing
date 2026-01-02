@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeingRoom.Models.RoomReservation>
+﻿@model RPaginationInfo<HealthWellbeingRoom.Models.RoomReservation>
 
 @{
     ViewData["Title"] = "Reservas da Sala";
@@ -8,117 +8,278 @@
 }
 
 <h1 class="mb-4 text-success">
-    <i class="bi bi-calendar-check"></i> Reservas da sala — @ViewBag.RoomName
+    <i class="bi bi-calendar-check me-2"></i> Reservas da sala — @ViewBag.RoomName
 </h1>
 
-<div class="mb-3 d-flex justify-content-end">
-    @if (isLogTech)
-    {
-        <a asp-controller="RoomReservations"
-           asp-action="Create"
-           class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Nova Reserva
+<!-- BOTÕES DE AÇÃO -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Lista de Reservas</h2>
+
+    <div class="d-flex gap-2">
+        <!-- Botão de pesquisa -->
+        <a class="btn btn-outline-primary btn-sm"
+           style="min-width:150px"
+           data-bs-toggle="collapse"
+           data-bs-target="#postSearch"
+           aria-expanded="false"
+           aria-controls="postSearch">
+            <i class="bi bi-search me-1"></i> Pesquisa
         </a>
-    }
+    </div>
+</div>
+
+<!-- FORMULÁRIO DE PESQUISA (por sala) -->
+<div class="collapse mt-2 mb-3" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="RoomReservationList" method="get" class="row g-2 align-items-end">
+            <!-- Mantém sempre a mesma sala -->
+            <input type="hidden" name="id" value="@ViewBag.RoomId" />
+            <!-- Força page=1 ao pesquisar -->
+            <input type="hidden" name="page" value="1" />
+
+            <div class="col-md-4">
+                <label for="searchResponsible" class="form-label">Responsável</label>
+                <input id="searchResponsible"
+                       name="searchResponsible"
+                       value="@ViewBag.SearchResponsible"
+                       class="form-control"
+                       placeholder="Nome do responsável"
+                       type="search" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchDate" class="form-label">Data da Reserva</label>
+                <input id="searchDate"
+                       name="searchDate"
+                       value="@ViewBag.SearchDate"
+                       class="form-control"
+                       type="date" />
+            </div>
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-outline-primary flex-fill">
+                    <i class="bi bi-search me-1"></i> Pesquisa
+                </button>
+
+                <a asp-action="RoomReservationList"
+                   asp-route-id="@ViewBag.RoomId"
+                   class="btn btn-secondary flex-fill">
+                    <i class="bi bi-x-circle me-1"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card shadow-sm" style="min-height: 60vh;">
     <div class="card-body">
-        <table class="table table-striped table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>Id</th>
-                    <th>Nome do responsável</th>
-                    <th>Sala</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @if (!Model.Any())
-                {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
-                            <i class="bi bi-info-circle"></i> Não existem reservas para esta sala.
-                        </td>
+                        <th>Id da Reserva</th>
+                        <th>Responsável</th>
+                        <th>Sala</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th class="text-center">Ações</th>
                     </tr>
-                }
-                else
-                {
-                    @foreach (var item in Model)
+                </thead>
+
+                <tbody>
+                    @if (!Model.Items.Any())
                     {
                         <tr>
-                            <td>@item.RoomReservationId.ToString("D3")</td>
-                            <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
-                            <td>@(item.Room?.Name ?? "—")</td>
-
-                            <!-- INÍCIO -->
-                            <td>
-                                @($"{item.ConsultationDate:dd/MM/yyyy} {item.StartHour:hh\\:mm}")
-                            </td>
-
-                            <!-- FIM -->
-                            <td>
-                                @($"{item.ConsultationDate:dd/MM/yyyy} {item.EndHour:hh\\:mm}")
-                            </td>
-
-                            <td class="text-center">
-
-                                @if (isLogTech)
-                                {
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.RoomReservationId"
-                                       class="btn btn-sm btn-warning me-1">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                }
-
-                                <a asp-controller="RoomReservations"
-                                   asp-action="Details"
-                                   asp-route-id="@item.RoomReservationId"
-                                   asp-route-fromCreation="false"
-                                   class="btn btn-sm btn-info me-1">
-                                    <i class="bi bi-info-circle-fill"></i> Detalhes
-                                </a>
-
-                                @if (isLogTech)
-                                {
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.RoomReservationId"
-                                       class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash-fill"></i> Eliminar
-                                    </a>
-                                }
-
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-info-circle"></i> Não existem reservas para esta sala.
                             </td>
                         </tr>
                     }
-                }
-            </tbody>
-        </table>
+                    else
+                    {
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <!-- ID RESERVA -->
+                                <td>@item.RoomReservationId.ToString("D3")</td>
+
+                                <!-- RESPONSÁVEL -->
+                                <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
+
+                                <!-- SALA -->
+                                <td>@(item.Room?.Name ?? "—")</td>
+
+                                <!-- INÍCIO -->
+                                <td>@($"{item.ConsultationDate:dd/MM/yyyy} {item.StartHour:hh\\:mm}")</td>
+
+                                <!-- FIM -->
+                                <td>@($"{item.ConsultationDate:dd/MM/yyyy} {item.EndHour:hh\\:mm}")</td>
+
+                                <!-- AÇÕES -->
+                                <td class="text-center">
+
+                                    @if (isLogTech)
+                                    {
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.RoomReservationId"
+                                           class="btn btn-sm btn-warning me-1">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+                                    }
+
+                                    <a asp-controller="RoomReservations"
+                                       asp-action="Details"
+                                       asp-route-id="@item.RoomReservationId"
+                                       asp-route-fromCreation="false"
+                                       class="btn btn-sm btn-info me-1">
+                                        <i class="bi bi-info-circle-fill"></i> Detalhes
+                                    </a>
+
+                                    @if (isLogTech)
+                                    {
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.RoomReservationId"
+                                           class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-trash-fill"></i> Eliminar
+                                        </a>
+                                    }
+
+                                    @if (isLogTech)
+                                    {
+                                        bool aceitaClick =
+                                        item.ConsultationDate.Date == DateTime.Today &&
+                                        DateTime.Now.TimeOfDay >= item.StartHour;
+
+                                        if (aceitaClick)
+                                        {
+                                            <form asp-action="MarcarComoRealizada"
+                                                  asp-route-id="@item.RoomReservationId"
+                                                  method="post"
+                                                  style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-primary me-1">
+                                                    <i class="bi bi-check-circle-fill"></i> Realizada
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn btn-sm btn-secondary me-1" disabled>
+                                                <i class="bi bi-check-circle-fill"></i> Realizada
+                                            </button>
+                                        }
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
+<!-- PAGINAÇÃO -->
+<nav aria-label="Room reservations page" class="d-flex justify-content-between align-items-center mt-4">
+    @if (Model.TotalItems > 0)
+    {
+        <span class="text-muted">
+            Mostrando
+            <strong>@((Model.CurrentPage - 1) * Model.ItemsPerPage + 1)</strong>
+            -
+            <strong>@(Math.Min(Model.CurrentPage * Model.ItemsPerPage, Model.TotalItems))</strong>
+            de <strong>@Model.TotalItems</strong>
+        </span>
+    }
+    else
+    {
+        <span class="text-muted">0 itens</span>
+    }
+
+    <ul class="pagination mb-0">
+        <!-- Primeira página -->
+        @if (Model.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="RoomReservationList"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="1"
+                   asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                   asp-route-searchDate="@ViewBag.SearchDate">
+                    <i class="bi bi-chevron-double-left"></i> Primeira
+                </a>
+            </li>
+        }
+
+        <!-- Números de página -->
+        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+        {
+            if (p == Model.CurrentPage)
+            {
+                <li class="page-item active">
+                    <a class="page-link" href="#">@p</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="RoomReservationList"
+                       asp-route-id="@ViewBag.RoomId"
+                       asp-route-page="@p"
+                       asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                       asp-route-searchDate="@ViewBag.SearchDate">
+                        @p
+                    </a>
+                </li>
+            }
+        }
+
+        <!-- Última página -->
+        @if (Model.CurrentPage == Model.TotalPages)
+        {
+            <li class="page-item disabled">
+                <a class="page-link">Última <i class="bi bi-chevron-double-right"></i></a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link"
+                   asp-action="RoomReservationList"
+                   asp-route-id="@ViewBag.RoomId"
+                   asp-route-page="@Model.TotalPages"
+                   asp-route-searchResponsible="@ViewBag.SearchResponsible"
+                   asp-route-searchDate="@ViewBag.SearchDate">
+                    Última <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+
 <!-- Botões fora da card -->
 <div class="mt-4 d-flex justify-content-between">
-
-    <!-- Botão Lista de Salas (Home) -->
     <a asp-controller="Rooms"
        asp-action="Index"
        class="btn btn-primary btn-sm">
         <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
 
-    <!-- Botão Voltar à Sala -->
     <a asp-controller="Rooms"
        asp-action="Details"
        asp-route-id="@ViewBag.RoomId"
        class="btn btn-primary btn-sm">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
     </a>
-
 </div>
 
 @section Scripts {
