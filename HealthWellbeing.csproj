@@ -20,8 +20,4 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.22" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\ClienteBalneario\" />
-  </ItemGroup>
-
 </Project>

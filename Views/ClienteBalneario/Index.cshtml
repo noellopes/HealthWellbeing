@@ -1,0 +1,8 @@
+﻿@model IEnumerable<ClienteBalnearioModel>
+
+<h2>Clientes</h2>
+
+@foreach (var c in Model)
+{
+    <p>@c.Nome - @c.Email</p>
+}
