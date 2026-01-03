@@ -1,0 +1,51 @@
+﻿@model HealthWellbeingRoom.Models.RoomConsumable
+
+@{
+    ViewData["Title"] = "Adicionar consumível à sala";
+}
+
+<h2 class="mb-3 text-success">
+    <i class="bi bi-droplet-half me-2"></i>
+    Adicionar consumível à sala "@ViewBag.RoomName"
+</h2>
+
+<form asp-action="Add" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+    <input type="hidden" asp-for="RoomId" value="@ViewBag.RoomId" />
+
+    <div class="mb-3">
+        <label class="form-label">Consumível</label>
+        <select asp-for="ConsumivelId"
+                class="form-select"
+                asp-items="ViewBag.Consumiveis">
+        </select>
+        <span asp-validation-for="ConsumivelId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity" class="form-label"></label>
+        <input asp-for="Quantity" class="form-control" min="1" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Note" class="form-label"></label>
+        <textarea asp-for="Note" class="form-control"></textarea>
+        <span asp-validation-for="Note" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i> Adicionar
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,4 +1,7 @@
-﻿@model HealthWellbeing.ViewModels.RPaginationInfo<HealthWellbeing.Models.ZonaArmazenamento>
+﻿@using HealthWellbeingRoom.Models
+@using HealthWellbeingRoom.ViewModels
+@model RPaginationInfo<RoomConsumable>
+
 
 @{
     ViewData["Title"] = "Consumíveis Associados";
@@ -77,24 +80,30 @@
 <div class="card shadow-sm" style="min-height: 60vh;">
     <div class="card-body">
 
+        <div class="d-flex justify-content-end mb-3">
+            <a asp-controller="RoomConsumable"
+               asp-action="Create"
+               asp-route-roomId="@ViewBag.RoomId"
+               class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Adicionar consumível à sala
+            </a>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
                     <tr>
-                        <th>Zona</th>
                         <th>Consumível</th>
                         <th>Categoria</th>
-                        <th>Stock</th>
-                        <th>Capacidade Máxima</th>
-                        <th>Ativa</th>
-                        <th class="text-center">Ações</th>
+                        <th>Quantidade</th>
+                        <th>Observações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.Items.Any())
                     {
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="4" class="text-center">
                                 <span class="alert alert-info d-block mb-0" role="alert">
                                     <i class="bi bi-info-circle-fill me-2"></i>
                                     Nenhum consumível associado a esta sala.
@@ -104,23 +113,13 @@
                     }
                     else
                     {
-                        @foreach (var zona in Model.Items)
+                        @foreach (var rc in Model.Items)
                         {
                             <tr>
-                                <td>@zona.NomeZona</td>
-                                <td>@zona.Consumivel?.Nome</td>
-                                <td>@zona.Consumivel?.CategoriaConsumivel?.Nome</td>
-                                <td>@zona.QuantidadeAtual</td>
-                                <td>@zona.CapacidadeMaxima</td>
-                                <td>@(zona.Ativa ? "Sim" : "Não")</td>
-                                <td class="text-center align-middle">
-                                    <a asp-controller="ZonaArmazenamento"
-                                       asp-action="Details"
-                                       asp-route-id="@zona.ZonaId"
-                                       class="btn btn-info px-4">
-                                        <i class="bi bi-info-circle me-1"></i> Detalhes
-                                    </a>
-                                </td>
+                                <td>@rc.Consumivel?.Nome</td>
+                                <td>@rc.Consumivel?.CategoriaConsumivel?.Nome</td>
+                                <td>@rc.Quantity</td>
+                                <td>@rc.Note</td>
                             </tr>
                         }
                     }
@@ -133,8 +132,6 @@
 
 <!-- Botões fora da card -->
 <div class="mt-4 d-flex justify-content-between">
-
-    <!-- Botão Lista de Salas (Home) -->
     <a asp-controller="Rooms"
        asp-action="Index"
        class="btn btn-primary btn-sm">
@@ -142,28 +139,16 @@
     </a>
 
     <div class="d-flex gap-2">
-
-        <!-- Botão Voltar à Sala -->
         <a asp-action="Details"
            asp-route-id="@ViewBag.RoomId"
            class="btn btn-primary btn-sm">
             <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
         </a>
-
-        <!-- Botão Buscar Consumíveis (ícone atualizado) -->
-        <a asp-controller="ZonaArmazenamento"
-           asp-action="Index"
-           asp-route-id="@ViewBag.RoomId"
-           class="btn btn-primary btn-sm">
-            <i class="bi bi-search me-1"></i> Buscar Consumíveis
-        </a>
-
     </div>
-
 </div>
 
 <!-- PAGINAÇÃO -->
-<nav aria-label="ZonaArmazenamento page" class="d-flex justify-content-between align-items-center mt-4">
+<nav aria-label="Consumables page" class="d-flex justify-content-between align-items-center mt-4">
     @if (Model.TotalItems > 0)
     {
         <span class="text-muted">
