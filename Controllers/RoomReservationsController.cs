@@ -824,14 +824,16 @@ public async Task<IActionResult> CancelarReserva(int id)
 
         //----------------------------------------------------------ROOMRESERVATION---------------------------------------------------------------------------------
 
-        [Authorize(Roles = "logisticsTechnician,Administrator")]
-        public IActionResult Reservations(int id)
-        {
-            ViewBag.RoomId = id;
-            return View();
-        }
+            [Authorize(Roles = "logisticsTechnician,Administrator")]
+            public IActionResult Reservations(int id)
+            {
+                ViewBag.RoomId = id;
+                return View();
+            }
 
-        //----------------------------------------------------------ROOMMATERIALS---------------------------------------------------------------------------------
+
+
+        // ------------------------------------------------------ ROOMMATERIALS ------------------------------------------------------
         public async Task<IActionResult> RoomMaterials(int id)
         {
             // 1. Carregar a sala com especialidade e materiais associados
@@ -841,14 +843,14 @@ public async Task<IActionResult> CancelarReserva(int id)
                     .ThenInclude(l => l.MedicalDevice)
                         .ThenInclude(d => d.TypeMaterial)
                 .Include(r => r.RoomConsumables)
-                    .ThenInclude(c => c.Consumivel)
-                        .ThenInclude(cons => cons!.CategoriaConsumivel)
+                    .ThenInclude(rc => rc.Consumivel)
+                        .ThenInclude(c => c.CategoriaConsumivel)
                 .FirstOrDefaultAsync(r => r.RoomId == id);
 
             if (room == null)
                 return NotFound();
 
-            // Se a sala não tiver especialidade, não há dispositivos obrigatórios
+            // Se a sala não tiver especialidade, não há obrigatórios
             if (room.SpecialtyId == null)
             {
                 var vmSemEspecialidade = new RoomMaterial
@@ -857,23 +859,31 @@ public async Task<IActionResult> CancelarReserva(int id)
                     RoomName = room.Name,
                     MedicalDevices = room.LocalizacaoDispMedicoMovel?.ToList() ?? new List<LocationMedDevice>(),
                     Consumables = room.RoomConsumables?.ToList() ?? new List<RoomConsumable>(),
-                    DevicesMissing = new List<MedicalDevice>()
+                    DevicesMissing = new List<MedicalDevice>(),
+                    ConsumablesMissing = new List<Consumivel>()
                 };
 
                 ViewBag.SemDispositivos = !vmSemEspecialidade.MedicalDevices.Any();
                 ViewBag.DispositivosEmFalta = vmSemEspecialidade.DevicesMissing;
+                ViewBag.TemDispositivosEmFalta = vmSemEspecialidade.DevicesMissing.Any();
+
+                ViewBag.SemConsumiveis = !vmSemEspecialidade.Consumables.Any();
+                ViewBag.ConsumiveisEmFalta = vmSemEspecialidade.ConsumablesMissing;
+                ViewBag.TemConsumiveisEmFalta = vmSemEspecialidade.ConsumablesMissing.Any();
+
+                ViewBag.RoomId = room.RoomId;
                 return View(vmSemEspecialidade);
             }
 
             var specialtyId = room.SpecialtyId.Value;
 
-            // 2. Dispositivos presentes na sala
+            // -------- DISPOSITIVOS --------
+
             var dispositivosPresentes = room.LocalizacaoDispMedicoMovel?
                 .Select(l => l.MedicalDevice)
                 .Where(d => d != null)
                 .ToList() ?? new List<MedicalDevice>();
 
-            // 3. Dispositivos obrigatórios da especialidade
             var dispositivosObrigatorios = await _context.SpecialtyRequiredDevices
                 .Where(srd => srd.SpecialtyId == specialtyId)
                 .Include(srd => srd.MedicalDevice)
@@ -882,29 +892,36 @@ public async Task<IActionResult> CancelarReserva(int id)
                 .Where(md => md != null)
                 .ToListAsync();
 
-            // 4. Dispositivos em falta
             var dispositivosEmFalta = dispositivosObrigatorios
                 .Where(o => !dispositivosPresentes.Any(p => p.MedicalDeviceID == o.MedicalDeviceID))
                 .ToList();
 
-            // 4b. Consumíveis obrigatórios da especialidade
+            // -------- CONSUMÍVEIS --------
+
             var consumiveisObrigatorios = await _context.SpecialtyRequiredConsumables
                 .Where(src => src.SpecialtyId == specialtyId)
                 .Include(src => src.Consumivel)
                     .ThenInclude(c => c.CategoriaConsumivel)
+                .Select(src => new
+                {
+                    src.ConsumivelId,
+                    src.RequiredQuantity,
+                    Consumivel = src.Consumivel
+                })
+                .Where(x => x.Consumivel != null)
                 .ToListAsync();
 
-            // 4c. Consumíveis presentes na sala
             var consumiveisPresentes = room.RoomConsumables ?? new List<RoomConsumable>();
 
-            // 4d. Consumíveis em falta
             var consumiveisEmFalta = consumiveisObrigatorios
                 .Where(o =>
                 {
-                    var presente = consumiveisPresentes.FirstOrDefault(p => p.ConsumivelId == o.ConsumivelId);
-                    return presente == null || presente.Consumivel.QuantidadeAtual < o.RequiredQuantity;
+                    var presente = consumiveisPresentes
+                        .FirstOrDefault(p => p.ConsumivelId == o.ConsumivelId);
+
+                    return presente == null || presente.Quantity < o.RequiredQuantity;
                 })
-                .Select(o => o.Consumivel)
+                .Select(o => o.Consumivel!)
                 .ToList();
 
             // 5. Construir ViewModel
@@ -919,15 +936,22 @@ public async Task<IActionResult> CancelarReserva(int id)
             };
 
             // 6. Flags para a View
-            ViewBag.SemDispositivos = !dispositivosPresentes.Any();
-            ViewBag.DispositivosEmFalta = dispositivosEmFalta;
 
+            // Informação geral (existem ou não dispositivos/consumíveis na sala)
+            ViewBag.SemDispositivos = !dispositivosPresentes.Any();
             ViewBag.SemConsumiveis = !consumiveisPresentes.Any();
+
+            // Listas em falta
+            ViewBag.DispositivosEmFalta = dispositivosEmFalta;
             ViewBag.ConsumiveisEmFalta = consumiveisEmFalta;
 
+            // Flags específicas para mostrar botão/alerta “em falta”
+            ViewBag.TemDispositivosEmFalta = dispositivosEmFalta.Any();
+            ViewBag.TemConsumiveisEmFalta = consumiveisEmFalta.Any();
+
+            ViewBag.RoomId = room.RoomId;
             return View(viewModel);
         }
-
 
         //----------------------------------------------------------ROOMMEXISTS---------------------------------------------------------------------------------
 

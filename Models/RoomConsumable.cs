@@ -10,22 +10,34 @@ namespace HealthWellbeingRoom.Models
 
         // FK para Room
         [Required]
+        [Display(Name = "Sala")]
         public int RoomId { get; set; }
-
-        // Navegação para Room (opcional para evitar warnings; EF irá popular quando incluído)
         public Room? Room { get; set; }
 
-        // FK para Consumivel
+        // FK para Consumível
         [Required]
+        [Display(Name = "Consumível")]
         public int ConsumivelId { get; set; }
-
-        // Navegação para Consumivel (opcional para evitar warnings; torna não anulável se a relação for sempre obrigatória)
         public Consumivel? Consumivel { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "A quantidade deve ser um número não negativo.")]
+        [Display(Name = "Quantidade")]
         public int Quantity { get; set; }
 
         [StringLength(500)]
+        [Display(Name = "Observações")]
         public string? Note { get; set; }
+
+        // Opcional: para registar quando este stock foi criado/atualizado
+        [DataType(DataType.Date)]
+        [Display(Name = "Data de Início")]
+        public DateTime InitialDate { get; set; } = DateTime.Now;
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Data de Fim")]
+        public DateTime? EndDate { get; set; }
+
+        // Se quiseres marcar o registo atual (sem histórico basta manter sempre true)
+        public bool IsCurrent { get; set; } = true;
     }
 }

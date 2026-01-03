@@ -592,38 +592,35 @@ namespace HealthWellbeingRoom.Controllers
             ViewData["RoomName"] = room.Name;
             ViewData["Title"] = "Consumíveis associados à sala";
 
-            // Consumíveis associados à sala via ZonaArmazenamento
-            var query = _context.ZonaArmazenamento
-                .Include(z => z.Consumivel)
+            var query = _context.RoomConsumables
+                .Include(rc => rc.Consumivel)
                     .ThenInclude(c => c.CategoriaConsumivel)
-                .Where(z => z.RoomId == id)
+                .Where(rc => rc.RoomId == id && rc.IsCurrent) // se usares IsCurrent
                 .AsQueryable();
 
-            // Aplicar filtros
             if (!string.IsNullOrEmpty(searchName))
-                query = query.Where(z => z.Consumivel.Nome.Contains(searchName));
+                query = query.Where(rc => rc.Consumivel!.Nome.Contains(searchName));
 
             if (!string.IsNullOrEmpty(searchCategory))
-                query = query.Where(z => z.Consumivel.CategoriaConsumivel.Nome.Contains(searchCategory));
+                query = query.Where(rc => rc.Consumivel!.CategoriaConsumivel!.Nome.Contains(searchCategory));
 
             if (searchMinQuantity.HasValue)
-                query = query.Where(z => z.QuantidadeAtual >= searchMinQuantity.Value);
+                query = query.Where(rc => rc.Quantity >= searchMinQuantity.Value);
 
             if (searchMaxQuantity.HasValue)
-                query = query.Where(z => z.QuantidadeAtual <= searchMaxQuantity.Value);
+                query = query.Where(rc => rc.Quantity <= searchMaxQuantity.Value);
 
-            // Paginação
-            int itemsPerPage = 10;
+            const int itemsPerPage = 10;
             int totalItems = await query.CountAsync();
-            var pagination = new RPaginationInfo<ZonaArmazenamento>(page, totalItems, itemsPerPage);
+
+            var pagination = new RPaginationInfo<RoomConsumable>(page, totalItems, itemsPerPage);
 
             pagination.Items = await query
-                .OrderBy(z => z.Consumivel.Nome)
+                .OrderBy(rc => rc.Consumivel!.Nome)
                 .Skip(pagination.ItemsToSkip)
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            // Manter filtros na ViewBag
             ViewBag.SearchName = searchName;
             ViewBag.SearchCategory = searchCategory;
             ViewBag.SearchMinQuantity = searchMinQuantity;
@@ -631,5 +628,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(pagination);
         }
+
+
     }
 }
