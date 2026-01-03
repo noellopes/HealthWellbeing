@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260103001120_AddSpecialtyRequiredDevice")]
+    partial class AddSpecialtyRequiredDevice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1191,32 +1194,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("Specialty");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.SpecialtyRequiredConsumable", b =>
-                {
-                    b.Property<int>("SpecialtyRequiredConsumableId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpecialtyRequiredConsumableId"));
-
-                    b.Property<int>("ConsumivelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequiredQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SpecialtyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SpecialtyRequiredConsumableId");
-
-                    b.HasIndex("ConsumivelId");
-
-                    b.HasIndex("SpecialtyId");
-
-                    b.ToTable("SpecialtyRequiredConsumables");
-                });
-
             modelBuilder.Entity("HealthWellbeingRoom.Models.SpecialtyRequiredDevice", b =>
                 {
                     b.Property<int>("SpecialtyRequiredDeviceId")
@@ -1572,25 +1549,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.Navigation("Consultation");
 
                     b.Navigation("Room");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.SpecialtyRequiredConsumable", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
-                        .WithMany()
-                        .HasForeignKey("ConsumivelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeingRoom.Models.Specialty", "Specialty")
-                        .WithMany()
-                        .HasForeignKey("SpecialtyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Consumivel");
-
-                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.SpecialtyRequiredDevice", b =>

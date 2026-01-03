@@ -119,5 +119,7 @@ namespace HealthWellbeing.Data
         public DbSet<RoomReservation> RoomReservations { get; set; }
         public DbSet<Consultation> Consultations { get; set; } = default!;
         public DbSet<ConsumablesExpenses> ConsumablesExpenses { get; set; }
+        public DbSet<SpecialtyRequiredDevice> SpecialtyRequiredDevices { get; set; }
+        public DbSet<SpecialtyRequiredConsumable> SpecialtyRequiredConsumables { get; set; }
     }
 }

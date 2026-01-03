@@ -833,11 +833,11 @@ public async Task<IActionResult> CancelarReserva(int id)
         }
 
         //----------------------------------------------------------ROOMMATERIALS---------------------------------------------------------------------------------
-
         public async Task<IActionResult> RoomMaterials(int id)
         {
-            // Carregar a sala com os materiais associados
+            // 1. Carregar a sala com especialidade e materiais associados
             var room = await _context.Room
+                .Include(r => r.Specialty)
                 .Include(r => r.LocalizacaoDispMedicoMovel)
                     .ThenInclude(l => l.MedicalDevice)
                         .ThenInclude(d => d.TypeMaterial)
@@ -849,30 +849,86 @@ public async Task<IActionResult> CancelarReserva(int id)
             if (room == null)
                 return NotFound();
 
-            // DEBUG — quantos consumíveis foram carregados pelo EF?
-            Console.WriteLine("DEBUG - Consumíveis carregados: " + room.RoomConsumables?.Count);
+            // Se a sala não tiver especialidade, não há dispositivos obrigatórios
+            if (room.SpecialtyId == null)
+            {
+                var vmSemEspecialidade = new RoomMaterial
+                {
+                    RoomId = room.RoomId,
+                    RoomName = room.Name,
+                    MedicalDevices = room.LocalizacaoDispMedicoMovel?.ToList() ?? new List<LocationMedDevice>(),
+                    Consumables = room.RoomConsumables?.ToList() ?? new List<RoomConsumable>(),
+                    DevicesMissing = new List<MedicalDevice>()
+                };
 
-            // PONTO 1: Mostrar TODOS os dispositivos associados à sala
-            var dispositivos = room.LocalizacaoDispMedicoMovel?.ToList();
+                ViewBag.SemDispositivos = !vmSemEspecialidade.MedicalDevices.Any();
+                ViewBag.DispositivosEmFalta = vmSemEspecialidade.DevicesMissing;
+                return View(vmSemEspecialidade);
+            }
 
-            // Construir ViewModel
-            var RoomMaterialviewModel = new RoomMaterial
+            var specialtyId = room.SpecialtyId.Value;
+
+            // 2. Dispositivos presentes na sala
+            var dispositivosPresentes = room.LocalizacaoDispMedicoMovel?
+                .Select(l => l.MedicalDevice)
+                .Where(d => d != null)
+                .ToList() ?? new List<MedicalDevice>();
+
+            // 3. Dispositivos obrigatórios da especialidade
+            var dispositivosObrigatorios = await _context.SpecialtyRequiredDevices
+                .Where(srd => srd.SpecialtyId == specialtyId)
+                .Include(srd => srd.MedicalDevice)
+                    .ThenInclude(md => md.TypeMaterial)
+                .Select(srd => srd.MedicalDevice)
+                .Where(md => md != null)
+                .ToListAsync();
+
+            // 4. Dispositivos em falta
+            var dispositivosEmFalta = dispositivosObrigatorios
+                .Where(o => !dispositivosPresentes.Any(p => p.MedicalDeviceID == o.MedicalDeviceID))
+                .ToList();
+
+            // 4b. Consumíveis obrigatórios da especialidade
+            var consumiveisObrigatorios = await _context.SpecialtyRequiredConsumables
+                .Where(src => src.SpecialtyId == specialtyId)
+                .Include(src => src.Consumivel)
+                    .ThenInclude(c => c.CategoriaConsumivel)
+                .ToListAsync();
+
+            // 4c. Consumíveis presentes na sala
+            var consumiveisPresentes = room.RoomConsumables ?? new List<RoomConsumable>();
+
+            // 4d. Consumíveis em falta
+            var consumiveisEmFalta = consumiveisObrigatorios
+                .Where(o =>
+                {
+                    var presente = consumiveisPresentes.FirstOrDefault(p => p.ConsumivelId == o.ConsumivelId);
+                    return presente == null || presente.Consumivel.QuantidadeAtual < o.RequiredQuantity;
+                })
+                .Select(o => o.Consumivel)
+                .ToList();
+
+            // 5. Construir ViewModel
+            var viewModel = new RoomMaterial
             {
                 RoomId = room.RoomId,
                 RoomName = room.Name,
-                MedicalDevices = dispositivos ?? new List<LocationMedDevice>(),
-                Consumables = room.RoomConsumables?.ToList() ?? new List<RoomConsumable>()
+                MedicalDevices = room.LocalizacaoDispMedicoMovel?.ToList() ?? new List<LocationMedDevice>(),
+                Consumables = room.RoomConsumables?.ToList() ?? new List<RoomConsumable>(),
+                DevicesMissing = dispositivosEmFalta,
+                ConsumablesMissing = consumiveisEmFalta
             };
 
-            Console.WriteLine("DEBUG - RoomConsumables count: " + room.RoomConsumables?.Count);
+            // 6. Flags para a View
+            ViewBag.SemDispositivos = !dispositivosPresentes.Any();
+            ViewBag.DispositivosEmFalta = dispositivosEmFalta;
 
-            foreach (var rc in room.RoomConsumables ?? new List<RoomConsumable>())
-            {
-                Console.WriteLine($"DEBUG - RC ID={rc.RoomConsumableId}, ConsumivelId={rc.ConsumivelId}, Nome={rc.Consumivel?.Nome}");
-            }
+            ViewBag.SemConsumiveis = !consumiveisPresentes.Any();
+            ViewBag.ConsumiveisEmFalta = consumiveisEmFalta;
 
-            return View(RoomMaterialviewModel);
+            return View(viewModel);
         }
+
 
         //----------------------------------------------------------ROOMMEXISTS---------------------------------------------------------------------------------
 
