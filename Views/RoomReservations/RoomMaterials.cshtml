@@ -48,7 +48,7 @@
 
             <!-- Botão desativado quando há dispositivos -->
             <button class="btn btn-secondary btn-sm mt-2" disabled>
-                <i class="bi bi-eye-slash"></i> Ver dispositivo em falta
+                <i class="bi bi-eye-slash"></i> Ver dispositivos em falta
             </button>
         }
         else
@@ -58,11 +58,42 @@
                 A sala não contém dispositivos médicos associados.
             </p>
 
-            <!-- Botão ativo quando não há dispositivos -->
-            <a asp-action="VerDispositivosEmFalta" asp-route-roomId="@Model.RoomId"
-               class="btn btn-danger btn-sm mt-2">
-                <i class="bi bi-eye"></i> Ver dispositivo em falta
-            </a>
+            <!-- Botão ativo quando NÃO há dispositivos -->
+            <button class="btn btn-danger btn-sm mt-2"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#faltasDispositivos">
+                <i class="bi bi-eye"></i> Ver dispositivos em falta
+            </button>
+
+            <!-- Collapse com dispositivos em falta -->
+            <div id="faltasDispositivos" class="collapse mt-3">
+                @if (Model.DevicesMissing != null && Model.DevicesMissing.Any())
+                {
+                    <table class="table table-bordered table-sm mt-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in Model.DevicesMissing)
+                            {
+                                <tr>
+                                    <td>@d.Name</td>
+                                    <td>@d.TypeMaterial?.Name</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info mt-2">
+                        Nenhum dispositivo obrigatório está em falta.
+                    </div>
+                }
+            </div>
         }
     </div>
 </div>
@@ -115,11 +146,42 @@
                 A sala não contém consumíveis associados.
             </p>
 
-            <!-- Botão ativo quando não há consumíveis -->
-            <a asp-action="VerConsumiveisEmFalta" asp-route-roomId="@Model.RoomId"
-               class="btn btn-danger btn-sm mt-2">
+            <!-- Botão ativo quando NÃO há consumíveis -->
+            <button class="btn btn-danger btn-sm mt-2"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#faltasConsumiveis">
                 <i class="bi bi-eye"></i> Ver consumíveis em falta
-            </a>
+            </button>
+
+            <!-- Collapse com consumíveis em falta -->
+            <div id="faltasConsumiveis" class="collapse mt-3">
+                @if (Model.ConsumablesMissing != null && Model.ConsumablesMissing.Any())
+                {
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in Model.ConsumablesMissing)
+                            {
+                                <tr>
+                                    <td>@c.Nome</td>
+                                    <td>@c.CategoriaConsumivel?.Nome</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-info mt-2">
+                        Nenhum consumível obrigatório está em falta.
+                    </div>
+                }
+            </div>
         }
     </div>
 </div>
