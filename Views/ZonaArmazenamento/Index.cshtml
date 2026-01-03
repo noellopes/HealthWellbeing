@@ -25,41 +25,51 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary mb-0">🏭 Zonas de Armazenamento</h2>
-        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">Nova Zona</a>
+        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">
+            <i class="bi bi-plus-lg me-1"></i> Nova Zona
+        </a>
     </div>
 
-    <form asp-action="Index" method="get" class="mb-4">
-        <div class="row g-2">
+    <form asp-action="Index" method="get" class="mb-4 bg-light p-3 rounded shadow-sm border">
+        <div class="row g-2 align-items-end">
 
             <div class="col-md-3">
+                <label class="form-label fw-bold small text-secondary">Nome</label>
                 <input type="text" name="searchNome" value="@ViewBag.SearchNome"
                        class="form-control shadow-sm"
-                       placeholder="🔍 Procurar por nome..." />
+                       placeholder="🔍 Zona..." />
             </div>
 
             <div class="col-md-2">
+                <label class="form-label fw-bold small text-secondary">Sala</label>
                 <input type="text" name="searchLocalizacao" value="@ViewBag.SearchLocalizacao"
                        class="form-control shadow-sm"
                        placeholder="📍 Sala..." />
             </div>
 
             <div class="col-md-3">
-                <select name="searchConsumivel" class="form-control shadow-sm" asp-items="ViewBag.ConsumiveisList">
-                    <option value="">-- Consumível --</option>
+                <label class="form-label fw-bold small text-secondary">Consumível</label>
+                <select name="searchConsumivel" class="form-select shadow-sm" asp-items="ViewBag.ConsumiveisList">
+                    <option value="">-- Todos --</option>
                 </select>
             </div>
 
             <div class="col-md-2">
-                <select name="estado" class="form-control shadow-sm">
+                <label class="form-label fw-bold small text-secondary">Estado</label>
+                <select name="estado" class="form-select shadow-sm">
                     <option value="todas" selected="@(ViewBag.Estado == "todas")">Todas</option>
-                    <option value="ativas" selected="@(ViewBag.Estado == "ativas")">Apenas Ativas</option>
-                    <option value="inativas" selected="@(ViewBag.Estado == "inativas")">Apenas Inativas</option>
+                    <option value="ativas" selected="@(ViewBag.Estado == "ativas")">Ativas</option>
+                    <option value="inativas" selected="@(ViewBag.Estado == "inativas")">Inativas</option>
                 </select>
             </div>
 
-            <div class="col-md-2 d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary w-50 me-2">OK</button>
-                <a asp-action="Index" class="btn btn-outline-secondary w-50">Limpar</a>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary w-100 me-1 shadow-sm" title="Pesquisar">
+                    <i class="bi bi-search"></i>
+                </button>
+                <a asp-action="Index" class="btn btn-secondary w-100 shadow-sm" title="Limpar Filtros">
+                    <i class="bi bi-x-lg"></i>
+                </a>
             </div>
 
         </div>
@@ -88,7 +98,7 @@
              style="font-size: 1.15rem; border-left: 6px solid #d39e00;">
             ⚠️ <strong>Nenhuma zona encontrada!</strong>
             <br />
-            Verifique os termos pesquisados e tente novamente.
+            Verifique os filtros e tente novamente.
         </div>
     }
     else
@@ -100,8 +110,8 @@
                         <th>Nome da Zona</th>
                         <th>Sala</th>
                         <th>Consumível</th>
-                        <th>Quantidade</th>
-                        <th>Ativa</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
                         <th class="text-center" style="width: 250px;">Ações</th>
                     </tr>
                 </thead>
@@ -113,9 +123,25 @@
 
                             <td>@item.Room?.Name</td>
 
-                            <td>@item.Consumivel?.Nome</td>
+                            <td>
+                                <i class="bi bi-box-seam text-muted me-1"></i>
+                                @item.Consumivel?.Nome
+                            </td>
 
-                            <td>@item.QuantidadeAtual / @item.CapacidadeMaxima</td>
+                            <td>
+                                @{
+                                    var percentagem = item.CapacidadeMaxima > 0
+                                    ? (item.QuantidadeAtual * 100) / item.CapacidadeMaxima
+                                    : 0;
+                                    string corBarra = percentagem > 90 ? "bg-danger" : (percentagem > 50 ? "bg-primary" : "bg-success");
+                                }
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">@item.QuantidadeAtual / @item.CapacidadeMaxima</span>
+                                    <div class="progress flex-grow-1" style="height: 5px; width: 50px;">
+                                        <div class="progress-bar @corBarra" role="progressbar" style="width: @percentagem%"></div>
+                                    </div>
+                                </div>
+                            </td>
 
                             <td>
                                 @if (item.Ativa)
@@ -129,9 +155,15 @@
                             </td>
 
                             <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.ZonaId" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
-                                <a asp-action="Edit" asp-route-id="@item.ZonaId" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
-                                <a asp-action="Delete" asp-route-id="@item.ZonaId" class="btn btn-sm btn-danger btn-acao">Eliminar</a>
+                                <a asp-action="Details" asp-route-id="@item.ZonaId" class="btn btn-sm btn-info text-white me-1 btn-acao" title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.ZonaId" class="btn btn-sm btn-warning text-white me-1 btn-acao" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.ZonaId" class="btn btn-sm btn-danger btn-acao" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </td>
                         </tr>
                     }
