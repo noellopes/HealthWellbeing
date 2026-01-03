@@ -1,0 +1,40 @@
+﻿@using HealthWellbeing.Models
+@model LocationMedDevice
+
+@{
+    ViewData["Title"] = "Adicionar dispositivo à sala";
+}
+
+<h2 class="mb-3 text-success">
+    <i class="bi bi-cpu me-2"></i>
+    Adicionar dispositivo à sala "@ViewBag.RoomName"
+</h2>
+
+<form asp-action="Add" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+    <input type="hidden" asp-for="RoomId" value="@ViewBag.RoomId" />
+
+    <div class="mb-3">
+        <label class="form-label">Dispositivo</label>
+        <select asp-for="MedicalDeviceID"
+                class="form-select"
+                asp-items="ViewBag.MedicalDeviceID">
+        </select>
+        <span asp-validation-for="MedicalDeviceID" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-1"></i> Adicionar
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
