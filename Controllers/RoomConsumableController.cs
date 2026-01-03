@@ -105,7 +105,9 @@ namespace HealthWellbeingRoom.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Consumível adicionado à sala com sucesso.";
+            var room = await _context.Room.FindAsync(rc.RoomId);
+            TempData["SuccessMessage"] =$"Consumível adicionado à sala '{room?.Name ?? rc.RoomId.ToString()}' com sucesso.";
+
             return RedirectToAction(
                 actionName: "RoomMaterials",
                 controllerName: "RoomReservations",

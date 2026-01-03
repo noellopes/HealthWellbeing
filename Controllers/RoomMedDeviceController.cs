@@ -78,7 +78,9 @@ namespace HealthWellbeingRoom.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Dispositivo associado à sala com sucesso.";
+            var room = await _context.Room.FindAsync(model.RoomId);
+            TempData["SuccessMessage"] = $"Dispositivo adicionado à sala '{room?.Name ?? model.RoomId.ToString()}' com sucesso.";
+
             return RedirectToAction("RoomMaterials", "RoomReservations", new { id = model.RoomId });
         }
     }

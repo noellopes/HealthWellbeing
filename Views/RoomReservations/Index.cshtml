@@ -11,7 +11,6 @@
     <i class="bi bi-calendar-check me-2"></i> Lista das reservas de Salas
 </h1>
 
-
 @if (TempData["SuccessMessage"] != null)
 {
     <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -24,7 +23,6 @@
 {
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
-
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Reservas de Salas</h2>
@@ -48,9 +46,6 @@
         }
     </div>
 </div>
-
-
-
 
 <!-- FORMULÁRIO DE PESQUISA -->
 <div class="collapse mt-2 mb-3" id="postSearch">
@@ -87,7 +82,6 @@
             </div>
 
             <div class="col-12 mt-2 d-flex gap-2">
-                <!-- Força page=1 ao pesquisar -->
                 <input type="hidden" name="page" value="1" />
 
                 <button type="submit" class="btn btn-outline-primary flex-fill">
@@ -132,6 +126,13 @@
                     {
                         @foreach (var item in Model.Items)
                         {
+                            // Lógica de materiais da sala para a cor do botão
+                            bool hasDevices = item.Room?.LocalizacaoDispMedicoMovel != null
+                            && item.Room.LocalizacaoDispMedicoMovel.Any();
+                            bool hasConsumables = item.Room?.RoomConsumables != null
+                            && item.Room.RoomConsumables.Any();
+                            bool materialOk = hasDevices && hasConsumables;
+
                             <tr>
                                 <!-- ID CONSULTA -->
                                 <td>@item.ConsultationId.ToString("D3")</td>
@@ -210,7 +211,7 @@
                                     <a asp-controller="RoomReservations"
                                        asp-action="RoomMaterials"
                                        asp-route-Id="@item.RoomId"
-                                       class="btn btn-sm @(item.Room?.LocalizacaoDispMedicoMovel != null && item.Room.LocalizacaoDispMedicoMovel.Any() ? "btn-success" : "btn-danger")">
+                                       class="btn btn-sm @(materialOk ? "btn-success" : "btn-danger")">
                                         <i class="bi bi-box-seam"></i> Material
                                     </a>
 
@@ -243,7 +244,6 @@
     }
 
     <ul class="pagination mb-0">
-        <!-- Primeira página -->
         @if (Model.CurrentPage == 1)
         {
             <li class="page-item disabled">
@@ -264,7 +264,6 @@
             </li>
         }
 
-        <!-- Números de página -->
         @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
         {
             if (p == Model.CurrentPage)
@@ -288,7 +287,6 @@
             }
         }
 
-        <!-- Última página -->
         @if (Model.CurrentPage == Model.TotalPages)
         {
             <li class="page-item disabled">

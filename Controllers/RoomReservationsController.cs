@@ -867,13 +867,18 @@ namespace HealthWellbeingRoom.Controllers
                     ConsumablesMissing = new List<Consumivel>()
                 };
 
+                // Flags dispositivos
                 ViewBag.SemDispositivos = !vmSemEspecialidade.MedicalDevices.Any();
                 ViewBag.DispositivosEmFalta = vmSemEspecialidade.DevicesMissing;
                 ViewBag.TemDispositivosEmFalta = vmSemEspecialidade.DevicesMissing.Any();
 
+                // Flags consumíveis
                 ViewBag.SemConsumiveis = !vmSemEspecialidade.Consumables.Any();
                 ViewBag.ConsumiveisEmFalta = vmSemEspecialidade.ConsumablesMissing;
                 ViewBag.TemConsumiveisEmFalta = vmSemEspecialidade.ConsumablesMissing.Any();
+
+                // Botão Material verde só se não houver nada em falta
+                ViewBag.MaterialOk = !ViewBag.TemDispositivosEmFalta && !ViewBag.TemConsumiveisEmFalta;
 
                 ViewBag.RoomId = room.RoomId;
                 return View(vmSemEspecialidade);
@@ -881,13 +886,13 @@ namespace HealthWellbeingRoom.Controllers
 
             var specialtyId = room.SpecialtyId.Value;
 
-            // -------- DISPOSITIVOS --------
-
+            // -------- DISPOSITIVOS PRESENTES --------
             var dispositivosPresentes = room.LocalizacaoDispMedicoMovel?
                 .Select(l => l.MedicalDevice)
                 .Where(d => d != null)
                 .ToList() ?? new List<MedicalDevice>();
 
+            // -------- DISPOSITIVOS OBRIGATÓRIOS --------
             var dispositivosObrigatorios = await _context.SpecialtyRequiredDevices
                 .Where(srd => srd.SpecialtyId == specialtyId)
                 .Include(srd => srd.MedicalDevice)
@@ -896,12 +901,12 @@ namespace HealthWellbeingRoom.Controllers
                 .Where(md => md != null)
                 .ToListAsync();
 
+            // Em falta = obrigatórios que NÃO estão presentes
             var dispositivosEmFalta = dispositivosObrigatorios
                 .Where(o => !dispositivosPresentes.Any(p => p.MedicalDeviceID == o.MedicalDeviceID))
                 .ToList();
 
-            // -------- CONSUMÍVEIS --------
-
+            // -------- CONSUMÍVEIS OBRIGATÓRIOS --------
             var consumiveisObrigatorios = await _context.SpecialtyRequiredConsumables
                 .Where(src => src.SpecialtyId == specialtyId)
                 .Include(src => src.Consumivel)
@@ -915,8 +920,10 @@ namespace HealthWellbeingRoom.Controllers
                 .Where(x => x.Consumivel != null)
                 .ToListAsync();
 
+            // Presentes na sala
             var consumiveisPresentes = room.RoomConsumables ?? new List<RoomConsumable>();
 
+            // Em falta = inexistente ou quantidade inferior à necessária
             var consumiveisEmFalta = consumiveisObrigatorios
                 .Where(o =>
                 {
@@ -941,7 +948,7 @@ namespace HealthWellbeingRoom.Controllers
 
             // 6. Flags para a View
 
-            // Informação geral (existem ou não dispositivos/consumíveis na sala)
+            // Informação geral (se existem dispositivos/consumíveis na sala)
             ViewBag.SemDispositivos = !dispositivosPresentes.Any();
             ViewBag.SemConsumiveis = !consumiveisPresentes.Any();
 
@@ -949,13 +956,17 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.DispositivosEmFalta = dispositivosEmFalta;
             ViewBag.ConsumiveisEmFalta = consumiveisEmFalta;
 
-            // Flags específicas para mostrar botão/alerta “em falta”
+            // Flags específicas “em falta”
             ViewBag.TemDispositivosEmFalta = dispositivosEmFalta.Any();
             ViewBag.TemConsumiveisEmFalta = consumiveisEmFalta.Any();
+
+            // Botão Material verde só quando NÃO há dispositivos nem consumíveis em falta
+            ViewBag.MaterialOk = !ViewBag.TemDispositivosEmFalta && !ViewBag.TemConsumiveisEmFalta;
 
             ViewBag.RoomId = room.RoomId;
             return View(viewModel);
         }
+
 
         //----------------------------------------------------------ROOMMEXISTS---------------------------------------------------------------------------------
 
