@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class ZonaArmazenamentoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
