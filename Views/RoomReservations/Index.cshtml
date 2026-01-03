@@ -317,11 +317,20 @@
         <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
 
-    <a asp-controller="RoomReservations"
-       asp-action="Consultation"
-       class="btn btn-success btn-sm">
-        <i class="bi bi-people-fill me-1"></i> Ver Lista de Consultas
-    </a>
+    <div class="d-flex gap-2">
+        <a asp-controller="RoomReservations"
+           asp-action="ConsumablesExpenses"
+           class="btn btn-warning btn-sm">
+            <i class="bi bi-droplet-half me-1"></i> Ver consumíveis gastos
+        </a>
+
+        <a asp-controller="RoomReservations"
+           asp-action="Consultation"
+           class="btn btn-success btn-sm">
+            <i class="bi bi-people-fill me-1"></i> Ver Lista de Consultas
+        </a>
+    </div>
+</div>
 
 </div>
 

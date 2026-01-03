@@ -82,8 +82,9 @@
 
         <div class="d-flex justify-content-end mb-3">
             <a asp-controller="RoomConsumable"
-               asp-action="Create"
+               asp-action="Add"
                asp-route-roomId="@ViewBag.RoomId"
+               asp-route-origin="Consumables"
                class="btn btn-success btn-sm">
                 <i class="bi bi-plus-circle me-1"></i> Adicionar consumível à sala
             </a>
@@ -95,7 +96,7 @@
                     <tr>
                         <th>Consumível</th>
                         <th>Categoria</th>
-                        <th>Quantidade</th>
+                        <th>Stock</th>
                         <th>Observações</th>
                     </tr>
                 </thead>

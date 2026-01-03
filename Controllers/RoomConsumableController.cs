@@ -18,14 +18,15 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
-        // GET: RoomConsumable/Create?roomId=1&consumivelId=5
-        public async Task<IActionResult> Add(int roomId, int? consumivelId)
+        // GET: RoomConsumable/Add?roomId=1&consumivelId=5&origin=Consumables
+        public async Task<IActionResult> Add(int roomId, int? consumivelId, string? origin)
         {
             var room = await _context.Room.FindAsync(roomId);
             if (room == null) return NotFound();
 
             ViewBag.RoomId = roomId;
             ViewBag.RoomName = room.Name;
+            ViewBag.Origin = origin;
 
             if (consumivelId.HasValue)
             {
@@ -56,10 +57,12 @@ namespace HealthWellbeingRoom.Controllers
             return View(new RoomConsumable { RoomId = roomId });
         }
 
-        // POST: RoomConsumable/Create
+        // POST: RoomConsumable/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add([Bind("RoomId,ConsumivelId,Quantity,Note")] RoomConsumable rc)
+        public async Task<IActionResult> Add(
+            [Bind("RoomId,ConsumivelId,Quantity,Note")] RoomConsumable rc,
+            string? origin)
         {
             if (!ModelState.IsValid)
             {
@@ -70,6 +73,7 @@ namespace HealthWellbeingRoom.Controllers
                     rc.ConsumivelId
                 );
                 ViewBag.RoomId = rc.RoomId;
+                ViewBag.Origin = origin;
                 return View(rc);
             }
 
@@ -106,14 +110,35 @@ namespace HealthWellbeingRoom.Controllers
             await _context.SaveChangesAsync();
 
             var room = await _context.Room.FindAsync(rc.RoomId);
-            TempData["SuccessMessage"] =$"Consumível adicionado à sala '{room?.Name ?? rc.RoomId.ToString()}' com sucesso.";
+            TempData["SuccessMessage"] =
+                $"Consumível adicionado à sala '{room?.Name ?? rc.RoomId.ToString()}' com sucesso.";
 
+            // DECISÃO DE PARA ONDE VOLTAR
+            if (!string.IsNullOrWhiteSpace(origin) &&
+                origin.Equals("Consumables", StringComparison.OrdinalIgnoreCase))
+            {
+                // View Consumíveis Associados (RoomsController)
+                return RedirectToAction(
+                    actionName: "Consumables",
+                    controllerName: "Rooms",
+                    routeValues: new { id = rc.RoomId });
+            }
+
+            if (!string.IsNullOrWhiteSpace(origin) &&
+                origin.Equals("RoomMaterials", StringComparison.OrdinalIgnoreCase))
+            {
+                // View Materiais da Sala (RoomReservationsController)
+                return RedirectToAction(
+                    actionName: "RoomMaterials",
+                    controllerName: "RoomReservations",
+                    routeValues: new { id = rc.RoomId });
+            }
+
+            // fallback
             return RedirectToAction(
                 actionName: "RoomMaterials",
                 controllerName: "RoomReservations",
                 routeValues: new { id = rc.RoomId });
-
-
         }
     }
 }

@@ -18,15 +18,16 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
-        // GET: RoomMedDevice/Add?roomId=1
+        // GET: RoomMedDevice/Add?roomId=1&origin=RoomMaterials
         [HttpGet]
-        public async Task<IActionResult> Add(int roomId)
+        public async Task<IActionResult> Add(int roomId, string? origin)
         {
             var room = await _context.Room.FindAsync(roomId);
             if (room == null) return NotFound();
 
             ViewBag.RoomId = roomId;
             ViewBag.RoomName = room.Name;
+            ViewBag.Origin = origin;
 
             ViewBag.MedicalDeviceID = new SelectList(
                 await _context.MedicalDevices
@@ -42,7 +43,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: RoomMedDevice/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(LocationMedDevice model)
+        public async Task<IActionResult> Add(LocationMedDevice model, string? origin)
         {
             if (!ModelState.IsValid)
             {
@@ -56,6 +57,7 @@ namespace HealthWellbeingRoom.Controllers
                 );
                 ViewBag.RoomId = model.RoomId;
                 ViewBag.RoomName = (await _context.Room.FindAsync(model.RoomId))?.Name;
+                ViewBag.Origin = origin;
                 return View(model);
             }
 
@@ -79,9 +81,34 @@ namespace HealthWellbeingRoom.Controllers
             await _context.SaveChangesAsync();
 
             var room = await _context.Room.FindAsync(model.RoomId);
-            TempData["SuccessMessage"] = $"Dispositivo adicionado à sala '{room?.Name ?? model.RoomId.ToString()}' com sucesso.";
+            TempData["SuccessMessage"] =
+                $"Dispositivo adicionado à sala '{room?.Name ?? model.RoomId.ToString()}' com sucesso.";
 
-            return RedirectToAction("RoomMaterials", "RoomReservations", new { id = model.RoomId });
+            // DECISÃO DE PARA ONDE VOLTAR
+            if (!string.IsNullOrWhiteSpace(origin) &&
+                origin.Equals("RoomMaterials", StringComparison.OrdinalIgnoreCase))
+            {
+                return RedirectToAction(
+                    actionName: "RoomMaterials",
+                    controllerName: "RoomReservations",
+                    routeValues: new { id = model.RoomId });
+            }
+
+            if (!string.IsNullOrWhiteSpace(origin) &&
+                origin.Equals("MedicalDevices", StringComparison.OrdinalIgnoreCase))
+            {
+                // Exemplo: se um dia tiveres uma view Rooms/Devices
+                return RedirectToAction(
+                    actionName: "MedicalDevices",
+                    controllerName: "Rooms",
+                    routeValues: new { id = model.RoomId });
+            }
+
+            // fallback
+            return RedirectToAction(
+                actionName: "RoomMaterials",
+                controllerName: "RoomReservations",
+                routeValues: new { id = model.RoomId });
         }
     }
 }
