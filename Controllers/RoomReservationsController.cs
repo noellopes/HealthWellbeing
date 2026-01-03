@@ -692,7 +692,6 @@ public async Task<IActionResult> CancelarReserva(int id)
         //------------------------------------------------------JSON RESULT-------------------------------------------------------------------------------------
         // Filtrar salas disponíveis para uma data e intervalo de horas e disponibilidade da sala
         [HttpGet]
-        [HttpGet]
         public JsonResult GetAvailableRooms(DateTime date, TimeSpan start, TimeSpan end, int? excludeReservationId = null)
         {
             var dateOnly = date.Date;
