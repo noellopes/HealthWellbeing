@@ -117,7 +117,12 @@
                         }
                         else
                         {
+                            @* Campo Readonly *@
                             <textarea asp-for="Observation" class="form-control" rows="3" readonly style="background-color: #e9ecef;"></textarea>
+
+                            <small class="text-muted">
+                                <i class="bi bi-lock-fill"></i> Apenas o Administrador pode alterar as observações.
+                            </small>
                         }
                         <span asp-validation-for="Observation" class="text-danger small"></span>
                     </div>
