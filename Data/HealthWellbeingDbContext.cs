@@ -22,7 +22,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.TreatmentType> TreatmentType { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Nurse> Nurse { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TreatmentRecord> TreatmentRecord { get; set; } = default!;
-        public DbSet<RoomConsumable> RoomConsumable { get; set; }
+        public DbSet<RoomConsumable> RoomConsumables { get; set; }
 
         // Soft Delete interceptor
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

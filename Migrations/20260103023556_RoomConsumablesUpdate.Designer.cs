@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260103023556_RoomConsumablesUpdate")]
+    partial class RoomConsumablesUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -905,31 +908,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.ToTable("Manufacturer");
                 });
 
-            modelBuilder.Entity("HealthWellbeingRoom.Models.MedDevSpecialtyRequirement", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RequiredDeviceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SpecialtyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("SpecialtyId");
-
-                    b.ToTable("MedDevSpecialtyRequirement");
-                });
-
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
                 {
                     b.Property<int>("MedicalDeviceID")
@@ -1508,17 +1486,6 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Manufacturer");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.MedDevSpecialtyRequirement", b =>
-                {
-                    b.HasOne("HealthWellbeingRoom.Models.Specialty", "Specialty")
-                        .WithMany()
-                        .HasForeignKey("SpecialtyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
