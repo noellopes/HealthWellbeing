@@ -1,8 +1,39 @@
-﻿@model IEnumerable<ClienteBalnearioModel>
+﻿@model IEnumerable<HealthWellbeing.Models.ClienteBalnearioModel>
 
-<h2>Clientes</h2>
+<h2>Lista de Clientes do Balneário</h2>
 
-@foreach (var c in Model)
-{
-    <p>@c.Nome - @c.Email</p>
-}
+<form method="get">
+    <input type="text" name="search" placeholder="Pesquisar nome..." />
+    <button type="submit" class="btn btn-primary">Pesquisar</button>
+</form>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Novo Cliente</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telemóvel</th>
+            <th>Tipo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nome</td>
+                <td>@item.Email</td>
+                <td>@item.Telemovel</td>
+                <td>@item.TipoCliente</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ClienteBalnearioId" class="btn btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.ClienteBalnearioId" class="btn btn-danger">Apagar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

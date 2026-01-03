@@ -1,23 +1,81 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HealthWellbeing.Controllers
 {
     public class ClienteBalnearioController : Controller
     {
-        public IActionResult Index()
+        // LISTA FAKE (simula BD)
+        private static List<ClienteBalnearioModel> _clientes = new()
         {
-            var clientes = new List<ClienteBalnearioModel>
-        {
-            new ClienteBalnearioModel { Nome = "Teste", Email = "teste@email.com" }
+            new ClienteBalnearioModel { ClienteBalnearioId = 1, Nome = "Maria Silva", Email="maria@gmail.com", Telemovel="912345678", Morada="Rua A", TipoCliente="Regular" },
+            new ClienteBalnearioModel { ClienteBalnearioId = 2, Nome = "João Pereira", Email="joao@gmail.com", Telemovel="913456789", Morada="Rua B", TipoCliente="VIP" }
         };
 
-            return View(clientes);
+        public IActionResult Index(string search)
+        {
+            var lista = _clientes;
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                lista = lista
+                    .Where(c => c.Nome.Contains(search, System.StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return View(lista);
         }
 
         public IActionResult Create()
         {
             return View();
         }
-    }
 
+        [HttpPost]
+        public IActionResult Create(ClienteBalnearioModel cliente)
+        {
+            if (!ModelState.IsValid)
+                return View(cliente);
+
+            cliente.ClienteBalnearioId = _clientes.Max(c => c.ClienteBalnearioId) + 1;
+            _clientes.Add(cliente);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
+            if (cliente == null) return NotFound();
+
+            return View(cliente);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(ClienteBalnearioModel cliente)
+        {
+            if (!ModelState.IsValid)
+                return View(cliente);
+
+            var existente = _clientes.First(c => c.ClienteBalnearioId == cliente.ClienteBalnearioId);
+            existente.Nome = cliente.Nome;
+            existente.Email = cliente.Email;
+            existente.Telemovel = cliente.Telemovel;
+            existente.Morada = cliente.Morada;
+            existente.TipoCliente = cliente.TipoCliente;
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
+            if (cliente != null)
+                _clientes.Remove(cliente);
+
+            return RedirectToAction(nameof(Index));
+        }
+    }
 }
