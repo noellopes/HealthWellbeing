@@ -6,22 +6,22 @@ namespace HealthWellbeingRoom.Models
     {
         public int ConsumablesExpensesId { get; set; }
 
-        // Which consumable was used
+        // Qual consumível foi utilizado
         public int ConsumableId { get; set; }
         public Consumivel Consumable { get; set; }
 
-        // Where it was used
+        // Onde foi utilizado
         public int RoomId { get; set; }
         public Room Room { get; set; }
 
-        // Which reservation generated this expense
+        // Qual reserva gerou esta despesa
         public int RoomReservationId { get; set; }
         public RoomReservation RoomReservation { get; set; }
 
-        // How much was consumed
+        // Quantidade consumida
         public int QuantityUsed { get; set; }
 
-        // When it happened
+        // Quando ocorreu
         public DateTime UsedAt { get; set; }
     }
 }

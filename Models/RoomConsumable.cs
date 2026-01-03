@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeingRoom.Models
 {
@@ -23,6 +24,9 @@ namespace HealthWellbeingRoom.Models
         [Range(0, int.MaxValue, ErrorMessage = "A quantidade deve ser um número não negativo.")]
         [Display(Name = "Quantidade")]
         public int Quantity { get; set; }
+
+        [NotMapped]
+        public int usedQuantity { get; set; } = 1;
 
         [StringLength(500)]
         [Display(Name = "Observações")]

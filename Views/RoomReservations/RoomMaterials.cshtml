@@ -55,10 +55,10 @@
                         <a asp-controller="RoomMedDevice"
                            asp-action="Add"
                            asp-route-roomId="@Model.RoomId"
+                           asp-route-origin="RoomMaterials"
                            class="btn btn-success btn-sm">
                             <i class="bi bi-plus-circle me-1"></i> Adicionar dispositivo
                         </a>
-
                     </div>
                 }
                 else
@@ -181,11 +181,11 @@
                 <div class="d-flex justify-content-end">
                     <a asp-controller="RoomConsumable"
                        asp-action="Add"
-                       asp-route-roomId="@ViewBag.RoomId"
+                       asp-route-roomId="@Model.RoomId"
+                       asp-route-origin="RoomMaterials"
                        class="btn btn-success btn-sm">
                         <i class="bi bi-plus-circle me-1"></i> Adicionar consumiveis
                     </a>
-
                 </div>
             </div>
 
@@ -198,7 +198,7 @@
                         <tr>
                             <th>Nome</th>
                             <th>Categoria</th>
-                            <th>Quantidade atual</th>
+                            <th>Stock</th>
                             <th>Quantidade máxima</th>
                         </tr>
                     </thead>
@@ -228,18 +228,22 @@
                     <tr>
                         <th>Nome</th>
                         <th>Categoria</th>
-                        <th>Quantidade atual</th>
+                        <th>Stock</th>
+                        <th>Quantidade utilizada</th>
                         <th>Quantidade máxima</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var cons in Model.Consumables)
+                    @for (int i = 0; i < Model.Consumables.Count; i++)
                     {
                         <tr>
-                            <td>@cons.Consumivel?.Nome</td>
-                            <td>@cons.Consumivel?.CategoriaConsumivel?.Nome</td>
-                            <td>@cons.Quantity</td>
-                            <td>@cons.Consumivel?.QuantidadeMaxima</td>
+                            <td>@Model.Consumables[i].Consumivel?.Nome</td>
+                            <td>@Model.Consumables[i].Consumivel?.CategoriaConsumivel?.Nome</td>
+                            <td>@Model.Consumables[i].Quantity</td>
+                            <td>
+                                <input asp-for="Consumables[i].usedQuantity" class="form-control-sm" />
+                            </td>
+                            <td>@Model.Consumables[i].Consumivel?.QuantidadeMaxima</td>
                         </tr>
                     }
                 </tbody>
