@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "Dispositivos Médicos Associados";
-    string? successMessage = Context.Request.Query["SuccessMessage"];
+    var successMessage = TempData["SuccessMessage"] as string;
 }
 
-@if (successMessage != null)
+@if (!string.IsNullOrEmpty(successMessage))
 {
-    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
         @successMessage
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -83,6 +83,16 @@
 <div class="card shadow-sm" style="min-height: 60vh;">
     <div class="card-body">
 
+        <!-- Botão Adicionar dispositivo à sala -->
+        <div class="d-flex justify-content-end mb-3">
+            <a asp-controller="RoomMedDevice"
+               asp-action="Add"
+               asp-route-roomId="@ViewBag.RoomId"
+               class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Adicionar dispositivo à sala
+            </a>
+        </div>
+
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
@@ -135,8 +145,6 @@
 
 <!-- Botões fora da card -->
 <div class="mt-4 d-flex justify-content-between">
-
-    <!-- Botão Lista de Salas (Home) -->
     <a asp-controller="Rooms"
        asp-action="Index"
        class="btn btn-primary btn-sm">
@@ -144,23 +152,12 @@
     </a>
 
     <div class="d-flex gap-2">
-
-        <!-- Botão Voltar à Sala -->
         <a asp-action="Details"
            asp-route-id="@ViewBag.RoomId"
            class="btn btn-primary btn-sm">
             <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
         </a>
-
-        <!-- Botão Buscar Dispositivo (ícone atualizado) -->
-        <a asp-controller="LocationMedDevice"
-           asp-action="Index"
-           class="btn btn-primary btn-sm">
-            <i class="bi bi-search me-1"></i> Buscar Dispositivo
-        </a>
-
     </div>
-
 </div>
 
 <!-- PAGINAÇÃO -->
@@ -239,3 +236,15 @@
         }
     </ul>
 </nav>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            var alert = document.getElementById('success-alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }
+        }, 4000);
+    </script>
+}

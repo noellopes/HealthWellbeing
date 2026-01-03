@@ -14,6 +14,8 @@ namespace HealthWellbeingRoom.ViewModels
         // Lista de dispositivos médicos obrigatórios que estão em falta na sala
         public List<MedicalDevice> DevicesMissing { get; set; } = new();
         public List<Consumivel> ConsumablesMissing { get; set; } = new();
+
+        public bool CanSeeMaterialButton =>!DevicesMissing.Any() && !ConsumablesMissing.Any();
     }
 
 }
