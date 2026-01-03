@@ -11,6 +11,13 @@
     <a asp-action="Create" class="btn btn-success">Novo Cliente</a>
 </p>
 
+@if (!Model.Any())
+{
+    <p class="text-muted">Nenhum cliente encontrado.</p>
+}
+
+
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -18,7 +25,7 @@
             <th>Email</th>
             <th>Telemóvel</th>
             <th>Tipo</th>
-            <th></th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
@@ -28,12 +35,27 @@
                 <td>@item.Nome</td>
                 <td>@item.Email</td>
                 <td>@item.Telemovel</td>
-                <td>@item.TipoCliente</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ClienteBalnearioId" class="btn btn-warning">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.ClienteBalnearioId" class="btn btn-danger">Apagar</a>
+                    <span class="badge @(item.TipoCliente == "VIP" ? "bg-warning text-dark" : "bg-secondary")">
+                        @item.TipoCliente
+                    </span>
+                </td>
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-id="@item.ClienteBalnearioId"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.ClienteBalnearioId"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Tem a certeza que deseja apagar este cliente?')">
+                        Apagar
+                    </a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
