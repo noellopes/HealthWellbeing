@@ -1,33 +1,41 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace HealthWellbeing.Models
 {
     public class ZonaArmazenamento
     {
         [Key]
-        public int Id { get; set; }
+        public int ZonaId { get; set; }
 
-        [Required(ErrorMessage = "O nome é obrigatório.")]
-        [StringLength(100, ErrorMessage = "O nome não pode ter mais de 100 caracteres.")]
-        public string Nome { get; set; }
+        [Required(ErrorMessage = "O nome da zona é obrigatório.")]
+        [StringLength(100)]
+        public string NomeZona { get; set; } = string.Empty;
 
-        [StringLength(200, ErrorMessage = "A descrição não pode ter mais de 200 caracteres.")]
-        public string? Descricao { get; set; }
+        // FK para Consumível
+        [Required(ErrorMessage = "O consumível é obrigatório.")]
+        public int ConsumivelId { get; set; }
 
+        // Navegação - NÃO validar no POST
+        [ValidateNever]
+        public Consumivel? Consumivel { get; set; }
 
-        [Required(ErrorMessage = "A localização é obrigatória.")]
-        [Display(Name = "Localização")]
-        public int LocalizacaoZonaArmazenamentoId { get; set; }
+        // FK para Sala (Room)
+        [Required(ErrorMessage = "A sala é obrigatória.")]
+        public int RoomId { get; set; }
 
-        public LocalizacaoZonaArmazenamento? LocalizacaoZonaArmazenamento { get; set; }
-
+        // Navegação - NÃO validar no POST
+        [ValidateNever]
+        public Room? Room { get; set; }
 
         [Required(ErrorMessage = "A capacidade máxima é obrigatória.")]
-        [Range(1, 10000, ErrorMessage = "A capacidade deve estar entre 1 e 10.000 m³.")]
-        [Display(Name = "Capacidade (m³)")]
-        public double CapacidadeMaxima { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "A capacidade máxima deve ser pelo menos 1.")]
+        public int CapacidadeMaxima { get; set; }
 
-        [Display(Name = "Zona Ativa")]
+        [Required(ErrorMessage = "A quantidade atual é obrigatória.")]
+        [Range(0, int.MaxValue, ErrorMessage = "A quantidade atual não pode ser negativa.")]
+        public int QuantidadeAtual { get; set; }
+
         public bool Ativa { get; set; } = true;
     }
 }

@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
 using HealthWellbeing.Data;
+using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class CategoriaConsumivelController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

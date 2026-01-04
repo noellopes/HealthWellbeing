@@ -1,0 +1,105 @@
+﻿@model HealthWellbeingRoom.Models.Equipment
+
+@{
+    ViewData["Title"] = "Registar";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<form asp-action="Create">
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-clipboard-plus me-2"></i> Novo Equipamento
+            </h4>
+        </div>
+
+		<div class="card-body">
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                        <input asp-for="Name" class="form-control" placeholder="Ex: Laptop Dell Latitude" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="RoomId" class="form-label fw-bold">Sala</label>
+                        <select asp-for="RoomId" class="form-select" asp-items="ViewBag.RoomId">
+                            <option value="">-- Selecione a Sala --</option>
+                        </select>
+                        <span asp-validation-for="RoomId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EquipmentTypeId" class="form-label fw-bold">Tipo de Equipamento</label>
+                        <select asp-for="EquipmentTypeId" class="form-select" asp-items="ViewBag.EquipmentTypeId">
+                            <option value="">-- Selecione o Tipo de Equipamento --</option>
+                        </select>
+                        <span asp-validation-for="EquipmentTypeId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="EquipmentStatusId" class="form-label fw-bold">Estado</label>
+                        <select asp-for="EquipmentStatusId" class="form-select" asp-items="ViewBag.EquipmentStatusId">
+                            <option value="">-- Selecione o Estado --</option>
+                        </select>
+                        <span asp-validation-for="EquipmentStatusId" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="SerialNumber" class="form-label fw-bold">Nº de Série</label>
+                        <input asp-for="SerialNumber" class="form-control" placeholder="Ex: SXR-04937" />
+                        <span asp-validation-for="SerialNumber" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="PurchaseDate" class="form-label fw-bold">Data Compra</label>
+                        <input asp-for="PurchaseDate" type="date" class="form-control" />
+                        <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label asp-for="Description" class="form-label fw-bold">Descrição</label>
+                        <textarea asp-for="Description" rows="4" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+			</div>
+
+            <div class="text-end mt-4 gap-2 border-top pt-3">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Submeter
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                </a>
+            </div>
+
+        </div>
+	</div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

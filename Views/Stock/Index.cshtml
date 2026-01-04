@@ -50,40 +50,26 @@
 
 <div class="container mt-4">
 
-    <!-- =============================== -->
-    <!-- TOPO: TÍTULO + BOTÕES -->
-    <!-- =============================== -->
+    <!-- TOPO -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h2 class="fw-bold text-primary mb-0">
-            🏭 Gestão de Stock
-        </h2>
+        <h2 class="fw-bold text-primary mb-0">🏭 Gestão de Stock</h2>
 
         <div class="d-flex gap-2">
-            <a asp-controller="Compra"
-               asp-action="Index"
-               class="btn btn-success px-4">
+            <a asp-controller="Compra" asp-action="Index" class="btn btn-success px-4">
                 📥 Fazer Compra
             </a>
 
-            <a asp-controller="HistoricoCompras" asp-action="Index"
-               class="btn btn-success px-4">
+            <a asp-controller="HistoricoCompras" asp-action="Index" class="btn btn-success px-4">
                 📑 Histórico de Compras
             </a>
-
-
         </div>
-
     </div>
 
-    <!-- =============================== -->
-    <!-- MENSAGENS DE ESTADO -->
-    <!-- =============================== -->
+    <!-- ALERTAS -->
     @if (ViewBag.StockCritico == true)
     {
         <div class="alert alert-warning shadow-sm mb-3">
-            ⚠️ A mostrar consumíveis em que a quantidade atual está próxima da quantidade mínima 
-
+            ⚠️ A mostrar consumíveis com stock próximo do mínimo.
         </div>
     }
 
@@ -101,59 +87,41 @@
         </div>
     }
 
-    <!-- =============================== -->
     <!-- FILTROS -->
-    <!-- =============================== -->
     <form method="get" asp-action="Index" class="mb-4">
         <div class="row g-3">
 
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">🔍</span>
-                    <input type="text"
-                           name="searchNome"
-                           value="@ViewBag.SearchNome"
-                           class="form-control"
-                           placeholder="Procurar por consumível..." />
+                    <input type="text" name="searchNome" value="@ViewBag.SearchNome"
+                           class="form-control" placeholder="Procurar por consumível..." />
                 </div>
             </div>
 
             <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text">📍</span>
-                    <input type="text"
-                           name="searchZona"
-                           value="@ViewBag.SearchZona"
-                           class="form-control"
-                           placeholder="Procurar por zona..." />
+                    <input type="text" name="searchZona" value="@ViewBag.SearchZona"
+                           class="form-control" placeholder="Procurar por zona..." />
                 </div>
             </div>
 
             <div class="col-md-2 d-flex align-items-center">
-                <input class="form-check-input me-2"
-                       type="checkbox"
-                       name="stockCritico"
-                       value="true"
-                       @(ViewBag.StockCritico == true ? "checked" : "")
+                <input class="form-check-input me-2" type="checkbox" name="stockCritico"
+                       value="true" @(ViewBag.StockCritico == true ? "checked" : "")
                        onchange="this.form.submit()" />
                 <label class="form-check-label">⚠️ Só stock crítico</label>
             </div>
 
             <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    Pesquisar
-                </button>
-                <a asp-action="Index" class="btn btn-outline-secondary w-100">
-                    Limpar
-                </a>
+                <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+                <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpar</a>
             </div>
-
         </div>
     </form>
 
-    <!-- =============================== -->
-    <!-- TABELA DE STOCK -->
-    <!-- =============================== -->
+    <!-- TABELA -->
     <div class="table-responsive">
 
        
@@ -194,28 +162,24 @@
                         string classe = "";
                         string icon = "";
 
-                        var atual = item.Consumivel?.QuantidadeAtual ?? 0;
-
-                        if (atual <= min)
+                        if (item.QuantidadeAtual <= min)
                         {
                             classe = "text-danger";
                             icon = "⚠️";
                         }
-                        else if (atual <= min + 10)
+                        else if (item.QuantidadeAtual <= min + 10)
                         {
                             classe = "text-warning";
                             icon = "⚠️";
                         }
 
-
                         <tr class="text-center">
                             <td>@item.Consumivel?.Nome</td>
-                            <td>@item.Zona?.Nome</td>
+                            <td>@item.Zona?.NomeZona</td>
 
                             <td class="fw-bold @classe">
-                                @item.Consumivel?.QuantidadeAtual @icon
+                                @item.QuantidadeAtual @icon
                             </td>
-
 
                             <td>@min</td>
                             <td>@max</td>
@@ -227,13 +191,10 @@
                     }
                 }
             </tbody>
-
         </table>
     </div>
 
-    <!-- =============================== -->
     <!-- PAGINAÇÃO -->
-    <!-- =============================== -->
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
 

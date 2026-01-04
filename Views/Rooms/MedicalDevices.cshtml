@@ -1,0 +1,75 @@
+﻿@model IEnumerable<HealthWellbeingRoom.Models.MedicalDevice>
+
+@{
+    ViewData["Title"] = "Dispositivos Médicos Associados";
+    string? successMessage = Context.Request.Query["SuccessMessage"];
+}
+
+@if (successMessage != null)
+{
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@* @foreach (var dispositivo in Model)
+{
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-black">
+            <h4 class="mb-0">
+                <i class="bi bi-heart-pulse me-2"></i> Informações do Dispositivo Médico "@dispositivo.Name"
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
+                <dd class="col-sm-9">@dispositivo.Name</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Sala</dt>
+                <dd class="col-sm-9">@dispositivo.Room?.Name</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Tipo de Dispositivo</dt>
+                <dd class="col-sm-9">@dispositivo.DeviceType?.Name</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
+                <dd class="col-sm-9">@dispositivo.DeviceStatus?.Name</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Nº de Série</dt>
+                <dd class="col-sm-9">@dispositivo.SerialNumber</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Data compra</dt>
+                <dd class="col-sm-9">@dispositivo.PurchaseDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-3 fw-bold text-muted">Descrição</dt>
+                <dd class="col-sm-9">@dispositivo.Description</dd>
+            </dl>
+        </div>
+
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a class="btn btn-warning me-1" asp-action="Edit" asp-route-id="@dispositivo.MedicalDeviceId">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@dispositivo.MedicalDeviceId" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+        </div>
+    </div>
+} *@
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+    <a asp-action="Details" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Sala
+    </a>
+
+    <a asp-action="Index" class="btn btn-primary">
+        <i class="bi bi-list-ul me-1"></i> Voltar à Lista
+    </a>
+</div>

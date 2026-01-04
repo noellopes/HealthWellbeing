@@ -1,0 +1,114 @@
+﻿@model HealthWellbeing.Models.Room
+
+@{
+    ViewData["Title"] = "Editar Sala";
+}
+
+<h1 class="mb-4 text-warning">
+    <i class="bi bi-pencil-square me-2"></i>
+    @ViewData["Title"]: @Model.Name
+</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-dark">
+        <h4 class="mb-0">
+            <i class="bi bi-gear-fill me-2"></i>
+            Formulário de Edição
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        <form asp-action="Edit" method="post">
+
+            @* @Html.AntiForgeryToken() *@
+            <input type="hidden" asp-for="RoomId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- Tipo e Especialidade -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="RoomTypeId" class="form-label fw-bold">Tipo de Sala</label>
+                    <select asp-for="RoomTypeId" class="form-select" asp-items="ViewBag.RoomTypes">
+                        <option value="">Selecione o tipo...</option>
+                    </select>
+                    <span asp-validation-for="RoomTypeId" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
+                    <select asp-for="SpecialtyId" class="form-select" asp-items="ViewBag.RoomSpecialty">
+                        <option value="">Selecione a especialidade...</option>
+                    </select>
+                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Nome e Localização -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Nome</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="RoomLocationId" class="form-label fw-bold">Localização</label>
+                    <select asp-for="RoomLocationId" class="form-select" asp-items="ViewBag.RoomLocations">
+                        <option value="">Selecione a localização...</option>
+                    </select>
+                    <span asp-validation-for="RoomLocationId" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Horário de Funcionamento -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="OpeningTime" class="form-label fw-bold">Horario de inicio</label>
+                    <input asp-for="OpeningTime" type="time" class="form-control" />
+                    <span asp-validation-for="OpeningTime" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ClosingTime" class="form-label fw-bold">Horario de fim</label>
+                    <input asp-for="ClosingTime" type="time" class="form-control" />
+                    <span asp-validation-for="ClosingTime" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="mb-3">
+                <label asp-for="RoomStatusId" class="form-label fw-bold">Estado</label>
+                <select asp-for="RoomStatusId" class="form-select" asp-items="ViewBag.RoomStatuses">
+                    <option value="">Selecione o estado...</option>
+                </select>
+                <span asp-validation-for="RoomStatusId" class="text-danger small"></span>
+            </div>
+
+            <!-- Observação -->
+            <div class="mb-3">
+                <label asp-for="Notes" class="form-label fw-bold">Observação</label>
+                <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Notes" class="text-danger small"></span>
+            </div>
+
+            <!-- Botões -->
+            <div class="card-footer d-flex justify-content-end gap-2 mt-4">
+                <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
+                    <i class="bi bi-save-fill me-1"></i> Guardar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-secondary btn-sm" style="min-width:150px">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e voltar à lista
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

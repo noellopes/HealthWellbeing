@@ -1,8 +1,11 @@
 ﻿using HealthWellbeing.Utils.Group1.Interfaces;
 using HealthWellbeing.Utils.Group1.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using HealthWellbeing.Models;
+using HealthWellbeingRoom.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace HealthWellbeing.Data
 {
@@ -12,52 +15,107 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
-        public DbSet<HealthWellbeing.Models.Alergia> Alergia { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Receita> Receita { get; set; } = default!;
 
-        public DbSet<HealthWellbeing.Models.Pathology> Pathology { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.TreatmentType> TreatmentType { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Nurse> Nurse { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.TreatmentRecord> TreatmentRecord { get; set; } = default!;
-
-        // Adiciona capacidade de "Soft Delete" ao contexto
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
+        // ========================
+        // CONFIGURAÇÃO GLOBAL
+        // ========================
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Regista um filtro nas query dos modelos que implementam ISoftDeletable
+            base.OnModelCreating(modelBuilder);
+
+            // ========================
+            // SOFT DELETE (GLOBAL FILTER)
+            // ========================
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
                 {
-                    var method = typeof(ModelBuilder).GetMethods()
-                        .First(m => m.Name == "Entity" && m.IsGenericMethod);
-                    var genericMethod = method.MakeGenericMethod(entityType.ClrType);
-                    dynamic entityBuilder = genericMethod.Invoke(modelBuilder, null);
-                    entityBuilder.HasQueryFilter(CreateIsDeletedFilter(entityType.ClrType));
+                    var parameter = Expression.Parameter(entityType.ClrType, "x");
+                    var property = Expression.Property(parameter, "IsDeleted");
+                    var condition = Expression.Equal(property, Expression.Constant(false));
+                    var lambda = Expression.Lambda(condition, parameter);
+
+                    modelBuilder
+                        .Entity(entityType.ClrType)
+                        .HasQueryFilter(lambda);
                 }
             }
-        }
-        private static LambdaExpression CreateIsDeletedFilter(Type entityType)
-        {
-            var param = Expression.Parameter(entityType, "x");
-            var prop = Expression.Property(param, "IsDeleted");
-            var condition = Expression.Equal(prop, Expression.Constant(false));
-            return Expression.Lambda(condition, param);
-        }
-        public DbSet<HealthWellbeing.Models.ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Fornecedor> Fornecedor { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Consumivel> Consumivel { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Stock> Stock { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.HistoricoCompras> HistoricoCompras { get; set; }
-        public DbSet<HealthWellbeing.Models.Compra> Compra { get; set; }
 
-        public DbSet<HealthWellbeing.Models.UsoConsumivel> UsoConsumivel { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; }
-        public DbSet<HealthWellbeing.Models.Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;
+            // ========================
+            // RELAÇÕES DO STOCK (⚠️ MUITO IMPORTANTE)
+            // ========================
+            modelBuilder.Entity<Stock>()
+                .HasOne(s => s.Consumivel)
+                .WithMany()
+                .HasForeignKey(s => s.ConsumivelID)
+                .OnDelete(DeleteBehavior.Cascade); // ✔️ permitido
 
+            modelBuilder.Entity<Stock>()
+                .HasOne(s => s.Zona)
+                .WithMany()
+                .HasForeignKey(s => s.ZonaID)
+                .OnDelete(DeleteBehavior.Restrict); // ❗ evita cascade paths
+
+            modelBuilder.Entity<ZonaArmazenamento>()
+            .HasOne(z => z.Consumivel)
+            .WithMany()
+            .HasForeignKey(z => z.ConsumivelId)
+            .OnDelete(DeleteBehavior.Restrict); // impede apagar consumível se tiver zonas
+
+
+            modelBuilder.Entity<Stock>()
+            .HasOne(s => s.Zona)
+            .WithMany()
+            .HasForeignKey(s => s.ZonaID)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        }
+
+        // ========================
+        // DBSets – Grupo Alimentar / Saúde
+        // ========================
+        public DbSet<Alergia> Alergia { get; set; } = default!;
+        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<Receita> Receita { get; set; } = default!;
+        public DbSet<Pathology> Pathology { get; set; } = default!;
+        public DbSet<TreatmentType> TreatmentType { get; set; } = default!;
+        public DbSet<Nurse> Nurse { get; set; } = default!;
+        public DbSet<TreatmentRecord> TreatmentRecord { get; set; } = default!;
+
+        // ========================
+        // CONSUMÍVEIS / STOCK
+        // ========================
+        public DbSet<ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
+        public DbSet<CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
+        public DbSet<Fornecedor> Fornecedor { get; set; } = default!;
+        public DbSet<Consumivel> Consumivel { get; set; } = default!;
+        public DbSet<Stock> Stock { get; set; } = default!;
+        public DbSet<HistoricoCompras> HistoricoCompras { get; set; } = default!;
+        public DbSet<Compra> Compra { get; set; } = default!;
+        public DbSet<UsoConsumivel> UsoConsumivel { get; set; } = default!;
+        public DbSet<LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; } = default!;
+        public DbSet<Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;
+
+        // ========================
+        // EQUIPAMENTOS / SALAS
+        // ========================
+        public DbSet<TypeMaterial> TypeMaterial { get; set; } = default!;
+        public DbSet<LocationMedDevice> LocationMedDevice { get; set; } = default!;
+        public DbSet<EquipmentType> EquipmentType { get; set; } = default!;
+        public DbSet<EquipmentStatus> EquipmentStatus { get; set; } = default!;
+        public DbSet<Manufacturer> Manufacturer { get; set; } = default!;
+        public DbSet<Equipment> Equipment { get; set; } = default!;
+        public DbSet<MedicalDevice> MedicalDevices { get; set; } = default!;
+        public DbSet<Room> Room { get; set; } = default!;
+        public DbSet<RoomHistory> RoomHistories { get; set; } = default!;
+        public DbSet<Specialty> Specialty { get; set; } = default!;
+        public DbSet<RoomStatus> RoomStatus { get; set; } = default!;
+        public DbSet<RoomType> RoomType { get; set; } = default!;
+        public DbSet<RoomLocation> RoomLocation { get; set; } = default!;
     }
-
 }

@@ -1,0 +1,88 @@
+﻿@model HealthWellbeing.Models.Room
+
+@{
+    ViewData["Title"] = "Eliminar Sala";
+}
+
+<!-- Título principal -->
+<h1 class="mb-4 text-danger">
+    <i class="bi bi-trash me-2"></i>
+    @ViewData["Title"]
+</h1>
+
+<!-- Mensagens de erro -->
+@if (TempData["errorMessageDelete"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["errorMessageDelete"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["errorMessageDeleteDispositivo"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["errorMessageDeleteDispositivo"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Card com detalhes da sala -->
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Atenção: Eliminação Irreversível
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <p class="lead text-muted">
+            Tem a certeza que deseja eliminar esta sala? <strong>Esta ação é irreversível.</strong>
+        </p>
+
+        <dl class="row mb-0 mt-4">
+            <dt class="col-sm-3 fw-bold text-muted">Id</dt>
+            <dd class="col-sm-9">@Model.FormattedRoomId</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Tipo</dt>
+            <dd class="col-sm-9">@Model.RoomType?.Name</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Especialidade</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Specialty?.Name) ? Model.Specialty.Name : "--sem especialidade--")</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Nome</dt>
+            <dd class="col-sm-9"><strong>@Model.Name</strong></dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Localização</dt>
+            <dd class="col-sm-9">@Model.RoomLocation?.Name</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Horário de Funcionamento</dt>
+            <dd class="col-sm-9">@Model.OpeningTime.ToString(@"hh\:mm") - @Model.ClosingTime.ToString(@"hh\:mm")</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Estado</dt>
+            <dd class="col-sm-9">@Model.RoomStatus?.Name</dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">Observações</dt>
+            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Notes) ? Model.Notes : "--sem observações--")</dd>
+        </dl>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="card-footer d-flex justify-content-end gap-2">
+        <form asp-action="Delete" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="RoomId" />
+
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash me-1"></i> Confirmar Eliminação
+            </button>
+        </form>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-1"></i> Cancelar e Voltar
+        </a>
+    </div>
+</div>

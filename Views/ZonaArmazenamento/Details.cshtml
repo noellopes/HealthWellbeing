@@ -49,24 +49,26 @@
         <div class="card-body">
             <dl class="row mb-4">
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Nome)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Nome)</dd>
+                <dt class="col-sm-4 details-label">Nome da Zona</dt>
+                <dd class="col-sm-8 details-value">@Model.NomeZona</dd>
 
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Descricao)</dt>
-                <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Descricao)</dd>
+                <dt class="col-sm-4 details-label">Consumível</dt>
+                <dd class="col-sm-8 details-value">@Model.Consumivel?.Nome</dd>
 
+                <dt class="col-sm-4 details-label">Sala</dt>
+                <dd class="col-sm-8 details-value">@Model.Room?.Name</dd>
 
-                <dt class="col-sm-4 details-label">Localização</dt>
-                <dd class="col-sm-8 details-value">
-                    @Model.LocalizacaoZonaArmazenamento?.Nome
+                <dt class="col-sm-4 details-label">Capacidade Máxima</dt>
+                <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima</dd>
+
+                <dt class="col-sm-4 details-label">Quantidade Nesta Zona</dt>
+                <dd class="col-sm-8 details-value">@Model.QuantidadeAtual</dd>
+
+                <dt class="col-sm-4 details-label text-primary">Total Global 🏥</dt>
+                <dd class="col-sm-8 details-value text-primary fw-bold">
+                    @ViewBag.TotalConsumivel Unidades
                 </dd>
-
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.CapacidadeMaxima)</dt>
-                <dd class="col-sm-8 details-value">
-                    @Model.CapacidadeMaxima m³
-                </dd>
-
-                <dt class="col-sm-4 details-label">@Html.DisplayNameFor(model => model.Ativa)</dt>
+                <dt class="col-sm-4 details-label">Estado</dt>
                 <dd class="col-sm-8 details-value">
                     @if (Model.Ativa)
                     {
@@ -81,7 +83,7 @@
             </dl>
 
             <div class="d-flex justify-content-end">
-                <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning text-white me-2">
+                <a asp-action="Edit" asp-route-id="@Model?.ZonaId" class="btn btn-warning text-white me-2">
                     ✏️ Editar
                 </a>
                 <a asp-action="Index" class="btn btn-secondary">
