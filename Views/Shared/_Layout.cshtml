@@ -46,6 +46,13 @@
                                 <li><hr class="dropdown-divider" /></li>
                                 <li><a class="dropdown-item" asp-controller="Nutritionist" asp-action="Index">Nutritionists</a></li>
                                 <li><a class="dropdown-item" asp-controller="Goal" asp-action="Index">Goals</a></li>
+                                <!-- Adicione dentro do dropdown Food Habits, após o item Goals: -->
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="NutritionalCalculation" asp-action="ListAll">
+                                        <i class="bi bi-calculator"></i> Nutritional Calculations
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     </ul>

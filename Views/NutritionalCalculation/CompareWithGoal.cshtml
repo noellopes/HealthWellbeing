@@ -1,0 +1,212 @@
+﻿@* Views/NutritionalCalculation/CompareWithGoal.cshtml *@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Comparação com Meta Atual";
+    var client = Model.Client as HealthWellbeing.Models.Client;
+    var calculated = Model.Calculated as HealthWellbeing.Models.NutritionalCalculation;
+    var existingGoal = Model.ExistingGoal as HealthWellbeing.Models.Goal;
+    var hasGoal = Model.HasGoal as bool? ?? false;
+}
+
+<div class="container">
+    <h2>Comparação para @client.Name</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="alert alert-info">
+        <strong>Meta calculada automaticamente</strong> vs. <strong>Meta registrada no sistema</strong>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5>Meta Calculada (Recomendada)</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Nome da Meta:</th>
+                            <td>@calculated.GoalType</td>
+                        </tr>
+                        <tr>
+                            <th>Calorias:</th>
+                            <td>@calculated.DailyCalories.ToString("0") kcal</td>
+                        </tr>
+                        <tr>
+                            <th>Proteínas:</th>
+                            <td>@calculated.DailyProtein.ToString("0") g</td>
+                        </tr>
+                        <tr>
+                            <th>Carboidratos:</th>
+                            <td>@calculated.DailyCarbs.ToString("0") g</td>
+                        </tr>
+                        <tr>
+                            <th>Gorduras:</th>
+                            <td>@calculated.DailyFat.ToString("0") g</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            @if (hasGoal)
+            {
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5>Meta Atual Registrada</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <tr>
+                                <th>Nome da Meta:</th>
+                                <td>@existingGoal.GoalName</td>
+                            </tr>
+                            <tr>
+                                <th>Calorias:</th>
+                                <td>@existingGoal.DailyCalories kcal</td>
+                            </tr>
+                            <tr>
+                                <th>Proteínas:</th>
+                                <td>@existingGoal.DailyProtein g</td>
+                            </tr>
+                            <tr>
+                                <th>Carboidratos:</th>
+                                <td>@existingGoal.DailyHydrates g</td>
+                            </tr>
+                            <tr>
+                                <th>Gorduras:</th>
+                                <td>@existingGoal.DailyFat g</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card border-warning">
+                    <div class="card-header bg-warning">
+                        <h5>Sem Meta Registrada</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Este cliente não tem uma meta nutricional registrada no sistema.</p>
+                        <p>Você pode criar uma meta baseada nos cálculos recomendados.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (hasGoal)
+    {
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Diferenças</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nutriente</th>
+                            <th>Calculado</th>
+                            <th>Registrado</th>
+                            <th>Diferença</th>
+                            <th>% Diferença</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            double calDiff = calculated.DailyCalories - existingGoal.DailyCalories;
+                            double calPercent = (calDiff / existingGoal.DailyCalories) * 100;
+
+                            double protDiff = calculated.DailyProtein - existingGoal.DailyProtein;
+                            double protPercent = (protDiff / existingGoal.DailyProtein) * 100;
+
+                            double carbDiff = calculated.DailyCarbs - existingGoal.DailyHydrates;
+                            double carbPercent = (carbDiff / existingGoal.DailyHydrates) * 100;
+
+                            double fatDiff = calculated.DailyFat - existingGoal.DailyFat;
+                            double fatPercent = (fatDiff / existingGoal.DailyFat) * 100;
+                        }
+
+                        <tr>
+                            <td>Calorias</td>
+                            <td>@calculated.DailyCalories.ToString("0")</td>
+                            <td>@existingGoal.DailyCalories</td>
+                            <td class="@(calDiff > 0 ? "text-success" : calDiff < 0 ? "text-danger" : "")">
+                                @calDiff.ToString("+0;-0;0")
+                            </td>
+                            <td class="@(calPercent > 0 ? "text-success" : calPercent < 0 ? "text-danger" : "")">
+                                @calPercent.ToString("+0.0;-0.0;0.0")%
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Proteínas</td>
+                            <td>@calculated.DailyProtein.ToString("0")</td>
+                            <td>@existingGoal.DailyProtein</td>
+                            <td class="@(protDiff > 0 ? "text-success" : protDiff < 0 ? "text-danger" : "")">
+                                @protDiff.ToString("+0;-0;0")
+                            </td>
+                            <td class="@(protPercent > 0 ? "text-success" : protPercent < 0 ? "text-danger" : "")">
+                                @protPercent.ToString("+0.0;-0.0;0.0")%
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Carboidratos</td>
+                            <td>@calculated.DailyCarbs.ToString("0")</td>
+                            <td>@existingGoal.DailyHydrates</td>
+                            <td class="@(carbDiff > 0 ? "text-success" : carbDiff < 0 ? "text-danger" : "")">
+                                @carbDiff.ToString("+0;-0;0")
+                            </td>
+                            <td class="@(carbPercent > 0 ? "text-success" : carbPercent < 0 ? "text-danger" : "")">
+                                @carbPercent.ToString("+0.0;-0.0;0.0")%
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Gorduras</td>
+                            <td>@calculated.DailyFat.ToString("0")</td>
+                            <td>@existingGoal.DailyFat</td>
+                            <td class="@(fatDiff > 0 ? "text-success" : fatDiff < 0 ? "text-danger" : "")">
+                                @fatDiff.ToString("+0;-0;0")
+                            </td>
+                            <td class="@(fatPercent > 0 ? "text-success" : fatPercent < 0 ? "text-danger" : "")">
+                                @fatPercent.ToString("+0.0;-0.0;0.0")%
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Calculate" asp-route-id="@client.ClientId" class="btn btn-secondary">
+            Voltar ao Cálculo
+        </a>
+        @if (hasGoal)
+        {
+            <form asp-action="UpdateGoal" method="post" style="display: inline;">
+                <input type="hidden" name="id" value="@client.ClientId" />
+                <button type="submit" class="btn btn-success">
+                    Atualizar Meta com Valores Calculados
+                </button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="UpdateGoal" method="post" style="display: inline;">
+                <input type="hidden" name="id" value="@client.ClientId" />
+                <button type="submit" class="btn btn-primary">
+                    Criar Meta Baseada no Cálculo
+                </button>
+            </form>
+        }
+    </div>
+</div>

@@ -1,0 +1,224 @@
+﻿@* Views/NutritionalCalculation/Calculate.cshtml *@
+@model HealthWellbeing.Models.NutritionalCalculation
+
+@{
+    ViewData["Title"] = "Cálculo Nutricional";
+}
+
+<div class="container">
+    <h2>Cálculo Nutricional para @Model.ClientName</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Dados do Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Idade:</th>
+                            <td>@Model.Age anos</td>
+                        </tr>
+                        <tr>
+                            <th>Peso:</th>
+                            <td>@Model.WeightKg kg</td>
+                        </tr>
+                        <tr>
+                            <th>Altura:</th>
+                            <td>@Model.HeightCm cm</td>
+                        </tr>
+                        <tr>
+                            <th>Gênero:</th>
+                            <td>@Model.Gender</td>
+                        </tr>
+                        <tr>
+                            <th>Fator Atividade:</th>
+                            <td>@Model.ActivityFactor</td>
+                        </tr>
+                        <tr>
+                            <th>IMC:</th>
+                            <td>@Model.BMI (@Model.BMICategory)</td>
+                        </tr>
+                        <tr>
+                            <th>Objetivo:</th>
+                            <td>@Model.GoalType</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Cálculos Metabólicos</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Taxa Metabólica Basal (BMR):</th>
+                            <td>@Model.BMR.ToString("0") kcal</td>
+                        </tr>
+                        <tr>
+                            <th>Gasto Energético Total (TDEE):</th>
+                            <td>@Model.TDEE.ToString("0") kcal</td>
+                        </tr>
+                        <tr>
+                            <th>Calorias Diárias Recomendadas:</th>
+                            <td><strong>@Model.DailyCalories.ToString("0") kcal</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Macronutrientes Diários</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nutriente</th>
+                                <th>Quantidade</th>
+                                <th>Percentual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Proteínas</td>
+                                <td>@Model.DailyProtein.ToString("0") g</td>
+                                <td>@Model.ProteinPercentage%</td>
+                            </tr>
+                            <tr>
+                                <td>Carboidratos</td>
+                                <td>@Model.DailyCarbs.ToString("0") g</td>
+                                <td>@Model.CarbsPercentage%</td>
+                            </tr>
+                            <tr>
+                                <td>Gorduras</td>
+                                <td>@Model.DailyFat.ToString("0") g</td>
+                                <td>@Model.FatPercentage%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Gráfico simples em HTML -->
+                    <div class="mt-3">
+                        <h6>Distribuição de Macronutrientes:</h6>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar bg-success" style="width: @Model.ProteinPercentage%">
+                                Proteínas @Model.ProteinPercentage%
+                            </div>
+                            <div class="progress-bar bg-info" style="width: @Model.CarbsPercentage%">
+                                Carbs @Model.CarbsPercentage%
+                            </div>
+                            <div class="progress-bar bg-warning" style="width: @Model.FatPercentage%">
+                                Gorduras @Model.FatPercentage%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Micronutrientes Diários</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Micronutriente</th>
+                                <th>Quantidade Recomendada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Vitamina C</td>
+                                <td>@Model.VitaminC_mg.ToString("0") mg</td>
+                            </tr>
+                            <tr>
+                                <td>Cálcio</td>
+                                <td>@Model.Calcium_mg.ToString("0") mg</td>
+                            </tr>
+                            <tr>
+                                <td>Ferro</td>
+                                <td>@Model.Iron_mg.ToString("0") mg</td>
+                            </tr>
+                            <tr>
+                                <td>Vitamina D</td>
+                                <td>@Model.VitaminD_mcg.ToString("0") mcg</td>
+                            </tr>
+                            <tr>
+                                <td>Fibra</td>
+                                <td>@Model.Fiber_g.ToString("0") g</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Ações</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <a asp-action="CompareWithGoal" asp-route-id="@Model.ClientId"
+                       class="btn btn-info btn-block">
+                        Comparar com Meta Atual
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <form asp-action="UpdateGoal" method="post">
+                        <input type="hidden" name="id" value="@Model.ClientId" />
+                        <button type="submit" class="btn btn-success btn-block">
+                            Salvar como Meta do Cliente
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <a asp-controller="Client" asp-action="Details" asp-route-id="@Model.ClientId"
+                       class="btn btn-secondary btn-block">
+                        Voltar para Cliente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Fórmulas Utilizadas</h5>
+        </div>
+        <div class="card-body">
+            <small class="text-muted">
+                <strong>BMR (Mifflin-St Jeor):</strong><br>
+                Homens: (10 × peso em kg) + (6.25 × altura em cm) - (5 × idade em anos) + 5<br>
+                Mulheres: (10 × peso em kg) + (6.25 × altura em cm) - (5 × idade em anos) - 161<br><br>
+
+                <strong>TDEE:</strong> BMR × Fator de Atividade<br>
+                <strong>Calorias:</strong> TDEE ajustado para objetivo (85% para perda, 115% para ganho)<br>
+                <strong>Macronutrientes:</strong> Distribuição baseada no objetivo (perda: 30P/40C/30F, ganho: 35P/45C/20F, manutenção: 25P/50C/25F)
+            </small>
+        </div>
+    </div>
+</div>
