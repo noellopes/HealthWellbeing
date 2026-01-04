@@ -1758,7 +1758,7 @@ namespace HealthWellbeing.Data
             EnsureUserIsCreatedAsync(userManager, "carla.ferreira@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "bruno.carvalho@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "ana.beatriz.silva@example.pt", "Secret123$", ["Utente"]).Wait();
-
+            EnsureUserIsCreatedAsync(userManager, "ana.martins@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
             
         }
 
