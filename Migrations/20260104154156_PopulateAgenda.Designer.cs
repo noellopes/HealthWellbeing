@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104154156_PopulateAgenda")]
+    partial class PopulateAgenda
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -326,9 +329,6 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("IdMedico")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdUtenteSaude")
-                        .HasColumnType("int");
-
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");
 
@@ -337,8 +337,6 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("IdEspecialidade");
 
                     b.HasIndex("IdMedico");
-
-                    b.HasIndex("IdUtenteSaude");
 
                     b.ToTable("Consulta");
                 });
@@ -1084,17 +1082,9 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteSaude", "UtenteSaude")
-                        .WithMany()
-                        .HasForeignKey("IdUtenteSaude")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Doctor");
 
                     b.Navigation("Speciality");
-
-                    b.Navigation("UtenteSaude");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
