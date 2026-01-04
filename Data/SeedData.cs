@@ -15,7 +15,7 @@ namespace HealthWellbeing.Data
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-            dbContext.Database.EnsureCreated();
+            dbContext.Database.Migrate();
 
             PopulateSpecialities(dbContext);
             PopulateDoctor(dbContext);
@@ -1591,6 +1591,8 @@ namespace HealthWellbeing.Data
 
         private static void PopulateAgendaMedica(HealthWellbeingDbContext db)
         {
+            if (db.AgendaMedica.Any()) return;
+
             var datas15 = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
             // apaga tudo nessas datas (para todos os médicos)
