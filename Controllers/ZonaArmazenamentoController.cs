@@ -42,23 +42,7 @@ namespace HealthWellbeing.Controllers
             );
         }
 
-        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
-        {
-            // Obter todas as zonas que têm este consumível
-            var quantidadeTotal = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId)
-                .SumAsync(z => z.QuantidadeAtual);
-
-            // Atualizar o Consumível
-            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel != null)
-            {
-                consumivel.QuantidadeAtual = quantidadeTotal;
-                _context.Update(consumivel);
-                await _context.SaveChangesAsync();
-            }
-        }
-
+        
         // -----------------------------
         // GET: ZonaArmazenamento (Index)
         // -----------------------------

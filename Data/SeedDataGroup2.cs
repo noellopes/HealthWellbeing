@@ -24,12 +24,14 @@ namespace HealthWellbeing.Data
 
                 // Garante que a BD existe
                 db.Database.EnsureCreated();
-
+               
                 PopulateCategorias(db);
                 PopulateConsumiveis(db);
                 PopulateZonasArmazenamento(db);
                 PopulateStock(db);
                 PopulateHistoricoCompras(db);
+                PopulateFornecedores(db);
+                PopulateFornecedorConsumiveis(db);
 
                 // ---------------------------------------------------------
                 // 2. DADOS DE UTILIZADORES
@@ -76,14 +78,6 @@ namespace HealthWellbeing.Data
                     EmailConfirmed = true
                 };
 
-            
-            PopulateCategorias(db);
-            PopulateConsumiveis(db);
-            PopulateZonasArmazenamento(db);
-            PopulateStock(db);
-            PopulateHistoricoCompras(db);
-            PopulateFornecedores(db);
-            PopulateFornecedorConsumiveis(db);
                 var result = await userManager.CreateAsync(user, password);
                 if (result.Succeeded)
                 {
