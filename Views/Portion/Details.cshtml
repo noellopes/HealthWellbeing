@@ -1,0 +1,38 @@
+﻿@model HealthWellbeing.Models.Portion
+
+@{
+    ViewData["Title"] = "Portion Details";
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+
+        <div class="fh-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-eye" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Portion Details</h1>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.PortionId" class="btn btn-outline-warning" style="border-radius:12px;">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="fh-panel">
+            <div class="fh-card p-3">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Portion</dt>
+                    <dd class="col-sm-9 fw-bold">@Model.PortionName</dd>
+                </dl>
+            </div>
+        </div>
+
+    </div>
+</div>

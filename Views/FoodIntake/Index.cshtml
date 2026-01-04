@@ -1,0 +1,459 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model HealthWellbeing.ViewModels.FoodIntakeIndexVM
+
+@{
+    ViewData["Title"] = "Food Intake";
+    var selectedDate = Model.SelectedDate.Date;
+}
+
+<div class="container my-4">
+    <div class="fi-wrapper">
+
+        <!-- HEADER -->
+        <div class="fi-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-clipboard2-pulse" style="color: var(--fi-cyan); font-size: 1.15rem;"></i>
+                        <h1 class="h5 mb-0 fi-titlebar">Food Intake</h1>
+                    </div>
+
+                    <div class="mt-2 fi-badge">
+                        <i class="bi bi-calendar3" style="color: var(--fi-cyan);"></i>
+                        <span>@selectedDate.ToString("yyyy-MM-dd")</span>
+                        <span class="mx-1">•</span>
+                        <i class="bi bi-person-badge" style="color: var(--fi-cyan);"></i>
+                        <span>@(Model.SelectedClientName ?? "Select a client")</span>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <form asp-action="Index" method="get" class="fi-toolbar d-flex flex-wrap gap-2 align-items-end">
+                    <div>
+                        <label class="form-label" for="date">Date</label>
+                        <input id="date" name="date" type="date"
+                               value="@selectedDate.ToString("yyyy-MM-dd")"
+                               min="@(ViewBag.MinPlanDate != null ? ((DateTime)ViewBag.MinPlanDate).ToString("yyyy-MM-dd") : null)"
+                               max="@(ViewBag.MaxPlanDate != null
+                                             ? (((DateTime)ViewBag.MaxPlanDate) < DateTime.Today ? ((DateTime)ViewBag.MaxPlanDate) : DateTime.Today).ToString("yyyy-MM-dd")
+                                             : DateTime.Today.ToString("yyyy-MM-dd"))"
+                               class="form-control" />
+
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="clientId">Client</label>
+                        <select id="clientId" name="clientId" class="form-select">
+                            <option value="0">— Select —</option>
+                            @foreach (var c in Model.Clients)
+                            {
+                                <option value="@c.Value" selected="@(c.Selected ? "selected" : null)">
+                                    @c.Text
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn fi-btn-primary">
+                            <i class="bi bi-arrow-repeat me-1"></i>Refresh
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="fi-panel">
+            <div id="fiMsg" class="alert d-none" role="alert" style="border-radius:14px;"></div>
+            @if (ViewBag.DateError != null)
+            {
+                <div class="alert alert-warning" role="alert" style="border-radius:14px;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    @ViewBag.DateError
+                </div>
+            }
+
+            @if (Model.SelectedClientId <= 0)
+            {
+                <div class="alert alert-warning mb-0" role="alert" style="border-radius:14px;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Please select a client to view the daily plan.
+                </div>
+            }
+            else
+            {
+                <div id="fiCards" class="fi-grid">
+                    @if (Model.Items == null || !Model.Items.Any())
+                    {
+                        <div class="fi-empty">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-info-circle" style="color: var(--fi-cyan);"></i>
+                                <strong>No foods found</strong>
+                            </div>
+                            <div class="mt-1" style="color: var(--fi-muted);">
+                                There are no foods associated with the plan for this date (or they haven’t been generated yet).
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            var isConsumed = item.IsConsumed;
+                            var btnClass = isConsumed ? "btn-success" : "btn-danger";
+                            var btnText = isConsumed ? "Consumed" : "Not consumed";
+                            var btnIcon = isConsumed ? "bi-check2-circle" : "bi-x-circle";
+                            var icon = string.IsNullOrWhiteSpace(item.IconClass) ? "bi-egg-fried" : item.IconClass;
+
+                            <div class="fi-col" data-food-id="@item.FoodId" data-food-intake-id="@item.FoodIntakeId">
+                                <div class="fi-card">
+                                    <div class="fi-card-top">
+                                        <div class="fi-icon">
+                                            <i class="bi @icon" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <p class="fi-food-name">@item.FoodName</p>
+                                            <p class="fi-sub">
+                                                <i class="bi bi-box-seam me-1"></i>@(item.PortionName ?? "Portion —")
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="fi-card-body">
+                                        <div class="fi-bottom-row">
+                                            <p class="fi-note">
+                                                <i class="bi bi-chat-left-text"></i>
+                                                <span class="js-note-text">@item.Note</span>
+                                            </p>
+
+                                            <button type="button"
+                                                    class="btn @btnClass btn-consumed-sm js-toggle-consumed"
+                                                    data-consumed="@(isConsumed ? "1" : "0")"
+                                                    data-food-intake-id="@item.FoodIntakeId"
+                                                    data-food-id="@item.FoodId">
+                                                <i class="bi @btnIcon me-1"></i>@btnText
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <!-- ADD CARD (foldable) full width bottom -->
+                    <div class="fi-add-col">
+                        <div class="fi-card fi-add-card" id="fiAddCard">
+                            <div class="fi-card-top d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="fi-icon">
+                                        <i class="bi bi-plus-circle" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="fi-food-name mb-0">Add</p>
+                                        <p class="fi-sub mb-0">Add a food to today’s plan</p>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-sm fi-btn-primary js-toggle-add" aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+
+                            <div class="fi-card-body d-none" id="fiAddBody">
+                                <div class="row g-2">
+                                    <div class="col-6 col-lg-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Food</label>
+                                        <select id="fiAddFoodSelect" class="form-select">
+                                            <option value="">— Select —</option>
+                                            @foreach (var f in Model.AvailableFoods)
+                                            {
+                                                <option value="@f.Value">@f.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-6 col-lg-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Portion</label>
+                                        <select id="fiAddPortionSelect" class="form-select">
+                                            <option value="">— Select —</option>
+                                            @foreach (var p in Model.Portions)
+                                            {
+                                                <option value="@p.Value">@p.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    
+                                    <div class="col-6">
+                                        <label class="form-label mb-1" style="color: var(--fi-text); font-weight:800;">Quantity</label>
+                                        <input id="fiAddQty" type="number" min="1" value="1" class="form-control" />
+                                    </div>
+
+                                    <div class="col-6 d-flex gap-2 mt-2">
+                                        <button type="button" id="fiAddBtn" class="btn fi-btn-primary" style="flex:1;">
+                                            <i class="bi bi-plus-lg me-1"></i>Add
+                                        </button>
+
+                                        <button type="button" id="fiClearSelectBtn" class="btn btn-outline-light">
+                                            <i class="bi bi-eraser me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="col-6" style="color: var(--fi-muted); font-size: .92rem;">
+                                        <i class="bi bi-info-circle me-1" style="color: var(--fi-cyan);"></i>
+                                        Click “Add” to create a new card.
+                                    </div>
+                                </div>
+
+                                @Html.AntiForgeryToken()
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function(){
+            const fiCards = document.getElementById("fiCards");
+            const msgBox  = document.getElementById("fiMsg");
+
+            const addSelect   = document.getElementById("fiAddFoodSelect");
+            const addPortion  = document.getElementById("fiAddPortionSelect");
+            const addQty      = document.getElementById("fiAddQty");
+            const addBtn      = document.getElementById("fiAddBtn");
+            const clearBtn    = document.getElementById("fiClearSelectBtn");
+
+            function getAntiForgeryToken(){
+                const el = document.querySelector('input[name="__RequestVerificationToken"]');
+                return el ? el.value : "";
+            }
+
+            function escapeHtml(str){
+                return (str ?? "").replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" })[m]);
+            }
+
+            function showMessage(type, text){
+                if(!msgBox) return;
+                msgBox.className = `alert alert-${type}`;
+                msgBox.innerHTML = `<i class="bi bi-info-circle me-1"></i>${escapeHtml(text)}`;
+                msgBox.classList.remove("d-none");
+
+                window.clearTimeout(showMessage._t);
+                showMessage._t = window.setTimeout(() => msgBox.classList.add("d-none"), 3500);
+            }
+
+            function setConsumedButton(btn, consumed){
+                btn.dataset.consumed = consumed ? "1" : "0";
+                btn.classList.toggle("btn-success", consumed);
+                btn.classList.toggle("btn-danger", !consumed);
+                btn.innerHTML = consumed
+                    ? `<i class="bi bi-check2-circle me-1"></i>Consumed`
+                    : `<i class="bi bi-x-circle me-1"></i>Not consumed`;
+            }
+
+            function updateNote(card, noteText){
+                const span = card.querySelector(".js-note-text");
+                if(span) span.textContent = noteText;
+            }
+
+            function makeFoodCardHtml(foodId, foodName, portionName, portionsPlanned){
+                const note = `Portions: 0/${portionsPlanned}`;
+                return `
+                <div class="fi-col" data-food-id="${foodId}" data-food-intake-id="">
+                    <div class="fi-card">
+                        <div class="fi-card-top">
+                            <div class="fi-icon">
+                                <i class="bi bi-basket2" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="fi-food-name">${escapeHtml(foodName)}</p>
+                                <p class="fi-sub"><i class="bi bi-box-seam me-1"></i>${escapeHtml(portionName || "Portion —")}</p>
+                            </div>
+                        </div>
+                        <div class="fi-card-body">
+                            <div class="fi-bottom-row">
+                                <p class="fi-note"><i class="bi bi-chat-left-text"></i><span class="js-note-text">${escapeHtml(note)}</span></p>
+                                <button type="button"
+                                        class="btn btn-danger btn-consumed-sm js-toggle-consumed"
+                                        data-consumed="0"
+                                        data-food-intake-id=""
+                                        data-food-id="${foodId}">
+                                    <i class="bi bi-x-circle me-1"></i>Not consumed
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // foldable add
+            document.addEventListener("click", function(e){
+                const t = e.target.closest(".js-toggle-add");
+                if(!t) return;
+
+                const body = document.getElementById("fiAddBody");
+                if(!body) return;
+
+                const isHidden = body.classList.contains("d-none");
+                body.classList.toggle("d-none", !isHidden);
+
+                t.setAttribute("aria-expanded", isHidden ? "true" : "false");
+                t.innerHTML = isHidden
+                    ? `<i class="bi bi-chevron-up"></i>`
+                    : `<i class="bi bi-chevron-down"></i>`;
+            });
+
+            // TOGGLE consumed (persist + update note)  ✅ credentials same-origin
+            document.addEventListener("click", async function(e){
+                const btn = e.target.closest(".js-toggle-consumed");
+                if(!btn) return;
+
+                const current = btn.dataset.consumed === "1";
+                const next    = !current;
+
+                // UI optimista
+                setConsumedButton(btn, next);
+
+                const card = btn.closest(".fi-col");
+
+                try{
+                    const payload = {
+                        foodId: parseInt(btn.dataset.foodId, 10),
+                        consumed: next,
+                        date: "@selectedDate.ToString("yyyy-MM-dd")",
+                        clientId: @Model.SelectedClientId
+                    };
+
+                    const res = await fetch("@Url.Action("ToggleConsumed", "FoodIntake")", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": getAntiForgeryToken()
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if(!res.ok) throw new Error("Failed to save.");
+
+                    const data = await res.json();
+
+                    // guardar id + atualizar note pelo que veio do servidor
+                    if(data && data.foodIntakeId){
+                        btn.dataset.foodIntakeId = data.foodIntakeId;
+                        if(card) card.dataset.foodIntakeId = data.foodIntakeId;
+                    }
+                    if(data && data.note && card){
+                        updateNote(card, data.note);
+                    }
+                    if(data && typeof data.isConsumed !== "undefined"){
+                        setConsumedButton(btn, !!data.isConsumed);
+                    }
+
+                    // mensagem (amarelo quando not consumed)
+                    showMessage(next ? "success" : "warning",
+                                next ? "Marked as consumed." : "Marked as not consumed.");
+
+                }catch(err){
+                    console.error(err);
+                    // reverter UI
+                    setConsumedButton(btn, current);
+                    showMessage("danger", "Could not save the change. Please try again.");
+                }
+            });
+
+            // ADD food (persist + create card in UI + keep add at bottom)
+            addBtn?.addEventListener("click", async function(){
+                const foodId = addSelect.value;
+                const foodName = addSelect.options[addSelect.selectedIndex]?.text || "";
+
+                const portionId = addPortion.value;
+                const portionName = addPortion.options[addPortion.selectedIndex]?.text || "";
+
+                const qty = parseInt(addQty.value || "1", 10);
+
+                if(!foodId){ showMessage("warning", "Please select a food."); return; }
+                if(!portionId){ showMessage("warning", "Please select a portion."); return; }
+                if(!qty || qty < 1){ showMessage("warning", "Quantity must be at least 1."); return; }
+
+                // Evitar duplicados na UI
+                if(fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`)){
+                    showMessage("warning", "That food is already on the list.");
+                    return;
+                }
+
+                try{
+                    const payload = {
+                        foodId: parseInt(foodId, 10),
+                        portionId: parseInt(portionId, 10),
+                        portionsPlanned: qty,
+                        date: "@selectedDate.ToString("yyyy-MM-dd")",
+                        clientId: @Model.SelectedClientId
+                    };
+
+                    const res = await fetch("@Url.Action("AddFood", "FoodIntake")", {
+                        method: "POST",
+                        credentials: "same-origin",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": getAntiForgeryToken()
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if(!res.ok) throw new Error("Failed to add.");
+
+                    const data = await res.json().catch(() => null);
+
+                    // inserir card (antes do add-card = fica no fundo)
+                    const addCol = fiCards.querySelector(".fi-add-col");
+                    const planned = data?.portionsPlanned ?? qty;
+                    const html = makeFoodCardHtml(foodId, foodName, (data?.portionName ?? portionName), planned);
+
+                    if(addCol){
+                        addCol.insertAdjacentHTML("beforebegin", html);
+                    }else{
+                        fiCards.insertAdjacentHTML("beforeend", html);
+                    }
+
+                    // atualizar intakeId devolvido
+                    const newCard = fiCards.querySelector(`.fi-col[data-food-id="${CSS.escape(foodId)}"]`);
+                    if(newCard && data?.foodIntakeId){
+                        newCard.dataset.foodIntakeId = data.foodIntakeId;
+                        const b = newCard.querySelector(".js-toggle-consumed");
+                        if(b) b.dataset.foodIntakeId = data.foodIntakeId;
+                    }
+                    if(newCard && data?.note){
+                        updateNote(newCard, data.note);
+                    }
+
+                    showMessage("success", "Food added to the day plan.");
+
+                    // limpar
+                    addSelect.value = "";
+                    addPortion.value = "";
+                    addQty.value = "1";
+
+                }catch(err){
+                    console.error(err);
+                    showMessage("danger", "Could not add the food. Please try again.");
+                }
+            });
+
+            clearBtn?.addEventListener("click", function(){
+                addSelect.value = "";
+                addPortion.value = "";
+                addQty.value = "1";
+            });
+
+        })();
+    </script>
+}

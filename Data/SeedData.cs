@@ -1,20 +1,30 @@
-﻿using HealthWellbeing.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
+internal static class SeedData
 namespace HealthWellbeing.Data
 {
+    internal static void Populate(HealthWellbeingDbContext? db)
     public static class SeedData
     {
         public static void Populate(HealthWellbeingDbContext? db)
         {
-            if (db == null) throw new ArgumentNullException(nameof(db));
+        if (db == null) throw new ArgumentNullException(nameof(db));
 
 
-            db.Database.EnsureCreated();
+        db.Database.EnsureCreated();
 
+        // =====================================================================
+        // CLIENTS (≈ 30)
+        // =====================================================================
+        if (!db.Client.Any())
             PopulateSpecialities(db);
             PopulateConsultas(db);
             PopulateDoctor(db);
@@ -23,38 +33,60 @@ namespace HealthWellbeing.Data
 
         private static void PopulateConsultas(HealthWellbeingDbContext db)
         {
+            var clients = new List<Client>
             if (db.Consulta.Any()) return;
 
             var hoje = DateTime.Today;
 
             var consulta = new[]
-            {
+    {
+        new Client
                 // -- Exemplo base --
                 new Consulta
-                {
+        {
+            Name      = "Alice Wonder",
+            Email     = "alice@example.com",
+            BirthDate = new DateTime(1992, 5, 14),
+            Gender    = "Female"
                     DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(10, 30),
                     HoraFim      = new TimeOnly(11, 30),
-                },
+        },
+        new Client
 
                 // FUTURAS (Agendada)
                 new Consulta
-                {
+        {
+            Name      = "Bob Strong",
+            Email     = "bob@example.com",
+            BirthDate = new DateTime(1987, 2, 8),
+            Gender    = "Male"
                     DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2025, 11, 5, 9, 0, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(9, 0),
                     HoraFim      = new TimeOnly(9, 30),
-                },
+        },
+        new Client
                 new Consulta
-                {
+        {
+            Name      = "Charlie Fit",
+            Email     = "charlie@example.com",
+            BirthDate = new DateTime(1998, 10, 20),
+            Gender    = "Male"
+        }
+    };
+
+            // Criar clientes de teste 4–30
+            for (int i = 4; i <= 30; i++)
                     DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2025, 12, 1, 11, 15, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(11, 15),
                     HoraFim      = new TimeOnly(12, 0),
                 },
                 new Consulta
-                {
+            {
+                clients.Add(new Client
                     DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(15, 0),
@@ -62,15 +94,29 @@ namespace HealthWellbeing.Data
                 },
                 new Consulta
                 {
+                    Name = $"Test Client {i}",
+                    Email = $"testclient{i}@example.com",
+                    BirthDate = new DateTime(1990, 1, 1).AddDays(i * 20),
+                    Gender = i % 2 == 0 ? "Male" : "Female"
+                });
+            }
                     DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(16, 30),
                     HoraFim      = new TimeOnly(17, 0),
                 },
 
+            db.Client.AddRange(clients);
+            db.SaveChanges();
+
+            // =====================================================================
+            // GOALS AUTOMÁTICOS
+            // =====================================================================
+            if (db.Goal != null && !db.Goal.Any())
                 // HOJE (para testar “Hoje”)
                 new Consulta
-                {
+            {
+                var allclients = db.Client.OrderBy(c => c.ClientId).ToList();
                     DataMarcacao = hoje.AddDays(-2).AddHours(10),
                     DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(9, 30),
@@ -84,6 +130,7 @@ namespace HealthWellbeing.Data
                     HoraFim      = new TimeOnly(14, 30),
                 },
 
+                if (clients.Any())
                 // EXPIRADAS
                 new Consulta
                 {
@@ -107,9 +154,17 @@ namespace HealthWellbeing.Data
                     HoraFim      = new TimeOnly(16, 30),
                 },
 
+                    var rng = new Random();
+                    double RandomWeight() => rng.Next(55, 95); // 55–95 kg
+
+                    var goals = new List<Goal>();
+                    int index = 0;
+
+                    foreach (var client in clients)
                 // CANCELADAS
                 new Consulta
-                {
+                    {
+                        double weight = RandomWeight();
                     DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
                     DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
                     DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
@@ -133,9 +188,33 @@ namespace HealthWellbeing.Data
                     HoraFim          = new TimeOnly(11, 0),
                 },
 
+                        string goalName =
+                            index % 3 == 0 ? "Weight Loss"
+                          : index % 3 == 1 ? "Muscle Gain"
+                          : "Maintenance";
+
+                        double activity =
+                            goalName == "Weight Loss" ? 1.3 :
+                            goalName == "Muscle Gain" ? 1.7 :
+                            1.5;
+
+                        double calories = weight * 22 * activity;
+                        double protein = weight * 1.6;
+                        double fat = calories * 0.27 / 9;
+                        double proteinCal = protein * 4;
+                        double hydrates = (calories - proteinCal - (fat * 9)) / 4;
+
+                        goals.Add(new Goal
                 // MAIS FUTURAS
                 new Consulta
-                {
+                        {
+                            ClientId = client.ClientId,
+                            GoalName = goalName,
+                            DailyCalories = (int)calories,
+                            DailyProtein = (int)protein,
+                            DailyFat = (int)fat,
+                            DailyHydrates = (int)hydrates,
+                        });
                     DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
                     DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
                     HoraInicio   = new TimeOnly(13, 30),
@@ -157,10 +236,12 @@ namespace HealthWellbeing.Data
                 }
             };
 
+                        index++;
             db.Consulta.AddRange(consulta);
             db.SaveChanges();
-        }
+                    }
 
+                    db.Goal.AddRange(goals);
         private static void PopulateDoctor(HealthWellbeingDbContext db)
         {
             var doctor = new[]
@@ -183,17 +264,25 @@ namespace HealthWellbeing.Data
             };
 
             db.Doctor.AddRange(doctor);
-            db.SaveChanges();
+                    db.SaveChanges();
+                }
+            }
         }
 
         private static void PopulateUtenteSaude(HealthWellbeingDbContext db)
         {
             if (db.UtenteSaude.Any()) return; // Evita duplicar registos
 
+            // =====================================================================
+            // NUTRITIONISTS (≈ 30)
+            // =====================================================================
+            if (!db.Nutritionist.Any())
             var utentes = new[]
-            {
+        {
+            var nutritionists = new List<Nutritionist>
                 new UtenteSaude
-                {
+            {
+                new Nutritionist
                     NomeCompleto   = "Ana Beatriz Silva",
                     DataNascimento = new DateTime(1999, 4, 8),
                     Nif            = "245379261", // válido
@@ -205,6 +294,9 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    Name   = "Dr. Joao Carvalho",
+                    Email  = "joao.carvalho@healthwellbeing.com",
+                    Gender = "Male"
                     NomeCompleto   = "Bruno Miguel Pereira",
                     DataNascimento = new DateTime(1987, 11, 23),
                     Nif            = "198754326", // válido
@@ -214,8 +306,12 @@ namespace HealthWellbeing.Data
                     Telefone       = "912345671",
                     Morada         = "Av. 25 de Abril, 102, Guarda"
                 },
+                new Nutritionist
                 new UtenteSaude
                 {
+                    Name   = "Dr. Sofia Martins",
+                    Email  = "sofia.martins@healthwellbeing.com",
+                    Gender = "Female"
                     NomeCompleto   = "Carla Sofia Fernandes",
                     DataNascimento = new DateTime(1991, 5, 19),
                     Nif            = "156987239", // válido
@@ -225,8 +321,16 @@ namespace HealthWellbeing.Data
                     Telefone       = "912345672",
                     Morada         = "Rua da Liberdade, 45, Covilhã"
                 },
+                new Nutritionist
                 new UtenteSaude
                 {
+                    Name   = "Dr. Ricardo Soares",
+                    Email  = "ricardo.soares@healthwellbeing.com",
+                    Gender = "Male"
+                }
+            };
+
+            for (int i = 4; i <= 30; i++)
                     NomeCompleto   = "Daniel Rocha",
                     DataNascimento = new DateTime(2003, 10, 26),
                     Nif            = "268945315", // válido
@@ -237,7 +341,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Travessa do Sol, 3, Celorico da Beira"
                 },
                 new UtenteSaude
-                {
+            {
+                nutritionists.Add(new Nutritionist
                     NomeCompleto   = "Eduarda Nogueira",
                     DataNascimento = new DateTime(1994, 5, 22),
                     Nif            = "296378459", // válido
@@ -249,6 +354,20 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    Name = $"Nutritionist {i}",
+                    Email = $"nutritionist{i}@healthwellbeing.com",
+                    Gender = i % 2 == 0 ? "Male" : "Female"
+                });
+            }
+
+            db.Nutritionist.AddRange(nutritionists);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // ALERGIES (≈ 30)
+        // =====================================================================
+        if (db.Alergy != null && !db.Alergy.Any())
                     NomeCompleto   = "Fábio Gonçalves",
                     DataNascimento = new DateTime(1997, 1, 4),
                     Nif            = "165947829", // válido
@@ -259,7 +378,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Escola, 5, Gouveia"
                 },
                 new UtenteSaude
-                {
+        {
+            var alergies = new List<Alergy>
                     NomeCompleto   = "Gabriela Santos",
                     DataNascimento = new DateTime(1986, 4, 26),
                     Nif            = "189567240", // válido
@@ -270,7 +390,20 @@ namespace HealthWellbeing.Data
                     Morada         = "Av. Dr. Francisco Sá Carneiro, 200, Viseu"
                 },
                 new UtenteSaude
-                {
+            {
+                new Alergy { AlergyId = 0, AlergyName = "Peanuts" },
+                new Alergy { AlergyId = 0, AlergyName = "Tree nuts" },
+                new Alergy { AlergyId = 0, AlergyName = "Lactose" },
+                new Alergy { AlergyId = 0, AlergyName = "Gluten" },
+                new Alergy { AlergyId = 0, AlergyName = "Seafood" },
+                new Alergy { AlergyId = 0, AlergyName = "Eggs" },
+                new Alergy { AlergyId = 0, AlergyName = "Soy" },
+                new Alergy { AlergyId = 0, AlergyName = "Sesame" },
+                new Alergy { AlergyId = 0, AlergyName = "Strawberries" },
+                new Alergy { AlergyId = 0, AlergyName = "Kiwi" }
+            };
+
+            for (int i = alergies.Count + 1; i <= 30; i++)
                     NomeCompleto   = "Hugo Matos",
                     DataNascimento = new DateTime(1993, 11, 22),
                     Nif            = "215983747", // válido
@@ -281,7 +414,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Castelo, 7, Belmonte"
                 },
                 new UtenteSaude
-                {
+            {
+                alergies.Add(new Alergy
                     NomeCompleto   = "Inês Carvalho",
                     DataNascimento = new DateTime(2004, 7, 12),
                     Nif            = "235679845", // válido
@@ -293,6 +427,18 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    AlergyName = $"Test Allergy {i}"
+                });
+            }
+
+            db.Alergy.AddRange(alergies);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // FOOD CATEGORIES (≈ 30, mas com base em categorias reais)
+        // =====================================================================
+        if (!db.FoodCategory.Any())
                     NomeCompleto   = "João Marques",
                     DataNascimento = new DateTime(1990, 7, 4),
                     Nif            = "286754197", // válido
@@ -303,7 +449,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Estação, 33, Pinhel"
                 },
                 new UtenteSaude
-                {
+        {
+            var categories = new List<FoodCategory>
                     NomeCompleto   = "Luísa Almeida",
                     DataNascimento = new DateTime(1978, 6, 19),
                     Nif            = "248963572", // válido
@@ -314,7 +461,18 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Lameira, 21, Manteigas"
                 },
                 new UtenteSaude
-                {
+            {
+                new FoodCategory { Category = "Fruits",      Description = "Fresh fruits and berries" },
+                new FoodCategory { Category = "Vegetables",  Description = "Fresh and cooked vegetables" },
+                new FoodCategory { Category = "Grains",      Description = "Cereals, bread and pasta" },
+                new FoodCategory { Category = "Proteins",    Description = "Meat, fish, eggs and legumes" },
+                new FoodCategory { Category = "Dairy",       Description = "Milk and dairy products" },
+                new FoodCategory { Category = "Fats & Oils", Description = "Healthy fats and oils" },
+                new FoodCategory { Category = "Snacks",      Description = "Snack foods" },
+                new FoodCategory { Category = "Drinks",      Description = "Non-alcoholic beverages" },
+                new FoodCategory { Category = "Breakfast",   Description = "Breakfast foods" },
+                new FoodCategory { Category = "Desserts",    Description = "Desserts and sweets" }
+            };
                     NomeCompleto   = "Miguel Figueiredo",
                     DataNascimento = new DateTime(1985, 8, 9),
                     Nif            = "196284739", // válido
@@ -325,9 +483,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Parque, 8, Almeida"
                 },
 
+            for (int i = categories.Count + 1; i <= 30; i++)
                 // ---------- + Exemplos ----------
                 new UtenteSaude
-                {
+            {
+                categories.Add(new FoodCategory
                     NomeCompleto   = "Joana Moreira",
                     DataNascimento = new DateTime(1988, 3, 14),
                     Nif            = "218945372",
@@ -339,6 +499,19 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    Category = $"Category {i}",
+                    Description = "Auto-generated test category"
+                });
+            }
+
+            db.FoodCategory.AddRange(categories);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // FOODS (≈ 30)
+        // =====================================================================
+        if (!db.Food.Any())
                     NomeCompleto   = "Carlos Almeida",
                     DataNascimento = new DateTime(1975, 9, 22),
                     Nif            = "295431678",
@@ -349,7 +522,12 @@ namespace HealthWellbeing.Data
                     Morada         = "Avenida 25 de Abril, 20, Porto"
                 },
                 new UtenteSaude
-                {
+        {
+            var categories = db.FoodCategory
+                .OrderBy(c => c.CategoryId)
+                .ToList();
+
+            if (categories.Any())
                     NomeCompleto   = "Sofia Marques",
                     DataNascimento = new DateTime(1992, 12, 5),
                     Nif            = "189546327",
@@ -360,7 +538,14 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Liberdade, 33, Coimbra"
                 },
                 new UtenteSaude
-                {
+            {
+                int fruitsId = categories.First(c => c.Category == "Fruits").CategoryId;
+                int vegetablesId = categories.First(c => c.Category == "Vegetables").CategoryId;
+                int grainsId = categories.First(c => c.Category == "Grains").CategoryId;
+                int proteinsId = categories.First(c => c.Category == "Proteins").CategoryId;
+                int dairyId = categories.First(c => c.Category == "Dairy").CategoryId;
+
+                var foods = new List<Food>
                     NomeCompleto   = "Ricardo Nogueira",
                     DataNascimento = new DateTime(1984, 2, 18),
                     Nif            = "239857416",
@@ -372,6 +557,38 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    new Food { CategoryId = fruitsId,     Name = "Apple" },
+                    new Food { CategoryId = fruitsId,     Name = "Banana" },
+                    new Food { CategoryId = fruitsId,     Name = "Orange" },
+                    new Food { CategoryId = fruitsId,     Name = "Strawberries" },
+                    new Food { CategoryId = fruitsId,     Name = "Blueberries" },
+
+                    new Food { CategoryId = vegetablesId, Name = "Broccoli" },
+                    new Food { CategoryId = vegetablesId, Name = "Carrots" },
+                    new Food { CategoryId = vegetablesId, Name = "Spinach" },
+                    new Food { CategoryId = vegetablesId, Name = "Tomato" },
+                    new Food { CategoryId = vegetablesId, Name = "Cucumber" },
+
+                    new Food { CategoryId = grainsId,     Name = "White Rice" },
+                    new Food { CategoryId = grainsId,     Name = "Brown Rice" },
+                    new Food { CategoryId = grainsId,     Name = "Whole Wheat Bread" },
+                    new Food { CategoryId = grainsId,     Name = "Oatmeal" },
+                    new Food { CategoryId = grainsId,     Name = "Pasta" },
+
+                    new Food { CategoryId = proteinsId,   Name = "Chicken Breast" },
+                    new Food { CategoryId = proteinsId,   Name = "Salmon" },
+                    new Food { CategoryId = proteinsId,   Name = "Tofu" },
+                    new Food { CategoryId = proteinsId,   Name = "Eggs" },
+                    new Food { CategoryId = proteinsId,   Name = "Lentils" },
+
+                    new Food { CategoryId = dairyId,      Name = "Milk" },
+                    new Food { CategoryId = dairyId,      Name = "Yogurt" },
+                    new Food { CategoryId = dairyId,      Name = "Cheddar Cheese" },
+                    new Food { CategoryId = dairyId,      Name = "Cottage Cheese" }
+                };
+
+                // completa até 30 com alimentos genéricos
+                for (int i = foods.Count + 1; i <= 30; i++)
                     NomeCompleto   = "Helena Rocha",
                     DataNascimento = new DateTime(1990, 7, 21),
                     Nif            = "259784631",
@@ -383,6 +600,8 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    var cat = categories[i % categories.Count];
+                    foods.Add(new Food
                     NomeCompleto   = "Tiago Fernandes",
                     DataNascimento = new DateTime(1982, 4, 9),
                     Nif            = "268953741",
@@ -393,7 +612,21 @@ namespace HealthWellbeing.Data
                     Morada         = "Avenida dos Bombeiros, 12, Aveiro"
                 },
                 new UtenteSaude
-                {
+                    {
+                        CategoryId = cat.CategoryId,
+                        Name = $"Test Food {i}"
+                    });
+                }
+
+                db.Food.AddRange(foods);
+                db.SaveChanges();
+            }
+        }
+
+        // =====================================================================
+        // PORTIONS
+        // =====================================================================
+        if (db.Portion != null && !db.Portion.Any())
                     NomeCompleto   = "Andreia Pinto",
                     DataNascimento = new DateTime(1995, 6, 30),
                     Nif            = "235978416",
@@ -448,7 +681,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Escola, 10, Évora"
                 },
                 new UtenteSaude
-                {
+        {
+            var portions = new List<Portion>
                     NomeCompleto   = "Rui Correia",
                     DataNascimento = new DateTime(1976, 3, 4),
                     Nif            = "278954136",
@@ -459,7 +693,27 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua dos Pescadores, 45, Nazaré"
                 },
                 new UtenteSaude
-                {
+            {
+                new Portion { PortionName = "Small portion (50 g)" },
+                new Portion { PortionName = "Medium portion (100 g)" },
+                new Portion { PortionName = "Large portion (150 g)" },
+                new Portion { PortionName = "Cup cooked" },
+                new Portion { PortionName = "Cup raw" },
+                new Portion { PortionName = "Slice(s)" },
+                new Portion { PortionName = "Glass (200 ml)" },
+                new Portion { PortionName = "Tablespoon" },
+                new Portion { PortionName = "Teaspoon" }
+            };
+
+                    db.Portion.AddRange(portions);
+                    db.SaveChanges();
+                }
+
+
+        // =====================================================================
+        // NUTRITIONAL COMPONENTS
+        // =====================================================================
+        if (db.NutritionalComponent != null && !db.NutritionalComponent.Any())
                     NomeCompleto   = "Bárbara Figueiredo",
                     DataNascimento = new DateTime(1994, 11, 29),
                     Nif            = "215978643",
@@ -470,7 +724,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Lameira, 31, Torres Vedras"
                 },
                 new UtenteSaude
-                {
+        {
+            var comps = new List<NutritionalComponent>
                     NomeCompleto   = "Diogo Costa",
                     DataNascimento = new DateTime(1983, 12, 11),
                     Nif            = "268974523",
@@ -481,7 +736,27 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua dos Combatentes, 14, Santarém"
                 },
                 new UtenteSaude
-                {
+            {
+                new NutritionalComponent { Name = "Energy",       Unit = "kcal", Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Protein",      Unit = "g",    Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Carbohydrate", Unit = "g",    Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Fat",          Unit = "g",    Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Fiber",        Unit = "g",    Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Sugar",        Unit = "g",    Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Sodium",       Unit = "mg",   Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Calcium",      Unit = "mg",   Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Vitamin C",    Unit = "mg",   Basis = "per 100 g" },
+                new NutritionalComponent { Name = "Iron",         Unit = "mg",   Basis = "per 100 g" }
+            };
+
+            db.NutritionalComponent.AddRange(comps);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // PLANS (≈ 30)
+        // =====================================================================
+        if (db.Plan != null && !db.Plan.Any())
                     NomeCompleto   = "Catarina Martins",
                     DataNascimento = new DateTime(1998, 9, 5),
                     Nif            = "239876415",
@@ -492,7 +767,12 @@ namespace HealthWellbeing.Data
                     Morada         = "Avenida da Liberdade, 66, Lisboa"
                 },
                 new UtenteSaude
-                {
+        {
+            var plans = new List<Plan>();
+            DateTime today = DateTime.Today;
+            var clients = db.Client.OrderBy(c => c.ClientId).ToList();
+
+            for (int i = 0; i < 30; i++)
                     NomeCompleto   = "João Vieira",
                     DataNascimento = new DateTime(1979, 7, 15),
                     Nif            = "258946371",
@@ -503,7 +783,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da Estação, 24, Braga"
                 },
                 new UtenteSaude
-                {
+            {
+                plans.Add(new Plan
                     NomeCompleto   = "Carla Neves",
                     DataNascimento = new DateTime(1989, 2, 2),
                     Nif            = "215987436",
@@ -515,6 +796,21 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    ClientId = clients[i].ClientId,
+                    StartingDate = today.AddDays(-i * 7),
+                    EndingDate = today.AddDays(-i * 7 + 30),
+                    Done = i % 3 == 0
+                });
+            }
+
+            db.Plan.AddRange(plans);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // JOIN TABLES – CLIENT ALERGIES
+        // =====================================================================
+        if (db.ClientAlergy != null && !db.ClientAlergy.Any())
                     NomeCompleto   = "Vítor Lopes",
                     DataNascimento = new DateTime(1981, 1, 18),
                     Nif            = "276895413",
@@ -525,7 +821,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Travessa do Mercado, 15, Setúbal"
                 },
                 new UtenteSaude
-                {
+        {
+            var clients = db.Client.OrderBy(c => c.ClientId).ToList();
+            var alergies = db.Alergy.OrderBy(a => a.AlergyId).ToList();
+
+            if (clients.Any() && alergies.Any())
                     NomeCompleto   = "Mariana Batista",
                     DataNascimento = new DateTime(1993, 4, 3),
                     Nif            = "289654137",
@@ -536,7 +836,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua de São Tiago, 18, Aveiro"
                 },
                 new UtenteSaude
-                {
+            {
+                var list = new List<ClientAlergy>();
+
+                int counter = 0;
+                for (int i = 0; i < clients.Count; i++)
                     NomeCompleto   = "Filipe Cruz",
                     DataNascimento = new DateTime(1987, 11, 9),
                     Nif            = "295764821",
@@ -548,6 +852,7 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    for (int j = 0; j < alergies.Count; j++)
                     NomeCompleto   = "Teresa Gonçalves",
                     DataNascimento = new DateTime(1990, 3, 23),
                     Nif            = "198743265",
@@ -558,7 +863,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Castelo, 19, Guimarães"
                 },
                 new UtenteSaude
-                {
+                    {
+                        if ((i + j) % 4 == 0) // nem todos os clientes têm todas as alergias
                     NomeCompleto   = "Paulo Teixeira",
                     DataNascimento = new DateTime(1975, 10, 14),
                     Nif            = "269841357",
@@ -569,7 +875,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Avenida Central, 31, Braga"
                 },
                 new UtenteSaude
-                {
+                        {
+                            list.Add(new ClientAlergy
                     NomeCompleto   = "Sandra Ramos",
                     DataNascimento = new DateTime(1988, 1, 5),
                     Nif            = "235978462",
@@ -580,7 +887,26 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua das Rosas, 12, Lisboa"
                 },
                 new UtenteSaude
-                {
+                            {
+                                ClientId = clients[i].ClientId,
+                                AlergyId = alergies[j].AlergyId
+                            });
+                            counter++;
+                            if (counter >= 40) break;
+                        }
+                    }
+                    if (counter >= 40) break;
+                }
+
+                db.ClientAlergy.AddRange(list);
+                db.SaveChanges();
+            }
+        }
+
+        // =====================================================================
+        // JOIN TABLES – NUTRITIONIST / CLIENT / PLAN
+        // =====================================================================
+        if (db.NutritionistClientPlan != null && !db.NutritionistClientPlan.Any())
                     NomeCompleto   = "Nuno Sousa",
                     DataNascimento = new DateTime(1992, 5, 27),
                     Nif            = "289635147",
@@ -591,7 +917,12 @@ namespace HealthWellbeing.Data
                     Morada         = "Travessa da Escola, 27, Aveiro"
                 },
                 new UtenteSaude
-                {
+        {
+            var clients = db.Client.OrderBy(c => c.ClientId).ToList();
+            var nutritionists = db.Nutritionist.OrderBy(n => n.NutritionistId).ToList();
+            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+
+            if (clients.Any() && nutritionists.Any() && plans.Any())
                     NomeCompleto   = "Patrícia Cardoso",
                     DataNascimento = new DateTime(1983, 6, 8),
                     Nif            = "219846735",
@@ -602,7 +933,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Campo, 7, Viseu"
                 },
                 new UtenteSaude
-                {
+            {
+                var list = new List<NutritionistClientPlan>();
+                int counter = 0;
+
+                for (int i = 0; i < clients.Count; i++)
                     NomeCompleto   = "Gonçalo Rocha",
                     DataNascimento = new DateTime(1985, 4, 11),
                     Nif            = "295687134",
@@ -614,6 +949,7 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    for (int j = 0; j < nutritionists.Count; j++)
                     NomeCompleto   = "Leonor Ferreira",
                     DataNascimento = new DateTime(1996, 2, 24),
                     Nif            = "218963475",
@@ -624,7 +960,10 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua das Oliveiras, 18, Lisboa"
                 },
                 new UtenteSaude
-                {
+                    {
+                        var plan = plans[(i + j) % plans.Count];
+
+                        list.Add(new NutritionistClientPlan
                     NomeCompleto   = "André Mendes",
                     DataNascimento = new DateTime(1990, 12, 15),
                     Nif            = "259871436",
@@ -635,7 +974,27 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua da República, 15, Coimbra"
                 },
                 new UtenteSaude
-                {
+                        {
+                            ClientId = clients[i].ClientId,
+                            NutritionistId = nutritionists[j].NutritionistId,
+                            PlanId = plan.PlanId
+                        });
+
+                        counter++;
+                        if (counter >= 40) break;
+                    }
+                    if (counter >= 40) break;
+                }
+
+                db.NutritionistClientPlan.AddRange(list);
+                db.SaveChanges();
+            }
+        }
+
+        // =====================================================================
+        // JOIN TABLES – FOOD PLANS  (PLAN + FOOD + PORTION)
+        // =====================================================================
+        if (!db.FoodPlan.Any())
                     NomeCompleto   = "Raquel Matos",
                     DataNascimento = new DateTime(1989, 7, 7),
                     Nif            = "236985147",
@@ -646,7 +1005,12 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua de São João, 23, Braga"
                 },
                 new UtenteSaude
-                {
+        {
+            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var foods = db.Food.OrderBy(f => f.FoodId).ToList();
+            var portions = db.Portion.OrderBy(p => p.PortionId).ToList();
+
+            if (plans.Any() && foods.Any() && portions.Any())
                     NomeCompleto   = "Henrique Azevedo",
                     DataNascimento = new DateTime(1977, 11, 25),
                     Nif            = "289634571",
@@ -657,7 +1021,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua das Laranjeiras, 19, Porto"
                 },
                 new UtenteSaude
-                {
+            {
+                var defaultPortion = portions.First();
+                var foodPlans = new List<FoodPlan>();
+
+                void AddFoodsToPlan(Plan plan, int startIndex, int count)
                     NomeCompleto   = "Beatriz Lopes",
                     DataNascimento = new DateTime(1995, 8, 2),
                     Nif            = "269841735",
@@ -669,6 +1037,7 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    for (int i = 0; i < count && (startIndex + i) < foods.Count; i++)
                     NomeCompleto   = "Miguel Ramos",
                     DataNascimento = new DateTime(1984, 9, 28),
                     Nif            = "259687314",
@@ -679,7 +1048,10 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Cruzeiro, 17, Viseu"
                 },
                 new UtenteSaude
-                {
+                    {
+                        var food = foods[startIndex + i];
+
+                        foodPlans.Add(new FoodPlan
                     NomeCompleto   = "Daniel Sousa",
                     DataNascimento = new DateTime(1979, 3, 16),
                     Nif            = "285963147",
@@ -690,7 +1062,29 @@ namespace HealthWellbeing.Data
                     Morada         = "Travessa dos Combatentes, 21, Setúbal"
                 },
                 new UtenteSaude
-                {
+                        {
+                            PlanId = plan.PlanId,
+                            FoodId = food.FoodId,
+                            PortionId = defaultPortion.PortionId
+                        });
+                    }
+                }
+
+                if (plans.Count >= 1) AddFoodsToPlan(plans[0], 0, 4);
+                if (plans.Count >= 2) AddFoodsToPlan(plans[1], 4, 5);
+                if (plans.Count >= 3) AddFoodsToPlan(plans[2], 9, 3);
+
+                db.FoodPlan.AddRange(foodPlans);
+                db.SaveChanges();
+            }
+        }
+
+        
+
+        // =====================================================================
+        // FOOD PLAN DAY (PlanId + Date + FoodId + PortionsPlanned)
+        // =====================================================================
+        if (db.FoodPlanDay != null && !db.FoodPlanDay.Any())
                     NomeCompleto   = "Sílvia Ferreira",
                     DataNascimento = new DateTime(1993, 4, 10),
                     Nif            = "239685471",
@@ -701,7 +1095,16 @@ namespace HealthWellbeing.Data
                     Morada         = "Avenida da Liberdade, 9, Braga"
                 },
                 new UtenteSaude
-                {
+        {
+            var today = DateTime.Today;
+            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var baseFoodPlans = db.FoodPlan
+                .AsNoTracking()
+                .OrderBy(fp => fp.PlanId)
+                .ThenBy(fp => fp.FoodId)
+                .ToList();
+
+            if (plans.Any() && baseFoodPlans.Any())
                     NomeCompleto   = "Alexandre Pinto",
                     DataNascimento = new DateTime(1986, 7, 21),
                     Nif            = "278954163",
@@ -712,7 +1115,11 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua das Escolas, 12, Coimbra"
                 },
                 new UtenteSaude
-                {
+            {
+                var rng = new Random();
+                var list = new List<FoodPlanDay>();
+
+                foreach (var plan in plans)
                     NomeCompleto   = "Vera Almeida",
                     DataNascimento = new DateTime(1990, 2, 19),
                     Nif            = "218964735",
@@ -724,6 +1131,11 @@ namespace HealthWellbeing.Data
                 },
                 new UtenteSaude
                 {
+                    var foodsForPlan = baseFoodPlans.Where(fp => fp.PlanId == plan.PlanId).ToList();
+                    if (!foodsForPlan.Any()) continue;
+
+                    // cria 7 dias de plano
+                    for (int d = 0; d < 7; d++)
                     NomeCompleto   = "Nádia Marques",
                     DataNascimento = new DateTime(1998, 11, 8),
                     Nif            = "296847153",
@@ -734,7 +1146,10 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Campo, 17, Évora"
                 },
                 new UtenteSaude
-                {
+                    {
+                        var date = today.AddDays(d).Date;
+
+                        foreach (var fp in foodsForPlan)
                     NomeCompleto   = "Hugo Barros",
                     DataNascimento = new DateTime(1981, 5, 4),
                     Nif            = "275986431",
@@ -745,7 +1160,8 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua dos Carvalhos, 14, Porto"
                 },
                 new UtenteSaude
-                {
+                        {
+                            list.Add(new FoodPlanDay
                     NomeCompleto   = "Joana Costa",
                     DataNascimento = new DateTime(1997, 6, 22),
                     Nif            = "285974316",
@@ -756,7 +1172,17 @@ namespace HealthWellbeing.Data
                     Morada         = "Rua do Rossio, 11, Lisboa"
                 },
                 new UtenteSaude
-                {
+                            {
+                                PlanId = plan.PlanId,
+                                FoodId = fp.FoodId,
+                                PortionId = fp.PortionId,
+                                Date = date,
+                                PortionsPlanned = rng.Next(1, 4), // 1..3 porções
+                                ScheduledTime = date.AddHours(9), // opcional
+                                MealType = "Daily"
+                            });
+                        }
+                    }
                     NomeCompleto   = "Paula Rocha",
                     DataNascimento = new DateTime(1988, 10, 27),
                     Nif            = "269854137",
@@ -768,13 +1194,19 @@ namespace HealthWellbeing.Data
                 }
             };
 
+                db.FoodPlanDay.AddRange(list);
             db.UtenteSaude.AddRange(utentes);
-            db.SaveChanges();
+                db.SaveChanges();
+            }
         }
         private static void PopulateSpecialities(HealthWellbeingDbContext db)
         {
             if (db.Specialities.Any()) return; // Evita duplicar registos
 
+        // =====================================================================
+        // FOOD INTAKE (pre-create from FoodPlanDay, not consumed)
+        // =====================================================================
+        if (db.FoodIntake != null && !db.FoodIntake.Any())
             var especialidades = new[]
             {
         new Specialities
@@ -794,44 +1226,86 @@ namespace HealthWellbeing.Data
         },
         new Specialities
         {
+            var days = db.FoodPlanDay.AsNoTracking().ToList();
+
+            var list = days.Select(x => new FoodIntake
             Nome = "Psiquiatria",
             Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
         },
         new Specialities
-        {
+            {
+                PlanId = x.PlanId,
+                FoodId = x.FoodId,
+                PortionId = x.PortionId,
+                Date = x.Date,
+                ScheduledTime = x.ScheduledTime ?? x.Date.AddHours(9),
+                PortionsPlanned = x.PortionsPlanned,
+                PortionsEaten = 0
+            }).ToList();
+
+            db.FoodIntake.AddRange(list);
+            db.SaveChanges();
+        }
+
+        // =====================================================================
+        // JOIN TABLES – FOOD / NUTRITIONAL COMPONENT
+        // =====================================================================
+        if (db.FoodNutritionalComponent != null && !db.FoodNutritionalComponent.Any())
             Nome = "Nutrição",
             Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
         },
         new Specialities
         {
+            var foods = db.Food.OrderBy(f => f.FoodId).ToList();
+            var comps = db.NutritionalComponent.OrderBy(c => c.NutritionalComponentId).ToList();
+
+            if (foods.Any() && comps.Any())
             Nome = "Medicina Geral e Familiar",
             Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
         },
         new Specialities
-        {
+            {
+                var list = new List<FoodNutritionalComponent>();
+                int counter = 0;
+
+                foreach (var food in foods)
             Nome = "Ortopedia",
             Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
         },
         new Specialities
-        {
+                {
+                    foreach (var comp in comps)
             Nome = "Ginecologia e Obstetrícia",
             Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
         },
         new Specialities
-        {
+                    {
+                        list.Add(new FoodNutritionalComponent
             Nome = "Psicologia",
             Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
         },
         new Specialities
-        {
+                        {
+                            FoodId = food.FoodId,
+                            NutritionalComponentId = comp.NutritionalComponentId,
+                            Value = 5 + (counter % 20)
+                        });
+
+                        counter++;
+                        if (counter >= 80) break;
+                    }
             Nome = "Fisioterapia",
             Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
         },
-       
+
+                    if (counter >= 80) break;
+                }
     };
 
+                db.FoodNutritionalComponent.AddRange(list);
             db.Specialities.AddRange(especialidades);
-            db.SaveChanges();
+                db.SaveChanges();
+            }
         }
 
     }
