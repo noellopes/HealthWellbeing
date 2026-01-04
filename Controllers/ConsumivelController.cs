@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ConsumivelController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
