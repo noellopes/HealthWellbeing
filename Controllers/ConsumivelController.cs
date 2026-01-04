@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Gestor de armazenamento")]
     public class ConsumivelController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -73,7 +73,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeMaxima,QuantidadeMinima")] Consumivel consumivel)
+        public async Task<IActionResult> Create([Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeMinima")] Consumivel consumivel)
         {
             if (ModelState.IsValid)
             {
@@ -102,7 +102,7 @@ namespace HealthWellbeing.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeMaxima,QuantidadeAtual,QuantidadeMinima")] Consumivel consumivel)
+            [Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeAtual,QuantidadeMinima")] Consumivel consumivel)
         {
             if (id != consumivel.ConsumivelId)
                 return View("InvalidConsumivel");
@@ -191,8 +191,23 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
             }
         }
+        private async Task AtualizarQuantidadeMaximaConsumivel(int consumivelId)
+        {
+            // Soma todas as capacidades máximas das zonas associadas
+            var quantidadeMaximaTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.CapacidadeMaxima);
 
-  
+            // Atualiza o Consumível
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeMaxima = quantidadeMaximaTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
+        }
+
 
     }
 }
