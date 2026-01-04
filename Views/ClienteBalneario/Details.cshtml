@@ -1,0 +1,35 @@
+﻿@model HealthWellbeing.Models.ClienteBalnearioModel
+
+<h2>Detalhes do Cliente</h2>
+
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">NomeCompleto</dt>
+    <dd class="col-sm-9">@Model.NomeCompleto</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Telemóvel</dt>
+    <dd class="col-sm-9">@Model.Telemovel</dd>
+
+    <dt class="col-sm-3">Morada</dt>
+    <dd class="col-sm-9">@Model.Morada</dd>
+
+    <dt class="col-sm-3">Tipo de Cliente</dt>
+    <dd class="col-sm-9">
+        <span class="badge @(Model.TipoCliente == "VIP" ? "bg-warning text-dark" : "bg-secondary")">
+            @Model.TipoCliente
+        </span>
+    </dd>
+</dl>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.ClienteBalnearioId" class="btn btn-warning">
+        Editar
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        Voltar
+    </a>
+</p>

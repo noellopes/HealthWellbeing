@@ -10,8 +10,8 @@ namespace HealthWellbeing.Controllers
         // LISTA FAKE (simula BD)
         private static List<ClienteBalnearioModel> _clientes = new()
         {
-            new ClienteBalnearioModel { ClienteBalnearioId = 1, Nome = "Maria Silva", Email="maria@gmail.com", Telemovel="912345678", Morada="Rua A", TipoCliente="Regular" },
-            new ClienteBalnearioModel { ClienteBalnearioId = 2, Nome = "João Pereira", Email="joao@gmail.com", Telemovel="913456789", Morada="Rua B", TipoCliente="VIP" }
+            new ClienteBalnearioModel { ClienteBalnearioId = 1, NomeCompleto = "Maria Silva", Email="maria@gmail.com", Telemovel="912345678", Morada="Rua A", TipoCliente="Regular" },
+            new ClienteBalnearioModel { ClienteBalnearioId = 2, NomeCompleto = "João Pereira", Email="joao@gmail.com", Telemovel="913456789", Morada="Rua B", TipoCliente="VIP" }
         };
 
 
@@ -22,12 +22,12 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrEmpty(search))
             {
                 lista = lista
-                    .Where(c => c.Nome.Contains(search, StringComparison.OrdinalIgnoreCase)
+                    .Where(c => c.NomeCompleto.Contains(search, StringComparison.OrdinalIgnoreCase)
                              || c.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
-            lista = lista.OrderBy(c => c.Nome).ToList();
+            lista = lista.OrderBy(c => c.NomeCompleto).ToList();
 
             return View(lista);
         }
@@ -40,13 +40,16 @@ namespace HealthWellbeing.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(ClienteBalnearioModel cliente)
         {
             if (!ModelState.IsValid)
                 return View(cliente);
 
-            cliente.ClienteBalnearioId = _clientes.Max(c => c.ClienteBalnearioId) + 1;
-            _clientes.Add(cliente);
+            cliente.ClienteBalnearioId = _clientes.Any()
+            ? _clientes.Max(c => c.ClienteBalnearioId) + 1
+            : 1;
+
 
             TempData["Success"] = "Cliente criado com sucesso.";
 
@@ -68,7 +71,7 @@ namespace HealthWellbeing.Controllers
                 return View(cliente);
 
             var existente = _clientes.First(c => c.ClienteBalnearioId == cliente.ClienteBalnearioId);
-            existente.Nome = cliente.Nome;
+            existente.NomeCompleto = cliente.NomeCompleto;
             existente.Email = cliente.Email;
             existente.Telemovel = cliente.Telemovel;
             existente.Morada = cliente.Morada;

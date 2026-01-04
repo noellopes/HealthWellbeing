@@ -9,8 +9,11 @@ namespace HealthWellbeing.Models
         [Key]
         public int ClienteBalnearioId { get; set; }
 
-        [Required, StringLength(100)]
-        public string Nome { get; set; }
+        [Required]
+        [StringLength(150)]
+        [Display(Name = "Nome Completo")]
+        public string NomeCompleto { get; set; }
+
 
         [Required, EmailAddress]
         public string Email { get; set; }

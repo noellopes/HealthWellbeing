@@ -1,0 +1,33 @@
+﻿@model HealthWellbeing.Models.ClienteBalnearioModel
+
+<h2>Apagar Cliente</h2>
+
+<h4 class="text-danger">Tem a certeza que deseja apagar este cliente?</h4>
+
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">NomeCompleto</dt>
+    <dd class="col-sm-9">@Model.NomeCompleto</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Telemóvel</dt>
+    <dd class="col-sm-9">@Model.Telemovel</dd>
+
+    <dt class="col-sm-3">Tipo de Cliente</dt>
+    <dd class="col-sm-9">@Model.TipoCliente</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="ClienteBalnearioId" />
+
+    <button type="submit" class="btn btn-danger">
+        Apagar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>
