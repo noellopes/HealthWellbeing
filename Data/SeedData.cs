@@ -689,7 +689,6 @@ namespace HealthWellBeingRoom.Data
                     IsUnderMaintenance = false
                 }
             });
-
             dbContext.SaveChanges();
         }
 

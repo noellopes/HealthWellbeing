@@ -24,12 +24,14 @@ namespace HealthWellbeing.Data
 
                 // Garante que a BD existe
                 db.Database.EnsureCreated();
-
+               
                 PopulateCategorias(db);
                 PopulateConsumiveis(db);
                 PopulateZonasArmazenamento(db);
                 PopulateStock(db);
                 PopulateHistoricoCompras(db);
+                PopulateFornecedores(db);
+                PopulateFornecedorConsumiveis(db);
 
                 // ---------------------------------------------------------
                 // 2. DADOS DE UTILIZADORES
@@ -166,14 +168,14 @@ namespace HealthWellbeing.Data
                 new() { NomeZona = "Prateleira A2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 200, QuantidadeAtual = 80, Ativa = true },
                 new() { NomeZona = "Prateleira A3", ConsumivelId = Cons("Luvas de Nitrilo"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 150, Ativa = true },
                 new() { NomeZona = "Armário B1",     ConsumivelId = Cons("Máscara Cirúrgica"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 500, QuantidadeAtual = 420, Ativa = true },
-                new() { NomeZona = "Armário B2",     ConsumivelId = Cons("Máscara N95"),       RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 110, Ativa = false },
+                new() { NomeZona = "Armário B2",     ConsumivelId = Cons("Máscara N95"),       RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 0, Ativa = false },
 
                 // Depósito 2
                 new() { NomeZona = "Gaveta C1", ConsumivelId = Cons("Seringa 5ml"),   RoomId = Sala("Depósito 2"), CapacidadeMaxima = 400, QuantidadeAtual = 180, Ativa = true },
                 new() { NomeZona = "Gaveta C2", ConsumivelId = Cons("Seringa 10ml"),  RoomId = Sala("Depósito 2"), CapacidadeMaxima = 400, QuantidadeAtual = 140, Ativa = true },
                 new() { NomeZona = "Gaveta C3", ConsumivelId = Cons("Agulhas 21G"),   RoomId = Sala("Depósito 2"), CapacidadeMaxima = 600, QuantidadeAtual = 260, Ativa = true },
                 new() { NomeZona = "Caixa D1",  ConsumivelId = Cons("Compressa Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 90, Ativa = true },
-                new() { NomeZona = "Caixa D2",  ConsumivelId = Cons("Compressa Não Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 60, Ativa = false },
+                new() { NomeZona = "Caixa D2",  ConsumivelId = Cons("Compressa Não Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 0, Ativa = false },
 
                 // Depósito 3
                 new() { NomeZona = "Prateleira E1", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Depósito 3"), CapacidadeMaxima = 300, QuantidadeAtual = 150, Ativa = true },
@@ -194,7 +196,7 @@ namespace HealthWellbeing.Data
                 // Centro Cirúrgico 3
                 new() { NomeZona = "Carrinho Cirurgia 1", ConsumivelId = Cons("Luvas Cirúrgicas Pequenas"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 120, QuantidadeAtual = 40, Ativa = true },
                 new() { NomeZona = "Carrinho Cirurgia 2", ConsumivelId = Cons("Máscara Cirúrgica"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 200, QuantidadeAtual = 90, Ativa = true },
-                new() { NomeZona = "Carrinho Cirurgia 3", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 150, QuantidadeAtual = 70, Ativa = false },
+                new() { NomeZona = "Carrinho Cirurgia 3", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 150, QuantidadeAtual = 0, Ativa = false },
 
                 // Farmácia 1
                 new() { NomeZona = "Prateleira Farm 1", ConsumivelId = Cons("Álcool 70%"), RoomId = Sala("Farmácia 1"), CapacidadeMaxima = 100, QuantidadeAtual = 35, Ativa = true },
@@ -206,7 +208,7 @@ namespace HealthWellbeing.Data
 
                 // Sala de Exames 1
                 new() { NomeZona = "Gaveta Exames 1", ConsumivelId = Cons("Seringa 5ml"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 200, QuantidadeAtual = 85, Ativa = true },
-                new() { NomeZona = "Gaveta Exames 2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 120, QuantidadeAtual = 30, Ativa = false }
+                new() { NomeZona = "Gaveta Exames 2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 120, QuantidadeAtual = 0, Ativa = false }
             };
 
             db.ZonaArmazenamento.AddRange(zonas);
@@ -290,29 +292,130 @@ namespace HealthWellbeing.Data
 
             var consumiveis = new List<Consumivel>
             {
-                C("Luvas Cirúrgicas Pequenas", "Pacote de luvas pequenas", "Luvas", 100, 0, 10),
-                C("Luvas Cirúrgicas Médias", "Pacote de luvas médias", "Luvas", 100, 0, 10),
-                C("Luvas de Nitrilo", "Luvas de nitrilo descartáveis", "Luvas", 200, 0, 20),
+                C("Luvas Cirúrgicas Pequenas", "Pacote de luvas pequenas", "Luvas", 0, 0, 10),
+                C("Luvas Cirúrgicas Médias", "Pacote de luvas médias", "Luvas", 0, 0, 10),
+                C("Luvas de Nitrilo", "Luvas de nitrilo descartáveis", "Luvas", 0, 0, 20),
 
-                C("Máscara N95", "Máscara respiratória N95", "Máscaras", 200, 0, 20),
-                C("Máscara Cirúrgica", "Máscara descartável para uso clínico", "Máscaras", 300, 0, 30),
+                C("Máscara N95", "Máscara respiratória N95", "Máscaras", 0, 0, 20),
+                C("Máscara Cirúrgica", "Máscara descartável para uso clínico", "Máscaras", 0, 0, 30),
 
-                C("Seringa 5ml", "Seringa descartável 5ml", "Seringas e Agulhas", 300, 0, 30),
-                C("Seringa 10ml", "Seringa descartável 10ml", "Seringas e Agulhas", 300, 0, 30),
-                C("Agulhas 21G", "Agulhas esterilizadas 21G", "Seringas e Agulhas", 500, 0, 50),
+                C("Seringa 5ml", "Seringa descartável 5ml", "Seringas e Agulhas", 0, 0, 30),
+                C("Seringa 10ml", "Seringa descartável 10ml", "Seringas e Agulhas", 0, 0, 30),
+                C("Agulhas 21G", "Agulhas esterilizadas 21G", "Seringas e Agulhas", 0, 0, 50),
 
-                C("Compressa Estéril", "Pacote de compressas estéreis", "Compressas", 150, 0, 15),
+                C("Compressa Estéril", "Pacote de compressas estéreis", "Compressas", 0, 0, 15),
                 C("Compressa Não Estéril", "Pacote de compressas não estéreis", "Compressas", 150, 0, 15),
 
-                C("Gaze Esterilizada", "Pacote de gazes esterilizadas", "Gazes", 200, 0, 20),
-                C("Gaze Não Esterilizada", "Pacote de gazes não esterilizadas", "Gazes", 200, 0, 20),
+                C("Gaze Esterilizada", "Pacote de gazes esterilizadas", "Gazes", 0, 0, 20),
+                C("Gaze Não Esterilizada", "Pacote de gazes não esterilizadas", "Gazes", 0, 0, 20),
 
-                C("Álcool 70%", "Frasco de álcool 70%", "Desinfetantes", 50, 0, 5),
-                C("Clorexidina", "Frasco de clorexidina", "Desinfetantes", 40, 0, 5)
+                C("Álcool 70%", "Frasco de álcool 70%", "Desinfetantes", 0, 0, 5),
+                C("Clorexidina", "Frasco de clorexidina", "Desinfetantes", 0, 0, 5)
             };
 
             db.Consumivel.AddRange(consumiveis);
             db.SaveChanges();
         }
+
+        private static void PopulateFornecedores(HealthWellbeingDbContext db)
+        {
+            if (db.Fornecedor.Any()) return;
+
+            var fornecedores = new List<Fornecedor>
+            {
+                new() { NomeEmpresa = "MediHealth Portugal", NIF = "509823471", Morada = "Rua da Saúde, 45, Lisboa", Telefone = "912345678", Email = "contacto@medihealth.pt" },
+                new() { NomeEmpresa = "HospitalarPlus", NIF = "501239874", Morada = "Avenida dos Hospitais, 120, Porto", Telefone = "934567890", Email = "geral@hospitalarplus.pt" },
+                new() { NomeEmpresa = "BioClean Serviços Médicos", NIF = "507654321", Morada = "Rua das Clínicas, 18, Coimbra", Telefone = "917654321", Email = "info@bioclean.pt" },
+                new() { NomeEmpresa = "MedSupply Lda", NIF = "509111222", Morada = "Parque Industrial de Gaia, Armazém 3", Telefone = "969111222", Email = "vendas@medsupply.pt" },
+                new() { NomeEmpresa = "EquipHospi", NIF = "510333444", Morada = "Rua do Hospital, 9, Aveiro", Telefone = "915333444", Email = "suporte@equiphosp.pt" },
+                new() { NomeEmpresa = "TecnoMedica", NIF = "513987654", Morada = "Rua da Inovação Médica, 22, Braga", Telefone = "933987654", Email = "geral@tecnomedica.pt" },
+                new() { NomeEmpresa = "SterilCare", NIF = "507222333", Morada = "Zona Industrial Norte, Lote 10, Leiria", Telefone = "919222333", Email = "comercial@sterilcare.pt" },
+                new() { NomeEmpresa = "BioPharma PT", NIF = "505444555", Morada = "Rua dos Laboratórios, 6, Faro", Telefone = "962444555", Email = "info@biopharmapt.pt" },
+                new() { NomeEmpresa = "Soluções Hospitalares Lda", NIF = "508111999", Morada = "Avenida Europa, 87, Lisboa", Telefone = "968111999", Email = "contacto@solucoeshosp.pt" },
+                new() { NomeEmpresa = "Clínica Distribuição", NIF = "509888777", Morada = "Rua da Saúde Pública, 15, Santarém", Telefone = "912888777", Email = "geral@clinicadist.pt" },
+                new() { NomeEmpresa = "HospiEquipamentos Lda", NIF = "509222111", Morada = "Rua Central, 200, Viseu", Telefone = "931222111", Email = "vendas@hospiequip.pt" },
+                new() { NomeEmpresa = "MediStock Portugal", NIF = "509777333", Morada = "Rua dos Armazéns, 5, Évora", Telefone = "938777333", Email = "info@medistock.pt" },
+                new() { NomeEmpresa = "LabCare Distribuição", NIF = "502456789", Morada = "Rua dos Laboratórios, 9, Funchal", Telefone = "914456789", Email = "suporte@labcare.pt" },
+                new() { NomeEmpresa = "PharmaLine", NIF = "506333666", Morada = "Rua das Farmácias, 17, Setúbal", Telefone = "965333666", Email = "contato@pharmaline.pt" },
+                new() { NomeEmpresa = "SafeMed Portugal", NIF = "509555888", Morada = "Rua do Progresso, 13, Guarda", Telefone = "931555888", Email = "info@safemed.pt" },
+                new() { NomeEmpresa = "HospitalTech", NIF = "510666999", Morada = "Parque Empresarial de Braga, Lote 4", Telefone = "934666999", Email = "geral@hospitaltech.pt" },
+                new() { NomeEmpresa = "EcoMed Solutions", NIF = "507999000", Morada = "Rua Verde, 22, Castelo Branco", Telefone = "939999000", Email = "info@ecomed.pt" },
+                new() { NomeEmpresa = "VitalCare", NIF = "503444222", Morada = "Rua das Clínicas, 10, Beja", Telefone = "968444222", Email = "contacto@vitalcare.pt" },
+                new() { NomeEmpresa = "CleanHosp", NIF = "505777999", Morada = "Zona Industrial, Lote 8, Portalegre", Telefone = "911777999", Email = "vendas@cleanhosp.pt" },
+                new() { NomeEmpresa = "Distribuidora Médica Nacional", NIF = "501234567", Morada = "Rua do Comércio, 45, Lisboa", Telefone = "933234567", Email = "geral@dmn.pt" },
+                new() { NomeEmpresa = "Medicalis Lda", NIF = "509121212", Morada = "Rua da Medicina, 88, Braga", Telefone = "934121212", Email = "suporte@medicalis.pt" },
+                new() { NomeEmpresa = "InfusionMed", NIF = "504333111", Morada = "Rua do Hospital Universitário, Coimbra", Telefone = "938333111", Email = "contacto@infusionmed.pt" },
+                new() { NomeEmpresa = "HealthPlus", NIF = "502222333", Morada = "Rua Nova Saúde, 70, Lisboa", Telefone = "962222333", Email = "info@healthplus.pt" },
+                new() { NomeEmpresa = "ProMedCare", NIF = "506111222", Morada = "Rua Central Médica, 55, Porto", Telefone = "911111222", Email = "vendas@promedcare.pt" },
+                new() { NomeEmpresa = "InovaClinic", NIF = "509333444", Morada = "Rua da Inovação, 20, Aveiro", Telefone = "933333444", Email = "geral@inovaclinic.pt" },
+                new() { NomeEmpresa = "HospitalLog", NIF = "508555666", Morada = "Rua da Logística, 8, Faro", Telefone = "915555666", Email = "suporte@hospitallog.pt" },
+                new() { NomeEmpresa = "CareDistribuição", NIF = "509777888", Morada = "Rua dos Fornecedores, 31, Coimbra", Telefone = "936777888", Email = "info@caredist.pt" },
+                new() { NomeEmpresa = "SaniPortugal", NIF = "505999000", Morada = "Rua da Higiene, 19, Leiria", Telefone = "937999000", Email = "contato@sanipt.pt" },
+                new() { NomeEmpresa = "GlobalMed Lda", NIF = "501555777", Morada = "Rua Internacional, 44, Porto", Telefone = "961555777", Email = "vendas@globalmed.pt" },
+                new() { NomeEmpresa = "CliniPro", NIF = "506888999", Morada = "Rua da Profissionalização, 33, Lisboa", Telefone = "939888999", Email = "geral@clinipro.pt" }
+            };
+
+            db.Fornecedor.AddRange(fornecedores);
+            db.SaveChanges();
+        }
+
+        private static void PopulateFornecedorConsumiveis(HealthWellbeingDbContext db)
+        {
+            if (db.Fornecedor_Consumivel.Any()) return;
+
+            var fornecedores = db.Fornecedor.ToList();
+            var consumiveis = db.Consumivel.ToList();
+
+            int F(string nomeEmpresa) =>
+                fornecedores.First(f => f.NomeEmpresa == nomeEmpresa).FornecedorId;
+
+            int C(string nomeConsumivel) =>
+                consumiveis.First(c => c.Nome == nomeConsumivel).ConsumivelId;
+
+            var ligacoes = new List<Fornecedor_Consumivel>
+            {
+                new() { FornecedorId = F("MediHealth Portugal"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.50f, TempoEntrega = 2},
+                new() { FornecedorId = F("HospitalarPlus"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.30f, TempoEntrega = 3},
+                new() { FornecedorId = F("MedSupply Lda"),ConsumivelId = C("Luvas de Nitrilo"), Preco = 3.10f, TempoEntrega = 2},
+                new() { FornecedorId = F("EquipHospi"), ConsumivelId = C("Máscara N95"), Preco = 1.80f, TempoEntrega = 1},
+                new() { FornecedorId = F("BioClean Serviços Médicos"), ConsumivelId = C("Compressa Estéril"), Preco = 4.20f, TempoEntrega = 4},
+                new() { FornecedorId = F("SterilCare"), ConsumivelId = C("Gaze Esterilizada"), Preco = 3.75f, TempoEntrega = 3},
+                new() { FornecedorId = F("MediHealth Portugal"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.50f, TempoEntrega = 2 },
+                new() { FornecedorId = F("HospitalarPlus"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.30f, TempoEntrega = 3 },
+                new() { FornecedorId = F("BioPharma PT"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.65f, TempoEntrega = 4 },
+                new() { FornecedorId = F("MedSupply Lda"), ConsumivelId = C("Luvas Cirúrgicas Médias"), Preco = 2.70f, TempoEntrega = 2 },
+                new() { FornecedorId = F("EquipHospi"), ConsumivelId = C("Luvas Cirúrgicas Médias"), Preco = 2.55f, TempoEntrega = 3 },
+                new() { FornecedorId = F("TecnoMedica"), ConsumivelId = C("Luvas Cirúrgicas Médias"), Preco = 2.80f, TempoEntrega = 5 },
+                new() { FornecedorId = F("MedSupply Lda"), ConsumivelId = C("Luvas de Nitrilo"), Preco = 3.10f, TempoEntrega = 2 },
+                new() { FornecedorId = F("SterilCare"), ConsumivelId = C("Luvas de Nitrilo"), Preco = 3.25f, TempoEntrega = 3 },
+                new() { FornecedorId = F("CleanHosp"), ConsumivelId = C("Luvas de Nitrilo"), Preco = 3.05f, TempoEntrega = 4 },
+                new() { FornecedorId = F("EquipHospi"), ConsumivelId = C("Máscara N95"), Preco = 1.80f, TempoEntrega = 1 },
+                new() { FornecedorId = F("HospitalTech"), ConsumivelId = C("Máscara N95"), Preco = 1.95f, TempoEntrega = 2 },
+                new() { FornecedorId = F("GlobalMed Lda"), ConsumivelId = C("Máscara N95"), Preco = 1.75f, TempoEntrega = 3 },
+                new() { FornecedorId = F("SaniPortugal"), ConsumivelId = C("Máscara Cirúrgica"), Preco = 0.45f, TempoEntrega = 2 },
+                new() { FornecedorId = F("Distribuidora Médica Nacional"), ConsumivelId = C("Máscara Cirúrgica"), Preco = 0.42f, TempoEntrega = 3 },
+                new() { FornecedorId = F("HealthPlus"), ConsumivelId = C("Máscara Cirúrgica"), Preco = 0.48f, TempoEntrega = 1 },
+                new() { FornecedorId = F("LabCare Distribuição"), ConsumivelId = C("Seringa 5ml"), Preco = 0.30f, TempoEntrega = 3 },
+                new() { FornecedorId = F("InfusionMed"), ConsumivelId = C("Seringa 5ml"), Preco = 0.28f, TempoEntrega = 2 },
+                new() { FornecedorId = F("ProMedCare"), ConsumivelId = C("Seringa 10ml"), Preco = 0.45f, TempoEntrega = 3 },
+                new() { FornecedorId = F("Medicalis Lda"), ConsumivelId = C("Seringa 10ml"), Preco = 0.48f, TempoEntrega = 2 },
+                new() { FornecedorId = F("CareDistribuição"), ConsumivelId = C("Agulhas 21G"), Preco = 0.15f, TempoEntrega = 4 },
+                new() { FornecedorId = F("HospiEquipamentos Lda"), ConsumivelId = C("Agulhas 21G"), Preco = 0.14f, TempoEntrega = 3 },
+                new() { FornecedorId = F("BioClean Serviços Médicos"), ConsumivelId = C("Compressa Estéril"), Preco = 4.20f, TempoEntrega = 4 },
+                new() { FornecedorId = F("VitalCare"), ConsumivelId = C("Compressa Estéril"), Preco = 4.10f, TempoEntrega = 3 },
+                new() { FornecedorId = F("Clínica Distribuição"), ConsumivelId = C("Compressa Não Estéril"), Preco = 3.50f, TempoEntrega = 2 },
+                new() { FornecedorId = F("SterilCare"), ConsumivelId = C("Gaze Esterilizada"), Preco = 3.75f, TempoEntrega = 3 },
+                new() { FornecedorId = F("EcoMed Solutions"), ConsumivelId = C("Gaze Esterilizada"), Preco = 3.60f, TempoEntrega = 4 },
+                new() { FornecedorId = F("Soluções Hospitalares Lda"), ConsumivelId = C("Gaze Não Esterilizada"), Preco = 3.10f, TempoEntrega = 3 },
+                new() { FornecedorId = F("PharmaLine"), ConsumivelId = C("Álcool 70%"), Preco = 1.90f, TempoEntrega = 2 },
+                new() { FornecedorId = F("SafeMed Portugal"), ConsumivelId = C("Álcool 70%"), Preco = 1.85f, TempoEntrega = 3 },
+                new() { FornecedorId = F("BioPharma PT"), ConsumivelId = C("Clorexidina"), Preco = 2.40f, TempoEntrega = 2 },
+                new() { FornecedorId = F("CliniPro"), ConsumivelId = C("Clorexidina"), Preco = 2.55f, TempoEntrega = 4 }
+            };
+
+            db.Fornecedor_Consumivel.AddRange(ligacoes);
+            db.SaveChanges();
+        }
+
     }
 }
