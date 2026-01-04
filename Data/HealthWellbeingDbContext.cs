@@ -42,7 +42,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.Musculo> Musculo { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
+        public DbSet<ProfissionalExecutante> ProfissionaisExecutantes { get; set; }
+        public object ProfissionalExecutanteId { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
 

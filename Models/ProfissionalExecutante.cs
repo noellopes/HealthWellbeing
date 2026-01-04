@@ -19,5 +19,6 @@ namespace HealthWellbeing.Models
 
         [EmailAddress(ErrorMessage = "Email inválido")]
         public string Email { get; set; }
+        public object ProfissionalExecutanteId { get; internal set; }
     }
 }
