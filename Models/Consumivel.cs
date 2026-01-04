@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
-    public class Consumivel
+    public class Consumivel : IValidatableObject
+
     {
         [Key]
         public int ConsumivelId { get; set; }
@@ -25,12 +26,20 @@ namespace HealthWellbeing.Models
 
         [Display(Name = "Quantidade Atual")]
         [Range(0, int.MaxValue, ErrorMessage = "A quantidade atual deve ser um número positivo.")]
-        public int QuantidadeAtual { get; set; }
+        public int QuantidadeAtual { get; set; } = 0;
 
         [Display(Name = "Quantidade Mínima")]
         [Range(0, int.MaxValue, ErrorMessage = "A quantidade mínima deve ser um número positivo.")]
         public int QuantidadeMinima { get; set; }
-
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (QuantidadeMaxima < QuantidadeMinima)
+            {
+                yield return new ValidationResult(
+                    "A quantidade máxima não pode ser menor que a quantidade mínima.",
+                    new[] { nameof(QuantidadeMaxima), nameof(QuantidadeMinima) });
+            }
+        }
         // Navegação
         public CategoriaConsumivel? CategoriaConsumivel { get; set; }
     }
