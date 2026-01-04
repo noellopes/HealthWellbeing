@@ -15,7 +15,7 @@ namespace HealthWellbeing.Controllers
             {
                 new ProfissionalExecutante
                 {
-                    ProfissionalExecutanteId = 1,
+                    Id = 1,
                     Nome = "Dr. João Silva",
                     Funcao = "Fisioterapeuta",
                     Telefone = "912345678",
@@ -23,7 +23,7 @@ namespace HealthWellbeing.Controllers
                 },
                 new ProfissionalExecutante
                 {
-                    ProfissionalExecutanteId = 2,
+                    Id = 2,
                     Nome = "Dra. Maria Santos",
                     Funcao = "Nutricionista",
                     Telefone = "967890123",
@@ -31,7 +31,7 @@ namespace HealthWellbeing.Controllers
                 },
                 new ProfissionalExecutante
                 {
-                    ProfissionalExecutanteId = 3,
+                    Id = 3,
                     Nome = "Prof. Carlos Lima",
                     Funcao = "Personal Trainer",
                     Telefone = "934567890",
