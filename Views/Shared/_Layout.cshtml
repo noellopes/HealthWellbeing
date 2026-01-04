@@ -54,6 +54,29 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
                         </li>
+
+                        <!--MArcação de consulta Dropdown-->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navHealthDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gestão de Consultas
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
+                                <li><a class="dropdown-item" asp-controller="UtenteSaude" asp-action="Index">Utentes</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Doctor" asp-action="Index">Doctor</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Specialities" asp-action="Index">Specialities</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Index">Consultas</a>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
+                        </li>
                     </ul>
 
                     <partial name="_LoginPartial" />
