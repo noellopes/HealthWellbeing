@@ -19,6 +19,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: RoomConsumable/Add?roomId=1&consumivelId=5&origin=Consumables
+        [HttpGet]
         public async Task<IActionResult> Add(int roomId, int? consumivelId, string? origin)
         {
             var room = await _context.Room.FindAsync(roomId);
@@ -86,15 +87,28 @@ namespace HealthWellbeingRoom.Controllers
 
             if (existente == null)
             {
+                if (rc.Quantity < 0) rc.Quantity = 0;
+
                 rc.InitialDate = DateTime.Now;
-                rc.IsCurrent = true;
+                rc.IsCurrent = rc.Quantity > 0;
                 _context.RoomConsumables.Add(rc);
             }
             else
             {
                 existente.Quantity += rc.Quantity;
-                existente.EndDate = null;
-                existente.IsCurrent = true;
+
+                if (existente.Quantity <= 0)
+                {
+                    existente.Quantity = 0;
+                    existente.IsCurrent = false;
+                    existente.EndDate = DateTime.Now;
+                }
+                else
+                {
+                    existente.IsCurrent = true;
+                    existente.EndDate = null;
+                }
+
                 _context.RoomConsumables.Update(existente);
             }
 
@@ -113,32 +127,107 @@ namespace HealthWellbeingRoom.Controllers
             TempData["SuccessMessage"] =
                 $"Consumível adicionado à sala '{room?.Name ?? rc.RoomId.ToString()}' com sucesso.";
 
-            // DECISÃO DE PARA ONDE VOLTAR
+            return RedirectToOrigin(origin, rc.RoomId);
+        }
+
+        // POST: RoomConsumable/Consumir
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Consumir(int roomConsumableId, int usedQuantity, string? origin)
+        {
+            if (usedQuantity <= 0)
+            {
+                TempData["ErrorMessage"] = "A quantidade a consumir deve ser maior que zero.";
+                return RedirectToOrigin(origin, null);
+            }
+
+            // Carrega o registo de stock da sala
+            var rc = await _context.RoomConsumables
+                .Include(x => x.Consumivel)
+                .Include(x => x.Room)
+                .FirstOrDefaultAsync(x => x.RoomConsumableId == roomConsumableId && x.IsCurrent);
+
+            if (rc == null)
+            {
+                TempData["ErrorMessage"] = "Registo de consumível na sala não encontrado.";
+                return RedirectToOrigin(origin, null);
+            }
+
+            // Não deixar consumir mais do que existe
+            if (usedQuantity > rc.Quantity)
+            {
+                TempData["ErrorMessage"] =
+                    $"Não pode consumir {usedQuantity} unidade(s). Stock disponível: {rc.Quantity}.";
+                return RedirectToOrigin(origin, rc.RoomId);
+            }
+
+            // Atualizar stock na sala
+            rc.Quantity -= usedQuantity;
+
+            if (rc.Quantity <= 0)
+            {
+                // remover completamente a associação da sala
+                _context.RoomConsumables.Remove(rc);
+            }
+            else
+            {
+                _context.RoomConsumables.Update(rc);
+            }
+
+
+            // Atualizar stock global do consumível
+            var cons = rc.Consumivel;
+            if (cons != null)
+            {
+                cons.QuantidadeAtual -= usedQuantity;
+                if (cons.QuantidadeAtual < 0) cons.QuantidadeAtual = 0;
+                _context.Consumivel.Update(cons);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Alerta de stock baixo na sala
+            if (rc.Quantity == 1)
+            {
+                TempData["LowStockMessage"] =
+                    $"O consumível '{rc.Consumivel?.Nome}' está quase a esgotar na sala '{rc.Room?.Name}'.";
+            }
+
+            TempData["SuccessMessage"] =
+                $"Foram consumidas {usedQuantity} unidade(s) de '{rc.Consumivel?.Nome}' na sala '{rc.Room?.Name}'.";
+
+            return RedirectToOrigin(origin, rc.RoomId);
+        }
+
+        // Helper para decidir para onde voltar
+        private IActionResult RedirectToOrigin(string? origin, int? roomId)
+        {
+            if (roomId == null)
+                return RedirectToAction("Index", "RoomReservations");
+
             if (!string.IsNullOrWhiteSpace(origin) &&
                 origin.Equals("Consumables", StringComparison.OrdinalIgnoreCase))
             {
-                // View Consumíveis Associados (RoomsController)
                 return RedirectToAction(
                     actionName: "Consumables",
                     controllerName: "Rooms",
-                    routeValues: new { id = rc.RoomId });
+                    routeValues: new { id = roomId.Value });
             }
 
             if (!string.IsNullOrWhiteSpace(origin) &&
                 origin.Equals("RoomMaterials", StringComparison.OrdinalIgnoreCase))
             {
-                // View Materiais da Sala (RoomReservationsController)
                 return RedirectToAction(
                     actionName: "RoomMaterials",
                     controllerName: "RoomReservations",
-                    routeValues: new { id = rc.RoomId });
+                    routeValues: new { id = roomId.Value });
             }
 
             // fallback
             return RedirectToAction(
                 actionName: "RoomMaterials",
                 controllerName: "RoomReservations",
-                routeValues: new { id = rc.RoomId });
+                routeValues: new { id = roomId.Value });
         }
     }
 }

@@ -89,7 +89,7 @@ namespace HealthWellbeingRoom.Controllers
             // 3. Registar consumíveis usados e descontar stock
             if (reserva.Room?.RoomConsumables != null)
             {
-                foreach (var item in reserva.Room.RoomConsumables)
+                foreach (var item in reserva.Room.RoomConsumables.ToList())
                 {
                     if (item.Quantity <= 0)
                         continue;
@@ -97,6 +97,7 @@ namespace HealthWellbeingRoom.Controllers
                     // Quantidade usada nesta reserva (ajusta regra se precisares)
                     int quantidadeUsada = item.Quantity;
 
+                    // 3.1 Registo de despesa
                     var gasto = new ConsumablesExpenses
                     {
                         ConsumableId = item.ConsumivelId,
@@ -108,7 +109,7 @@ namespace HealthWellbeingRoom.Controllers
 
                     _context.ConsumablesExpenses.Add(gasto);
 
-                    // Atualizar stock global do consumível
+                    // 3.2 Atualizar stock global do consumível
                     if (item.Consumivel != null)
                     {
                         item.Consumivel.QuantidadeAtual -= quantidadeUsada;
@@ -118,11 +119,26 @@ namespace HealthWellbeingRoom.Controllers
                         _context.Consumivel.Update(item.Consumivel);
                     }
 
-                    // (Opcional) atualizar quantidade disponível na sala
+                    // 3.3 Atualizar stock na sala
                     item.Quantity -= quantidadeUsada;
-                    if (item.Quantity < 0)
-                        item.Quantity = 0;
-                    _context.RoomConsumables.Update(item);
+
+                    if (item.Quantity <= 0)
+                    {
+                        // Se queres remover completamente o consumível da sala:
+                        _context.RoomConsumables.Remove(item);
+                    }
+                    else
+                    {
+                        // Ainda sobra stock na sala
+                        _context.RoomConsumables.Update(item);
+
+                        // Alerta se ficou apenas 1 unidade
+                        if (item.Quantity == 1 && item.Consumivel != null && reserva.Room != null)
+                        {
+                            TempData["LowStockMessage"] =
+                                $"O consumível '{item.Consumivel.Nome}' está quase a esgotar na sala '{reserva.Room.Name}'.";
+                        }
+                    }
                 }
             }
 
@@ -140,6 +156,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
 
         //------------------------------------------------------CANCELAR RESERVA-------------------------------------------------------------------------------------
