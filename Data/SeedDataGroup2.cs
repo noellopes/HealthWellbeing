@@ -165,14 +165,14 @@ namespace HealthWellbeing.Data
                 new() { NomeZona = "Prateleira A2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 200, QuantidadeAtual = 80, Ativa = true },
                 new() { NomeZona = "Prateleira A3", ConsumivelId = Cons("Luvas de Nitrilo"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 150, Ativa = true },
                 new() { NomeZona = "Armário B1",     ConsumivelId = Cons("Máscara Cirúrgica"), RoomId = Sala("Depósito 1"), CapacidadeMaxima = 500, QuantidadeAtual = 420, Ativa = true },
-                new() { NomeZona = "Armário B2",     ConsumivelId = Cons("Máscara N95"),       RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 110, Ativa = false },
+                new() { NomeZona = "Armário B2",     ConsumivelId = Cons("Máscara N95"),       RoomId = Sala("Depósito 1"), CapacidadeMaxima = 300, QuantidadeAtual = 0, Ativa = false },
 
                 // Depósito 2
                 new() { NomeZona = "Gaveta C1", ConsumivelId = Cons("Seringa 5ml"),   RoomId = Sala("Depósito 2"), CapacidadeMaxima = 400, QuantidadeAtual = 180, Ativa = true },
                 new() { NomeZona = "Gaveta C2", ConsumivelId = Cons("Seringa 10ml"),  RoomId = Sala("Depósito 2"), CapacidadeMaxima = 400, QuantidadeAtual = 140, Ativa = true },
                 new() { NomeZona = "Gaveta C3", ConsumivelId = Cons("Agulhas 21G"),   RoomId = Sala("Depósito 2"), CapacidadeMaxima = 600, QuantidadeAtual = 260, Ativa = true },
                 new() { NomeZona = "Caixa D1",  ConsumivelId = Cons("Compressa Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 90, Ativa = true },
-                new() { NomeZona = "Caixa D2",  ConsumivelId = Cons("Compressa Não Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 60, Ativa = false },
+                new() { NomeZona = "Caixa D2",  ConsumivelId = Cons("Compressa Não Estéril"), RoomId = Sala("Depósito 2"), CapacidadeMaxima = 250, QuantidadeAtual = 0, Ativa = false },
 
                 // Depósito 3
                 new() { NomeZona = "Prateleira E1", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Depósito 3"), CapacidadeMaxima = 300, QuantidadeAtual = 150, Ativa = true },
@@ -193,7 +193,7 @@ namespace HealthWellbeing.Data
                 // Centro Cirúrgico 3
                 new() { NomeZona = "Carrinho Cirurgia 1", ConsumivelId = Cons("Luvas Cirúrgicas Pequenas"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 120, QuantidadeAtual = 40, Ativa = true },
                 new() { NomeZona = "Carrinho Cirurgia 2", ConsumivelId = Cons("Máscara Cirúrgica"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 200, QuantidadeAtual = 90, Ativa = true },
-                new() { NomeZona = "Carrinho Cirurgia 3", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 150, QuantidadeAtual = 70, Ativa = false },
+                new() { NomeZona = "Carrinho Cirurgia 3", ConsumivelId = Cons("Gaze Esterilizada"), RoomId = Sala("Centro Cirúrgico 3"), CapacidadeMaxima = 150, QuantidadeAtual = 0, Ativa = false },
 
                 // Farmácia 1
                 new() { NomeZona = "Prateleira Farm 1", ConsumivelId = Cons("Álcool 70%"), RoomId = Sala("Farmácia 1"), CapacidadeMaxima = 100, QuantidadeAtual = 35, Ativa = true },
@@ -205,7 +205,7 @@ namespace HealthWellbeing.Data
 
                 // Sala de Exames 1
                 new() { NomeZona = "Gaveta Exames 1", ConsumivelId = Cons("Seringa 5ml"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 200, QuantidadeAtual = 85, Ativa = true },
-                new() { NomeZona = "Gaveta Exames 2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 120, QuantidadeAtual = 30, Ativa = false }
+                new() { NomeZona = "Gaveta Exames 2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 120, QuantidadeAtual = 0, Ativa = false }
             };
 
             db.ZonaArmazenamento.AddRange(zonas);
