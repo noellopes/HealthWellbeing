@@ -1,0 +1,77 @@
+﻿@model IEnumerable<HealthWellbeing.ViewModels.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "Gestão de Utilizadores";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3 text-primary"><i class="fas fa-users-cog"></i> Gestão de Utilizadores</h2>
+    <p class="text-muted">Administração de permissões e perfis de acesso ao sistema:</p>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/" class="btn btn-secondary shadow-sm">
+            <i class="fas fa-home me-1"></i> Início
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Utilizador (Email)</th>
+                    <th>Roles Atuais</th>
+                    <th class="text-center" style="width: 450px;">Ações de Permissão</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@user.Email</td>
+                        <td>
+                            @if (user.Roles != null && user.Roles.Any())
+                            {
+                                @foreach (var role in user.Roles)
+                                {
+                                    var badgeClass = role.Contains("Admin") ? "bg-danger" :
+                                    role.Contains("Profissional") ? "bg-success" : "bg-info";
+                                    <span class="badge @badgeClass me-1 shadow-sm">@role</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Sem Role</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+
+                                <form asp-action="ChangeToAdmin" method="post" class="d-inline me-1">
+                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm">
+                                        <i class="fas fa-user-shield"></i> Tornar Admin
+                                    </button>
+                                </form>
+
+                                <form asp-action="ChangeToProfissional" method="post" class="d-inline me-1">
+                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                    <button type="submit" class="btn btn-outline-success btn-sm shadow-sm">
+                                        <i class="fas fa-user-md"></i> Tornar Profissional
+                                    </button>
+                                </form>
+
+                                <form asp-action="ChangeToClient" method="post" class="d-inline">
+                                    <input type="hidden" name="userId" value="@user.UserId" />
+                                    <button type="submit" class="btn btn-outline-info btn-sm shadow-sm">
+                                        <i class="fas fa-user"></i> Tornar Cliente
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

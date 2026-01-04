@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Views\PlanoExercicios\Create - Cópia.cshtml" />
+    <Content Remove="Views\PlanoExercicios\AdminPage.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
