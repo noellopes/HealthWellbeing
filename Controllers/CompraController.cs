@@ -83,6 +83,36 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmarRegisto(RegistoCompra model)
         {
+            var consumivel = _context.Consumivel
+                .FirstOrDefault(c => c.ConsumivelId == model.ConsumivelId);
+
+            if (consumivel == null)
+                return NotFound();
+
+            // 🔒 limite máximo permitido
+            var limitePermitido =
+                consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
+
+            // ❌ bloqueio se exceder
+            if (model.Quantidade > limitePermitido)
+            {
+                ModelState.AddModelError(
+                    "Quantidade",
+                    $"Não é possível comprar mais de {limitePermitido} unidades."
+                );
+
+                // recarregar fornecedores para a view não rebentar
+                model.Fornecedores = _context.Fornecedor_Consumivel
+                    .Where(fc => fc.ConsumivelId == model.ConsumivelId)
+                    .Include(fc => fc.Fornecedor)
+                    .OrderBy(fc => fc.Preco)
+                    .ThenBy(fc => fc.TempoEntrega)
+                    .ToList();
+
+                return View("RegistoCompra", model);
+            }
+
+            // fornecedor
             var fornecedor = _context.Fornecedor_Consumivel
                 .First(fc => fc.FornecedorId == model.FornecedorId
                           && fc.ConsumivelId == model.ConsumivelId);
@@ -96,13 +126,14 @@ namespace HealthWellbeing.Controllers
                 TempoEntrega = fornecedor.TempoEntrega ?? 0
             });
 
-            var consumivel = _context.Consumivel.Find(model.ConsumivelId);
+            // ✅ atualização segura
             consumivel.QuantidadeAtual += model.Quantidade;
 
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Historico));
         }
+
 
         public IActionResult Historico()
         {
