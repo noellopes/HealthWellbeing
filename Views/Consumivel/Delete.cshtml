@@ -4,6 +4,13 @@
     ViewData["Title"] = "Eliminar Consumível";
 }
 
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
 <style>
     .delete-container {
         max-width: 650px;

@@ -148,13 +148,29 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var consumivel = await _context.Consumivel.FindAsync(id);
-            if (consumivel != null)
+            var consumivel = await _context.Consumivel
+                .Include(c => c.CategoriaConsumivel)
+                .FirstOrDefaultAsync(c => c.ConsumivelId == id);
+
+            if (consumivel == null)
+                return View("InvalidConsumivel");
+
+            try
             {
-                // Aqui podemos verificar se há Auditorias associadas, opcional
                 _context.Consumivel.Remove(consumivel);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Consumível eliminado com sucesso!";
+            }
+            catch (DbUpdateException)
+            {
+                // conta quantas zonas existem
+                int numZonas = await _context.ZonaArmazenamento
+                    .Where(z => z.ConsumivelId == id)
+                    .CountAsync();
+
+                // Passa a mensagem de erro para a view
+                ViewBag.Error = $"Não é possível apagar este consumível. Existem {numZonas} zonas de armazenamento associadas.";
+                return View(consumivel);
             }
 
             return RedirectToAction(nameof(Index));
@@ -175,5 +191,8 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
             }
         }
+
+  
+
     }
 }

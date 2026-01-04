@@ -60,6 +60,13 @@ namespace HealthWellbeing.Data
                 .WithMany()
                 .HasForeignKey(s => s.ZonaID)
                 .OnDelete(DeleteBehavior.Restrict); // ❗ evita cascade paths
+
+            modelBuilder.Entity<ZonaArmazenamento>()
+            .HasOne(z => z.Consumivel)
+            .WithMany()
+            .HasForeignKey(z => z.ConsumivelId)
+            .OnDelete(DeleteBehavior.Restrict); // impede apagar consumível se tiver zonas
+
         }
 
         // ========================
