@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrator")]
     public class ConsumivelController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -21,6 +21,11 @@ namespace HealthWellbeing.Controllers
         // INDEX COM PAGINAÇÃO + PESQUISA
         public async Task<IActionResult> Index(string? searchNome, string? searchCategoria, int page = 1)
         {
+            var todosConsumiveisIds = await _context.Consumivel.Select(c => c.ConsumivelId).ToListAsync();
+            foreach (var id in todosConsumiveisIds)
+            {
+                await AtualizarQuantidadeAtualConsumivel(id);
+            }
 
             var query = _context.Consumivel.Include(c => c.CategoriaConsumivel).AsQueryable();
 
@@ -153,6 +158,22 @@ namespace HealthWellbeing.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
+        {
+            // Obter todas as zonas que têm este consumível
+            var quantidadeTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.QuantidadeAtual);
+
+            // Atualizar o Consumível
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeAtual = quantidadeTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

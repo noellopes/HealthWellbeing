@@ -141,6 +141,8 @@ namespace HealthWellbeing.Controllers
                 _context.Add(zona);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "✅ Zona criada com sucesso!";
+                await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -186,6 +188,7 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(zona);
                     await _context.SaveChangesAsync();
+                    await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
                     TempData["SuccessMessage"] = "💾 Alterações guardadas com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
@@ -244,6 +247,23 @@ namespace HealthWellbeing.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
+        {
+            // Obter todas as zonas que têm este consumível
+            var quantidadeTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.QuantidadeAtual);
+
+            // Atualizar o Consumível
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeAtual = quantidadeTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
