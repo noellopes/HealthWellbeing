@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "Gestor de armazenamento")]
     public class ZonaArmazenamentoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -47,40 +49,52 @@ namespace HealthWellbeing.Controllers
             int page = 1,
             string searchNome = "",
             string searchLocalizacao = "",
-            string estado = "todas")
+            string estado = "todas",
+            int? searchConsumivel = null) 
         {
             var zonasQuery = _context.ZonaArmazenamento
                 .Include(z => z.Consumivel)
                 .Include(z => z.Room)
                 .AsQueryable();
 
-            // Pesquisa por nome da zona
+            // 1. Pesquisa por nome da zona
             if (!string.IsNullOrEmpty(searchNome))
                 zonasQuery = zonasQuery.Where(z => z.NomeZona.Contains(searchNome));
 
-            // Pesquisa por sala (nome da sala)
+            // 2. Pesquisa por sala
             if (!string.IsNullOrEmpty(searchLocalizacao))
                 zonasQuery = zonasQuery.Where(z => z.Room.Name.Contains(searchLocalizacao));
 
-            // Filtro por estado
+            // 3. Pesquisa por Consumível (Dropdown)
+            if (searchConsumivel.HasValue)
+            {
+                zonasQuery = zonasQuery.Where(z => z.ConsumivelId == searchConsumivel.Value);
+            }
+
+            // 4. Filtro por estado
             switch (estado)
             {
                 case "ativas":
                     zonasQuery = zonasQuery.Where(z => z.Ativa == true);
                     break;
-
                 case "inativas":
                     zonasQuery = zonasQuery.Where(z => z.Ativa == false);
                     break;
-
-                default:
-                    break;
             }
+
+            // --- Carregar a lista para a Dropdown de Pesquisa na View ---
+            ViewBag.ConsumiveisList = new SelectList(
+                _context.Consumivel.OrderBy(c => c.Nome),
+                "ConsumivelId",
+                "Nome",
+                searchConsumivel // Mantém selecionado o que o user escolheu
+            );
 
             // Manter valores na View
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
             ViewBag.Estado = estado;
+            ViewBag.SearchConsumivel = searchConsumivel; // Importante para paginação
 
             // Paginação
             int totalZonas = await zonasQuery.CountAsync();
@@ -100,16 +114,22 @@ namespace HealthWellbeing.Controllers
         // -----------------------------
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var zona = await _context.ZonaArmazenamento
                 .Include(z => z.Consumivel)
                 .Include(z => z.Room)
                 .FirstOrDefaultAsync(m => m.ZonaId == id);
 
-            if (zona == null)
-                return NotFound();
+            if (zona == null) return NotFound();
+
+            
+            var totalStock = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == zona.ConsumivelId)
+                .SumAsync(z => z.QuantidadeAtual);
+
+            ViewBag.TotalConsumivel = totalStock;
+            
 
             return View(zona);
         }
@@ -130,7 +150,6 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
-            // Regra de negócio: quantidade atual não pode exceder capacidade máxima
             if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
             {
                 ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser superior à capacidade máxima.");
@@ -156,12 +175,10 @@ namespace HealthWellbeing.Controllers
         // -----------------------------
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var zona = await _context.ZonaArmazenamento.FindAsync(id);
-            if (zona == null)
-                return NotFound();
+            if (zona == null) return NotFound();
 
             PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
@@ -174,8 +191,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
-            if (id != zona.ZonaId)
-                return NotFound();
+            if (id != zona.ZonaId) return NotFound();
 
             if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
             {
@@ -195,10 +211,8 @@ namespace HealthWellbeing.Controllers
                 {
                     if (!_context.ZonaArmazenamento.Any(e => e.ZonaId == id))
                         return NotFound();
-
                     throw;
                 }
-
                 return RedirectToAction(nameof(Index));
             }
 
@@ -212,16 +226,14 @@ namespace HealthWellbeing.Controllers
         // -----------------------------
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var zona = await _context.ZonaArmazenamento
                 .Include(z => z.Consumivel)
                 .Include(z => z.Room)
                 .FirstOrDefaultAsync(m => m.ZonaId == id);
 
-            if (zona == null)
-                return NotFound();
+            if (zona == null) return NotFound();
 
             return View(zona);
         }

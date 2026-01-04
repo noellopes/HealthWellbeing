@@ -1,24 +1,92 @@
-﻿ using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Data
 {
     public class SeedDataGroup2
     {
-        internal static void Populate(HealthWellbeingDbContext db)
+        
+        public static async Task Populate(IServiceProvider serviceProvider)
         {
-            if (db == null) throw new ArgumentNullException(nameof(db));
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var db = services.GetRequiredService<HealthWellbeingDbContext>();
 
-            db.Database.EnsureCreated();
+                if (db == null) throw new ArgumentNullException(nameof(db));
 
-            
-            PopulateCategorias(db);
-            PopulateConsumiveis(db);
-            PopulateZonasArmazenamento(db);
-            PopulateStock(db);
-            PopulateHistoricoCompras(db);
+                // Garante que a BD existe
+                db.Database.EnsureCreated();
+
+                PopulateCategorias(db);
+                PopulateConsumiveis(db);
+                PopulateZonasArmazenamento(db);
+                PopulateStock(db);
+                PopulateHistoricoCompras(db);
+
+                // ---------------------------------------------------------
+                // 2. DADOS DE UTILIZADORES
+                // ---------------------------------------------------------
+                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                await PopulateUsersAndRoles(userManager, roleManager);
+            }
         }
+
+        private static async Task PopulateUsersAndRoles(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            // 1. Criar Roles
+            string[] roles = { "Admin", "Gestor de armazenamento" };
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+
+            // 2. Criar Admin Padrão
+            await EnsureUser(userManager, "admin@health.com", "P@ssword123!", new[] { "Admin", "Gestor de armazenamento" });
+
+            // 3. Criar Gestor
+            await EnsureUser(userManager, "gestor@health.com", "Gestor123!", new[] { "Gestor de armazenamento" });
+
+            // 4. Criar Utilizador 
+            await EnsureUser(userManager, "mendes@health.com", "Mendes123!", new[] { "Admin", "Gestor de armazenamento" });
+        }
+
+        private static async Task EnsureUser(UserManager<IdentityUser> userManager, string email, string password, string[] roles)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new IdentityUser
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    foreach (var role in roles)
+                    {
+                        await userManager.AddToRoleAsync(user, role);
+                    }
+                }
+            }
+        }
+
+
         private static void PopulateHistoricoCompras(HealthWellbeingDbContext db)
         {
             if (db.HistoricoCompras.Any()) return;
@@ -57,7 +125,6 @@ namespace HealthWellbeing.Data
             if (!consumiveis.Any() || !zonas.Any()) return;
 
             var rnd = new Random();
-
             var stocks = new List<Stock>();
 
             foreach (var c in consumiveis)
@@ -68,13 +135,10 @@ namespace HealthWellbeing.Data
                 {
                     ConsumivelID = c.ConsumivelId,
                     ZonaID = zona.ZonaId,
-
                     // 🔑 COMEÇA NA QUANTIDADE MÍNIMA
                     QuantidadeAtual = c.QuantidadeMinima,
-
                     QuantidadeMinima = c.QuantidadeMinima,
                     QuantidadeMaxima = c.QuantidadeMaxima,
-
                     UsaValoresDoConsumivel = true,
                     DataUltimaAtualizacao = DateTime.Now
                 });
@@ -144,13 +208,9 @@ namespace HealthWellbeing.Data
                 new() { NomeZona = "Gaveta Exames 2", ConsumivelId = Cons("Luvas Cirúrgicas Médias"), RoomId = Sala("Sala de Exames 1"), CapacidadeMaxima = 120, QuantidadeAtual = 30, Ativa = false }
             };
 
-            
-
             db.ZonaArmazenamento.AddRange(zonas);
             db.SaveChanges();
         }
-
-
 
         private static void PopulateCategorias(HealthWellbeingDbContext db)
         {
