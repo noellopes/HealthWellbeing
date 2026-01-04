@@ -290,25 +290,25 @@ namespace HealthWellbeing.Data
 
             var consumiveis = new List<Consumivel>
             {
-                C("Luvas Cirúrgicas Pequenas", "Pacote de luvas pequenas", "Luvas", 100, 0, 10),
-                C("Luvas Cirúrgicas Médias", "Pacote de luvas médias", "Luvas", 100, 0, 10),
-                C("Luvas de Nitrilo", "Luvas de nitrilo descartáveis", "Luvas", 200, 0, 20),
+                C("Luvas Cirúrgicas Pequenas", "Pacote de luvas pequenas", "Luvas", 0, 0, 10),
+                C("Luvas Cirúrgicas Médias", "Pacote de luvas médias", "Luvas", 0, 0, 10),
+                C("Luvas de Nitrilo", "Luvas de nitrilo descartáveis", "Luvas", 0, 0, 20),
 
-                C("Máscara N95", "Máscara respiratória N95", "Máscaras", 200, 0, 20),
-                C("Máscara Cirúrgica", "Máscara descartável para uso clínico", "Máscaras", 300, 0, 30),
+                C("Máscara N95", "Máscara respiratória N95", "Máscaras", 0, 0, 20),
+                C("Máscara Cirúrgica", "Máscara descartável para uso clínico", "Máscaras", 0, 0, 30),
 
-                C("Seringa 5ml", "Seringa descartável 5ml", "Seringas e Agulhas", 300, 0, 30),
-                C("Seringa 10ml", "Seringa descartável 10ml", "Seringas e Agulhas", 300, 0, 30),
-                C("Agulhas 21G", "Agulhas esterilizadas 21G", "Seringas e Agulhas", 500, 0, 50),
+                C("Seringa 5ml", "Seringa descartável 5ml", "Seringas e Agulhas", 0, 0, 30),
+                C("Seringa 10ml", "Seringa descartável 10ml", "Seringas e Agulhas", 0, 0, 30),
+                C("Agulhas 21G", "Agulhas esterilizadas 21G", "Seringas e Agulhas", 0, 0, 50),
 
-                C("Compressa Estéril", "Pacote de compressas estéreis", "Compressas", 150, 0, 15),
+                C("Compressa Estéril", "Pacote de compressas estéreis", "Compressas", 0, 0, 15),
                 C("Compressa Não Estéril", "Pacote de compressas não estéreis", "Compressas", 150, 0, 15),
 
-                C("Gaze Esterilizada", "Pacote de gazes esterilizadas", "Gazes", 200, 0, 20),
-                C("Gaze Não Esterilizada", "Pacote de gazes não esterilizadas", "Gazes", 200, 0, 20),
+                C("Gaze Esterilizada", "Pacote de gazes esterilizadas", "Gazes", 0, 0, 20),
+                C("Gaze Não Esterilizada", "Pacote de gazes não esterilizadas", "Gazes", 0, 0, 20),
 
-                C("Álcool 70%", "Frasco de álcool 70%", "Desinfetantes", 50, 0, 5),
-                C("Clorexidina", "Frasco de clorexidina", "Desinfetantes", 40, 0, 5)
+                C("Álcool 70%", "Frasco de álcool 70%", "Desinfetantes", 0, 0, 5),
+                C("Clorexidina", "Frasco de clorexidina", "Desinfetantes", 0, 0, 5)
             };
 
             db.Consumivel.AddRange(consumiveis);
