@@ -184,6 +184,8 @@ namespace HealthWellbeing.Controllers
 
                 
                 await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
+                await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
+
 
                 TempData["SuccessMessage"] = "✅ Zona criada com sucesso!";
                 return RedirectToAction(nameof(Index));
@@ -238,6 +240,7 @@ namespace HealthWellbeing.Controllers
 
                     // Atualiza o total no consumível pai
                     await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
+                    await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
 
                     TempData["SuccessMessage"] = "💾 Alterações guardadas com sucesso!";
                 }
@@ -310,9 +313,47 @@ namespace HealthWellbeing.Controllers
 
             // Atualiza o total no consumível pai
             await AtualizarQuantidadeAtualConsumivel(consumivelId);
+            // Atualiza consumível
+            await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
+            await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
 
             TempData["SuccessMessage"] = "🗑️ Zona eliminada com sucesso!";
             return RedirectToAction(nameof(Index));
+        }
+
+
+
+        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
+        {
+            // Obter todas as zonas que têm este consumível
+            var quantidadeTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.QuantidadeAtual);
+
+            // Atualizar o Consumível
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeAtual = quantidadeTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
+        }
+        private async Task AtualizarQuantidadeMaximaConsumivel(int consumivelId)
+        {
+            // Soma todas as capacidades máximas das zonas associadas
+            var quantidadeMaximaTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.CapacidadeMaxima);
+
+            // Atualiza o Consumível
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeMaxima = quantidadeMaximaTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

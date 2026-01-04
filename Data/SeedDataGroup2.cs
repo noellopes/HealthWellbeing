@@ -44,7 +44,7 @@ namespace HealthWellbeing.Data
         private static async Task PopulateUsersAndRoles(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             // 1. Criar Roles
-            string[] roles = { "Admin", "Gestor de armazenamento" };
+            string[] roles = { "Administrator", "Gestor de armazenamento" };
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
@@ -54,13 +54,14 @@ namespace HealthWellbeing.Data
             }
 
             // 2. Criar Admin Padrão
-            await EnsureUser(userManager, "admin@health.com", "P@ssword123!", new[] { "Admin", "Gestor de armazenamento" });
+            await EnsureUser(userManager, "admin@health.com", "P@ssword123!", new[] { "Administrator", "Gestor de armazenamento" });
 
             // 3. Criar Gestor
             await EnsureUser(userManager, "gestor@health.com", "Gestor123!", new[] { "Gestor de armazenamento" });
 
             // 4. Criar Utilizador 
-            await EnsureUser(userManager, "mendes@health.com", "Mendes123!", new[] { "Admin", "Gestor de armazenamento" });
+            await EnsureUser(userManager, "mendes@health.com", "Mendes123!", new[] { "Administrator", "Gestor de armazenamento" });
+            await EnsureUser(userManager, "leal@health.com", "Leal123!", new[] { "Administrator", "Gestor de armazenamento" });
         }
 
         private static async Task EnsureUser(UserManager<IdentityUser> userManager, string email, string password, string[] roles)
