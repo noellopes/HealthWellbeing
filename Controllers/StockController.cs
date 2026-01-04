@@ -40,7 +40,7 @@ namespace HealthWellbeing.Controllers
                     _context.Stock.Add(new Stock
                     {
                         ConsumivelID = c.ConsumivelId,
-                        ZonaID = zonaAleatoria.Id,
+                        ZonaID = zonaAleatoria.ZonaId,
                         QuantidadeAtual = c.QuantidadeAtual,
                         QuantidadeMinima = c.QuantidadeMinima,
                         QuantidadeMaxima = c.QuantidadeMaxima,
@@ -110,7 +110,7 @@ namespace HealthWellbeing.Controllers
 
             if (!string.IsNullOrWhiteSpace(searchZona))
             {
-                query = query.Where(s => s.Zona.Nome.Contains(searchZona));
+                query = query.Where(s => s.Zona.NomeZona.Contains(searchZona));
                 ViewBag.SearchZona = searchZona;
             }
 
