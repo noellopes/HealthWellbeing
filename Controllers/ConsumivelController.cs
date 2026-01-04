@@ -25,6 +25,8 @@ namespace HealthWellbeing.Controllers
             foreach (var id in todosConsumiveisIds)
             {
                 await AtualizarQuantidadeAtualConsumivel(id);
+                await AtualizarQuantidadeMaximaConsumivel(id);
+
             }
 
             var query = _context.Consumivel.Include(c => c.CategoriaConsumivel).AsQueryable();
