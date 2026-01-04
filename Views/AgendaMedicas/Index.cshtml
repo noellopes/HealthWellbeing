@@ -1,37 +1,48 @@
 ﻿@model List<HealthWellbeing.ViewModel.EspecialidadeAgendaVM>
 
 @{
-    ViewData["Title"] = "Horário de Marcação de Consultas";
+    ViewData["Title"] = "Agenda Médica (15 dias úteis)";
 }
 
 <h2>@ViewData["Title"]</h2>
 
+@if (User.IsInRole("Medico"))
+{
+    <a class="btn btn-primary mb-3" asp-action="MinhaAgenda15Dias">
+        Definir a minha agenda (15 dias)
+    </a>
+}
+
 @foreach (var esp in Model)
 {
-    <h3>@esp.Especialidade</h3>
+    <h3 class="mt-4">@esp.Especialidade</h3>
 
     <div class="table-responsive mb-4">
         <table class="table table-sm table-striped table-bordered align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th>Médico</th>
-                    <th>Segunda</th>
-                    <th>Terça</th>
-                    <th>Quarta</th>
-                    <th>Quinta</th>
-                    <th>Sexta</th>
+                    <th style="min-width:180px;">Médico</th>
+                    @foreach (var d in esp.Datas)
+                    {
+                        <th style="min-width:160px;">
+                            @d.ToString("dd/MM") <br />
+                            <small>@d.DayOfWeek</small>
+                        </th>
+                    }
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var medico in esp.Medicos)
                 {
                     <tr>
                         <td>@medico.Medico</td>
-                        <td>@medico.Segunda</td>
-                        <td>@medico.Terca</td>
-                        <td>@medico.Quarta</td>
-                        <td>@medico.Quinta</td>
-                        <td>@medico.Sexta</td>
+                        @foreach (var d in esp.Datas)
+                        {
+                            <td>
+                                @(medico.HorariosPorData.TryGetValue(d, out var txt) ? txt : "-")
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>

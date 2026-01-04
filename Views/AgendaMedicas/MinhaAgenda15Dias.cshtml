@@ -1,0 +1,79 @@
+﻿@model HealthWellbeing.ViewModel.MedicoAgenda15DiasVM
+
+@{
+    ViewData["Title"] = "Agenda Médica (15 dias úteis)";
+}
+
+<h2>Agenda Médica (15 dias úteis)</h2>
+
+<p><strong>Médico:</strong> @Model.Medico</p>
+
+<form asp-action="MinhaAgenda15Dias" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Dia</th>
+
+                <th colspan="3">Manhã</th>
+                <th colspan="3">Tarde</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+
+                <th>Ativo</th>
+                <th>Início</th>
+                <th>Fim</th>
+
+                <th>Ativo</th>
+                <th>Início</th>
+                <th>Fim</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (int i = 0; i < Model.Dias.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Model.Dias[i].Data.ToString("dd/MM/yyyy")
+
+                        <input type="hidden" asp-for="Dias[i].Data" />
+                        <input type="hidden" asp-for="Dias[i].DiaSemana" />
+                    </td>
+
+                    <td>@Model.Dias[i].DiaSemana</td>
+
+                    <!-- MANHÃ -->
+                    <td class="text-center">
+                        <input asp-for="Dias[i].Manha.Ativo" />
+                    </td>
+                    <td>
+                        <input asp-for="Dias[i].Manha.HoraInicio" type="time" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="Dias[i].Manha.HoraFim" type="time" class="form-control" />
+                    </td>
+
+                    <!-- TARDE -->
+                    <td class="text-center">
+                        <input asp-for="Dias[i].Tarde.Ativo" />
+                    </td>
+                    <td>
+                        <input asp-for="Dias[i].Tarde.HoraInicio" type="time" class="form-control" />
+                    </td>
+                    <td>
+                        <input asp-for="Dias[i].Tarde.HoraFim" type="time" class="form-control" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Guardar Agenda</button>
+</form>
