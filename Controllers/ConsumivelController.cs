@@ -18,18 +18,18 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // INDEX: Sincroniza stock e gera avisos de proposta
+        // INDEX: Sincroniza stock, gera avisos e lista os consumíveis
         public async Task<IActionResult> Index(string? searchNome, string? searchCategoria, int page = 1)
         {
             var todosConsumiveisIds = await _context.Consumivel.Select(c => c.ConsumivelId).ToListAsync();
 
             foreach (var id in todosConsumiveisIds)
             {
-                // 1. Atualiza as quantidades reais baseadas nas zonas
+                // 1. Atualiza as quantidades reais baseadas na soma das zonas
                 await AtualizarQuantidadeAtualConsumivel(id);
                 await AtualizarQuantidadeMaximaConsumivel(id);
 
-                // 2. Verifica se deve mostrar um aviso de proposta de encomenda
+                // 2. Verifica se deve gerar o TempData para o alerta na View
                 await VerificarNecessidadeProposta(id);
             }
 
@@ -56,7 +56,7 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-        // AÇÃO PARA ACEITAR A PROPOSTA
+        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e atualiza o stock na zona
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AceitarEncomenda(int id)
@@ -64,7 +64,7 @@ namespace HealthWellbeing.Controllers
             var consumivel = await _context.Consumivel.FindAsync(id);
             if (consumivel == null) return NotFound();
 
-            // Procura o melhor fornecedor
+            // Procura o melhor fornecedor (Mais barato, depois mais rápido)
             var melhorFornecedor = await _context.Fornecedor_Consumivel
                 .Where(fc => fc.ConsumivelId == id)
                 .OrderBy(fc => fc.Preco)
@@ -77,17 +77,34 @@ namespace HealthWellbeing.Controllers
 
                 if (qtdAEncomendar > 0)
                 {
-                    _context.Compra.Add(new Compra
+                    // 1. Cria o registo na tabela Compra
+                    var novaCompra = new Compra
                     {
                         ConsumivelId = id,
                         FornecedorId = melhorFornecedor.FornecedorId,
                         Quantidade = qtdAEncomendar,
                         PrecoUnitario = melhorFornecedor.Preco,
                         TempoEntrega = melhorFornecedor.TempoEntrega ?? 0
-                    });
+                    };
+                    _context.Compra.Add(novaCompra);
+
+                    // 2. ATUALIZA O STOCK FÍSICO (Zona de Armazenamento)
+                    // Procuramos a primeira zona disponível para este consumível
+                    var zonaDestino = await _context.ZonaArmazenamento
+                        .FirstOrDefaultAsync(z => z.ConsumivelId == id);
+
+                    if (zonaDestino != null)
+                    {
+                        zonaDestino.QuantidadeAtual += qtdAEncomendar;
+                        _context.Update(zonaDestino);
+                    }
 
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"Encomenda de {qtdAEncomendar} unid. de {consumivel.Nome} realizada com sucesso!";
+
+                    // 3. Sincroniza o total do Consumível para que o alerta desapareça no próximo Index
+                    await AtualizarQuantidadeAtualConsumivel(id);
+
+                    TempData["SuccessMessage"] = $"Stock atualizado! Encomenda de {qtdAEncomendar} unid. de {consumivel.Nome} processada.";
                 }
             }
             else
@@ -103,7 +120,6 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult NegarEncomenda(int id)
         {
-            // Apenas remove o aviso desta sessão
             TempData.Remove($"Aviso_{id}");
             return RedirectToAction(nameof(Index));
         }
@@ -113,8 +129,6 @@ namespace HealthWellbeing.Controllers
         private async Task VerificarNecessidadeProposta(int consumivelId)
         {
             var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-
-            // Se o stock estiver abaixo do mínimo, cria uma mensagem de proposta no TempData
             if (consumivel != null && consumivel.QuantidadeAtual <= consumivel.QuantidadeMinima)
             {
                 TempData[$"Aviso_{consumivelId}"] = $"Stock Crítico: {consumivel.Nome} ({consumivel.QuantidadeAtual} unidades). Deseja repor stock?";
@@ -151,7 +165,7 @@ namespace HealthWellbeing.Controllers
             }
         }
 
-        // --- MÉTODOS PADRÃO (CREATE, EDIT, DETAILS, DELETE) ---
+        // --- MÉTODOS PADRÃO ---
 
         public async Task<IActionResult> Details(int? id)
         {

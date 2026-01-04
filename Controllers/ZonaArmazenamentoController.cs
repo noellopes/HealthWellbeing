@@ -22,28 +22,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // -----------------------------
-        // HELPERS
-        // -----------------------------
-        private void PreencherDropDowns(int? consumivelId = null, int? roomId = null)
-        {
-            ViewBag.Consumiveis = new SelectList(
-                _context.Consumivel.OrderBy(c => c.Nome),
-                "ConsumivelId",
-                "Nome",
-                consumivelId
-            );
-
-            
-            ViewBag.Rooms = new SelectList(
-                _context.Set<Room>().OrderBy(r => r.Name),
-                "RoomId",
-                "Name",
-                roomId
-            );
-        }
-
-        
-        // -----------------------------
         // GET: ZonaArmazenamento (Index)
         // -----------------------------
         public async Task<IActionResult> Index(
@@ -58,162 +36,121 @@ namespace HealthWellbeing.Controllers
                 .Include(z => z.Room)
                 .AsQueryable();
 
-            // 1. Pesquisa por nome da zona
+            // --- LÓGICA DE ALERTAS (NOVO) ---
+            // Verificamos o stock de todos os consumíveis presentes nestas zonas
+            var zonasParaAlerta = await zonasQuery.ToListAsync();
+            foreach (var zona in zonasParaAlerta)
+            {
+                if (zona.Consumivel != null && zona.Consumivel.QuantidadeAtual <= zona.Consumivel.QuantidadeMinima)
+                {
+                    TempData[$"Aviso_{zona.ConsumivelId}"] = $"Stock Crítico: {zona.Consumivel.Nome}. Reposição necessária!";
+                }
+            }
+
+            // --- Filtros de Pesquisa ---
             if (!string.IsNullOrEmpty(searchNome))
                 zonasQuery = zonasQuery.Where(z => z.NomeZona.Contains(searchNome));
 
-            // 2. Pesquisa por sala
             if (!string.IsNullOrEmpty(searchLocalizacao))
                 zonasQuery = zonasQuery.Where(z => z.Room.Name.Contains(searchLocalizacao));
 
-            // 3. Pesquisa por Consumível (Dropdown)
             if (searchConsumivel.HasValue)
-            {
                 zonasQuery = zonasQuery.Where(z => z.ConsumivelId == searchConsumivel.Value);
-            }
 
-            // 4. Filtro por estado
             switch (estado)
             {
-                case "ativas":
-                    zonasQuery = zonasQuery.Where(z => z.Ativa == true);
-                    break;
-                case "inativas":
-                    zonasQuery = zonasQuery.Where(z => z.Ativa == false);
-                    break;
+                case "ativas": zonasQuery = zonasQuery.Where(z => z.Ativa == true); break;
+                case "inativas": zonasQuery = zonasQuery.Where(z => z.Ativa == false); break;
             }
 
-            // --- Carregar a lista para a Dropdown de Pesquisa na View ---
-            ViewBag.ConsumiveisList = new SelectList(
-                _context.Consumivel.OrderBy(c => c.Nome),
-                "ConsumivelId",
-                "Nome",
-                searchConsumivel // Mantém selecionado o que o user escolheu
-            );
-
-            // Manter valores na View
+            // Dropdowns e paginação
+            ViewBag.ConsumiveisList = new SelectList(_context.Consumivel.OrderBy(c => c.Nome), "ConsumivelId", "Nome", searchConsumivel);
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
             ViewBag.Estado = estado;
-            ViewBag.SearchConsumivel = searchConsumivel; 
+            ViewBag.SearchConsumivel = searchConsumivel;
 
-            // Paginação
             int totalZonas = await zonasQuery.CountAsync();
             var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 10);
-
-            pagination.Items = await zonasQuery
-                .OrderBy(z => z.NomeZona)
-                .Skip(pagination.ItemsToSkip)
-                .Take(pagination.ItemsPerPage)
-                .ToListAsync();
+            pagination.Items = await zonasQuery.OrderBy(z => z.NomeZona).Skip(pagination.ItemsToSkip).Take(pagination.ItemsPerPage).ToListAsync();
 
             return View(pagination);
         }
 
+        // --- AÇÃO PARA O BOTÃO DO POPUP (NOVO) ---
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AceitarPropostaZona(int id)
+        {
+            // Redireciona para o ConsumivelController para processar a compra e atualizar o stock
+            return RedirectToAction("AceitarEncomenda", "Consumivel", new { id = id });
+        }
+
         // -----------------------------
-        // GET: ZonaArmazenamento/Details/5
+        // MÉTODOS DE SUPORTE E CRUD
         // -----------------------------
+
+        private void PreencherDropDowns(int? consumivelId = null, int? roomId = null)
+        {
+            ViewBag.Consumiveis = new SelectList(_context.Consumivel.OrderBy(c => c.Nome), "ConsumivelId", "Nome", consumivelId);
+            ViewBag.Rooms = new SelectList(_context.Set<Room>().OrderBy(r => r.Name), "RoomId", "Name", roomId);
+        }
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
-            var zona = await _context.ZonaArmazenamento
-                .Include(z => z.Consumivel)
-                .Include(z => z.Room)
-                .FirstOrDefaultAsync(m => m.ZonaId == id);
-
+            var zona = await _context.ZonaArmazenamento.Include(z => z.Consumivel).Include(z => z.Room).FirstOrDefaultAsync(m => m.ZonaId == id);
             if (zona == null) return NotFound();
 
-            var totalStock = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == zona.ConsumivelId)
-                .SumAsync(z => z.QuantidadeAtual);
-
-            ViewBag.TotalConsumivel = totalStock;
-
+            ViewBag.TotalConsumivel = await _context.ZonaArmazenamento.Where(z => z.ConsumivelId == zona.ConsumivelId).SumAsync(z => z.QuantidadeAtual);
             return View(zona);
         }
 
-        // -----------------------------
-        // GET: ZonaArmazenamento/Create
-        // -----------------------------
-        public IActionResult Create()
-        {
-            PreencherDropDowns();
-            return View();
-        }
+        public IActionResult Create() { PreencherDropDowns(); return View(); }
 
-        // -----------------------------
-        // POST: ZonaArmazenamento/Create
-        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
-            // Validação 1: Capacidade Máxima
             if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
-            {
-                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser superior à capacidade máxima.");
-            }
+                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode exceder a capacidade.");
 
-            // Validação 2: Inativa vs Stock 
             if (zona.Ativa == false && zona.QuantidadeAtual > 0)
-            {
-                ModelState.AddModelError("Ativa", "Não é possível ter stock numa zona inativa. Para inativar a zona, a quantidade deve ser 0.");
-            }
+                ModelState.AddModelError("Ativa", "Zonas inativas devem ter stock 0.");
 
             if (ModelState.IsValid)
             {
                 _context.Add(zona);
                 await _context.SaveChangesAsync();
-
-                
                 await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
                 await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
-
-
                 TempData["SuccessMessage"] = "✅ Zona criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-
-            TempData["ErrorMessage"] = "❌ Erro ao criar a zona.";
             PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // -----------------------------
-        // GET: ZonaArmazenamento/Edit/5
-        // -----------------------------
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var zona = await _context.ZonaArmazenamento.FindAsync(id);
             if (zona == null) return NotFound();
-
             PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // -----------------------------
-        // POST: ZonaArmazenamento/Edit/5
-        // -----------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ZonaId,NomeZona,ConsumivelId,RoomId,CapacidadeMaxima,QuantidadeAtual,Ativa")] ZonaArmazenamento zona)
         {
             if (id != zona.ZonaId) return NotFound();
 
-            // Validação 1: Capacidade Máxima
             if (zona.QuantidadeAtual > zona.CapacidadeMaxima)
-            {
-                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual não pode ser superior à capacidade máxima.");
-            }
+                ModelState.AddModelError("QuantidadeAtual", "A quantidade atual excede a capacidade.");
 
-            // Validação 2: Inativa vs Stock (NOVO)
             if (zona.Ativa == false && zona.QuantidadeAtual > 0)
-            {
-                ModelState.AddModelError("Ativa", "Conflito: Uma zona inativa não pode ter consumíveis (Quantidade tem de ser 0).");
-            }
+                ModelState.AddModelError("Ativa", "Inative a zona apenas com stock 0.");
 
             if (ModelState.IsValid)
             {
@@ -221,123 +158,60 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(zona);
                     await _context.SaveChangesAsync();
-
-                    // Atualiza o total no consumível pai
                     await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
                     await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
-
-                    TempData["SuccessMessage"] = "💾 Alterações guardadas com sucesso!";
+                    TempData["SuccessMessage"] = "💾 Alterações guardadas!";
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.ZonaArmazenamento.Any(e => e.ZonaId == id))
-                        return NotFound();
-                    throw;
-                }
+                catch (DbUpdateConcurrencyException) { if (!_context.ZonaArmazenamento.Any(e => e.ZonaId == id)) return NotFound(); throw; }
                 return RedirectToAction(nameof(Index));
             }
-
-            TempData["ErrorMessage"] = "❌ Erro ao editar a zona.";
             PreencherDropDowns(zona.ConsumivelId, zona.RoomId);
             return View(zona);
         }
 
-        // -----------------------------
-        // GET: ZonaArmazenamento/Delete/5
-        // -----------------------------
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-
-            var zona = await _context.ZonaArmazenamento
-                .Include(z => z.Consumivel)
-                .Include(z => z.Room)
-                .FirstOrDefaultAsync(m => m.ZonaId == id);
-
-            if (zona == null) return NotFound();
-
-            return View(zona);
+            var zona = await _context.ZonaArmazenamento.Include(z => z.Consumivel).Include(z => z.Room).FirstOrDefaultAsync(m => m.ZonaId == id);
+            return (zona == null) ? NotFound() : View(zona);
         }
 
-        // -----------------------------
-        // POST: ZonaArmazenamento/Delete/5
-        // -----------------------------
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var zona = await _context.ZonaArmazenamento.FindAsync(id);
-
-            if (zona == null)
-            {
-                TempData["ErrorMessage"] = "❌ Erro ao eliminar a zona.";
-                return RedirectToAction(nameof(Index));
-            }
+            if (zona == null) return RedirectToAction(nameof(Index));
 
             if (zona.Ativa)
             {
-                TempData["ErrorMessage"] = "❌ Não é possível apagar uma zona que está Ativa. Por favor, inative-a primeiro.";
+                TempData["ErrorMessage"] = "❌ Inative a zona antes de apagar.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Verifica se existem stocks associados na tabela Stock
-            int numStocks = await _context.Stock.CountAsync(s => s.ZonaID == zona.ZonaId);
-            if (numStocks > 0)
-            {
-                TempData["ErrorMessage"] = $"❌ Não é possível apagar esta zona. Existem {numStocks} registos de stock associados.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Guardar ID do consumível para atualizar total depois
             int consumivelId = zona.ConsumivelId;
-
-            // Remove a zona
             _context.ZonaArmazenamento.Remove(zona);
             await _context.SaveChangesAsync();
 
-            // Atualiza o total no consumível pai
             await AtualizarQuantidadeAtualConsumivel(consumivelId);
-            // Atualiza consumível
-            await AtualizarQuantidadeAtualConsumivel(zona.ConsumivelId);
-            await AtualizarQuantidadeMaximaConsumivel(zona.ConsumivelId);
+            await AtualizarQuantidadeMaximaConsumivel(consumivelId);
 
-            TempData["SuccessMessage"] = "🗑️ Zona eliminada com sucesso!";
+            TempData["SuccessMessage"] = "🗑️ Zona eliminada!";
             return RedirectToAction(nameof(Index));
         }
 
-
-
         private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
         {
-            // Obter todas as zonas que têm este consumível
-            var quantidadeTotal = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId)
-                .SumAsync(z => z.QuantidadeAtual);
-
-            // Atualizar o Consumível
+            var quantidadeTotal = await _context.ZonaArmazenamento.Where(z => z.ConsumivelId == consumivelId).SumAsync(z => z.QuantidadeAtual);
             var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel != null)
-            {
-                consumivel.QuantidadeAtual = quantidadeTotal;
-                _context.Update(consumivel);
-                await _context.SaveChangesAsync();
-            }
+            if (consumivel != null) { consumivel.QuantidadeAtual = quantidadeTotal; _context.Update(consumivel); await _context.SaveChangesAsync(); }
         }
+
         private async Task AtualizarQuantidadeMaximaConsumivel(int consumivelId)
         {
-            // Soma todas as capacidades máximas das zonas associadas
-            var quantidadeMaximaTotal = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId)
-                .SumAsync(z => z.CapacidadeMaxima);
-
-            // Atualiza o Consumível
+            var quantidadeMaximaTotal = await _context.ZonaArmazenamento.Where(z => z.ConsumivelId == consumivelId).SumAsync(z => z.CapacidadeMaxima);
             var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel != null)
-            {
-                consumivel.QuantidadeMaxima = quantidadeMaximaTotal;
-                _context.Update(consumivel);
-                await _context.SaveChangesAsync();
-            }
+            if (consumivel != null) { consumivel.QuantidadeMaxima = quantidadeMaximaTotal; _context.Update(consumivel); await _context.SaveChangesAsync(); }
         }
     }
 }

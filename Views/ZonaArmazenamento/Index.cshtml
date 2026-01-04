@@ -19,6 +19,13 @@
     .table td, .table th {
         vertical-align: middle;
     }
+
+    /* Estilo para destacar os alertas de stock */
+    .alert-stock {
+        border-left: 5px solid #ffc107;
+        background-color: #fff3cd;
+        color: #856404;
+    }
 </style>
 
 <div class="container mt-4">
@@ -29,6 +36,28 @@
             <i class="bi bi-plus-lg me-1"></i> Nova Zona
         </a>
     </div>
+
+    @foreach (var item in Model.Items)
+    {
+        var chaveAviso = $"Aviso_{item.ConsumivelId}";
+        if (TempData[chaveAviso] != null)
+        {
+            <div class="alert alert-stock d-flex justify-content-between align-items-center shadow-sm mb-2 p-2">
+                <div>
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>@TempData[chaveAviso]</strong>
+                </div>
+                <form asp-action="AceitarPropostaZona" asp-route-id="@item.ConsumivelId" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success btn-sm fw-bold">
+                        <i class="bi bi-cart-check me-1"></i> Repor Stock
+                    </button>
+                </form>
+            </div>
+            TempData.Remove(chaveAviso);
+         @* Evita repetições na mesma carga de página *@
+        }
+    }
 
     <form asp-action="Index" method="get" class="mb-4 bg-light p-3 rounded shadow-sm border">
         <div class="row g-2 align-items-end">
@@ -136,8 +165,8 @@
                                     string corBarra = percentagem > 90 ? "bg-danger" : (percentagem > 50 ? "bg-primary" : "bg-success");
                                 }
                                 <div class="d-flex align-items-center">
-                                    <span class="me-2">@item.QuantidadeAtual / @item.CapacidadeMaxima</span>
-                                    <div class="progress flex-grow-1" style="height: 5px; width: 50px;">
+                                    <span class="me-2 small">@item.QuantidadeAtual / @item.CapacidadeMaxima</span>
+                                    <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
                                         <div class="progress-bar @corBarra" role="progressbar" style="width: @percentagem%"></div>
                                     </div>
                                 </div>
@@ -223,7 +252,12 @@
 </div>
 
 <script>
+    // Fechar alertas normais automaticamente, mas manter os de stock críticos visíveis por mais tempo
     setTimeout(() => {
-        document.querySelectorAll('.alert').forEach(a => new bootstrap.Alert(a).close());
+        document.querySelectorAll('.alert-success, .alert-danger').forEach(a => {
+            if (bootstrap.Alert.getInstance(a)) {
+                new bootstrap.Alert(a).close();
+            }
+        });
     }, 4000);
 </script>
