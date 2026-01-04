@@ -235,19 +235,40 @@ namespace HealthWellbeing.Controllers
         {
             var zona = await _context.ZonaArmazenamento.FindAsync(id);
 
-            if (zona != null)
-            {
-                _context.ZonaArmazenamento.Remove(zona);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "🗑️ Zona eliminada com sucesso!";
-            }
-            else
+            if (zona == null)
             {
                 TempData["ErrorMessage"] = "❌ Erro ao eliminar a zona.";
+                return RedirectToAction(nameof(Index));
             }
 
+            // Verifica se existem stocks associados
+            int numStocks = await _context.Stock.CountAsync(s => s.ZonaID == zona.ZonaId);
+            if (numStocks > 0)
+            {
+                TempData["ErrorMessage"] = $"❌ Não é possível apagar esta zona. Existem {numStocks} stocks associados.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Atualiza a quantidade do consumível
+            var consumivel = await _context.Consumivel.FindAsync(zona.ConsumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeAtual -= zona.QuantidadeAtual;
+                if (consumivel.QuantidadeAtual < 0)
+                    consumivel.QuantidadeAtual = 0;
+
+                _context.Update(consumivel);
+            }
+
+            // Remove a zona
+            _context.ZonaArmazenamento.Remove(zona);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "🗑️ Zona eliminada com sucesso!";
             return RedirectToAction(nameof(Index));
         }
+
+
 
         private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
         {

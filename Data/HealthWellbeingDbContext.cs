@@ -67,6 +67,13 @@ namespace HealthWellbeing.Data
             .HasForeignKey(z => z.ConsumivelId)
             .OnDelete(DeleteBehavior.Restrict); // impede apagar consumível se tiver zonas
 
+
+            modelBuilder.Entity<Stock>()
+            .HasOne(s => s.Zona)
+            .WithMany()
+            .HasForeignKey(s => s.ZonaID)
+            .OnDelete(DeleteBehavior.Cascade);
+
         }
 
         // ========================
