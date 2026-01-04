@@ -75,6 +75,7 @@ using (var scope = app.Services.CreateScope())
     var dataContext = services.GetRequiredService<HealthWellbeingDbContext>();
     dataContext.Database.Migrate();
 
+    // Seed do grupo 2
     SeedData.Populate(dataContext);
 
     // Seed do grupo 2 
