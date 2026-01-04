@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize] 
+    [Authorize(Roles = "Gestor de armazenamento")]
     public class ZonaArmazenamentoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

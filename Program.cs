@@ -75,8 +75,8 @@ using (var scope = app.Services.CreateScope())
     var dataContext = services.GetRequiredService<HealthWellbeingDbContext>();
     dataContext.Database.Migrate();
 
-    // Seed do grupo 2 (o teu)
-    SeedData.Populate(dataContext);
+    // Seed do grupo 2 
+    await SeedDataGroup2.Populate(services);
 
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     SeedData.SeedRoles(roleManager);
@@ -91,8 +91,7 @@ using (var scope = app.Services.CreateScope())
     SeedDataGroup1.SeedUsers(userManager);
     SeedDataGroup1.Populate(dataContext);
 
-    // GROUP 2 - Consumíveis / Zonas
-    SeedDataGroup2.Populate(dataContext);
+    
 }
 
 app.UseHttpsRedirection();
