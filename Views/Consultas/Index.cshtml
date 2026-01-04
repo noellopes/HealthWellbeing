@@ -126,10 +126,14 @@ else
                         </a>
                             <a asp-action="Edit" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-warning text-white">
                             <i class="bi bi-pencil-square"></i> Editar
-                        </a>
-                            <a asp-action="Delete" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </a>
+							</a>
+                                <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Cancelar esta consulta? O horário ficará disponível.');">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </button>
+                                </form>
                     </td>
                 </tr>
                         }

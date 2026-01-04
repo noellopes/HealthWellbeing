@@ -137,46 +137,64 @@ namespace HealthWellbeing.Controllers
 
             var datas15Uteis = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
-            // ✅ remover tudo o que existe do médico nas próximas 15 datas úteis
-            var existentes = await _context.AgendaMedica
-                .Where(a => a.IdMedico == doctor.IdMedico && datas15Uteis.Contains(a.Data))
-                .ToListAsync();
-
-            _context.AgendaMedica.RemoveRange(existentes);
-
-            // ✅ criar novamente a partir do VM
             foreach (var dia in vm.Dias.Where(d => datas15Uteis.Contains(d.Data)))
             {
-                if (dia.Manha != null && dia.Manha.Ativo)
-                {
-                    _context.AgendaMedica.Add(new AgendaMedica
-                    {
-                        IdMedico = doctor.IdMedico,
-                        Data = dia.Data,
-                        DiaSemana = dia.Data.DayOfWeek,
-                        Periodo = "Manha",
-                        HoraInicio = dia.Manha.HoraInicio,
-                        HoraFim = dia.Manha.HoraFim
-                    });
-                }
+                // manhã
+                await UpsertPeriodo(doctor.IdMedico, dia.Data, "Manha", dia.Manha);
 
-                if (dia.Tarde != null && dia.Tarde.Ativo)
-                {
-                    _context.AgendaMedica.Add(new AgendaMedica
-                    {
-                        IdMedico = doctor.IdMedico,
-                        Data = dia.Data,
-                        DiaSemana = dia.Data.DayOfWeek,
-                        Periodo = "Tarde",
-                        HoraInicio = dia.Tarde.HoraInicio,
-                        HoraFim = dia.Tarde.HoraFim
-                    });
-                }
+                // tarde
+                await UpsertPeriodo(doctor.IdMedico, dia.Data, "Tarde", dia.Tarde);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(MinhaAgenda15Dias));
         }
+
+        private async Task UpsertPeriodo(int idMedico, DateOnly data, string periodo, MedicoAgendaVM? p)
+        {
+            var existente = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
+                a.IdMedico == idMedico &&
+                a.Data == data &&
+                a.Periodo == periodo
+            );
+
+            // se não há VM ou está desativado -> remove se existir
+            if (p == null || !p.Ativo)
+            {
+                if (existente != null)
+                    _context.AgendaMedica.Remove(existente);
+
+                return;
+            }
+
+            // validação hora
+            if (p.HoraFim <= p.HoraInicio)
+            {
+                ModelState.AddModelError("", $"Hora fim tem de ser posterior à hora início em {data:dd/MM/yyyy} ({periodo}).");
+                return;
+            }
+
+            if (existente == null)
+            {
+                _context.AgendaMedica.Add(new AgendaMedica
+                {
+                    IdMedico = idMedico,
+                    Data = data,
+                    DiaSemana = data.DayOfWeek, // só visual
+                    Periodo = periodo,          // "Manha" / "Tarde"
+                    HoraInicio = p.HoraInicio,
+                    HoraFim = p.HoraFim
+                });
+            }
+            else
+            {
+                existente.HoraInicio = p.HoraInicio;
+                existente.HoraFim = p.HoraFim;
+                existente.DiaSemana = data.DayOfWeek;
+                existente.Periodo = periodo;
+            }
+        }
+
 
         // ----------------- helpers -----------------
 
