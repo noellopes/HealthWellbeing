@@ -11,6 +11,64 @@ namespace HealthWellbeing.Controllers
     {
         private readonly HealthWellbeingDbContext _db;
 
+        //testes
+        // TESTES - Utente fixo para ver UX
+        [HttpGet]
+        public IActionResult UtenteView()
+        {
+            var utenteFixe = new UtenteSaude
+            {
+                UtenteSaudeId = 1,
+                NomeCompleto = "Maria Correia",
+                DataNascimento = new DateTime(1999, 5, 12),
+                Nif = "245123987",       // 9 dígitos (para UI serve)
+                Niss = "12345678901",    // 11 dígitos
+                Nus = "123456789",       // 9 dígitos
+                Email = "maria.correia@email.pt",
+                Telefone = "912345678",
+                Morada = "Rua Exemplo, 10, 3500-000 Viseu"
+            };
+
+            return View(utenteFixe); // ✅ PASSA O MODEL PARA A VIEW
+        }
+        [HttpGet]
+        public async Task<IActionResult> RecepcionistaView(int page = 1, string searchNome = "", string searchNif = "")
+
+        {
+            if (page < 1) page = 1;
+
+            var utentesQuery = _db.UtenteSaude.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchNome))
+                utentesQuery = utentesQuery.Where(u => u.NomeCompleto.Contains(searchNome));
+
+            if (!string.IsNullOrWhiteSpace(searchNif))
+                utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
+
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+
+            int numberUtentes = await utentesQuery.CountAsync();
+            if (numberUtentes == 0) page = 1;
+
+            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            utentesInfo.Items = await utentesQuery
+                .OrderBy(u => u.NomeCompleto)
+                .Skip(utentesInfo.ItemsToSkip)
+                .Take(utentesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            // Nome do recepcionista (podes trocar depois por login real)
+            ViewBag.NomeRecepcionista = "Recepcionista";
+
+            return View(utentesInfo); // Vai procurar Views/UtenteSaude/RecepcionistaView.cshtml
+        }
+
+
+
+
+        //fim de testes
         public UtenteSaudeController(HealthWellbeingDbContext db)
         {
             _db = db;
@@ -256,3 +314,4 @@ namespace HealthWellbeing.Controllers
     }
 
 }
+

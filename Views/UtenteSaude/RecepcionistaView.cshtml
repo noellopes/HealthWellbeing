@@ -2,23 +2,21 @@
 @model PaginationInfo<UtenteSaude>
 
 @{
-    ViewData["Title"] = "Diretor Clínico - Utentes";
-
+    ViewData["Title"] = "Área do Recepcionista";
+    string nomeRecepcionista = ViewBag.NomeRecepcionista as string ?? "Recepcionista";
     string searchNome = ViewBag.SearchNome as string ?? "";
     string searchNif = ViewBag.SearchNif as string ?? "";
-
     bool isFirst = Model.CurrentPage <= 1;
     bool isLast = Model.CurrentPage >= Model.TotalPages;
 }
 
 <style>
-    /* Container principal */
+    /* Mantém o teu tema */
     .utente-wrapper {
         background: #1f4f6a;
         border-radius: 10px;
         padding: 24px;
         box-shadow: 0 2px 12px rgba(0,0,0,.2);
-        color: #1f4f6a;
     }
 
     .utente-card {
@@ -34,7 +32,7 @@
         padding: 10px;
     }
 
-    /* ---------- CABEÇALHO ---------- */
+    /* Cabeçalho */
     .utente-header {
         background: #a8d6ea;
         border-radius: 10px 10px 0 0;
@@ -45,8 +43,8 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        flex-wrap: wrap;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .utente-logo .logo-img {
@@ -55,40 +53,35 @@
         box-shadow: 0 2px 3px rgba(0,0,0,.2);
     }
 
-    .top-nav {
+    .utente-actions {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
 
-    .top-btn {
+    .utente-btn {
         padding: 8px 14px;
         border-radius: 18px;
         border: none;
         background: #2d79a0;
         color: #fff;
-        font-weight: 700;
+        font-weight: 600;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
 
-        .top-btn:hover {
+        .utente-btn.alt {
+            background: #3f8fb7;
+        }
+
+        .utente-btn:hover {
             filter: brightness(1.05);
         }
 
-        /* Ativo (Utentes) */
-        .top-btn.active {
-            background: #256b8f; /* ligeiramente diferente */
-            cursor: default;
-            pointer-events: none; /* “trancada” */
-            opacity: .95;
-            box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
-        }
-
-    /* ---------- CORPO ---------- */
+    /* Corpo */
     .utente-body {
         background: #e6f3fb;
         min-height: 360px;
@@ -104,109 +97,53 @@
         border-radius: 0 0 8px 8px;
     }
 
-    .welcome-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 14px;
-    }
-
-    .welcome-title {
-        margin: 0;
+    /* Pequenos ajustes visuais */
+    .title-welcome {
+        margin-top: 0;
         color: #1f4f6a;
         font-weight: 800;
     }
-
-    .agenda-btn {
-        padding: 8px 14px;
-        border-radius: 18px;
-        border: none;
-        background: #2d79a0;
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-    }
-
-        .agenda-btn:hover {
-            filter: brightness(1.05);
-        }
 </style>
 
 <div class="utente-wrapper">
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- ---------- TOPO: LOGO + NAV (Médicos / Especialidades / Utentes ativo) ---------- -->
+            <!-- TOPO: Logo + Consultar Agendas Médicas -->
             <div class="utente-header">
                 <div class="utente-header-content">
-
                     <div class="utente-logo">
                         <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
                              alt="Logo HealthWellbeing"
                              class="logo-img" />
                     </div>
 
-                    <div class="top-nav">
-                        <!-- Ajusta os controllers/actions aos teus -->
-                        <a class="top-btn"
-                           asp-controller="Medicos"
-                           asp-action="Index">
-                            <i class="bi bi-heart-pulse"></i> Médicos
-                        </a>
-
-                        <a class="top-btn"
-                           asp-controller="Especialidades"
-                           asp-action="Index">
-                            <i class="bi bi-diagram-3"></i> Especialidades
-                        </a>
-
-                        <!-- UTENTES (ATIVO / TRANCADO) -->
-                        <a class="top-btn active"
-                           href="#"
-                           aria-disabled="true"
-                           tabindex="-1">
-                            <i class="bi bi-people"></i> Utentes
+                    <div class="utente-actions">
+                        <!-- ⚠️ Ajusta controller/action para o teu módulo de agendas -->
+                        <a asp-controller="AgendasMedicas" asp-action="Index" class="utente-btn">
+                            <i class="bi bi-calendar2-week"></i> Consultar Agendas Médicas
                         </a>
                     </div>
-
                 </div>
             </div>
 
-            <!-- ---------- CORPO PRINCIPAL ---------- -->
+            <!-- CORPO -->
             <div class="utente-body">
 
-                <!-- Bem-vindo + Agenda Médica -->
-                <div class="welcome-row">
-                    <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
+                <!-- Bem-vindo -->
+                <h2 class="title-welcome">Bem-vindo, @nomeRecepcionista</h2>
 
-                    <!-- Ajusta para o teu módulo de agendas -->
-                    <a class="agenda-btn"
-                       asp-controller="AgendasMedicas"
-                       asp-action="Index">
-                        <i class="bi bi-calendar2-week"></i> Agenda Médica
-                    </a>
-                </div>
-
-                <!-- Lista de utentes + Pesquisar + Criar Novo -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Cabeçalho lista + botão pesquisar -->
+                <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                     <h2 class="h4 m-0">Lista de Utentes</h2>
+
                     <div class="d-flex justify-content-end">
-                        <a class="btn btn-secondary me-2"
+                        <a class="btn btn-secondary"
                            data-bs-toggle="collapse"
                            data-bs-target="#utenteSearch"
                            aria-expanded="false"
                            aria-controls="utenteSearch">
                             <i class="bi bi-search me-1"></i> Pesquisar
-                        </a>
-
-                        <a asp-action="Create" class="btn btn-success">
-                            <i class="bi bi-plus-circle me-1"></i> Criar Novo
                         </a>
                     </div>
                 </div>
@@ -214,7 +151,9 @@
                 <!-- Pesquisa -->
                 <div class="collapse mt-2 mb-2" id="utenteSearch">
                     <div class="card card-body">
-                        <form asp-controller="UtenteSaude" asp-action="Index" method="get" class="row g-2 align-items-end">
+                        <!-- ⚠️ Ajusta asp-action se esta view estiver numa action diferente -->
+                        <form asp-controller="UtenteSaude" asp-action="RecepcionistaView" method="get" class="row g-2 align-items-end">
+
                             <div class="col-md-6">
                                 <label for="searchNome" class="form-label">Nome</label>
                                 <input id="searchNome" name="searchNome"
@@ -237,7 +176,8 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search me-1"></i> Pesquisar
                                 </button>
-                                <a asp-controller="UtenteSaude" asp-action="Index" class="btn btn-secondary">Limpar</a>
+                                <a asp-controller="UtenteSaude" asp-action="RecepcionistaView" class="btn btn-secondary">Limpar</a>
+
                             </div>
                         </form>
                     </div>
@@ -252,13 +192,13 @@
                 }
 
                 <!-- Tabela -->
-                <div class="table-responsive mt-4">
-                    <table class="table table-striped table-bordered align-middle">
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm table-striped table-bordered align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>Nome</th>
                                 <th style="width:120px;">Idade</th>
-                                <th style="width:320px;">Ações</th>
+                                <th style="width:190px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -266,7 +206,7 @@
                             {
                                 <tr>
                                     <td colspan="3" class="text-center text-muted">
-                                        Ainda não existem utentes. Clique em <strong>Criar Novo</strong> para adicionar o primeiro.
+                                        Não existem utentes para apresentar.
                                     </td>
                                 </tr>
                             }
@@ -278,14 +218,10 @@
                                         <td>@u.NomeCompleto</td>
                                         <td>@u.Idade</td>
                                         <td>
-                                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-eye me-1"></i> Detalhes
-                                            </a>
-                                            <a class="btn btn-sm btn-warning text-white" asp-action="Edit" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-pencil-square me-1"></i> Editar
-                                            </a>
-                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-trash me-1"></i> Apagar
+                                            <a class="btn btn-sm btn-primary"
+                                               asp-action="Details"
+                                               asp-route-id="@u.UtenteSaudeId">
+                                                <i class="bi bi-eye me-1"></i>Detalhes
                                             </a>
                                         </td>
                                     </tr>
@@ -295,14 +231,16 @@
                     </table>
                 </div>
 
-                <!-- Paginação (igual à tua, só com « e » no protótipo se quiseres) -->
+                <!-- Paginação -->
+                
+
                 <nav aria-label="Paginação de utentes">
                     <ul class="pagination justify-content-center">
 
                         <li class="page-item @(isFirst ? "disabled" : "")">
                             <a class="page-link"
-                               href="@(isFirst ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                  new { page = Model.CurrentPage - 1, searchNome, searchNif }))">
+                               href="@(isFirst ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                  new { page = Model.CurrentPage - 1, searchNome, searchNif }))">
                                 «
                             </a>
                         </li>
@@ -311,8 +249,8 @@
                         {
                             <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                                 <a class="page-link"
-                                   href="@(i == Model.CurrentPage ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                          new { page = i, searchNome, searchNif }))">
+                                   href="@(i == Model.CurrentPage ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                          new { page = i, searchNome, searchNif }))">
                                 @i
                             </a>
                         </li>
@@ -320,30 +258,19 @@
 
                         <li class="page-item @(isLast ? "disabled" : "")">
                             <a class="page-link"
-                               href="@(isLast ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                  new { page = Model.CurrentPage + 1, searchNome, searchNif }))">
+                               href="@(isLast ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                  new { page = Model.CurrentPage + 1, searchNome, searchNif }))">
                                 »
                             </a>
                         </li>
 
                     </ul>
-                    <!--butões para apagar-->
-                    <a class="utente-btn alt"
-                       asp-controller="UtenteSaude"
-                       asp-action="UtenteView">
-                        <i class="bi bi-person-lines-fill"></i> UtenteView
-                    </a>
-                    <a class="utente-btn alt"
-                       asp-controller="UtenteSaude"
-                       asp-action="RecepcionistaView">
-                        <i class="bi bi-people-fill"></i> Área Recepcionista
-                    </a>
                 </nav>
+
 
             </div>
 
             <div class="utente-footer-bar"></div>
-
         </div>
     </div>
 </div>
