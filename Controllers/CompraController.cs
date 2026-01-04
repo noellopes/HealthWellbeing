@@ -78,30 +78,13 @@ namespace HealthWellbeing.Controllers
 
             return View(vm);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmarRegisto(RegistoCompra model)
         {
-            var consumivel = _context.Consumivel
-                .FirstOrDefault(c => c.ConsumivelId == model.ConsumivelId);
-
-            if (consumivel == null)
-                return NotFound();
-
-            // 🔒 limite máximo permitido
-            var limitePermitido =
-                consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
-
-            // ❌ bloqueio se exceder
-            if (model.Quantidade > limitePermitido)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(
-                    "Quantidade",
-                    $"Não é possível comprar mais de {limitePermitido} unidades."
-                );
-
-                // recarregar fornecedores para a view não rebentar
+                // Recarregar fornecedores caso haja erro
                 model.Fornecedores = _context.Fornecedor_Consumivel
                     .Where(fc => fc.ConsumivelId == model.ConsumivelId)
                     .Include(fc => fc.Fornecedor)
@@ -112,27 +95,80 @@ namespace HealthWellbeing.Controllers
                 return View("RegistoCompra", model);
             }
 
-            // fornecedor
-            var fornecedor = _context.Fornecedor_Consumivel
-                .First(fc => fc.FornecedorId == model.FornecedorId
-                          && fc.ConsumivelId == model.ConsumivelId);
+            // 🔹 Consumível (fonte única de verdade)
+            var consumivel = _context.Consumivel
+                .FirstOrDefault(c => c.ConsumivelId == model.ConsumivelId);
 
-            _context.Compra.Add(new Compra
+            if (consumivel == null)
+                return NotFound();
+
+            int limitePermitido = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
+
+            if (model.Quantidade > limitePermitido)
+            {
+                ModelState.AddModelError(
+                    "Quantidade",
+                    $"Não é possível comprar mais de {limitePermitido} unidades."
+                );
+
+                model.Fornecedores = _context.Fornecedor_Consumivel
+                    .Where(fc => fc.ConsumivelId == model.ConsumivelId)
+                    .Include(fc => fc.Fornecedor)
+                    .OrderBy(fc => fc.Preco)
+                    .ThenBy(fc => fc.TempoEntrega)
+                    .ToList();
+
+                return View("RegistoCompra", model);
+            }
+
+            // 🔹 Fornecedor selecionado
+            var fornecedor = _context.Fornecedor_Consumivel
+                .Include(fc => fc.Fornecedor)
+                .First(fc =>
+                    fc.FornecedorId == model.FornecedorId &&
+                    fc.ConsumivelId == model.ConsumivelId
+                );
+
+            // 🟢 1 — Registar COMPRA
+            var compra = new Compra
             {
                 ConsumivelId = model.ConsumivelId,
                 FornecedorId = fornecedor.FornecedorId,
                 Quantidade = model.Quantidade,
                 PrecoUnitario = fornecedor.Preco,
-                TempoEntrega = fornecedor.TempoEntrega ?? 0
+                TempoEntrega = fornecedor.TempoEntrega ?? 0,
+                DataCompra = DateTime.Now
+            };
+            
+            _context.Compra.Add(compra);
+
+            // 🔹 Obter o stock associado ao consumível
+            var stock = _context.Stock
+                .FirstOrDefault(s => s.ConsumivelID == model.ConsumivelId);
+
+            if (stock == null)
+                return BadRequest("Stock não encontrado para este consumível.");
+
+            _context.HistoricoCompras.Add(new HistoricoCompras
+            {
+                StockId = stock.StockId,          // 🔗 ligação correta
+                Quantidade = model.Quantidade,
+                FornecedorId = fornecedor.FornecedorId, // opcional mas recomendado
+                Tipo = "Entrada",
+                Data = DateTime.Now,
+                
             });
 
-            // ✅ atualização segura
+
+            // 🟢 2 — Atualizar APENAS o Consumível
             consumivel.QuantidadeAtual += model.Quantidade;
 
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Historico));
+            // ✅ 3 — Ir para o HISTÓRICO DE COMPRAS
+            return RedirectToAction("Index", "HistoricoCompras");
         }
+
 
 
         public IActionResult Historico()

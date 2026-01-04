@@ -24,7 +24,7 @@ namespace HealthWellbeing.Controllers
             var todosConsumiveisIds = await _context.Consumivel.Select(c => c.ConsumivelId).ToListAsync();
             foreach (var id in todosConsumiveisIds)
             {
-                await AtualizarQuantidadeAtualConsumivel(id);
+               
                 await AtualizarQuantidadeMaximaConsumivel(id);
 
             }
