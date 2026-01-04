@@ -61,9 +61,13 @@
                 <dt class="col-sm-4 details-label">Capacidade Máxima</dt>
                 <dd class="col-sm-8 details-value">@Model.CapacidadeMaxima</dd>
 
-                <dt class="col-sm-4 details-label">Quantidade Atual</dt>
+                <dt class="col-sm-4 details-label">Quantidade Nesta Zona</dt>
                 <dd class="col-sm-8 details-value">@Model.QuantidadeAtual</dd>
 
+                <dt class="col-sm-4 details-label text-primary">Total Global 🏥</dt>
+                <dd class="col-sm-8 details-value text-primary fw-bold">
+                    @ViewBag.TotalConsumivel Unidades
+                </dd>
                 <dt class="col-sm-4 details-label">Estado</dt>
                 <dd class="col-sm-8 details-value">
                     @if (Model.Ativa)
