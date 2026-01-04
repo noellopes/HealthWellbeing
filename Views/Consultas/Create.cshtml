@@ -21,7 +21,7 @@
                         <label asp-for="DataMarcacao" class="form-label fw-semibold">
                             Data de Marcação
                         </label>
-                        <input asp-for="DataMarcacao" type="datetime-local" class="form-control rounded-3 shadow-sm" />
+                        <input asp-for="DataMarcacao" type="date" class="form-control rounded-3 shadow-sm" />
                         <span asp-validation-for="DataMarcacao" class="text-danger small"></span>
                     </div>
 
@@ -29,7 +29,7 @@
                         <label asp-for="DataConsulta" class="form-label fw-semibold">
                             Data da Consulta
                         </label>
-                        <input asp-for="DataConsulta" type="datetime-local" class="form-control rounded-3 shadow-sm" />
+                        <input asp-for="DataConsulta" type="date" class="form-control rounded-3 shadow-sm" />
                         <span asp-validation-for="DataConsulta" class="text-danger small"></span>
                     </div>
 
@@ -50,11 +50,27 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label asp-for="DataCancelamento" class="form-label fw-semibold">
-                            Data de Cancelamento (opcional)
+                        <label asp-for="IdMedico" class="form-label fw-semibold">
+                            Médico
                         </label>
-                        <input asp-for="DataCancelamento" type="datetime-local" class="form-control rounded-3 shadow-sm" />
-                        <span asp-validation-for="DataCancelamento" class="text-danger small"></span>
+                        <select asp-for="IdMedico"
+                                class="form-select rounded-3 shadow-sm"
+                                asp-items="ViewBag.IdMedico">
+                            <option value="">-- Selecione o médico --</option>
+                        </select>
+                        <span asp-validation-for="IdMedico" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="IdEspecialidade" class="form-label fw-semibold">
+                            Especialidade
+                        </label>
+                        <select asp-for="IdEspecialidade"
+                                class="form-select rounded-3 shadow-sm"
+                                asp-items="ViewBag.IdEspecialidade">
+                            <option value="">-- Selecione a especialidade --</option>
+                        </select>
+                        <span asp-validation-for="IdEspecialidade" class="text-danger small"></span>
                     </div>
                 </div>
 

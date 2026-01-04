@@ -1,40 +1,82 @@
 ﻿using HealthWellbeing.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// DbContexts
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")
+    )
+);
+
+builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("HealthWellbeingConnection")
+        ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")
+    )
+);
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 8;
+    options.Password.RequiredUniqueChars = 6;
+    options.Password.RequireNonAlphanumeric = true;
+
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultUI();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Pipeline
+if (!app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    app.UseMigrationsEndPoint();
 }
 
+// SEEDING (correto: fora do if/else da pipeline)
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-    SeedData.Populate(dbContext);
+    var serviceProvider = scope.ServiceProvider;
+
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    SeedData.SeedRoles(roleManager);
+
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    SeedData.SeedDefaultAdmin(userManager);
+
+    if (app.Environment.IsDevelopment())
+    {
+        // se quiseres semear utilizadores extra só em dev
+        SeedData.SeedUsers(userManager);
+
+        var dbContext = serviceProvider.GetRequiredService<HealthWellbeingDbContext>();
+        SeedData.Populate(dbContext);
+        SeedDataExercicio.Populate(dbContext);
+        SeedDataTipoExercicio.Populate(dbContext);
+        SeedDataProblemaSaude.Populate(dbContext);
+    }
 }
 
 app.UseHttpsRedirection();
@@ -42,11 +84,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=UtenteSaude}/{action=Index}/{id?}");
+    pattern: "{controller=UtenteSaude}/{action=Index}/{id?}"
+);
+
 app.MapRazorPages();
 
 app.Run();

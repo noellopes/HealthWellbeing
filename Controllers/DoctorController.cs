@@ -36,8 +36,7 @@ namespace HealthWellbeing.Controllers
             var DoctorInfo = new PaginationInfo<Doctor>(page, numberDoctors);
 
             // define um pageSize 
-            var pageSize = 6;
-
+            var pageSize = DoctorInfo.ItemsPerPage > 0 ? DoctorInfo.ItemsPerPage : 10;
             // aplica ordenação + paginação
             DoctorInfo.Items = await doctorQuery
                 .OrderBy(d => d.Nome)                   

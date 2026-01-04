@@ -22,10 +22,12 @@ namespace HealthWellbeing.Models{
 
         public string Email { get; set; } = default!;
 
+        public ICollection<Consulta>? Consultas { get; set; }
         [Required(ErrorMessage = "Por favor selecione a especialidade")]
         [ForeignKey(nameof(Especialidade))]
         public int IdEspecialidade { get; set; }
         public Specialities? Especialidade { get; set; }
+        public ICollection<AgendaMedica>? AgendaMedica { get; set; }
 
     }
 }
