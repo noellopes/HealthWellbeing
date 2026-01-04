@@ -14,6 +14,7 @@ namespace HealthWellbeing.Controllers
             new ClienteBalnearioModel { ClienteBalnearioId = 2, Nome = "João Pereira", Email="joao@gmail.com", Telemovel="913456789", Morada="Rua B", TipoCliente="VIP" }
         };
 
+
         public IActionResult Index(string search)
         {
             var lista = _clientes;
@@ -21,9 +22,12 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrEmpty(search))
             {
                 lista = lista
-                    .Where(c => c.Nome.Contains(search, System.StringComparison.OrdinalIgnoreCase))
+                    .Where(c => c.Nome.Contains(search, StringComparison.OrdinalIgnoreCase)
+                             || c.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
+
+            lista = lista.OrderBy(c => c.Nome).ToList();
 
             return View(lista);
         }
@@ -33,6 +37,8 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+
+
         [HttpPost]
         public IActionResult Create(ClienteBalnearioModel cliente)
         {
@@ -41,6 +47,8 @@ namespace HealthWellbeing.Controllers
 
             cliente.ClienteBalnearioId = _clientes.Max(c => c.ClienteBalnearioId) + 1;
             _clientes.Add(cliente);
+
+            TempData["Success"] = "Cliente criado com sucesso.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -66,6 +74,8 @@ namespace HealthWellbeing.Controllers
             existente.Morada = cliente.Morada;
             existente.TipoCliente = cliente.TipoCliente;
 
+            TempData["Success"] = "Cliente atualizado com sucesso.";
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -73,8 +83,11 @@ namespace HealthWellbeing.Controllers
         {
             var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
             if (cliente != null)
+            {
                 _clientes.Remove(cliente);
 
+                TempData["Success"] = "Cliente removido com sucesso.";
+            }
             return RedirectToAction(nameof(Index));
         }
     }
