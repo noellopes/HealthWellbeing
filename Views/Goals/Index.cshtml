@@ -1,71 +1,185 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Goal>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Goals";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="bi bi-bullseye"></i> Patient Goals</h1>
+            <p class="mb-0">Track therapeutic goals and patient progress</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="bi bi-plus-circle"></i> Create New Goal
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TargetDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProgressPercentage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TargetDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProgressPercentage)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Patient.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.GoalId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.GoalId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.GoalId">Delete</a>
-            </td>
-        </tr>
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.Count()</h3>
+                <p class="text-muted mb-0">Total Goals</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-info text-white">
+            <div class="card-body">
+                <h3>@Model.Count(g => g.Status == GoalStatus.Active)</h3>
+                <p class="mb-0">Active</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h3>@Model.Count(g => g.Status == GoalStatus.Completed)</h3>
+                <p class="mb-0">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">@(Model.Any() ? Model.Average(g => g.ProgressPercentage).ToString("F0") : "0")%</h3>
+                <p class="text-muted mb-0">Avg Progress</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">All Goals (@Model.Count())</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <input type="text" id="searchInput" class="form-control d-inline-block" placeholder="🔍 Search goals..." style="max-width: 300px;">
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover" id="goalsTable">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Goal Title</th>
+                            <th>Start Date</th>
+                            <th>Target Date</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderByDescending(g => g.StartDate))
+                        {
+                            <tr>
+                                <td>
+                                    <i class="bi bi-person-fill text-primary"></i> <strong>@(item.Patient?.FullName ?? "Unknown")</strong>
+                                </td>
+                                <td>
+                                    <strong>@item.Title</strong>
+                                    @if (!string.IsNullOrEmpty(item.Description))
+                                    {
+                                        <br>
+                            
+                                        <small class="text-muted">@(item.Description.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</small>
+                                    }
+                                </td>
+                                <td>
+                                    <small>@item.StartDate.ToString("MMM dd, yyyy")</small>
+                                </td>
+                                <td>
+                                    @if (item.TargetDate.HasValue)
+                                    {
+                                        <small>@item.TargetDate.Value.ToString("MMM dd, yyyy")</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Not set</span>
+                                    }
+                                </td>
+                                <td style="min-width: 150px;">
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar @(item.ProgressPercentage >= 75 ? "bg-success" : item.ProgressPercentage >= 50 ? "bg-info" : item.ProgressPercentage >= 25 ? "bg-warning" : "bg-danger")"
+                                             role="progressbar"
+                                             style="width: @item.ProgressPercentage%;"
+                                             aria-valuenow="@item.ProgressPercentage"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            <strong>@item.ProgressPercentage%</strong>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case GoalStatus.Active:
+                                            <span class="badge bg-info"><i class="bi bi-play-circle"></i> Active</span>
+                                            break;
+                                        case GoalStatus.Completed:
+                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Completed</span>
+                                            break;
+                                        case GoalStatus.Paused:
+                                            <span class="badge bg-warning"><i class="bi bi-pause-circle"></i> Paused</span>
+                                            break;
+                                        case GoalStatus.Abandoned:
+                                            <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Abandoned</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.GoalId" class="btn btn-sm btn-info" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.GoalId" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.GoalId" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-bullseye" style="font-size: 3rem;"></i>
+                <h5 class="alert-heading mt-3">No goals found</h5>
+                <p>Create therapeutic goals to track patient progress.</p>
+                <hr>
+                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Create First Goal</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var tableRows = document.querySelectorAll('#goalsTable tbody tr');
+
+            tableRows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

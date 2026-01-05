@@ -1,77 +1,167 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.TherapySession>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Therapy Sessions";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="bi bi-calendar-check"></i> Therapy Sessions</h1>
+            <p class="mb-0">Manage and track all therapy appointments</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="bi bi-plus-circle"></i> Schedule New Session
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ScheduledDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CompletedDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Professional)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ScheduledDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationMinutes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CompletedDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Patient.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Professional.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SessionId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SessionId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SessionId">Delete</a>
-            </td>
-        </tr>
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.Count()</h3>
+                <p class="text-muted mb-0">Total Sessions</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-info">@Model.Count(s => s.Status == SessionStatus.Scheduled)</h3>
+                <p class="text-muted mb-0">Scheduled</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-success">@Model.Count(s => s.Status == SessionStatus.Completed)</h3>
+                <p class="text-muted mb-0">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-danger">@Model.Count(s => s.Status == SessionStatus.Cancelled)</h3>
+                <p class="text-muted mb-0">Cancelled</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">All Sessions (@Model.Count())</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <input type="text" id="searchInput" class="form-control d-inline-block" placeholder="🔍 Search sessions..." style="max-width: 300px;">
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover" id="sessionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Patient</th>
+                            <th>Professional</th>
+                            <th>Type</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderByDescending(s => s.ScheduledDateTime))
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.ScheduledDateTime.ToString("MMM dd, yyyy")</strong><br>
+                                    <small class="text-muted"><i class="bi bi-clock"></i> @item.ScheduledDateTime.ToString("HH:mm")</small>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-fill text-primary"></i> <strong>@(item.Patient?.FullName ?? "Unknown")</strong>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-badge text-success"></i> @(item.Professional?.FirstName + " " + item.Professional?.LastName)
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">@item.Type.ToString()</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">@item.DurationMinutes min</span>
+                                </td>
+                                <td>
+                                    @switch (item.Status)
+                                    {
+                                        case SessionStatus.Scheduled:
+                                            <span class="badge bg-info"><i class="bi bi-calendar-check"></i> Scheduled</span>
+                                            break;
+                                        case SessionStatus.Completed:
+                                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Completed</span>
+                                            break;
+                                        case SessionStatus.Cancelled:
+                                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Cancelled</span>
+                                            break;
+                                        case SessionStatus.NoShow:
+                                            <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> No Show</span>
+                                            break;
+                                        case SessionStatus.Rescheduled:
+                                            <span class="badge bg-secondary"><i class="bi bi-arrow-repeat"></i> Rescheduled</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.SessionId" class="btn btn-sm btn-info" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.SessionId" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.SessionId" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-calendar-x" style="font-size: 3rem;"></i>
+                <h5 class="alert-heading mt-3">No therapy sessions found</h5>
+                <p>Start scheduling therapy sessions for your patients.</p>
+                <hr>
+                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Schedule First Session</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var tableRows = document.querySelectorAll('#sessionsTable tbody tr');
+
+            tableRows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

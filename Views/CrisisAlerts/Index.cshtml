@@ -1,71 +1,180 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.CrisisAlert>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Crisis Alerts";
 }
 
-<h1>Index</h1>
+<div class="page-header bg-danger">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="bi bi-exclamation-triangle-fill"></i> Crisis Alerts</h1>
+            <p class="mb-0">Monitor and respond to patient crisis situations</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="bi bi-plus-circle"></i> Report New Alert
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AlertDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Level)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsResolved)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ResolvedDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Resolution)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AlertDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Level)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsResolved)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ResolvedDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Resolution)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Patient.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AlertId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AlertId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AlertId">Delete</a>
-            </td>
-        </tr>
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.Count()</h3>
+                <p class="text-muted mb-0">Total Alerts</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-danger text-white">
+            <div class="card-body">
+                <h3>@Model.Count(a => !a.IsResolved)</h3>
+                <p class="mb-0"><i class="bi bi-exclamation-circle"></i> Active</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h3>@Model.Count(a => !a.IsResolved && a.Level == CrisisLevel.Critical)</h3>
+                <p class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Critical</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h3>@Model.Count(a => a.IsResolved)</h3>
+                <p class="mb-0"><i class="bi bi-check-circle"></i> Resolved</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">All Alerts (@Model.Count())</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <input type="text" id="searchInput" class="form-control d-inline-block" placeholder="🔍 Search alerts..." style="max-width: 300px;">
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover" id="alertsTable">
+                    <thead>
+                        <tr>
+                            <th>Alert Date</th>
+                            <th>Patient</th>
+                            <th>Level</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderByDescending(a => a.AlertDateTime))
+                        {
+                            var rowClass = !item.IsResolved && item.Level == CrisisLevel.Critical ? "table-danger" : "";
+                            <tr class="@rowClass">
+                                <td>
+                                    <strong>@item.AlertDateTime.ToString("MMM dd, yyyy")</strong><br>
+                                    <small class="text-muted"><i class="bi bi-clock"></i> @item.AlertDateTime.ToString("HH:mm")</small>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-fill text-primary"></i> <strong>@(item.Patient?.FullName ?? "Unknown")</strong>
+                                </td>
+                                <td>
+                                    @switch (item.Level)
+                                    {
+                                        case CrisisLevel.Critical:
+                                            <span class="badge bg-danger" style="font-size: 0.9rem;">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> CRITICAL
+                                            </span>
+                                            break;
+                                        case CrisisLevel.High:
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-exclamation-circle"></i> High
+                                            </span>
+                                            break;
+                                        case CrisisLevel.Medium:
+                                            <span class="badge bg-info">Medium</span>
+                                            break;
+                                        case CrisisLevel.Low:
+                                            <span class="badge bg-secondary">Low</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <small>@(item.Description.Length > 70 ? item.Description.Substring(0, 70) + "..." : item.Description)</small>
+                                </td>
+                                <td>
+                                    @if (item.IsResolved)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle-fill"></i> Resolved
+                                        </span>
+                                        @if (item.ResolvedDateTime.HasValue)
+                                        {
+                                            <br>
+                            
+                                            <small class="text-muted">@item.ResolvedDateTime.Value.ToString("MMM dd, yyyy")</small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle-fill"></i> ACTIVE
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.AlertId" class="btn btn-sm btn-info" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.AlertId" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.AlertId" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success text-center" role="alert">
+                <i class="bi bi-check-circle" style="font-size: 3rem; color: green;"></i>
+                <h5 class="alert-heading mt-3">No crisis alerts</h5>
+                <p>Great news! There are currently no active crisis alerts in the system.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var tableRows = document.querySelectorAll('#alertsTable tbody tr');
+
+            tableRows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>

@@ -1,65 +1,160 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.MoodEntry>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Mood Tracking";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="bi bi-emoji-smile"></i> Mood Tracking</h1>
+            <p class="mb-0">Monitor patient emotional wellbeing over time</p>
+        </div>
+        <div>
+            <a asp-action="Create" class="btn btn-light btn-lg">
+                <i class="bi bi-plus-circle"></i> Add Mood Entry
+            </a>
+        </div>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.EntryDateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MoodScore)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Emotion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Trigger)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Patient)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.EntryDateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MoodScore)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Emotion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Trigger)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Patient.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.MoodEntryId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.MoodEntryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.MoodEntryId">Delete</a>
-            </td>
-        </tr>
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h3 class="text-primary">@Model.Count()</h3>
+                <p class="text-muted mb-0">Total Entries</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-success text-white">
+            <div class="card-body">
+                <h3>@Model.Count(m => m.MoodScore >= 8)</h3>
+                <p class="mb-0">High Mood (8-10)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-warning text-white">
+            <div class="card-body">
+                <h3>@Model.Count(m => m.MoodScore >= 5 && m.MoodScore < 8)</h3>
+                <p class="mb-0">Medium Mood (5-7)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-danger text-white">
+            <div class="card-body">
+                <h3>@Model.Count(m => m.MoodScore < 5)</h3>
+                <p class="mb-0">Low Mood (1-4)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h5 class="card-title mb-0">Recent Entries (@Model.Count())</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <input type="text" id="searchInput" class="form-control d-inline-block" placeholder="🔍 Search entries..." style="max-width: 300px;">
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover" id="moodTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Patient</th>
+                            <th>Mood Score</th>
+                            <th>Emotion</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderByDescending(m => m.EntryDateTime))
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.EntryDateTime.ToString("MMM dd, yyyy")</strong><br>
+                                    <small class="text-muted"><i class="bi bi-clock"></i> @item.EntryDateTime.ToString("HH:mm")</small>
+                                </td>
+                                <td>
+                                    <i class="bi bi-person-fill text-primary"></i> <strong>@(item.Patient?.FullName ?? "Unknown")</strong>
+                                </td>
+                                <td>
+                                    @{
+                                        var moodClass = item.MoodScore >= 8 ? "bg-success" :
+                                        item.MoodScore >= 5 ? "bg-warning" : "bg-danger";
+                                        var moodIcon = item.MoodScore >= 8 ? "bi-emoji-smile-fill" :
+                                        item.MoodScore >= 5 ? "bi-emoji-neutral-fill" : "bi-emoji-frown-fill";
+                                    }
+                                    <span class="badge @moodClass" style="font-size: 1rem; padding: 8px 12px;">
+                                        <i class="bi @moodIcon"></i> @item.MoodScore/10
+                                    </span>
+                                </td>
+                          
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Notes))
+                                    {
+                                        var displayNotes = item.Notes.Length > 40 ? item.Notes.Substring(0, 40) + "..." : item.Notes;
+                                        <small>@displayNotes</small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No notes</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@item.MoodEntryId" class="btn btn-sm btn-info" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.MoodEntryId" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MoodEntryId" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center" role="alert">
+                <i class="bi bi-emoji-neutral" style="font-size: 3rem;"></i>
+                <h5 class="alert-heading mt-3">No mood entries found</h5>
+                <p>Start tracking patient moods to monitor their emotional wellbeing.</p>
+                <hr>
+                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Add First Mood Entry</a>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            var searchText = this.value.toLowerCase();
+            var tableRows = document.querySelectorAll('#moodTable tbody tr');
+
+            tableRows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
 }
-    </tbody>
-</table>
