@@ -1,10 +1,11 @@
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Microsoft.AspNetCore.Identity;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HealthWellbeing.Data
 {
@@ -14,13 +15,14 @@ namespace HealthWellbeing.Data
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
-            dbContext.Database.EnsureCreated();
+            dbContext.Database.Migrate();
 
             PopulateSpecialities(dbContext);
             PopulateDoctor(dbContext);
             PopulateAgendaMedica(dbContext);
-            PopulateConsultas(dbContext);
             PopulateUtenteSaude(dbContext);
+            PopulateConsultas(dbContext);
+            
 
             var clients = PopulateClients(dbContext);
             PopulateMember(dbContext, clients);
@@ -38,9 +40,73 @@ namespace HealthWellbeing.Data
             PopulateLevels(dbContext);
         }
 
+        private static void PopulateSpecialities(HealthWellbeingDbContext db)
+        {
+            if (db.Doctor.Any()) return;
+            if (db.Specialities.Any()) return; // Evita duplicar registos
+
+            var especialidades = new[]
+            {
+    new Specialities
+    {
+        Nome = "Cardiologia",
+        Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
+    },
+    new Specialities
+    {
+        Nome = "Dermatologia",
+        Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
+    },
+    new Specialities
+    {
+        Nome = "Pediatria",
+        Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
+    },
+    new Specialities
+    {
+        Nome = "Psiquiatria",
+        Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
+    },
+    new Specialities
+    {
+        Nome = "Nutrição",
+        Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
+    },
+    new Specialities
+    {
+        Nome = "Medicina Geral e Familiar",
+        Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
+    },
+    new Specialities
+    {
+        Nome = "Ortopedia",
+        Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
+    },
+    new Specialities
+    {
+        Nome = "Ginecologia e Obstetrícia",
+        Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
+    },
+    new Specialities
+    {
+        Nome = "Psicologia",
+        Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
+    },
+    new Specialities
+    {
+        Nome = "Fisioterapia",
+        Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
+    },
+
+};
+
+            db.Specialities.AddRange(especialidades);
+            db.SaveChanges();
+        }
+
         private static void PopulateDoctor(HealthWellbeingDbContext db)
         {
-
+            if (db.Doctor.Any()) return;
             var especialidades = db.Specialities
                 .ToDictionary(e => e.Nome, e => e);
 
@@ -69,6 +135,8 @@ namespace HealthWellbeing.Data
 
         private static void PopulateConsultas(HealthWellbeingDbContext db)
         {
+            if (db.Consulta.Any()) return;
+
             var hoje = DateTime.Today;
 
             // médicos disponíveis (para alternar)
@@ -79,7 +147,15 @@ namespace HealthWellbeing.Data
             if (!doctors.Any())
                 throw new InvalidOperationException("Não há médicos na BD. Corre primeiro o PopulateDoctor.");
 
-            // 15 consultas (datas/horas de exemplo) — SEM IdMedico/IdEspecialidade aqui
+            // ✅ utentes disponíveis (para alternar)
+            var utentes = db.UtenteSaude
+                .OrderBy(u => u.UtenteSaudeId)
+                .ToList();
+
+            if (!utentes.Any())
+                throw new InvalidOperationException("Não há utentes na BD. Corre primeiro o PopulateUtenteSaude.");
+
+            // 15 consultas (datas/horas de exemplo)
             var consultas = new List<Consulta>
     {
         // Base
@@ -121,7 +197,7 @@ namespace HealthWellbeing.Data
             HoraFim      = new TimeOnly(17, 0),
         },
 
-        // Hoje (para testar “Hoje”)
+        // Hoje
         new Consulta
         {
             DataMarcacao = hoje.AddDays(-2).AddHours(10),
@@ -186,7 +262,7 @@ namespace HealthWellbeing.Data
             HoraFim          = new TimeOnly(11, 0),
         },
 
-        // Mais futuras (para fechar 15)
+        // Mais futuras
         new Consulta
         {
             DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
@@ -203,13 +279,15 @@ namespace HealthWellbeing.Data
         },
     };
 
-            // ✅ OPÇÃO A: alterna médicos (e especialidade) por consulta
+            // ✅ alterna médico + especialidade + utente
             for (int i = 0; i < consultas.Count; i++)
             {
                 var d = doctors[i % doctors.Count];
+                var u = utentes[i % utentes.Count];
 
                 consultas[i].IdMedico = d.IdMedico;
                 consultas[i].IdEspecialidade = d.IdEspecialidade;
+                consultas[i].IdUtenteSaude = u.UtenteSaudeId; // ✅ muito importante
             }
 
             // Seed idempotente (evita duplicados)
@@ -217,12 +295,31 @@ namespace HealthWellbeing.Data
             {
                 bool exists = db.Consulta.Any(x =>
                     x.IdMedico == c.IdMedico &&
+                    x.IdUtenteSaude == c.IdUtenteSaude &&
                     x.DataConsulta == c.DataConsulta &&
                     x.HoraInicio == c.HoraInicio);
 
                 if (!exists)
                     db.Consulta.Add(c);
             }
+            var doctor = new[]
+            {
+                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },
+                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt" },
+                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt" },
+                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt" },
+                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt" },
+                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt" },
+                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt" },
+                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt" },
+                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt" },
+                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt" },
+                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt" },
+                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt" },
+                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt" },
+                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt" },
+                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
+            };
 
             db.SaveChanges();
         }
@@ -816,69 +913,6 @@ namespace HealthWellbeing.Data
             db.SaveChanges();
         }
 
-        private static void PopulateSpecialities(HealthWellbeingDbContext db)
-        {
-            if (db.Specialities.Any()) return; // Evita duplicar registos
-
-            var especialidades = new[]
-            {
-        new Specialities
-        {
-            Nome = "Cardiologia",
-            Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
-        },
-        new Specialities
-        {
-            Nome = "Dermatologia",
-            Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
-        },
-        new Specialities
-        {
-            Nome = "Pediatria",
-            Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
-        },
-        new Specialities
-        {
-            Nome = "Psiquiatria",
-            Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
-        },
-        new Specialities
-        {
-            Nome = "Nutrição",
-            Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
-        },
-        new Specialities
-        {
-            Nome = "Medicina Geral e Familiar",
-            Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
-        },
-        new Specialities
-        {
-            Nome = "Ortopedia",
-            Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
-        },
-        new Specialities
-        {
-            Nome = "Ginecologia e Obstetrícia",
-            Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
-        },
-        new Specialities
-        {
-            Nome = "Psicologia",
-            Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
-        },
-        new Specialities
-        {
-            Nome = "Fisioterapia",
-            Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
-        },
-
-    };
-
-            db.Specialities.AddRange(especialidades);
-            db.SaveChanges();
-        }
-
         private static void PopulateEventTypes(HealthWellbeingDbContext dbContext)
         {
             if (dbContext.EventType.Any()) return;
@@ -1347,7 +1381,6 @@ namespace HealthWellbeing.Data
 
             return clients;
         }
-
         private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
         {
             if (dbContext.Member.Any()) return;
@@ -1577,31 +1610,121 @@ namespace HealthWellbeing.Data
         {
             if (db.AgendaMedica.Any()) return;
 
-            var medicos = db.Doctor.ToDictionary(m => m.Nome, m => m);
+            var datas15 = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
-
-            var horarios = new[]
-            {
-
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(17, 0) },
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Wednesday, HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(17, 0) },
-            new AgendaMedica { IdMedico = medicos["João Ribeiro"].IdMedico, DiaSemana = DayOfWeek.Friday,    HoraInicio = new TimeOnly(9, 0), HoraFim = new TimeOnly(12, 0) },
-
-
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Monday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(18, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Tuesday,   HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(16, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Wednesday, HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(9, 0),  HoraFim = new TimeOnly(12, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Thursday,  HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(16, 0) },
-            new AgendaMedica { IdMedico = medicos["Carla Ferreira"].IdMedico, DiaSemana = DayOfWeek.Friday,    HoraInicio = new TimeOnly(14, 0), HoraFim = new TimeOnly(18, 0) },
-        };
-
-            db.AgendaMedica.AddRange(horarios);
+            // apaga tudo nessas datas (para todos os médicos)
+            var existentes = db.AgendaMedica.Where(a => datas15.Contains(a.Data)).ToList();
+            db.AgendaMedica.RemoveRange(existentes);
             db.SaveChanges();
+
+            var medicos = db.Doctor
+                .AsEnumerable()
+                .GroupBy(m => m.Nome)
+                .ToDictionary(g => g.Key, g => g.First());
+
+            // 1) Template semanal
+            var templateSemanal = new List<(string MedicoNome, DayOfWeek Dia, TimeOnly Ini, TimeOnly Fim)>
+    {
+        // João Ribeiro
+        ("João Ribeiro", DayOfWeek.Monday,    new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("João Ribeiro", DayOfWeek.Monday,    new TimeOnly(14, 0), new TimeOnly(17, 0)),
+        ("João Ribeiro", DayOfWeek.Tuesday,   new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("João Ribeiro", DayOfWeek.Wednesday, new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("João Ribeiro", DayOfWeek.Thursday,  new TimeOnly(14, 0), new TimeOnly(17, 0)),
+        ("João Ribeiro", DayOfWeek.Friday,    new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+
+        // Carla Ferreira
+        ("Carla Ferreira", DayOfWeek.Monday,    new TimeOnly(14, 0), new TimeOnly(18, 0)),
+        ("Carla Ferreira", DayOfWeek.Tuesday,   new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("Carla Ferreira", DayOfWeek.Tuesday,   new TimeOnly(14, 0), new TimeOnly(16, 0)),
+        ("Carla Ferreira", DayOfWeek.Wednesday, new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("Carla Ferreira", DayOfWeek.Thursday,  new TimeOnly(9, 0),  new TimeOnly(12, 0)),
+        ("Carla Ferreira", DayOfWeek.Thursday,  new TimeOnly(14, 0), new TimeOnly(16, 0)),
+        ("Carla Ferreira", DayOfWeek.Friday,    new TimeOnly(14, 0), new TimeOnly(18, 0)),
+    };
+
+            
+
+            // 3) Criar registos por data real + periodo
+            var novos = new List<AgendaMedica>();
+
+            foreach (var data in datas15)
+            {
+                foreach (var t in templateSemanal.Where(x => x.Dia == data.DayOfWeek))
+                {
+                    if (!medicos.TryGetValue(t.MedicoNome, out var medico))
+                        continue;
+
+                    // Regra simples para Periodo
+                    var periodo = t.Ini < new TimeOnly(13, 0) ? "Manha" : "Tarde";
+
+                    bool exists = db.AgendaMedica.Any(a =>
+                        a.IdMedico == medico.IdMedico &&
+                        a.Data == data &&
+                        a.HoraInicio == t.Ini &&
+                        a.HoraFim == t.Fim
+                    );
+
+                    if (!exists)
+                    {
+                        novos.Add(new AgendaMedica
+                        {
+                            IdMedico = medico.IdMedico,
+                            Data = data,
+                            DiaSemana = data.DayOfWeek,   // (melhor usar data.DayOfWeek)
+                            Periodo = periodo,            // ✅ AGORA FICA GRAVADO
+                            HoraInicio = t.Ini,
+                            HoraFim = t.Fim
+                        });
+                    }
+                }
+            }
+
+            if (novos.Any())
+            {
+                db.AgendaMedica.AddRange(novos);
+                db.SaveChanges();
+            }
+
+            // 4) Corrigir dados antigos (opcional mas recomendado)
+            // a) Apagar os com Data default
+            var antigosDefault = db.AgendaMedica.Where(a => a.Data == default(DateOnly)).ToList();
+            if (antigosDefault.Any())
+            {
+                db.AgendaMedica.RemoveRange(antigosDefault);
+                db.SaveChanges();
+            }
+
+            // b) Preencher Periodo em registos existentes sem Periodo
+            var semPeriodo = db.AgendaMedica
+                .Where(a => a.Periodo == null || a.Periodo == "")
+                .ToList();
+
+            if (semPeriodo.Any())
+            {
+                foreach (var a in semPeriodo)
+                {
+                    a.Periodo = a.HoraInicio < new TimeOnly(13, 0) ? "Manha" : "Tarde";
+                }
+
+                db.SaveChanges();
+            }
+        }
+
+        private static List<DateOnly> GetProximosDiasUteis(DateOnly inicio, int quantidade)
+        {
+            var res = new List<DateOnly>();
+            var d = inicio;
+
+            while (res.Count < quantidade)
+            {
+                if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
+                    res.Add(d);
+
+                d = d.AddDays(1);
+            }
+
+            return res;
         }
 
 
@@ -1631,15 +1754,20 @@ namespace HealthWellbeing.Data
 
         internal static void SeedUsers(UserManager<IdentityUser> userManager)
         {
-            //EnsureUserIsCreatedAsync(userManager, "joao@jbma.pt", "Secret123$", ["DiretorClinico"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "anab@jbma.pt", "Secret123$", ["Utente"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "brunoMP@jbma.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "diretorClinico@Healthwellbeing.pt", "Secret123$", ["DiretorClinico"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "carla.ferreira@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "bruno.carvalho@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "ana.beatriz.silva@example.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "ana.martins@healthwellbeing.pt", "Secret123$", ["Medico"]).Wait();
+            
         }
 
         internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
             EnsureRoleIsCreatedAsync(roleManager, "Administrador").Wait();
-            EnsureRoleIsCreatedAsync(roleManager, "DiretorClinino").Wait();
+            EnsureRoleIsCreatedAsync(roleManager, "DiretorClinico").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Utente").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Medico").Wait();
             EnsureRoleIsCreatedAsync(roleManager, "Rececionista").Wait();

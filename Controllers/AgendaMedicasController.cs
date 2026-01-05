@@ -1,8 +1,8 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class AgendaMedicasController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -20,46 +21,35 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: AgendaMedicas
+        // GET: /AgendaMedicas
         public async Task<IActionResult> Index()
         {
-            var agendaMedica = await _context.AgendaMedica
-        .Include(a => a.Medico)
-        .ThenInclude(m => m.Especialidade)   // Doctor.Especialidade (Specialities)
-        .ToListAsync();
+            var datas15Uteis = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
-            // construir o modelo para a view
-            var model = agendaMedica
+            var agenda = await _context.AgendaMedica
+                .Where(a => datas15Uteis.Contains(a.Data))
+                .Include(a => a.Medico)
+                    .ThenInclude(m => m.Especialidade)
+                .ToListAsync();
+
+            // Agrupar por especialidade
+            var model = agenda
                 .Where(a => a.Medico != null && a.Medico.Especialidade != null)
-                .GroupBy(a => a.Medico.Especialidade.Nome)
-                .Select(g => new EspecialidadeAgendaVM
+                .GroupBy(a => a.Medico!.Especialidade!.Nome)
+                .Select(espGroup => new EspecialidadeAgendaVM
                 {
-                    Especialidade = g.Key,
-                    Medicos = g
-                        .GroupBy(a => a.Medico!)   // agrupar por médico
-                        .Select(mg => new MedicoAgendaVM
+                    Especialidade = espGroup.Key,
+                    Datas = datas15Uteis,
+
+                    Medicos = espGroup
+                        .GroupBy(a => a.Medico!)
+                        .Select(medGroup => new MedicoAgendaTabelaVM
                         {
-                            Medico = mg.Key.Nome,
-                                
-                            Segunda = string.Join(", ",
-                                mg.Where(x => x.DiaSemana == DayOfWeek.Monday)
-                                  .Select(x => $"{x.HoraInicio:HH\\:mm}-{x.HoraFim:HH\\:mm}")),
-
-                            Terca = string.Join(", ",
-                                mg.Where(x => x.DiaSemana == DayOfWeek.Tuesday)
-                                  .Select(x => $"{x.HoraInicio:HH\\:mm}-{x.HoraFim:HH\\:mm}")),
-
-                            Quarta = string.Join(", ",
-                                mg.Where(x => x.DiaSemana == DayOfWeek.Wednesday)
-                                  .Select(x => $"{x.HoraInicio:HH\\:mm}-{x.HoraFim:HH\\:mm}")),
-
-                            Quinta = string.Join(", ",
-                                mg.Where(x => x.DiaSemana == DayOfWeek.Thursday)
-                                  .Select(x => $"{x.HoraInicio:HH\\:mm}-{x.HoraFim:HH\\:mm}")),
-
-                            Sexta = string.Join(", ",
-                                mg.Where(x => x.DiaSemana == DayOfWeek.Friday)
-                                  .Select(x => $"{x.HoraInicio:HH\\:mm}-{x.HoraFim:HH\\:mm}")),
+                            Medico = medGroup.Key.Nome,
+                            HorariosPorData = datas15Uteis.ToDictionary(
+                                d => d,
+                                d => FormatDia(medGroup.Where(x => x.Data == d).ToList())
+                            )
                         })
                         .OrderBy(m => m.Medico)
                         .ToList()
@@ -70,141 +60,185 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-        // GET: AgendaMedicas/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: /AgendaMedicas/MinhaAgenda15Dias
+        [Authorize(Roles = "Medico")]
+        public async Task<IActionResult> MinhaAgenda15Dias()
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var doctor = await GetDoctorFromLoggedUser();
+            if (doctor == null)
+                return Content("Não existe um médico associado ao teu utilizador (email não encontrado em Doctor).");
 
-            var agendaMedica = await _context.AgendaMedica
-                .Include(a => a.Medico)
-                .FirstOrDefaultAsync(m => m.IdAgendaMedica == id);
-            if (agendaMedica == null)
-            {
-                return NotFound();
-            }
+            var datas15Uteis = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
-            return View(agendaMedica);
+            // Carregar o que já existe no período
+            var existentes = await _context.AgendaMedica
+                .Where(a => a.IdMedico == doctor.IdMedico && datas15Uteis.Contains(a.Data))
+                .ToListAsync();
+
+            var vm = new MedicoAgenda15DiasVM
+            {
+                Medico = doctor.Nome,
+                Dias = datas15Uteis.Select(d =>
+                {
+                    var diaEntries = existentes.Where(x => x.Data == d).ToList();
+
+                    var manha = diaEntries.FirstOrDefault(x => x.Periodo == "Manha");
+                    var tarde = diaEntries.FirstOrDefault(x => x.Periodo == "Tarde");
+
+                    return new AgendaDiaVM
+                    {
+                        Data = d,
+                        DiaSemana = d.DayOfWeek,
+                        Manha = manha != null
+                            ? new MedicoAgendaVM
+                            {
+                                Periodo = "Manha",
+                                Ativo = true,
+                                HoraInicio = manha.HoraInicio,
+                                HoraFim = manha.HoraFim
+                            }
+                            : new MedicoAgendaVM
+                            {
+                                Periodo = "Manha",
+                                Ativo = false
+                            },
+                        Tarde = tarde != null
+                            ? new MedicoAgendaVM
+                            {
+                                Periodo = "Tarde",
+                                Ativo = true,
+                                HoraInicio = tarde.HoraInicio,
+                                HoraFim = tarde.HoraFim
+                            }
+                            : new MedicoAgendaVM
+                            {
+                                Periodo = "Tarde",
+                                Ativo = false
+                            }
+                    };
+                }).ToList()
+            };
+
+            return View(vm);
         }
 
-        // GET: AgendaMedicas/Create
-        public IActionResult Create()
-        {
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Email");
-            return View();
-        }
-
-        // POST: AgendaMedicas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: /AgendaMedicas/MinhaAgenda15Dias
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdAgendaMedica,IdMedico,DiaSemana,HoraInicio,HoraFim")] AgendaMedica agendaMedica)
+        [Authorize(Roles = "Medico")]
+        public async Task<IActionResult> MinhaAgenda15Dias(MedicoAgenda15DiasVM vm)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(agendaMedica);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Email", agendaMedica.IdMedico);
-            return View(agendaMedica);
-        }
+            var doctor = await GetDoctorFromLoggedUser();
+            if (doctor == null)
+                return Content("Não existe um médico associado ao teu utilizador (email não encontrado em Doctor).");
 
-        // GET: AgendaMedicas/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid)
+                return View(vm);
 
-            var agendaMedica = await _context.AgendaMedica.FindAsync(id);
-            if (agendaMedica == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Email", agendaMedica.IdMedico);
-            return View(agendaMedica);
-        }
+            var datas15Uteis = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
 
-        // POST: AgendaMedicas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdAgendaMedica,IdMedico,DiaSemana,HoraInicio,HoraFim")] AgendaMedica agendaMedica)
-        {
-            if (id != agendaMedica.IdAgendaMedica)
+            foreach (var dia in vm.Dias.Where(d => datas15Uteis.Contains(d.Data)))
             {
-                return NotFound();
-            }
+                // manhã
+                await UpsertPeriodo(doctor.IdMedico, dia.Data, "Manha", dia.Manha);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(agendaMedica);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AgendaMedicaExists(agendaMedica.IdAgendaMedica))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdMedico"] = new SelectList(_context.Doctor, "IdMedico", "Email", agendaMedica.IdMedico);
-            return View(agendaMedica);
-        }
-
-        // GET: AgendaMedicas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var agendaMedica = await _context.AgendaMedica
-                .Include(a => a.Medico)
-                .FirstOrDefaultAsync(m => m.IdAgendaMedica == id);
-            if (agendaMedica == null)
-            {
-                return NotFound();
-            }
-
-            return View(agendaMedica);
-        }
-
-        // POST: AgendaMedicas/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {   
-            var agendaMedica = await _context.AgendaMedica.FindAsync(id);
-            if (agendaMedica != null)
-            {
-                _context.AgendaMedica.Remove(agendaMedica);
+                // tarde
+                await UpsertPeriodo(doctor.IdMedico, dia.Data, "Tarde", dia.Tarde);
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(MinhaAgenda15Dias));
         }
 
-        private bool AgendaMedicaExists(int id)
+        private async Task UpsertPeriodo(int idMedico, DateOnly data, string periodo, MedicoAgendaVM? p)
         {
-            return _context.AgendaMedica.Any(e => e.IdAgendaMedica == id);
+            var existente = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
+                a.IdMedico == idMedico &&
+                a.Data == data &&
+                a.Periodo == periodo
+            );
+
+            // se não há VM ou está desativado -> remove se existir
+            if (p == null || !p.Ativo)
+            {
+                if (existente != null)
+                    _context.AgendaMedica.Remove(existente);
+
+                return;
+            }
+
+            // validação hora
+            if (p.HoraFim <= p.HoraInicio)
+            {
+                ModelState.AddModelError("", $"Hora fim tem de ser posterior à hora início em {data:dd/MM/yyyy} ({periodo}).");
+                return;
+            }
+
+            if (existente == null)
+            {
+                _context.AgendaMedica.Add(new AgendaMedica
+                {
+                    IdMedico = idMedico,
+                    Data = data,
+                    DiaSemana = data.DayOfWeek, // só visual
+                    Periodo = periodo,          // "Manha" / "Tarde"
+                    HoraInicio = p.HoraInicio,
+                    HoraFim = p.HoraFim
+                });
+            }
+            else
+            {
+                existente.HoraInicio = p.HoraInicio;
+                existente.HoraFim = p.HoraFim;
+                existente.DiaSemana = data.DayOfWeek;
+                existente.Periodo = periodo;
+            }
         }
 
-        
+
+        // ----------------- helpers -----------------
+
+        private async Task<Doctor?> GetDoctorFromLoggedUser()
+        {
+            var email = User?.Identity?.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(email)) return null;
+
+            var emailLower = email.ToLower();
+
+            return await _context.Doctor
+                .FirstOrDefaultAsync(d => d.Email.ToLower() == emailLower);
+        }
+
+        private static List<DateOnly> GetProximosDiasUteis(DateOnly inicio, int quantidade)
+        {
+            var res = new List<DateOnly>();
+            var d = inicio;
+
+            while (res.Count < quantidade)
+            {
+                if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
+                    res.Add(d);
+
+                d = d.AddDays(1);
+            }
+
+            return res;
+        }
+
+        private static string FormatDia(List<AgendaMedica> entries)
+        {
+            var manha = entries.FirstOrDefault(x => x.Periodo == "Manha");
+            var tarde = entries.FirstOrDefault(x => x.Periodo == "Tarde");
+
+            var partes = new List<string>();
+
+            if (manha != null)
+                partes.Add($"Manhã: {manha.HoraInicio:HH\\:mm}-{manha.HoraFim:HH\\:mm}");
+
+            if (tarde != null)
+                partes.Add($"Tarde: {tarde.HoraInicio:HH\\:mm}-{tarde.HoraFim:HH\\:mm}");
+
+            return partes.Count == 0 ? "-" : string.Join(" | ", partes);
+        }
     }
 }

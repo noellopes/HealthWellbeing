@@ -1,15 +1,14 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
@@ -23,35 +22,33 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Consultas
+        // -------------------------------
+        // LISTA / HISTÓRICO (mantido)
+        // -------------------------------
         public async Task<IActionResult> Index(int page = 1, string searchTerm = "")
         {
-
             var hoje = DateTime.Today;
 
             var consultasQuery = _context.Consulta
                 .Include(c => c.Doctor)
                 .Include(c => c.Speciality)
-                .Where(c =>
-                    !c.DataCancelamento.HasValue &&        
-                    c.DataConsulta.Date >= hoje           
-                )
                 .AsQueryable();
+
+            if (!User.IsInRole("DiretorClinico"))
+            {
+                consultasQuery = consultasQuery.Where(c =>
+                    !c.DataCancelamento.HasValue &&
+                    c.DataConsulta.Date >= hoje
+                );
+            }
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                // Aceitar formatos comuns em PT
                 var culture = new CultureInfo("pt-PT");
                 var formats = new[] { "dd/MM/yyyy", "d/M/yyyy", "yyyy-MM-dd" };
 
-                if (DateTime.TryParseExact(searchTerm.Trim(),
-                                           formats,
-                                           culture,
-                                           DateTimeStyles.None,
-                                           out var dataPesquisa))
-                    
+                if (DateTime.TryParseExact(searchTerm.Trim(), formats, culture, DateTimeStyles.None, out var dataPesquisa))
                 {
-                    // FILTRAR APENAS POR DATA (sem hora)
                     consultasQuery = consultasQuery.Where(c =>
                         c.DataMarcacao.Date == dataPesquisa.Date ||
                         c.DataConsulta.Date == dataPesquisa.Date
@@ -59,191 +56,271 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    // Se o utilizador escrever algo que não é data válida, podes:
-                    // - ou não filtrar (deixar tudo)
-                    // - ou devolver 0 resultados. Aqui vou devolver 0 resultados:
                     consultasQuery = consultasQuery.Where(c => false);
                 }
             }
 
-            // Aqui já não há nada "estranho" na query, CountAsync funciona
             int numberConsultas = await consultasQuery.CountAsync();
-
             var consultasInfo = new PaginationInfo<Consulta>(page, numberConsultas);
-
             var pageSize = consultasInfo.ItemsPerPage > 0 ? consultasInfo.ItemsPerPage : 10;
 
             consultasInfo.Items = await consultasQuery
-                .OrderBy(c => c.DataConsulta)
+                .OrderByDescending(c => c.DataConsulta)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
             ViewBag.SearchTerm = searchTerm;
-
             return View(consultasInfo);
         }
 
-        // GET: Consultas/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // ----------------------------------------------------
+        // MARCAÇÃO (NOVA VERSÃO: grelha server-side simples)
+        // ----------------------------------------------------
+
+        // GET: /Consultas/Marcar?idEspecialidade=..&idMedico=..
+        [Authorize(Roles = "Utente")]
+        [HttpGet]
+        public async Task<IActionResult> Marcar(int? idEspecialidade, int? idMedico)
         {
-            if (id == null)
+            var vm = new MarcarConsultaGridVM
             {
-                return NotFound();
+                IdEspecialidade = idEspecialidade,
+                IdMedico = idMedico,
+                Especialidades = await _context.Specialities
+                    .OrderBy(e => e.Nome)
+                    .Select(e => new SimpleOptionVM { Id = e.IdEspecialidade, Nome = e.Nome })
+                    .ToListAsync()
+            };
+
+            if (idEspecialidade.HasValue)
+            {
+                vm.Medicos = await _context.Doctor
+                    .Where(d => d.IdEspecialidade == idEspecialidade.Value)
+                    .OrderBy(d => d.Nome)
+                    .Select(d => new SimpleOptionVM { Id = d.IdMedico, Nome = d.Nome })
+                    .ToListAsync();
             }
 
-            var consulta = await _context.Consulta
-                .FirstOrDefaultAsync(m => m.IdConsulta == id);
-            if (consulta == null)
+            if (idMedico.HasValue)
             {
-                return NotFound();
+                await FillGrid(vm, idMedico.Value);
             }
 
-            return View(consulta);
+            return View(vm);
         }
 
-        // GET: Consultas/Create
-        public IActionResult Create()
-        {
-            
-            ViewData["IdMedico"] = new SelectList(_context.Set<Doctor>(), "IdMedico", "Nome");
-            ViewData["IdEspecialidade"] = new SelectList(_context.Set<Specialities>(), "IdEspecialidade", "Nome");
-
-            return View();
-        }
-
-        // POST: Consultas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: /Consultas/MarcarSlot  (clicar em "Livre")
+        [Authorize(Roles = "Utente")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdConsulta,DataMarcacao,DataConsulta,DataCancelamento,HoraInicio,HoraFim,IdMedico,IdEspecialidade")] Consulta consulta)
+        public async Task<IActionResult> MarcarSlot(int idMedico, int idEspecialidade, string data, string horaInicio, string horaFim)
         {
-            var dataHoraConsulta = consulta.DataConsulta.Date + consulta.HoraInicio.ToTimeSpan();
+            var d = DateOnly.ParseExact(data, "yyyy-MM-dd");
+            var hi = TimeOnly.ParseExact(horaInicio, "HH:mm");
+            var hf = TimeOnly.ParseExact(horaFim, "HH:mm");
 
-            
-            if (dataHoraConsulta < DateTime.Now)
+            // 🔎 obter o utente logado (ajusta ao teu projeto)
+            var email = User.Identity?.Name?.Trim()?.ToLower();
+            var utente = await _context.UtenteSaude
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+
+            if (utente == null)
+                return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
+
+            // ✅ LIMITAR A 2 CONSULTAS POR DIA (não canceladas)
+            var totalNoDia = await _context.Consulta.CountAsync(c =>
+                c.IdUtenteSaude == utente.UtenteSaudeId &&              
+                !c.DataCancelamento.HasValue &&
+                DateOnly.FromDateTime(c.DataConsulta) == d
+            );
+
+            if (totalNoDia >= 2)
             {
-                ModelState.AddModelError("DataConsulta",
-                    "A data e hora da consulta não podem ser anteriores à data e hora atual.");
+                TempData["Erro"] = "Só podes marcar no máximo 2 consultas por dia.";
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
             }
 
-            
-            var dataHoraFim = consulta.DataConsulta.Date + consulta.HoraFim.ToTimeSpan();
-            if (dataHoraFim <= dataHoraConsulta)
+            // validar se slot está dentro do horário do médico
+            var bloco = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
+                a.IdMedico == idMedico &&
+                a.Data == d &&
+                a.HoraInicio <= hi &&
+                a.HoraFim >= hf
+            );
+
+            if (bloco == null)
             {
-                ModelState.AddModelError("HoraFim",
-                    "A hora de fim tem de ser posterior à hora de início.");
+                TempData["Erro"] = "O slot escolhido não está dentro do horário de trabalho do médico.";
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
             }
 
-            if (ModelState.IsValid)
-            {
-                consulta.DataMarcacao = DateTime.Now;
+            // validar conflito do médico (não canceladas)
+            bool existeConflito = await _context.Consulta.AnyAsync(c =>
+                c.IdMedico == idMedico &&
+                !c.DataCancelamento.HasValue &&
+                DateOnly.FromDateTime(c.DataConsulta) == d &&
+                hi < c.HoraFim && hf > c.HoraInicio
+            );
 
-                _context.Add(consulta);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index),
-                new
-                {
-                    id = consulta.IdConsulta,
-                    SuccessMessage = "Consulta criada com sucesso."
-                }
-                );
+            if (existeConflito)
+            {
+                TempData["Erro"] = "Esse horário já foi marcado entretanto. Escolhe outro slot.";
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
             }
 
-            ViewData["IdMedico"] = new SelectList(_context.Set<Doctor>(), "IdMedico", "Nome", consulta.IdMedico);
-            ViewData["IdEspecialidade"] = new SelectList(_context.Set<Specialities>(), "IdEspecialidade", "Nome", consulta.IdEspecialidade);
-
-            return View(consulta);
-        }
-
-        // GET: Consultas/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+            var consulta = new Consulta
             {
-                return NotFound();
-            }
+                IdMedico = idMedico,
+                IdEspecialidade = idEspecialidade,
 
-            var consulta = await _context.Consulta.FindAsync(id);
-            if (consulta == null)
-            {
-                return NotFound();
-            }
-            return View(consulta);
-        }
+                IdUtenteSaude = utente.UtenteSaudeId, 
+                DataMarcacao = DateTime.Now,
 
-        // POST: Consultas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdConsulta,DataMarcacao,DataConsulta,DataCancelamento,HoraInicio,HoraFim")] Consulta consulta)
-        {
-            if (id != consulta.IdConsulta)
-            {
-                return NotFound();
-            }
+                // melhor guardar a data com a hora real da consulta:
+                DataConsulta = d.ToDateTime(hi),
+                HoraInicio = hi,
+                HoraFim = hf
+            };
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(consulta);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ConsultaExists(consulta.IdConsulta))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(consulta);
-        }
-
-        // GET: Consultas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var consulta = await _context.Consulta
-                .FirstOrDefaultAsync(m => m.IdConsulta == id);
-            if (consulta == null)
-            {
-                return NotFound();
-            }
-
-            return View(consulta);
-        }
-
-        // POST: Consultas/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var consulta = await _context.Consulta.FindAsync(id);
-            if (consulta != null)
-            {
-                _context.Consulta.Remove(consulta);
-            }
-
+            _context.Consulta.Add(consulta);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            TempData["Ok"] = "Consulta marcada com sucesso!";
+            return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
         }
 
-        private bool ConsultaExists(int id)
+        // ----------------- helpers -----------------
+
+        private async Task FillGrid(MarcarConsultaGridVM vm, int idMedico)
         {
-            return _context.Consulta.Any(e => e.IdConsulta == id);
+            vm.Datas = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
+
+            // IMPORTANTE:
+            // - busca agenda por Data (correto)
+            // - E também busca "templates" antigos (Seed) com Data default, para fallback por DiaSemana
+            var agenda = await _context.AgendaMedica
+                .Where(a => a.IdMedico == idMedico &&
+                            (vm.Datas.Contains(a.Data) || a.Data == default(DateOnly)))
+                .ToListAsync();
+
+            var consultas = await _context.Consulta
+                .Where(c => c.IdMedico == idMedico
+                            && !c.DataCancelamento.HasValue
+                            && vm.Datas.Contains(DateOnly.FromDateTime(c.DataConsulta)))
+                .Select(c => new
+                {
+                    Data = DateOnly.FromDateTime(c.DataConsulta),
+                    c.HoraInicio,
+                    c.HoraFim
+                })
+                .ToListAsync();
+
+            var duracao = TimeSpan.FromMinutes(30);
+
+            // construir slots possíveis com base na agenda (por Data OU por DiaSemana fallback)
+            var allSlots = new SortedSet<(TimeOnly start, TimeOnly end)>();
+
+            foreach (var dia in vm.Datas)
+            {
+                var blocosDoDia = agenda
+                    .Where(a => a.Data == dia || (a.Data == default(DateOnly) && a.DiaSemana == dia.DayOfWeek))
+                    .ToList();
+
+                foreach (var bloco in blocosDoDia)
+                {
+                    var ini = bloco.HoraInicio.ToTimeSpan();
+                    var fim = bloco.HoraFim.ToTimeSpan();
+
+                    for (var t = ini; t + duracao <= fim; t += duracao)
+                    {
+                        var s = TimeOnly.FromTimeSpan(t);
+                        var e = TimeOnly.FromTimeSpan(t + duracao);
+                        allSlots.Add((s, e));
+                    }
+                }
+            }
+
+            // montar grelha
+            foreach (var (s, e) in allSlots)
+            {
+                var row = new TimeSlotRowVM { Inicio = s, Fim = e };
+
+                foreach (var dia in vm.Datas)
+                {
+                    var blocosDoDia = agenda
+                        .Where(a => a.Data == dia || (a.Data == default(DateOnly) && a.DiaSemana == dia.DayOfWeek))
+                        .ToList();
+
+                    bool dentroHorario = blocosDoDia.Any(a => a.HoraInicio <= s && a.HoraFim >= e);
+
+                    if (!dentroHorario)
+                    {
+                        row.Cells.Add(new TimeSlotCellVM
+                        {
+                            Data = dia,
+                            Inicio = s,
+                            Fim = e,
+                            Estado = "fora"
+                        });
+                        continue;
+                    }
+
+                    bool ocupado = consultas.Any(c =>
+                        c.Data == dia &&
+                        Overlaps(s, e, c.HoraInicio, c.HoraFim)
+                    );
+
+                    row.Cells.Add(new TimeSlotCellVM
+                    {
+                        Data = dia,
+                        Inicio = s,
+                        Fim = e,
+                        Estado = ocupado ? "ocupado" : "livre"
+                    });
+                }
+
+                vm.Linhas.Add(row);
+            }
+        }
+
+        private static bool Overlaps(TimeOnly aStart, TimeOnly aEnd, TimeOnly bStart, TimeOnly bEnd)
+        {
+            return aStart < bEnd && bStart < aEnd;
+        }
+
+        private static List<DateOnly> GetProximosDiasUteis(DateOnly inicio, int quantidade)
+        {
+            var res = new List<DateOnly>();
+            var d = inicio;
+
+            while (res.Count < quantidade)
+            {
+                if (d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday)
+                    res.Add(d);
+
+                d = d.AddDays(1);
+            }
+
+            return res;
+        }
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancelar(int id)
+        {
+            var consulta = await _context.Consulta.FirstOrDefaultAsync(c => c.IdConsulta == id);
+            if (consulta == null) return NotFound();
+
+            // se já estiver cancelada, não faz nada
+            if (!consulta.DataCancelamento.HasValue)
+            {
+                consulta.DataCancelamento = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["SuccessMessage"] = "Consulta cancelada e o horário ficou disponível.";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

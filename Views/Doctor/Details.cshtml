@@ -10,27 +10,35 @@
     <h4>Médico</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Nome)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Nome)
         </dd>
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Telemovel)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Telemovel)
         </dd>
-        <dt class = "col-sm-2">
+
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Email)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt class="col-sm-2">
+            Especialidade
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Especialidade.Nome)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" class="btn btn-sm btn-warning"" asp-route-id="@Model?.IdMedico">Editar</a> |
-    <a asp-action="Index" class="btn btn-sm btn-primary">Voltar à lista  </a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
 </div>

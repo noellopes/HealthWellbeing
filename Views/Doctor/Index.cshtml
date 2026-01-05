@@ -6,63 +6,159 @@
 
 <h1>Médicos</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-sm btn-primary text-white">Criar Perfil</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Nome
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Items) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                    <a asp-action="Details" class="btn btn-sm btn-primary text-white" asp-route-id="@item.IdMedico">Detalhes</a> |
-                    <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.IdMedico">Editar</a> |
-                    <a asp-action="Delete" class="btn btn-sm btn-danger" asp-route-id="@item.IdMedico">Eliminar</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<nav aria-label="Doctors page">
-    <ul class="pagination">
-        @if (Model.CurrentPage == 1)
-        {
-            <li class="page-item disabled"><a class="page-link">Primeira</a></li>
-        }
-        else
-        {
-            <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
-        }
+<!-- Pesquisa -->
+<div class="collapse mt-2 mb-2" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchName" class="form-label">Pesquisa</label>
+                <input id="searchName"
+                       name="searchName"
+                       value="@ViewBag.searchName"
+                       class="form-control"
+                       placeholder="Pesquise um médico"
+                       type="search" />
+            </div>
 
-        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-        {
-            if (p == Model.CurrentPage)
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Procurar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">Sem Perfis</h4>
+            <p>Ainda não existem perfis registados.</p>
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Criar Perfil
+    </a>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4">Lista de Perfis</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-primary"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#postSearch"
+                        aria-expanded="false"
+                        aria-controls="postSearch">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Criar Perfil
+                </a>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Especialidade</th>  
+                <th></th>                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
             {
-                <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </td>
+                    <td>
+                        @item.Especialidade?.Nome   
+                    </td>
+                    <td>
+                        <a asp-action="Details"
+                           class="btn btn-sm btn-primary text-white"
+                           asp-route-id="@item.IdMedico">
+                            Detalhes
+                        </a> |
+                        <a asp-action="Edit"
+                           class="btn btn-sm btn-warning"
+                           asp-route-id="@item.IdMedico">
+                            Editar
+                        </a> |
+                        <a asp-action="Delete"
+                           class="btn btn-sm btn-danger"
+                           asp-route-id="@item.IdMedico">
+                            Eliminar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <nav aria-label="Doctors page">
+        <ul class="pagination">
+            @if (Model.CurrentPage == 1)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">Primeira</a>
+                </li>
             }
             else
             {
-                <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index">Primeira</a>
+                </li>
             }
-        }
 
-        @if (Model.CurrentPage == Model.TotalPages)
-        {
-            <li class="page-item disabled"><a class="page-link">Última</a></li>
-        }
-        else
-        {
-            <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
-        }
-    </ul>
-</nav>
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                if (p == Model.CurrentPage)
+                {
+                    <li class="page-item active">
+                        <a class="page-link" href="#">@p</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@p">
+                            @p
+                        </a>
+                    </li>
+                }
+            }
+
+            @if (Model.CurrentPage == Model.TotalPages)
+            {
+                <li class="page-item disabled">
+                    <a class="page-link">Última</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@Model.TotalPages">
+                        Última
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

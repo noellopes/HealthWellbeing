@@ -592,9 +592,11 @@ namespace HealthWellbeing.Migrations
                     IdAgendaMedica = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IdMedico = table.Column<int>(type: "int", nullable: true),
+                    Data = table.Column<DateOnly>(type: "date", nullable: false),
                     DiaSemana = table.Column<int>(type: "int", nullable: false),
                     HoraInicio = table.Column<TimeOnly>(type: "time", nullable: false),
-                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: false)
+                    HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Periodo = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

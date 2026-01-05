@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20251215173653_MigracaoInicial")]
-    partial class MigracaoInicial
+    [Migration("20260104154156_PopulateAgenda")]
+    partial class PopulateAgenda
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -111,6 +111,9 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAgendaMedica"));
 
+                    b.Property<DateOnly>("Data")
+                        .HasColumnType("date");
+
                     b.Property<int>("DiaSemana")
                         .HasColumnType("int");
 
@@ -122,6 +125,10 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<int?>("IdMedico")
                         .HasColumnType("int");
+
+                    b.Property<string>("Periodo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdAgendaMedica");
 
