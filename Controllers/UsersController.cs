@@ -17,23 +17,49 @@ public class UsersController : Controller
     }
 
     // LISTAR TODOS OS USERS E ROLES
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchEmail, int page = 1)
     {
-        var users = await _userManager.Users.ToListAsync();
-        var userRoleList = new List<UserRoleViewModel>();
+        // 1. Iniciar a query sobre os utilizadores
+        var query = _userManager.Users.AsQueryable();
 
-        foreach (var user in users)
+        // 2. Aplicar o filtro de pesquisa
+        if (!string.IsNullOrEmpty(searchEmail))
         {
-            var viewModel = new UserRoleViewModel
+            query = query.Where(u => u.Email.Contains(searchEmail));
+        }
+
+        // 3. Contar total de resultados para a paginação
+        int totalItems = await query.CountAsync();
+
+        // 4. Criar o objeto de paginação (ViewModel de paginação)
+        var pagination = new PaginationInfo<UserRoleViewModel>(page, totalItems);
+
+        // 5. Paginar na base de dados
+        var usersPaged = await query
+            .OrderBy(u => u.Email)
+            .Skip(pagination.ItemsToSkip)
+            .Take(pagination.ItemsPerPage)
+            .ToListAsync();
+
+        // 6. Converter para a lista de ViewModels com as Roles
+        var userRoleList = new List<UserRoleViewModel>();
+        foreach (var user in usersPaged)
+        {
+            userRoleList.Add(new UserRoleViewModel
             {
                 UserId = user.Id,
                 Email = user.Email,
                 Roles = (await _userManager.GetRolesAsync(user)).ToList()
-            };
-            userRoleList.Add(viewModel);
+            });
         }
 
-        return View(userRoleList);
+        // 7. Injetar os itens no objeto de paginação
+        pagination.Items = userRoleList;
+
+        // Guardar o filtro para a View manter o texto na caixa e nos links
+        ViewBag.SearchEmail = searchEmail;
+
+        return View(pagination);
     }
 
     // ALTERAR ROLE (Exemplo simplificado: Alternar para Profissional)
