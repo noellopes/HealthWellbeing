@@ -83,7 +83,10 @@
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Equipamentos</a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Equipments" asp-action="Create">Criar Equipamentos</a></li>
+                                        @if (isAdmin)
+                                        {
+                                            <li><a class="dropdown-item" asp-controller="Equipments" asp-action="Create">Criar Equipamentos</a></li>
+                                        }
                                         <li><a class="dropdown-item" asp-controller="Equipments" asp-action="Index">Lista de Equipamentos</a></li>
                                     </ul>
                                 </li>
