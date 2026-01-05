@@ -108,7 +108,7 @@ public class UsersController : Controller
             await _userManager.RemoveFromRolesAsync(user, currentRoles);
 
             // Adiciona a nova role
-            await _userManager.AddToRoleAsync(user, "Cliente");
+            await _userManager.AddToRoleAsync(user, "Utente");
         }
         return RedirectToAction(nameof(Index));
     }
