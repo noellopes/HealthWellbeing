@@ -9,7 +9,7 @@ builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+var connectionString = builder.Configuration.GetConnectionString("HealthWellbeingConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -59,6 +59,7 @@ else
 
         var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
         SeedData.SeedUsers(userManager, context);
+        SeedData.SeedDefaultAdmin(userManager);
         SeedDataExercicio.Populate(context);
         SeedDataTipoExercicio.Populate(context);
         SeedDataProblemaSaude.Populate(context);
