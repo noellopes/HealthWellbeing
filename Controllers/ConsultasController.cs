@@ -235,8 +235,6 @@ namespace HealthWellbeing.Controllers
             var hi = TimeOnly.ParseExact(partes[1], "HH:mm");
             var hf = TimeOnly.ParseExact(partes[2], "HH:mm");
 
-            // utente logado
-            var email = User.Identity?.Name?.Trim()?.ToLower();
             // 🔎 obter o utente logado (ajusta ao teu projeto)
             var email = User.Identity?.Name?.Trim();
             if (string.IsNullOrWhiteSpace(email))
@@ -287,6 +285,12 @@ namespace HealthWellbeing.Controllers
                 }
 
                 idMedicoFinal = vm.IdMedico.Value;
+                var inicioConsulta = d.ToDateTime(hi);
+                if (inicioConsulta <= DateTime.Now)
+                {
+                    TempData["Erro"] = "Não é possível marcar consultas no passado.";
+                    return RedirectToAction(nameof(Marcar), new { idEspecialidade, vm.IdMedico.Value });
+                } 
 
                 // validar se slot está dentro da agenda do médico
                 var bloco = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
