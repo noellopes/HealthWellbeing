@@ -1,108 +1,140 @@
 ﻿@model HealthWellbeing.Models.Event
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Event Details";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-calendar-event me-2"></i> Event Details
-        </h4>
-    </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventName)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventName)
-            </dd>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventDescription)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventDescription)
-            </dd>
+            @* --- HEADER --- *@
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-info text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-calendar2-check fs-4 text-info-emphasis"></i>
+                </div>
+                <div>
+                    <h2 class="h4 mb-0 fw-bold text-dark">Event Details</h2>
+                </div>
+            </div>
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventType)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventType.EventTypeName)
-            </dd>
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-info">
+                <div class="card-body p-4 p-md-5">
 
-            <dt class="col-sm-3 fw-bold text-muted">Activity Focus</dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.ActivityTypeId)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold text-muted">Activities</dt>
-            <dd class="col-sm-9">
-                @if (Model.EventActivities != null && Model.EventActivities.Any())
-                {
-                    <ul class="list-group list-group-flush">
-                        @foreach (var ea in Model.EventActivities)
+                    @* --- STATUS BADGE --- *@
+                    <div class="d-flex justify-content-end mb-3">
+                        @if (Model.Status == HealthWellbeing.Models.EventStatus.Agendado)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-1">
-                                @ea.Activity.ActivityName
-                                <span class="badge bg-light text-dark border">@ea.Activity.ActivityReward pts</span>
-                            </li>
+                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">Scheduled</span>
                         }
-                    </ul>
-                }
-                else
-                {
-                    <span class="text-muted small">No activities assigned.</span>
-                }
-            </dd>
+                        else if (Model.Status == HealthWellbeing.Models.EventStatus.Adecorrer)
+                        {
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">Happening Now</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill">Finished</span>
+                        }
+                    </div>
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventStart)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventStart)
-            </dd>
+                    @* --- 1. EVENT INFO --- *@
+                    <div class="row mb-5">
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-1">Event Name</label>
+                            <div class="border-bottom pb-2">
+                                <span class="fs-4 fw-bold text-dark">@Model.EventName</span>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Description</label>
+                            <div class="p-3 bg-light bg-opacity-50 rounded-3 border border-light-subtle">
+                                <p class="mb-0 text-dark">@Model.EventDescription</p>
+                            </div>
+                        </div>
+                    </div>
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventEnd)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.EventEnd)
-            </dd>
+                    @* --- 2. CATEGORY & LEVEL --- *@
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Category</label>
+                            <div class="h-100 p-3 rounded-3 border border-secondary border-opacity-25 bg-white d-flex align-items-center">
+                                <div class="rounded-circle bg-secondary bg-opacity-10 p-2 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-tag fs-5 text-secondary"></i>
+                                </div>
+                                <span class="fw-bold text-dark">@Model.EventType?.EventTypeName</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Requirements</label>
+                            <div class="h-100 p-3 rounded-3 bg-light border d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-bold">Min. Level:</span>
+                                <span class="fs-5 fw-bold text-dark">Lvl @Model.MinLevel</span>
+                            </div>
+                        </div>
+                    </div>
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Status)
-            </dd>
+                    @* --- 3. TIME & POINTS --- *@
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Schedule</label>
+                            <div class="p-3 rounded-3 border border-primary border-opacity-25 bg-primary bg-opacity-10 d-flex align-items-center justify-content-around">
+                                <div class="text-center">
+                                    <small class="text-muted d-block text-uppercase" style="font-size:0.7rem">Start</small>
+                                    <span class="fw-bold text-dark">@Model.EventStart.ToString("dd MMM, HH:mm")</span>
+                                </div>
+                                <i class="bi bi-arrow-right text-primary"></i>
+                                <div class="text-center">
+                                    <small class="text-muted d-block text-uppercase" style="font-size:0.7rem">End</small>
+                                    <span class="fw-bold text-dark">@Model.EventEnd.ToString("dd MMM, HH:mm")</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Reward</label>
+                            <div class="h-100 p-3 rounded-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 d-flex align-items-center justify-content-center flex-column">
+                                <span class="fs-3 fw-bold text-dark lh-1">@Model.EventPoints</span>
+                                <small class="text-uppercase fw-bold text-warning-emphasis" style="font-size: 0.7rem">Points</small>
+                            </div>
+                        </div>
+                    </div>
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.MinLevel)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.MinLevel)
-            </dd>
+                    @* --- 4. ACTIVITIES --- *@
+                    @if (Model.EventActivities != null && Model.EventActivities.Any())
+                    {
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Included Activities</label>
+                            <div class="list-group shadow-sm">
+                                @foreach (var ea in Model.EventActivities)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 border-light-subtle">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-check-circle-fill text-success me-3"></i>
+                                            <span class="fw-medium">@ea.Activity.ActivityName</span>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">@ea.Activity.ActivityReward pts</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
 
-            <dt class="col-sm-3 fw-bold text-muted">
-                @Html.DisplayNameFor(model => model.EventPoints)
-            </dt>
-            <dd class="col-sm-9 fw-bold text-primary">
-                @Html.DisplayFor(model => model.EventPoints) pts
-            </dd>
-        </dl>
+                    @* --- BUTTONS --- *@
+                    <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Back to List</a>
+                        <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-warning px-4 shadow-sm">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@Model.EventId" class="btn btn-danger px-4 shadow-sm">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-<div class="mt-4 d-flex justify-content-end gap-2">
-    <a asp-action="Edit" asp-route-id="@Model?.EventId" class="btn btn-warning">
-        <i class="bi bi-pencil-square me-1"></i> Edit
-    </a>
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
-    </a>
 </div>
