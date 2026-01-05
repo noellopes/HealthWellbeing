@@ -95,10 +95,12 @@ namespace HealthWellbeing.Controllers
             if (stockCritico)
             {
                 query = query.Where(s =>
-                    s.QuantidadeAtual <= s.Consumivel.QuantidadeMinima
+                    s.QuantidadeAtual <= s.Consumivel.QuantidadeMinima + 40
                 );
+
                 ViewBag.StockCritico = true;
             }
+
 
             if (!string.IsNullOrWhiteSpace(searchNome))
             {
@@ -125,7 +127,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // =====================================================
-        // CREATE ❌ (DESATIVADO — NÃO FAZ SENTIDO)
+        // CREATE ❌ (DESATIVADO)
         // =====================================================
         public IActionResult Create()
         {
