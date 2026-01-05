@@ -36,14 +36,20 @@ namespace HealthWellbeing.Controllers
                 .Include(z => z.Room)
                 .AsQueryable();
 
-            // --- LÓGICA DE ALERTAS (NOVO) ---
-            // Verificamos o stock de todos os consumíveis presentes nestas zonas
-            var zonasParaAlerta = await zonasQuery.ToListAsync();
-            foreach (var zona in zonasParaAlerta)
+            // --- LÓGICA DE ALERTAS E PENDÊNCIAS (MODIFICADO) ---
+            var todosConsumiveis = await _context.Consumivel.ToListAsync();
+            foreach (var c in todosConsumiveis)
             {
-                if (zona.Consumivel != null && zona.Consumivel.QuantidadeAtual <= zona.Consumivel.QuantidadeMinima)
+                // Alerta de Stock Crítico
+                if (c.QuantidadeAtual <= c.QuantidadeMinima)
                 {
-                    TempData[$"Aviso_{zona.ConsumivelId}"] = $"Stock Crítico: {zona.Consumivel.Nome}. Reposição necessária!";
+                    TempData[$"Aviso_{c.ConsumivelId}"] = $"Stock Crítico: {c.Nome}. Reposição necessária!";
+                }
+
+                // Alerta de Encomenda Pendente (Sinalizado pelo ConsumivelController)
+                if (TempData.ContainsKey($"Pendente_{c.ConsumivelId}"))
+                {
+                    TempData.Keep($"Pendente_{c.ConsumivelId}"); // Mantém o sinal ativo até ser clicado
                 }
             }
 
@@ -77,12 +83,64 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // --- AÇÃO PARA O BOTÃO DO POPUP (NOVO) ---
+        // --- AÇÃO PARA CONFIRMAR RECEÇÃO (MODIFICADO) ---
+        // Agora este método é responsável por atualizar o stock físico
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmarRececao(int consumivelId)
+        {
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+
+            // Procura a última compra registada para este consumível que ainda não foi arrumada
+            var ultimaCompra = await _context.Compra
+                .Where(c => c.ConsumivelId == consumivelId)
+                .OrderByDescending(c => c.CompraId)
+                .FirstOrDefaultAsync();
+
+            if (consumivel != null && ultimaCompra != null)
+            {
+                int quantidadeParaDistribuir = ultimaCompra.Quantidade;
+
+                // DISTRIBUIÇÃO INTELIGENTE PELAS ZONAS ATIVAS
+                var zonasDisponiveis = await _context.ZonaArmazenamento
+                    .Where(z => z.ConsumivelId == consumivelId && z.Ativa)
+                    .OrderBy(z => z.NomeZona)
+                    .ToListAsync();
+
+                foreach (var zona in zonasDisponiveis)
+                {
+                    if (quantidadeParaDistribuir <= 0) break;
+
+                    int espacoLivre = zona.CapacidadeMaxima - zona.QuantidadeAtual;
+                    if (espacoLivre > 0)
+                    {
+                        int aAdicionar = Math.Min(quantidadeParaDistribuir, espacoLivre);
+                        zona.QuantidadeAtual += aAdicionar;
+                        quantidadeParaDistribuir -= aAdicionar;
+                        _context.Update(zona);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Sincroniza o total do Consumível
+                await AtualizarQuantidadeAtualConsumivel(consumivelId);
+
+                // Limpa o sinalizador de pendência
+                TempData.Remove($"Pendente_{consumivelId}");
+
+                TempData["SuccessMessage"] = $"✅ Stock de {consumivel.Nome} atualizado e arrumado nas zonas!";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // AÇÃO ANTIGA (AJUSTADA PARA O NOVO FLUXO)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AceitarPropostaZona(int id)
         {
-            // Redireciona para o ConsumivelController para processar a compra e atualizar o stock
+            // Este botão apenas envia para o controller de consumíveis para criar a encomenda
             return RedirectToAction("AceitarEncomenda", "Consumivel", new { id = id });
         }
 

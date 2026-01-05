@@ -56,7 +56,7 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e atualiza o stock nas zonas (Respeitando Capacidades)
+        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e sinaliza para confirmação futura
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AceitarEncomenda(int id)
@@ -64,7 +64,6 @@ namespace HealthWellbeing.Controllers
             var consumivel = await _context.Consumivel.FindAsync(id);
             if (consumivel == null) return NotFound();
 
-            // Procura o melhor fornecedor (Mais barato, depois mais rápido)
             var melhorFornecedor = await _context.Fornecedor_Consumivel
                 .Where(fc => fc.ConsumivelId == id)
                 .OrderBy(fc => fc.Preco)
@@ -73,12 +72,11 @@ namespace HealthWellbeing.Controllers
 
             if (melhorFornecedor != null)
             {
-                // Calcula quanto falta para atingir o stock máximo ideal do consumível
                 int qtdAEncomendar = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
                 if (qtdAEncomendar > 0)
                 {
-                    // 1. Cria o registo na tabela Compra
+                    // 1. MODIFICADO: Cria o registo na tabela Compra, mas NÃO distribui o stock ainda
                     var novaCompra = new Compra
                     {
                         ConsumivelId = id,
@@ -88,54 +86,15 @@ namespace HealthWellbeing.Controllers
                         TempoEntrega = melhorFornecedor.TempoEntrega ?? 0
                     };
                     _context.Compra.Add(novaCompra);
-
-                    // 2. DISTRIBUIÇÃO INTELIGENTE PELAS ZONAS
-                    // Busca todas as zonas ativas para este produto
-                    var zonasDisponiveis = await _context.ZonaArmazenamento
-                        .Where(z => z.ConsumivelId == id && z.Ativa == true)
-                        .OrderBy(z => z.NomeZona) // Opcional: ordem de preenchimento
-                        .ToListAsync();
-
-                    int quantidadeParaDistribuir = qtdAEncomendar;
-                    int quantidadeAlocada = 0;
-
-                    foreach (var zona in zonasDisponiveis)
-                    {
-                        // Se já não há nada para distribuir, para o loop
-                        if (quantidadeParaDistribuir <= 0) break;
-
-                        // Calcula o espaço livre nesta gaveta/zona
-                        int espacoLivre = zona.CapacidadeMaxima - zona.QuantidadeAtual;
-
-                        if (espacoLivre > 0)
-                        {
-                            // Define quanto vamos pôr nesta zona: o que for menor entre o que falta e o espaço livre
-                            int aAdicionar = Math.Min(quantidadeParaDistribuir, espacoLivre);
-
-                            zona.QuantidadeAtual += aAdicionar;
-                            _context.Update(zona);
-
-                            // Atualiza os contadores
-                            quantidadeParaDistribuir -= aAdicionar;
-                            quantidadeAlocada += aAdicionar;
-                        }
-                    }
-
                     await _context.SaveChangesAsync();
 
-                    // 3. Sincroniza o total do Consumível
-                    await AtualizarQuantidadeAtualConsumivel(id);
+                    // 2. MODIFICADO: Sinaliza a pendência via TempData persistente
+                    // Este sinal será lido pelo ZonaArmazenamentoController para mostrar o segundo popup
+                    TempData[$"Pendente_{id}"] = true;
 
-                    // Mensagem de feedback
-                    if (quantidadeParaDistribuir > 0)
-                    {
-                        // Caso tenhamos encomendado mais do que cabe no armazém
-                        TempData["SuccessMessage"] = $"⚠️ Encomenda processada, mas {quantidadeParaDistribuir} unidades não couberam nas zonas disponíveis (Armazém Cheio). Stock físico atualizado em {quantidadeAlocada} un.";
-                    }
-                    else
-                    {
-                        TempData["SuccessMessage"] = $"✅ Stock atualizado! Encomenda de {quantidadeAlocada} unid. de {consumivel.Nome} distribuída pelas zonas.";
-                    }
+                    // 3. MODIFICADO: Redireciona com mensagem de instrução
+                    TempData["SuccessMessage"] = $"✅ Encomenda de {consumivel.Nome} solicitada com sucesso! " +
+                                                $"Por favor, vá a 'Zonas de Armazenamento' para confirmar a receção e arrumar o stock.";
                 }
             }
             else
