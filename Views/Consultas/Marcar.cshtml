@@ -1,0 +1,112 @@
+﻿@model HealthWellbeing.ViewModel.MarcarConsultaGridVM
+
+@{
+    ViewData["Title"] = "Marcar Consulta";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger">@TempData["Erro"]</div>
+}
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+
+<form method="get" asp-action="Marcar" class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Especialidade</label>
+        <select class="form-select" name="idEspecialidade" onchange="this.form.submit()">
+            <option value="">-- escolher --</option>
+            @foreach (var e in Model.Especialidades)
+            {
+                <option value="@e.Id" selected="@(Model.IdEspecialidade == e.Id)">
+                    @e.Nome
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Médico</label>
+        <select class="form-select" name="idMedico" onchange="this.form.submit()" @(Model.IdEspecialidade == null ? "disabled" : "")>
+            <option value="">-- escolher --</option>
+            @foreach (var m in Model.Medicos)
+            {
+                <option value="@m.Id" selected="@(Model.IdMedico == m.Id)">
+                    @m.Nome
+                </option>
+            }
+        </select>
+    </div>
+</form>
+
+@if (Model.IdMedico == null)
+{
+    <div class="text-muted"><em>Escolhe uma especialidade e um médico para ver a agenda.</em></div>
+}
+else if (Model.Linhas.Count == 0)
+{
+    <div class="alert alert-warning">Este médico não tem horários definidos para os próximos 15 dias úteis.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th style="min-width:120px;">Hora</th>
+                    @foreach (var d in Model.Datas)
+                    {
+                        <th style="min-width:120px;">
+                            @d.ToString("dd/MM")<br />
+                            <small>@d.DayOfWeek</small>
+                        </th>
+                    }
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.Linhas.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.Linhas[i].Label</td>
+
+                        @for (int j = 0; j < Model.Linhas[i].Cells.Count; j++)
+                        {
+                            var cell = Model.Linhas[i].Cells[j];
+
+                            <td>
+                                @if (cell.Estado == "fora")
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                                else if (cell.Estado == "ocupado")
+                                {
+                                    <span class="badge bg-danger">Ocupado</span>
+                                }
+                                else
+                                {
+                                    <form asp-action="MarcarSlot" method="post" class="m-0">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="idMedico" value="@Model.IdMedico" />
+                                        <input type="hidden" name="idEspecialidade" value="@Model.IdEspecialidade" />
+                                        <input type="hidden" name="data" value="@cell.Data.ToString("yyyy-MM-dd")" />
+                                        <input type="hidden" name="horaInicio" value="@cell.Inicio.ToString("HH:mm")" />
+                                        <input type="hidden" name="horaFim" value="@cell.Fim.ToString("HH:mm")" />
+
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            Livre
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

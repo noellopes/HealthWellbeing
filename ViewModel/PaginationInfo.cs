@@ -4,7 +4,7 @@
     {
         public const int NUMBER_PAGES_SHOW_BEFORE_AFTER = 5;
 
-        public PaginationInfo(int currentPage, int totalItems, int itemsPerPage = 10)
+        public PaginationInfo(int currentPage, int totalItems, int itemsPerPage = 6)
         {
             TotalItems = totalItems;
             ItemsPerPage = itemsPerPage;

@@ -361,6 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Data/SeedData.cs
+FodyWeavers.xsd
 /Models/NutrientComponent.cs
 /Views/FoodComponent/Delete.cshtml
 /Views/FoodComponent/Edit.cshtml

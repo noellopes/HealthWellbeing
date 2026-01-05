@@ -1,0 +1,92 @@
+﻿@model HealthWellbeing.Models.ProblemaSaude
+
+@{
+    ViewData["Title"] = "Eliminar Problema de Saúde";
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-danger text-white text-center py-3 rounded-top-4">
+            <h2 class="mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewData["Title"]</h2>
+        </div>
+
+        <div class="card-body px-5 py-4">
+            <h4 class="text-center text-secondary mb-4">Tem a certeza de que deseja eliminar este problema?</h4>
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-end fw-semibold text-secondary">Categoria:</dt>
+                <dd class="col-sm-8">@Model.ProblemaCategoria</dd>
+
+                <dt class="col-sm-4 text-end fw-semibold text-secondary">Nome:</dt>
+                <dd class="col-sm-8">@Model.ProblemaNome</dd>
+
+                <dt class="col-sm-4 text-end fw-semibold text-secondary">Zona Atingida:</dt>
+                <dd class="col-sm-8">@Model.ZonaAtingida</dd>
+
+                <dt class="col-sm-4 text-end fw-semibold text-secondary">Profissionais de Apoio:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.ProfissionalExecutante?.Any() ?? false)
+                    {
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var prof in Model.ProfissionalExecutante)
+                            {
+                                <span class="badge bg-primary">
+                                    @prof.Nome (@prof.Funcao)
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum profissional associado.</span>
+                    }
+                </dd>
+                <dt class="col-sm-4 text-end fw-semibold text-secondary">Gravidade:</dt>
+                <dd class="col-sm-8">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="progress flex-grow-1" style="height: 12px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated
+                                @(Model.Gravidade >= 8 ? "bg-danger" :
+                                                                   Model.Gravidade >= 5 ? "bg-warning" : "bg-success")"
+                                 role="progressbar"
+                                 style="width: @(Model.Gravidade * 10)%;">
+                            </div>
+                        </div>
+                        <span class="fw-bold">@Model.Gravidade/10</span>
+                    </div>
+                </dd>
+            </dl>
+        </div>
+
+        <div class="card-footer bg-light text-center py-4 rounded-bottom-4">
+            <form asp-action="Delete" class="d-inline">
+                <input type="hidden" asp-for="ProblemaSaudeId" />
+                <button type="submit" class="btn btn-danger px-4 me-2">
+                    <i class="bi bi-trash-fill"></i> Eliminar
+                </button>
+            </form>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left-circle"></i> Cancelar
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+    dt, dd {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+
+    h4 {
+        font-weight: 500;
+    }
+</style>

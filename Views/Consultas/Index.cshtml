@@ -32,6 +32,31 @@
     </div>
 }
 
+
+
+
+<div class="collapse mt-2 mb-2" id="postSearch">
+    <div class="card card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label for="searchTerm" class="form-label">Pesquisa</label>
+                <input id="searchTerm" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Pesquise uma data" type="search" />
+            </div>
+            
+
+            <div class="col-12 mt-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i> Procurar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 @if (!Model.Items.Any())
 {
     <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
@@ -49,11 +74,21 @@ else
 {
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4">Lista de Consultas</h2>
-        <div class="d-flex justify-content-end">
-           
-            <a asp-action="Create" class="btn btn-success">
-                <i class="bi bi-plus-circle me-1"></i> Marcar Consulta
-            </a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-primary"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#postSearch"
+                        aria-expanded="false"
+                        aria-controls="postSearch">
+                    <i class="bi bi-search me-1"></i> Pesquisar
+                </button>
+
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Marcar Consulta
+                </a>
+            </div>
         </div>
     </div>
 
@@ -64,8 +99,8 @@ else
                 <tr>
                     <th>Data Marcação</th>
                     <th>Data Consulta</th>
-                    <th>Hora Início</th>
-                    <th>Hora Fim</th>
+                    <th>Médico</th>
+                    <th>Especialidade</th>
                     <th>Estado</th>
                     <th class="text-end">Ações</th>
                 </tr>
@@ -75,8 +110,10 @@ else
                 @foreach (var consulta in Model.Items)
                 {
                     <tr class="text-center">
-                        <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy HH:mm")</td>
-                        <td>@consulta.DataConsulta.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy")</td>
+                        <td>@consulta.DataConsulta.ToString("dd/MM/yyyy")</td>
+                        <td>@consulta.Doctor?.Nome</td>
+                        <td>@consulta.Speciality?.Nome</td>
                         
                     <td>
                         <span class="@Badge(consulta.Estado) px-3 py-2 rounded-pill">
@@ -89,10 +126,14 @@ else
                         </a>
                             <a asp-action="Edit" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-warning text-white">
                             <i class="bi bi-pencil-square"></i> Editar
-                        </a>
-                            <a asp-action="Delete" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </a>
+							</a>
+                                <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Cancelar esta consulta? O horário ficará disponível.');">
+                                        <i class="bi bi-x-circle"></i> Cancelar
+                                    </button>
+                                </form>
                     </td>
                 </tr>
                         }
