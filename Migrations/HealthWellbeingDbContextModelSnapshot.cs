@@ -329,6 +329,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("IdUtenteSaude")
                         .HasColumnType("int");
 
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");
 

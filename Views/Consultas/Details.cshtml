@@ -76,6 +76,24 @@
             </dl>
 
             <hr class="my-4" />
+            <hr />
+
+            <h4 class="mt-3">Observações</h4>
+
+            @if (string.IsNullOrWhiteSpace(Model.Observacoes))
+            {
+                <p class="text-muted">Sem observações.</p>
+            }
+            else
+            {
+                <div class="border rounded p-3 bg-light" style="white-space: pre-wrap;">
+                    @Model.Observacoes
+                </div>
+            }
+
+            <a asp-action="Observacoes" asp-route-id="@Model.IdConsulta" class="btn btn-secondary mt-3">
+                <i class="bi bi-journal-text"></i> Editar Observações
+            </a>
 
             <div class="d-flex justify-content-between">
                 <a asp-action="Index" class="btn btn-outline-secondary px-4">

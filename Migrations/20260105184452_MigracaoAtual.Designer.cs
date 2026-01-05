@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260104230107_MigracaoInicial")]
-    partial class MigracaoInicial
+    [Migration("20260105184452_MigracaoAtual")]
+    partial class MigracaoAtual
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -331,6 +331,10 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<int>("IdUtenteSaude")
                         .HasColumnType("int");
+
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");

@@ -39,5 +39,9 @@ namespace HealthWellbeing.Models
         [ForeignKey(nameof(UtenteSaude))]
         public int IdUtenteSaude { get; set; }
         public UtenteSaude? UtenteSaude { get; set; }
+
+        [Display(Name = "Observações")]
+        [MaxLength(4000, ErrorMessage = "As observações não podem ter mais de 4000 caracteres.")]
+        public string? Observacoes { get; set; }
     }
 }

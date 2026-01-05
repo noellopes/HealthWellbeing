@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoInicial : Migration
+    public partial class MigracaoAtual : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -623,7 +623,8 @@ namespace HealthWellbeing.Migrations
                     SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
                     IdEspecialidade = table.Column<int>(type: "int", nullable: false),
-                    IdUtenteSaude = table.Column<int>(type: "int", nullable: false)
+                    IdUtenteSaude = table.Column<int>(type: "int", nullable: false),
+                    Observacoes = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true)
                 },
                 constraints: table =>
                 {

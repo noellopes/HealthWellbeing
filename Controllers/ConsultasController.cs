@@ -21,6 +21,87 @@ namespace HealthWellbeing.Controllers
         {
             _context = context;
         }
+        [HttpGet]
+        public async Task<IActionResult> Observacoes(int id)
+        {
+            var consulta = await _context.Consulta
+                .FirstOrDefaultAsync(c => c.IdConsulta == id);
+
+            if (consulta == null)
+                return NotFound();
+
+            var vm = new ConsultaObservacoesVM
+            {
+                IdConsulta = consulta.IdConsulta,
+                Observacoes = consulta.Observacoes
+            };
+
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Observacoes(ConsultaObservacoesVM vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            var consulta = await _context.Consulta
+                .FirstOrDefaultAsync(c => c.IdConsulta == vm.IdConsulta);
+
+            if (consulta == null)
+                return NotFound();
+
+            consulta.Observacoes = vm.Observacoes;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Observações guardadas com sucesso.";
+
+            return RedirectToAction("Details", new { id = vm.IdConsulta });
+        }
+
+        [Authorize(Roles = "DiretorClinico")]
+        [HttpGet]
+        public async Task<IActionResult> Relatorio()
+        {
+            var hoje = DateTime.Today;
+
+            var totalMarcadas = await _context.Consulta.CountAsync();
+
+            var totalCanceladas = await _context.Consulta
+                .CountAsync(c => c.DataCancelamento.HasValue);
+
+            var totalNaoCanceladas = await _context.Consulta
+                .CountAsync(c => !c.DataCancelamento.HasValue);
+
+            // Realizadas: já passaram, não canceladas e têm observações
+            var totalRealizadas = await _context.Consulta
+                .CountAsync(c =>
+                    !c.DataCancelamento.HasValue &&
+                    c.DataConsulta.Date < hoje &&
+                    !string.IsNullOrWhiteSpace(c.Observacoes)
+                );
+
+            // Faltadas: já passaram, não canceladas e NÃO têm observações
+            var totalFaltadas = await _context.Consulta
+                .CountAsync(c =>
+                    !c.DataCancelamento.HasValue &&
+                    c.DataConsulta.Date < hoje &&
+                    string.IsNullOrWhiteSpace(c.Observacoes)
+                );
+
+            var vm = new RelatorioConsultasVM
+            {
+                TotalMarcadas = totalMarcadas,
+                TotalCanceladas = totalCanceladas,
+                TotalNaoCanceladas = totalNaoCanceladas,
+                TotalRealizadas = totalRealizadas,
+                TotalFaltadas = totalFaltadas
+            };
+
+            return View(vm);
+        }
 
         // -------------------------------
         // LISTA / HISTÓRICO (mantido)

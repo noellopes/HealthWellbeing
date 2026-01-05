@@ -123,10 +123,10 @@ else
                     <td class="text-end">
                             <a asp-action="Details" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-primary" >
                                 <i class="bi bi-info-circle"></i> Detalhes
-                        </a>
-                            <a asp-action="Edit" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-warning text-white">
-                            <i class="bi bi-pencil-square"></i> Editar
-							</a>
+                            </a>
+                            <a asp-action="Observacoes" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-secondary">
+                                <i class="bi bi-journal-text"></i> Observações
+                            </a>
                                 <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-sm btn-danger"
