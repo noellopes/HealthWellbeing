@@ -8,8 +8,8 @@ namespace HealthWellbeing.Data
     {
         public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
-        public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
-            : base(options) { }
+        {
+        }
 
         // -------------------------
         // PRINCIPAIS
@@ -20,6 +20,7 @@ namespace HealthWellbeing.Data
         public DbSet<Consulta> Consulta { get; set; } = default!;
         public DbSet<Doctor> Doctor { get; set; } = default!;
         public DbSet<Specialities> Specialities { get; set; } = default!;
+        public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
 
         // -------------------------
         // NUTRIÇÃO / PLANOS
@@ -34,7 +35,6 @@ namespace HealthWellbeing.Data
         public DbSet<Portion> Portion { get; set; } = default!;
         public DbSet<NutritionalComponent> NutritionalComponent { get; set; } = default!;
         public DbSet<FoodNutritionalComponent> FoodNutritionalComponent { get; set; } = default!;
-
         public DbSet<FoodPlan> FoodPlan { get; set; } = default!;
         public DbSet<FoodPlanDay> FoodPlanDay { get; set; } = default!;
         public DbSet<FoodIntake> FoodIntake { get; set; } = default!;
@@ -46,33 +46,27 @@ namespace HealthWellbeing.Data
         public DbSet<ClientAlergy> ClientAlergy { get; set; } = default!;
 
         // -------------------------
-        // RECEITAS (se usares mesmo)
+        // EVENTOS / GAMIFICAÇÃO
+        // -------------------------
+        public DbSet<EventType> EventType { get; set; } = default!;
+        public DbSet<Level> Level { get; set; } = default!;
+        public DbSet<Event> Event { get; set; } = default!;
+        public DbSet<Activity_> Activity { get; set; } = default!;
+
+        // -------------------------
+        // TREINO
+        // -------------------------
+        public DbSet<TrainingType> TrainingType { get; set; } = default!;
+        public DbSet<Trainer> Trainer { get; set; } = default!;
+        public DbSet<Training> Training { get; set; } = default!;
+
+        // -------------------------
+        // OUTROS (se existirem mesmo no teu projeto)
         // -------------------------
         public DbSet<Receita> Receita { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<Alergia> Alergia { get; set; } = default!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        }
-
-        public DbSet<EventType> EventType { get; set; } = default!;
-        public DbSet<Level> Level { get; set; } = default!;
-        public DbSet<Event> Event { get; set; } = default!;
-        public DbSet<Activity_> Activity { get; set; } = default!;
-        public DbSet<Alergia> Alergia { get; set; } = default!;
-        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<Receita> Receita { get; set; } = default!;
-        public DbSet<UtenteSaude> UtenteSaude { get; set; } = default!;
-        public DbSet<Consulta> Consulta { get; set; } = default!;
-        public DbSet<Doctor> Doctor { get; set; } = default!;
-        public DbSet<Specialities> Specialities { get; set; } = default!;
-        public DbSet<Member> Member { get; set; } = default!;
-        public DbSet<Client> Client { get; set; } = default!;
-        public DbSet<TrainingType> TrainingType { get; set; } = default!;
-        public DbSet<Plan> Plan { get; set; } = default!;
-        public DbSet<Trainer> Trainer { get; set; } = default!;
-        public DbSet<Training> Training { get; set; } = default!;
         public DbSet<Exercicio> Exercicio { get; set; } = default!;
         public DbSet<TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<Beneficio> Beneficio { get; set; } = default!;
@@ -81,11 +75,14 @@ namespace HealthWellbeing.Data
         public DbSet<GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
-        public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // -------------------------
+            // RELAÇÕES (FKs) IMPORTANTES
+            // -------------------------
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
@@ -104,11 +101,23 @@ namespace HealthWellbeing.Data
                 .WithMany(d => d.Consultas)
                 .HasForeignKey(c => c.IdMedico)
                 .OnDelete(DeleteBehavior.Restrict);
-            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Consulta>()
+                .HasOne(c => c.Speciality)
+                .WithMany(s => s.Consultas)
+                .HasForeignKey(c => c.IdEspecialidade)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AgendaMedica>()
+                .HasOne(a => a.Medico)
+                .WithMany(d => d.AgendaMedica)
+                .HasForeignKey(a => a.IdMedico)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // -------------------------
             // ÍNDICES ÚNICOS
             // -------------------------
+
             modelBuilder.Entity<FoodPlanDay>()
                 .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
                 .IsUnique();
@@ -123,21 +132,21 @@ namespace HealthWellbeing.Data
 
             // -------------------------
             // RELAÇÃO 1-para-1: Client <-> UtenteSaude
+            // (não pode haver mais utentes do que clientes)
             // -------------------------
             modelBuilder.Entity<UtenteSaude>()
                 .HasOne(u => u.Client)
                 .WithOne(c => c.UtenteSaude)
                 .HasForeignKey<UtenteSaude>(u => u.ClientId)
-                .OnDelete(DeleteBehavior.Restrict); // evita cascatas em cadeia
-
-            modelBuilder.Entity<Consulta>()
-                .HasOne(c => c.Speciality)
-                .WithMany(s => s.Consultas)
-                .HasForeignKey(c => c.IdEspecialidade)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Reforço: 1 utente por client (garante unicidade do ClientId em UtenteSaude)
+            modelBuilder.Entity<UtenteSaude>()
+                .HasIndex(u => u.ClientId)
+                .IsUnique();
+
             // -------------------------
-            // DECIMAIS DA RECEITA (remove warnings)
-            // Ajusta as propriedades ao teu model Receita real!
+            // DECIMAIS DA RECEITA (se as props existirem mesmo)
             // -------------------------
             modelBuilder.Entity<Receita>(entity =>
             {
@@ -147,21 +156,14 @@ namespace HealthWellbeing.Data
                 entity.Property(e => e.Proteinas).HasPrecision(10, 2);
             });
 
-            modelBuilder.Entity<AgendaMedica>()
-                .HasOne(a => a.Medico)
-                .WithMany(d => d.AgendaMedica)
-                .HasForeignKey(a => a.IdMedico)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
             // -------------------------
-            // Regra global: evitar Cascade (MAS sem contrariar configurações explícitas)
+            // Regra global: evitar Cascade (sem contrariar configurações explícitas)
+            // Só troca Cascade -> Restrict
             // -------------------------
             foreach (var fk in modelBuilder.Model.GetEntityTypes()
-                     .SelectMany(e => e.GetForeignKeys())
-                     .Where(fk => !fk.IsOwnership))
+                         .SelectMany(e => e.GetForeignKeys())
+                         .Where(fk => !fk.IsOwnership))
             {
-                // Se já estiver definido explicitamente, respeita.
-                // Só mudamos CASCADE para RESTRICT.
                 if (fk.DeleteBehavior == DeleteBehavior.Cascade)
                     fk.DeleteBehavior = DeleteBehavior.Restrict;
             }
