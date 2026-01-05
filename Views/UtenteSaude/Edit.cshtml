@@ -1,9 +1,8 @@
-﻿@using HealthWellbeing.Models
-@model UtenteSaude
+﻿@using HealthWellbeing.ViewModel
+@model UtenteSaudeFormVM
 
 @{
     ViewData["Title"] = "Editar Utente";
-    ViewData["Mode"] = "Edit"; // ✅ antes do partial
 }
 
 <style>
@@ -88,7 +87,7 @@
     }
 
     .form-card {
-        background: #ffffff;
+        background: #fff;
         border-radius: 12px;
         padding: 16px;
         border: 1px solid rgba(97,166,199,.45);
@@ -106,13 +105,37 @@
         color: #2b546c;
         font-weight: 600;
     }
+
+    /* Mini-cards das secções do formulário */
+    .section-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .section-head {
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 1.05rem;
+    }
+
+    .section-subtitle {
+        color: #2b546c;
+        font-size: .9rem;
+        opacity: .9;
+    }
 </style>
 
 <div class="utente-wrapper">
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- TOPO: Logo + Voltar -->
+            <!-- Header -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
@@ -122,38 +145,35 @@
                     </div>
 
                     <div class="utente-actions">
-                        <a asp-action="Index" class="utente-btn">
+                        <a asp-controller="UtenteSaude" asp-action="Index" class="utente-btn">
                             <i class="bi bi-arrow-left"></i> Voltar
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- CORPO -->
+            <!-- Body -->
             <div class="utente-body">
                 <div class="form-card">
-                    <h2 class="form-title">
-                        <i class="bi bi-pencil-square me-2"></i>Editar Utente
-                    </h2>
-                    <p class="form-sub">Atualiza os dados do utente e guarda as alterações.</p>
+                    <h2 class="form-title"><i class="bi bi-pencil-square me-2"></i>Editar Utente</h2>
+                    <p class="form-sub">Atualiza os dados e guarda as alterações.</p>
 
                     <form asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" method="post">
-
                         @Html.AntiForgeryToken()
 
+                        <input type="hidden" asp-for="IsEdit" />
                         <input type="hidden" asp-for="UtenteSaudeId" />
-                        <!--    <input type="hidden" asp-for="ClientId" /> teste -->
+                        <input type="hidden" asp-for="ClientId" />
 
                         <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
-                        @{ViewData["Mode"] = "Edit";                        }
-                        @Html.Partial("_FormUtenteSaude", Model)
+                        <partial name="_FormUtenteSaudeForm" model="Model" />
 
                         <div class="d-flex gap-2 flex-wrap mt-3">
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-check-circle me-1"></i> Guardar
                             </button>
-                            <a asp-action="Index" class="btn btn-secondary">
+                            <a asp-controller="UtenteSaude" asp-action="Index" class="btn btn-secondary">
                                 <i class="bi bi-x-circle me-1"></i> Cancelar
                             </a>
                         </div>

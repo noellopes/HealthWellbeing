@@ -1,5 +1,5 @@
-﻿@using HealthWellbeing.Models
-@model UtenteSaude
+﻿@using HealthWellbeing.ViewModel
+@model UtenteSaudeFormVM
 
 @{
     ViewData["Title"] = "Criar Utente";
@@ -87,7 +87,7 @@
     }
 
     .form-card {
-        background: #ffffff;
+        background: #fff;
         border-radius: 12px;
         padding: 16px;
         border: 1px solid rgba(97,166,199,.45);
@@ -105,13 +105,36 @@
         color: #2b546c;
         font-weight: 600;
     }
+
+    .section-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .section-head {
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 1.05rem;
+    }
+
+    .section-subtitle {
+        color: #2b546c;
+        font-size: .9rem;
+        opacity: .9;
+    }
 </style>
 
 <div class="utente-wrapper">
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- TOPO: Logo + Voltar -->
+            <!-- Header -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
@@ -121,31 +144,34 @@
                     </div>
 
                     <div class="utente-actions">
-                        <a asp-action="Index" class="utente-btn">
+                        <a asp-controller="UtenteSaude" asp-action="Index" class="utente-btn">
                             <i class="bi bi-arrow-left"></i> Voltar
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- CORPO -->
+            <!-- Body -->
             <div class="utente-body">
                 <div class="form-card">
-                    <h2 class="form-title">
-                        <i class="bi bi-plus-circle me-2"></i>Criar Utente
-                    </h2>
-                    <p class="form-sub">Preenche os dados do novo utente e guarda.</p>
+                    <h2 class="form-title"><i class="bi bi-plus-circle me-2"></i>Criar Utente</h2>
+                    <p class="form-sub">Podes selecionar um cliente existente pelo nome, ou criar um novo.</p>
 
                     <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-                        @{ ViewData["Mode"] = "Create";}
-                        @Html.Partial("_FormUtenteSaude", Model)
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="IsEdit" value="false" />
+                        <input type="hidden" asp-for="ClientId" />
+
+                        <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                        <partial name="_FormUtenteSaudeForm" model="Model" />
 
                         <div class="d-flex gap-2 flex-wrap mt-3">
                             <button type="submit" class="btn btn-success">
                                 <i class="bi bi-check-circle me-1"></i> Guardar
                             </button>
-                            <a asp-action="Index" class="btn btn-secondary">
+                            <a asp-controller="UtenteSaude" asp-action="Index" class="btn btn-secondary">
                                 <i class="bi bi-x-circle me-1"></i> Cancelar
                             </a>
                         </div>
@@ -162,62 +188,104 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Vem do controller (ViewBag.ClientsJson)
         const clients = @Html.Raw(ViewBag.ClientsJson ?? "[]");
 
-        const byId = (id) => clients.find(c => String(c.clientId) === String(id));
+        const nameId = "@Html.IdFor(m => m.Name)";
+        const clientIdId = "@Html.IdFor(m => m.ClientId)";
+        const emailId = "@Html.IdFor(m => m.Email)";
+        const phoneId = "@Html.IdFor(m => m.Phone)";
+        const addressId = "@Html.IdFor(m => m.Address)";
+        const birthId = "@Html.IdFor(m => m.BirthDate)";
+        const genderId = "@Html.IdFor(m => m.Gender)";
 
-        const setVal = (id, val) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (el.tagName === "TEXTAREA") el.value = val ?? "";
-            else el.value = val ?? "";
-        };
+        const nameInput = document.getElementById(nameId);
+        const clientIdInput = document.getElementById(clientIdId);
+        const emailInput = document.getElementById(emailId);
+        const phoneInput = document.getElementById(phoneId);
+        const addressInput = document.getElementById(addressId);
+        const birthInput = document.getElementById(birthId);
+        const genderInput = document.getElementById(genderId);
 
-        const calcAge = (birthStr) => {
-            if (!birthStr) return "";
-            const d = new Date(birthStr);
-            if (isNaN(d.getTime())) return "";
-            const today = new Date();
-            let age = today.getFullYear() - d.getFullYear();
-            const m = today.getMonth() - d.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
-            return age < 0 ? 0 : age;
-        };
+        const box = document.getElementById("clientSuggestions");
+        const clientFields = [emailInput, phoneInput, addressInput, genderInput];
 
-        function fillClient(id) {
-            const c = byId(id);
-            if (!c) {
-                setVal("NomeCompletoRO", "");
-                setVal("EmailRO", "");
-                setVal("TelefoneRO", "");
-                setVal("MoradaRO", "");
-                setVal("DataNascimentoRO", "");
-                setVal("IdadeRO", "");
-                return;
-            }
-
-            setVal("NomeCompletoRO", c.name ?? "");
-            setVal("EmailRO", c.email ?? "");
-            setVal("TelefoneRO", c.phone ?? "");
-            setVal("MoradaRO", c.address ?? "");
-
-            // BirthDate pode vir como "2026-01-05T00:00:00"
-            const b = (c.birthDate ?? "");
-            const dateOnly = b ? String(b).substring(0, 10) : "";
-            setVal("DataNascimentoRO", dateOnly);
-            setVal("IdadeRO", calcAge(b));
+        function lockClientFields(locked) {
+            clientFields.forEach(i => i.readOnly = locked);
+            if (birthInput) birthInput.disabled = locked;
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const sel = document.getElementById("clientSelect");
-            if (!sel) return;
+        function clearClientSelectionButKeepTypedName() {
+            clientIdInput.value = "";
+            lockClientFields(false);
+        }
 
-            sel.addEventListener("change", (e) => fillClient(e.target.value));
+        function fillClientFields(c) {
+            clientIdInput.value = c.clientId;
+            emailInput.value = c.email ?? "";
+            phoneInput.value = c.phone ?? "";
+            addressInput.value = c.address ?? "";
+            birthInput.value = c.birthDate ?? "";
+            genderInput.value = c.gender ?? "";
+            lockClientFields(true);
+        }
 
-            // caso volte do POST com ModelState inválido e já tenha ClientId
-            if (sel.value) fillClient(sel.value);
+        function hideBox() {
+            box.style.display = "none";
+            box.innerHTML = "";
+        }
+
+        function showSuggestions(term) {
+            const t = (term || "").trim().toLowerCase();
+            box.innerHTML = "";
+            if (t.length < 1) { hideBox(); return; }
+
+            const matches = clients
+                .filter(c => (c.name || "").toLowerCase().includes(t))
+                .slice(0, 8);
+
+            if (matches.length === 0) { hideBox(); return; }
+
+            matches.forEach(c => {
+                const a = document.createElement("button");
+                a.type = "button";
+                a.className = "list-group-item list-group-item-action";
+                a.innerHTML = `<strong>${c.name}</strong><br/><small class="text-muted">${c.email ?? ""}</small>`;
+                a.onclick = () => {
+                    nameInput.value = c.name;
+                    fillClientFields(c);
+                    hideBox();
+                };
+                box.appendChild(a);
+            });
+
+            box.style.display = "block";
+        }
+
+        nameInput.addEventListener("input", () => {
+            showSuggestions(nameInput.value || "");
+
+            if (parseInt(clientIdInput.value || "0") > 0) {
+                clearClientSelectionButKeepTypedName();
+                emailInput.value = "";
+                phoneInput.value = "";
+                addressInput.value = "";
+                if (birthInput) birthInput.value = "";
+                genderInput.value = "";
+            }
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!box.contains(e.target) && e.target !== nameInput) hideBox();
+        });
+
+        window.addEventListener("load", () => {
+            const cid = parseInt(clientIdInput.value || "0");
+            if (cid > 0) {
+                const c = clients.find(x => x.clientId === cid);
+                if (c) fillClientFields(c);
+            } else {
+                lockClientFields(false);
+            }
         });
     </script>
 }
-

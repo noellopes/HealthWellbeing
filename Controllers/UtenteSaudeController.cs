@@ -3,7 +3,6 @@ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
@@ -18,98 +17,30 @@ namespace HealthWellbeing.Controllers
         }
 
         // ================================
-        // Helper: dropdown + JSON para autopreencher no Create
+        // Helper: JSON de clients disponíveis (para autocomplete no Create)
         // ================================
-        private void LoadClientsForDropdown(int? selectedClientId = null)
+        private void LoadClientsJsonAvailable()
         {
             var available = _db.Client.AsNoTracking()
-                .Where(c => c.UtenteSaude == null) // se a navigation existir
-                .OrderBy(c => c.Name);
-
-            ViewBag.ClientId = new SelectList(available, "ClientId", "Name", selectedClientId);
-
-            var clients = available.Select(c => new
-            {
-                clientId = c.ClientId,
-                name = c.Name,
-                email = c.Email,
-                phone = c.Phone,
-                address = c.Address,
-                birthDate = c.BirthDate
-            }).ToList();
-
-            ViewBag.ClientsJson = JsonSerializer.Serialize(clients);
-        }
-
-
-        // ================================
-        // TESTE UI (UtenteView)
-        // ================================
-        [HttpGet]
-        public IActionResult UtenteView()
-        {
-            var utenteFixe = new UtenteSaude
-            {
-                UtenteSaudeId = 1,
-                ClientId = 1,
-                Nif = "245123987",
-                Niss = "12345678901",
-                Nus = "123456789",
-                Client = new Client
+                .Where(c => c.UtenteSaude == null)
+                .OrderBy(c => c.Name)
+                .Select(c => new
                 {
-                    ClientId = 1,
-                    Name = "Maria Correia",
-                    Email = "maria.correia@email.pt",
-                    Phone = "912345678",
-                    Address = "Rua Exemplo, 10, 3500-000 Viseu",
-                    BirthDate = new DateTime(1999, 5, 12),
-                    Gender = "Female"
-                }
-            };
+                    clientId = c.ClientId,
+                    name = c.Name,
+                    email = c.Email,
+                    phone = c.Phone,
+                    address = c.Address,
+                    birthDate = c.BirthDate.HasValue ? c.BirthDate.Value.ToString("yyyy-MM-dd") : "",
+                    gender = c.Gender
+                })
+                .ToList();
 
-            return View(utenteFixe);
+            ViewBag.ClientsJson = JsonSerializer.Serialize(available);
         }
 
         // ================================
-        // RECEPCIONISTA VIEW (Paginação + Pesquisa)
-        // ================================
-        [HttpGet]
-        public async Task<IActionResult> RecepcionistaView(int page = 1, string searchNome = "", string searchNif = "")
-        {
-            if (page < 1) page = 1;
-
-            var utentesQuery = _db.UtenteSaude
-                .Include(u => u.Client)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(searchNome))
-                utentesQuery = utentesQuery.Where(u => u.Client != null && u.Client.Name.Contains(searchNome));
-
-            if (!string.IsNullOrWhiteSpace(searchNif))
-                utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
-
-            ViewBag.SearchNome = searchNome;
-            ViewBag.SearchNif = searchNif;
-
-            int numberUtentes = await utentesQuery.CountAsync();
-            if (numberUtentes == 0) page = 1;
-
-            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
-
-            utentesInfo.Items = await utentesQuery
-                .AsNoTracking()
-                .OrderBy(u => u.Client!.Name)
-                .Skip(utentesInfo.ItemsToSkip)
-                .Take(utentesInfo.ItemsPerPage)
-                .ToListAsync();
-
-            ViewBag.NomeRecepcionista = "Recepcionista";
-
-            return View(utentesInfo);
-        }
-
-        // ================================
-        // LISTAR (Index)
+        // LISTAR (Index) - igual ao teu
         // ================================
         public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "")
         {
@@ -144,7 +75,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // ================================
-        // DETALHES
+        // DETALHES - igual ao teu
         // ================================
         public async Task<IActionResult> Details(int id)
         {
@@ -158,61 +89,124 @@ namespace HealthWellbeing.Controllers
         }
 
         // ================================
-        // CREATE (GET)
+        // CREATE (GET) - com autocomplete
         // ================================
         [HttpGet]
         public IActionResult Create()
         {
-            LoadClientsForDropdown();
-            return View(new UtenteSaude());
+            LoadClientsJsonAvailable();
+
+            var vm = new UtenteSaudeFormVM
+            {
+                IsEdit = false
+            };
+
+            return View(vm);
         }
 
         // ================================
         // CREATE (POST)
+        // - Se ClientId vem preenchido => cria só UtenteSaude e associa a cliente existente
+        // - Se ClientId vem vazio => cria Client + UtenteSaude associados
         // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId,Nif,Niss,Nus")] UtenteSaude u)
+        public async Task<IActionResult> Create(UtenteSaudeFormVM vm)
         {
-            // 1) Validação: cliente existe (sem carregar navigation para o EF)
-            bool clientExists = await _db.Client.AnyAsync(c => c.ClientId == u.ClientId);
-            if (!clientExists)
-                ModelState.AddModelError(nameof(UtenteSaude.ClientId), "Selecione um cliente válido.");
+            vm.IsEdit = false;
 
-            // 2) Regra 1-1 (Cliente só pode ter 1 UtenteSaude)
-            if (await _db.UtenteSaude.AnyAsync(x => x.ClientId == u.ClientId))
-                ModelState.AddModelError(nameof(UtenteSaude.ClientId), "Este cliente já tem um Utente de Saúde associado.");
+            // Unicidades do Utente
+            if (!string.IsNullOrWhiteSpace(vm.Nif) && await _db.UtenteSaude.AnyAsync(x => x.Nif == vm.Nif))
+                ModelState.AddModelError(nameof(vm.Nif), "Já existe um utente com este NIF.");
 
-            // 3) Unicidades
-            if (!string.IsNullOrWhiteSpace(u.Nif) && await _db.UtenteSaude.AnyAsync(x => x.Nif == u.Nif))
-                ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
+            if (!string.IsNullOrWhiteSpace(vm.Nus) && await _db.UtenteSaude.AnyAsync(x => x.Nus == vm.Nus))
+                ModelState.AddModelError(nameof(vm.Nus), "Já existe um utente com este NUS.");
 
-            if (!string.IsNullOrWhiteSpace(u.Nus) && await _db.UtenteSaude.AnyAsync(x => x.Nus == u.Nus))
-                ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
+            if (!string.IsNullOrWhiteSpace(vm.Niss) && await _db.UtenteSaude.AnyAsync(x => x.Niss == vm.Niss))
+                ModelState.AddModelError(nameof(vm.Niss), "Já existe um utente com este NISS.");
 
-            if (!string.IsNullOrWhiteSpace(u.Niss) && await _db.UtenteSaude.AnyAsync(x => x.Niss == u.Niss))
-                ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
-
-            // 4) Se falhar -> aí sim carregamos o Client (só para mostrar os campos read-only)
-            if (!ModelState.IsValid)
+            // ===============================
+            // CASO A) escolheu cliente existente
+            // ===============================
+            if (vm.ClientId.HasValue && vm.ClientId.Value > 0)
             {
-                u.Client = await _db.Client.AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == u.ClientId);
-                LoadClientsForDropdown(u.ClientId);
-                return View(u);
+                bool clientExists = await _db.Client.AnyAsync(c => c.ClientId == vm.ClientId.Value);
+                if (!clientExists)
+                    ModelState.AddModelError(nameof(vm.ClientId), "Selecione um cliente válido (da lista).");
+
+                if (await _db.UtenteSaude.AnyAsync(x => x.ClientId == vm.ClientId.Value))
+                    ModelState.AddModelError(nameof(vm.ClientId), "Este cliente já tem um Utente de Saúde associado.");
+
+                if (!ModelState.IsValid)
+                {
+                    // repõe dados do cliente (para não depender do JS no postback)
+                    var c = await _db.Client.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == vm.ClientId.Value);
+                    if (c != null)
+                    {
+                        vm.Name = c.Name;
+                        vm.Email = c.Email;
+                        vm.Phone = c.Phone;
+                        vm.Address = c.Address;
+                        vm.BirthDate = c.BirthDate;
+                        vm.Gender = c.Gender;
+                    }
+
+                    LoadClientsJsonAvailable();
+                    return View(vm);
+                }
+
+                var u = new UtenteSaude
+                {
+                    ClientId = vm.ClientId.Value,
+                    Nif = vm.Nif,
+                    Niss = vm.Niss,
+                    Nus = vm.Nus,
+                    Client = null
+                };
+
+                _db.UtenteSaude.Add(u);
+                await _db.SaveChangesAsync();
+
+                TempData["Msg"] = "Utente criado e associado a um cliente existente.";
+                return RedirectToAction(nameof(Details), new { id = u.UtenteSaudeId });
             }
 
-            // 5) MUITO IMPORTANTE: não levar navigation para o Add
-            u.Client = null;
+            // ===============================
+            // CASO B) não escolheu cliente => criar Client + Utente
+            // ===============================
+            if (!ModelState.IsValid)
+            {
+                LoadClientsJsonAvailable();
+                return View(vm);
+            }
 
-            _db.UtenteSaude.Add(u);
+            var newClient = new Client
+            {
+                Name = vm.Name!,
+                Email = vm.Email!,
+                Phone = vm.Phone!,
+                Address = vm.Address ?? "",
+                BirthDate = vm.BirthDate,
+                Gender = vm.Gender ?? ""
+            };
+
+            var newUtente = new UtenteSaude
+            {
+                Client = newClient,
+                Nif = vm.Nif,
+                Niss = vm.Niss,
+                Nus = vm.Nus
+            };
+
+            _db.UtenteSaude.Add(newUtente);
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = "Utente criado com sucesso.";
-            return RedirectToAction(nameof(Details), new { id = u.UtenteSaudeId });
+            TempData["Msg"] = "Cliente e utente criados com sucesso.";
+            return RedirectToAction(nameof(Details), new { id = newUtente.UtenteSaudeId });
         }
 
         // ================================
-        // EDIT (GET)  -> Cliente read-only
+        // EDIT (GET) - devolve VM para editar Client + Utente
         // ================================
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -222,55 +216,84 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
 
             if (u == null) return NotFound();
+            if (u.Client == null) return NotFound();
 
-            // Não carregamos dropdown/JSON porque no Edit o cliente é read-only
-            return View(u);
+            var vm = new UtenteSaudeFormVM
+            {
+                IsEdit = true,
+                UtenteSaudeId = u.UtenteSaudeId,
+                ClientId = u.ClientId,
+
+                // Client
+                Name = u.Client.Name,
+                Email = u.Client.Email,
+                Phone = u.Client.Phone,
+                Address = u.Client.Address,
+                BirthDate = u.Client.BirthDate,
+                Gender = u.Client.Gender,
+
+                // Utente
+                Nif = u.Nif,
+                Niss = u.Niss,
+                Nus = u.Nus
+            };
+
+            return View(vm);
         }
 
         // ================================
-        // EDIT (POST) -> NÃO ACEITA ClientId (proteção)
+        // EDIT (POST) - atualiza Client + Utente
         // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtenteSaudeId,ClientId,Nif,Niss,Nus")] UtenteSaude u)
+        public async Task<IActionResult> Edit(int id, UtenteSaudeFormVM vm)
         {
-            if (id != u.UtenteSaudeId) return NotFound();
+            vm.IsEdit = true;
+
+            if (id != vm.UtenteSaudeId) return NotFound();
 
             var existing = await _db.UtenteSaude
                 .Include(x => x.Client)
                 .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
 
             if (existing == null) return NotFound();
+            if (existing.Client == null) return NotFound();
 
-            // Unicidade (ignora o próprio registo)
-            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nif == u.Nif))
-                ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
+            // proteção: não permitir trocar o ClientId
+            if (!vm.ClientId.HasValue || vm.ClientId.Value != existing.ClientId)
+                ModelState.AddModelError(nameof(vm.ClientId), "Não é permitido alterar o cliente associado.");
 
-            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nus == u.Nus))
-                ModelState.AddModelError(nameof(UtenteSaude.Nus), "Já existe um utente com este NUS.");
+            // unicidade (ignora o próprio)
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nif == vm.Nif))
+                ModelState.AddModelError(nameof(vm.Nif), "Já existe um utente com este NIF.");
 
-            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Niss == u.Niss))
-                ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nus == vm.Nus))
+                ModelState.AddModelError(nameof(vm.Nus), "Já existe um utente com este NUS.");
+
+            if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Niss == vm.Niss))
+                ModelState.AddModelError(nameof(vm.Niss), "Já existe um utente com este NISS.");
 
             if (!ModelState.IsValid)
-            {
-                // para manter valores no ecrã
-                existing.Nif = u.Nif;
-                existing.Niss = u.Niss;
-                existing.Nus = u.Nus;
-                return View(existing);
-            }
+                return View(vm);
 
-            existing.Nif = u.Nif;
-            existing.Niss = u.Niss;
-            existing.Nus = u.Nus;
+            // Utente
+            existing.Nif = vm.Nif;
+            existing.Niss = vm.Niss;
+            existing.Nus = vm.Nus;
+
+            // Client
+            existing.Client.Name = vm.Name ?? "";
+            existing.Client.Email = vm.Email ?? "";
+            existing.Client.Phone = vm.Phone ?? "";
+            existing.Client.Address = vm.Address ?? "";
+            existing.Client.BirthDate = vm.BirthDate;
+            existing.Client.Gender = vm.Gender ?? "";
 
             await _db.SaveChangesAsync();
 
-            TempData["Msg"] = "Utente atualizado com sucesso.";
+            TempData["Msg"] = "Utente e cliente atualizados com sucesso.";
             return RedirectToAction(nameof(Details), new { id = existing.UtenteSaudeId });
         }
-
 
         // ================================
         // DELETE (GET)
@@ -288,7 +311,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // ================================
-        // DELETE (POST)
+        // DELETE (POST) - remove só Utente (Client fica)
         // ================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

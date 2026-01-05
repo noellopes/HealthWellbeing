@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using HealthWellbeing.Models; // para PortugueseNifAttribute e DateNotInFutureAttribute
+using HealthWellbeing.Models;
 
 namespace HealthWellbeing.ViewModel
 {
     public class UtenteSaudeFormVM : IValidatableObject
     {
-        // controla comportamento Create/Edit
         public bool IsEdit { get; set; }
 
         public int UtenteSaudeId { get; set; }
 
-        [Required(ErrorMessage = "Selecione um cliente válido.")]
+        // No Create pode ser null (quando vais criar Client + Utente)
         public int? ClientId { get; set; }
 
         // =======================
-        // CLIENT (editável no Edit, auto-preenchido no Create)
+        // CLIENT
         // =======================
-
         [StringLength(100, MinimumLength = 6, ErrorMessage = "O nome deve ter entre 6 e 100 caracteres.")]
         [RegularExpression(
             @"^[A-Za-zÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç]+(?:\s[A-Za-zÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç]+)+$",
@@ -64,9 +62,8 @@ namespace HealthWellbeing.ViewModel
         }
 
         // =======================
-        // UTENTE (sempre editável)
+        // UTENTE
         // =======================
-
         [Required(ErrorMessage = "O NIF é obrigatório.")]
         [Display(Name = "NIF")]
         [PortugueseNif(ErrorMessage = "NIF inválido.")]
@@ -90,13 +87,30 @@ namespace HealthWellbeing.ViewModel
         // =======================
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            // No Create e no Edit, o Nome ajuda a seleção e também fica guardado no Edit
-            if (string.IsNullOrWhiteSpace(Name))
-                yield return new ValidationResult("O nome é obrigatório.", new[] { nameof(Name) });
+            // No Edit: ClientId tem de existir e não pode mudar
+            if (IsEdit && (!ClientId.HasValue || ClientId.Value <= 0))
+                yield return new ValidationResult("Cliente inválido no Edit.", new[] { nameof(ClientId) });
 
-            // No Edit, obrigamos também Email e Phone (porque estás a editar o Client)
+            // No Create:
+            // - Se NÃO escolheu cliente (ClientId null), então estás a criar Client + Utente, logo Name/Email/Phone obrigatórios.
+            if (!IsEdit && (!ClientId.HasValue || ClientId.Value <= 0))
+            {
+                if (string.IsNullOrWhiteSpace(Name))
+                    yield return new ValidationResult("O nome é obrigatório.", new[] { nameof(Name) });
+
+                if (string.IsNullOrWhiteSpace(Email))
+                    yield return new ValidationResult("O email é obrigatório.", new[] { nameof(Email) });
+
+                if (string.IsNullOrWhiteSpace(Phone))
+                    yield return new ValidationResult("O telefone é obrigatório.", new[] { nameof(Phone) });
+            }
+
+            // No Edit: como estás a editar o Client, obriga também Email/Phone/Name
             if (IsEdit)
             {
+                if (string.IsNullOrWhiteSpace(Name))
+                    yield return new ValidationResult("O nome é obrigatório.", new[] { nameof(Name) });
+
                 if (string.IsNullOrWhiteSpace(Email))
                     yield return new ValidationResult("O email é obrigatório.", new[] { nameof(Email) });
 

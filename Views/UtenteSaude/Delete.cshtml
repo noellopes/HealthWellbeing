@@ -3,12 +3,10 @@
 
 @{
     ViewData["Title"] = "Apagar Utente";
-
     var nome = !string.IsNullOrWhiteSpace(Model?.Client?.Name) ? Model.Client!.Name : "—";
 }
 
 <style>
-    /* Tema igual ao resto */
     .utente-wrapper {
         background: #1f4f6a;
         border-radius: 10px;
@@ -89,7 +87,6 @@
         border-radius: 0 0 8px 8px;
     }
 
-    /* Card principal */
     .danger-card {
         background: #ffffff;
         border-radius: 12px;
@@ -98,9 +95,8 @@
         box-shadow: 0 2px 10px rgba(0,0,0,.08);
     }
 
-    /* Card de alerta (vermelhinho claro) */
     .danger-data {
-        background: #ffe8ea; /* vermelho claro */
+        background: #ffe8ea;
         border: 1px solid rgba(220,53,69,.35);
         border-radius: 12px;
         padding: 14px;
@@ -149,13 +145,11 @@
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- TOPO: Logo + Cancelar -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
                         <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
-                             alt="Logo HealthWellbeing"
-                             class="logo-img" />
+                             alt="Logo HealthWellbeing" class="logo-img" />
                     </div>
 
                     <div class="utente-actions">
@@ -166,7 +160,6 @@
                 </div>
             </div>
 
-            <!-- CORPO -->
             <div class="utente-body">
                 <div class="danger-card">
 
@@ -177,7 +170,6 @@
                         Tens a certeza que queres apagar este utente? Esta ação não pode ser desfeita.
                     </p>
 
-                    <!-- Card vermelho claro com os dados -->
                     <div class="danger-data">
                         <div class="row g-2">
                             <div class="col-12 col-md-6">
@@ -203,9 +195,9 @@
                         </div>
                     </div>
 
-                    <!-- Botões -->
-                    <form asp-action="Delete" method="post" class="mt-3 d-flex gap-2 flex-wrap">
-                        <input type="hidden" asp-for="UtenteSaudeId" />
+                    <!-- ✅ FIX: asp-route-id para o POST receber o "id" -->
+                    <form asp-action="Delete" asp-route-id="@Model.UtenteSaudeId" method="post" class="mt-3 d-flex gap-2 flex-wrap">
+                        @Html.AntiForgeryToken()
 
                         <button type="submit" class="btn btn-danger">
                             <i class="bi bi-trash"></i> Apagar
