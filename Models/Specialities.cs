@@ -4,7 +4,7 @@ namespace HealthWellbeing.Models
 {
     public class Specialities
     {
-        [Key] // PK porque o nome foge à convenção "Id"
+        [Key]
         public int IdEspecialidade { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório.")]
@@ -17,5 +17,10 @@ namespace HealthWellbeing.Models
 
         public ICollection<Consulta>? Consultas { get; set; }
         public ICollection<Doctor>? Medicos { get; set; }
+
+        [MaxLength(5000)]
+        public string? OqueEDescricao { get; set; }
+
+        
     }
 }
