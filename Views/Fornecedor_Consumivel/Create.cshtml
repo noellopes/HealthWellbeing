@@ -1,88 +1,88 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Nova Associação";
+    ViewData["Title"] = "Adicionar Fornecedor a Consumível";
 }
 
-<div class="container mt-4" style="max-width:700px;">
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
 
-    <!-- TÍTULO -->
-    <div class="mb-4">
-        <h2 class="fw-bold text-primary">
-            ➕ Nova Associação Fornecedor–Consumível
-        </h2>
-        <p class="text-muted">
-            Associe um fornecedor a um consumível, definindo preço e tempo de entrega.
-        </p>
-    </div>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
 
-    <!-- FORMULÁRIO -->
-    <form asp-action="Create" method="post" class="card shadow-sm">
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="create-container">
+    <div class="card">
+        <div class="card-header">
+            ➕ Associar Fornecedor a Consumível
+        </div>
         <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="FornecedorId" class="form-label">Fornecedor</label>
+                    <select asp-for="FornecedorId"
+                            class="form-control"
+                            asp-items="ViewBag.FornecedorId">
+                    </select>
+                    <span asp-validation-for="FornecedorId" class="text-danger"></span>
+                </div>
 
-            <!-- FORNECEDOR -->
-            <div class="mb-3">
-                <label asp-for="FornecedorId" class="form-label fw-semibold">
-                    🏢 Fornecedor
-                </label>
-                <select asp-for="FornecedorId"
-                        class="form-select"
-                        asp-items="ViewBag.FornecedorId">
-                    <option value="">-- Selecionar fornecedor --</option>
-                </select>
-                <span asp-validation-for="FornecedorId" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="ConsumivelId" class="form-label">Consumível</label>
+                    <select asp-for="ConsumivelId"
+                            class="form-control"
+                            asp-items="ViewBag.ConsumivelId">
+                    </select>
+                    <span asp-validation-for="ConsumivelId" class="text-danger"></span>
+                </div>
 
-            <!-- CONSUMÍVEL -->
-            <div class="mb-3">
-                <label asp-for="ConsumivelId" class="form-label fw-semibold">
-                    📦 Consumível
-                </label>
-                <select asp-for="ConsumivelId"
-                        class="form-select"
-                        asp-items="ViewBag.ConsumivelId">
-                    <option value="">-- Selecionar consumível --</option>
-                </select>
-                <span asp-validation-for="ConsumivelId" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="TempoEntrega" class="form-label"></label>
+                    <input asp-for="TempoEntrega" class="form-control" />
+                    <span asp-validation-for="TempoEntrega" class="text-danger"></span>
+                </div>
 
-            <!-- TEMPO ENTREGA -->
-            <div class="mb-3">
-                <label asp-for="TempoEntrega" class="form-label fw-semibold">
-                    🚚 Tempo de Entrega (dias)
-                </label>
-                <input asp-for="TempoEntrega"
-                       class="form-control"
-                       placeholder="Ex: 2" />
-                <span asp-validation-for="TempoEntrega" class="text-danger"></span>
-            </div>
+                <div class="mb-3">
+                    <label asp-for="Preco" class="form-label"></label>
+                    <input asp-for="Preco" class="form-control" />
+                    <span asp-validation-for="Preco" class="text-danger"></span>
+                </div>
 
-            <!-- PREÇO -->
-            <div class="mb-4">
-                <label asp-for="Preco" class="form-label fw-semibold">
-                    💰 Preço Unitário (€)
-                </label>
-                <input asp-for="Preco"
-                       class="form-control"
-                       placeholder="Ex: 2.50" />
-                <span asp-validation-for="Preco" class="text-danger"></span>
-            </div>
-
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-spacing">
+                        Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Voltar
+                    </a>
+                </div>
+            </form>
         </div>
-
-        <!-- AÇÕES -->
-        <div class="card-footer bg-light d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                ← Voltar
-            </a>
-
-            <button type="submit" class="btn btn-success px-4">
-                💾 Guardar
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

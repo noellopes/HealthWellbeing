@@ -1,82 +1,95 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Editar";
+    ViewData["Title"] = "Editar Associação";
 }
 
-<div class="container mt-4">
+<style>
+    .edit-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
 
-    <h2 class="fw-bold text-primary mb-4">
-        ✏️ Editar Associação
-    </h2>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
 
-    <div class="card shadow-sm">
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="edit-container">
+    <div class="card">
+        <div class="card-header">
+            ✏️ Editar Associação Fornecedor–Consumível
+        </div>
+
         <div class="card-body">
-
             <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <!-- ID escondido -->
                 <input type="hidden" asp-for="FornecedorConsumivelId" />
-                <input type="hidden" asp-for="FornecedorId" />
-                <input type="hidden" asp-for="ConsumivelId" />
 
-                <!-- FORNECEDOR -->
                 <div class="mb-3">
-                    <label class="form-label text-muted">
-                        🏢 Fornecedor
-                    </label>
-                    <input class="form-control bg-light"
-                           value="@Model.Fornecedor?.NomeEmpresa"
-                           readonly />
+                    <label asp-for="FornecedorId" class="form-label">Fornecedor</label>
+                    <select asp-for="FornecedorId"
+                            class="form-control"
+                            asp-items="ViewBag.FornecedorId">
+                    </select>
+                    <span asp-validation-for="FornecedorId" class="text-danger"></span>
                 </div>
 
-                <!-- CONSUMÍVEL -->
                 <div class="mb-3">
-                    <label class="form-label text-muted">
-                        📦 Consumível
-                    </label>
-                    <input class="form-control bg-light"
-                           value="@Model.Consumivel?.Nome"
-                           readonly />
+                    <label asp-for="ConsumivelId" class="form-label">Consumível</label>
+                    <select asp-for="ConsumivelId"
+                            class="form-control"
+                            asp-items="ViewBag.ConsumivelId">
+                    </select>
+                    <span asp-validation-for="ConsumivelId" class="text-danger"></span>
                 </div>
 
-                <!-- TEMPO ENTREGA -->
                 <div class="mb-3">
-                    <label asp-for="TempoEntrega" class="form-label">
-                        ⏱ Tempo de Entrega (dias)
-                    </label>
-                    <input asp-for="TempoEntrega"
-                           class="form-control" />
-                    <span asp-validation-for="TempoEntrega"
-                          class="text-danger"></span>
+                    <label asp-for="TempoEntrega" class="form-label"></label>
+                    <input asp-for="TempoEntrega" class="form-control" />
+                    <span asp-validation-for="TempoEntrega" class="text-danger"></span>
                 </div>
 
-                <!-- PREÇO -->
                 <div class="mb-3">
-                    <label asp-for="Preco" class="form-label">
-                        💰 Preço (€)
-                    </label>
-                    <input asp-for="Preco"
-                           class="form-control" />
-                    <span asp-validation-for="Preco"
-                          class="text-danger"></span>
+                    <label asp-for="Preco" class="form-label"></label>
+                    <input asp-for="Preco" class="form-control" />
+                    <span asp-validation-for="Preco" class="text-danger"></span>
                 </div>
 
-                <div class="d-flex gap-2 mt-4">
-                    <button type="submit"
-                            class="btn btn-primary px-4">
-                        💾 Guardar
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-spacing">
+                        💾 Guardar alterações
                     </button>
-
-                    <a asp-action="Index"
-                       class="btn btn-outline-secondary px-4">
-                        Cancelar
+                    <a asp-action="Index" class="btn btn-secondary">
+                        ⬅️ Voltar
                     </a>
                 </div>
-
             </form>
-
         </div>
     </div>
-
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
