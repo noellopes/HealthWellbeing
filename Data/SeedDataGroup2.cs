@@ -374,12 +374,6 @@ namespace HealthWellbeing.Data
 
             var ligacoes = new List<Fornecedor_Consumivel>
             {
-                new() { FornecedorId = F("MediHealth Portugal"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.50f, TempoEntrega = 2},
-                new() { FornecedorId = F("HospitalarPlus"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.30f, TempoEntrega = 3},
-                new() { FornecedorId = F("MedSupply Lda"),ConsumivelId = C("Luvas de Nitrilo"), Preco = 3.10f, TempoEntrega = 2},
-                new() { FornecedorId = F("EquipHospi"), ConsumivelId = C("Máscara N95"), Preco = 1.80f, TempoEntrega = 1},
-                new() { FornecedorId = F("BioClean Serviços Médicos"), ConsumivelId = C("Compressa Estéril"), Preco = 4.20f, TempoEntrega = 4},
-                new() { FornecedorId = F("SterilCare"), ConsumivelId = C("Gaze Esterilizada"), Preco = 3.75f, TempoEntrega = 3},
                 new() { FornecedorId = F("MediHealth Portugal"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.50f, TempoEntrega = 2 },
                 new() { FornecedorId = F("HospitalarPlus"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.30f, TempoEntrega = 3 },
                 new() { FornecedorId = F("BioPharma PT"), ConsumivelId = C("Luvas Cirúrgicas Pequenas"), Preco = 2.65f, TempoEntrega = 4 },
