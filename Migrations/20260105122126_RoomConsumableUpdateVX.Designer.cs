@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105122126_RoomConsumableUpdateVX")]
+    partial class RoomConsumableUpdateVX
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -789,7 +792,7 @@ namespace HealthWellbeingRoom.Migrations
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RoomReservationId")
+                    b.Property<int>("RoomReservationId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UsedAt")
@@ -903,31 +906,6 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasKey("ManufacturerId");
 
                     b.ToTable("Manufacturer");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.MedDevSpecialtyRequirement", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RequiredDeviceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SpecialtyId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("SpecialtyId");
-
-                    b.ToTable("MedDevSpecialtyRequirement");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>
@@ -1474,7 +1452,8 @@ namespace HealthWellbeingRoom.Migrations
                     b.HasOne("HealthWellbeingRoom.Models.RoomReservation", "RoomReservation")
                         .WithMany()
                         .HasForeignKey("RoomReservationId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Consumable");
 
@@ -1519,17 +1498,6 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.Navigation("Manufacturer");
-                });
-
-            modelBuilder.Entity("HealthWellbeingRoom.Models.MedDevSpecialtyRequirement", b =>
-                {
-                    b.HasOne("HealthWellbeingRoom.Models.Specialty", "Specialty")
-                        .WithMany()
-                        .HasForeignKey("SpecialtyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Specialty");
                 });
 
             modelBuilder.Entity("HealthWellbeingRoom.Models.MedicalDevice", b =>

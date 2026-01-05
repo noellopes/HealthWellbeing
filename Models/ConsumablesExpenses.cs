@@ -15,8 +15,8 @@ namespace HealthWellbeingRoom.Models
         public Room Room { get; set; }
 
         // Qual reserva gerou esta despesa
-        public int RoomReservationId { get; set; }
-        public RoomReservation RoomReservation { get; set; }
+        public int? RoomReservationId { get; set; }
+        public RoomReservation? RoomReservation { get; set; }
 
         // Quantidade consumida
         public int QuantityUsed { get; set; }

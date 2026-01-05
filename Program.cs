@@ -75,9 +75,11 @@ using (var scope = app.Services.CreateScope())
     var dataContext = services.GetRequiredService<HealthWellbeingDbContext>();
     dataContext.Database.Migrate();
 
-    // Seed do grupo 2 (o teu)
+    // 1️ SEED DO TEU GRUPO (Grupo 2 original)
+    // Aqui estão: Categorias, Consumíveis, SpecialtyRequiredConsumable, etc.
     SeedData.Populate(dataContext);
 
+    // 2️ ROLES E USERS DO TEU GRUPO
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     SeedData.SeedRoles(roleManager);
 
@@ -85,13 +87,13 @@ using (var scope = app.Services.CreateScope())
     SeedData.SeedDefaultAdmin(userManager);
     SeedData.SeedUser(userManager);
 
-    // GROUP 1
+    // 3️ SEED DO GRUPO 1 (não mexe em consumíveis)
     SeedDataGroup1.SeedRoles(roleManager);
     SeedDataGroup1.SeedDefaultAdmin(userManager);
     SeedDataGroup1.SeedUsers(userManager);
     SeedDataGroup1.Populate(dataContext);
 
-    // GROUP 2 - Consumíveis / Zonas
+    // 4️ SEED DO GRUPO 2 (Zonas, etc.) — MAS sem voltar a mexer em consumíveis
     SeedDataGroup2.Populate(dataContext);
 }
 

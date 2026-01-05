@@ -91,11 +91,11 @@ namespace HealthWellbeingRoom.Controllers
             {
                 foreach (var item in reserva.Room.RoomConsumables.ToList())
                 {
-                    if (item.Quantity <= 0)
+                    // usa a quantidade real usada na reserva
+                    if (item.RealUsedQuantity <= 0)
                         continue;
 
-                    // Quantidade usada nesta reserva (ajusta regra se precisares)
-                    int quantidadeUsada = item.Quantity;
+                    int quantidadeUsada = item.RealUsedQuantity;
 
                     // 3.1 Registo de despesa
                     var gasto = new ConsumablesExpenses
@@ -106,7 +106,6 @@ namespace HealthWellbeingRoom.Controllers
                         QuantityUsed = quantidadeUsada,
                         UsedAt = DateTime.Now
                     };
-
                     _context.ConsumablesExpenses.Add(gasto);
 
                     // 3.2 Atualizar stock global do consumível
@@ -124,15 +123,12 @@ namespace HealthWellbeingRoom.Controllers
 
                     if (item.Quantity <= 0)
                     {
-                        // Se queres remover completamente o consumível da sala:
                         _context.RoomConsumables.Remove(item);
                     }
                     else
                     {
-                        // Ainda sobra stock na sala
                         _context.RoomConsumables.Update(item);
 
-                        // Alerta se ficou apenas 1 unidade
                         if (item.Quantity == 1 && item.Consumivel != null && reserva.Room != null)
                         {
                             TempData["LowStockMessage"] =
@@ -141,6 +137,7 @@ namespace HealthWellbeingRoom.Controllers
                     }
                 }
             }
+
 
             await _context.SaveChangesAsync();
 

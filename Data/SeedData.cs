@@ -38,7 +38,6 @@ namespace HealthWellBeingRoom.Data
 
             // 4.1 - Requisitos por especialidade (NOVA)
             PopulateSpecialtyRequiredDevices(dbContext);
-            //PopulateSpecialtyRequiredConsumable(dbContext);
 
 
             // 5 - Infraestrutura de Consultation
@@ -1143,95 +1142,6 @@ namespace HealthWellBeingRoom.Data
             dbContext.SpecialtyRequiredDevices.AddRange(list);
             dbContext.SaveChanges();
         }
-        //private static void PopulateSpecialtyRequiredConsumable(HealthWellbeingDbContext dbContext)
-        //{
-        //    if (dbContext.SpecialtyRequiredConsumables.Any())
-        //        return;
-
-        //    // Carregar todos os consumíveis
-        //    var consumables = dbContext.Consumivel
-        //        .AsNoTracking()
-        //        .ToList();
-
-        //    // Map por nome exato (ajusta se os nomes diferirem um pouco)
-        //    var byName = consumables.ToDictionary(c => c.Nome, c => c.ConsumivelId);
-
-        //    var list = new List<SpecialtyRequiredConsumable>
-        //    {
-        //        // 1 - Atendimento Ambulatorial
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId= byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara Cirúrgica"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
-
-        //        // 2 - Cuidados Intensivos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-
-        //        // 3 - Procedimentos Cirúrgicos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Clorexidina"],               RequiredQuantity = 1 },
-
-        //        // 4 - Exames Clínicos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-
-        //        // 5 - Análises Clínicas
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
-
-        //        // 6 - Gestão de Medicamentos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-
-        //        // 7 - Armazenamento
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 7, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-
-        //        // 8 - Pós-Operatório
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
-
-        //        // 9 - Atendimento Crítico
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-
-        //        // 10 - Higienização de Instrumentos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Clorexidina"],              RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Álcool 70%"],               RequiredQuantity = 1 },
-
-        //        // 11 - Exames de Imagem
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 },
-
-        //        // 12 - Exames Cardiológicos
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Máscara Cirúrgica"],        RequiredQuantity = 1 },
-        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 }
-        //    };
-
-        //    dbContext.SpecialtyRequiredConsumables.AddRange(list);
-        //    dbContext.SaveChanges();
-        //}
-
 
         //Garante que ha um administrador no sistema, cria-o com a passe e atribuilhe o papel de "administrador".
         //(Cria um admin por defeito)
