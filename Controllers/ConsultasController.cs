@@ -120,7 +120,7 @@ namespace HealthWellbeing.Controllers
             {
                 consultasQuery = consultasQuery.Where(c =>
                     !c.DataCancelamento.HasValue &&
-                    c.DataConsulta.Date >= hoje
+                    c.DataConsulta >= DateTime.Now
                 );
             }
 
@@ -161,7 +161,7 @@ namespace HealthWellbeing.Controllers
         // ----------------------------------------------------
 
         // GET: /Consultas/Marcar?idEspecialidade=..&idMedico=..
-        [Authorize(Roles = "Utente")]
+        [Authorize(Roles = "Utente,Rececionista")]
         [HttpGet]
         public async Task<IActionResult> Marcar(int? idEspecialidade, int? idMedico, bool naoSelecionarMedico = false)
         {
@@ -196,7 +196,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: /Consultas/MarcarSlot  (clicar em "Livre")
-        [Authorize(Roles = "Utente")]
+        [Authorize(Roles = "Utente,Rececionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarcarConsulta(MarcarConsultaGridVM vm)
@@ -237,8 +237,14 @@ namespace HealthWellbeing.Controllers
 
             // utente logado
             var email = User.Identity?.Name?.Trim()?.ToLower();
+            // 🔎 obter o utente logado (ajusta ao teu projeto)
+            var email = User.Identity?.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                return Content("Utilizador sem email no Identity.");
+
             var utente = await _context.UtenteSaude
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+                .Include(u => u.Client)
+                .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
 
             if (utente == null)
                 return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
@@ -619,7 +625,7 @@ namespace HealthWellbeing.Controllers
 
             return res;
         }
-        [Authorize]
+        [Authorize(Roles = "Utente,Medico,Rececionista")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancelar(int id)
@@ -636,6 +642,51 @@ namespace HealthWellbeing.Controllers
 
             TempData["SuccessMessage"] = "Consulta cancelada e o horário ficou disponível.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Utente,Medico,Rececionista,DiretorClinico")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var consulta = await _context.Consulta
+                .Include(c => c.Doctor)
+                .Include(c => c.Speciality)
+                .Include(c => c.UtenteSaude)
+                    .ThenInclude(u => u.Client)
+                .FirstOrDefaultAsync(c => c.IdConsulta == id);
+
+            if (consulta == null) return NotFound();
+
+            // ✅ Segurança básica: Utente só vê as suas, Médico só vê as suas
+            if (User.IsInRole("Utente"))
+            {
+                var email = User.Identity?.Name?.Trim();
+                if (string.IsNullOrWhiteSpace(email))
+                    return Content("Utilizador sem email no Identity.");
+
+                var utente = await _context.UtenteSaude
+                    .Include(u => u.Client)
+                    .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
+
+                if (utente == null)
+                    return Content("Este utilizador não é Utente (não existe UtenteSaude associado ao Client).");
+            }
+
+            if (User.IsInRole("Medico"))
+            {
+                // se tiveres o email do médico no Identity = Doctor.Email
+                var email = User.Identity?.Name?.Trim();
+                if (string.IsNullOrWhiteSpace(email))
+                    return Content("Utilizador sem email no Identity.");
+
+                var utente = await _context.UtenteSaude
+                    .Include(u => u.Client)
+                    .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
+
+                if (utente == null)
+                    return Content("Este utilizador não é Utente (não existe UtenteSaude associado ao Client).");
+            }
+
+            return View(consulta);
         }
     }
 }

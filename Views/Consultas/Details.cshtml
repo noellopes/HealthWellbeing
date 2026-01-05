@@ -3,10 +3,8 @@
 @{
     ViewData["Title"] = "Detalhes da Consulta";
 
-    // Usa o Estado já calculado na própria classe Consulta
     var estado = Model.Estado;
 
-    // Escolhe a classe CSS para o badge com if/else clássico (compatível com C# antigos)
     string badgeClass;
     if (estado == "Cancelada")
     {
@@ -69,9 +67,22 @@
                     @Model.Estado
                 </dd>
 
-                <dt class="col-sm-4 fw-semibold text-secondary">ID da Consulta</dt>
+                <!-- ✅ NOVO: Médico -->
+                <dt class="col-sm-4 fw-semibold text-secondary">Médico:</dt>
                 <dd class="col-sm-8">
-                    @Model.IdConsulta
+                    @(Model.Doctor != null ? Model.Doctor.Nome : "—")
+                </dd>
+
+                <!-- ✅ NOVO: Especialidade -->
+                <dt class="col-sm-4 fw-semibold text-secondary">Especialidade:</dt>
+                <dd class="col-sm-8">
+                    @(Model.Speciality != null ? Model.Speciality.Nome : "—")
+                </dd>
+
+                <!-- ✅ NOVO: Utente (Email) -->
+                <dt class="col-sm-4 fw-semibold text-secondary">Email do Utente</dt>
+                <dd class="col-sm-8">
+                    @(Model.UtenteSaude?.Client?.Email ?? "—")
                 </dd>
             </dl>
 
@@ -99,14 +110,6 @@
                 <a asp-action="Index" class="btn btn-outline-secondary px-4">
                     <i class="bi bi-arrow-left"></i> Voltar
                 </a>
-                <div class="d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.IdConsulta" class="btn btn-warning px-4">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@Model.IdConsulta" class="btn btn-danger px-4">
-                        <i class="bi bi-trash"></i> Apagar
-                    </a>
-                </div>
             </div>
         </div>
     </div>

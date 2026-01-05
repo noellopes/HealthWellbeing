@@ -23,7 +23,7 @@ namespace HealthWellbeing.Models
 
         public string Estado =>
             DataCancelamento.HasValue ? "Cancelada" :
-            (DataConsulta.Date < DateTime.Today) ? "Expirada" :
+            (DataConsulta.Date < DateTime.Now) ? "Expirada" :
             (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
 
         public string? SearchTerm { get; set; }

@@ -1,36 +1,258 @@
-﻿@model HealthWellbeing.Models.UtenteSaude
+﻿@using HealthWellbeing.Models
+@model UtenteSaude
+
 @{
     ViewData["Title"] = "Detalhes do Utente";
+
+    // Dados vindos do Client (com fallback seguro)
+    var nome = Model.Client?.Name ?? "—";
+    var email = Model.Client?.Email ?? "—";
+    var telefone = Model.Client?.Phone ?? "—";
+    var morada = Model.Client?.Address ?? "—";
+
+    DateTime? dataNasc = Model.Client?.BirthDate;
+
+    int? idade = null;
+    if (dataNasc.HasValue)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dataNasc.Value.Year;
+        if (dataNasc.Value.Date > today.AddYears(-age)) age--;
+        idade = age < 0 ? 0 : age;
+    }
+
+    var dataNascTexto = dataNasc.HasValue ? dataNasc.Value.ToString("dd/MM/yyyy") : "—";
+    var idadeTexto = idade.HasValue ? $"{idade} anos" : "—";
 }
-<h1>Detalhes</h1>
 
-<dl class="row">
-    <dt class="col-sm-3">Nome</dt>
-    <dd class="col-sm-9">@Model.NomeCompleto</dd>
+<style>
+    /* Tema igual ao resto */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-    <dt class="col-sm-3">Data de Nascimento</dt>
-    <dd class="col-sm-9">@Model.DataNascimento.ToString("yyyy-MM-dd") (@Model.Idade anos)</dd>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-    <dt class="col-sm-3">NIF</dt>
-    <dd class="col-sm-9">@Model.Nif</dd>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-    <dt class="col-sm-3">NISS</dt>
-    <dd class="col-sm-9">@Model.Niss</dd>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-    <dt class="col-sm-3">NUS</dt>
-    <dd class="col-sm-9">@Model.Nus</dd>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-    <dt class="col-sm-3">Email</dt>
-    <dd class="col-sm-9">@Model.Email</dd>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
 
-    <dt class="col-sm-3">Telefone</dt>
-    <dd class="col-sm-9">@Model.Telefone</dd>
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
 
-    <dt class="col-sm-3">Morada</dt>
-    <dd class="col-sm-9">@Model.Morada</dd>
-</dl>
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-<p>
-    <a asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" class="btn btn-primary">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Voltar</a>
-</p>
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Card dos detalhes */
+    .details-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .details-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .details-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+    }
+
+    .info-item {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #2b546c;
+            opacity: .85;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #1f4f6a;
+            font-weight: 700;
+            word-break: break-word;
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + Voltar -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+
+                        <a asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" class="utente-btn">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CORPO -->
+            <div class="utente-body">
+                <div class="details-card">
+                    <h2 class="details-title">Detalhes do Utente</h2>
+                    <p class="details-sub">Consulta os dados completos do utente selecionado.</p>
+
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Nome</span>
+                                <span class="val">@nome</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Data de Nascimento</span>
+                                <span class="val">@dataNascTexto (@idadeTexto)</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">NIF</span>
+                                <span class="val">@Model.Nif</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">NISS</span>
+                                <span class="val">@Model.Niss</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">NUS</span>
+                                <span class="val">@Model.Nus</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Email</span>
+                                <span class="val">@email</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Telefone</span>
+                                <span class="val">@telefone</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="info-item">
+                                <span class="lbl">Morada</span>
+                                <span class="val">@morada</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="info-item">
+                                <span class="lbl">Cliente (ID)</span>
+                                <span class="val">@Model.ClientId</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>

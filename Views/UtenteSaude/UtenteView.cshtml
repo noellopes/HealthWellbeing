@@ -1,0 +1,278 @@
+﻿@using HealthWellbeing.Models
+@model UtenteSaude
+
+@{
+    ViewData["Title"] = "Área do Utente";
+
+    var nome = Model?.Client != null && !string.IsNullOrWhiteSpace(Model.Client.Name)
+        ? Model.Client.Name
+        : "Utente";
+
+    DateTime? dataNasc = Model?.Client?.BirthDate;
+
+    var dataNascTexto = dataNasc.HasValue ? dataNasc.Value.ToString("dd/MM/yyyy") : "—";
+    var idadeTexto = Model?.Client != null ? $"{Model.Client.Age}" : "—"; // Age vem do Client
+
+    var email = !string.IsNullOrWhiteSpace(Model?.Client?.Email) ? Model.Client.Email : "—";
+    var telefone = !string.IsNullOrWhiteSpace(Model?.Client?.Phone) ? Model.Client.Phone : "—";
+    var morada = !string.IsNullOrWhiteSpace(Model?.Client?.Address) ? Model.Client.Address : "—";
+}
+
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+        .utente-btn.alt {
+            background: #3f8fb7;
+        }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Dashboard cards */
+    .info-card, .actions-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        height: 100%;
+    }
+
+    .info-item {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #2b546c;
+            opacity: .85;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #1f4f6a;
+            font-weight: 700;
+            word-break: break-word;
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + Marcar Consulta -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-controller="Consultas" asp-action="Create" class="utente-btn">
+                            <i class="bi bi-calendar-plus"></i> Marcar Consulta
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CORPO -->
+            <div class="utente-body">
+
+                <h2 style="margin-top:0;color:#1f4f6a;font-weight:800;">Bem-vindo, @nome</h2>
+                <p style="margin-bottom:14px;color:#2b546c;">
+                    Aqui tens os teus dados e os atalhos para as tuas consultas.
+                </p>
+
+                <div class="row g-3 align-items-stretch">
+                    <!-- Card com dados do utente -->
+                    <div class="col-12 col-lg-8">
+                        <div class="info-card">
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                <h3 class="h5 m-0" style="color:#1f4f6a;font-weight:800;">
+                                    <i class="bi bi-person-badge me-2"></i>Dados do Utente
+                                </h3>
+
+                                <!-- Editar (UtenteSaude) -->
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="UtenteSaude"
+                                   asp-action="Edit"
+                                   asp-route-id="@Model.UtenteSaudeId">
+                                    <i class="bi bi-pencil-square me-1"></i> Editar
+                                </a>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">Nome</span>
+                                        <span class="val">@nome</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">Data de nascimento</span>
+                                        <span class="val">@dataNascTexto</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">Idade</span>
+                                        <span class="val">@idadeTexto</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">NIF</span>
+                                        <span class="val">@Model.Nif</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">NISS</span>
+                                        <span class="val">@Model.Niss</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">NUS (SNS)</span>
+                                        <span class="val">@Model.Nus</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">Email</span>
+                                        <span class="val">@email</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="info-item">
+                                        <span class="lbl">Telefone</span>
+                                        <span class="val">@telefone</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <span class="lbl">Morada</span>
+                                        <span class="val">@morada</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Botões à direita -->
+                    <div class="col-12 col-lg-4">
+                        <div class="actions-card">
+                            <h3 class="h5" style="color:#1f4f6a;font-weight:800;">
+                                <i class="bi bi-lightning-charge me-2"></i>Atalhos
+                            </h3>
+
+                            <a class="utente-btn"
+                               asp-controller="Consultas"
+                               asp-action="Index">
+                                <i class="bi bi-journal-medical me-1"></i> Minhas Consultas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+
+        </div>
+    </div>
+</div>

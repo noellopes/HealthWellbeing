@@ -1,0 +1,124 @@
+﻿@using HealthWellbeing.ViewModel
+@model UtenteSaudeFormVM
+
+@{
+    bool isEdit = Model.IsEdit;
+}
+
+<div class="section-card mb-3">
+    <div class="section-head">
+        <div class="section-title">
+            <i class="bi bi-person-badge me-2"></i>Dados do Cliente
+        </div>
+        <div class="section-subtitle">
+            Informação pessoal e contactos
+        </div>
+    </div>
+
+    <div class="row g-2">
+
+        <!-- NOME (no Create mostra sugestões) -->
+        <div class="col-12 position-relative">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-semibold"></label>
+                <input asp-for="Name" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+
+                @if (!isEdit)
+                {
+                    <div id="clientSuggestions"
+                         class="list-group position-absolute w-100 shadow"
+                         style="z-index: 2000; display:none;"></div>
+
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                }
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <label asp-for="BirthDate" class="form-label fw-semibold"></label>
+                <input asp-for="BirthDate" type="date" class="form-control client-field" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Idade</label>
+                <input class="form-control" value="@Model.Age" readonly />
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold"></label>
+                <input asp-for="Email" class="form-control client-field" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label fw-semibold"></label>
+                <input asp-for="Phone" class="form-control client-field" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label fw-semibold"></label>
+                <textarea asp-for="Address" class="form-control client-field" rows="3"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="mb-3">
+                <label asp-for="Gender" class="form-label fw-semibold"></label>
+                <input asp-for="Gender" class="form-control client-field" />
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="section-card">
+    <div class="section-head">
+        <div class="section-title">
+            <i class="bi bi-shield-lock me-2"></i>Dados do Utente
+        </div>
+        <div class="section-subtitle">
+            Identificadores nacionais (SNS / SS / Finanças)
+        </div>
+    </div>
+
+    <div class="row g-2">
+        <div class="col-12 col-md-4">
+            <div class="mb-3">
+                <label asp-for="Nif" class="form-label fw-semibold"></label>
+                <input asp-for="Nif" class="form-control" placeholder="9 dígitos" />
+                <span asp-validation-for="Nif" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="mb-3">
+                <label asp-for="Niss" class="form-label fw-semibold"></label>
+                <input asp-for="Niss" class="form-control" placeholder="11 dígitos" />
+                <span asp-validation-for="Niss" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="mb-3">
+                <label asp-for="Nus" class="form-label fw-semibold"></label>
+                <input asp-for="Nus" class="form-control" placeholder="9 dígitos" />
+                <span asp-validation-for="Nus" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+</div>
