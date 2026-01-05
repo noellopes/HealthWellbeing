@@ -22,27 +22,25 @@ namespace HealthWellbeing.Controllers
         // ================================
         private void LoadClientsForDropdown(int? selectedClientId = null)
         {
-            ViewBag.ClientId = new SelectList(
-                _db.Client.AsNoTracking().OrderBy(c => c.Name),
-                "ClientId",
-                "Name",
-                selectedClientId
-            );
+            var available = _db.Client.AsNoTracking()
+                .Where(c => c.UtenteSaude == null) // se a navigation existir
+                .OrderBy(c => c.Name);
 
-            var clients = _db.Client.AsNoTracking()
-                .Select(c => new
-                {
-                    clientId = c.ClientId,
-                    name = c.Name,
-                    email = c.Email,
-                    phone = c.Phone,
-                    address = c.Address,
-                    birthDate = c.BirthDate
-                })
-                .ToList();
+            ViewBag.ClientId = new SelectList(available, "ClientId", "Name", selectedClientId);
+
+            var clients = available.Select(c => new
+            {
+                clientId = c.ClientId,
+                name = c.Name,
+                email = c.Email,
+                phone = c.Phone,
+                address = c.Address,
+                birthDate = c.BirthDate
+            }).ToList();
 
             ViewBag.ClientsJson = JsonSerializer.Serialize(clients);
         }
+
 
         // ================================
         // TESTE UI (UtenteView)
@@ -176,17 +174,16 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ClientId,Nif,Niss,Nus")] UtenteSaude u)
         {
-            // Para a View mostrar dados read-only quando há erro
-            u.Client = await _db.Client.AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == u.ClientId);
-
-            // Validação: cliente existe
-            if (u.Client == null)
+            // 1) Validação: cliente existe (sem carregar navigation para o EF)
+            bool clientExists = await _db.Client.AnyAsync(c => c.ClientId == u.ClientId);
+            if (!clientExists)
                 ModelState.AddModelError(nameof(UtenteSaude.ClientId), "Selecione um cliente válido.");
 
-            // Unicidades
+            // 2) Regra 1-1 (Cliente só pode ter 1 UtenteSaude)
             if (await _db.UtenteSaude.AnyAsync(x => x.ClientId == u.ClientId))
                 ModelState.AddModelError(nameof(UtenteSaude.ClientId), "Este cliente já tem um Utente de Saúde associado.");
 
+            // 3) Unicidades
             if (!string.IsNullOrWhiteSpace(u.Nif) && await _db.UtenteSaude.AnyAsync(x => x.Nif == u.Nif))
                 ModelState.AddModelError(nameof(UtenteSaude.Nif), "Já existe um utente com este NIF.");
 
@@ -196,11 +193,16 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(u.Niss) && await _db.UtenteSaude.AnyAsync(x => x.Niss == u.Niss))
                 ModelState.AddModelError(nameof(UtenteSaude.Niss), "Já existe um utente com este NISS.");
 
+            // 4) Se falhar -> aí sim carregamos o Client (só para mostrar os campos read-only)
             if (!ModelState.IsValid)
             {
+                u.Client = await _db.Client.AsNoTracking().FirstOrDefaultAsync(c => c.ClientId == u.ClientId);
                 LoadClientsForDropdown(u.ClientId);
                 return View(u);
             }
+
+            // 5) MUITO IMPORTANTE: não levar navigation para o Add
+            u.Client = null;
 
             _db.UtenteSaude.Add(u);
             await _db.SaveChangesAsync();
