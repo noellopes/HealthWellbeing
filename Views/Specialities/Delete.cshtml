@@ -4,34 +4,226 @@
     ViewData["Title"] = "Apagar Especialidade";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0 text-danger">@ViewData["Title"]</h1>
-    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
-</div>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="card border-danger shadow-sm">
-    <div class="card-header bg-danger text-white fw-semibold">
-        Confirmação de eliminação
-    </div>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-    <div class="card-body">
-        <p class="mb-4">Tens a certeza de que queres apagar esta especialidade?</p>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-        <dl class="row mb-0">
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Nome)</dt>
-            <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(m => m.Nome)</dd>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Descricao)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.Descricao)</dd>
-        </dl>
-    </div>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-    <div class="card-footer d-flex justify-content-end gap-2">
-        <form asp-action="Delete" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="IdEspecialidade" />
-            <button type="submit" class="btn btn-danger">Apagar</button>
-        </form>
-        <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .danger-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .danger-data {
+        background: #ffe8ea;
+        border: 1px solid rgba(220,53,69,.35);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
+    }
+
+    .danger-title {
+        margin: 0;
+        color: #8a1f2b;
+        font-weight: 900;
+    }
+
+    .danger-sub {
+        margin: 8px 0 0 0;
+        color: #7a2a33;
+        font-weight: 600;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,.65);
+        border: 1px solid rgba(220,53,69,.20);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #7a2a33;
+            opacity: .9;
+            margin-bottom: 2px;
+            font-weight: 800;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #8a1f2b;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    .delete-btn {
+        background-color: #8a1f2b;
+        color: #fff;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .cancel-btn {
+        background-color: #f1f1f1;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+        .cancel-btn:hover, .delete-btn:hover {
+            filter: brightness(1.05);
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="danger-card">
+
+                    <h2 class="danger-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Especialidade
+                    </h2>
+                    <p class="danger-sub">
+                        Tens a certeza que queres apagar esta especialidade? Esta ação não pode ser desfeita.
+                    </p>
+
+                    <div class="danger-data">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-6">
+                                <div class="info-item">
+                                    <span class="lbl">Nome</span>
+                                    <span class="val">@Model.Nome</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <div class="info-item">
+                                    <span class="lbl">Descrição</span>
+                                    <span class="val">@Model.Descricao</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdEspecialidade" />
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <button type="submit" class="delete-btn">
+                                <i class="bi bi-trash me-1"></i> Apagar
+                            </button>
+                            <a asp-action="Index" class="cancel-btn">
+                                <i class="bi bi-x-circle me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+
+        </div>
     </div>
 </div>

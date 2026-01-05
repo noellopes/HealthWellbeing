@@ -4,161 +4,289 @@
     ViewData["Title"] = "Médicos";
 }
 
-<h1>Médicos</h1>
+<style>
+    /* Tema igual ao resto */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<!-- Pesquisa -->
-<div class="collapse mt-2 mb-2" id="postSearch">
-    <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label for="searchName" class="form-label">Pesquisa</label>
-                <input id="searchName"
-                       name="searchName"
-                       value="@ViewBag.searchName"
-                       class="form-control"
-                       placeholder="Pesquise um médico"
-                       type="search" />
-            </div>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-            <div class="col-12 mt-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Procurar
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    Limpar
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
-        <div class="ps-3">
-            <h4 class="alert-heading">Sem Perfis</h4>
-            <p>Ainda não existem perfis registados.</p>
-        </div>
-    </div>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i> Criar Perfil
-    </a>
-}
-else
-{
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Perfis</h2>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-primary"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#postSearch"
-                        aria-expanded="false"
-                        aria-controls="postSearch">
-                    <i class="bi bi-search me-1"></i> Pesquisar
-                </button>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-                <a asp-action="Create" class="btn btn-success">
-                    <i class="bi bi-plus-circle me-1"></i> Criar Perfil
-                </a>
-            </div>
-        </div>
-    </div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Especialidade</th>  
-                <th></th>                
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Items)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Nome)
-                    </td>
-                    <td>
-                        @item.Especialidade?.Nome   
-                    </td>
-                    <td>
-                        <a asp-action="Details"
-                           class="btn btn-sm btn-primary text-white"
-                           asp-route-id="@item.IdMedico">
-                            Detalhes
-                        </a> |
-                        <a asp-action="Edit"
-                           class="btn btn-sm btn-warning"
-                           asp-route-id="@item.IdMedico">
-                            Editar
-                        </a> |
-                        <a asp-action="Delete"
-                           class="btn btn-sm btn-danger"
-                           asp-route-id="@item.IdMedico">
-                            Eliminar
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .search-wrap {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .content-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .content-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+
+    .content-sub {
+        margin: 6px 0 0 0;
+        color: #2b546c;
+        font-weight: 600;
+    }
+
+    /* Tabela de médicos */
+    .doctor-table th, .doctor-table td {
+        vertical-align: middle;
+    }
+
+    .doctor-table .btn-group .btn {
+        font-size: .9rem;
+    }
+
+    /* Paginação */
+    .pagination-nav {
+        margin-top: 20px;
+    }
+
+        .pagination-nav .page-item .page-link {
+            background-color: #2d79a0;
+            color: #fff;
+        }
+
+        .pagination-nav .page-item.active .page-link {
+            background-color: #1f4f6a;
+            border-color: #1f4f6a;
+        }
+
+        .pagination-nav .page-item.disabled .page-link {
+            background-color: #ccc;
+            color: #fff;
+            pointer-events: none;
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + pesquisa + criação -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <button class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
+                            <i class="bi bi-search me-1"></i> Pesquisar
+                        </button>
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i> Criar Perfil
                         </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Pesquisa -->
+            <div class="collapse mt-2 mb-2" id="postSearch">
+                <div class="card card-body">
+                    <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label for="searchName" class="form-label">Pesquisa</label>
+                            <input id="searchName"
+                                   name="searchName"
+                                   value="@ViewBag.searchName"
+                                   class="form-control"
+                                   placeholder="Pesquise um médico"
+                                   type="search" />
+                        </div>
 
-    <nav aria-label="Doctors page">
-        <ul class="pagination">
-            @if (Model.CurrentPage == 1)
-            {
-                <li class="page-item disabled">
-                    <a class="page-link">Primeira</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index">Primeira</a>
-                </li>
-            }
+                        <div class="col-12 mt-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-1"></i> Procurar
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary">
+                                Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-            {
-                if (p == Model.CurrentPage)
+            <!-- CORPO -->
+            <div class="utente-body">
+                @if (!Model.Items.Any())
                 {
-                    <li class="page-item active">
-                        <a class="page-link" href="#">@p</a>
-                    </li>
+                    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
+                        <div class="ps-3">
+                            <h4 class="alert-heading">Sem Perfis</h4>
+                            <p>Ainda não existem perfis registados.</p>
+                        </div>
+                    </div>
+                    <a asp-action="Create" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-1"></i> Criar Perfil
+                    </a>
                 }
                 else
                 {
-                    <li class="page-item">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@p">
-                            @p
-                        </a>
-                    </li>
-                }
-            }
+                    <div class="content-card">
+                        <h2 class="content-title">Lista de Perfis</h2>
+                        <table class="table table-striped doctor-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Especialidade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                                        <td>@item.Especialidade?.Nome</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a asp-action="Details" class="btn btn-outline-primary" asp-route-id="@item.IdMedico">
+                                                    <i class="bi bi-eye"></i> Detalhes
+                                                </a>
+                                                <a asp-action="Edit" class="btn btn-outline-warning" asp-route-id="@item.IdMedico">
+                                                    <i class="bi bi-pencil"></i> Editar
+                                                </a>
+                                                <a asp-action="Delete" class="btn btn-outline-danger" asp-route-id="@item.IdMedico">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
 
-            @if (Model.CurrentPage == Model.TotalPages)
-            {
-                <li class="page-item disabled">
-                    <a class="page-link">Última</a>
-                </li>
-            }
-            else
-            {
-                <li class="page-item">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@Model.TotalPages">
-                        Última
-                    </a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
+                        <!-- Paginação -->
+                        <nav class="pagination-nav" aria-label="Doctors page">
+                            <ul class="pagination justify-content-center">
+                                @if (Model.CurrentPage == 1)
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link">Primeira</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index">Primeira</a>
+                                    </li>
+                                }
+
+                                @for (var p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                                {
+                                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@p">@p</a>
+                                    </li>
+                                }
+
+                                @if (Model.CurrentPage == Model.TotalPages)
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link">Última</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                }
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>
