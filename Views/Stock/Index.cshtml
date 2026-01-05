@@ -3,138 +3,88 @@
 @{
     ViewData["Title"] = "Gestão de Stock";
 }
-@{
-    var totalCriticos = Model.Items
-        .Count(s => s.QuantidadeAtual <= s.Consumivel.QuantidadeMinima + 10);
-}
-
-<div class="d-flex align-items-baseline mb-3">
-
-
-    <div class="d-flex align-items-baseline mb-3">
-        @if (totalCriticos > 0)
-        {
-            @if (ViewBag.StockCritico == true)
-            {
-                <!-- ESTÁS NO STOCK CRÍTICO → voltar ao normal -->
-                <a asp-action="Index"
-                   class="text-decoration-none d-inline-flex align-items-baseline gap-1"
-                   style="color:#000000; font-size:1rem; margin-left:15px;">
-                    <span style="font-size:14px; line-height:1;">▲</span>
-                    <span class="fw-semibold">
-                        Voltar a Gestao de Stock
-                    </span>
-                </a>
-            }
-            else
-            {
-                <!-- ESTÁS NO STOCK NORMAL → ir para crítico -->
-                <a asp-action="Index"
-                   asp-route-stockCritico="true"
-                   class="text-decoration-none d-inline-flex align-items-baseline gap-1"
-                   style="color:#d17b00; font-size:1rem; margin-left:15px;">
-                    <span style="font-size:14px; line-height:1;">▲</span>
-                    <span class="fw-semibold">
-                        Atenção: @totalCriticos consumíveis em stock crítico, clique para ver
-                    </span>
-
-                </a>
-            }
-
-
-        }
-    </div>
-
-</div>
-
 
 <div class="container mt-4">
 
-    <!-- TOPO -->
+    <!-- TÍTULO + AÇÕES -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary mb-0">🏭 Gestão de Stock</h2>
+        <h2 class="fw-bold text-primary mb-0">
+            📦 Gestão de Stock
+        </h2>
 
         <div class="d-flex gap-2">
             <a asp-controller="Compra" asp-action="Index" class="btn btn-success px-4">
-                📥 Fazer Compra
+                🛒 Fazer Compra
             </a>
 
-            <a asp-controller="HistoricoCompras" asp-action="Index" class="btn btn-success px-4">
+            <a asp-controller="HistoricoCompras" asp-action="Index" class="btn btn-outline-primary px-4">
                 📑 Histórico de Compras
             </a>
         </div>
     </div>
 
-    <!-- ALERTAS -->
-    @if (ViewBag.StockCritico == true)
-    {
-        <div class="alert alert-warning shadow-sm mb-3">
-            ⚠️ A mostrar consumíveis com stock próximo do mínimo.
-        </div>
-    }
+    <!-- FILTROS (ESTILO ZONAS) -->
+    <form method="get" asp-action="Index" class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
 
-    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchNome))
-    {
-        <div class="alert alert-info shadow-sm mb-2">
-            🔍 Pesquisa por consumível: <strong>@ViewBag.SearchNome</strong>
-        </div>
-    }
-
-    @if (!string.IsNullOrWhiteSpace(ViewBag.SearchZona))
-    {
-        <div class="alert alert-info shadow-sm mb-3">
-            📍 Pesquisa por zona: <strong>@ViewBag.SearchZona</strong>
-        </div>
-    }
-
-    <!-- FILTROS -->
-    <form method="get" asp-action="Index" class="mb-4">
-        <div class="row g-3">
-
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text">🔍</span>
-                    <input type="text" name="searchNome" value="@ViewBag.SearchNome"
-                           class="form-control" placeholder="Procurar por consumível..." />
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text text-muted">🔍</span>
+                        <input type="text"
+                               name="searchNome"
+                               value="@ViewBag.SearchNome"
+                               class="form-control"
+                               placeholder="Procurar por consumível..." />
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-4">
-                <div class="input-group">
-                    <span class="input-group-text">📍</span>
-                    <input type="text" name="searchZona" value="@ViewBag.SearchZona"
-                           class="form-control" placeholder="Procurar por zona..." />
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text text-muted">📍</span>
+                        <input type="text"
+                               name="searchZona"
+                               value="@ViewBag.SearchZona"
+                               class="form-control"
+                               placeholder="Procurar por zona..." />
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-2 d-flex align-items-center">
-                <input class="form-check-input me-2" type="checkbox" name="stockCritico"
-                       value="true" @(ViewBag.StockCritico == true ? "checked" : "")
-                       onchange="this.form.submit()" />
-                <label class="form-check-label">⚠️ Só stock crítico</label>
-            </div>
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="stockCritico"
+                           value="true"
+                           @(ViewBag.StockCritico == true ? "checked" : "") />
+                    <label class="form-check-label text-muted">
+                        ⚠️ Só stock crítico
+                    </label>
+                </div>
 
-            <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
-                <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpar</a>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Filtrar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+
             </div>
         </div>
     </form>
 
     <!-- TABELA -->
     <div class="table-responsive">
-
-       
-
-        <table class="table table-bordered table-striped shadow-sm">
-            <thead class="text-center fw-bold" style="background-color:#d7e9ff;">
+        <table class="table table-bordered align-middle shadow-sm">
+            <thead class="text-center fw-semibold" style="background-color:#d7e9ff;">
                 <tr>
                     <th>Consumível</th>
                     <th>Zona</th>
-                    <th>Quantidade Atual</th>
-                    <th>Quantidade Mínima</th>
-                    <th>Quantidade Máxima</th>
-                    <th>Última Atualização</th>
+                    <th style="width:220px;">Quantidade Atual</th>
+                    <th>Quantidade mínima</th>
+                    <th>Quantidade máxima</th>
+                    <th>Última atualização</th>
                 </tr>
             </thead>
 
@@ -143,7 +93,7 @@
                 {
                     <tr>
                         <td colspan="6" class="text-center text-muted py-4">
-                            <strong>Nenhum registo de stock encontrado.</strong>
+                            Nenhum registo de stock encontrado.
                         </td>
                     </tr>
                 }
@@ -151,46 +101,60 @@
                 {
                     foreach (var item in Model.Items)
                     {
-                        var min = item.UsaValoresDoConsumivel
-                        ? item.Consumivel?.QuantidadeMinima ?? 0
-                        : item.QuantidadeMinima;
+                        var min = item.Consumivel?.QuantidadeMinima ?? item.QuantidadeMinima;
+                        var max = item.Consumivel?.QuantidadeMaxima ?? item.QuantidadeMaxima;
+                        var atual = item.QuantidadeAtual;
 
-                        var max = item.UsaValoresDoConsumivel
-                        ? item.Consumivel?.QuantidadeMaxima ?? 0
-                        : item.QuantidadeMaxima;
+                        var percentagem = max > 0
+                        ? (int)((double)atual / max * 100)
+                        : 0;
 
-                        string classe = "";
-                        string icon = "";
+                        string barraClasse;
 
-                        if (item.QuantidadeAtual <= min)
+                        if (atual <= min)
                         {
-                            classe = "text-danger";
-                            icon = "⚠️";
+                            barraClasse = "bg-danger";
                         }
-                        else if (item.QuantidadeAtual <= min + 10)
+                        else if (atual <= min + 40)
                         {
-                            classe = "text-warning";
-                            icon = "⚠️";
+                            barraClasse = "bg-warning";
+                        }
+                        else
+                        {
+                            barraClasse = "bg-success";
                         }
 
-                        <tr class="text-center">
-                            <td>@item.Consumivel?.Nome</td>
-                            <td>@item.Zona?.NomeZona</td>
-
-                            <td class="fw-bold @classe">
-                                @item.QuantidadeAtual @icon
+                        <tr>
+                            <td>
+                                <span class="text-muted me-1">📦</span>
+                                @item.Consumivel?.Nome
                             </td>
 
-                            <td>@min</td>
-                            <td>@max</td>
-
                             <td>
+                                <span class="text-muted me-1">📍</span>
+                                @item.Zona?.NomeZona
+                            </td>
+
+                            <td class="text-center">
+                                <div class="fw-bold mb-1">@atual</div>
+                                <div class="progress" style="height:6px;">
+                                    <div class="progress-bar @barraClasse"
+                                         style="width:@percentagem%">
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="text-center">@min</td>
+                            <td class="text-center">@max</td>
+
+                            <td class="text-center text-muted">
                                 @item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")
                             </td>
                         </tr>
                     }
                 }
             </tbody>
+
         </table>
     </div>
 

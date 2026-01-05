@@ -16,7 +16,6 @@ namespace HealthWellbeing.Controllers
         }
 
         [HttpGet]
-        [HttpGet]
         public IActionResult Index(int? consumivelId)
         {
             var consumiveis = _context.Consumivel.ToList();

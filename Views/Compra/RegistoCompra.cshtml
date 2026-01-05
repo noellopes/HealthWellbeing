@@ -6,48 +6,82 @@
 
 <div class="container mt-4">
 
-    <h2 class="fw-bold text-primary mb-4">
+    <!-- TÍTULO -->
+    <h2 class="fw-bold text-primary mb-3">
         🧾 Registo de Encomenda
     </h2>
 
-    <p class="text-muted">
-        Selecione o fornecedor para o consumível.
+    <p class="text-muted mb-4">
+        Selecione o fornecedor para o consumível pretendido, tendo em conta o preço e o tempo de entrega.
     </p>
 
-    <form asp-action="ConfirmarRegisto" method="post">
+    <!-- FORM -->
+    <form asp-action="ConfirmarRegisto"
+          asp-controller="Compra"
+          method="post">
+
         @Html.AntiForgeryToken()
 
-        <input asp-for="ConsumivelId" type="hidden" />
-        <input asp-for="Quantidade" type="hidden" />
+        <!-- CAMPOS ESCONDIDOS OBRIGATÓRIOS -->
+        <input type="hidden" asp-for="ConsumivelId" />
+        <input type="hidden" asp-for="Quantidade" />
 
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-0">
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background-color:#d7e9ff;" class="text-center fw-semibold">
                         <tr>
-                            <th></th>
+                            <th style="width:60px;"></th>
                             <th>Fornecedor</th>
                             <th>Preço (€)</th>
-                            <th>Tempo de Entrega (dias)</th>
+                            <th>Tempo de Entrega</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        @foreach (var fc in Model.Fornecedores)
+                        @if (Model.Fornecedores == null || !Model.Fornecedores.Any())
                         {
                             <tr>
-                                <td>
-                                    <input type="radio"
-                                           name="FornecedorId"
-                                           value="@fc.FornecedorId"
-                                           required />
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Não existem fornecedores associados a este consumível.
                                 </td>
-                                <td>@fc.Fornecedor?.NomeEmpresa</td>
-                                <td>@fc.Preco</td>
-                                <td>@(fc.TempoEntrega ?? 0) dias</td>
                             </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.Fornecedores)
+                            {
+                                <tr class="text-center">
+                                    <!-- RADIO -->
+                                    <td>
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="FornecedorId"
+                                               value="@item.FornecedorId"
+                                               required />
+                                    </td>
+
+                                    <!-- FORNECEDOR -->
+                                    <td class="text-start">
+                                        🏢 <strong>@item.Fornecedor?.NomeEmpresa</strong>
+                                    </td>
+
+                                    <!-- PREÇO -->
+                                    <td>
+                                        <span class="fw-bold text-success">
+                                            @item.Preco.ToString("0.00") €
+                                        </span>
+                                    </td>
+
+                                    <!-- TEMPO -->
+                                    <td>
+                                        <span class="badge bg-info text-dark">
+                                            ⏱ @(item.TempoEntrega ?? 0) dias
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -55,15 +89,33 @@
             </div>
         </div>
 
-        <div class="mt-4 d-flex justify-content-between">
-            <a asp-action="Index" class="btn btn-secondary">
+        <!-- AÇÕES -->
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index"
+               asp-controller="Stock"
+               class="btn btn-outline-secondary px-4">
                 ⬅ Voltar
             </a>
 
-            <button type="submit" class="btn btn-success px-4">
-                ✔ Confirmar Encomenda
+            <button type="submit"
+                    class="btn btn-success px-5">
+                ✅ Confirmar Encomenda
             </button>
         </div>
+
     </form>
+
 </div>
 
+@section Scripts {
+    <script>
+        // realçar linha selecionada
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                document.querySelectorAll('tbody tr')
+                    .forEach(tr => tr.classList.remove('table-success'));
+                this.closest('tr').classList.add('table-success');
+            });
+        });
+    </script>
+}

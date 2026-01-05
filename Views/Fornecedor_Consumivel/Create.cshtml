@@ -1,46 +1,92 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nova Associação";
 }
 
-<h1>Create</h1>
+<div class="container mt-4" style="max-width:700px;">
 
-<h4>Fornecedor_Consumivel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FornecedorId" class="control-label"></label>
-                <select asp-for="FornecedorId" class ="form-control" asp-items="ViewBag.FornecedorId"></select>
+    <!-- TÍTULO -->
+    <div class="mb-4">
+        <h2 class="fw-bold text-primary">
+            ➕ Nova Associação Fornecedor–Consumível
+        </h2>
+        <p class="text-muted">
+            Associe um fornecedor a um consumível, definindo preço e tempo de entrega.
+        </p>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <form asp-action="Create" method="post" class="card shadow-sm">
+        <div class="card-body">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- FORNECEDOR -->
+            <div class="mb-3">
+                <label asp-for="FornecedorId" class="form-label fw-semibold">
+                    🏢 Fornecedor
+                </label>
+                <select asp-for="FornecedorId"
+                        class="form-select"
+                        asp-items="ViewBag.FornecedorId">
+                    <option value="">-- Selecionar fornecedor --</option>
+                </select>
+                <span asp-validation-for="FornecedorId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ConsumivelId" class="control-label"></label>
-                <select asp-for="ConsumivelId" class ="form-control" asp-items="ViewBag.ConsumivelId"></select>
+
+            <!-- CONSUMÍVEL -->
+            <div class="mb-3">
+                <label asp-for="ConsumivelId" class="form-label fw-semibold">
+                    📦 Consumível
+                </label>
+                <select asp-for="ConsumivelId"
+                        class="form-select"
+                        asp-items="ViewBag.ConsumivelId">
+                    <option value="">-- Selecionar consumível --</option>
+                </select>
+                <span asp-validation-for="ConsumivelId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="TempoEntrega" class="control-label"></label>
-                <input asp-for="TempoEntrega" class="form-control" />
+
+            <!-- TEMPO ENTREGA -->
+            <div class="mb-3">
+                <label asp-for="TempoEntrega" class="form-label fw-semibold">
+                    🚚 Tempo de Entrega (dias)
+                </label>
+                <input asp-for="TempoEntrega"
+                       class="form-control"
+                       placeholder="Ex: 2" />
                 <span asp-validation-for="TempoEntrega" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Preco" class="control-label"></label>
-                <input asp-for="Preco" class="form-control" />
+
+            <!-- PREÇO -->
+            <div class="mb-4">
+                <label asp-for="Preco" class="form-label fw-semibold">
+                    💰 Preço Unitário (€)
+                </label>
+                <input asp-for="Preco"
+                       class="form-control"
+                       placeholder="Ex: 2.50" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="card-footer bg-light d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                ← Voltar
+            </a>
+
+            <button type="submit" class="btn btn-success px-4">
+                💾 Guardar
+            </button>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
