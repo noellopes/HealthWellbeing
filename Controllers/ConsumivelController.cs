@@ -56,7 +56,7 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e atualiza o stock na zona
+        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e atualiza o stock nas zonas (Respeitando Capacidades)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AceitarEncomenda(int id)
@@ -73,6 +73,7 @@ namespace HealthWellbeing.Controllers
 
             if (melhorFornecedor != null)
             {
+                // Calcula quanto falta para atingir o stock máximo ideal do consumível
                 int qtdAEncomendar = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
                 if (qtdAEncomendar > 0)
@@ -88,23 +89,53 @@ namespace HealthWellbeing.Controllers
                     };
                     _context.Compra.Add(novaCompra);
 
-                    // 2. ATUALIZA O STOCK FÍSICO (Zona de Armazenamento)
-                    // Procuramos a primeira zona disponível para este consumível
-                    var zonaDestino = await _context.ZonaArmazenamento
-                        .FirstOrDefaultAsync(z => z.ConsumivelId == id);
+                    // 2. DISTRIBUIÇÃO INTELIGENTE PELAS ZONAS
+                    // Busca todas as zonas ativas para este produto
+                    var zonasDisponiveis = await _context.ZonaArmazenamento
+                        .Where(z => z.ConsumivelId == id && z.Ativa == true)
+                        .OrderBy(z => z.NomeZona) // Opcional: ordem de preenchimento
+                        .ToListAsync();
 
-                    if (zonaDestino != null)
+                    int quantidadeParaDistribuir = qtdAEncomendar;
+                    int quantidadeAlocada = 0;
+
+                    foreach (var zona in zonasDisponiveis)
                     {
-                        zonaDestino.QuantidadeAtual += qtdAEncomendar;
-                        _context.Update(zonaDestino);
+                        // Se já não há nada para distribuir, para o loop
+                        if (quantidadeParaDistribuir <= 0) break;
+
+                        // Calcula o espaço livre nesta gaveta/zona
+                        int espacoLivre = zona.CapacidadeMaxima - zona.QuantidadeAtual;
+
+                        if (espacoLivre > 0)
+                        {
+                            // Define quanto vamos pôr nesta zona: o que for menor entre o que falta e o espaço livre
+                            int aAdicionar = Math.Min(quantidadeParaDistribuir, espacoLivre);
+
+                            zona.QuantidadeAtual += aAdicionar;
+                            _context.Update(zona);
+
+                            // Atualiza os contadores
+                            quantidadeParaDistribuir -= aAdicionar;
+                            quantidadeAlocada += aAdicionar;
+                        }
                     }
 
                     await _context.SaveChangesAsync();
 
-                    // 3. Sincroniza o total do Consumível para que o alerta desapareça no próximo Index
+                    // 3. Sincroniza o total do Consumível
                     await AtualizarQuantidadeAtualConsumivel(id);
 
-                    TempData["SuccessMessage"] = $"Stock atualizado! Encomenda de {qtdAEncomendar} unid. de {consumivel.Nome} processada.";
+                    // Mensagem de feedback
+                    if (quantidadeParaDistribuir > 0)
+                    {
+                        // Caso tenhamos encomendado mais do que cabe no armazém
+                        TempData["SuccessMessage"] = $"⚠️ Encomenda processada, mas {quantidadeParaDistribuir} unidades não couberam nas zonas disponíveis (Armazém Cheio). Stock físico atualizado em {quantidadeAlocada} un.";
+                    }
+                    else
+                    {
+                        TempData["SuccessMessage"] = $"✅ Stock atualizado! Encomenda de {quantidadeAlocada} unid. de {consumivel.Nome} distribuída pelas zonas.";
+                    }
                 }
             }
             else
