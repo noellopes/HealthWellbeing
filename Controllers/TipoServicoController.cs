@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data; // Certifique-se que o DbContext está neste namespace
+using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class TipoServicoController : Controller
     {
-        // Alterado de ApplicationDbContext para HealthWellbeingDbContext
+        
         private readonly HealthWellbeingDbContext _context;
 
         public TipoServicoController(HealthWellbeingDbContext context)
@@ -101,7 +101,7 @@ namespace HealthWellbeing.Controllers
                     _context.Update(tipoServico);
                     await _context.SaveChangesAsync();
 
-                    // Alterado para passar o successMessage via Query String
+                    
                     return RedirectToAction(nameof(Details), new
                     {
                         id = tipoServico.TipoServicosId,
@@ -120,25 +120,48 @@ namespace HealthWellbeing.Controllers
             return View(tipoServico);
         }
 
+        // GET: TipoServico/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // Corrigido: Procurar pela chave correta 'TipoServicosId'
+            var tipoServico = await _context.TipoServicos
+                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
+
+            if (tipoServico == null)
+            {
+                return NotFound();
+            }
+
+            return View(tipoServico);
+        }
+
         // POST: TipoServico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var tipoServico = await _context.TipoServicos.FindAsync(id);
+
             if (tipoServico != null)
             {
                 _context.TipoServicos.Remove(tipoServico);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index),
-                new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
+            // Redireciona para o Index com a mensagem de sucesso que a sua View já sabe ler
+            return RedirectToAction(nameof(Index), new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
         }
 
+        // Método auxiliar corrigido
         private bool TipoServicoExists(int id)
         {
             return _context.TipoServicos.Any(e => e.TipoServicosId == id);
         }
+        
+        }
     }
-}
