@@ -41,23 +41,42 @@
             }
         </select>
     </div>
+    <div class="mt-2">
+        <label>
+            <input type="checkbox"
+                   name="naoSelecionarMedico"
+                   value="true"
+                   @(Model.NaoSelecionarMedico ? "checked" : "")
+                   onchange="this.form.submit()" />
+            Não selecionar o médico
+        </label>
+    </div>
 </form>
 
-@if (Model.IdMedico == null)
+@if (!Model.NaoSelecionarMedico && Model.IdMedico == null)
 {
     <div class="text-muted"><em>Escolhe uma especialidade e um médico para ver a agenda.</em></div>
+}
+else if (Model.NaoSelecionarMedico && Model.IdEspecialidade == null)
+{
+    <div class="text-muted"><em>Escolhe uma especialidade para ver a agenda preferencial.</em></div>
 }
 else if (Model.Linhas.Count == 0)
 {
     <div class="alert alert-warning">Este médico não tem horários definidos para os próximos 15 dias úteis.</div>
 }
-else
-{
+<form asp-action="MarcarConsulta" method="post" class="mt-3">
+    @Html.AntiForgeryToken()
+
+    <!-- Mantém o contexto no POST -->
+    <input type="hidden" asp-for="IdEspecialidade" />
+    <input type="hidden" asp-for="IdMedico" />
+    <input type="hidden" asp-for="NaoSelecionarMedico" />
+
     <div class="table-responsive">
         <table class="table table-sm table-striped table-bordered align-middle">
-            <thead class="table-dark">
+            <thead>
                 <tr>
-                    <th style="min-width:120px;">Hora</th>
                     @foreach (var d in Model.Datas)
                     {
                         <th style="min-width:120px;">
@@ -89,18 +108,16 @@ else
                                 }
                                 else
                                 {
-                                    <form asp-action="MarcarSlot" method="post" class="m-0">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="idMedico" value="@Model.IdMedico" />
-                                        <input type="hidden" name="idEspecialidade" value="@Model.IdEspecialidade" />
-                                        <input type="hidden" name="data" value="@cell.Data.ToString("yyyy-MM-dd")" />
-                                        <input type="hidden" name="horaInicio" value="@cell.Inicio.ToString("HH:mm")" />
-                                        <input type="hidden" name="horaFim" value="@cell.Fim.ToString("HH:mm")" />
+                                    <!-- ✅ Sem JS: radio guarda data+hi+hf num único campo -->
+                                    var slotValue = $"{cell.Data:yyyy-MM-dd}|{cell.Inicio:HH\\:mm}|{cell.Fim:HH\\:mm}";
 
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            Livre
-                                        </button>
-                                    </form>
+                                    <label class="d-flex align-items-center gap-2 m-0">
+                                        <input type="radio"
+                                               name="DataSelecionada"
+                                               value="@slotValue"
+                                               @(Model.DataSelecionada == slotValue ? "checked" : "") />
+                                        <span class="badge bg-success">Livre</span>
+                                    </label>
                                 }
                             </td>
                         }
@@ -109,4 +126,8 @@ else
             </tbody>
         </table>
     </div>
-}
+
+    <button type="submit" class="btn btn-primary mt-2">
+        Marcar consulta
+    </button>
+</form>

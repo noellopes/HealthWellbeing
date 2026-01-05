@@ -27,6 +27,7 @@ namespace HealthWellbeing.Controllers
         // -------------------------------
         public async Task<IActionResult> Index(int page = 1, string searchTerm = "")
         {
+
             var hoje = DateTime.Today;
 
             var consultasQuery = _context.Consulta
@@ -81,12 +82,13 @@ namespace HealthWellbeing.Controllers
         // GET: /Consultas/Marcar?idEspecialidade=..&idMedico=..
         [Authorize(Roles = "Utente")]
         [HttpGet]
-        public async Task<IActionResult> Marcar(int? idEspecialidade, int? idMedico)
+        public async Task<IActionResult> Marcar(int? idEspecialidade, int? idMedico, bool naoSelecionarMedico = false)
         {
             var vm = new MarcarConsultaGridVM
             {
                 IdEspecialidade = idEspecialidade,
                 IdMedico = idMedico,
+                NaoSelecionarMedico = naoSelecionarMedico,
                 Especialidades = await _context.Specialities
                     .OrderBy(e => e.Nome)
                     .Select(e => new SimpleOptionVM { Id = e.IdEspecialidade, Nome = e.Nome })
@@ -101,8 +103,10 @@ namespace HealthWellbeing.Controllers
                     .Select(d => new SimpleOptionVM { Id = d.IdMedico, Nome = d.Nome })
                     .ToListAsync();
             }
-
-            if (idMedico.HasValue)
+            if (naoSelecionarMedico && idEspecialidade.HasValue ){
+                await FillGridPreferencial(vm, idEspecialidade.Value);
+            }
+            else if (idMedico.HasValue)
             {
                 await FillGrid(vm, idMedico.Value);
             }
@@ -114,13 +118,43 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Utente")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarcarSlot(int idMedico, int idEspecialidade, string data, string horaInicio, string horaFim)
+        public async Task<IActionResult> MarcarConsulta(MarcarConsultaGridVM vm)
         {
-            var d = DateOnly.ParseExact(data, "yyyy-MM-dd");
-            var hi = TimeOnly.ParseExact(horaInicio, "HH:mm");
-            var hf = TimeOnly.ParseExact(horaFim, "HH:mm");
+            // validações básicas
+            if (!vm.IdEspecialidade.HasValue)
+            {
+                TempData["Erro"] = "Escolhe a especialidade.";
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+            }
 
-            // 🔎 obter o utente logado (ajusta ao teu projeto)
+            if (string.IsNullOrWhiteSpace(vm.DataSelecionada))
+            {
+                TempData["Erro"] = "Escolhe um horário na grelha.";
+                return RedirectToAction(nameof(Marcar), new
+                {
+                    idEspecialidade = vm.IdEspecialidade,
+                    idMedico = vm.IdMedico,
+                    naoSelecionarMedico = vm.NaoSelecionarMedico
+                });
+            }
+
+            var partes = vm.DataSelecionada.Split('|');
+            if (partes.Length != 3)
+            {
+                TempData["Erro"] = "Horário inválido. Tenta novamente.";
+                return RedirectToAction(nameof(Marcar), new
+                {
+                    idEspecialidade = vm.IdEspecialidade,
+                    idMedico = vm.IdMedico,
+                    naoSelecionarMedico = vm.NaoSelecionarMedico
+                });
+            }
+
+            var d = DateOnly.ParseExact(partes[0], "yyyy-MM-dd");
+            var hi = TimeOnly.ParseExact(partes[1], "HH:mm");
+            var hf = TimeOnly.ParseExact(partes[2], "HH:mm");
+
+            // utente logado
             var email = User.Identity?.Name?.Trim()?.ToLower();
             var utente = await _context.UtenteSaude
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == email);
@@ -128,9 +162,9 @@ namespace HealthWellbeing.Controllers
             if (utente == null)
                 return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
 
-            // ✅ LIMITAR A 2 CONSULTAS POR DIA (não canceladas)
+            // limite 2 consultas/dia (igual ao teu)
             var totalNoDia = await _context.Consulta.CountAsync(c =>
-                c.IdUtenteSaude == utente.UtenteSaudeId &&              
+                c.IdUtenteSaude == utente.UtenteSaudeId &&
                 !c.DataCancelamento.HasValue &&
                 DateOnly.FromDateTime(c.DataConsulta) == d
             );
@@ -138,46 +172,87 @@ namespace HealthWellbeing.Controllers
             if (totalNoDia >= 2)
             {
                 TempData["Erro"] = "Só podes marcar no máximo 2 consultas por dia.";
-                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
             }
 
-            // validar se slot está dentro do horário do médico
-            var bloco = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
-                a.IdMedico == idMedico &&
-                a.Data == d &&
-                a.HoraInicio <= hi &&
-                a.HoraFim >= hf
-            );
+            int idEspecialidade = vm.IdEspecialidade.Value;
+            int? idMedicoFinal = null;
 
-            if (bloco == null)
+            // ----------- ESCOLHA DO MÉDICO -----------
+            if (vm.NaoSelecionarMedico)
             {
-                TempData["Erro"] = "O slot escolhido não está dentro do horário de trabalho do médico.";
-                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
+                // marcação preferencial
+                idMedicoFinal = await EscolherMedicoPreferencialAsync(idEspecialidade, d, hi, hf);
+
+                if (!idMedicoFinal.HasValue)
+                {
+                    TempData["Erro"] = "Não há médicos disponíveis nesse horário.";
+                    return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+                }
+            }
+            else
+            {
+                // marcação normal: exige médico escolhido
+                if (!vm.IdMedico.HasValue)
+                {
+                    TempData["Erro"] = "Escolhe um médico ou marca a opção 'Não selecionar o médico'.";
+                    return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+                }
+
+                idMedicoFinal = vm.IdMedico.Value;
+
+                // validar se slot está dentro da agenda do médico
+                var bloco = await _context.AgendaMedica.FirstOrDefaultAsync(a =>
+                    a.IdMedico == idMedicoFinal.Value &&
+                    a.Data == d &&
+                    a.HoraInicio <= hi &&
+                    a.HoraFim >= hf
+                );
+
+                if (bloco == null)
+                {
+                    TempData["Erro"] = "O slot escolhido não está dentro do horário de trabalho do médico.";
+                    return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+                }
+
+                // conflito do médico (não canceladas)
+                bool existeConflito = await _context.Consulta.AnyAsync(c =>
+                    c.IdMedico == idMedicoFinal.Value &&
+                    !c.DataCancelamento.HasValue &&
+                    DateOnly.FromDateTime(c.DataConsulta) == d &&
+                    hi < c.HoraFim && hf > c.HoraInicio
+                );
+
+                if (existeConflito)
+                {
+                    TempData["Erro"] = "Esse horário já foi marcado entretanto. Escolhe outro slot.";
+                    return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+                }
             }
 
-            // validar conflito do médico (não canceladas)
-            bool existeConflito = await _context.Consulta.AnyAsync(c =>
-                c.IdMedico == idMedico &&
+            // (recomendado) transação + revalidação rápida para evitar corridas
+            using var tx = await _context.Database.BeginTransactionAsync();
+
+            bool aindaLivre = !await _context.Consulta.AnyAsync(c =>
+                c.IdMedico == idMedicoFinal.Value &&
                 !c.DataCancelamento.HasValue &&
                 DateOnly.FromDateTime(c.DataConsulta) == d &&
                 hi < c.HoraFim && hf > c.HoraInicio
             );
 
-            if (existeConflito)
+            if (!aindaLivre)
             {
-                TempData["Erro"] = "Esse horário já foi marcado entretanto. Escolhe outro slot.";
-                return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
+                await tx.RollbackAsync();
+                TempData["Erro"] = "O horário foi ocupado no último momento. Tenta novamente.";
+                return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
             }
 
             var consulta = new Consulta
             {
-                IdMedico = idMedico,
+                IdMedico = idMedicoFinal.Value,
                 IdEspecialidade = idEspecialidade,
-
-                IdUtenteSaude = utente.UtenteSaudeId, 
+                IdUtenteSaude = utente.UtenteSaudeId,
                 DataMarcacao = DateTime.Now,
-
-                // melhor guardar a data com a hora real da consulta:
                 DataConsulta = d.ToDateTime(hi),
                 HoraInicio = hi,
                 HoraFim = hf
@@ -185,17 +260,19 @@ namespace HealthWellbeing.Controllers
 
             _context.Consulta.Add(consulta);
             await _context.SaveChangesAsync();
+            await tx.CommitAsync();
 
             TempData["Ok"] = "Consulta marcada com sucesso!";
-            return RedirectToAction(nameof(Marcar), new { idEspecialidade, idMedico });
+            return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
         }
+
 
         // ----------------- helpers -----------------
 
         private async Task FillGrid(MarcarConsultaGridVM vm, int idMedico)
         {
             vm.Datas = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
-
+         
             // IMPORTANTE:
             // - busca agenda por Data (correto)
             // - E também busca "templates" antigos (Seed) com Data default, para fallback por DiaSemana
@@ -205,16 +282,16 @@ namespace HealthWellbeing.Controllers
                 .ToListAsync();
 
             var consultas = await _context.Consulta
-                .Where(c => c.IdMedico == idMedico
-                            && !c.DataCancelamento.HasValue
-                            && vm.Datas.Contains(DateOnly.FromDateTime(c.DataConsulta)))
-                .Select(c => new
-                {
-                    Data = DateOnly.FromDateTime(c.DataConsulta),
-                    c.HoraInicio,
-                    c.HoraFim
-                })
-                .ToListAsync();
+               .Where(c => c.IdMedico == idMedico
+               && !c.DataCancelamento.HasValue
+               && vm.Datas.Contains(DateOnly.FromDateTime(c.DataConsulta)))
+              .Select(c => new
+              {
+                  Data = DateOnly.FromDateTime(c.DataConsulta),
+                  c.HoraInicio,
+                  c.HoraFim
+              })
+              .ToListAsync();
 
             var duracao = TimeSpan.FromMinutes(30);
 
@@ -282,6 +359,163 @@ namespace HealthWellbeing.Controllers
 
                 vm.Linhas.Add(row);
             }
+        }
+
+        private async Task FillGridPreferencial(MarcarConsultaGridVM vm, int idEspecialidade)
+        {
+            vm.Datas = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
+
+            var idsMedicos = await _context.Doctor
+                .Where(d => d.IdEspecialidade == idEspecialidade)
+                .Select(d => d.IdMedico)
+                .ToListAsync();
+
+            if (idsMedicos.Count == 0) return;
+
+            // carregar agenda dos médicos da especialidade (para as datas)
+            var agenda = await _context.AgendaMedica
+                .Where(a => idsMedicos.Contains(a.IdMedico.Value) && vm.Datas.Contains(a.Data))
+                .ToListAsync();
+
+            // carregar consultas (não canceladas) desses médicos (para as datas)
+            var consultas = await _context.Consulta
+                .Where(c => idsMedicos.Contains(c.IdMedico)
+                            && !c.DataCancelamento.HasValue
+                            && vm.Datas.Contains(DateOnly.FromDateTime(c.DataConsulta)))
+                .Select(c => new
+                {
+                    c.IdMedico,
+                    Data = DateOnly.FromDateTime(c.DataConsulta),
+                    c.HoraInicio,
+                    c.HoraFim
+                })
+                .ToListAsync();
+
+            var duracao = TimeSpan.FromMinutes(30);
+
+            // construir slots (união de todos os blocos da especialidade)
+            var allSlots = new SortedSet<(TimeOnly start, TimeOnly end)>();
+
+            foreach (var dia in vm.Datas)
+            {
+                var blocos = agenda.Where(a => a.Data == dia).ToList();
+                foreach (var b in blocos)
+                {
+                    var ini = b.HoraInicio.ToTimeSpan();
+                    var fim = b.HoraFim.ToTimeSpan();
+
+                    for (var t = ini; t + duracao <= fim; t += duracao)
+                    {
+                        allSlots.Add((TimeOnly.FromTimeSpan(t), TimeOnly.FromTimeSpan(t + duracao)));
+                    }
+                }
+            }
+
+            foreach (var (s, e) in allSlots)
+            {
+                var row = new TimeSlotRowVM { Inicio = s, Fim = e };
+
+                foreach (var dia in vm.Datas)
+                {
+                    // médicos que trabalham nesse dia e cujo bloco cobre o slot
+                    var medicosEmTrabalho = agenda
+                        .Where(a => a.Data == dia && a.HoraInicio <= s && a.HoraFim >= e)
+                        .Select(a => a.IdMedico)
+                        .Distinct()
+                        .ToList();
+
+                    if (medicosEmTrabalho.Count == 0)
+                    {
+                        row.Cells.Add(new TimeSlotCellVM { Data = dia, Inicio = s, Fim = e, Estado = "fora" });
+                        continue;
+                    }
+
+                    // existe pelo menos 1 médico sem conflito?
+                    bool existeDisponivel = medicosEmTrabalho.Any(idMedico =>
+                        !consultas.Any(c =>
+                            c.IdMedico == idMedico &&
+                            c.Data == dia &&
+                            Overlaps(s, e, c.HoraInicio, c.HoraFim)
+                        )
+                    );
+
+                    row.Cells.Add(new TimeSlotCellVM
+                    {
+                        Data = dia,
+                        Inicio = s,
+                        Fim = e,
+                        Estado = existeDisponivel ? "livre" : "ocupado"
+                    });
+                }
+
+                vm.Linhas.Add(row);
+            }
+        }
+
+
+        private async Task<int?> EscolherMedicoPreferencialAsync(int idEspecialidade, DateOnly d, TimeOnly hi, TimeOnly hf)
+        {
+            // 1) médicos da especialidade
+            var medicos = await _context.Doctor
+                .Where(m => m.IdEspecialidade == idEspecialidade)
+                .Select(m => new { m.IdMedico, m.Nome })
+                .ToListAsync();
+
+            if (medicos.Count == 0) return null;
+
+            var ids = medicos.Select(m => m.IdMedico).ToList();
+
+            // 2) médicos a trabalhar nesse dia/hora (agenda cobre o slot)
+            var idsEmTrabalho = await _context.AgendaMedica
+                .Where(a =>
+                    a.IdMedico.HasValue &&
+                    ids.Contains(a.IdMedico.Value) &&
+                    a.Data == d &&
+                    a.HoraInicio <= hi &&
+                    a.HoraFim >= hf
+                )
+                .Select(a => a.IdMedico.Value)
+                .Distinct()
+                .ToListAsync();
+
+            if (idsEmTrabalho.Count == 0) return null;
+
+            // 3) remover médicos com conflito nesse slot
+            var idsComConflito = await _context.Consulta
+                .Where(c =>
+                    idsEmTrabalho.Contains(c.IdMedico) &&
+                    !c.DataCancelamento.HasValue &&
+                    DateOnly.FromDateTime(c.DataConsulta) == d &&
+                    hi < c.HoraFim && hf > c.HoraInicio
+                )
+                .Select(c => c.IdMedico)
+                .Distinct()
+                .ToListAsync();
+
+            var disponiveis = idsEmTrabalho.Except(idsComConflito).ToList();
+            if (disponiveis.Count == 0) return null;
+
+            // 4) contar consultas no dia (balanceamento)
+            var contagens = await _context.Consulta
+                .Where(c =>
+                    disponiveis.Contains(c.IdMedico) &&
+                    !c.DataCancelamento.HasValue &&
+                    DateOnly.FromDateTime(c.DataConsulta) == d
+                )
+                .GroupBy(c => c.IdMedico)
+                .Select(g => new { IdMedico = g.Key, Total = g.Count() })
+                .ToListAsync();
+
+            int TotalNoDia(int idMedico) => contagens.FirstOrDefault(x => x.IdMedico == idMedico)?.Total ?? 0;
+
+            // 5) escolher: menos consultas no dia, empate por nome (alfabético)
+            var escolhido = medicos
+                .Where(m => disponiveis.Contains(m.IdMedico))
+                .OrderBy(m => TotalNoDia(m.IdMedico))
+                .ThenBy(m => m.Nome) // alfabético
+                .FirstOrDefault();
+
+            return escolhido?.IdMedico;
         }
 
         private static bool Overlaps(TimeOnly aStart, TimeOnly aEnd, TimeOnly bStart, TimeOnly bEnd)
