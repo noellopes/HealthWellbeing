@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Apagar Utente";
+
+    var nome = !string.IsNullOrWhiteSpace(Model?.Client?.Name) ? Model.Client!.Name : "—";
 }
 
 <style>
@@ -181,7 +183,7 @@
                             <div class="col-12 col-md-6">
                                 <div class="info-item">
                                     <span class="lbl">Nome</span>
-                                    <span class="val">@Model.NomeCompleto</span>
+                                    <span class="val">@nome</span>
                                 </div>
                             </div>
 

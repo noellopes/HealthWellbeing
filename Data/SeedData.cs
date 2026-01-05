@@ -306,61 +306,45 @@ namespace HealthWellbeing.Data
         {
             if (db.UtenteSaude.Any()) return;
 
-            var utentes = new List<UtenteSaude>
-            {
-                new UtenteSaude
-                {
-                    NomeCompleto = "Ana Beatriz Silva",
-                    DataNascimento = new DateTime(1999, 4, 8),
-                    Nif = "245379261",
-                    Niss = "12345678901",
-                    Nus = "123456789",
-                    Email = "ana.beatriz.silva@example.pt",
-                    Telefone = "912345670",
-                    Morada = "Rua das Flores, 12, Guarda"
-                },
-                new UtenteSaude
-                {
-                    NomeCompleto = "Bruno Miguel Pereira",
-                    DataNascimento = new DateTime(1987, 11, 23),
-                    Nif = "198754326",
-                    Niss = "22345678901",
-                    Nus = "223456789",
-                    Email = "bruno.miguel.pereira@example.pt",
-                    Telefone = "912345671",
-                    Morada = "Av. 25 de Abril, 102, Guarda"
-                },
-                new UtenteSaude
-                {
-                    NomeCompleto = "Carla Sofia Fernandes",
-                    DataNascimento = new DateTime(1991, 5, 19),
-                    Nif = "156987239",
-                    Niss = "32345678901",
-                    Nus = "323456789",
-                    Email = "carla.sofia.fernandes@example.pt",
-                    Telefone = "912345672",
-                    Morada = "Rua da Liberdade, 45, Covilhã"
-                },
-            };
+            var clients = db.Client.OrderBy(c => c.ClientId).Take(30).ToList();
+            if (!clients.Any()) return;
 
-            for (int i = 4; i <= 30; i++)
+            var utentes = new List<UtenteSaude>();
+
+            for (int i = 0; i < clients.Count; i++)
             {
                 utentes.Add(new UtenteSaude
                 {
-                    NomeCompleto = $"Utente {i}",
-                    DataNascimento = new DateTime(1990, 1, 1).AddDays(i * 30),
-                    Nif = (200000000 + i).ToString(),
-                    Niss = (10000000000L + i).ToString(),
-                    Nus = (100000000 + i).ToString(),
-                    Email = $"utente{i}@example.pt",
-                    Telefone = $"91{(2000000 + i).ToString().PadLeft(7, '0')}",
-                    Morada = $"Rua de Teste, {i}, Portugal"
+                    ClientId = clients[i].ClientId,
+                    Nif = GenerateValidNif(i),
+                    Niss = (11000000000L + i).ToString(),     // 11 dígitos
+                    Nus = (100000000 + i).ToString()         // 9 dígitos
                 });
             }
 
             db.UtenteSaude.AddRange(utentes);
             db.SaveChanges();
         }
+
+        private static string GenerateValidNif(int i)
+        {
+            // 1º dígito válido: 1/2/3/5/6/8/9 -> vamos usar "2"
+            string first8 = "2" + (1000000 + i).ToString("D7"); // 8 dígitos
+
+            int sum = 0;
+            for (int k = 0; k < 8; k++)
+            {
+                int digit = first8[k] - '0';
+                int weight = 9 - k;
+                sum += digit * weight;
+            }
+
+            int remainder = sum % 11;
+            int check = remainder < 2 ? 0 : 11 - remainder;
+
+            return first8 + check.ToString();
+        }
+
 
         // ---------------------------------------------------------------------
         // NUTRITIONISTS

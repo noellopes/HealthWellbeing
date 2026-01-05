@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Editar Utente";
+    ViewData["Mode"] = "Edit"; // ✅ antes do partial
 }
 
 <style>
@@ -86,7 +87,6 @@
         border-radius: 0 0 8px 8px;
     }
 
-    /* Card do formulário */
     .form-card {
         background: #ffffff;
         border-radius: 12px;
@@ -138,7 +138,11 @@
                     <p class="form-sub">Atualiza os dados do utente e guarda as alterações.</p>
 
                     <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+
                         <input type="hidden" asp-for="UtenteSaudeId" />
+                        <input type="hidden" asp-for="ClientId" /> <!-- ✅ mantém o FK -->
+
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                         @Html.Partial("_FormUtenteSaude", Model)

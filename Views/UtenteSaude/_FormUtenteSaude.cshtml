@@ -1,25 +1,84 @@
 ﻿@model HealthWellbeing.Models.UtenteSaude
+@{
+    var mode = (ViewData["Mode"] as string) ?? "Create";
+    bool isEdit = mode.Equals("Edit", StringComparison.OrdinalIgnoreCase);
+}
 
 <div class="row g-2">
 
+    <!-- CLIENTE -->
     <div class="col-12">
         <div class="mb-3">
-            <label asp-for="NomeCompleto" class="form-label fw-semibold"></label>
-            <input asp-for="NomeCompleto" class="form-control" />
-            <span asp-validation-for="NomeCompleto" class="text-danger"></span>
+            <label class="form-label fw-semibold">Cliente</label>
+
+            @if (!isEdit)
+            {
+                <select asp-for="ClientId"
+                        class="form-select"
+                        asp-items="ViewBag.ClientId"
+                        id="clientSelect">
+                    <option value="">-- Seleciona um cliente --</option>
+                </select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            }
+            else
+            {
+                <!-- em Edit: não deixa mudar -->
+                <input class="form-control" value="@Model.NomeCompleto" readonly />
+                <input type="hidden" asp-for="ClientId" />
+            }
+        </div>
+    </div>
+
+    <!-- CAMPOS VINDOS DO CLIENT (READONLY) -->
+    <div class="col-12">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Nome completo</label>
+            <input class="form-control" id="NomeCompletoRO" value="@Model.NomeCompleto" readonly />
         </div>
     </div>
 
     <div class="col-12 col-md-6">
         <div class="mb-3">
-            <label asp-for="DataNascimento" class="form-label fw-semibold"></label>
-            <input asp-for="DataNascimento" type="date" class="form-control" />
-            <span asp-validation-for="DataNascimento" class="text-danger"></span>
+            <label class="form-label fw-semibold">Data de nascimento</label>
+            <input class="form-control"
+                   id="DataNascimentoRO"
+                   value="@(Model.DataNascimento?.ToString("yyyy-MM-dd") ?? "")"
+                   readonly />
         </div>
     </div>
 
-    <div class="col-12 col-md-6"></div>
+    <div class="col-12 col-md-6">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Idade</label>
+            <input class="form-control" id="IdadeRO" value="@Model.Idade" readonly />
+        </div>
+    </div>
 
+    <div class="col-12 col-md-6">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input class="form-control" id="EmailRO" value="@Model.Email" readonly />
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Telefone</label>
+            <input class="form-control" id="TelefoneRO" value="@Model.Telefone" readonly />
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Morada</label>
+            <textarea class="form-control" id="MoradaRO" rows="3" readonly>@Model.Morada</textarea>
+        </div>
+    </div>
+
+    <hr class="my-2" />
+
+    <!-- CAMPOS DO UTENTE (EDITÁVEIS) -->
     <div class="col-12 col-md-4">
         <div class="mb-3">
             <label asp-for="Nif" class="form-label fw-semibold"></label>
@@ -41,30 +100,6 @@
             <label asp-for="Nus" class="form-label fw-semibold"></label>
             <input asp-for="Nus" class="form-control" placeholder="9 dígitos" />
             <span asp-validation-for="Nus" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label fw-semibold"></label>
-            <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <div class="mb-3">
-            <label asp-for="Telefone" class="form-label fw-semibold"></label>
-            <input asp-for="Telefone" class="form-control" placeholder="9 dígitos" />
-            <span asp-validation-for="Telefone" class="text-danger"></span>
-        </div>
-    </div>
-
-    <div class="col-12">
-        <div class="mb-3">
-            <label asp-for="Morada" class="form-label fw-semibold"></label>
-            <textarea asp-for="Morada" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Morada" class="text-danger"></span>
         </div>
     </div>
 

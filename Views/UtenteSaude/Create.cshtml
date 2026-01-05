@@ -138,7 +138,7 @@
 
                     <form asp-action="Create" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-
+                        @{ ViewData["Mode"] = "Create";}
                         @Html.Partial("_FormUtenteSaude", Model)
 
                         <div class="d-flex gap-2 flex-wrap mt-3">
@@ -160,4 +160,64 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Vem do controller (ViewBag.ClientsJson)
+        const clients = @Html.Raw(ViewBag.ClientsJson ?? "[]");
+
+        const byId = (id) => clients.find(c => String(c.clientId) === String(id));
+
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (el.tagName === "TEXTAREA") el.value = val ?? "";
+            else el.value = val ?? "";
+        };
+
+        const calcAge = (birthStr) => {
+            if (!birthStr) return "";
+            const d = new Date(birthStr);
+            if (isNaN(d.getTime())) return "";
+            const today = new Date();
+            let age = today.getFullYear() - d.getFullYear();
+            const m = today.getMonth() - d.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+            return age < 0 ? 0 : age;
+        };
+
+        function fillClient(id) {
+            const c = byId(id);
+            if (!c) {
+                setVal("NomeCompletoRO", "");
+                setVal("EmailRO", "");
+                setVal("TelefoneRO", "");
+                setVal("MoradaRO", "");
+                setVal("DataNascimentoRO", "");
+                setVal("IdadeRO", "");
+                return;
+            }
+
+            setVal("NomeCompletoRO", c.name ?? "");
+            setVal("EmailRO", c.email ?? "");
+            setVal("TelefoneRO", c.phone ?? "");
+            setVal("MoradaRO", c.address ?? "");
+
+            // BirthDate pode vir como "2026-01-05T00:00:00"
+            const b = (c.birthDate ?? "");
+            const dateOnly = b ? String(b).substring(0, 10) : "";
+            setVal("DataNascimentoRO", dateOnly);
+            setVal("IdadeRO", calcAge(b));
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const sel = document.getElementById("clientSelect");
+            if (!sel) return;
+
+            sel.addEventListener("change", (e) => fillClient(e.target.value));
+
+            // caso volte do POST com ModelState inválido e já tenha ClientId
+            if (sel.value) fillClient(sel.value);
+        });
+    </script>
 }
+

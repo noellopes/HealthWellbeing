@@ -3,6 +3,26 @@
 
 @{
     ViewData["Title"] = "Detalhes do Utente";
+
+    // Dados vindos do Client (com fallback seguro)
+    var nome = Model.Client?.Name ?? "—";
+    var email = Model.Client?.Email ?? "—";
+    var telefone = Model.Client?.Phone ?? "—";
+    var morada = Model.Client?.Address ?? "—";
+
+    DateTime? dataNasc = Model.Client?.BirthDate;
+
+    int? idade = null;
+    if (dataNasc.HasValue)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dataNasc.Value.Year;
+        if (dataNasc.Value.Date > today.AddYears(-age)) age--;
+        idade = age < 0 ? 0 : age;
+    }
+
+    var dataNascTexto = dataNasc.HasValue ? dataNasc.Value.ToString("dd/MM/yyyy") : "—";
+    var idadeTexto = idade.HasValue ? $"{idade} anos" : "—";
 }
 
 <style>
@@ -150,6 +170,10 @@
                         <a asp-action="Index" class="utente-btn">
                             <i class="bi bi-arrow-left"></i> Voltar
                         </a>
+
+                        <a asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" class="utente-btn">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
                     </div>
                 </div>
             </div>
@@ -158,22 +182,20 @@
             <div class="utente-body">
                 <div class="details-card">
                     <h2 class="details-title">Detalhes do Utente</h2>
-                    <p class="details-sub">
-                        Consulta os dados completos do utente selecionado.
-                    </p>
+                    <p class="details-sub">Consulta os dados completos do utente selecionado.</p>
 
                     <div class="row g-2">
                         <div class="col-12 col-md-6">
                             <div class="info-item">
                                 <span class="lbl">Nome</span>
-                                <span class="val">@Model.NomeCompleto</span>
+                                <span class="val">@nome</span>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="info-item">
                                 <span class="lbl">Data de Nascimento</span>
-                                <span class="val">@Model.DataNascimento.ToString("dd/MM/yyyy") (@Model.Idade anos)</span>
+                                <span class="val">@dataNascTexto (@idadeTexto)</span>
                             </div>
                         </div>
 
@@ -201,21 +223,28 @@
                         <div class="col-12 col-md-6">
                             <div class="info-item">
                                 <span class="lbl">Email</span>
-                                <span class="val">@(!string.IsNullOrWhiteSpace(Model.Email) ? Model.Email : "—")</span>
+                                <span class="val">@email</span>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="info-item">
                                 <span class="lbl">Telefone</span>
-                                <span class="val">@(!string.IsNullOrWhiteSpace(Model.Telefone) ? Model.Telefone : "—")</span>
+                                <span class="val">@telefone</span>
                             </div>
                         </div>
 
                         <div class="col-12">
                             <div class="info-item">
                                 <span class="lbl">Morada</span>
-                                <span class="val">@(!string.IsNullOrWhiteSpace(Model.Morada) ? Model.Morada : "—")</span>
+                                <span class="val">@morada</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="info-item">
+                                <span class="lbl">Cliente (ID)</span>
+                                <span class="val">@Model.ClientId</span>
                             </div>
                         </div>
                     </div>

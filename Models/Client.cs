@@ -91,5 +91,7 @@ namespace HealthWellbeing.Models
         public ICollection<Goal>? Goals { get; set; }
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
+        public UtenteSaude? UtenteSaude { get; set; }
+
     }
 }

@@ -147,10 +147,10 @@ namespace HealthWellbeing.Migrations
                     ModoPreparo = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     TempoPreparo = table.Column<int>(type: "int", nullable: false),
                     Porcoes = table.Column<int>(type: "int", nullable: false),
-                    CaloriasPorPorcao = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Proteinas = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    HidratosCarbono = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Gorduras = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CaloriasPorPorcao = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Proteinas = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    HidratosCarbono = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    Gorduras = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     IsVegetariana = table.Column<bool>(type: "bit", nullable: false),
                     IsVegan = table.Column<bool>(type: "bit", nullable: false),
                     IsLactoseFree = table.Column<bool>(type: "bit", nullable: false)
@@ -188,26 +188,6 @@ namespace HealthWellbeing.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Specialities", x => x.IdEspecialidade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UtenteSaude",
-                columns: table => new
-                {
-                    UtenteSaudeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    NomeCompleto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Nif = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    Niss = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    Nus = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: true),
-                    Telefone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    Morada = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UtenteSaude", x => x.UtenteSaudeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -295,6 +275,28 @@ namespace HealthWellbeing.Migrations
                     table.PrimaryKey("PK_Plan", x => x.PlanId);
                     table.ForeignKey(
                         name: "FK_Plan_Client_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Client",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UtenteSaude",
+                columns: table => new
+                {
+                    UtenteSaudeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    Nif = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
+                    Niss = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    Nus = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UtenteSaude", x => x.UtenteSaudeId);
+                    table.ForeignKey(
+                        name: "FK_UtenteSaude_Client_ClientId",
                         column: x => x.ClientId,
                         principalTable: "Client",
                         principalColumn: "ClientId",
@@ -612,6 +614,12 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Plan_ClientId",
                 table: "Plan",
                 column: "ClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UtenteSaude_ClientId",
+                table: "UtenteSaude",
+                column: "ClientId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UtenteSaude_Nif",

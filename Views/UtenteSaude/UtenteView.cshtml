@@ -3,9 +3,20 @@
 
 @{
     ViewData["Title"] = "Área do Utente";
-    var nome = !string.IsNullOrWhiteSpace(Model?.NomeCompleto) ? Model.NomeCompleto : "Utente";
-}
 
+    var nome = Model?.Client != null && !string.IsNullOrWhiteSpace(Model.Client.Name)
+        ? Model.Client.Name
+        : "Utente";
+
+    DateTime? dataNasc = Model?.Client?.BirthDate;
+
+    var dataNascTexto = dataNasc.HasValue ? dataNasc.Value.ToString("dd/MM/yyyy") : "—";
+    var idadeTexto = Model?.Client != null ? $"{Model.Client.Age}" : "—"; // Age vem do Client
+
+    var email = !string.IsNullOrWhiteSpace(Model?.Client?.Email) ? Model.Client.Email : "—";
+    var telefone = !string.IsNullOrWhiteSpace(Model?.Client?.Phone) ? Model.Client.Phone : "—";
+    var morada = !string.IsNullOrWhiteSpace(Model?.Client?.Address) ? Model.Client.Address : "—";
+}
 
 <style>
     .utente-wrapper {
@@ -66,6 +77,7 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        margin-top: 8px;
     }
 
         .utente-btn.alt {
@@ -165,9 +177,9 @@
                                     <i class="bi bi-person-badge me-2"></i>Dados do Utente
                                 </h3>
 
-                                <!-- opcional: editar perfil -->
+                                <!-- Editar (UtenteSaude) -->
                                 <a class="btn btn-sm btn-outline-primary"
-                                   asp-controller="UtentesSaude"
+                                   asp-controller="UtenteSaude"
                                    asp-action="Edit"
                                    asp-route-id="@Model.UtenteSaudeId">
                                     <i class="bi bi-pencil-square me-1"></i> Editar
@@ -178,21 +190,21 @@
                                 <div class="col-12 col-md-6">
                                     <div class="info-item">
                                         <span class="lbl">Nome</span>
-                                        <span class="val">@Model.NomeCompleto</span>
+                                        <span class="val">@nome</span>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md-6">
                                     <div class="info-item">
                                         <span class="lbl">Data de nascimento</span>
-                                        <span class="val">@Model.DataNascimento.ToString("dd/MM/yyyy")</span>
+                                        <span class="val">@dataNascTexto</span>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md-6">
                                     <div class="info-item">
                                         <span class="lbl">Idade</span>
-                                        <span class="val">@Model.Idade</span>
+                                        <span class="val">@idadeTexto</span>
                                     </div>
                                 </div>
 
@@ -220,21 +232,21 @@
                                 <div class="col-12 col-md-6">
                                     <div class="info-item">
                                         <span class="lbl">Email</span>
-                                        <span class="val">@(!string.IsNullOrWhiteSpace(Model.Email) ? Model.Email : "—")</span>
+                                        <span class="val">@email</span>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md-6">
                                     <div class="info-item">
                                         <span class="lbl">Telefone</span>
-                                        <span class="val">@(!string.IsNullOrWhiteSpace(Model.Telefone) ? Model.Telefone : "—")</span>
+                                        <span class="val">@telefone</span>
                                     </div>
                                 </div>
 
                                 <div class="col-12">
                                     <div class="info-item">
                                         <span class="lbl">Morada</span>
-                                        <span class="val">@(!string.IsNullOrWhiteSpace(Model.Morada) ? Model.Morada : "—")</span>
+                                        <span class="val">@morada</span>
                                     </div>
                                 </div>
                             </div>
@@ -242,21 +254,18 @@
                         </div>
                     </div>
 
-                    <!-- Botões à direita (protótipo) -->
+                    <!-- Botões à direita -->
                     <div class="col-12 col-lg-4">
                         <div class="actions-card">
                             <h3 class="h5" style="color:#1f4f6a;font-weight:800;">
                                 <i class="bi bi-lightning-charge me-2"></i>Atalhos
                             </h3>
 
-                            <!-- BOTÃO: Minhas Consultas -->
                             <a class="utente-btn"
                                asp-controller="Consultas"
                                asp-action="Index">
                                 <i class="bi bi-journal-medical me-1"></i> Minhas Consultas
                             </a>
-
-                           
                         </div>
                     </div>
                 </div>

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260104235053_MigracaoInicial")]
+    [Migration("20260105010356_MigracaoInicial")]
     partial class MigracaoInicial
     {
         /// <inheritdoc />
@@ -582,17 +582,20 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
 
                     b.Property<decimal>("CaloriasPorPorcao")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("Descricao")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("Gorduras")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<decimal>("HidratosCarbono")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<bool>("IsLactoseFree")
                         .HasColumnType("bit");
@@ -617,7 +620,8 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Proteinas")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("TempoPreparo")
                         .HasColumnType("int");
@@ -685,16 +689,8 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UtenteSaudeId"));
 
-                    b.Property<DateTime>("DataNascimento")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<string>("Morada")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nif")
                         .IsRequired()
@@ -706,21 +702,15 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<string>("NomeCompleto")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Nus")
                         .IsRequired()
                         .HasMaxLength(9)
                         .HasColumnType("nvarchar(9)");
 
-                    b.Property<string>("Telefone")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.HasKey("UtenteSaudeId");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.HasIndex("Nif")
                         .IsUnique();
@@ -933,6 +923,17 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Client");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Client", "Client")
+                        .WithOne("UtenteSaude")
+                        .HasForeignKey("HealthWellbeing.Models.UtenteSaude", "ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Alergy", b =>
                 {
                     b.Navigation("ClientAlergies");
@@ -947,6 +948,8 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Membership");
 
                     b.Navigation("NutritionistClientPlans");
+
+                    b.Navigation("UtenteSaude");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>
