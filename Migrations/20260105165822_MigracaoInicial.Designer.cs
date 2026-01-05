@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260105031834_MigracaoInicial")]
+    [Migration("20260105165822_MigracaoInicial")]
     partial class MigracaoInicial
     {
         /// <inheritdoc />
@@ -1091,6 +1091,10 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("OqueEDescricao")
+                        .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("IdEspecialidade");
 
