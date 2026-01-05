@@ -8,8 +8,6 @@
 
 }
 
-
-
 @if (!string.IsNullOrEmpty(successMessage))
 
 {
@@ -26,11 +24,7 @@
 
 }
 
-
-
 <h1 class="mb-4">@ViewData["Title"]</h1>
-
-
 
 <div class="d-flex align-items-center mb-3">
     <a asp-action="Create" class="btn btn-success me-2">
@@ -89,22 +83,18 @@
                 <th class="" style="width: 25%">Ações</th>
 
             </tr>
-
         </thead>
         <tbody>
 
             @foreach (var item in Model.ListaServicos)
 
             {
-
                 <tr>
 
                     <td>@Html.DisplayFor(modelItem => item.Nome)</td>
                     <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
 
                     <td>
-
-
                         <a asp-action="Edit" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-primary me-2">
                             <i class="bi bi-pencil-square"></i>Edit
                         </a>

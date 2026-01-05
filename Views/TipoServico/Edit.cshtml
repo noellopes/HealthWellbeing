@@ -15,8 +15,6 @@
         <div class="card-body">
             <form asp-action="Edit" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
-
-                @* IMPORTANTE: O nome aqui deve ser igual ao do Model e do Controller *@
                 <input type="hidden" asp-for="TipoServicosId" />
 
                 <div class="mb-3">

@@ -1,7 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,7 +25,6 @@ namespace HealthWellbeing.Controllers
             // 1. Inicia a consulta na tabela TipoServicos
             var consulta = _context.TipoServicos.AsQueryable();
 
-            // 2. Aplica filtro se existir
             if (!string.IsNullOrEmpty(pesquisarNome))
             {
                 consulta = consulta.Where(x => x.Nome.Contains(pesquisarNome));
@@ -55,7 +53,6 @@ namespace HealthWellbeing.Controllers
 
         [HttpGet]
         [HttpPost]
-        // GET: TipoServico/Details/5
         public async Task<IActionResult> Details(int? id, string? successMessage = null)
         {
             if (id == null)
