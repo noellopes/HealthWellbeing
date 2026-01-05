@@ -1,46 +1,44 @@
-﻿@model HealthWellbeing.Models.Goal
+@model HealthWellbeing.Models.Goal
 
 @{
     ViewData["Title"] = "Delete Goal";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h4 mb-0">
-        <i class="bi bi-trash-fill me-2 text-danger"></i>
-        Delete Goal
-    </h1>
+<div class="container my-4">
+    <div class="fh-wrapper">
+        <div class="fh-header">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-trash3" style="color:#ef4444; font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Delete Goal</h1>
+                </div>
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
 
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Back to list
-    </a>
-</div>
+        <div class="fh-panel">
+            <div class="alert alert-danger fh-alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>This action cannot be undone.
+            </div>
 
-<hr />
+            <div class="fh-card p-3">
+                <dl class="row mb-3">
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Goal</dt>
+                    <dd class="col-sm-9 fw-bold">@Model.GoalName</dd>
+                </dl>
 
-<div class="alert alert-danger">
-    <h5 class="alert-heading">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        Are you sure you want to delete this goal?
-    </h5>
-</div>
-
-<dl class="row">
-    <dt class="col-sm-4">Client</dt>
-    <dd class="col-sm-8">@Model.Client?.Name</dd>
-
-    <dt class="col-sm-4">Goal</dt>
-    <dd class="col-sm-8">@Model.GoalName</dd>
-</dl>
-
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="GoalId" />
-
-    <div class="mt-3 d-flex gap-2">
-        <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash-fill me-1"></i> Delete
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-x-circle me-1"></i> Cancel
-        </a>
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="GoalId" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
+                        <button type="submit" class="btn btn-danger" style="border-radius:12px; font-weight:800;">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</form>
+</div>
