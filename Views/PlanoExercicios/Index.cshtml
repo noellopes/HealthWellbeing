@@ -1,63 +1,210 @@
-﻿@model IEnumerable<HealthWellbeing.Models.PlanoExercicios>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.PlanoExercicios>
 
 @{
     ViewData["Title"] = "Planos de Exercício";
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
-<h1>Planos de Exercício</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="text-primary"><i class="bi bi-list-check"></i> Planos de Exercício</h1>
 
-<p>
-    @if (User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude"))
+    <div class="d-flex gap-2">
+        @if (isStaff)
+        {
+            <a class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
+                <i class="bi bi-search me-1"></i> Pesquisa
+            </a>
+        }
+
+        @if (!isStaff)
+        {
+            <a asp-controller="Estatisticas" asp-action="MeuProgresso" class="btn btn-info text-white shadow-sm">
+                <i class="bi bi-graph-up-arrow me-1"></i> Ver O Meu Progresso
+            </a>
+        }
+    </div>
+</div>
+
+@if (isStaff)
+{
+    <div class="collapse mb-3" id="searchForm">
+        <div class="card card-body bg-light border-0 shadow-sm">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-9">
+                    <label for="searchUtente" class="form-label fw-bold">Pesquisar Utente</label>
+                    <input type="text" id="searchUtente" name="searchUtente" value="@ViewBag.SearchUtente" class="form-control" placeholder="Nome do utente..." />
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Filtrar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<div class="mb-3">
+    @if (isStaff)
     {
         <a asp-action="Create" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Criar Manual
         </a>
     }
+
     <a asp-action="CreateAutomatico" class="btn btn-success ms-2">
         <i class="bi bi-magic"></i> Gerar Automático
     </a>
-</p>
+</div>
 
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Utente</th>
-            <th>Qtd. Exercícios</th>
-            <th>Progresso</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            var qtd = item.PlanoExercicioExercicios?.Count ?? 0;
-            var concluidos = item.PlanoExercicioExercicios?.Count(x => x.Concluido) ?? 0;
-            var pct = qtd > 0 ? (concluidos * 100) / qtd : 0;
-
-            <tr>
-                <td>@item.PlanoExerciciosId</td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
-                </td>
-                <td>@qtd Exercícios</td>
-                <td style="width: 20%;">
-                    <div class="progress" style="height: 20px;">
-                        <div class="progress-bar" role="progressbar" style="width: @pct%;" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100">
-                            @pct%
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-info text-white">Treinar / Ver</a>
-
-                    @if (User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude"))
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning mt-3 shadow-sm">
+        <i class="bi bi-exclamation-triangle me-2"></i> Nenhum plano de exercícios encontrado.
+    </div>
+}
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Utente</th>
+                        <th>Qtd. Exercícios</th>
+                        <th>Progresso</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
                     {
-                        <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-warning">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-danger">Apagar</a>
+                        var qtd = item.PlanoExercicioExercicios?.Count ?? 0;
+                        var concluidos = item.PlanoExercicioExercicios?.Count(x => x.Concluido) ?? 0;
+                        var pct = qtd > 0 ? (concluidos * 100) / qtd : 0;
+
+                        <tr>
+                            <td>@item.PlanoExerciciosId</td>
+                            <td>
+                                <i class="bi bi-person-circle text-secondary me-2"></i>
+                                @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
+                            </td>
+                            <td><span class="badge bg-secondary">@qtd Exercícios</span></td>
+                            <td style="width: 20%; vertical-align: middle;">
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar @(pct == 100 ? "bg-success" : "bg-primary")"
+                                         role="progressbar"
+                                         style="width: @pct%;"
+                                         aria-valuenow="@pct"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        @pct%
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Details" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-info text-white me-1" title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+
+                                @if (isStaff)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-warning me-1" title="Editar">
+                                        <i class="bi bi-pencil"></i>Editar
+                                    </a>
+                                    
+                                }
+
+                                <a asp-action="Delete" asp-route-id="@item.PlanoExerciciosId" class="btn btn-sm btn-danger" title="Apagar">
+                                    <i class="bi bi-trash"></i>Apagar
+                                </a>
+                            </td>
+                        </tr>
                     }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @{
+                var routeData = new Dictionary<string, string>
+                {
+                { "searchUtente", ViewBag.SearchUtente },
+                { "dataInicio", ViewBag.DataInicio },
+                { "dataFim", ViewBag.DataFim }
+                };
+            }
+
+            @if (Model.CurrentPage == 1)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i> Anterior</span>
+                </li>
+            }
+            else
+            {
+                routeData["page"] = "1";
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a primeira página">
+                        <i class="bi bi-chevron-double-left"></i> Primeira
+                    </a>
+                </li>
+
+                routeData["page"] = (Model.CurrentPage - 1).ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Página anterior">
+                        <i class="bi bi-chevron-left"></i> Anterior
+                    </a>
+                </li>
+            }
+
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                if (p == Model.CurrentPage)
+                {
+                    <li class="page-item active"><span class="page-link">@p</span></li>
+                }
+                else
+                {
+                    routeData["page"] = p.ToString();
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a>
+                    </li>
+                }
+            }
+
+            @if (Model.CurrentPage == Model.TotalPages)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Próxima <i class="bi bi-chevron-right"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Última <i class="bi bi-chevron-double-right"></i></span>
+                </li>
+            }
+            else
+            {
+                routeData["page"] = (Model.CurrentPage + 1).ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Próxima página">
+                        Próxima <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+
+                routeData["page"] = Model.TotalPages.ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a última página">
+                        Última <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

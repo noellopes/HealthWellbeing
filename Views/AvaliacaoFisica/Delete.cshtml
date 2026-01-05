@@ -1,129 +1,51 @@
 ﻿@model HealthWellbeing.Models.AvaliacaoFisica
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Apagar Avaliação";
 }
 
-<h1>Delete</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>AvaliacaoFisica</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataMedicao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataMedicao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peso)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peso)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GorduraCorporal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GorduraCorporal)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MassaMuscular)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MassaMuscular)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Pescoco)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Pescoco)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ombros)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Ombros)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peitoral)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peitoral)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BracoDireito)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BracoDireito)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BracoEsquerdo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BracoEsquerdo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cintura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cintura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Abdomen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Abdomen)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Anca)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Anca)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CoxaDireita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CoxaDireita)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CoxaEsquerda)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CoxaEsquerda)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GemeoDireito)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GemeoDireito)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GemeoEsquerdo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GemeoEsquerdo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UtenteGrupo7)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UtenteGrupo7.UtenteGrupo7Id)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="AvaliacaoFisicaId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+            <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-3"></i>
+                <div>
+                    <strong>Atenção!</strong> Tem a certeza que pretende eliminar esta avaliação?
+                    <div class="small">Esta ação é irreversível.</div>
+                </div>
+            </div>
+
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-trash3 me-2"></i>Eliminar Registo</h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-end">Utente:</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.UtenteGrupo7.Nome</dd>
+
+                        <dt class="col-sm-4 text-end">Data:</dt>
+                        <dd class="col-sm-8">@Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-end">Peso:</dt>
+                        <dd class="col-sm-8">@Model.Peso kg</dd>
+                    </dl>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="AvaliacaoFisicaId" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Confirmar Eliminação
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
