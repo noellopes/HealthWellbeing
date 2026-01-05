@@ -6,54 +6,53 @@
 
 <div class="container mt-4">
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
+    <!-- TÍTULO + AÇÕES -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">📥 Histórico de Compras de Consumíveis</h2>
+        <h2 class="fw-bold text-primary fs-2">
+            📥 Histórico de Compras de Consumíveis
+        </h2>
 
         <div>
-            <a asp-controller="Stock" asp-action="Index" class="btn btn-outline-primary me-2 px-4">
+            <a asp-controller="Stock"
+               asp-action="Index"
+               class="btn btn-outline-primary btn-sm me-2 px-3">
                 ↩ Voltar ao Stock
             </a>
 
-            <a asp-action="Index"
-               asp-controller="Compra"
-               class="btn btn-success">
-                Nova Compra
+            <a asp-controller="Compra"
+               asp-action="Index"
+               class="btn btn-success btn-sm px-3">
+                ➕ Nova Compra
             </a>
-
         </div>
+
     </div>
 
-
+    <!-- ESTADO VAZIO -->
     @if (Model.Items == null || !Model.Items.Any())
     {
-        <div class="alert alert-warning text-center py-4 shadow-sm">
-            <h4 class="fw-bold">Nenhuma compra registada</h4>
-            <p>Ainda não existem entradas de stock registadas.</p>
+        <div class="alert alert-warning text-center py-5 shadow-sm">
+            <h4 class="fw-bold mb-2">Nenhuma compra registada</h4>
+            <p class="mb-3">Ainda não existem entradas de stock provenientes de compras.</p>
 
-            <a asp-action="CreateEntrada" class="btn btn-success px-4">
+            <a asp-controller="Compra"
+               asp-action="Index"
+               class="btn btn-success btn-lg px-4">
                 ➕ Registar Primeira Compra
             </a>
         </div>
     }
     else
     {
+        <!-- TABELA -->
         <div class="table-responsive">
-            <table class="table table-bordered table-striped shadow-sm align-middle">
-                <thead style="background-color: #e8f1ff;" class="fw-bold text-center">
+            <table class="table table-bordered table-hover align-middle shadow-sm">
+                <thead class="fw-semibold" style="background-color:#e8f1ff;">
                     <tr>
                         <th>Consumível</th>
-                        <th>Fornecedores</th>
-                        <th>Quantidade</th>
-                        <th>Data</th>
-                        <th style="width:170px;">Ações</th>
+                        <th>Fornecedor</th>
+                        <th style="width:140px;">Quantidade</th>
+                        <th style="width:190px;">Data</th>
                     </tr>
                 </thead>
 
@@ -61,33 +60,28 @@
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            <!-- ✅ CONSUMÍVEL -->
+                            <!-- CONSUMÍVEL -->
                             <td>
-                                @item.Stock?.Consumivel?.Nome  
+                                <span class="me-1" style="font-size:0.85rem;">📦</span>
+                                @item.Stock?.Consumivel?.Nome
                             </td>
 
-                            <!-- ✅ FORNECEDOR -->
+                            <!-- FORNECEDOR -->
                             <td>
-                                @item.Fornecedor?.NomeEmpresa 
+                                <span class="me-1" style="font-size:0.85rem;">🏢</span>
+                                @item.Fornecedor?.NomeEmpresa
                             </td>
 
-                            <!-- Quantidade -->
-                            <td>
-                                @item.Quantidade
+                            <!-- QUANTIDADE -->
+                            <td class="text-center">
+                                <span class="fw-semibold text-success">
+                                    +@item.Quantidade
+                                </span>
                             </td>
 
-                            <!-- Data -->
-                            <td>
+                            <!-- DATA -->
+                            <td class="text-muted">
                                 @item.Data.ToString("dd/MM/yyyy HH:mm")
-                            </td>
-
-                            <!-- Ações -->
-                            <td>
-                                <a asp-action="Details" asp-route-id="@item.Id"
-                                   class="btn btn-info btn-sm">Ver</a>
-
-                                <a asp-action="Delete" asp-route-id="@item.Id"
-                                   class="btn btn-danger btn-sm">Eliminar</a>
                             </td>
                         </tr>
                     }
@@ -96,7 +90,6 @@
             </table>
         </div>
     }
-
 
     <!-- PAGINAÇÃO -->
     <nav class="mt-4">

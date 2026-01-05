@@ -1,49 +1,82 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar";
 }
 
-<h1>Edit</h1>
+<div class="container mt-4">
 
-<h4>Fornecedor_Consumivel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="FornecedorConsumivelId" />
-            <div class="form-group">
-                <label asp-for="FornecedorId" class="control-label"></label>
-                <select asp-for="FornecedorId" class="form-control" asp-items="ViewBag.FornecedorId"></select>
-                <span asp-validation-for="FornecedorId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConsumivelId" class="control-label"></label>
-                <select asp-for="ConsumivelId" class="form-control" asp-items="ViewBag.ConsumivelId"></select>
-                <span asp-validation-for="ConsumivelId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TempoEntrega" class="control-label"></label>
-                <input asp-for="TempoEntrega" class="form-control" />
-                <span asp-validation-for="TempoEntrega" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Preco" class="control-label"></label>
-                <input asp-for="Preco" class="form-control" />
-                <span asp-validation-for="Preco" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <h2 class="fw-bold text-primary mb-4">
+        ✏️ Editar Associação
+    </h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-action="Edit">
+
+                <!-- ID escondido -->
+                <input type="hidden" asp-for="FornecedorConsumivelId" />
+                <input type="hidden" asp-for="FornecedorId" />
+                <input type="hidden" asp-for="ConsumivelId" />
+
+                <!-- FORNECEDOR -->
+                <div class="mb-3">
+                    <label class="form-label text-muted">
+                        🏢 Fornecedor
+                    </label>
+                    <input class="form-control bg-light"
+                           value="@Model.Fornecedor?.NomeEmpresa"
+                           readonly />
+                </div>
+
+                <!-- CONSUMÍVEL -->
+                <div class="mb-3">
+                    <label class="form-label text-muted">
+                        📦 Consumível
+                    </label>
+                    <input class="form-control bg-light"
+                           value="@Model.Consumivel?.Nome"
+                           readonly />
+                </div>
+
+                <!-- TEMPO ENTREGA -->
+                <div class="mb-3">
+                    <label asp-for="TempoEntrega" class="form-label">
+                        ⏱ Tempo de Entrega (dias)
+                    </label>
+                    <input asp-for="TempoEntrega"
+                           class="form-control" />
+                    <span asp-validation-for="TempoEntrega"
+                          class="text-danger"></span>
+                </div>
+
+                <!-- PREÇO -->
+                <div class="mb-3">
+                    <label asp-for="Preco" class="form-label">
+                        💰 Preço (€)
+                    </label>
+                    <input asp-for="Preco"
+                           class="form-control" />
+                    <span asp-validation-for="Preco"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit"
+                            class="btn btn-primary px-4">
+                        💾 Guardar
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary px-4">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
