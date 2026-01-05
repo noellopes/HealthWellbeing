@@ -25,14 +25,55 @@
                     <i class="bi bi-save me-1"></i> Guardar
                 </button>
 
-                <a asp-action="Details" asp-route-id="@Model.IdConsulta" class="btn btn-secondary">
-                    Voltar aos detalhes
-                </a>
+                <button type="button" id="btnVoltar" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar atrás
+                </button>
             </div>
+
         </form>
     </div>
 </div>
 
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const form = document.querySelector('form');
+            const textarea = document.getElementById('Observacoes'); // id gerado pelo asp-for normalmente é "Observacoes"
+            const btnVoltar = document.getElementById('btnVoltar');
+
+            // valor inicial (o que veio da BD)
+            const initialValue = (textarea?.value || "");
+            let isDirty = false;
+
+            if (textarea) {
+                textarea.addEventListener('input', function () {
+                    isDirty = (textarea.value !== initialValue);
+                });
+            }
+
+            // se clicar no "Voltar atrás"
+            btnVoltar?.addEventListener('click', function () {
+                if (isDirty) {
+                    const ok = confirm("Pretende sair sem guardar?");
+                    if (!ok) return;
+                }
+                window.history.back();
+            });
+
+            // opcional: se tentar fechar/refresh da página com alterações
+            window.addEventListener('beforeunload', function (e) {
+                if (!isDirty) return;
+                e.preventDefault();
+                e.returnValue = '';
+            });
+
+            // quando submeter (Guardar), não mostrar avisos
+            form?.addEventListener('submit', function () {
+                isDirty = false;
+            });
+        })();
+    </script>
 }

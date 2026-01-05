@@ -4,6 +4,7 @@ using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -676,19 +677,7 @@ namespace HealthWellbeing.Controllers
             }
 
             if (User.IsInRole("Medico"))
-            {
-                // se tiveres o email do médico no Identity = Doctor.Email
-                var email = User.Identity?.Name?.Trim();
-                if (string.IsNullOrWhiteSpace(email))
-                    return Content("Utilizador sem email no Identity.");
-
-                var utente = await _context.UtenteSaude
-                    .Include(u => u.Client)
-                    .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
-
-                if (utente == null)
-                    return Content("Este utilizador não é Utente (não existe UtenteSaude associado ao Client).");
-            }
+                return View(consulta);
 
             return View(consulta);
         }
