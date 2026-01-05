@@ -1,0 +1,90 @@
+﻿@model HealthWellbeing.Models.AvaliacaoFisica
+
+@{
+    ViewData["Title"] = "Avaliação Não Encontrada";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <h2 class="mb-4 text-danger fw-bold">
+                <i class="bi bi-exclamation-octagon"></i> Registo Inválido
+            </h2>
+
+            <div class="alert alert-danger d-flex align-items-start p-4 border border-danger rounded shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 text-danger me-3" style="font-size: 2.5rem;"></i>
+                <div>
+                    <h4 class="alert-heading fw-bold">O registo desapareceu!</h4>
+                    <p class="mb-0">
+                        A Avaliação Física que estava a tentar editar ou visualizar já não existe na base de dados.
+                        É muito provável que tenha sido eliminada por outro utilizador ou noutra sessão enquanto estava a trabalhar nela.
+                    </p>
+                </div>
+            </div>
+
+            @if (Model != null)
+            {
+                <div class="card border-info shadow mb-4">
+                    <div class="card-header bg-info text-white fw-bold">
+                        <i class="bi bi-life-preserver me-2"></i> Recuperação de Dados
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">Não perca o seu trabalho!</h5>
+                        <p class="card-text text-muted">
+                            Ainda temos os dados que acabou de preencher. Se quiser, pode clicar no botão abaixo para
+                            <strong>salvar estes dados como uma NOVA avaliação</strong> em vez de perder tudo.
+                        </p>
+
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" asp-for="UtenteGrupo7Id" />
+                            <input type="hidden" asp-for="DataMedicao" />
+
+                            <input type="hidden" asp-for="Peso" />
+                            <input type="hidden" asp-for="Altura" />
+                            <input type="hidden" asp-for="GorduraCorporal" />
+                            <input type="hidden" asp-for="MassaMuscular" />
+
+                            <input type="hidden" asp-for="Pescoco" />
+                            <input type="hidden" asp-for="Ombros" />
+                            <input type="hidden" asp-for="Peitoral" />
+
+                            <input type="hidden" asp-for="BracoDireito" />
+                            <input type="hidden" asp-for="BracoEsquerdo" />
+
+                            <input type="hidden" asp-for="Cintura" />
+                            <input type="hidden" asp-for="Abdomen" />
+                            <input type="hidden" asp-for="Anca" />
+
+                            <input type="hidden" asp-for="CoxaDireita" />
+                            <input type="hidden" asp-for="CoxaEsquerda" />
+                            <input type="hidden" asp-for="GemeoDireito" />
+                            <input type="hidden" asp-for="GemeoEsquerdo" />
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-save me-1"></i> Salvar como Nova Avaliação
+                                </button>
+
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                    Cancelar e Sair
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

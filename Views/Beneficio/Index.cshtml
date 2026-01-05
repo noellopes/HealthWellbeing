@@ -111,48 +111,86 @@ else
             </tbody>
         </table>
 
-        
-        <nav>
-            <ul class="pagination">
+
+
+
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
                 @{
                     var routeData = new Dictionary<string, string>
-                    {
-                        { "searchNome", ViewBag.SearchNome },
-                        { "searchDescricao", ViewBag.SearchDescricao }
-                    };
+                        {
+                        { "searchUtente", ViewBag.SearchUtente },
+                        { "dataInicio", ViewBag.DataInicio },
+                        { "dataFim", ViewBag.DataFim }
+                        };
                 }
 
                 @if (Model.CurrentPage == 1)
                 {
-                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="bi bi-chevron-left"></i> Anterior</span>
+                    </li>
                 }
                 else
                 {
-                    { routeData["page"] = "1"; }
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Primeira</a></li>
+                    routeData["page"] = "1";
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a primeira página">
+                            <i class="bi bi-chevron-double-left"></i> Primeira
+                        </a>
+                    </li>
+
+                    routeData["page"] = (Model.CurrentPage - 1).ToString();
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Página anterior">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    </li>
                 }
 
                 @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                 {
                     if (p == Model.CurrentPage)
                     {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        <li class="page-item active"><span class="page-link">@p</span></li>
                     }
                     else
                     {
-                        { routeData["page"] = p.ToString(); }
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a></li>
+                        routeData["page"] = p.ToString();
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a>
+                        </li>
                     }
                 }
 
                 @if (Model.CurrentPage == Model.TotalPages)
                 {
-                    <li class="page-item disabled"><a class="page-link">Última</a></li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Próxima <i class="bi bi-chevron-right"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Última <i class="bi bi-chevron-double-right"></i></span>
+                    </li>
                 }
                 else
                 {
-                    { routeData["page"] = Model.TotalPages.ToString(); }
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="routeData">Última</a></li>
+                    routeData["page"] = (Model.CurrentPage + 1).ToString();
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Próxima página">
+                            Próxima <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    routeData["page"] = Model.TotalPages.ToString();
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a última página">
+                            Última <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
                 }
             </ul>
         </nav>

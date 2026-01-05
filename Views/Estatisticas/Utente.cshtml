@@ -1,0 +1,149 @@
+﻿@model HealthWellbeing.ViewModels.UtenteEstatisticasViewModel
+
+@{
+    ViewData["Title"] = "Relatório - " + Model.NomeUtente;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+            <h2 class="fw-bold text-primary mb-0">
+                <i class="bi bi-person-circle"></i> @Model.NomeUtente
+            </h2>
+            <p class="text-muted mb-0">Relatório de Performance e Evolução</p>
+        </div>
+        <button onclick="window.print()" class="btn btn-outline-secondary d-print-none">
+            <i class="bi bi-printer"></i> Imprimir
+        </button>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow-sm h-100 border-0">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-6 fw-bold mb-0">@Model.VolumeTotalAcumulado <span class="fs-5">kg</span></h1>
+                    <small class="text-white-50 text-uppercase fw-bold">Volume Total Levantado</small>
+                    <div class="mt-2"><i class="bi bi-trophy-fill fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow-sm h-100 border-0">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h1 class="display-6 fw-bold mb-0">
+                        @Model.TotalPlanos100Porcento <span class="fs-5 text-white-50">/ @Model.TotalPlanosAtribuidos</span>
+                    </h1>
+                    <small class="text-white-50 text-uppercase fw-bold">Planos Concluídos a 100%</small>
+                    <div class="mt-2"><i class="bi bi-check-circle-fill fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light text-dark shadow-sm h-100 border-0">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="fw-bold mb-1 text-primary">@Model.ExercicioFavorito</h4>
+                    <small class="text-muted text-uppercase fw-bold">Exercício Mais Frequente</small>
+                    <div class="mt-2"><i class="bi bi-heart-fill text-danger fs-4"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-bar-chart-line-fill text-primary me-2"></i>Evolução de Carga (kg)
+                    </h5>
+                    <small class="text-muted">Soma total de peso levantado em cada plano sequencial.</small>
+                </div>
+                <div class="card-body">
+                    @if (Model.EvolucaoCarga.Any())
+                    {
+                        <div class="d-flex justify-content-around border-bottom pb-2" style="height: 320px;">
+                            @foreach (var barra in Model.EvolucaoCarga)
+                            {
+                                <div class="d-flex flex-column align-items-center justify-content-end h-100 px-1" style="flex: 1;">
+
+                                    <small class="fw-bold text-dark mb-1 small">@barra.ValorReal</small>
+
+                                    <div class="bg-primary rounded-top w-100 shadow-sm opacity-75"
+                                         style="height: @barra.AlturaPercentagem%; min-height: 4px; max-width: 60px; transition: height 0.5s;"
+                                         data-bs-toggle="tooltip"
+                                         title="Plano @barra.Label: @barra.ValorReal kg">
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-around mt-2 text-muted small fw-bold">
+                            @foreach (var barra in Model.EvolucaoCarga)
+                            {
+                                <div style="flex: 1;" class="text-center">@barra.Label</div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted"></i>
+                            <p class="mt-2">Sem dados de carga suficientes para gerar o gráfico.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-pie-chart-fill text-success me-2"></i>Taxa de Sucesso
+                    </h5>
+                    <small class="text-muted">Proporção global de exercícios concluídos.</small>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+
+                    <div class="position-relative mb-4 mt-2"
+                         style="
+                            width: 220px;
+                            height: 220px;
+                            border-radius: 50%;
+                            /* O truque do Donut sem JS */
+                            background: conic-gradient(
+                                #198754 0% @Model.PercentagemConclusao%,
+                                #e9ecef @Model.PercentagemConclusao% 100%
+                            );">
+
+                        <div class="position-absolute top-50 start-50 translate-middle bg-white rounded-circle d-flex flex-column justify-content-center align-items-center shadow-sm"
+                             style="width: 160px; height: 160px;">
+                            <span class="display-4 fw-bold text-dark">@Model.PercentagemConclusao<span class="fs-4">%</span></span>
+                            <small class="text-success text-uppercase fw-bold" style="font-size: 0.7rem;">Concluído</small>
+                        </div>
+                    </div>
+
+                    <div class="w-100 px-2">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                <span><i class="bi bi-circle-fill text-success me-2"></i> Exercícios Feitos</span>
+                                <span class="badge bg-success rounded-pill">@Model.QtdConcluidos</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
+                                <span><i class="bi bi-circle-fill text-secondary me-2"></i> Pendentes</span>
+                                <span class="badge bg-secondary rounded-pill">@Model.QtdNaoConcluidos</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center border-top px-0 mt-2 pt-2">
+                                <span class="fw-bold">Total Atribuído</span>
+                                <span class="fw-bold text-dark">@Model.TotalExercicios</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

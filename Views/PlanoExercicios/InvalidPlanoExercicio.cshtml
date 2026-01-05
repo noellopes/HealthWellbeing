@@ -1,0 +1,68 @@
+﻿@model HealthWellbeing.Models.PlanoExercicios
+
+@{
+    ViewData["Title"] = "Plano Inválido";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <h2 class="mb-4 text-warning fw-bold">
+                <i class="bi bi-exclamation-octagon"></i> Plano de Exercícios Inválido
+            </h2>
+
+            <div class="alert alert-warning d-flex align-items-start p-4 border border-warning rounded shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 text-warning me-3" style="font-size: 2.5rem;"></i>
+                <div>
+                    <h4 class="alert-heading fw-bold">O plano desapareceu!</h4>
+                    <p class="mb-0">
+                        O Plano de Exercícios que estava a tentar editar já não existe na base de dados.
+                        Provavelmente foi eliminado por outro utilizador (Staff) enquanto estava a trabalhar nele.
+                    </p>
+                </div>
+            </div>
+
+            @if (Model != null)
+            {
+                <div class="card border-info shadow mb-4">
+                    <div class="card-header bg-info text-white fw-bold">
+                        <i class="bi bi-life-preserver me-2"></i> Recuperação de Dados
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title text-dark">Não perca o seu trabalho!</h5>
+                        <p class="card-text text-muted">
+                            Ainda temos os dados que configurou (Utente selecionado). Pode clicar no botão abaixo para
+                            <strong>criar um NOVO plano</strong> com este utente, em vez de perder a informação.
+                        </p>
+
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" asp-for="UtenteGrupo7Id" />
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-save me-1"></i> Criar como Novo Plano
+                                </button>
+
+                                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                    Cancelar e Sair
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-secondary btn-lg">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

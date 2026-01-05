@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels; // Necessário para PaginationInfo
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,26 +20,49 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: ObjetivoFisico
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "")
         {
-            return View(await _context.ObjetivoFisico.ToListAsync());
+            var query = _context.ObjetivoFisico.AsQueryable();
+
+            
+            if (!string.IsNullOrEmpty(searchNome))
+            {
+                query = query.Where(o => o.NomeObjetivo.Contains(searchNome));
+            }
+
+            
+            ViewBag.SearchNome = searchNome;
+
+            
+            int total = await query.CountAsync();
+            var pagination = new PaginationInfo<ObjetivoFisico>(page, total);
+
+            if (total > 0)
+            {
+                pagination.Items = await query
+                    .OrderBy(o => o.NomeObjetivo)
+                    .Skip(pagination.ItemsToSkip)
+                    .Take(pagination.ItemsPerPage)
+                    .ToListAsync();
+            }
+            else
+            {
+                pagination.Items = new List<ObjetivoFisico>();
+            }
+
+            return View(pagination);
         }
 
         // GET: ObjetivoFisico/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var objetivoFisico = await _context.ObjetivoFisico
                 .FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
-            if (objetivoFisico == null)
-            {
-                return NotFound();
-            }
+
+            if (objetivoFisico == null) return NotFound();
 
             return View(objetivoFisico);
         }
@@ -50,8 +74,6 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: ObjetivoFisico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ObjetivoFisicoId,NomeObjetivo")] ObjetivoFisico objetivoFisico)
@@ -60,6 +82,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(objetivoFisico);
                 await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Sucesso: Objetivo Físico criado.";
                 return RedirectToAction(nameof(Index));
             }
             return View(objetivoFisico);
@@ -68,30 +91,20 @@ namespace HealthWellbeing.Controllers
         // GET: ObjetivoFisico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var objetivoFisico = await _context.ObjetivoFisico.FindAsync(id);
-            if (objetivoFisico == null)
-            {
-                return NotFound();
-            }
+            if (objetivoFisico == null) return NotFound();
+
             return View(objetivoFisico);
         }
 
-        // POST: ObjetivoFisico/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ObjetivoFisicoId,NomeObjetivo")] ObjetivoFisico objetivoFisico)
         {
-            if (id != objetivoFisico.ObjetivoFisicoId)
-            {
-                return NotFound();
-            }
+            if (id != objetivoFisico.ObjetivoFisicoId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -99,12 +112,14 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(objetivoFisico);
                     await _context.SaveChangesAsync();
+                    TempData["StatusMessage"] = "Sucesso: Objetivo Físico atualizado.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!ObjetivoFisicoExists(objetivoFisico.ObjetivoFisicoId))
                     {
-                        return NotFound();
+                        
+                        return View("InvalidObjetivoFisico", objetivoFisico);
                     }
                     else
                     {
@@ -119,17 +134,12 @@ namespace HealthWellbeing.Controllers
         // GET: ObjetivoFisico/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var objetivoFisico = await _context.ObjetivoFisico
                 .FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
-            if (objetivoFisico == null)
-            {
-                return NotFound();
-            }
+
+            if (objetivoFisico == null) return NotFound();
 
             return View(objetivoFisico);
         }
@@ -143,9 +153,10 @@ namespace HealthWellbeing.Controllers
             if (objetivoFisico != null)
             {
                 _context.ObjetivoFisico.Remove(objetivoFisico);
+                await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Sucesso: Objetivo eliminado.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

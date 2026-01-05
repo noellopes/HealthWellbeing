@@ -1,137 +1,187 @@
-﻿@model IEnumerable<HealthWellbeing.Models.AvaliacaoFisica>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.AvaliacaoFisica>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Histórico de Avaliações";
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 text-primary"><i class="bi bi-clipboard-data"></i> Avaliações Físicas</h1>
+    <div>
+        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm">
+            <i class="bi bi-search"></i> Pesquisar
+        </a>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Nova Avaliação
+        </a>
+    </div>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DataMedicao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Peso)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Altura)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GorduraCorporal)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MassaMuscular)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Pescoco)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ombros)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Peitoral)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BracoDireito)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BracoEsquerdo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cintura)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Abdomen)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Anca)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CoxaDireita)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CoxaEsquerda)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GemeoDireito)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GemeoEsquerdo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UtenteGrupo7)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataMedicao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Peso)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Altura)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GorduraCorporal)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MassaMuscular)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pescoco)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ombros)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Peitoral)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BracoDireito)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BracoEsquerdo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cintura)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Abdomen)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Anca)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CoxaDireita)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CoxaEsquerda)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GemeoDireito)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.GemeoEsquerdo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UtenteGrupo7.UtenteGrupo7Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AvaliacaoFisicaId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AvaliacaoFisicaId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AvaliacaoFisicaId">Delete</a>
-            </td>
-        </tr>
+<div class="collapse mb-4" id="searchForm">
+    <div class="card card-body bg-light border-0 shadow-sm">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+            @if (isStaff)
+            {
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Nome do Utente</label>
+                    <input type="text" name="searchUtente" value="@ViewBag.SearchUtente" class="form-control" placeholder="Procurar nome..." />
+                </div>
+            }
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Data Início</label>
+                <input type="date" name="dataInicio" value="@ViewBag.DataInicio" class="form-control" />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Data Fim</label>
+                <input type="date" name="dataFim" value="@ViewBag.DataFim" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Filtrar</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-info text-center py-4">
+        <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+        Nenhuma avaliação física encontrada com os critérios selecionados.
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Utente</th>
+                        <th>Data da Medição</th>
+                        <th>Peso (kg)</th>
+                        <th>Altura (cm)</th>
+                        <th class="text-end" style="min-width: 150px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">
+                                <i class="bi bi-person-circle text-secondary me-2"></i>
+                                @Html.DisplayFor(modelItem => item.UtenteGrupo7.Nome)
+                            </td>
+                            <td>
+                                @item.DataMedicao.ToString("dd/MM/yyyy")
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@item.Peso kg</span>
+                            </td>
+                            <td>
+                                @item.Altura cm
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.AvaliacaoFisicaId" class="btn btn-sm btn-info text-white me-1" title="Ver Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.AvaliacaoFisicaId" class="btn btn-sm btn-warning me-1" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.AvaliacaoFisicaId" class="btn btn-sm btn-danger" title="Apagar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @{
+                var routeData = new Dictionary<string, string>
+                {
+                { "searchUtente", ViewBag.SearchUtente },
+                { "dataInicio", ViewBag.DataInicio },
+                { "dataFim", ViewBag.DataFim }
+                };
+            }
+
+            @if (Model.CurrentPage == 1)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="bi bi-chevron-left"></i> Anterior</span>
+                </li>
+            }
+            else
+            {
+                routeData["page"] = "1";
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a primeira página">
+                        <i class="bi bi-chevron-double-left"></i> Primeira
+                    </a>
+                </li>
+
+                routeData["page"] = (Model.CurrentPage - 1).ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Página anterior">
+                        <i class="bi bi-chevron-left"></i> Anterior
+                    </a>
+                </li>
+            }
+
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                if (p == Model.CurrentPage)
+                {
+                    <li class="page-item active"><span class="page-link">@p</span></li>
+                }
+                else
+                {
+                    routeData["page"] = p.ToString();
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a>
+                    </li>
+                }
+            }
+
+            @if (Model.CurrentPage == Model.TotalPages)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">Próxima <i class="bi bi-chevron-right"></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Última <i class="bi bi-chevron-double-right"></i></span>
+                </li>
+            }
+            else
+            {
+                routeData["page"] = (Model.CurrentPage + 1).ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Próxima página">
+                        Próxima <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+
+                routeData["page"] = Model.TotalPages.ToString();
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a última página">
+                        Última <i class="bi bi-chevron-double-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

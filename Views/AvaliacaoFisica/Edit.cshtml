@@ -1,119 +1,160 @@
 ﻿@model HealthWellbeing.Models.AvaliacaoFisica
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Avaliação";
+    bool isStaff = ViewBag.IsStaff ?? false;
 }
 
-<h1>Edit</h1>
-
-<h4>AvaliacaoFisica</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AvaliacaoFisicaId" />
-            <div class="form-group">
-                <label asp-for="DataMedicao" class="control-label"></label>
-                <input asp-for="DataMedicao" class="form-control" />
-                <span asp-validation-for="DataMedicao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Peso" class="control-label"></label>
-                <input asp-for="Peso" class="form-control" />
-                <span asp-validation-for="Peso" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Altura" class="control-label"></label>
-                <input asp-for="Altura" class="form-control" />
-                <span asp-validation-for="Altura" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GorduraCorporal" class="control-label"></label>
-                <input asp-for="GorduraCorporal" class="form-control" />
-                <span asp-validation-for="GorduraCorporal" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MassaMuscular" class="control-label"></label>
-                <input asp-for="MassaMuscular" class="form-control" />
-                <span asp-validation-for="MassaMuscular" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Pescoco" class="control-label"></label>
-                <input asp-for="Pescoco" class="form-control" />
-                <span asp-validation-for="Pescoco" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Ombros" class="control-label"></label>
-                <input asp-for="Ombros" class="form-control" />
-                <span asp-validation-for="Ombros" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Peitoral" class="control-label"></label>
-                <input asp-for="Peitoral" class="form-control" />
-                <span asp-validation-for="Peitoral" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BracoDireito" class="control-label"></label>
-                <input asp-for="BracoDireito" class="form-control" />
-                <span asp-validation-for="BracoDireito" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BracoEsquerdo" class="control-label"></label>
-                <input asp-for="BracoEsquerdo" class="form-control" />
-                <span asp-validation-for="BracoEsquerdo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Cintura" class="control-label"></label>
-                <input asp-for="Cintura" class="form-control" />
-                <span asp-validation-for="Cintura" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Abdomen" class="control-label"></label>
-                <input asp-for="Abdomen" class="form-control" />
-                <span asp-validation-for="Abdomen" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Anca" class="control-label"></label>
-                <input asp-for="Anca" class="form-control" />
-                <span asp-validation-for="Anca" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CoxaDireita" class="control-label"></label>
-                <input asp-for="CoxaDireita" class="form-control" />
-                <span asp-validation-for="CoxaDireita" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CoxaEsquerda" class="control-label"></label>
-                <input asp-for="CoxaEsquerda" class="form-control" />
-                <span asp-validation-for="CoxaEsquerda" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GemeoDireito" class="control-label"></label>
-                <input asp-for="GemeoDireito" class="form-control" />
-                <span asp-validation-for="GemeoDireito" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="GemeoEsquerdo" class="control-label"></label>
-                <input asp-for="GemeoEsquerdo" class="form-control" />
-                <span asp-validation-for="GemeoEsquerdo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UtenteGrupo7Id" class="control-label"></label>
-                <select asp-for="UtenteGrupo7Id" class="form-control" asp-items="ViewBag.UtenteGrupo7Id"></select>
-                <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-warning text-dark"><i class="bi bi-pencil-square"></i> Editar Avaliação Física</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="AvaliacaoFisicaId" />
+
+        @if (!isStaff)
+        {
+            <input type="hidden" asp-for="UtenteGrupo7Id" />
+        }
+
+        <div class="row g-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm border-warning h-100">
+                    <div class="card-header bg-warning text-dark fw-bold">
+                        <i class="bi bi-person-lines-fill me-2"></i> Dados Gerais
+                    </div>
+                    <div class="card-body row g-3">
+                        @if (isStaff)
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="UtenteGrupo7Id" class="form-label fw-bold">Utente</label>
+                                <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
+                                <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
+                            </div>
+                        }
+
+                        <div class="col-md-6">
+                            <label asp-for="DataMedicao" class="form-label fw-bold">Data da Medição</label>
+                            <input asp-for="DataMedicao" class="form-control" />
+                            <span asp-validation-for="DataMedicao" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="bi bi-speedometer2 me-2"></i> Composição Corporal
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Peso" class="form-label">Peso (kg)</label>
+                            <input asp-for="Peso" class="form-control" />
+                            <span asp-validation-for="Peso" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Altura" class="form-label">Altura (cm)</label>
+                            <input asp-for="Altura" class="form-control" />
+                            <span asp-validation-for="Altura" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="GorduraCorporal" class="form-label">Gordura (%)</label>
+                            <input asp-for="GorduraCorporal" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="MassaMuscular" class="form-label">Massa (%)</label>
+                            <input asp-for="MassaMuscular" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="bi bi-arrows-expand me-2"></i> Medidas Tronco & Superiores
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Pescoco" class="form-label">Pescoço</label>
+                            <input asp-for="Pescoco" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Ombros" class="form-label">Ombros</label>
+                            <input asp-for="Ombros" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Peitoral" class="form-label">Peitoral</label>
+                            <input asp-for="Peitoral" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="BracoDireito" class="form-label">Braço Direito</label>
+                            <input asp-for="BracoDireito" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="BracoEsquerdo" class="form-label">Braço Esquerdo</label>
+                            <input asp-for="BracoEsquerdo" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-light fw-bold">
+                        <i class="bi bi-person-standing me-2"></i> Cintura & Membros Inferiores
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Cintura" class="form-label">Cintura</label>
+                            <input asp-for="Cintura" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Abdomen" class="form-label">Abdómen</label>
+                            <input asp-for="Abdomen" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Anca" class="form-label">Anca</label>
+                            <input asp-for="Anca" class="form-control" />
+                        </div>
+
+                        <div class="col-12"><hr class="text-muted"></div>
+
+                        <div class="col-md-3">
+                            <label asp-for="CoxaDireita" class="form-label">Coxa Dir.</label>
+                            <input asp-for="CoxaDireita" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="CoxaEsquerda" class="form-label">Coxa Esq.</label>
+                            <input asp-for="CoxaEsquerda" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="GemeoDireito" class="form-label">Gémeo Dir.</label>
+                            <input asp-for="GemeoDireito" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="GemeoEsquerdo" class="form-label">Gémeo Esq.</label>
+                            <input asp-for="GemeoEsquerdo" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 text-end mt-4">
+                <button type="submit" class="btn btn-warning btn-lg px-5">
+                    <i class="bi bi-save"></i> Atualizar Dados
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
