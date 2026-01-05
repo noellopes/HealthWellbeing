@@ -189,12 +189,6 @@ namespace HealthWellbeingRoom.Controllers
 
             await _context.SaveChangesAsync();
 
-            if (rc.Quantity == 1)
-            {
-                TempData["LowStockMessage"] =
-                    $"O consumível '{rc.Consumivel?.Nome}' está quase a esgotar na sala '{rc.Room?.Name}'.";
-            }
-
             TempData["SuccessMessage"] =
                 $"Foram consumidas {usedQuantity} unidade(s) de '{rc.Consumivel?.Nome}' na sala '{rc.Room?.Name}'.";
 
