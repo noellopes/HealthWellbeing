@@ -1,4 +1,9 @@
-﻿using System;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,11 +21,40 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TipoServico
-        public async Task<IActionResult> Index(string? successMessage = null)
+        public async Task<IActionResult> Index(string pesquisarNome, int pagina = 1)
         {
-            ViewBag.SuccessMessage = successMessage;
-            return View(await _context.TipoServicos.ToListAsync());
+            // 1. Inicia a consulta na tabela TipoServicos
+            var consulta = _context.TipoServicos.AsQueryable();
+
+            // 2. Aplica filtro se existir
+            if (!string.IsNullOrEmpty(pesquisarNome))
+            {
+                consulta = consulta.Where(x => x.Nome.Contains(pesquisarNome));
+            }
+
+            // 3. Cria o "embrulho" (ViewModel)
+            var model = new TipoServicoViewModel
+            {
+                PesquisarNome = pesquisarNome,
+                paginacao = new Paginacao
+                {
+                    PaginaCorrente = pagina,
+                    ItemTotal = await consulta.CountAsync()
+                },
+                // 4. Converte o resultado da BD para a lista dentro do ViewModel
+                ListaServicos = await consulta
+                    .OrderBy(x => x.Nome)
+                    .Skip((pagina - 1) * 6)
+                    .Take(6)
+                    .ToListAsync()
+            };
+
+            return View(model);
         }
+
+
+        [HttpGet]
+        [HttpPost]
         // GET: TipoServico/Details/5
         public async Task<IActionResult> Details(int? id, string? successMessage = null)
         {

@@ -1,43 +1,170 @@
-﻿@model IEnumerable<HealthWellbeing.Models.TipoServicos>
+﻿@model HealthWellbeing.Models.TipoServicoViewModel
+
+
 
 @{
+
     ViewData["Title"] = "Tipo de Serviços";
+
+    var successMessage = TempData["SuccessMessage"]?.ToString();
+
 }
+
+
+
+@if (!string.IsNullOrEmpty(successMessage))
+
+{
+     <div class="container py-4">
+
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+
+        <i class="bi bi-check-circle-fill me-2"></i>@successMessage
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    </div>
+    </div>
+
+}
+
+
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 
+
+<div class="d-flex align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-success me-2">
+        <i class="bi bi-plus-circle me-1"></i>Criar Novo Tipo de Serviço
+    </a>
+
+    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#searchModal">
+        <i class="bi bi-search me-1"></i>Pesquisar
+    </button>
+
+    @if (!string.IsNullOrEmpty(Model.PesquisarNome))
+    {
+        <a asp-action="Index" class="btn btn-outline-danger">Limpar busca</a>
+    }
+</div>
+
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchModalLabel">Pesquisar Tipo de Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Index" method="get">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pesquisarNome" class="form-label">Nome do Tipo Serviço</label>
+                        <input type="text" name="pesquisarNome" id="pesquisarNome" class="form-control"
+                               placeholder="Digite o nome..." value="@Model.PesquisarNome">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i> Pesquisar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="table-responsive">
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Nome)</th>
-            <th>@Html.DisplayNameFor(model => model.Descricao)</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+
+    <table class="table table-striped table-hover table-bordered shadow-sm">
+
+        <thead class="table-dark">
+
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.Nome)</td>
-                <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
+
+                <th>@Html.DisplayNameFor(model => model.ListaServicos.First().Nome)</th>
+                <th> @Html.DisplayNameFor(model => model.ListaServicos.First().Descricao)</th>
+                <th class="" style="width: 25%">Ações</th>
+
+            </tr>
+
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.ListaServicos)
+
+            {
+
+                <tr>
+
+                    <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
 
                     <td>
-                    
-                    
-                    <a asp-action="Edit" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-primary me-2">
-                        <i class="bi bi-pencil-square"></i>Edit
-                        </a> 
-                    <a asp-action="Details" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-warning me-2">
-                        <i class="bi bi-info-circle"></i>Details
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-danger">
-                        <i class="bi bi-trash"></i>Delete
-                    </a>
-                        
-                </td>
-            </tr>
-        }
+
+
+                        <a asp-action="Edit" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-primary me-2">
+                            <i class="bi bi-pencil-square"></i>Edit
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-warning me-2">
+                            <i class="bi bi-info-circle"></i>Details
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.TipoServicosId" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>Delete
+                        </a>
+
+                    </td>
+                </tr>
+
+            }
+
+        </tbody>
+
+    </table>
 
 </div>
+
+
+@* PAGINAÇÃO *@
+
+<nav aria-label="Navegação de páginas" class="mt-4">
+
+    <ul class="pagination justify-content-start">
+
+        @* Botão Primeira *@
+
+        <li class="page-item @(Model.paginacao.PaginaCorrente == 1 ? "disabled" : "")">
+
+            <a class="page-link" asp-action="Index" asp-route-pagina="1" asp-route-pesquisarNome="@Model.PesquisarNome">Primeira</a>
+
+        </li>
+
+        @* Números das Páginas *@
+
+        @for (int p = Model.paginacao.PrimeiraPaginaVer; p <= Model.paginacao.UltimaPaginaVer; p++)
+
+        {
+
+            <li class="page-item @(p == Model.paginacao.PaginaCorrente ? "active" : "")">
+
+                <a class="page-link" asp-action="Index" asp-route-pagina="@p" asp-route-pesquisarNome="@Model.PesquisarNome">@p</a>
+
+            </li>
+
+        }
+
+        @* Botão Última *@
+
+        <li class="page-item @(Model.paginacao.PaginaCorrente == Model.paginacao.PaginaTotal ? "disabled" : "")">
+
+            <a class="page-link" asp-action="Index" asp-route-pagina="@Model.paginacao.PaginaTotal" asp-route-pesquisarNome="@Model.PesquisarNome">Última</a>
+
+        </li>
+
+    </ul>
+
+</nav>
