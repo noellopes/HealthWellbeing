@@ -1,6 +1,7 @@
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 internal class SeedData
 {
@@ -57,17 +58,18 @@ internal class SeedData
         }
     }
 
-    internal static void SeedUsers(UserManager<IdentityUser> userManager)
+    internal static void SeedUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
     {
-        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
-        EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }, dbContext).Wait();
+        EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }, dbContext).Wait();
     }
 
-    private static async Task EnsureUserIsCreatedAsync(
+    private static async Task<IdentityUser> EnsureUserIsCreatedAsync(
         UserManager<IdentityUser> userManager,
         string username,
         string password,
-        string[] roles)
+        string[] roles,
+        HealthWellbeingDbContext? dbContext = null)
     {
         var user = await userManager.FindByNameAsync(username);
 
@@ -82,6 +84,45 @@ internal class SeedData
             if (!await userManager.IsInRoleAsync(user, role))
                 await userManager.AddToRoleAsync(user, role);
         }
+        if (dbContext != null && roles.Contains("Cliente", StringComparer.OrdinalIgnoreCase))
+        {
+            await EnsureClientProfileAsync(dbContext, user);
+        }
+
+        return user;
+    }
+
+    private static async Task EnsureClientProfileAsync(HealthWellbeingDbContext dbContext, IdentityUser user)
+    {
+
+        var client = await dbContext.Client
+            .FirstOrDefaultAsync(c => c.IdentityUserId == user.Id || (c.IdentityUserId == null && c.Email == user.Email));
+
+        if (client == null)
+        {
+            client = new Client
+            {
+                ClientId = Guid.NewGuid().ToString("N"),
+                IdentityUserId = user.Id,
+                Name = "Cliente Health",          // passa regex (nome + apelido)
+                Email = user.Email ?? user.UserName ?? "",
+                Phone = "555-0000000",
+                Address = "",
+                BirthDate = null,
+                Gender = "",
+                RegistrationDate = DateTime.Now
+            };
+
+            dbContext.Client.Add(client);
+        }
+        else
+        {
+            client.IdentityUserId = user.Id;
+            if (!string.IsNullOrWhiteSpace(user.Email))
+                client.Email = user.Email;
+        }
+
+        await dbContext.SaveChangesAsync();
     }
 
     internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)

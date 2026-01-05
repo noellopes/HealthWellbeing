@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Models
 {
@@ -34,6 +35,11 @@ namespace HealthWellbeing.Models
 		[DataType(DataType.Date)]
 		public DateTime RegistrationDate { get; set; } = DateTime.Now;
 		public Member? Membership { get; set; }
+		
+		[StringLength(450)]
+		public string? IdentityUserId { get; set; }
+
+		public IdentityUser? IdentityUser { get; set; }
 	}
 }
 
