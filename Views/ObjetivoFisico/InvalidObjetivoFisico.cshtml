@@ -1,7 +1,7 @@
-﻿@model HealthWellbeing.Models.ProblemaSaude
+﻿@model HealthWellbeing.Models.ObjetivoFisico
 
 @{
-    ViewData["Title"] = "Problema de Saúde Inválido";
+    ViewData["Title"] = "Objetivo Físico Inválido";
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -11,7 +11,7 @@
     <div class="ps-4">
         <h4 class="alert-heading mb-2">O registo não existe</h4>
         <p class="mb-0">
-            O problema de saúde que tentou editar ou visualizar já não existe na base de dados.
+            O Objetivo Físico que tentou editar já não existe na base de dados.
             Provavelmente foi eliminado por outro utilizador.
         </p>
     </div>
@@ -21,23 +21,19 @@
 {
     <div class="card border-info mb-4 shadow-sm">
         <div class="card-header bg-info text-white">
-            <i class="bi bi-arrow-repeat me-2"></i> Recuperação de Dados
+            <i class="bi bi-arrow-repeat me-2"></i>Recuperação de Dados
         </div>
-
         <div class="card-body">
             <h5 class="card-title">Deseja salvar os dados como um novo registo?</h5>
             <p class="card-text">
                 Apesar de o original ter sido apagado, ainda temos os dados que acabou de preencher.
-                Pode clicar abaixo para os adicionar novamente à base de dados como um novo Problema de Saúde.
+                Pode clicar abaixo para os adicionar novamente à base de dados como um novo Objetivo Físico.
             </p>
 
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
 
-                <input type="hidden" asp-for="ProblemaCategoria" />
-                <input type="hidden" asp-for="ProblemaNome" />
-                <input type="hidden" asp-for="ZonaAtingida" />
-                <input type="hidden" asp-for="Gravidade" />
+                <input type="hidden" asp-for="NomeObjetivo" />
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-success">

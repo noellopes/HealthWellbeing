@@ -1,56 +1,40 @@
-﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.ObjetivoFisico>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.UtenteGrupo7>
 
 @{
-    ViewData["Title"] = "Objetivos Físicos";
+    ViewData["Title"] = "Estatísticas dos Utentes";
 }
 
-<h1 class="mb-4 text-primary"><i class="bi bi-trophy"></i> Objetivos Físicos</h1>
-
+<h1 class="mb-4 text-primary"><i class="bi bi-bar-chart-line"></i> Análise de Utentes</h1>
 
 @if (TempData["StatusMessage"] is string statusMessage)
 {
-    string alertClass = "alert-info";
-
-    if (statusMessage.StartsWith("Sucesso:"))
-    {
-        alertClass = "alert-success";
-    }
-    else if (statusMessage.StartsWith("Aviso:"))
-    {
-        alertClass = "alert-warning";
-    }
-    else if (statusMessage.StartsWith("Erro:"))
-    {
-        alertClass = "alert-danger";
-    }
-
-    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
         @statusMessage
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
     </div>
 }
 
-
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h4">Listagem</h2>
     <div>
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
-            <i class="bi bi-search me-1"></i> Pesquisa
-        </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Criar Novo
+            <i class="bi bi-search me-1"></i> Pesquisa Avançada
         </a>
     </div>
 </div>
-
 
 <div class="collapse mb-3" id="searchForm">
     <div class="card card-body bg-light">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
 
-            <div class="col-md-9">
-                <label for="searchNome" class="form-label fw-bold">Nome do Objetivo</label>
-                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Ex: Perda de Peso, Musculação..." />
+            <div class="col-md-5">
+                <label for="searchNome" class="form-label fw-bold">Nome do Utente</label>
+                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Ex: João Silva" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchProfissional" class="form-label fw-bold">ID Profissional</label>
+                <input id="searchProfissional" name="searchProfissional" value="@ViewBag.SearchProfissional" class="form-control" placeholder="Ex: P001" />
             </div>
 
             <div class="col-md-3 d-flex gap-2">
@@ -63,11 +47,10 @@
     </div>
 </div>
 
-
 @if (!Model.Items.Any())
 {
     <div class="alert alert-warning shadow-sm">
-        <i class="bi bi-exclamation-triangle me-2"></i> Nenhum objetivo físico encontrado.
+        <i class="bi bi-exclamation-triangle me-2"></i> Nenhum utente encontrado com os critérios de pesquisa.
     </div>
 }
 else
@@ -77,24 +60,29 @@ else
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Nome do Objetivo</th>
-                        <th class="text-end" style="min-width: 200px;">Ações</th>
+                        <th>Nome do Utente</th>
+                        <th>ID Profissional</th>
+                        <th class="text-end" style="min-width: 150px;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            <td class="fw-bold text-dark">@item.NomeObjetivo</td>
+                            <td class="fw-bold text-dark">@item.Nome</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ProfissionalSaudeId))
+                                {
+                                    <span class="badge bg-secondary">@item.ProfissionalSaudeId</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">N/A</span>
+                                }
+                            </td>
                             <td class="text-end">
-                                <a asp-action="Edit" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-warning btn-sm me-1" title="Editar">
-                                    <i class="bi bi-pencil"></i>Editar
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-info btn-sm me-1 text-white" title="Detalhes">
-                                    <i class="bi bi-eye"></i>Detalhes
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-danger btn-sm" title="Apagar">
-                                    <i class="bi bi-trash"></i>Apagar
+                                <a asp-action="Utente" asp-route-id="@item.UtenteGrupo7Id" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                                    Ver Progresso <i class="bi bi-arrow-right-short"></i>
                                 </a>
                             </td>
                         </tr>

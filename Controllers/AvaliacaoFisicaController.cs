@@ -9,6 +9,7 @@ using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using HealthWellbeing.ViewModels; 
 
 namespace HealthWellbeing.Controllers
 {
@@ -24,22 +25,69 @@ namespace HealthWellbeing.Controllers
             _userManager = userManager;
         }
 
-        // GET: AvaliacaoFisica
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchUtente = "",
+            string dataInicio = "",
+            string dataFim = "")
         {
-            var query = _context.AvaliacaoFisica.Include(a => a.UtenteGrupo7).AsQueryable();
+            var query = _context.AvaliacaoFisica
+                .Include(a => a.UtenteGrupo7)
+                .AsQueryable();
 
+           
             if (User.IsInRole("Utente"))
             {
                 var userId = _userManager.GetUserId(User);
                 query = query.Where(a => a.UtenteGrupo7.UserId == userId);
             }
-            // Se for Administrador ou ProfissionalSaude, vê tudo.
+            else
+            {
+                
+                if (!string.IsNullOrEmpty(searchUtente))
+                {
+                    query = query.Where(a => a.UtenteGrupo7.Nome.Contains(searchUtente));
+                }
+            }
 
-            return View(await query.ToListAsync());
+            
+            if (DateTime.TryParse(dataInicio, out DateTime dtInicio))
+            {
+                query = query.Where(a => a.DataMedicao >= dtInicio);
+            }
+
+            if (DateTime.TryParse(dataFim, out DateTime dtFim))
+            {
+                query = query.Where(a => a.DataMedicao <= dtFim.AddDays(1).AddTicks(-1));
+            }
+
+            
+            ViewBag.SearchUtente = searchUtente;
+            ViewBag.DataInicio = dataInicio;
+            ViewBag.DataFim = dataFim;
+
+           
+            int total = await query.CountAsync();
+            var pagination = new PaginationInfo<AvaliacaoFisica>(page, total);
+
+            if (total > 0)
+            {
+                pagination.Items = await query
+                    .OrderByDescending(a => a.DataMedicao)
+                    .Skip(pagination.ItemsToSkip)
+                    .Take(pagination.ItemsPerPage)
+                    .ToListAsync();
+            }
+            else
+            {
+                pagination.Items = new List<AvaliacaoFisica>();
+            }
+
+            return View(pagination);
         }
 
-        // GET: AvaliacaoFisica/Details/5
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -50,38 +98,31 @@ namespace HealthWellbeing.Controllers
 
             if (avaliacaoFisica == null) return NotFound();
 
-            // Segurança: Utente só vê os seus detalhes
+            
             if (User.IsInRole("Utente"))
             {
                 var userId = _userManager.GetUserId(User);
-                if (avaliacaoFisica.UtenteGrupo7.UserId != userId)
-                {
-                    return Forbid();
-                }
+                if (avaliacaoFisica.UtenteGrupo7.UserId != userId) return Forbid();
             }
 
             return View(avaliacaoFisica);
         }
 
-        // GET: AvaliacaoFisica/Create
+       
         public IActionResult Create()
         {
-            
             bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
             ViewBag.IsStaff = isStaff;
 
             if (isStaff)
             {
-                
                 ViewData["UtenteGrupo7Id"] = new SelectList(_context.UtenteGrupo7, "UtenteGrupo7Id", "Nome");
             }
-
-            
 
             return View();
         }
 
-        // POST: AvaliacaoFisica/Create
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AvaliacaoFisicaId,DataMedicao,Peso,Altura,GorduraCorporal,MassaMuscular,Pescoco,Ombros,Peitoral,BracoDireito,BracoEsquerdo,Cintura,Abdomen,Anca,CoxaDireita,CoxaEsquerda,GemeoDireito,GemeoEsquerdo,UtenteGrupo7Id")] AvaliacaoFisica avaliacaoFisica)
@@ -90,20 +131,17 @@ namespace HealthWellbeing.Controllers
 
             if (!isStaff)
             {
-                // LÓGICA PARA UTENTE
+                
                 var userId = _userManager.GetUserId(User);
                 var utenteLogado = await _context.UtenteGrupo7.FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (utenteLogado == null)
                 {
-                    ModelState.AddModelError("", "Você precisa criar o seu Perfil de Utente antes de registar avaliações.");
+                    ModelState.AddModelError("", "Erro: Perfil de Utente não encontrado.");
                     return View(avaliacaoFisica);
                 }
 
-                // Força o ID do utente logado
                 avaliacaoFisica.UtenteGrupo7Id = utenteLogado.UtenteGrupo7Id;
-
-                // Remove erros de validação pois o campo não existe no HTML do utente
                 ModelState.Remove("UtenteGrupo7Id");
                 ModelState.Remove("UtenteGrupo7");
             }
@@ -115,7 +153,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recarregar em caso de erro
+            
             ViewBag.IsStaff = isStaff;
             if (isStaff)
             {
@@ -125,7 +163,7 @@ namespace HealthWellbeing.Controllers
             return View(avaliacaoFisica);
         }
 
-        // GET: AvaliacaoFisica/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -141,10 +179,7 @@ namespace HealthWellbeing.Controllers
             if (!isStaff)
             {
                 var userId = _userManager.GetUserId(User);
-                if (avaliacaoFisica.UtenteGrupo7.UserId != userId)
-                {
-                    return Forbid();
-                }
+                if (avaliacaoFisica.UtenteGrupo7.UserId != userId) return Forbid();
             }
 
             ViewBag.IsStaff = isStaff;
@@ -156,7 +191,7 @@ namespace HealthWellbeing.Controllers
             return View(avaliacaoFisica);
         }
 
-        // POST: AvaliacaoFisica/Edit/5
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AvaliacaoFisicaId,DataMedicao,Peso,Altura,GorduraCorporal,MassaMuscular,Pescoco,Ombros,Peitoral,BracoDireito,BracoEsquerdo,Cintura,Abdomen,Anca,CoxaDireita,CoxaEsquerda,GemeoDireito,GemeoEsquerdo,UtenteGrupo7Id")] AvaliacaoFisica avaliacaoFisica)
@@ -167,7 +202,7 @@ namespace HealthWellbeing.Controllers
 
             if (!isStaff)
             {
-                // Garante que o Utente não altera a propriedade do registo
+                
                 var original = await _context.AvaliacaoFisica.AsNoTracking().FirstOrDefaultAsync(a => a.AvaliacaoFisicaId == id);
                 if (original != null)
                 {
@@ -185,8 +220,15 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AvaliacaoFisicaExists(avaliacaoFisica.AvaliacaoFisicaId)) return NotFound();
-                    else throw;
+                    if (!AvaliacaoFisicaExists(avaliacaoFisica.AvaliacaoFisicaId))
+                    {
+                        
+                        return View("InvalidAvaliacaoFisica", avaliacaoFisica);
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -199,7 +241,7 @@ namespace HealthWellbeing.Controllers
             return View(avaliacaoFisica);
         }
 
-        // GET: AvaliacaoFisica/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -219,7 +261,7 @@ namespace HealthWellbeing.Controllers
             return View(avaliacaoFisica);
         }
 
-        // POST: AvaliacaoFisica/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -228,8 +270,8 @@ namespace HealthWellbeing.Controllers
             if (avaliacaoFisica != null)
             {
                 _context.AvaliacaoFisica.Remove(avaliacaoFisica);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

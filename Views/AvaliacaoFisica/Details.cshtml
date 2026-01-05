@@ -1,126 +1,87 @@
 ﻿@model HealthWellbeing.Models.AvaliacaoFisica
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Avaliação";
 }
 
-<h1>Details</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-<div>
-    <h4>AvaliacaoFisica</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DataMedicao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DataMedicao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peso)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peso)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GorduraCorporal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GorduraCorporal)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MassaMuscular)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MassaMuscular)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Pescoco)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Pescoco)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ombros)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Ombros)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peitoral)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peitoral)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BracoDireito)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BracoDireito)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BracoEsquerdo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BracoEsquerdo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cintura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cintura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Abdomen)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Abdomen)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Anca)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Anca)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CoxaDireita)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CoxaDireita)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CoxaEsquerda)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CoxaEsquerda)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GemeoDireito)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GemeoDireito)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GemeoEsquerdo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GemeoEsquerdo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UtenteGrupo7)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UtenteGrupo7.UtenteGrupo7Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AvaliacaoFisicaId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary mb-0">Avaliação Física</h2>
+                    <p class="text-muted">Realizada a @Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")</p>
+                </div>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.AvaliacaoFisicaId" class="btn btn-warning me-2"><i class="bi bi-pencil"></i> Editar</a>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i> Utente: @Model.UtenteGrupo7.Nome</h5>
+                </div>
+                <div class="card-body">
+
+                    <div class="row text-center mb-4">
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border">
+                                <h3 class="text-primary">@Model.Peso <small class="fs-6 text-muted">kg</small></h3>
+                                <div class="small fw-bold text-uppercase">Peso</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border">
+                                <h3 class="text-primary">@Model.Altura <small class="fs-6 text-muted">cm</small></h3>
+                                <div class="small fw-bold text-uppercase">Altura</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border">
+                                <h3 class="text-success">@Model.GorduraCorporal <small class="fs-6 text-muted">%</small></h3>
+                                <div class="small fw-bold text-uppercase">Gordura</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded border">
+                                <h3 class="text-info">@Model.MassaMuscular <small class="fs-6 text-muted">%</small></h3>
+                                <div class="small fw-bold text-uppercase">Massa Muscular</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <h5 class="mb-3 text-secondary"><i class="bi bi-rulers me-2"></i>Perímetros e Medidas (cm)</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between"><span>Pescoço:</span> <strong>@Model.Pescoco</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Ombros:</span> <strong>@Model.Ombros</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Peitoral:</span> <strong>@Model.Peitoral</strong></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between"><span>Braço Dir:</span> <strong>@Model.BracoDireito</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Braço Esq:</span> <strong>@Model.BracoEsquerdo</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Cintura:</span> <strong>@Model.Cintura</strong></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between"><span>Anca:</span> <strong>@Model.Anca</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Coxa Dir:</span> <strong>@Model.CoxaDireita</strong></li>
+                                <li class="list-group-item d-flex justify-content-between"><span>Coxa Esq:</span> <strong>@Model.CoxaEsquerda</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
