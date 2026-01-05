@@ -510,5 +510,8 @@ namespace HealthWellbeing.Controllers
                 .Select(e => new SelectListItem { Value = e.ExercicioId.ToString(), Text = e.ExercicioNome })
                 .ToList();
         }
+
+
+        
     }
 }
