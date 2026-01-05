@@ -64,6 +64,7 @@ namespace HealthWellbeing.Data
             // 4. Criar Utilizador 
             await EnsureUser(userManager, "mendes@health.com", "Mendes123!", new[] { "Administrator", "Gestor de armazenamento" });
             await EnsureUser(userManager, "leal@health.com", "Leal123!", new[] { "Administrator", "Gestor de armazenamento" });
+            await EnsureUser(userManager, "rebolho@health.com", "Rebolho123!", new[] { "Administrator", "Gestor de armazenamento" });
         }
 
         private static async Task EnsureUser(UserManager<IdentityUser> userManager, string email, string password, string[] roles)

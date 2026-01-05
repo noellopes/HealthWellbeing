@@ -1,46 +1,92 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Adicionar Fornecedor a Consumível";
 }
 
-<h1>Create</h1>
+<style>
+    .create-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
 
-<h4>Fornecedor_Consumivel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FornecedorId" class="control-label"></label>
-                <select asp-for="FornecedorId" class ="form-control" asp-items="ViewBag.FornecedorId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConsumivelId" class="control-label"></label>
-                <select asp-for="ConsumivelId" class ="form-control" asp-items="ViewBag.ConsumivelId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TempoEntrega" class="control-label"></label>
-                <input asp-for="TempoEntrega" class="form-control" />
-                <span asp-validation-for="TempoEntrega" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Preco" class="control-label"></label>
-                <input asp-for="Preco" class="form-control" />
-                <span asp-validation-for="Preco" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: 500;
+    }
+
+    .btn-spacing {
+        margin-right: 10px;
+    }
+</style>
+
+<div class="create-container">
+    <div class="card">
+        <div class="card-header">
+            ➕ Associar Fornecedor a Consumível
+        </div>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FornecedorId" class="form-label">Fornecedor</label>
+                    <select asp-for="FornecedorId"
+                            class="form-control"
+                            asp-items="ViewBag.FornecedorId">
+                    </select>
+                    <span asp-validation-for="FornecedorId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ConsumivelId" class="form-label">Consumível</label>
+                    <select asp-for="ConsumivelId"
+                            class="form-control"
+                            asp-items="ViewBag.ConsumivelId">
+                    </select>
+                    <span asp-validation-for="ConsumivelId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TempoEntrega" class="form-label"></label>
+                    <input asp-for="TempoEntrega" class="form-control" />
+                    <span asp-validation-for="TempoEntrega" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Preco" class="form-label"></label>
+                    <input asp-for="Preco" class="form-control" />
+                    <span asp-validation-for="Preco" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-spacing">
+                        Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

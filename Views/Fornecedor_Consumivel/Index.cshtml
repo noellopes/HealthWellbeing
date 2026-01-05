@@ -1,53 +1,89 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Fornecedor_Consumivel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Associações Fornecedor–Consumível";
 }
 
-<h1>Index</h1>
+<style>
+    .btn-acao {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        padding: 4px 10px;
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Fornecedor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Consumivel)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TempoEntrega)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Preco)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Fornecedor.NomeEmpresa)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Consumivel.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TempoEntrega)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Preco)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.FornecedorConsumivelId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.FornecedorConsumivelId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.FornecedorConsumivelId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary mb-0">
+            🔗 Fornecedor – Consumível
+        </h2>
+        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">
+            ➕ Adicionar Novo
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            Nenhuma associação registada.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Fornecedor</th>
+                        <th>Consumível</th>
+                        <th>Tempo de Entrega</th>
+                        <th>Preço</th>
+                        <th class="text-center" style="width: 230px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">
+                                @item.Fornecedor.NomeEmpresa
+                            </td>
+                            <td>
+                                @item.Consumivel.Nome
+                            </td>
+                            <td>
+                                @item.TempoEntrega
+                            </td>
+                            <td>
+                                @item.Preco
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Details"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-info text-white me-1 btn-acao">
+                                    Ver
+                                </a>
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-warning text-white me-1 btn-acao">
+                                    Editar
+                                </a>
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-danger btn-acao">
+                                    Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
