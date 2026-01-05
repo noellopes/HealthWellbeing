@@ -15,15 +15,12 @@
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+            @* Id da consulta apenas em hidden *@
+            <input asp-for="ConsultationId" type="hidden" />
+
             <div class="row g-3">
 
                 <!-- ===================== LINHA 1 ===================== -->
-                <div class="col-md-6">
-                    <label asp-for="ConsultationId" class="form-label fw-bold">Id da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" type="number" min="1" placeholder="Ex: 123" />
-                    <span asp-validation-for="ConsultationId" class="text-danger small"></span>
-                </div>
-
                 <div class="col-md-6">
                     <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta*</label>
                     <input asp-for="ConsultationDate"
@@ -33,6 +30,23 @@
                            min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                     <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
                 </div>
+
+                <div class="col-md-6">
+                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
+
+                    @* hidden para o valor ser enviado no POST *@
+                    <input asp-for="SpecialtyId" type="hidden" />
+
+                    <select asp-for="SpecialtyId"
+                            class="form-select"
+                            asp-items="@(ViewBag.Specialties as SelectList)"
+                            disabled>
+                        <option value="">Selecione a especialidade...</option>
+                    </select>
+
+                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
+                </div>
+
 
                 <!-- ===================== LINHA 2 ===================== -->
                 <div class="col-md-6">
@@ -50,7 +64,11 @@
                 <!-- ===================== LINHA 3 ===================== -->
                 <div class="col-md-6">
                     <label asp-for="RoomId" class="form-label fw-bold">Sala****</label>
-                    <select asp-for="RoomId" class="form-select" asp-items="@(ViewBag.Rooms as SelectList)" id="room-select" required>
+                    <select asp-for="RoomId"
+                            class="form-select"
+                            asp-items="@(ViewBag.Rooms as SelectList)"
+                            id="room-select"
+                            required>
                         <option value="">Selecione a sala...</option>
                     </select>
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
@@ -58,14 +76,20 @@
 
                 <div class="col-md-6">
                     <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável</label>
-                    <input asp-for="ResponsibleName" class="form-control" placeholder="Ex: Dr. João Silva" required />
+                    <input asp-for="ResponsibleName"
+                           class="form-control"
+                           placeholder="Ex: Dr. João Silva"
+                           readonly />
                     <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== OBSERVAÇÕES ===================== -->
                 <div class="col-md-12">
                     <label asp-for="Notes" class="form-label fw-bold">Observações (Opcional)</label>
-                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Informações adicionais..."></textarea>
+                    <textarea asp-for="Notes"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Informações adicionais..."></textarea>
                     <span asp-validation-for="Notes" class="text-danger small"></span>
                 </div>
 
@@ -125,7 +149,7 @@
     <script>
         // Bloquear datas anteriores a hoje
         document.getElementById('consultation-date')
-                .setAttribute('min', new Date().toISOString().split('T')[0]);
+            .setAttribute('min', new Date().toISOString().split('T')[0]);
 
         function updateHourLimits() {
             const dateInput = document.getElementById('consultation-date');
@@ -137,7 +161,7 @@
             const selectedDate = new Date(dateInput.value);
             const today = new Date();
             const nowTime = today.getHours().toString().padStart(2, '0') + ":" +
-                            today.getMinutes().toString().padStart(2, '0');
+                today.getMinutes().toString().padStart(2, '0');
 
             if (selectedDate.toDateString() === today.toDateString()) {
                 startInput.min = nowTime;

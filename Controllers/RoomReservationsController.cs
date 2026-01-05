@@ -298,10 +298,18 @@ namespace HealthWellbeingRoom.Controllers
                 .OrderBy(s => s.Name)
                 .ToListAsync();
 
-            var specialitySelect = new SelectList(specialities, "SpecialityId", "Name", selectedSpecialityId);
-            ViewData["SpecialityId"] = specialitySelect;
-            ViewData["SpecialtyId"] = specialitySelect;
-            ViewBag.RoomSpecialty = specialitySelect;
+            // atenção ao nome da chave e ao selectedSpecialityId
+            var specialtiesSelect = new SelectList(
+                specialities,
+                "SpecialtyId",     // garante que é esta a PK na entidade
+                "Name",
+                selectedSpecialityId
+            );
+
+            // usar o mesmo nome que a View espera
+            ViewBag.Specialties = specialtiesSelect;
+            ViewData["SpecialtyId"] = specialtiesSelect;
+
 
             // --- Carregar Consultas ---
             var consultations = await _context.Consultations
@@ -417,24 +425,36 @@ namespace HealthWellbeingRoom.Controllers
 
         // GET: RoomReservations/Create
         [Authorize(Roles = "logisticsTechnician")]
-        public async Task<IActionResult> Create(int? roomId)
+        public async Task<IActionResult> Create(int? roomId, int? consultationId)
         {
+            Consultation? consultation = null;
+
+            if (consultationId.HasValue)
+            {
+                consultation = await _context.Consultations
+                    .FirstOrDefaultAsync(c => c.ConsultationId == consultationId.Value);
+            }
+
             await PreencherDropdowns(
-                selectedRoomId: roomId,
-                selectedSpecialityId: null,
-                consultationDate: null,
-                startHour: null,
-                endHour: null,
+                selectedRoomId: roomId ?? consultation?.RoomId,
+                selectedSpecialityId: consultation?.SpecialtyId,
+                consultationDate: consultation?.ConsultationDate,
                 excludeReservationId: null
             );
 
             var model = new RoomReservation
             {
-                RoomId = roomId ?? 0
+                RoomId = roomId ?? consultation?.RoomId ?? 0,
+                ConsultationId = consultation?.ConsultationId ?? 0,
+                SpecialtyId = consultation?.SpecialtyId,
+                ResponsibleName = consultation?.DoctorName ?? string.Empty,
+                ConsultationDate = consultation?.ConsultationDate ?? DateTime.Today,
             };
 
             return View(model);
         }
+
+
         //------------------------------------------------------CREATE POST-------------------------------------------------------------------------------------
         [HttpPost]
         [ValidateAntiForgeryToken]
