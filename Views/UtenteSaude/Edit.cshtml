@@ -137,14 +137,16 @@
                     </h2>
                     <p class="form-sub">Atualiza os dados do utente e guarda as alterações.</p>
 
-                    <form asp-action="Edit" method="post">
+                    <form asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" method="post">
+
                         @Html.AntiForgeryToken()
 
                         <input type="hidden" asp-for="UtenteSaudeId" />
-                        <input type="hidden" asp-for="ClientId" /> <!-- ✅ mantém o FK -->
+                        <!--    <input type="hidden" asp-for="ClientId" /> teste -->
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                        <div asp-validation-summary="All" class="text-danger mb-2"></div>
 
+                        @{ViewData["Mode"] = "Edit";                        }
                         @Html.Partial("_FormUtenteSaude", Model)
 
                         <div class="d-flex gap-2 flex-wrap mt-3">

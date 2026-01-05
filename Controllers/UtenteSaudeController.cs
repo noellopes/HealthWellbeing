@@ -232,7 +232,7 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UtenteSaudeId,Nif,Niss,Nus")] UtenteSaude u)
+        public async Task<IActionResult> Edit(int id, [Bind("UtenteSaudeId,ClientId,Nif,Niss,Nus")] UtenteSaude u)
         {
             if (id != u.UtenteSaudeId) return NotFound();
 
@@ -254,14 +254,13 @@ namespace HealthWellbeing.Controllers
 
             if (!ModelState.IsValid)
             {
-                // devolvemos o "existing" com o Client para a view mostrar read-only
+                // para manter valores no ecrã
                 existing.Nif = u.Nif;
                 existing.Niss = u.Niss;
                 existing.Nus = u.Nus;
                 return View(existing);
             }
 
-            // Atualiza apenas campos do UtenteSaude
             existing.Nif = u.Nif;
             existing.Niss = u.Niss;
             existing.Nus = u.Nus;
@@ -271,6 +270,7 @@ namespace HealthWellbeing.Controllers
             TempData["Msg"] = "Utente atualizado com sucesso.";
             return RedirectToAction(nameof(Details), new { id = existing.UtenteSaudeId });
         }
+
 
         // ================================
         // DELETE (GET)

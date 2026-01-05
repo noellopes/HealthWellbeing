@@ -26,6 +26,7 @@
                 <!-- em Edit: não deixa mudar -->
                 <input class="form-control" value="@Model.NomeCompleto" readonly />
                 <input type="hidden" asp-for="ClientId" />
+                <span asp-validation-for="ClientId" class="text-danger"></span>
             }
         </div>
     </div>
