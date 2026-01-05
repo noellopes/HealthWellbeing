@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260104154156_PopulateAgenda")]
-    partial class PopulateAgenda
+    [Migration("20260105165704_MigracaoInicial")]
+    partial class MigracaoInicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -329,6 +329,9 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("IdMedico")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdUtenteSaude")
+                        .HasColumnType("int");
+
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");
 
@@ -337,6 +340,8 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("IdEspecialidade");
 
                     b.HasIndex("IdMedico");
+
+                    b.HasIndex("IdUtenteSaude");
 
                     b.ToTable("Consulta");
                 });
@@ -776,6 +781,10 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<string>("OqueEDescricao")
+                        .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("IdEspecialidade");
 
                     b.ToTable("Specialities");
@@ -1082,9 +1091,17 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeing.Models.UtenteSaude", "UtenteSaude")
+                        .WithMany()
+                        .HasForeignKey("IdUtenteSaude")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Doctor");
 
                     b.Navigation("Speciality");
+
+                    b.Navigation("UtenteSaude");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
