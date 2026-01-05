@@ -364,3 +364,8 @@ FodyWeavers.xsd
 /Models/NutrientComponent.cs
 /Views/FoodComponent/Delete.cshtml
 /Views/FoodComponent/Edit.cshtml
+/Migrations/20251124191832_WhitFoodInTake.cs
+/Migrations/20251124191832_WhitFoodInTake.Designer.cs
+/Migrations/20251124191832_WhitFoodInTake.cs
+/Migrations/20251124191832_WhitFoodInTake.cs
+/Migrations/20251124191832_WhitFoodInTake.cs

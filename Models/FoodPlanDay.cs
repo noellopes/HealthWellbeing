@@ -1,30 +1,33 @@
-﻿using HealthWellbeing.Models;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
 {
-    public class FoodIntake
+    public class FoodPlanDay
     {
         [Key]
-        public int FoodIntakeId { get; set; }
+        public int FoodPlanDayId { get; set; }
 
+        [Required]
         public int PlanId { get; set; }
+
+        [Required]
         public int FoodId { get; set; }
+
+        [Required]
         public int PortionId { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime Date { get; set; }
 
-        public int PortionsPlanned { get; set; }
-        public int PortionsEaten { get; set; }
+        [Range(1, 50)]
+        public int PortionsPlanned { get; set; } = 1;
 
-        public DateTime ScheduledTime { get; set; }
+        public DateTime? ScheduledTime { get; set; }
+        public string? MealType { get; set; }
 
-        public Food? Food { get; set; }
         public Plan? Plan { get; set; }
+        public Food? Food { get; set; }
         public Portion? Portion { get; set; }
     }
-
 }
-

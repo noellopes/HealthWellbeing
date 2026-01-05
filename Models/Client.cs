@@ -57,6 +57,32 @@ namespace HealthWellbeing.Models
                 _ => "Pending Acceptation..",
             };
 
+        [Range(0, 500, ErrorMessage = "Weight must be positive.")]
+        public double WeightKg { get; set; } = 70.0;
+
+        [Range(0, 300, ErrorMessage = "Height must be positive.")]
+        public int HeightCm { get; set; } = 170;
+
+        
+        [Range(1.0, 2.5)]
+        public double ActivityFactor { get; set; } = 1.5;
+
+        // Helper: calcula idade usando BirthDate; se não houver BirthDate, assumimos 30 anos por defeito.
+        public int Age
+        {
+            get
+            {
+                if (BirthDate.HasValue)
+                {
+                    var today = DateTime.Today;
+                    var age = today.Year - BirthDate.Value.Year;
+                    if (BirthDate.Value.Date > today.AddYears(-age)) age--;
+                    return age;
+                }
+                return 30; // fallback razoável
+            }
+        }
+    
         public Member? Membership { get; set; }
 
 

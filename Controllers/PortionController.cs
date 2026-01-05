@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,156 +18,134 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Portions
-        public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
+        // GET: Portion
+        public async Task<IActionResult> Index(int page = 1, string search = "")
         {
-            var query = _context.Portion.AsQueryable();
+            const int pageSize = 10;
+            search ??= "";
+
+            var query = _context.Portion.AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                search = search.Trim().ToLower();
-
-                query = query.Where(p =>
-                    p.PortionName.ToLower().Contains(search));
+                var s = search.Trim().ToLower();
+                query = query.Where(p => p.PortionName.ToLower().Contains(s));
             }
 
-            int totalItems = await query.CountAsync();
+            var totalItems = await query.CountAsync();
 
             var items = await query
                 .OrderBy(p => p.PortionName)
-                .Skip((page - 1) * itemsPerPage)
-                .Take(itemsPerPage)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-
-            var model = new PaginationInfo<Portion>(items, totalItems, page, itemsPerPage);
 
             ViewBag.Search = search;
 
-            return View(model);
+            return View(new PaginationInfo<Portion>(items, totalItems, page, pageSize));
         }
 
-
-        // GET: Portions/Details/5
+        // GET: Portion/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var portion = await _context.Portion
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.PortionId == id);
-            if (portion == null)
-            {
-                return NotFound();
-            }
+
+            if (portion == null) return NotFound();
 
             return View(portion);
         }
 
-        // GET: Portions/Create
+        // GET: Portion/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Portions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Portion/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PortionId,PortionName")] Portion portion)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(portion);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(portion);
+            if (!ModelState.IsValid) return View(portion);
+
+            _context.Add(portion);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Portion created successfully.";
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Portions/Edit/5
+        // GET: Portion/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var portion = await _context.Portion.FindAsync(id);
-            if (portion == null)
-            {
-                return NotFound();
-            }
+            if (portion == null) return NotFound();
+
             return View(portion);
         }
 
-        // POST: Portions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Portion/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("PortionId,PortionName")] Portion portion)
         {
-            if (id != portion.PortionId)
+            if (id != portion.PortionId) return NotFound();
+            if (!ModelState.IsValid) return View(portion);
+
+            try
             {
-                return NotFound();
+                _context.Update(portion);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Portion updated successfully.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PortionExists(portion.PortionId)) return NotFound();
+                throw;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(portion);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PortionExists(portion.PortionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(portion);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Portions/Delete/5
+        // GET: Portion/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var portion = await _context.Portion
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.PortionId == id);
-            if (portion == null)
-            {
-                return NotFound();
-            }
+
+            if (portion == null) return NotFound();
 
             return View(portion);
         }
 
-        // POST: Portions/Delete/5
+        // POST: Portion/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var portion = await _context.Portion.FindAsync(id);
-            if (portion != null)
+            if (portion == null) return RedirectToAction(nameof(Index));
+
+            try
             {
                 _context.Portion.Remove(portion);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Portion deleted successfully.";
+            }
+            catch
+            {
+                TempData["Error"] = "This portion cannot be deleted because it is being used.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

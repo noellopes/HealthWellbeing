@@ -29,6 +29,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.ClientAlergy> ClientAlergy { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.NutritionistClientPlan> NutritionistClientPlan { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodIntake> FoodIntake { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.FoodPlanDay> FoodPlanDay { get; set; } = default!;
 
 
 
@@ -36,6 +37,18 @@ namespace HealthWellbeing.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<FoodPlanDay>()
+                .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
+                .IsUnique();
+
+            modelBuilder.Entity<FoodIntake>()
+                .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
+                .IsUnique();
+
+            modelBuilder.Entity<FoodNutritionalComponent>()
+                .HasIndex(x => new { x.FoodId, x.NutritionalComponentId })
+                .IsUnique();
+
             foreach (var fk in modelBuilder.Model.GetEntityTypes()
                      .SelectMany(e => e.GetForeignKeys())
                      .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade))
