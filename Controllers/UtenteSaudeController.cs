@@ -38,6 +38,80 @@ namespace HealthWellbeing.Controllers
 
             ViewBag.ClientsJson = JsonSerializer.Serialize(available);
         }
+        // ================================
+        // TESTE UI (UtenteView)
+        // ================================
+        [HttpGet]
+        public IActionResult UtenteView()
+        {
+            var utenteFixe = new UtenteSaude
+            {
+                UtenteSaudeId = 1,
+                ClientId = 1,
+                Nif = "245123987",
+                Niss = "12345678901",
+                Nus = "123456789",
+                Client = new Client
+                {
+                    ClientId = 1,
+                    Name = "Maria Correia",
+                    Email = "maria.correia@email.pt",
+                    Phone = "912345678",
+                    Address = "Rua Exemplo, 10, 3500-000 Viseu",
+                    BirthDate = new DateTime(1999, 5, 12),
+                    Gender = "Female"
+                }
+            };
+
+            return View(utenteFixe);
+        }
+
+        // ================================
+        // RECEPCIONISTA VIEW (Paginação + Pesquisa)
+        // ================================
+        [HttpGet]
+        public async Task<IActionResult> RecepcionistaView(
+            int page = 1,
+            string searchNome = "",
+            string searchNif = ""
+        )
+        {
+            if (page < 1)
+                page = 1;
+
+            var utentesQuery = _db.UtenteSaude
+                .Include(u => u.Client)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchNome))
+                utentesQuery = utentesQuery.Where(u =>
+                    u.Client != null && u.Client.Name.Contains(searchNome)
+                );
+
+            if (!string.IsNullOrWhiteSpace(searchNif))
+                utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
+
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+
+            int numberUtentes = await utentesQuery.CountAsync();
+
+            if (numberUtentes == 0)
+                page = 1;
+
+            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+            utentesInfo.Items = await utentesQuery
+                .AsNoTracking()
+                .OrderBy(u => u.Client!.Name)
+                .Skip(utentesInfo.ItemsToSkip)
+                .Take(utentesInfo.ItemsPerPage)
+                .ToListAsync();
+
+            ViewBag.NomeRecepcionista = "Recepcionista";
+
+            return View(utentesInfo);
+        }
 
         // ================================
         // LISTAR (Index) - igual ao teu
