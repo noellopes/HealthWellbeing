@@ -88,7 +88,7 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServicos tipoServico)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicosId,Nome,Descricao")] TipoServicos tipoServico)
         {
             if (id != tipoServico.TipoServicosId)
             {
@@ -101,6 +101,13 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(tipoServico);
                     await _context.SaveChangesAsync();
+
+                    // Alterado para passar o successMessage via Query String
+                    return RedirectToAction(nameof(Details), new
+                    {
+                        id = tipoServico.TipoServicosId,
+                        successMessage = "Dados do Tipo de Serviço alterado com sucesso!"
+                    });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -108,10 +115,7 @@ namespace HealthWellbeing.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    else { throw; }
                 }
             }
             return View(tipoServico);

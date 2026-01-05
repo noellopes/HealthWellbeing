@@ -1,45 +1,46 @@
 ﻿@model HealthWellbeing.Models.TipoServicos
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Tipo de Serviço";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i> @ViewData["Title"]
+            </h4>
+        </div>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">
-            <i class="bi bi-pencil-square me-2"></i> Editar Tipo de Serviço
-        </h4>
-    </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
 
-<div class="card-body">
-<form asp-action="Edit" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+                @* IMPORTANTE: O nome aqui deve ser igual ao do Model e do Controller *@
+                <input type="hidden" asp-for="TipoServicosId" />
 
-    <input type="hidden" asp-for="TipoServicosId" />
+                <div class="mb-3">
+                    <label asp-for="Nome" class="form-label font-weight-bold"></label>
+                    <input asp-for="Nome" class="form-control" placeholder="Ex: Massagem Terapêutica" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
 
-    <div class="mb-3">
-        <label asp-for="Nome" class="control-label"></label>
-        <input asp-for="Nome" class="form-control" />
-        <span asp-validation-for="Nome" class="text-danger"></span>
-    </div>
+                <div class="mb-3">
+                    <label asp-for="Descricao" class="form-label font-weight-bold"></label>
+                    <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Descricao" class="text-danger"></span>
+                </div>
 
-     <div class="mb-3">
-        <label asp-for="Descricao" class="control-label"></label>
-        <input asp-for="Descricao" class="form-control" />
-        <span asp-validation-for="Descricao" class="text-danger"></span>
-    </div>
-
-            <div class="d-flex justify-content-start gap-2">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-1"></i>Guardar
-            </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="=bi bi-arrow-left-circle me-1"></i>Cancelar
-            </a>
-    </div>
-</form>
+                <div class="d-flex justify-content-start gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Guardar Alterações
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
