@@ -38,7 +38,7 @@ namespace HealthWellBeingRoom.Data
 
             // 4.1 - Requisitos por especialidade (NOVA)
             PopulateSpecialtyRequiredDevices(dbContext);
-            PopulateSpecialtyRequiredConsumable(dbContext);
+            //PopulateSpecialtyRequiredConsumable(dbContext);
 
 
             // 5 - Infraestrutura de Consultation
@@ -349,58 +349,58 @@ namespace HealthWellBeingRoom.Data
                 var rooms = new List<Room>
                 {
                     // Consultas
-                    new Room { Name = "Sala de Consultas 1", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas gerais." },
-                    new Room { Name = "Sala de Consultas 2", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Atendimento pediátrico." },
-                    new Room { Name = "Sala de Consultas 3", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("09:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas de especialidade." },
-                    new Room { Name = "Sala de Consultas 4", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas dermatológicas." },
-                    new Room { Name = "Sala de Consultas 5", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas ginecológicas." },
+                    new Room { Name = "Sala de Consultas 1", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas gerais." },
+                    new Room { Name = "Sala de Consultas 2", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Atendimento pediátrico." },
+                    new Room { Name = "Sala de Consultas 3", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("09:00"), ClosingTime = TimeSpan.Parse("17:00"), Notes = "Consultas de especialidade." },
+                    new Room { Name = "Sala de Consultas 4", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas dermatológicas." },
+                    new Room { Name = "Sala de Consultas 5", SpecialtyId = specialty["Atendimento Ambulatorial"], RoomTypeId = roomType["Consultas"], RoomLocationId = roomLocation["BlocoA-Ala1-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Consultas ginecológicas." },
 
                     // UTI
-                    new Room { Name = "UTI 1", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização contínua." },
-                    new Room { Name = "UTI 2", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Equipamentos de suporte vital." },
-                    new Room { Name = "UTI 3", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Isolamento de pacientes críticos." },
-                    new Room { Name = "UTI 4", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "UTI neonatal." },
+                    new Room { Name = "UTI 1", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização contínua." },
+                    new Room { Name = "UTI 2", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Equipamentos de suporte vital." },
+                    new Room { Name = "UTI 3", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Isolamento de pacientes críticos." },
+                    new Room { Name = "UTI 4", SpecialtyId = specialty["Cuidados Intensivos"], RoomTypeId = roomType["Unidade de Terapia Intensiva (UTI)"], RoomLocationId = roomLocation["BlocoA-Ala2-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "UTI neonatal." },
 
                     // Centro Cirúrgico
-                    new Room { Name = "Centro Cirúrgico 1", SpecialtyId = specialty["Procedimentos Cirúrgicos"], RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias gerais." },
+                    new Room { Name = "Centro Cirúrgico 1", SpecialtyId = specialty["Procedimentos Cirúrgicos"], RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.N"], RoomStatusId = roomStatus["Fora de Serviço"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias gerais." },
                     new Room { Name = "Centro Cirúrgico 2", SpecialtyId = specialty["Procedimentos Cirúrgicos"], RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Cirurgias ortopédicas." },
-                    new Room { Name = "Centro Cirúrgico 3", SpecialtyId = specialty["Procedimentos Cirúrgicos"], RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Preparação para cirurgia cardíaca." },
+                    new Room { Name = "Centro Cirúrgico 3", SpecialtyId = specialty["Procedimentos Cirúrgicos"], RoomTypeId = roomType["Centro Cirúrgico"], RoomLocationId = roomLocation["BlocoA-Ala3-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("07:00"), ClosingTime = TimeSpan.Parse("19:00"), Notes = "Preparação para cirurgia cardíaca." },
 
                     // Sala de Exames
-                    new Room { Name = "Sala de Exames 1", SpecialtyId = specialty["Exames Clínicos"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Exames laboratoriais básicos." },
-                    new Room { Name = "Sala de Exames 2", SpecialtyId = specialty["Exames de Imagem"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Raio-X e ultrassonografia." },
-                    new Room { Name = "Sala de Exames 3", SpecialtyId =specialty[ "Exames Cardiológicos"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Eletrocardiograma e ecocardiograma." },
+                    new Room { Name = "Sala de Exames 1", SpecialtyId = specialty["Exames Clínicos"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Exames laboratoriais básicos." },
+                    new Room { Name = "Sala de Exames 2", SpecialtyId = specialty["Exames de Imagem"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Raio-X e ultrassonografia." },
+                    new Room { Name = "Sala de Exames 3", SpecialtyId =specialty[ "Exames Cardiológicos"], RoomTypeId = roomType["Exames"], RoomLocationId = roomLocation["BlocoB-Ala1-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("20:00"), Notes = "Eletrocardiograma e ecocardiograma." },
 
                     // Laboratórios
-                    new Room { Name = "Laboratório 1", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Bioquímica e hematologia." },
-                    new Room { Name = "Laboratório 2", SpecialtyId =specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.N"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Microbiologia." },
-                    new Room { Name = "Laboratório 3", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Imunologia e patologia clínica." },
-                    new Room { Name = "Laboratório 4", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade laboratorial." },
+                    new Room { Name = "Laboratório 1", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Bioquímica e hematologia." },
+                    new Room { Name = "Laboratório 2", SpecialtyId =specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Microbiologia." },
+                    new Room { Name = "Laboratório 3", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Imunologia e patologia clínica." },
+                    new Room { Name = "Laboratório 4", SpecialtyId = specialty["Análises Clínicas"], RoomTypeId = roomType["Laboratório de A. Clínicas"], RoomLocationId = roomLocation["BlocoB-Ala2-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade laboratorial." },
 
                     // Farmácia
-                    new Room { Name = "Farmácia 1", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Dispensação de medicamentos." },
-                    new Room { Name = "Farmácia 2", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Controle de estoque." },
-                    new Room { Name = "Farmácia 3", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Medicamentos especiais." },
+                    new Room { Name = "Farmácia 1", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Dispensação de medicamentos." },
+                    new Room { Name = "Farmácia 2", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Controle de estoque." },
+                    new Room { Name = "Farmácia 3", SpecialtyId = specialty["Gestão de Medicamentos"], RoomTypeId = roomType["Farmácia Hospitalar"], RoomLocationId = roomLocation["BlocoB-Ala3-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("08:00"), ClosingTime = TimeSpan.Parse("18:00"), Notes = "Medicamentos especiais." },
 
                     // Depósito
-                    new Room { Name = "Depósito 1", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.L"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Materiais cirúrgicos." },
-                    new Room { Name = "Depósito 2", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.O"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de estoque." },
-                    new Room { Name = "Depósito 3", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Insumos hospitalares." },
+                    new Room { Name = "Depósito 1", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Materiais cirúrgicos." },
+                    new Room { Name = "Depósito 2", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de estoque." },
+                    new Room { Name = "Depósito 3", SpecialtyId = specialty["Armazenamento"], RoomTypeId = roomType["Depósito Hospitalar"], RoomLocationId = roomLocation["BlocoC-Ala1-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Insumos hospitalares." },
 
                     // Recuperação
-                    new Room { Name = "Sala de Recuperação 1", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.S"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização pós-cirúrgica." },
-                    new Room { Name = "Sala de Recuperação 2", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.L"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em observação." },
-                    new Room { Name = "Sala de Recuperação 3", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.O"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de equipamentos." },
+                    new Room { Name = "Sala de Recuperação 1", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Monitorização pós-cirúrgica." },
+                    new Room { Name = "Sala de Recuperação 2", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em observação." },
+                    new Room { Name = "Sala de Recuperação 3", SpecialtyId = specialty["Pós-Operatório"], RoomTypeId = roomType["Recuperação Pós-Operatória"], RoomLocationId = roomLocation["BlocoC-Ala2-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Revisão de equipamentos." },
 
                     // Emergência
-                    new Room { Name = "Sala de Emergência 1", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.N"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Atendimento imediato." },
-                    new Room { Name = "Sala de Emergência 2", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.S"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em estado grave." },
-                    new Room { Name = "Sala de Emergência 3", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.L"], RoomStatusId = roomStatus["Em Manutenção"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Triagem de urgência." },
+                    new Room { Name = "Sala de Emergência 1", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Atendimento imediato." },
+                    new Room { Name = "Sala de Emergência 2", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Pacientes em estado grave." },
+                    new Room { Name = "Sala de Emergência 3", SpecialtyId = specialty["Atendimento Crítico"], RoomTypeId = roomType["Emergência"], RoomLocationId = roomLocation["BlocoC-Ala3-Z.L"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("00:00"), ClosingTime = TimeSpan.Parse("23:59"), Notes = "Triagem de urgência." },
 
                     // Esterilização
-                    new Room { Name = "Sala de Esterilização 1", SpecialtyId =specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.O"], RoomStatusId = roomStatus["Disponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Esterilização de instrumentos cirúrgicos." },
-                    new Room { Name = "Sala de Esterilização 2", SpecialtyId = specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.N"], RoomStatusId = roomStatus["Indisponível"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Processamento de materiais." },
-                    new Room { Name = "Sala de Esterilização 3", SpecialtyId = specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.S"], RoomStatusId = roomStatus["Em Limpeza"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade." }
+                    new Room { Name = "Sala de Esterilização 1", SpecialtyId =specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.O"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Esterilização de instrumentos cirúrgicos." },
+                    new Room { Name = "Sala de Esterilização 2", SpecialtyId = specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.N"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Processamento de materiais." },
+                    new Room { Name = "Sala de Esterilização 3", SpecialtyId = specialty["Higienização de Instrumentos"], RoomTypeId = roomType["Esterilização"], RoomLocationId = roomLocation["BlocoC-Ala4-Z.S"], RoomStatusId = roomStatus["Criado"], OpeningTime = TimeSpan.Parse("06:00"), ClosingTime = TimeSpan.Parse("22:00"), Notes = "Controle de qualidade." }
 
                 };
                 dbContext.Room.AddRange(rooms);
@@ -1143,94 +1143,94 @@ namespace HealthWellBeingRoom.Data
             dbContext.SpecialtyRequiredDevices.AddRange(list);
             dbContext.SaveChanges();
         }
-        private static void PopulateSpecialtyRequiredConsumable(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.SpecialtyRequiredConsumables.Any())
-                return;
+        //private static void PopulateSpecialtyRequiredConsumable(HealthWellbeingDbContext dbContext)
+        //{
+        //    if (dbContext.SpecialtyRequiredConsumables.Any())
+        //        return;
 
-            // Carregar todos os consumíveis
-            var consumables = dbContext.Consumivel
-                .AsNoTracking()
-                .ToList();
+        //    // Carregar todos os consumíveis
+        //    var consumables = dbContext.Consumivel
+        //        .AsNoTracking()
+        //        .ToList();
 
-            // Map por nome exato (ajusta se os nomes diferirem um pouco)
-            var byName = consumables.ToDictionary(c => c.Nome, c => c.ConsumivelId);
+        //    // Map por nome exato (ajusta se os nomes diferirem um pouco)
+        //    var byName = consumables.ToDictionary(c => c.Nome, c => c.ConsumivelId);
 
-            var list = new List<SpecialtyRequiredConsumable>
-            {
-                // 1 - Atendimento Ambulatorial
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId= byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara Cirúrgica"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
+        //    var list = new List<SpecialtyRequiredConsumable>
+        //    {
+        //        // 1 - Atendimento Ambulatorial
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId= byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara Cirúrgica"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 1, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
 
-                // 2 - Cuidados Intensivos
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
+        //        // 2 - Cuidados Intensivos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 2, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
 
-                // 3 - Procedimentos Cirúrgicos
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Clorexidina"],               RequiredQuantity = 1 },
+        //        // 3 - Procedimentos Cirúrgicos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Luvas Cirúrgicas Pequenas"], RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 3, ConsumivelId = byName["Clorexidina"],               RequiredQuantity = 1 },
 
-                // 4 - Exames Clínicos
-                new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
+        //        // 4 - Exames Clínicos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 4, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
 
-                // 5 - Análises Clínicas
-                new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
+        //        // 5 - Análises Clínicas
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Álcool 70%"],                RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 5, ConsumivelId = byName["Compressa Não Estéril"],     RequiredQuantity = 1 },
 
-                // 6 - Gestão de Medicamentos
-                new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
+        //        // 6 - Gestão de Medicamentos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Seringa 5ml"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 6, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
 
-                // 7 - Armazenamento
-                new SpecialtyRequiredConsumable { SpecialtyId = 7, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        // 7 - Armazenamento
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 7, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
 
-                // 8 - Pós-Operatório
-                new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
+        //        // 8 - Pós-Operatório
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Luvas Cirúrgicas Médias"],   RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Compressa Estéril"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 8, ConsumivelId = byName["Gaze Esterilizada"],         RequiredQuantity = 1 },
 
-                // 9 - Atendimento Crítico
-                new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
+        //        // 9 - Atendimento Crítico
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Luvas de Nitrilo"],          RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Máscara N95"],               RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Seringa 10ml"],              RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 9, ConsumivelId = byName["Agulhas 21G"],               RequiredQuantity = 1 },
 
-                // 10 - Higienização de Instrumentos
-                new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Clorexidina"],              RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Álcool 70%"],               RequiredQuantity = 1 },
+        //        // 10 - Higienização de Instrumentos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Clorexidina"],              RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 10, ConsumivelId = byName["Álcool 70%"],               RequiredQuantity = 1 },
 
-                // 11 - Exames de Imagem
-                new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 },
+        //        // 11 - Exames de Imagem
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 11, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 },
 
-                // 12 - Exames Cardiológicos
-                new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Máscara Cirúrgica"],        RequiredQuantity = 1 },
-                new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 }
-            };
+        //        // 12 - Exames Cardiológicos
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Luvas de Nitrilo"],         RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Máscara Cirúrgica"],        RequiredQuantity = 1 },
+        //        new SpecialtyRequiredConsumable { SpecialtyId = 12, ConsumivelId = byName["Compressa Não Estéril"],    RequiredQuantity = 1 }
+        //    };
 
-            dbContext.SpecialtyRequiredConsumables.AddRange(list);
-            dbContext.SaveChanges();
-        }
+        //    dbContext.SpecialtyRequiredConsumables.AddRange(list);
+        //    dbContext.SaveChanges();
+        //}
 
 
         //Garante que ha um administrador no sistema, cria-o com a passe e atribuilhe o papel de "administrador".

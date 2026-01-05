@@ -52,7 +52,7 @@ namespace HealthWellbeingRoom.Controllers
             string? searchClosingTime,
             int page = 1)
         {
-            // Carregamento inicial com Includes
+            // ----------------- carregar salas -----------------
             var allRooms = await _context.Room
                 .Include(r => r.Specialty)
                 .Include(r => r.RoomStatus)
@@ -60,7 +60,55 @@ namespace HealthWellbeingRoom.Controllers
                 .Include(r => r.RoomType)
                 .ToListAsync();
 
-            // Filtro por nome
+            // ----------------- marcar indisponíveis se reserva agora -----------------
+            var now = DateTime.Now;
+            var today = now.Date;
+            var nowTime = now.TimeOfDay;
+
+            var indisponivelStatus = await _context.RoomStatus
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Name == "Indisponível");
+
+            var disponivelStatus = await _context.RoomStatus
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Name == "Disponível");
+
+            if (indisponivelStatus != null)
+            {
+                foreach (var room in allRooms)
+                {
+                    bool temReservaAgora = await _context.RoomReservations
+                        .AsNoTracking()
+                        .AnyAsync(r =>
+                            r.RoomId == room.RoomId &&
+                            r.Status == "Ativa" &&
+                            r.ConsultationDate == today &&
+                            r.StartHour <= nowTime &&
+                            nowTime < r.EndHour
+                        );
+
+                    if (temReservaAgora && indisponivelStatus != null)
+                    {
+                        // Se tiver reserva a decorrer, mostra como Indisponível
+                        room.RoomStatusId = indisponivelStatus.RoomStatusId;
+                        room.RoomStatus.Name = "Indisponível";
+                    }
+                    else
+                    {
+                        // Se não há reserva agora e o estado atual é Indisponível,
+                        // voltamos para Disponível (apenas para este caso automático)
+                        if (room.RoomStatus.Name == "Indisponível" && disponivelStatus != null)
+                        {
+                            room.RoomStatusId = disponivelStatus.RoomStatusId;
+                            room.RoomStatus.Name = "Disponível";
+                        }
+                        // Estados como "Em Limpeza", "Em Manutenção", "Fora de Serviço" não são alterados
+                    }
+                }
+
+            }
+
+            // ----------------- filtros existentes -----------------
             if (!string.IsNullOrWhiteSpace(searchName))
             {
                 var normalizedSearch = RemoveDiacritics.Normalize(searchName);
@@ -68,15 +116,13 @@ namespace HealthWellbeingRoom.Controllers
                     .Where(r => RemoveDiacritics.Normalize(r.Name ?? "").Contains(normalizedSearch))
                     .ToList();
             }
-            // Filtro por status
+
             if (!string.IsNullOrWhiteSpace(searchStatus) && int.TryParse(searchStatus, out var statusId))
                 allRooms = allRooms.Where(r => r.RoomStatusId == statusId).ToList();
 
-            // Filtro por especialidade
             if (!string.IsNullOrWhiteSpace(searchSpecialty) && int.TryParse(searchSpecialty, out var specialtyId))
                 allRooms = allRooms.Where(r => r.SpecialtyId == specialtyId).ToList();
 
-            // Filtro por localização
             if (!string.IsNullOrWhiteSpace(searchLocation))
             {
                 var normalizedLocation = RemoveDiacritics.Normalize(searchLocation.Trim().ToLower());
@@ -85,8 +131,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Filtro por tipo de sala
-            // Filtro por tipo de sala (comparação por Id)
             if (!string.IsNullOrWhiteSpace(searchRoomType) && int.TryParse(searchRoomType, out int roomTypeId))
             {
                 allRooms = allRooms
@@ -94,7 +138,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList();
             }
 
-            // Filtro por horário
             TimeSpan? openingTime = null;
             TimeSpan? closingTime = null;
 
@@ -138,7 +181,6 @@ namespace HealthWellbeingRoom.Controllers
                 }
             }
 
-            // Mensagem se nenhum resultado
             if (!allRooms.Any() && ViewBag.ErrorMessage == null)
             {
                 var mensagens = new List<string>();
@@ -150,7 +192,6 @@ namespace HealthWellbeingRoom.Controllers
                 ViewBag.ErrorMessage = $"Nenhuma sala encontrada com {string.Join(", ", mensagens)}.";
             }
 
-            // Paginação
             const int itemsPerPage = 10;
             var totalItems = allRooms.Count;
             var pagination = new RPaginationInfo<Room>(page, totalItems, itemsPerPage)
@@ -162,7 +203,6 @@ namespace HealthWellbeingRoom.Controllers
                     .ToList()
             };
 
-            // Manter filtros na View
             ViewBag.SearchName = searchName;
             ViewBag.SearchStatus = searchStatus;
             ViewBag.SearchSpecialty = searchSpecialty;
@@ -171,7 +211,6 @@ namespace HealthWellbeingRoom.Controllers
             ViewBag.SearchOpeningTime = searchOpeningTime;
             ViewBag.SearchClosingTime = searchClosingTime;
 
-            // Dropdowns
             ViewBag.Status = new SelectList(
                 _context.RoomStatus.Select(s => new { Value = s.RoomStatusId.ToString(), Text = s.Name }),
                 "Value", "Text", searchStatus);
@@ -190,6 +229,7 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(pagination);
         }
+
         //------------------------------------------------------DETAILS-------------------------------------------------------------------------------------
         [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Details(int? id, bool fromCreation = false)
