@@ -85,7 +85,6 @@ namespace HealthWellbeing.Controllers
             }
             return View(tipoServico);
         }
-
         // POST: TipoServico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -114,28 +113,7 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
-
-                return RedirectToAction(nameof(Details),
-                    new { id = tipoServico.TipoServicosId, successMessage = "Tipo de Serviço alterado com sucesso!" });
             }
-            return View(tipoServico);
-        }
-
-        // GET: TipoServico/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
-            if (tipoServico == null)
-            {
-                return NotFound();
-            }
-
             return View(tipoServico);
         }
 
