@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-HealthWellbeing-62cdc3a8-10df-429a-bd24-ae9f22f0d652</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\**" />
+    <Compile Remove="Views\UtenteSaude\Images\**" />
+    <Content Remove="Migrations\**" />
+    <Content Remove="Views\UtenteSaude\Images\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <EmbeddedResource Remove="Views\UtenteSaude\Images\**" />
+    <None Remove="Migrations\**" />
+    <None Remove="Views\UtenteSaude\Images\**" />
+    <Compile Remove="Data\Migrations\**" />
+    <Content Remove="Data\Migrations\**" />
+    <EmbeddedResource Remove="Data\Migrations\**" />
+    <None Remove="Data\Migrations\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.20" />

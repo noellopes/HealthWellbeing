@@ -1,54 +1,110 @@
 ﻿@model HealthWellbeing.Models.Alergia
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Alergia";
 }
 
-<h1>Edit</h1>
+<h1>Editar Alergia</h1>
 
-<h4>Alergia</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="AlergiaID" />
-            <div class="form-group">
+            <input type="hidden" asp-for="AlergiaId" />
+
+            <div class="form-group mb-3">
                 <label asp-for="Nome" class="control-label"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Descricao" class="control-label"></label>
                 <input asp-for="Descricao" class="form-control" />
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Gravidade" class="control-label"></label>
-                <input asp-for="Gravidade" class="form-control" />
+                <select asp-for="Gravidade" asp-items="ViewBag.Gravidades" class="form-control"></select>
                 <span asp-validation-for="Gravidade" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mb-3">
                 <label asp-for="Sintomas" class="control-label"></label>
                 <input asp-for="Sintomas" class="form-control" />
                 <span asp-validation-for="Sintomas" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="FoodId" class="control-label"></label>
-                <select asp-for="FoodId" class="form-control" asp-items="ViewBag.FoodId"></select>
-                <span asp-validation-for="FoodId" class="text-danger"></span>
+
+            <!-- SELEÇÃO DE ALIMENTOS -->
+            <div class="form-group mb-3">
+                <label>Alimentos relacionados</label>
+                <select id="alimentosSelect" class="form-control">
+                    <option value="">-- Selecione um alimento --</option>
+                    @foreach (var a in ViewBag.Alimentos)
+                    {
+                        <option value="@a.id">@a.nome</option>
+                    }
+                </select>
             </div>
+
+            <div id="selectedAlimentos" class="mb-2"></div>
+
+            <!-- Campo escondido para enviar os IDs -->
+            <input type="hidden" id="selectedAlimentosInput" name="selectedAlimentosIds" />
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Salvar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const select = document.getElementById("alimentosSelect");
+        const selectedContainer = document.getElementById("selectedAlimentos");
+        const hiddenInput = document.getElementById("selectedAlimentosInput");
+
+        // Lista inicial de alimentos pré-selecionados (passar via ViewBag)
+        const selected = @Html.Raw(Json.Serialize(ViewBag.SelectedAlimentos ?? new List<object>()));
+
+        function renderSelected() {
+            selectedContainer.innerHTML = "";
+            selected.forEach(a => {
+                const badge = document.createElement("div");
+                badge.classList.add("badge", "bg-success", "me-2", "mb-2");
+                badge.innerHTML = `${a.nome} <span style="cursor:pointer" onclick="removeAlimento(${a.id})">❌</span>`;
+                selectedContainer.appendChild(badge);
+            });
+            hiddenInput.value = selected.map(a => a.id).join(",");
+        }
+
+        function removeAlimento(id) {
+            const index = selected.findIndex(a => a.id === id);
+            if (index > -1) {
+                selected.splice(index, 1);
+                renderSelected();
+            }
+        }
+
+        select.addEventListener("change", () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const id = parseInt(selectedOption.value);
+            const nome = selectedOption.text;
+
+            if (id && !selected.some(a => a.id === id)) {
+                selected.push({ id, nome });
+                renderSelected();
+            }
+
+            select.selectedIndex = 0;
+        });
+
+        renderSelected();
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

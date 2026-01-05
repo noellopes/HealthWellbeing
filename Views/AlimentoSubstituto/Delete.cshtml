@@ -1,0 +1,48 @@
+﻿@model HealthWellbeing.Models.AlimentoSubstituto
+
+@{
+    ViewData["Title"] = "Apagar";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Apagar Alimento Substituto</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
+</div>
+
+<hr />
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Tem certeza que deseja apagar esse registro?</h5>
+        <div>
+            <h6>AlimentoSubstituto</h6>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.AlimentoOriginal)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.AlimentoOriginal.Name)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.AlimentoSubstitutoRef)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.AlimentoSubstitutoRef.Name)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Motivo)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Motivo)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ProporcaoEquivalente)</dt>
+                <dd class="col-sm-9">@(Model?.ProporcaoEquivalente.HasValue == true ?
+                                        Model.ProporcaoEquivalente.Value.ToString("0.##") : "-")</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Observacoes)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Observacoes)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FatorSimilaridade)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.FatorSimilaridade)</dd>
+            </dl>
+
+            <form asp-action="Delete" class="d-flex justify-content-end">
+                <input type="hidden" asp-for="AlimentoSubstitutoId" />
+                <input type="submit" value="Apagar" class="btn btn-danger me-2" />
+                <a class="btn btn-outline-secondary" asp-action="Index">Voltar</a>
+            </form>
+        </div>
+    </div>
+</div>

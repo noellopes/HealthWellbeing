@@ -1,0 +1,158 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Terapeuta>
+
+@{
+    ViewData["Title"] = "Lista de Terapeutas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Lista de Terapeutas</h1>
+<hr />
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @ViewBag.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Adicionar Novo Terapeuta</a>
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form asp-action="Index" method="get">
+            <div class="row">
+
+                <!-- Filtro por Nome -->
+                <div class="col-md-4">
+                    <label class="form-label">Nome</label>
+                    <input type="text"
+                           name="nomeFiltro"
+                           value="@ViewBag.NomeFiltro"
+                           class="form-control"
+                           placeholder="Pesquisar por nome..." />
+                </div>
+
+                <!-- Filtro por Especialidade -->
+                <div class="col-md-4">
+                    <label class="form-label">Especialidade</label>
+                    <input type="text"
+                           name="especialidadeFiltro"
+                           value="@ViewBag.EspecialidadeFiltro"
+                           class="form-control"
+                           placeholder="Pesquisar por especialidade..." />
+                </div>
+
+                <!-- Filtro Ativo/Inativo -->
+                <div class="col-md-3">
+                    <label class="form-label">Estado</label>
+                    <select name="ativoFiltro" class="form-select">
+                        <option value="">Todos</option>
+
+                        <option value="true"
+                                selected="@(ViewBag.AtivoFiltro != null && ViewBag.AtivoFiltro == true)">
+                            Ativo
+                        </option>
+
+                        <option value="false"
+                                selected="@(ViewBag.AtivoFiltro != null && ViewBag.AtivoFiltro == false)">
+                            Inativo
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Botão Filtrar -->
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Nome)</th>
+            <th>@Html.DisplayNameFor(model => model.Especialidade)</th>
+            <th>@Html.DisplayNameFor(model => model.Telefone)</th>
+            <th>@Html.DisplayNameFor(model => model.Email)</th>
+            <th>@Html.DisplayNameFor(model => model.AnosExperiencia)</th>
+            <th>@Html.DisplayNameFor(model => model.Ativo)</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Nome)</td>
+                <td>@Html.DisplayFor(modelItem => item.Especialidade)</td>
+                <td>@Html.DisplayFor(modelItem => item.Telefone)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.AnosExperiencia)</td>
+                <td>
+                    @if (item.Ativo)
+                    {
+                        <span class="badge bg-success">Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inativo</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.TerapeutaId" class="btn btn-info btn-sm">Detalhes</a>
+                    <a asp-action="Edit" asp-route-id="@item.TerapeutaId" class="btn btn-primary btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.TerapeutaId" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    int paginaAtual = ViewBag.Page ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+@if (totalPaginas > 1)
+{
+    <nav aria-label="Paginação de terapeutas">
+        <ul class="pagination justify-content-center">
+
+            <li class="page-item @(paginaAtual == 1 ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="1"
+                   asp-route-nomeFiltro="@ViewBag.NomeFiltro"
+                   asp-route-especialidadeFiltro="@ViewBag.EspecialidadeFiltro"
+                   asp-route-ativoFiltro="@ViewBag.AtivoFiltro">«</a>
+            </li>
+
+            @for (int i = Math.Max(1, paginaAtual - 3); i <= Math.Min(totalPaginas, paginaAtual + 3); i++)
+            {
+                <li class="page-item @(i == paginaAtual ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-nomeFiltro="@ViewBag.NomeFiltro"
+                       asp-route-especialidadeFiltro="@ViewBag.EspecialidadeFiltro"
+                       asp-route-ativoFiltro="@ViewBag.AtivoFiltro">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(paginaAtual == totalPaginas ? "disabled" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@totalPaginas"
+                   asp-route-nomeFiltro="@ViewBag.NomeFiltro"
+                   asp-route-especialidadeFiltro="@ViewBag.EspecialidadeFiltro"
+                   asp-route-ativoFiltro="@ViewBag.AtivoFiltro">»</a>
+            </li>
+
+        </ul>
+    </nav>
+}

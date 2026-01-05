@@ -92,4 +92,8 @@ namespace HealthWellbeing.Models
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
     }
+		[DataType(DataType.Date)]
+		public DateTime RegistrationDate { get; set; } = DateTime.Now;
+		public Member? Membership { get; set; }
+	}
 }

@@ -1,138 +1,67 @@
-﻿@using HealthWellbeing.Models
-@using HealthWellbeing.ViewModels
-@model PaginationInfo<Plan>
+﻿@model IEnumerable<HealthWellbeing.Models.Plan>
 
 @{
-    ViewData["Title"] = "Plans";
-    string search = ViewBag.Search as string ?? "";
+    ViewData["Title"] = "Plan Management";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center">
-        <h1 class="h4 mb-0">
-            <i class="bi bi-calendar2-check-fill me-2 text-primary"></i>
-            Plans
-        </h1>
-    </div>
+<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
 
-    <div class="d-flex align-items-center gap-2">
-        <form asp-action="Index" method="get" class="d-flex">
-            <input type="search"
-                   name="search"
-                   value="@search"
-                   class="form-control form-control-sm me-2"
-                   placeholder="Search by date (YYYY-MM-DD) or status" />
-            <button type="submit" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
+<p>
+    <a asp-action="Create" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-circle"></i> Create New Plan
+    </a>
+</p>
 
-        <a asp-action="Create" class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Plan
-        </a>
-    </div>
-</div>
-
-<hr />
-
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
-        <div class="ps-3">
-            <h4 class="alert-heading mb-1">No plans</h4>
-            <p class="mb-0">There are no plans matching your search.</p>
-        </div>
-    </div>
-}
-else
-{
-    <div class="table-responsive mt-3">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-light">
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th class="d-none d-md-table-cell">
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th class="d-none d-sm-table-cell">
+                    @Html.DisplayNameFor(model => model.DurationDays)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
                 <tr>
-                    <th>Starting Date</th>
-                    <th>Ending Date</th>
-                    <th>Status</th>
-                    <th class="text-center" style="width: 180px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.StartingDate.ToShortDateString()</td>
-                        <td>@item.EndingDate.ToShortDateString()</td>
-                        <td>
-                            @if (item.Done)
-                            {
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle-fill me-1"></i> Done
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">
-                                    <i class="bi bi-hourglass-split me-1"></i> In progress
-                                </span>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <a asp-action="Details" asp-route-id="@item.PlanId"
-                               class="btn btn-sm btn-info text-white me-1">
-                                <i class="bi bi-eye-fill"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@item.PlanId"
-                               class="btn btn-sm btn-warning text-white me-1">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.PlanId"
-                               class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    @if (Model.TotalPages > 1)
-    {
-        <nav aria-label="Plans pagination">
-            <ul class="pagination justify-content-center mt-3">
-                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage - 1)"
-                       asp-route-search="@search"
-                       aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
-                {
-                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i"
-                           asp-route-search="@search">
-                            @i
+                    <td class="fw-bold">
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td class="d-none d-md-table-cell text-truncate" style="max-width: 200px;">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @string.Format("{0:C}", item.Price)
+                    </td>
+                    <td class="d-none d-sm-table-cell">
+                        @Html.DisplayFor(modelItem => item.DurationDays)
+                    </td>
+                    <td class="text-nowrap">
+                        <a asp-action="Edit" asp-route-id="@item.PlanId" class="btn btn-sm btn-outline-primary me-1">
+                            Edit
                         </a>
-                    </li>
-                }
-
-                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage + 1)"
-                       asp-route-search="@search"
-                       aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    }
-}
+                        <a asp-action="Details" asp-route-id="@item.PlanId" class="btn btn-sm btn-outline-info me-1">
+                            Details
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.PlanId" class="btn btn-sm btn-outline-danger">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

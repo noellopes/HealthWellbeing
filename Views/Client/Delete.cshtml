@@ -37,18 +37,6 @@
             <dd class="col-sm-9">
                 @Html.DisplayFor(model => model.Phone)
             </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.CreateMember)
-            </dt>
-            <dd class="col-sm-9">
-                @{
-                    string badgeClass = Model.CreateMember == true ? "bg-success" : (Model.CreateMember == false ? "bg-danger" : "bg-warning text-dark");
-                }
-                <span class="badge @badgeClass fs-6">
-                    @Model.CreateMemberText
-                </span>
-            </dd>
         </dl>
     </div>
 </div>

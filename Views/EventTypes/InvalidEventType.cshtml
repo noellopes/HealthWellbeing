@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Invalid Event Type";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0" style="font-size: 4rem;"></i>
+    <div class="ps-4">
+        <h4 class="alert-heading mb-2">Invalid Event Type</h4>
+        <p class="mb-0">The selected event type no longer exists. It may have been removed or deleted.</p>
+    </div>
+</div>
+
+<div class="mt-4 text-end">
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+    </a>
+</div>
