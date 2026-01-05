@@ -16,7 +16,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Descrição")]
         public string? Descricao { get; set; }// Detalhes do tipo de serviço
 
-        // Relacionamento 1:N com os serviços específicos
-        //public ICollection<Servico> Servicos { get; set; }
+        
     }
 }
