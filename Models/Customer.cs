@@ -48,6 +48,7 @@ namespace HealthWellbeing.Models {
         public Level? Level { get; set; }
 
         public virtual ICollection<CustomerBadge>? CustomerBadges { get; set; }
+        public virtual ICollection<CustomerActivity>? CustomerActivities { get; set; }
     }
 }
 

@@ -39,6 +39,7 @@ namespace HealthWellbeing.Data
             PopulateEventActivities(dbContext);
             PopulateBadgeRequirements(dbContext);
             PopulateCustomerBadges(dbContext);
+            PopulateCustomerActivities(dbContext);
         }
 
 
@@ -165,6 +166,8 @@ namespace HealthWellbeing.Data
 
             var customers = new[]
             {
+                new Customer { Name = "Maria Utente", Email = "maria@ipg.pt", PhoneNumber = "+351 910000002", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 500 },
+                new Customer { Name = "Paulo Utente", Email = "paulo@ipg.pt", PhoneNumber = "+351 910000003", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-2), TotalPoints = 100 },
                 new Customer { Name = "Ana Pereira", Email = "ana.pereira@ipg.pt", PhoneNumber = "+351 912345678", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-12), TotalPoints = 1250 },
                 new Customer { Name = "Bruno Silva", Email = "bruno.silva@ipg.pt", PhoneNumber = "+351 965874123", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-1), TotalPoints = 0 },
                 new Customer { Name = "Carla Santos", Email = "carla.santos@ipg.pt", PhoneNumber = "+351 932145698", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 450 },
@@ -174,7 +177,15 @@ namespace HealthWellbeing.Data
                 new Customer { Name = "Gisela Nunes", Email = "gisela.nunes@ipg.pt", PhoneNumber = "+351 914785236", Gender = "Feminino", RegistrationDate = DateTime.Now.AddDays(-2), TotalPoints = 0 },
                 new Customer { Name = "Hugo Almeida", Email = "hugo.almeida@ipg.pt", PhoneNumber = "+351 936547896", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-8), TotalPoints = 890 },
                 new Customer { Name = "Inês Rodrigues", Email = "ines.rodrigues@ipg.pt", PhoneNumber = "+351 921456987", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-4), TotalPoints = 210 },
-                new Customer { Name = "João Soares", Email = "joao.soares@ipg.pt", PhoneNumber = "+351 915632478", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-50), TotalPoints = 300 }
+                new Customer { Name = "João Soares", Email = "joao.soares@ipg.pt", PhoneNumber = "+351 915632478", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-50), TotalPoints = 300 },
+                new Customer { Name = "Katia Lima", Email = "katia.lima@ipg.pt", PhoneNumber = "+351 911223344", Gender = "Feminino", RegistrationDate = DateTime.Now.AddYears(-1), TotalPoints = 2100 }, 
+                new Customer { Name = "Luis Vaz", Email = "luis.vaz@ipg.pt", PhoneNumber = "+351 922334455", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-5), TotalPoints = 50 }, 
+                new Customer { Name = "Marta Ferreira", Email = "marta.ferreira@ipg.pt", PhoneNumber = "+351 933445566", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-5), TotalPoints = 600 },
+                new Customer { Name = "Nuno Gomes", Email = "nuno.gomes@ipg.pt", PhoneNumber = "+351 966778899", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-10), TotalPoints = 1500 },
+                new Customer { Name = "Olivia Sousa", Email = "olivia.sousa@ipg.pt", PhoneNumber = "+351 919887766", Gender = "Feminino", RegistrationDate = DateTime.Now.AddDays(-1), TotalPoints = 0 },
+                new Customer { Name = "Pedro Mendes", Email = "pedro.mendes@ipg.pt", PhoneNumber = "+351 928776655", Gender = "Masculino", RegistrationDate = DateTime.Now.AddYears(-3), TotalPoints = 5000 }, 
+                new Customer { Name = "Rita Carvalho", Email = "rita.carvalho@ipg.pt", PhoneNumber = "+351 937665544", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-2), TotalPoints = 150 },
+                new Customer { Name = "Tiago Antunes", Email = "tiago.antunes@ipg.pt", PhoneNumber = "+351 965544332", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-7), TotalPoints = 800 }
             };
 
             foreach (var cust in customers) {
@@ -1129,6 +1140,147 @@ namespace HealthWellbeing.Data
             }
         }
 
+        private static void PopulateCustomerActivities(HealthWellbeingDbContext dbContext) {
+            // 1. Safety Check: Se já houver registos na tabela intermédia, aborta.
+            if (dbContext.CustomerActivity.Any()) return;
+
+            // 2. Carregar Referências da BD (Foreign Keys necessárias)
+            var customers = dbContext.Customer.ToList();
+            var activities = dbContext.Activity.ToList();
+            var events = dbContext.Event.ToList();
+
+            // Se não houver dados base, não conseguimos relacionar nada.
+            if (!customers.Any() || !activities.Any()) return;
+
+            // --- Referências de Atividades Chave ---
+            var actAgua = activities.FirstOrDefault(a => a.ActivityName.Contains("Beber 2L")); // Hábito
+            var actCorrida = activities.FirstOrDefault(a => a.ActivityName.Contains("Corrida")); // Treino
+            var actZumba = activities.FirstOrDefault(a => a.ActivityName.Contains("Aula de Grupo")); // Aula
+            var actYoga = activities.FirstOrDefault(a => a.ActivityName.Contains("Meditação")); // Mindfulness
+            var actSono = activities.FirstOrDefault(a => a.ActivityName.Contains("Dormir 8 horas")); // Hábito
+
+            // --- Referências de Eventos Chave ---
+            var evtMaratona = events.FirstOrDefault(e => e.EventName.Contains("Maratona"));
+            var evtZumba = events.FirstOrDefault(e => e.EventName.Contains("Zumba"));
+
+            var historyList = new List<CustomerActivity>();
+            var random = new Random();
+
+            // =================================================================================
+            // CENÁRIO 1: A Consistente (Maria Utente)
+            // Objetivo: Testar gráficos de linha temporal e streaks.
+            // =================================================================================
+            var maria = customers.FirstOrDefault(c => c.Email == "maria@ipg.pt");
+            if (maria != null && actAgua != null && actSono != null) {
+                // Bebe água todos os dias nos últimos 10 dias
+                for (int i = 0; i < 10; i++) {
+                    historyList.Add(new CustomerActivity {
+                        CustomerId = maria.CustomerId,
+                        ActivityId = actAgua.ActivityId,
+                        EventId = null, // Sem evento associado
+                        CompletionDate = DateTime.Now.AddDays(-i).AddHours(random.Next(9, 20)),
+                        PointsEarned = actAgua.ActivityReward
+                    });
+                }
+                // Dormiu bem 5 vezes alternadas
+                for (int i = 0; i < 10; i += 2) {
+                    historyList.Add(new CustomerActivity {
+                        CustomerId = maria.CustomerId,
+                        ActivityId = actSono.ActivityId,
+                        EventId = null,
+                        CompletionDate = DateTime.Now.AddDays(-i).AddHours(8),
+                        PointsEarned = actSono.ActivityReward
+                    });
+                }
+            }
+
+            // =================================================================================
+            // CENÁRIO 2: O Evento de Grupo (Aula de Zumba)
+            // Objetivo: Testar listagens filtradas por EventId.
+            // =================================================================================
+            if (evtZumba != null && actZumba != null) {
+                // Vamos pôr a Katia, a Ana e a Rita na mesma aula
+                var attendeesEmails = new[] { "katia.lima@ipg.pt", "ana.pereira@ipg.pt", "rita.carvalho@ipg.pt" };
+                var attendees = customers.Where(c => attendeesEmails.Contains(c.Email)).ToList();
+
+                foreach (var att in attendees) {
+                    historyList.Add(new CustomerActivity {
+                        CustomerId = att.CustomerId,
+                        ActivityId = actZumba.ActivityId,
+                        EventId = evtZumba.EventId, // Ligação FK ao Evento
+                        CompletionDate = evtZumba.EventStart, // Data síncrona com o evento
+                        PointsEarned = actZumba.ActivityReward + 15 // Bónus por ir ao evento presencial
+                    });
+                }
+            }
+
+            // =================================================================================
+            // CENÁRIO 3: O "Pro" (Pedro Mendes)
+            // Objetivo: Testar rankings e pontuações altas.
+            // =================================================================================
+            var pedro = customers.FirstOrDefault(c => c.Email == "pedro.mendes@ipg.pt");
+            if (pedro != null && evtMaratona != null && actCorrida != null) {
+                // Pedro correu a Maratona
+                historyList.Add(new CustomerActivity {
+                    CustomerId = pedro.CustomerId,
+                    ActivityId = actCorrida.ActivityId,
+                    EventId = evtMaratona.EventId,
+                    CompletionDate = evtMaratona.EventStart.AddHours(3), // Acabou 3h depois
+                    PointsEarned = 1000 // Pontuação massiva manual
+                });
+
+                // Pedro treina muito (5 treinos aleatórios no último mês)
+                for (int i = 0; i < 5; i++) {
+                    historyList.Add(new CustomerActivity {
+                        CustomerId = pedro.CustomerId,
+                        ActivityId = actCorrida.ActivityId,
+                        EventId = null,
+                        CompletionDate = DateTime.Now.AddDays(-random.Next(1, 30)),
+                        PointsEarned = actCorrida.ActivityReward
+                    });
+                }
+            }
+
+            // =================================================================================
+            // CENÁRIO 4: O Iniciante (Luis Vaz)
+            // Objetivo: Testar perfis com pouco histórico.
+            // =================================================================================
+            var luis = customers.FirstOrDefault(c => c.Email == "luis.vaz@ipg.pt");
+            if (luis != null && actYoga != null) {
+                historyList.Add(new CustomerActivity {
+                    CustomerId = luis.CustomerId,
+                    ActivityId = actYoga.ActivityId,
+                    EventId = null,
+                    CompletionDate = DateTime.Now.AddDays(-1),
+                    PointsEarned = actYoga.ActivityReward
+                });
+            }
+
+            // =================================================================================
+            // CENÁRIO 5: Volume de Dados (Random Noise)
+            // Objetivo: Encher tabelas para paginação (Page 1, Page 2...).
+            // =================================================================================
+            // Vamos criar mais 30 registos aleatórios distribuídos pelos outros customers
+            for (int i = 0; i < 30; i++) {
+                var randomCustomer = customers[random.Next(customers.Count)];
+                var randomActivity = activities[random.Next(activities.Count)];
+
+                historyList.Add(new CustomerActivity {
+                    CustomerId = randomCustomer.CustomerId,
+                    ActivityId = randomActivity.ActivityId,
+                    EventId = null, // Maioria é sem evento
+                    CompletionDate = DateTime.Now.AddDays(-random.Next(1, 60)), // Últimos 2 meses
+                    PointsEarned = randomActivity.ActivityReward
+                });
+            }
+
+            // 3. Guardar na Base de Dados
+            if (historyList.Any()) {
+                dbContext.CustomerActivity.AddRange(historyList);
+                dbContext.SaveChanges();
+            }
+        }
+
         private static void PopulateCustomerBadges(HealthWellbeingDbContext dbContext) {
             // 1. Se já existirem associações, não faz nada
             if (dbContext.CustomerBadge.Any()) return;
@@ -1243,6 +1395,12 @@ namespace HealthWellbeing.Data
             EnsureUserIsCreatedAsync(userManager, "joao@ipg.pt", "Secret123$", ["Treinador"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "maria@ipg.pt", "Secret123$", ["Utente"]).Wait();
             EnsureUserIsCreatedAsync(userManager, "paulo@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "ana.pereira@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "bruno.silva@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "elisa.martins@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "katia.lima@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "pedro.mendes@ipg.pt", "Secret123$", ["Utente"]).Wait();
+            EnsureUserIsCreatedAsync(userManager, "olivia.sousa@ipg.pt", "Secret123$", ["Utente"]).Wait();
         }
 
         internal static void SeedRoles(RoleManager<IdentityRole> roleManager) {

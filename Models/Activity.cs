@@ -24,6 +24,7 @@ namespace HealthWellbeing.Models
         public virtual ActivityType? ActivityType { get; set; }
 
         public virtual ICollection<EventActivity>? EventActivities { get; set; }
+        public virtual ICollection<CustomerActivity>? CustomerActivities { get; set; }
 
         public void obterRecompensas()
         {

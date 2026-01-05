@@ -52,6 +52,7 @@ namespace HealthWellbeing.Models
         [Display(Name = "Minimum Level")]
         [Range(1, 100, ErrorMessage = "Level must be between 1 and 100.")]
         public int MinLevel { get; set; }
+        public virtual ICollection<CustomerActivity>? CustomerActivities { get; set; }
 
         [NotMapped]
         [Display(Name = "Status")]

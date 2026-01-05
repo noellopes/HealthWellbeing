@@ -43,6 +43,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.CustomerBadge> CustomerBadge { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.CustomerActivity> CustomerActivity { get; set; } = default!;  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -107,6 +108,27 @@ namespace HealthWellbeing.Data
                 .HasOne(ea => ea.Activity)
                 .WithMany() 
                 .HasForeignKey(ea => ea.ActivityId);
+
+
+            modelBuilder.Entity<CustomerActivity>(entity => {
+                entity.HasKey(ca => ca.CustomerActivityId);
+
+                entity.HasOne(ca => ca.Customer)
+                      .WithMany(c => c.CustomerActivities)
+                      .HasForeignKey(ca => ca.CustomerId)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(ca => ca.Activity)
+                      .WithMany(a => a.CustomerActivities)
+                      .HasForeignKey(ca => ca.ActivityId)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(ca => ca.Event)
+                      .WithMany(e => e.CustomerActivities)
+                      .HasForeignKey(ca => ca.EventId)
+                      .OnDelete(DeleteBehavior.NoAction);
+            });
         }
+
     }
 }

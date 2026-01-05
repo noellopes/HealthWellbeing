@@ -1,0 +1,137 @@
+﻿@model IEnumerable<HealthWellbeing.ViewModels.MyBadge>
+
+@{
+    ViewData["Title"] = "My Badges";
+
+    // Header Stats Calculation
+    int totalPointsEarned = Model.Where(m => m.IsEarned).Sum(m => m.Badge.RewardPoints);
+    int totalBadges = Model.Count();
+    int earnedBadges = Model.Count(m => m.IsEarned);
+    int progressPercent = totalBadges > 0 ? (earnedBadges * 100) / totalBadges : 0;
+}
+
+<div class="container py-5">
+
+    @* --- HEADER --- *@
+    <div class="row align-items-center mb-5">
+        <div class="col-md-7">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="bi bi-patch-check-fill me-2"></i>My Badges
+            </h1>
+            <p class="lead text-muted">
+                Track your achievements and see what you need to do next.
+            </p>
+        </div>
+        <div class="col-md-5">
+            <div class="card bg-white border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-end mb-2">
+                        <h6 class="text-uppercase text-muted fw-bold small mb-0">Total Score</h6>
+                        <h2 class="fw-bold text-primary mb-0">@totalPointsEarned <span class="fs-6 text-dark">pts</span></h2>
+                    </div>
+
+                    @* Global Progress Bar *@
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: @progressPercent%" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="mt-2 small text-muted text-end">
+                        @earnedBadges of @totalBadges badges unlocked
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --- BADGES GRID --- *@
+    @if (!Model.Any()) {
+        <div class="alert alert-info rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            No badges defined in the system yet.
+        </div>
+    }
+    else {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @foreach (var item in Model) {
+                bool isEarned = item.IsEarned;
+
+                // Visual Logic
+                string cardStyle = isEarned ? "border-success shadow-sm" : "bg-light border-0 opacity-75 grayscale-effect";
+                string icon = isEarned ? "bi-trophy-fill text-warning" : "bi-lock-fill text-secondary";
+                string badgeColor = isEarned ? "bg-primary" : "bg-secondary";
+
+                // Terminology: Accurate status
+                string statusText = isEarned ? "Unlocked" : "Locked";
+                string statusColor = isEarned ? "text-success" : "text-muted";
+
+                <div class="col">
+                    <div class="card h-100 rounded-4 overflow-hidden transition-hover @cardStyle">
+                        <div class="card-body text-center d-flex flex-column pt-5">
+
+                            @* Main Icon *@
+                            <div class="mb-3">
+                                <i class="bi @icon display-3 drop-shadow"></i>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-1">@item.Badge.BadgeName</h5>
+
+                            <div class="mb-3">
+                                <span class="badge @badgeColor bg-opacity-10 text-dark border">
+                                    @item.Badge.BadgeType?.BadgeTypeName
+                                </span>
+                            </div>
+
+                            <p class="card-text small text-muted mb-4 px-2">
+                                @item.Badge.BadgeDescription
+                            </p>
+
+                            @* Footer *@
+                            <div class="mt-auto w-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3 border-top pt-3">
+                                    <span class="fw-bold @(isEarned ? "text-primary" : "text-muted")">
+                                        +@item.Badge.RewardPoints pts
+                                    </span>
+                                    <small class="fw-bold @statusColor">
+                                        @statusText
+                                    </small>
+                                </div>
+
+                                <div class="d-grid">
+                                    @* BUTTON: Always "View Details" because the action is the same *@
+                                    <a asp-action="Details" asp-route-id="@item.Badge.BadgeId" class="btn btn-sm rounded-pill @(isEarned ? "btn-outline-primary" : "btn-primary")">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    /* CSS: Visual effects for interactivity */
+    .transition-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+
+    .grayscale-effect {
+        filter: grayscale(100%);
+        transition: all 0.3s ease;
+    }
+
+        .grayscale-effect:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+    .drop-shadow {
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    }
+</style>

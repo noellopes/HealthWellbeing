@@ -1,0 +1,151 @@
+﻿@model HealthWellbeing.ViewModels.MyBadge
+
+@{
+    ViewData["Title"] = "Badge: " + Model.Badge.BadgeName;
+
+    // Configuração Visual
+    bool isEarned = Model.IsEarned;
+    var headerClass = isEarned ? "bg-success text-white" : "bg-white text-dark border-bottom";
+    var iconMain = isEarned ? "bi-trophy-fill" : "bi-lock-fill";
+}
+
+<div class="container py-5">
+
+    @* --- BOTÃO VOLTAR (Clean Design) --- *@
+    <div class="mb-4">
+        <a asp-action="Index" class="d-inline-flex align-items-center text-decoration-none text-secondary fw-bold hover-primary">
+            <div class="bg-white border rounded-circle p-1 me-2 shadow-sm d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="bi bi-arrow-left"></i>
+            </div>
+            Back to My Badges
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        @* --- ESQUERDA: O BADGE EM SI --- *@
+        <div class="col-md-4">
+            <div class="card shadow rounded-4 overflow-hidden border-0 h-100">
+
+                <div class="card-header @headerClass text-center py-5 border-0 position-relative">
+                    <i class="bi @iconMain" style="font-size: 5rem;"></i>
+
+                    @if (isEarned) {
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-white text-success rounded-pill px-3 py-2 shadow-sm">
+                                <i class="bi bi-check-lg"></i> Earned
+                            </span>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <h2 class="fw-bold mb-2">@Model.Badge.BadgeName</h2>
+                    <span class="badge bg-light text-dark border mb-3">
+                        @Model.Badge.BadgeType?.BadgeTypeName
+                    </span>
+
+                    <p class="text-muted">@Model.Badge.BadgeDescription</p>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3">
+                        <span class="text-muted small fw-bold">REWARD</span>
+                        <span class="fw-bold text-primary fs-5">@Model.Badge.RewardPoints pts</span>
+                    </div>
+
+                    @if (isEarned) {
+                        <div class="mt-3 text-success small fw-bold">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Earned on: @Model.DateAwarded?.ToString("MMMM dd, yyyy")
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* --- DIREITA: REQUISITOS --- *@
+        <div class="col-md-8">
+            <div class="card shadow-sm rounded-4 border-0 h-100">
+                <div class="card-header bg-white pt-4 px-4 border-0">
+                    <h4 class="fw-bold mb-1">Requirements to Unlock</h4>
+                    <p class="text-muted small">Meet the criteria below to earn this badge.</p>
+                </div>
+
+                <div class="card-body px-4">
+                    @if (Model.Badge.BadgeRequirements != null && Model.Badge.BadgeRequirements.Any()) {
+                        <div class="list-group list-group-flush">
+                            @foreach (var req in Model.Badge.BadgeRequirements) {
+                                <div class="list-group-item py-4 px-0 border-bottom-0 border-top">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="fw-bold mb-1">@req.BadgeRequirementName</h6>
+                                            <p class="text-muted small mb-0">@req.RequirementDescription</p>
+
+                                            @* Context Tags *@
+                                            <div class="mt-2">
+                                                @if (req.EventTypes != null) {
+                                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                                        Event: @req.EventTypes.EventTypeName
+                                                    </span>
+                                                }
+                                                @if (req.ActivityTypes != null) {
+                                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25">
+                                                        Activity: @req.ActivityTypes.Name
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        @* Target / Goal *@
+                                        <div class="text-end" style="min-width: 100px;">
+                                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Target</small>
+                                            <div class="fs-4 fw-bold text-primary lh-1">@req.TargetValue</div>
+                                        </div>
+                                    </div>
+
+                                    @* --- STATUS BAR (Passiva) --- *@
+                                    <div class="mt-3">
+                                        @{
+                                            int visualProgress = isEarned ? 100 : 0;
+                                            string progressColor = isEarned ? "bg-success" : "bg-secondary";
+                                            string progressText = isEarned ? "Completed" : "Pending";
+                                        }
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span class="text-muted fw-bold" style="font-size: 0.7rem;">STATUS</span>
+                                            <span class="fw-bold @(isEarned ? "text-success" : "text-muted")">@progressText</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar @progressColor" role="progressbar"
+                                                 style="width: @visualProgress%"
+                                                 aria-valuenow="@visualProgress" aria-valuemin="0" aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    }
+                    else {
+                        <div class="text-center py-5 text-muted opacity-50">
+                            <i class="bi bi-info-circle display-4"></i>
+                            <p class="mt-3">No specific requirements defined.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-primary:hover {
+        color: var(--bs-primary) !important;
+    }
+
+        .hover-primary:hover .bg-white {
+            border-color: var(--bs-primary) !important;
+            color: var(--bs-primary) !important;
+        }
+</style>
