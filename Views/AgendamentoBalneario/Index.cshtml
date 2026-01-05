@@ -15,11 +15,9 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.DataHoraInicio)
+                @Html.DisplayNameFor(model => model.HoraInicio)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataHoraFim)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.Estado)
             </th>
@@ -39,11 +37,9 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.DataHoraInicio)
+                @Html.DisplayFor(modelItem => item.HoraInicio)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataHoraFim)
-            </td>
+           
             <td>
                 @Html.DisplayFor(modelItem => item.Estado)
             </td>

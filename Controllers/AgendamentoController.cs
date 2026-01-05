@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 
+
 namespace HealthWellbeing.Controllers
 {
     public class AgendamentoController : Controller
@@ -61,18 +62,18 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoBalneario agendamento)
+        public async Task<IActionResult> Create([Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] Models.AgendamentoBalneario agendamentobalneario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(agendamento);
+                _context.Add(agendamentobalneario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamento.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId", agendamento.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamento.UtenteBalnearioId);
-            return View(agendamento);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentobalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId", agendamentobalneario.TerapeutaId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentobalneario.UtenteBalnearioId);
+            return View(agendamentobalneario);
         }
 
         // GET: Agendamento/Edit/5

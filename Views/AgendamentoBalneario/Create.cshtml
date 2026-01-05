@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.AgendamentoBalneario
+﻿@model HealthWellbeing.Models.AgendamentoBalneario 
 
 @{
     ViewData["Title"] = "Criar Novo Agendamento";
@@ -42,7 +42,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="TipoServicosId" class="control-label"></label>
+                        <label asp-for="TipoServicoId" class="control-label"></label>
                         <select asp-for="TipoServicoId" class="form-control" asp-items="ViewBag.TipoServicoId" required>
                             <option value="">-- selecione o tipo de serviço --</option>
                         </select>

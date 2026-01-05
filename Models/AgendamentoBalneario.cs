@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HealthWellBeing.Models
+namespace HealthWellbeing.Models
 {
     // Enum para o estado da reserva
     public enum EstadoAgendamento
