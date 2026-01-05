@@ -2,10 +2,11 @@
 
 <h2>Lista de Clientes do Balneário</h2>
 
-<form method="get">
-    <input type="text" name="search" placeholder="Pesquisar nome..." />
+<form method="get" class="mb-3">
+    <input type="text" name="search" value="@ViewBag.Search" placeholder="Pesquisar nome..." />
     <button type="submit" class="btn btn-primary">Pesquisar</button>
 </form>
+
 
 <p>
     <a asp-action="Create" class="btn btn-success">Novo Cliente</a>
@@ -56,6 +57,13 @@
                         Editar
                     </a>
 
+                    <a asp-action="Details"
+                       asp-route-id="@item.ClienteBalnearioId"
+                       class="btn btn-info btn-sm">
+                        Detalhes
+                    </a>
+
+
                     <a asp-action="Delete"
                        asp-route-id="@item.ClienteBalnearioId"
                        class="btn btn-danger btn-sm"
@@ -68,3 +76,23 @@
     </tbody>
 </table>
 
+@if (ViewBag.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@i"
+                       asp-route-search="@ViewBag.Search">
+                        @i
+                    </a>
+                </li>
+            }
+
+        </ul>
+    </nav>
+}

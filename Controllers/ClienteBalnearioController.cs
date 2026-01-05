@@ -1,7 +1,9 @@
 ﻿using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
 
 namespace HealthWellbeing.Controllers
 {
@@ -15,22 +17,35 @@ namespace HealthWellbeing.Controllers
         };
 
 
-        public IActionResult Index(string search)
+        public IActionResult Index(string search, int page = 1)
         {
-            var lista = _clientes;
+            int pageSize = 5;
+
+            var lista = _clientes.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                lista = lista
-                    .Where(c => c.NomeCompleto.Contains(search, StringComparison.OrdinalIgnoreCase)
-                             || c.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                lista = lista.Where(c =>
+                    c.NomeCompleto.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    c.Email.Contains(search, StringComparison.OrdinalIgnoreCase));
             }
 
-            lista = lista.OrderBy(c => c.NomeCompleto).ToList();
+            int totalItems = lista.Count();
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            return View(lista);
+            var clientesPaginados = lista
+                .OrderBy(c => c.NomeCompleto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.Search = search;
+
+            return View(clientesPaginados);
         }
+
 
         public IActionResult Create()
         {
@@ -93,5 +108,15 @@ namespace HealthWellbeing.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult Details(int id)
+        {
+            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
+            if (cliente == null)
+                return NotFound();
+
+            return View(cliente);
+        }
+
     }
 }
