@@ -926,7 +926,7 @@ namespace HealthWellbeing.Migrations
                         column: x => x.IdUtenteSaude,
                         principalTable: "UtenteSaude",
                         principalColumn: "UtenteSaudeId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -1190,6 +1190,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Training");
+
+            migrationBuilder.DropTable(
+                name: "Alimento");
 
             migrationBuilder.DropTable(
                 name: "Beneficio");
