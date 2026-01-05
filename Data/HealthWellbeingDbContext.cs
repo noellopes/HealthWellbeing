@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Data
 {
-    public class HealthWellbeingDbContext : DbContext
+    public class HealthWellbeingDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
     {
         public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
             : base(options)
