@@ -1,7 +1,7 @@
 ﻿@model HealthWellbeing.Models.TipoServicos
 
 @{
-    ViewData["Title"] = "Criar Tipo de Serviço";
+    ViewData["Title"] = "Criar Tipo de Serviços";
 
 }
 
@@ -20,13 +20,13 @@
 
         <div class="mb-3">
             <label asp-for="Nome" class="control-label"></label>
-            <input asp-for="Nome" class="form-control" />
+                <input asp-for="Nome" class="form-control" placeholder="Digite seu nome"/>
             <span asp-validation-for="Nome" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label asp-for="Descricao" class="control-label"></label>
-            <textarea asp-for="Descricao" class="form-control"></textarea>
+                <textarea asp-for="Descricao" class="form-control" placeholder="Digite a descrição"></textarea>
             <span asp-validation-for="Descricao" class="text-danger"></span>
         </div>
 
