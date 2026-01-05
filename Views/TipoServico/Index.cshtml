@@ -2,25 +2,10 @@
 
 @{
     ViewData["Title"] = "Tipo de Serviços";
-    string? successMessage = Context.Request.Query["successMessage"];
-
-}
-@if (successMessage != null)
-{
-    <div class="container py-4">
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>@successMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    </div>
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i>Criar Novo Tipo de Serviço</a>
-</p>
 
 <div class="table-responsive">
 <table class="table table-striped table-bordered">
@@ -35,7 +20,6 @@
         @foreach (var item in Model)
         {
             <tr>
- 
                 <td>@Html.DisplayFor(modelItem => item.Nome)</td>
                 <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
 
@@ -55,7 +39,5 @@
                 </td>
             </tr>
         }
-    </tbody>
-</table>
 
 </div>
