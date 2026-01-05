@@ -1146,6 +1146,7 @@ namespace HealthWellbeing.Data
             EnsureUserIsCreatedAsync(userManager, "bruno.carvalho@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "ana.beatriz.silva@example.pt", "Secret123$", new[] { "Utente" }).GetAwaiter().GetResult();
             EnsureUserIsCreatedAsync(userManager, "ana.martins@healthwellbeing.pt", "Secret123$", new[] { "Medico" }).GetAwaiter().GetResult();
+            EnsureUserIsCreatedAsync(userManager, "rececionista@healthwellbeing.pt", "Secret123$", new[] { "Rececionista" }).GetAwaiter().GetResult();
         }
 
         internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
