@@ -4,8 +4,6 @@ using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
@@ -32,13 +30,13 @@ namespace HealthWellbeing.Controllers
             var query = _context.ProblemaSaude.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(categoria))
-                query = query.Where(p => p.ProblemaCategoria.ToLower().Contains(categoria.ToLower()));
+                query = query.Where(p => p.ProblemaCategoria.Contains(categoria));
 
             if (!string.IsNullOrWhiteSpace(nome))
-                query = query.Where(p => p.ProblemaNome.ToLower().Contains(nome.ToLower()));
+                query = query.Where(p => p.ProblemaNome.Contains(nome));
 
             if (!string.IsNullOrWhiteSpace(zona))
-                query = query.Where(p => p.ZonaAtingida.ToLower().Contains(zona.ToLower()));
+                query = query.Where(p => p.ZonaAtingida.Contains(zona));
 
             if (!string.IsNullOrWhiteSpace(gravidade))
                 query = query.Where(p => p.Gravidade.ToString() == gravidade);
@@ -65,13 +63,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             var problemaSaude = await _context.ProblemaSaude
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             return View(problemaSaude);
         }
@@ -85,9 +83,7 @@ namespace HealthWellbeing.Controllers
         // POST: ProblemaSaudes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")]
-            ProblemaSaude problemaSaude)
+        public async Task<IActionResult> Create(ProblemaSaude problemaSaude)
         {
             if (ModelState.IsValid)
             {
@@ -95,19 +91,21 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(problemaSaude);
+
+            // 🔥 dados existem → permitir recuperação
+            return View("invalidProblemaSaude", problemaSaude);
         }
 
         // GET: ProblemaSaudes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
 
             if (problemaSaude == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             return View(problemaSaude);
         }
@@ -115,48 +113,41 @@ namespace HealthWellbeing.Controllers
         // POST: ProblemaSaudes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            int id,
-            [Bind("ProblemaSaudeId,ProblemaCategoria,ProblemaNome,ZonaAtingida,Gravidade")]
-            ProblemaSaude problemaSaude)
+        public async Task<IActionResult> Edit(int id, ProblemaSaude problemaSaude)
         {
             if (id != problemaSaude.ProblemaSaudeId)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude", problemaSaude);
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View("invalidProblemaSaude", problemaSaude);
+
+            try
             {
-                try
-                {
-                    _context.Update(problemaSaude);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProblemaSaudeExists(problemaSaude.ProblemaSaudeId))
-                    {
-                        return View("Invalid", problemaSaude);
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(problemaSaude);
+                await _context.SaveChangesAsync();
             }
-            return View(problemaSaude);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProblemaSaudeExists(problemaSaude.ProblemaSaudeId))
+                    return View("invalidProblemaSaude", problemaSaude);
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ProblemaSaudes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             var problemaSaude = await _context.ProblemaSaude
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
-                return View("Invalid", null);
+                return View("invalidProblemaSaude");
 
             return View(problemaSaude);
         }
@@ -167,11 +158,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
-            if (problemaSaude != null)
-            {
-                _context.ProblemaSaude.Remove(problemaSaude);
-                await _context.SaveChangesAsync();
-            }
+
+            if (problemaSaude == null)
+                return View("invalidProblemaSaude");
+
+            _context.ProblemaSaude.Remove(problemaSaude);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -182,3 +174,4 @@ namespace HealthWellbeing.Controllers
         }
     }
 }
+
