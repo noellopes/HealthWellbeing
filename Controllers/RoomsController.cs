@@ -661,6 +661,19 @@ namespace HealthWellbeingRoom.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
+            // alerta de stock baixo (<= 5)
+            var lowStocks = pagination.Items
+                .Where(rc => rc.Quantity <= 5)
+                .ToList();
+
+            if (lowStocks.Any())
+            {
+                TempData["LowStockMessage"] = string.Join(" | ",
+                    lowStocks.Select(rc =>
+                        $"O consumível '{rc.Consumivel!.Nome}' está quase a esgotar."));
+            }
+
+
             ViewBag.SearchName = searchName;
             ViewBag.SearchCategory = searchCategory;
             ViewBag.SearchMinQuantity = searchMinQuantity;
