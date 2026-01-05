@@ -502,7 +502,7 @@ namespace HealthWellbeingRoom.Controllers
                     ModelState.AddModelError(string.Empty, "Já existe uma reserva para esta sala no período selecionado.");
             }
 
-            // 5C. Validar estado da sala (somente "Disponível" ou "Criada")
+            // 5C. Validar estado da sala (apenas recusar estados claramente indisponíveis)
             if (roomReservation.RoomId > 0)
             {
                 var salaEstado = await _context.Room
@@ -513,11 +513,14 @@ namespace HealthWellbeingRoom.Controllers
                 {
                     ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala selecionada não existe.");
                 }
-                else if (salaEstado.RoomStatus.Name != "Disponível" && salaEstado.RoomStatus.Name != "Criada")
+                else if (salaEstado.RoomStatus.Name == "Em Limpeza" ||
+                         salaEstado.RoomStatus.Name == "Em Manutenção" ||
+                         salaEstado.RoomStatus.Name == "Fora de Serviço")
                 {
                     ModelState.AddModelError(nameof(roomReservation.RoomId), "A sala selecionada não está disponível para reserva.");
                 }
             }
+
 
             // 6. Se houver erros, recarregar dropdowns
             if (!ModelState.IsValid)
@@ -538,20 +541,25 @@ namespace HealthWellbeingRoom.Controllers
             _context.Add(roomReservation);
             await _context.SaveChangesAsync();
 
-            // 8. Atualizar estado da sala
-            var sala = await _context.Room.FindAsync(roomReservation.RoomId);
+            // 8. Atualizar estado da sala: se ainda estiver "Criado", passa para "Disponível"
+            var sala = await _context.Room
+                .Include(r => r.RoomStatus)
+                .FirstOrDefaultAsync(r => r.RoomId == roomReservation.RoomId);
+
             if (sala != null)
             {
-                var indisponivelStatus = await _context.RoomStatus
-                    .FirstOrDefaultAsync(s => s.Name == "Indisponível");
+                var disponivelStatus = await _context.RoomStatus
+                    .FirstOrDefaultAsync(s => s.Name == "Disponível");
 
-                if (indisponivelStatus != null)
+                if (disponivelStatus != null &&
+                    (sala.RoomStatus.Name == "Criado" || sala.RoomStatusId == 0))
                 {
-                    sala.RoomStatusId = indisponivelStatus.RoomStatusId;
+                    sala.RoomStatusId = disponivelStatus.RoomStatusId;
                     _context.Update(sala);
                     await _context.SaveChangesAsync();
                 }
             }
+
 
             // 9. Atualizar consulta
             if (consulta != null)
