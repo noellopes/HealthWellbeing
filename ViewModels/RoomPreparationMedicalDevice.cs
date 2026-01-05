@@ -9,6 +9,8 @@
 
         // Lista de materiais para esta consulta
         public List<MedicalDeviceStatus> Dispositivo { get; set; } = new List<MedicalDeviceStatus>();
+
+        public DateTime? HoraFim { get; set; } 
     }
 
     public class MedicalDeviceStatus

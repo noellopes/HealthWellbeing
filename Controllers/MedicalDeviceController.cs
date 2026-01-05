@@ -538,7 +538,7 @@ namespace HealthWellBeingRoom.Controllers
         {
             //Se o utilizador não escolheu a data, usa data de Amanhã.
             //Se escolheu, usa a data escolhida.
-            DateTime dataFiltro = dataAlvo ?? DateTime.Today.AddDays(1);
+            DateTime dataFiltro = dataAlvo ?? DateTime.Today;
 
             //Passamos a data para a View (para o calendário saber qual dia está selecionado)
             ViewBag.DataSelecionada = dataFiltro.ToString("yyyy-MM-dd");
@@ -560,7 +560,12 @@ namespace HealthWellBeingRoom.Controllers
 
                 var prep = new RoomPreparationMedicalDevice
                 {
-                    DataConsulta = consulta.ConsultationDate.Value,
+                    // Combinar a Data da consulta com a Hora de Início e Fim para ter DateTimes completos
+                    DataConsulta = consulta.ConsultationDate.Value.Date + (consulta.StartTime?.ToTimeSpan() ?? TimeSpan.Zero),
+
+                    // Calcular hora do fim
+                    HoraFim = consulta.ConsultationDate.Value.Date + (consulta.EndTime?.ToTimeSpan() ?? TimeSpan.Zero),
+
                     NomeSala = consulta.Room.Name,
                     Especialidade = consulta.Specialty.Name,
                     Medico = consulta.DoctorName
