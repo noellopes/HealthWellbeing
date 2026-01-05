@@ -1089,6 +1089,10 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<string>("OqueEDescricao")
+                        .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("IdEspecialidade");
 
                     b.ToTable("Specialities");
