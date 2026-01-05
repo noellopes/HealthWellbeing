@@ -4,14 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContexts
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")
-    )
-);
-
+// DB principal (HealthWellbeing)
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("HealthWellbeingConnection")
@@ -19,32 +12,29 @@ builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
     )
 );
 
+// DB Identity
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = false;
-
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 8;
-    options.Password.RequiredUniqueChars = 6;
-    options.Password.RequireNonAlphanumeric = true;
-
-    options.Lockout.AllowedForNewUsers = true;
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultUI();
+// ✅ Identity com Roles (precisas disto para RoleManager funcionar)
+builder.Services
+    .AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -52,31 +42,23 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseMigrationsEndPoint();
-}
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
 
-// SEEDING (correto: fora do if/else da pipeline)
-using (var scope = app.Services.CreateScope())
-{
-    var serviceProvider = scope.ServiceProvider;
+    // 1) Migra + Seed do DB principal
+    var hwDb = services.GetRequiredService<HealthWellbeingDbContext>();
+    SeedData.Populate(hwDb);
 
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    // 2) Migra + Seed do Identity
+    var identityDb = services.GetRequiredService<ApplicationDbContext>();
+    identityDb.Database.Migrate();
+
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+
     SeedData.SeedRoles(roleManager);
-
-    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
     SeedData.SeedDefaultAdmin(userManager);
-
-    if (app.Environment.IsDevelopment())
-    {
-        // se quiseres semear utilizadores extra só em dev
-        SeedData.SeedUsers(userManager);
-
-        var dbContext = serviceProvider.GetRequiredService<HealthWellbeingDbContext>();
-        SeedData.Populate(dbContext);
-        SeedDataExercicio.Populate(dbContext);
-        SeedDataTipoExercicio.Populate(dbContext);
-        SeedDataProblemaSaude.Populate(dbContext);
-    }
+    SeedData.SeedUsers(userManager);
 }
 
 app.UseHttpsRedirection();
@@ -84,14 +66,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// ✅ FALTAVA ISTO
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=UtenteSaude}/{action=Index}/{id?}"
-);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
 app.Run();

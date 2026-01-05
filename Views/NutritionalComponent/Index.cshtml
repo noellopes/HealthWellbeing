@@ -1,0 +1,125 @@
+﻿@using HealthWellbeing.Models
+@using HealthWellbeing.ViewModels
+@model PaginationInfos<NutritionalComponent>
+
+@{
+    ViewData["Title"] = "Nutritional Components";
+    string search = ViewBag.Search as string ?? "";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <h1 class="h4 mb-0">
+            <i class="bi bi-clipboard2-data-fill me-2 text-primary"></i>
+            Nutritional Components
+        </h1>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <form asp-action="Index" method="get" class="d-flex">
+            <input type="search"
+                   name="search"
+                   value="@search"
+                   class="form-control form-control-sm me-2"
+                   placeholder="Search by name or unit" />
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+
+        <a asp-action="Create" class="btn btn-success btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Component
+        </a>
+    </div>
+</div>
+
+<hr />
+
+@if (!Model.Items.Any())
+{
+    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading mb-1">No components</h4>
+            <p class="mb-0">There are no components matching your search.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive mt-3">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Unit</th>
+                    <th>Basis</th>
+                    <th class="text-center" style="width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Unit</td>
+                        <td>@item.Basis</td>
+                        <td class="text-center">
+                            <a asp-action="Details" asp-route-id="@item.NutritionalComponentId"
+                               class="btn btn-sm btn-info text-white me-1">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.NutritionalComponentId"
+                               class="btn btn-sm btn-warning text-white me-1">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.NutritionalComponentId"
+                               class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Nutritional components pagination">
+            <ul class="pagination justify-content-center mt-3">
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-search="@search"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                {
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-search="@search">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       asp-action="Index"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-search="@search"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+}

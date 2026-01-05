@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Data
@@ -10,23 +11,62 @@ namespace HealthWellbeing.Data
         {
         }
 
-        public DbSet<EventType> EventType { get; set; } = default!;
-        public DbSet<Level> Level { get; set; } = default!;
-        public DbSet<Event> Event { get; set; } = default!;
-        public DbSet<Activity_> Activity { get; set; } = default!;
-        public DbSet<Alergia> Alergia { get; set; } = default!;
-        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
-        public DbSet<Receita> Receita { get; set; } = default!;
+        // -------------------------
+        // PRINCIPAIS
+        // -------------------------
+        public DbSet<Member> Member { get; set; } = default!;
+        public DbSet<Client> Client { get; set; } = default!;
         public DbSet<UtenteSaude> UtenteSaude { get; set; } = default!;
         public DbSet<Consulta> Consulta { get; set; } = default!;
         public DbSet<Doctor> Doctor { get; set; } = default!;
         public DbSet<Specialities> Specialities { get; set; } = default!;
-        public DbSet<Member> Member { get; set; } = default!;
-        public DbSet<Client> Client { get; set; } = default!;
-        public DbSet<TrainingType> TrainingType { get; set; } = default!;
+        public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
+
+        // -------------------------
+        // NUTRIÇÃO / PLANOS
+        // -------------------------
+        public DbSet<Goal> Goal { get; set; } = default!;
         public DbSet<Plan> Plan { get; set; } = default!;
+        public DbSet<Nutritionist> Nutritionist { get; set; } = default!;
+        public DbSet<NutritionistClientPlan> NutritionistClientPlan { get; set; } = default!;
+
+        public DbSet<FoodCategory> FoodCategory { get; set; } = default!;
+        public DbSet<Food> Food { get; set; } = default!;
+        public DbSet<Portion> Portion { get; set; } = default!;
+        public DbSet<NutritionalComponent> NutritionalComponent { get; set; } = default!;
+        public DbSet<FoodNutritionalComponent> FoodNutritionalComponent { get; set; } = default!;
+        public DbSet<FoodPlan> FoodPlan { get; set; } = default!;
+        public DbSet<FoodPlanDay> FoodPlanDay { get; set; } = default!;
+        public DbSet<FoodIntake> FoodIntake { get; set; } = default!;
+
+        // -------------------------
+        // ALERGIAS
+        // -------------------------
+        public DbSet<Alergy> Alergy { get; set; } = default!;
+        public DbSet<ClientAlergy> ClientAlergy { get; set; } = default!;
+
+        // -------------------------
+        // EVENTOS / GAMIFICAÇÃO
+        // -------------------------
+        public DbSet<EventType> EventType { get; set; } = default!;
+        public DbSet<Level> Level { get; set; } = default!;
+        public DbSet<Event> Event { get; set; } = default!;
+        public DbSet<Activity_> Activity { get; set; } = default!;
+
+        // -------------------------
+        // TREINO
+        // -------------------------
+        public DbSet<TrainingType> TrainingType { get; set; } = default!;
         public DbSet<Trainer> Trainer { get; set; } = default!;
         public DbSet<Training> Training { get; set; } = default!;
+
+        // -------------------------
+        // OUTROS (se existirem mesmo no teu projeto)
+        // -------------------------
+        public DbSet<Receita> Receita { get; set; } = default!;
+        public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
+        public DbSet<Alergia> Alergia { get; set; } = default!;
+
         public DbSet<Exercicio> Exercicio { get; set; } = default!;
         public DbSet<TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<Beneficio> Beneficio { get; set; } = default!;
@@ -35,11 +75,14 @@ namespace HealthWellbeing.Data
         public DbSet<GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; } = default!;
-        public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // -------------------------
+            // RELAÇÕES (FKs) IMPORTANTES
+            // -------------------------
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
@@ -70,6 +113,60 @@ namespace HealthWellbeing.Data
                 .WithMany(d => d.AgendaMedica)
                 .HasForeignKey(a => a.IdMedico)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // -------------------------
+            // ÍNDICES ÚNICOS
+            // -------------------------
+
+            modelBuilder.Entity<FoodPlanDay>()
+                .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
+                .IsUnique();
+
+            modelBuilder.Entity<FoodIntake>()
+                .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
+                .IsUnique();
+
+            modelBuilder.Entity<FoodNutritionalComponent>()
+                .HasIndex(x => new { x.FoodId, x.NutritionalComponentId })
+                .IsUnique();
+
+            // -------------------------
+            // RELAÇÃO 1-para-1: Client <-> UtenteSaude
+            // (não pode haver mais utentes do que clientes)
+            // -------------------------
+            modelBuilder.Entity<UtenteSaude>()
+                .HasOne(u => u.Client)
+                .WithOne(c => c.UtenteSaude)
+                .HasForeignKey<UtenteSaude>(u => u.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Reforço: 1 utente por client (garante unicidade do ClientId em UtenteSaude)
+            modelBuilder.Entity<UtenteSaude>()
+                .HasIndex(u => u.ClientId)
+                .IsUnique();
+
+            // -------------------------
+            // DECIMAIS DA RECEITA (se as props existirem mesmo)
+            // -------------------------
+            modelBuilder.Entity<Receita>(entity =>
+            {
+                entity.Property(e => e.CaloriasPorPorcao).HasPrecision(10, 2);
+                entity.Property(e => e.Gorduras).HasPrecision(10, 2);
+                entity.Property(e => e.HidratosCarbono).HasPrecision(10, 2);
+                entity.Property(e => e.Proteinas).HasPrecision(10, 2);
+            });
+
+            // -------------------------
+            // Regra global: evitar Cascade (sem contrariar configurações explícitas)
+            // Só troca Cascade -> Restrict
+            // -------------------------
+            foreach (var fk in modelBuilder.Model.GetEntityTypes()
+                         .SelectMany(e => e.GetForeignKeys())
+                         .Where(fk => !fk.IsOwnership))
+            {
+                if (fk.DeleteBehavior == DeleteBehavior.Cascade)
+                    fk.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
     }
 }

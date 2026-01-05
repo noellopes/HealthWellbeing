@@ -1,0 +1,48 @@
+﻿@model HealthWellbeing.Models.Portion
+
+@{
+    ViewData["Title"] = "Delete Portion";
+}
+
+<div class="container my-4">
+    <div class="fh-wrapper">
+
+        <div class="fh-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-trash3" style="color:#ef4444; font-size:1.15rem;"></i>
+                    <h1 class="h5 fh-title mb-0">Delete Portion</h1>
+                </div>
+
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left me-1"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <div class="fh-panel">
+            <div class="alert alert-danger fh-alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                This action cannot be undone.
+            </div>
+
+            <div class="fh-card p-3">
+                <dl class="row mb-3">
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Portion</dt>
+                    <dd class="col-sm-9 fw-bold">@Model.PortionName</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="PortionId" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
+                        <button type="submit" class="btn btn-danger" style="border-radius:12px; font-weight:800;">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>

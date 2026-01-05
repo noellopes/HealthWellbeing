@@ -1,0 +1,23 @@
+{
+  "name": "healthwellbeing",
+  "version": "1.0.0",
+  "description": "The **HealthWellbeing** project is an academic web application developed using **ASP.NET**.  \r It is part of the *Internet Programming* course, where students actively contribute to its development as a practical learning experience.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noellopes/HealthWellbeing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noellopes/HealthWellbeing/issues"
+  },
+  "homepage": "https://github.com/noellopes/HealthWellbeing#readme",
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1"
+  }
+}
