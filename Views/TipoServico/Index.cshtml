@@ -4,8 +4,10 @@
 
     ViewData["Title"] = "Tipo de Serviços";
 
+    string? successMessage = Context.Request.Query["successMessage"];
 
 }
+
 
 
 @if (!string.IsNullOrEmpty(successMessage))
@@ -13,7 +15,7 @@
 {
      <div class="container py-4">
 
-    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+    <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
 
         <i class="bi bi-check-circle-fill me-2"></i>@successMessage
 
