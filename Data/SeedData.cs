@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Data
 {
@@ -42,67 +41,26 @@ namespace HealthWellbeing.Data
 
         private static void PopulateSpecialities(HealthWellbeingDbContext db)
         {
-            if (db.Doctor.Any()) return;
-            if (db.Specialities.Any()) return; // Evita duplicar registos
+            if (db.Specialities.Any()) return; // ✅ basta isto
 
             var especialidades = new[]
             {
-    new Specialities
-    {
-        Nome = "Cardiologia",
-        Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular."
-    },
-    new Specialities
-    {
-        Nome = "Dermatologia",
-        Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas."
-    },
-    new Specialities
-    {
-        Nome = "Pediatria",
-        Descricao = "Cuidados de saúde para bebés, crianças e adolescentes."
-    },
-    new Specialities
-    {
-        Nome = "Psiquiatria",
-        Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais."
-    },
-    new Specialities
-    {
-        Nome = "Nutrição",
-        Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar."
-    },
-    new Specialities
-    {
-        Nome = "Medicina Geral e Familiar",
-        Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias."
-    },
-    new Specialities
-    {
-        Nome = "Ortopedia",
-        Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões."
-    },
-    new Specialities
-    {
-        Nome = "Ginecologia e Obstetrícia",
-        Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto."
-    },
-    new Specialities
-    {
-        Nome = "Psicologia",
-        Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental."
-    },
-    new Specialities
-    {
-        Nome = "Fisioterapia",
-        Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas."
-    },
-
-};
+        new Specialities { Nome = "Cardiologia", Descricao = "Avaliação, diagnóstico e tratamento de doenças do coração e sistema cardiovascular." },
+        new Specialities { Nome = "Dermatologia", Descricao = "Prevenção, diagnóstico e tratamento de doenças da pele, cabelo e unhas." },
+        new Specialities { Nome = "Pediatria", Descricao = "Cuidados de saúde para bebés, crianças e adolescentes." },
+        new Specialities { Nome = "Psiquiatria", Descricao = "Avaliação e tratamento de perturbações mentais, emocionais e comportamentais." },
+        new Specialities { Nome = "Nutrição", Descricao = "Aconselhamento alimentar e planos de nutrição para promoção da saúde e bem-estar." },
+        new Specialities { Nome = "Medicina Geral e Familiar", Descricao = "Acompanhamento global e contínuo da saúde de utentes e famílias." },
+        new Specialities { Nome = "Ortopedia", Descricao = "Tratamento de doenças e lesões dos ossos, articulações, músculos e tendões." },
+        new Specialities { Nome = "Ginecologia e Obstetrícia", Descricao = "Saúde da mulher, sistema reprodutor e acompanhamento da gravidez e parto." },
+        new Specialities { Nome = "Psicologia", Descricao = "Apoio psicológico, gestão emocional e acompanhamento em saúde mental." },
+        new Specialities { Nome = "Fisioterapia", Descricao = "Reabilitação motora e funcional após lesões, cirurgias ou doenças crónicas." },
+    };
 
             db.Specialities.AddRange(especialidades);
             db.SaveChanges();
         }
+
 
         private static void PopulateDoctor(HealthWellbeingDbContext db)
         {
@@ -201,7 +159,9 @@ namespace HealthWellbeing.Data
         new Consulta
         {
             DataMarcacao = hoje.AddDays(-2).AddHours(10),
-            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 9, 30, 0, DateTimeKind.Unspecified),
+            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 15, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(15, 30),
+
             HoraInicio   = new TimeOnly(15, 30),
             HoraFim      = new TimeOnly(16, 0),
         },
@@ -302,24 +262,7 @@ namespace HealthWellbeing.Data
                 if (!exists)
                     db.Consulta.Add(c);
             }
-            var doctor = new[]
-            {
-                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },
-                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt" },
-                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt" },
-                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt" },
-                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt" },
-                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt" },
-                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt" },
-                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt" },
-                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt" },
-                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt" },
-                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt" },
-                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt" },
-                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt" },
-                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt" },
-                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
-            };
+          
 
             db.SaveChanges();
         }
