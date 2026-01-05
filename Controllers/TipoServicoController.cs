@@ -2,10 +2,7 @@
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace HealthWellbeing.Controllers
 {
@@ -22,7 +19,7 @@ namespace HealthWellbeing.Controllers
         // GET: TipoServico
         public async Task<IActionResult> Index(string pesquisarNome, int pagina = 1)
         {
-            // 1. Inicia a consulta na tabela TipoServicos
+            
             var consulta = _context.TipoServicos.AsQueryable();
 
             if (!string.IsNullOrEmpty(pesquisarNome))
@@ -30,7 +27,7 @@ namespace HealthWellbeing.Controllers
                 consulta = consulta.Where(x => x.Nome.Contains(pesquisarNome));
             }
 
-            // 3. Cria o "embrulho" (ViewModel)
+           
             var model = new TipoServicoViewModel
             {
                 PesquisarNome = pesquisarNome,
@@ -39,7 +36,7 @@ namespace HealthWellbeing.Controllers
                     PaginaCorrente = pagina,
                     ItemTotal = await consulta.CountAsync()
                 },
-                // 4. Converte o resultado da BD para a lista dentro do ViewModel
+              
                 ListaServicos = await consulta
                     .OrderBy(x => x.Nome)
                     .Skip((pagina - 1) * 6)
@@ -51,6 +48,8 @@ namespace HealthWellbeing.Controllers
         }
 
 
+
+        // GET: TipoServico/Details/5
         [HttpGet]
         [HttpPost]
         public async Task<IActionResult> Details(int? id, string? successMessage = null)
@@ -153,7 +152,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Corrigido: Procurar pela chave correta 'TipoServicosId'
+           
             var tipoServico = await _context.TipoServicos
                 .FirstOrDefaultAsync(m => m.TipoServicosId == id);
 
@@ -178,11 +177,11 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Redireciona para o Index com a mensagem de sucesso que a sua View já sabe ler
+            
             return RedirectToAction(nameof(Index), new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
         }
 
-        // Método auxiliar corrigido
+        
         private bool TipoServicoExists(int id)
         {
             return _context.TipoServicos.Any(e => e.TipoServicosId == id);
