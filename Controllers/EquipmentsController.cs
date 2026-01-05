@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeingRoom.Controllers
 {
-    [Authorize(Roles = "logisticsTechnician,Administrator")]
+    [Authorize]
     public class EquipmentsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -25,6 +25,7 @@ namespace HealthWellbeingRoom.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         // GET: Equipments
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchSerie = "", int searchType = -1, int searchStatus = -1, int searchRoom = -1)
         {
@@ -127,6 +128,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["RoomId"] = new SelectList(_context.Set<Room>(), "RoomId", "Name");
@@ -138,6 +140,7 @@ namespace HealthWellbeingRoom.Controllers
         // POST: Equipments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
@@ -169,6 +172,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments/Edit/5
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -212,6 +216,7 @@ namespace HealthWellbeingRoom.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "logisticsTechnician,Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("EquipmentId,Name,Description,SerialNumber,RoomId,PurchaseDate,EquipmentTypeId,EquipmentStatusId")] Equipment equipment)
         {
             if (id != equipment.EquipmentId)
@@ -289,6 +294,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // GET: Equipments/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -312,6 +318,7 @@ namespace HealthWellbeingRoom.Controllers
         }
 
         // POST: Equipments/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

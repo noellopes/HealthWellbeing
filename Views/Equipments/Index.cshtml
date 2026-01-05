@@ -5,6 +5,9 @@
 @{
     ViewData["Title"] = "Equipamentos Registados";
     var successMessage = TempData["SuccessMessage"];
+
+    // --- Verificar permissões ---
+    bool isAdmin = User.IsInRole("Administrator");
 }
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
@@ -15,9 +18,14 @@
         <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#postSearch" aria-expanded="false" aria-controls="postSearch">
             <i class="bi bi-search me-1"></i> Pesquisar
         </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Registar Novo
-        </a>
+
+        @* Mostrar o botão add apenas para o admin *@
+        @if (isAdmin)
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Registar Novo
+            </a>
+        }
     </div>
 </div>
 
@@ -121,9 +129,13 @@
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
 
-                            <a asp-action="Delete" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
+                            @* Mostrar o botão eliminar apenas para o admin *@
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Delete" asp-route-id="@equip.EquipmentId" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                            }
                         </td>
                     </tr>
                 }
