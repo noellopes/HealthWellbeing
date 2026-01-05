@@ -2,7 +2,7 @@
 
 namespace HealthWellbeing.Models
 {
-    public class Agendamento
+    public class AgendamentoBalneario
 
     {
         [Key]

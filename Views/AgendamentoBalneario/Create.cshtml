@@ -1,0 +1,96 @@
+﻿@model HealthWellbeing.Models.AgendamentoBalneario
+
+@{
+    ViewData["Title"] = "Criar Novo Agendamento";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+        </h4>
+    </div>
+    <div class="card-body">
+
+        <form asp-action="Create">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="UtenteBalnearioId" class="control-label">Cliente</label>
+                        <select asp-for="UtenteBalnearioId" class="form-control" asp-items="ViewBag.UtenteBalnearioId" data-val="false">
+                            <option value="">-- selecione um cliente --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TerapeutaId" class="control-label"></label>
+                        <select asp-for="TerapeutaId" class="form-control" asp-items="ViewBag.TerapeutaId" data-val="false">
+                            <option value="">-- selecione um terapeuta --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ServicoId" class="control-label"></label>
+                        <select asp-for="ServicoId" class="form-control" asp-items="ViewBag.ServicoId" required>
+                            <option value="">-- selecione um serviço --</option>
+                        </select>
+                        <span asp-validation-for="ServicoId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TipoServicosId" class="control-label"></label>
+                        <select asp-for="TipoServicoId" class="form-control" asp-items="ViewBag.TipoServicoId" required>
+                            <option value="">-- selecione o tipo de serviço --</option>
+                        </select>
+                        <span asp-validation-for="TipoServicoId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="HoraInicio" class="control-label"></label>
+                        <input asp-for="HoraInicio" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DuracaoMinutos" class="control-label"></label>
+                        <input asp-for="DuracaoMinutos" class="form-control" type="number" min="1" />
+                        <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Preco" class="control-label"></label>
+                        <input asp-for="Preco" class="form-control" />
+                        <span asp-validation-for="Preco" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Descricao" class="control-label"></label>
+                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex justify-content-start gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Criar Agendamento
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
