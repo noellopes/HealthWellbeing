@@ -1,88 +1,134 @@
 ﻿@model HealthWellbeing.Models.Event
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Event";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
 
-<div class="card shadow-sm">
-    <div class="card-header bg-success text-white">
-        <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i> New Event</h4>
-    </div>
-    <div class="card-body">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-            <div class="mb-3">
-                <label asp-for="EventName" class="form-label fw-bold"></label>
-                <input asp-for="EventName" class="form-control" />
-                <span asp-validation-for="EventName" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="EventDescription" class="form-label fw-bold"></label>
-                <textarea asp-for="EventDescription" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="EventDescription" class="text-danger small"></span>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label asp-for="EventTypeId" class="form-label fw-bold"></label>
-                    <select asp-for="EventTypeId" class="form-select" asp-items="ViewBag.EventTypeId">
-                        <option value="">All Types</option>
-                    </select>
-                    <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+            @* --- HEADER --- *@
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-success text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-calendar-plus fs-4 text-success-emphasis"></i>
                 </div>
-
-                <div class="col-md-6">
-                    <label asp-for="ActivityTypeId" class="form-label fw-bold"></label>
-                    <select asp-for="ActivityTypeId" class="form-select" asp-items="ViewBag.ActivityCategory" id="activityCategoryDropdown">
-                        <option value="">-- Select Activity Focus --</option>
-                    </select>
-                    <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                <div>
+                    <h2 class="h4 mb-0 fw-bold text-dark">Create Event</h2>
                 </div>
             </div>
 
-            <div class="card bg-light mb-4 d-none" id="activitiesContainer">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold">Select Activities to Include:</h6>
-                    <p class="small text-muted mb-2">Total Points will be calculated automatically based on selections.</p>
-                    <div id="activitiesList" class="row"></div>
-                    <div class="mt-2 fw-bold text-end text-primary">
-                        Total Points: <span id="totalPointsDisplay">0</span>
-                    </div>
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-success">
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+                        @* --- 1. BASIC INFO --- *@
+                        <div class="row mb-4">
+                            <div class="col-12 mb-3">
+                                <label asp-for="EventName" class="form-label fw-bold text-uppercase small text-muted">Event Name</label>
+                                <input asp-for="EventName" class="form-control" placeholder="e.g. Summer HIIT Marathon" />
+                                <span asp-validation-for="EventName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="EventDescription" class="form-label fw-bold text-uppercase small text-muted">Description</label>
+                                <textarea asp-for="EventDescription" class="form-control" rows="3" placeholder="Describe the event details..."></textarea>
+                                <span asp-validation-for="EventDescription" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        @* --- 2. CLASSIFICATION (Types) --- *@
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Classification</label>
+                            <div class="p-4 bg-light bg-opacity-50 rounded-3 border border-light-subtle">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="EventTypeId" class="form-label fw-bold text-dark small">Event Category</label>
+                                        <select asp-for="EventTypeId" class="form-select bg-white" asp-items="ViewBag.EventTypeId">
+                                            <option value="">-- Select Category --</option>
+                                        </select>
+                                        <span asp-validation-for="EventTypeId" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label asp-for="ActivityTypeId" class="form-label fw-bold text-dark small">Activity Focus</label>
+                                        <select asp-for="ActivityTypeId" class="form-select bg-white" asp-items="ViewBag.ActivityCategory" id="activityCategoryDropdown">
+                                            <option value="">-- Select Focus --</option>
+                                        </select>
+                                        <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* --- 3. DYNAMIC ACTIVITIES SECTION --- *@
+                        <div id="activitiesContainer" class="mb-4 d-none animate__animated animate__fadeIn">
+                            <div class="p-4 bg-white border border-success border-opacity-25 rounded-3 shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <label class="form-label fw-bold text-success mb-0">Select Activities</label>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                        Total: <span id="totalPointsDisplay" class="fw-bold">0</span> pts
+                                    </span>
+                                </div>
+
+                                <div id="activitiesList" class="row g-2">
+                                </div>
+                            </div>
+                        </div>
+
+                        @* --- 4. SCHEDULE & REQUIREMENTS --- *@
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-uppercase small text-muted mb-2">Schedule & Rules</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="EventStart" class="form-label fw-bold text-dark small">Start Date</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-calendar-event"></i></span>
+                                        <input asp-for="EventStart" class="form-control" type="datetime-local" />
+                                    </div>
+                                    <span asp-validation-for="EventStart" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="EventEnd" class="form-label fw-bold text-dark small">End Date</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-clock"></i></span>
+                                        <input asp-for="EventEnd" class="form-control" type="datetime-local" />
+                                    </div>
+                                    <span asp-validation-for="EventEnd" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="MinLevel" class="form-label fw-bold text-dark small">Min. Level Required</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-bar-chart"></i></span>
+                                        <input asp-for="MinLevel" class="form-control" type="number" min="1" />
+                                    </div>
+                                    <span asp-validation-for="MinLevel" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* --- BUTTONS --- *@
+                        <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Back to List</a>
+                            <button type="submit" class="btn btn-success px-4 shadow-sm">Create Event</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="EventStart" class="form-label fw-bold"></label>
-                    <input asp-for="EventStart" class="form-control" type="datetime-local" />
-                    <span asp-validation-for="EventStart" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="EventEnd" class="form-label fw-bold"></label>
-                    <input asp-for="EventEnd" class="form-control" type="datetime-local" />
-                    <span asp-validation-for="EventEnd" class="text-danger small"></span>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="MinLevel" class="form-label fw-bold"></label>
-                <input asp-for="MinLevel" class="form-control" type="number" />
-                <span asp-validation-for="MinLevel" class="text-danger small"></span>
-            </div>
-
-            <div class="d-flex justify-content-end gap-2">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check-circle me-1"></i> Create
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-circle me-1"></i> Back to List
-                </a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -93,7 +139,7 @@
     <script>
         $(document).ready(function () {
             $('#activityCategoryDropdown').change(function () {
-                var category = $(this).val(); // Agora isto devolve um ID (número)
+                var category = $(this).val();
                 var container = $('#activitiesContainer');
                 var list = $('#activitiesList');
 
@@ -104,20 +150,20 @@
                     return;
                 }
 
-                // A chamada AJAX agora envia "typeId" porque o Controller espera isso
                 $.getJSON('/Events/GetActivitiesByType', { typeId: category }, function (data) {
                     list.empty();
                     if (data.length === 0) {
-                        list.append('<div class="col-12 text-muted">No activities found for this category.</div>');
+                        list.append('<div class="col-12 text-muted fst-italic">No activities available for this category.</div>');
                     } else {
                         $.each(data, function (i, item) {
                             var checkbox = `
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check">
+                                <div class="col-md-6">
+                                    <div class="form-check p-3 rounded-3 border bg-light h-100">
                                         <input class="form-check-input activity-check" type="checkbox"
                                                name="selectedActivities" value="${item.id}" data-points="${item.points}" id="act_${item.id}">
-                                        <label class="form-check-label" for="act_${item.id}">
-                                            ${item.name} <span class="badge bg-secondary rounded-pill ms-1">${item.points} pts</span>
+                                        <label class="form-check-label w-100 d-flex justify-content-between align-items-center cursor-pointer" for="act_${item.id}">
+                                            <span class="fw-medium">${item.name}</span>
+                                            <span class="badge bg-secondary rounded-pill">${item.points} pts</span>
                                         </label>
                                     </div>
                                 </div>`;

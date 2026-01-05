@@ -43,6 +43,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.CustomerBadge> CustomerBadge { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
+        public DbSet<UtenteEvent> UtenteEvent { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

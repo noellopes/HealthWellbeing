@@ -99,14 +99,6 @@ namespace HealthWellbeing.Models
                     new[] { nameof(EventEnd) }
                 );
             }
-
-            if (EventStart.Hour < 6 || EventStart.Hour >= 23)
-            {
-                yield return new ValidationResult(
-                    "The event must occur during operating hours (06:00 - 23:00).",
-                    new[] { nameof(EventStart) }
-                );
-            }
         }
     }
 }

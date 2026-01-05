@@ -1,0 +1,154 @@
+﻿@model HealthWellbeing.Models.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+    int currentLevel = ViewBag.CustomerLevel;
+    bool isEnrolled = ViewBag.IsEnrolled;
+    bool canJoin = currentLevel >= Model.MinLevel;
+    bool isHappening = Model.EventStart <= DateTime.Now && Model.EventEnd >= DateTime.Now;
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+
+    <div class="mb-4">
+        <a asp-action="Index" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Calendar
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow rounded-4 overflow-hidden h-100 text-center">
+
+                <div class="bg-success p-5 d-flex flex-column align-items-center justify-content-center text-white position-relative" style="min-height: 220px;">
+
+                    @if (isHappening)
+                    {
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-record-circle me-1"></i> Happening Now
+                        </span>
+                    }
+
+                    <h2 class="fw-bold mb-3">@Model.EventName</h2>
+                    <span class="badge bg-white text-success border-0 px-3 py-2 rounded-pill text-uppercase">
+                        @Model.EventType?.EventTypeName
+                    </span>
+                </div>
+
+                <div class="card-body p-4 d-flex flex-column">
+                    <p class="text-muted small mb-4">
+                        @Model.EventDescription
+                    </p>
+
+                    <div class="bg-light p-3 rounded-3 mb-4">
+                        <span class="fs-2 fw-bold text-dark">@Model.EventPoints</span>
+                        <span class="text-muted">points</span>
+                    </div>
+
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3 mb-auto">
+                        <div class="small text-success fw-bold text-uppercase mb-1">Event Date</div>
+                        <div class="text-dark fw-bold">@Model.EventStart.ToString("dd MMMM yyyy")</div>
+                        <div class="text-muted small">@Model.EventStart.ToString("HH:mm") - @Model.EventEnd.ToString("HH:mm")</div>
+
+                        <hr class="border-success opacity-25 my-2">
+
+                        <div class="d-flex justify-content-between align-items-center px-3">
+                            <span class="small text-success fw-bold text-uppercase">Min Level</span>
+                            <span class="fs-5 fw-bold @(canJoin ? "text-dark" : "text-danger")">@Model.MinLevel</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        @if (isEnrolled)
+                        {
+                            <button class="btn btn-success w-100 py-2 rounded-pill fw-bold" disabled>
+                                <i class="bi bi-check-circle-fill me-2"></i> Enrolled
+                            </button>
+                        }
+                        else if (canJoin)
+                        {
+                            <form asp-action="Enroll" method="post">
+                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill fw-bold shadow-sm">
+                                    Enroll Now
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary w-100 py-2 rounded-pill fw-bold opacity-75" disabled>
+                                Level too low (@currentLevel / @Model.MinLevel)
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4 p-md-5">
+
+                <h3 class="fw-bold text-dark mb-2">Event Activities</h3>
+                <p class="text-muted mb-5">Complete these activities during the event to earn your points.</p>
+
+                @if (Model.EventActivities != null && Model.EventActivities.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var ea in Model.EventActivities)
+                        {
+                            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                        <i class="bi bi-activity"></i>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-dark">@ea.Activity.ActivityName</h6>
+                                        <p class="text-muted small mb-1">@ea.Activity.ActivityDescription</p>
+                                        <span class="badge bg-warning text-dark border border-warning border-opacity-25 fw-normal rounded-1">
+                                            @ea.Activity.ActivityType?.Name
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="ms-3">
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">
+                                        + @ea.Activity.ActivityReward pts
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info bg-light border-0 d-flex align-items-center rounded-3">
+                        <i class="bi bi-info-circle me-3 fs-4 text-secondary"></i>
+                        <span class="text-muted">No specific activities defined yet, but participation counts!</span>
+                    </div>
+                }
+
+                @if (!canJoin && !isEnrolled)
+                {
+                    <div class="mt-5 alert alert-warning border-0 rounded-3 d-flex align-items-center">
+                        <i class="bi bi-lock-fill fs-3 me-3 text-warning-emphasis"></i>
+                        <div>
+                            <span class="fw-bold text-dark">Event Locked</span><br>
+                            <span class="small">You need to reach <strong>Level @Model.MinLevel</strong> to unlock this event. Keep training!</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

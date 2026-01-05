@@ -165,6 +165,8 @@ namespace HealthWellbeing.Data
 
             var customers = new[]
             {
+                new Customer { Name = "Maria Utente", Email = "maria@ipg.pt", PhoneNumber = "+351 910000002", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 500 },
+                new Customer { Name = "Paulo Utente", Email = "paulo@ipg.pt", PhoneNumber = "+351 910000003", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-2), TotalPoints = 100 },
                 new Customer { Name = "Ana Pereira", Email = "ana.pereira@ipg.pt", PhoneNumber = "+351 912345678", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-12), TotalPoints = 1250 },
                 new Customer { Name = "Bruno Silva", Email = "bruno.silva@ipg.pt", PhoneNumber = "+351 965874123", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-1), TotalPoints = 0 },
                 new Customer { Name = "Carla Santos", Email = "carla.santos@ipg.pt", PhoneNumber = "+351 932145698", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 450 },

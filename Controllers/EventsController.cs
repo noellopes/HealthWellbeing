@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize(Roles = "Gestor")]
     public class EventsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -36,11 +38,12 @@ namespace HealthWellbeing.Controllers
             return Json(activities);
         }
 
-        public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int page = 1)
+        public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int? searchLevel, int page = 1)
         {
             ViewBag.SearchName = searchName;
             ViewBag.SearchType = searchType;
             ViewBag.SearchStatus = searchStatus;
+            ViewBag.SearchLevel = searchLevel;
 
             var statusList = new List<SelectListItem>
             {
@@ -61,6 +64,11 @@ namespace HealthWellbeing.Controllers
 
             if (!string.IsNullOrEmpty(searchName)) eventsQuery = eventsQuery.Where(e => e.EventName.Contains(searchName));
             if (searchType.HasValue) eventsQuery = eventsQuery.Where(e => e.EventTypeId == searchType);
+
+            if (searchLevel.HasValue)
+            {
+                eventsQuery = eventsQuery.Where(e => e.MinLevel == searchLevel);
+            }
 
             if (!string.IsNullOrEmpty(searchStatus))
             {
