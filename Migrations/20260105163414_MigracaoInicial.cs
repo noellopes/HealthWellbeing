@@ -622,7 +622,8 @@ namespace HealthWellbeing.Migrations
                     HoraFim = table.Column<TimeOnly>(type: "time", nullable: false),
                     SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
-                    IdEspecialidade = table.Column<int>(type: "int", nullable: false)
+                    IdEspecialidade = table.Column<int>(type: "int", nullable: false),
+                    IdUtenteSaude = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -639,6 +640,12 @@ namespace HealthWellbeing.Migrations
                         principalTable: "Specialities",
                         principalColumn: "IdEspecialidade",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Consulta_UtenteSaude_IdUtenteSaude",
+                        column: x => x.IdUtenteSaude,
+                        principalTable: "UtenteSaude",
+                        principalColumn: "UtenteSaudeId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -670,6 +677,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Consulta_IdMedico",
                 table: "Consulta",
                 column: "IdMedico");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Consulta_IdUtenteSaude",
+                table: "Consulta",
+                column: "IdUtenteSaude");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Doctor_IdEspecialidade",
@@ -788,9 +800,6 @@ namespace HealthWellbeing.Migrations
                 name: "Training");
 
             migrationBuilder.DropTable(
-                name: "UtenteSaude");
-
-            migrationBuilder.DropTable(
                 name: "Alimento");
 
             migrationBuilder.DropTable(
@@ -801,6 +810,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Doctor");
+
+            migrationBuilder.DropTable(
+                name: "UtenteSaude");
 
             migrationBuilder.DropTable(
                 name: "EventType");
