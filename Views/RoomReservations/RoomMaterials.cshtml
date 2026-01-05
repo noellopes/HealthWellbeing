@@ -233,6 +233,7 @@
                         <th>Quantidade máxima</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @for (int i = 0; i < Model.Consumables.Count; i++)
                     {
@@ -240,9 +241,23 @@
                             <td>@Model.Consumables[i].Consumivel?.Nome</td>
                             <td>@Model.Consumables[i].Consumivel?.CategoriaConsumivel?.Nome</td>
                             <td>@Model.Consumables[i].Quantity</td>
-                            <td>
-                                <input asp-for="Consumables[i].usedQuantity" class="form-control-sm" />
+
+                            <!-- CAMPO + BOTÃO NA MESMA COLUNA -->
+                            <td style="white-space: nowrap;">
+                                <input type="number"
+                                       id="usedQuantity_@Model.Consumables[i].ConsumivelId"
+                                       value="@Model.Consumables[i].usedQuantity"
+                                       class="form-control-sm d-inline-block"
+                                       disabled
+                                       style="width: 80px;" />
+
+                                <button type="button"
+                                        class="btn btn-outline-primary btn-sm ms-1"
+                                        onclick="toggleUsedQuantity(@Model.Consumables[i].ConsumivelId)">
+                                    Editar
+                                </button>
                             </td>
+
                             <td>@Model.Consumables[i].Consumivel?.QuantidadeMaxima</td>
                         </tr>
                     }
@@ -264,3 +279,38 @@
         <i class="bi bi-arrow-left-circle"></i> Voltar à lista de reservas
     </a>
 </div>
+
+<script>
+    function toggleUsedQuantity(id) {
+        const input = document.getElementById(`usedQuantity_${id}`);
+        const isDisabled = input.disabled;
+
+        if (isDisabled) {
+            input.disabled = false;
+            input.focus();
+        } else {
+            input.disabled = true;
+            const novaQuantidade = input.value;
+
+            fetch('/RoomConsumable/AtualizarUsado', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ id: id, quantity: novaQuantidade })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Erro ao atualizar");
+                return response.json();
+            })
+            .then(data => {
+                console.log("Atualizado com sucesso:", data);
+            })
+            .catch(error => {
+                alert("Erro ao atualizar quantidade.");
+                console.error(error);
+            });
+        }
+    }
+</script>

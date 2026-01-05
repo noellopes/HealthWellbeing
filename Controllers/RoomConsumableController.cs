@@ -141,7 +141,6 @@ namespace HealthWellbeingRoom.Controllers
                 return RedirectToOrigin(origin, null);
             }
 
-            // Carrega o registo de stock da sala
             var rc = await _context.RoomConsumables
                 .Include(x => x.Consumivel)
                 .Include(x => x.Room)
@@ -153,7 +152,6 @@ namespace HealthWellbeingRoom.Controllers
                 return RedirectToOrigin(origin, null);
             }
 
-            // Não deixar consumir mais do que existe
             if (usedQuantity > rc.Quantity)
             {
                 TempData["ErrorMessage"] =
@@ -165,17 +163,11 @@ namespace HealthWellbeingRoom.Controllers
             rc.Quantity -= usedQuantity;
 
             if (rc.Quantity <= 0)
-            {
-                // remover completamente a associação da sala
                 _context.RoomConsumables.Remove(rc);
-            }
             else
-            {
                 _context.RoomConsumables.Update(rc);
-            }
 
-
-            // Atualizar stock global do consumível
+            // Atualizar stock global
             var cons = rc.Consumivel;
             if (cons != null)
             {
@@ -184,9 +176,19 @@ namespace HealthWellbeingRoom.Controllers
                 _context.Consumivel.Update(cons);
             }
 
+            // REGISTAR O GASTO
+            var expense = new ConsumablesExpenses
+            {
+                ConsumableId = rc.ConsumivelId,
+                RoomId = rc.RoomId,
+                UsedAt = DateTime.Now,
+                QuantityUsed = usedQuantity
+            };
+
+            _context.ConsumablesExpenses.Add(expense);
+
             await _context.SaveChangesAsync();
 
-            // Alerta de stock baixo na sala
             if (rc.Quantity == 1)
             {
                 TempData["LowStockMessage"] =
@@ -197,6 +199,28 @@ namespace HealthWellbeingRoom.Controllers
                 $"Foram consumidas {usedQuantity} unidade(s) de '{rc.Consumivel?.Nome}' na sala '{rc.Room?.Name}'.";
 
             return RedirectToOrigin(origin, rc.RoomId);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AtualizarUsado([FromBody] RoomUpdateUsedConsumables dto)
+        {
+            if (dto == null)
+                return BadRequest();
+
+            // Procurar o consumível da sala pelo ConsumivelId
+            var rc = await _context.RoomConsumables
+                .FirstOrDefaultAsync(x => x.ConsumivelId == dto.Id && x.IsCurrent);
+
+            if (rc == null)
+                return NotFound();
+
+            // Atualizar o valor real utilizado
+            rc.RealUsedQuantity = dto.Quantity;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { sucesso = true });
         }
 
         // Helper para decidir para onde voltar

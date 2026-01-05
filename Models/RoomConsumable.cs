@@ -25,6 +25,8 @@ namespace HealthWellbeingRoom.Models
         [Display(Name = "Quantidade")]
         public int Quantity { get; set; }
 
+        public int RealUsedQuantity { get; set; } = 0;
+
         [NotMapped]
         public int usedQuantity { get; set; } = 1;
 
