@@ -34,6 +34,7 @@
                 <input id="dataAlvo"
                        name="dataAlvo"
                        value="@dataAtual"
+                       min="@DateTime.Now.ToString("yyyy-MM-dd")" @*bloqueia datas passadas*@
                        class="form-control"
                        type="date"
                        onchange="this.form.submit()" /> @* Submete assim que mudas a data *@
@@ -79,6 +80,14 @@ else
                         </div>
                         <small class="d-block mt-1">
                             <i class="bi bi-person-badge"></i> @sala.Medico &bull;
+
+                            @* mostra o intervalo da hora da consulta *@
+                            <i class="bi bi-clock"></i>
+                            @sala.DataConsulta.ToString("HH:mm")
+                            @if (sala.HoraFim.HasValue)
+                            {
+                                <span> - @sala.HoraFim.Value.ToString("HH:mm")</span>
+                            }
                         </small>
                     </div>
 
