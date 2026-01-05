@@ -15,7 +15,7 @@
         <table class="table table-striped table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Id</th>
+                    @* <th>Id</th> *@
                     <th>Início</th>
                     <th>Fim</th>
                     <th>Responsável</th>
@@ -44,7 +44,7 @@
                         : "";
 
                         <tr class="@cssClass">
-                            <td>@item.ConsultationId.ToString("D3")</td>
+                            @* <td>@item.ConsultationId.ToString("D3")</td> *@
                             <td>@item.ConsultationDate.ToString("dd/MM/yyyy") @item.StartHour.ToString(@"hh\:mm")</td>
                             <td>@item.ConsultationDate.ToString("dd/MM/yyyy") @item.EndHour.ToString(@"hh\:mm")</td>
                             <td>@item.ResponsibleName</td>

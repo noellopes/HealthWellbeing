@@ -103,12 +103,12 @@
             <table class="table h-100">
                 <thead>
                     <tr>
-                        <th>Id da Consulta</th>
+                        @* <th>Id da Consulta</th> *@
                         <th>Responsável</th>
                         <th>Sala</th>
                         <th>Data da Reserva</th>
-                        <th>Início</th>
-                        <th>Fim</th>
+                        <th>Hora do início</th>
+                        <th>Hora do Fim</th>
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
@@ -135,7 +135,7 @@
 
                             <tr>
                                 <!-- ID CONSULTA -->
-                                <td>@item.ConsultationId.ToString("D3")</td>
+                                @* <td>@item.ConsultationId.ToString("D3")</td> *@
 
                                 <!-- RESPONSÁVEL -->
                                 <td>@(string.IsNullOrWhiteSpace(item.ResponsibleName) ? "—" : item.ResponsibleName)</td>
