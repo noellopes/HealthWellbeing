@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
+using System.Reflection;
+
+
+
+
 
 namespace HealthWellbeing.Data
 {
@@ -673,32 +678,47 @@ namespace HealthWellbeing.Data
         {
             if (db.Doctor.Any()) return;
 
-            var especialidades = db.Specialities
-                .AsNoTracking()
-                .ToDictionary(e => e.Nome, e => e);
+            var especialidades = db.Specialities.AsNoTracking().ToList();
+            if (!especialidades.Any())
+                throw new InvalidOperationException("Não há especialidades. Corre primeiro o PopulateSpecialities.");
 
-            var doctors = new[]
+            var doctors = new List<Doctor>
+    {
+        new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt" },
+        new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt" },
+        new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt" },
+        new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt" },
+        new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt" },
+        new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt" },
+        new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt" },
+        new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt" },
+        new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt" },
+        new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt" },
+        new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt" },
+        new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt" },
+        new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt" },
+        new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt" },
+        new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt" },
+    };
+
+            // Liga cada médico a uma especialidade (sem assumir nomes de propriedades)
+            for (int i = 0; i < doctors.Count; i++)
             {
-                new Doctor { Nome = "Ana Martins",      Telemovel = "912345678", Email = "ana.martins@healthwellbeing.pt",      Especialidade = especialidades["Cardiologia"]},
-                new Doctor { Nome = "Bruno Carvalho",   Telemovel = "913456789", Email = "bruno.carvalho@healthwellbeing.pt",   Especialidade = especialidades["Dermatologia"]},
-                new Doctor { Nome = "Carla Ferreira",   Telemovel = "914567890", Email = "carla.ferreira@healthwellbeing.pt",   Especialidade = especialidades["Pediatria"]},
-                new Doctor { Nome = "Daniel Sousa",     Telemovel = "915678901", Email = "daniel.sousa@healthwellbeing.pt",     Especialidade = especialidades["Psiquiatria"]},
-                new Doctor { Nome = "Eduarda Almeida",  Telemovel = "916789012", Email = "eduarda.almeida@healthwellbeing.pt",  Especialidade = especialidades["Nutrição"]},
-                new Doctor { Nome = "Fábio Pereira",    Telemovel = "917890123", Email = "fabio.pereira@healthwellbeing.pt",    Especialidade = especialidades["Medicina Geral e Familiar"]},
-                new Doctor { Nome = "Gabriela Rocha",   Telemovel = "918901234", Email = "gabriela.rocha@healthwellbeing.pt",   Especialidade = especialidades["Ortopedia"]},
-                new Doctor { Nome = "Hugo Santos",      Telemovel = "919012345", Email = "hugo.santos@healthwellbeing.pt",      Especialidade = especialidades["Ginecologia e Obstetrícia"]},
-                new Doctor { Nome = "Inês Correia",     Telemovel = "920123456", Email = "ines.correia@healthwellbeing.pt",     Especialidade = especialidades["Psicologia"]},
-                new Doctor { Nome = "João Ribeiro",     Telemovel = "921234567", Email = "joao.ribeiro@healthwellbeing.pt",     Especialidade = especialidades["Fisioterapia"]},
-                new Doctor { Nome = "Luísa Nogueira",   Telemovel = "922345678", Email = "luisa.nogueira@healthwellbeing.pt",   Especialidade = especialidades["Medicina Geral e Familiar"]},
-                new Doctor { Nome = "Miguel Costa",     Telemovel = "923456789", Email = "miguel.costa@healthwellbeing.pt",     Especialidade = especialidades["Pediatria"]},
-                new Doctor { Nome = "Nádia Gonçalves",  Telemovel = "924567890", Email = "nadia.goncalves@healthwellbeing.pt",  Especialidade = especialidades["Cardiologia"]},
-                new Doctor { Nome = "Óscar Figueiredo", Telemovel = "925678901", Email = "oscar.figueiredo@healthwellbeing.pt", Especialidade = especialidades["Pediatria"]},
-                new Doctor { Nome = "Patrícia Lopes",   Telemovel = "926789012", Email = "patricia.lopes@healthwellbeing.pt",   Especialidade = especialidades["Ginecologia e Obstetrícia"]},
-            };
+                var esp = especialidades[i % especialidades.Count];
 
-            db.Doctor.AddRange(doctors);
+                // tenta navigation (Especialidade / Speciality / Specialities)
+                TrySetAnyProperty(doctors[i], esp, "Especialidade", "Speciality", "Specialities");
+
+                // tenta FK (IdEspecialidade / EspecialidadeId / SpecialityId / SpecialitiesId)
+                var espId = TryGetEntityId(esp);
+                if (espId.HasValue)
+                    TrySetAnyInt(doctors[i], espId.Value, "IdEspecialidade", "EspecialidadeId", "SpecialityId", "SpecialitiesId");
+            }
+
+            db.Doctor.AddRange(doctors);   // ✅ faltava isto no teu código
             db.SaveChanges();
         }
+
 
         // ---------------------------------------------------------------------
         // CLIENTS (SEM geração automática; usa o seed)
@@ -775,169 +795,98 @@ namespace HealthWellbeing.Data
 
             var hoje = DateTime.Today;
 
-            var doctors = db.Doctor
-                .OrderBy(d => d.IdMedico)
-                .ToList();
-
+            var doctors = db.Doctor.AsNoTracking().ToList();
             if (!doctors.Any())
                 throw new InvalidOperationException("Não há médicos na BD. Corre primeiro o PopulateDoctors.");
 
-            var utentes = db.UtenteSaude
-                .OrderBy(u => u.UtenteSaudeId)
-                .ToList();
-
+            var utentes = db.UtenteSaude.AsNoTracking().ToList();
             if (!utentes.Any())
                 throw new InvalidOperationException("Não há utentes na BD. Corre primeiro o PopulateUtenteSaude.");
 
             var consultas = new List<Consulta>
-            {
-                // Base
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(10, 30),
-                    HoraFim      = new TimeOnly(11, 30),
-                },
+    {
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2024, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+            DataConsulta  = new DateTime(2025, 4, 21, 10, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio    = new TimeOnly(10, 30),
+            HoraFim       = new TimeOnly(11, 30),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
+            DataConsulta  = new DateTime(2026, 1, 5, 9, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio    = new TimeOnly(9, 0),
+            HoraFim       = new TimeOnly(9, 30),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
+            DataConsulta  = new DateTime(2026, 1, 10, 11, 15, 0, DateTimeKind.Unspecified),
+            HoraInicio    = new TimeOnly(11, 15),
+            HoraFim       = new TimeOnly(12, 0),
+        },
+        new Consulta
+        {
+            DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
+            DataConsulta  = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio    = new TimeOnly(15, 0),
+            HoraFim       = new TimeOnly(15, 45),
+        },
 
-                // Futuras (Agendada)
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 10, 9, 15, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 5, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 12, 14, 40, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 10, 11, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 15),
-                    HoraFim      = new TimeOnly(12, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 15, 16, 5, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2026, 1, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(15, 0),
-                    HoraFim      = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 20, 10, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 20, 16, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 30),
-                    HoraFim      = new TimeOnly(17, 0),
-                },
+        new Consulta
+        {
+            DataMarcacao = hoje.AddDays(-2).AddHours(10),
+            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 15, 30, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(15, 30),
+            HoraFim      = new TimeOnly(16, 0),
+        },
+        new Consulta
+        {
+            DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
+            DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
+            HoraInicio   = new TimeOnly(14, 0),
+            HoraFim      = new TimeOnly(14, 30),
+        },
+    };
 
-                // Hoje
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-2).AddHours(10),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 15, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(15, 30),
-                    HoraFim      = new TimeOnly(16, 0),
-                },
-                new Consulta
-                {
-                    DataMarcacao = hoje.AddDays(-1).AddHours(15).AddMinutes(20),
-                    DataConsulta = new DateTime(hoje.Year, hoje.Month, hoje.Day, 14, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(14, 0),
-                    HoraFim      = new TimeOnly(14, 30),
-                },
-
-                // Expiradas
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 9, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 15, 9, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(9, 0),
-                    HoraFim      = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 8, 20, 11, 25, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 9, 25, 11, 45, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(11, 45),
-                    HoraFim      = new TimeOnly(12, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 7, 5, 13, 10, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 8, 10, 16, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(16, 0),
-                    HoraFim      = new TimeOnly(16, 30),
-                },
-
-                // Canceladas
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 10, 1, 10, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 30, 9, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 28, 9, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(9, 0),
-                    HoraFim          = new TimeOnly(9, 30),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 9, 15, 11, 30, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 10, 10, 15, 0, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 10, 8, 10, 0, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(15, 0),
-                    HoraFim          = new TimeOnly(15, 45),
-                },
-                new Consulta
-                {
-                    DataMarcacao     = new DateTime(2025, 6, 10, 12, 0, 0, DateTimeKind.Unspecified),
-                    DataConsulta     = new DateTime(2025, 7, 5, 10, 30, 0, DateTimeKind.Unspecified),
-                    DataCancelamento = new DateTime(2025, 7, 3, 14, 15, 0, DateTimeKind.Unspecified),
-                    HoraInicio       = new TimeOnly(10, 30),
-                    HoraFim          = new TimeOnly(11, 0),
-                },
-
-                // Mais futuras
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 22, 9, 45, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 11, 15, 13, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(13, 30),
-                    HoraFim      = new TimeOnly(14, 15),
-                },
-                new Consulta
-                {
-                    DataMarcacao = new DateTime(2025, 10, 25, 8, 55, 0, DateTimeKind.Unspecified),
-                    DataConsulta = new DateTime(2025, 12, 12, 8, 30, 0, DateTimeKind.Unspecified),
-                    HoraInicio   = new TimeOnly(8, 30),
-                    HoraFim      = new TimeOnly(9, 0),
-                },
-            };
-
-            // ✅ alterna médico + especialidade + utente
             for (int i = 0; i < consultas.Count; i++)
             {
                 var d = doctors[i % doctors.Count];
                 var u = utentes[i % utentes.Count];
 
-                consultas[i].IdMedico = d.IdMedico;
-                consultas[i].IdEspecialidade = d.IdEspecialidade;
-                consultas[i].IdUtenteSaude = u.UtenteSaudeId;
+                // ---- Liga médico (navigation)
+                TrySetAnyProperty(consultas[i], d, "Doctor", "Medico");
+
+                // ---- Liga médico (FK int)
+                var doctorId = TryGetEntityId(d);
+                if (doctorId.HasValue)
+                    TrySetAnyInt(consultas[i], doctorId.Value, "IdMedico", "MedicoId", "DoctorId");
+
+                // ---- Liga utente (navigation)
+                TrySetAnyProperty(consultas[i], u, "UtenteSaude", "Utente");
+
+                // ---- Liga utente (FK int)
+                var utenteId = TryGetEntityId(u);
+                if (utenteId.HasValue)
+                    TrySetAnyInt(consultas[i], utenteId.Value, "IdUtenteSaude", "UtenteSaudeId", "UtenteId");
+
+                // ---- Se existir especialidade na Consulta, tenta preencher a partir do Doctor
+                var esp = TryGetAnyPropertyValue(d, "Especialidade", "Speciality", "Specialities");
+                if (esp != null)
+                {
+                    TrySetAnyProperty(consultas[i], esp, "Especialidade", "Speciality", "Specialities");
+
+                    var espId = TryGetEntityId(esp);
+                    if (espId.HasValue)
+                        TrySetAnyInt(consultas[i], espId.Value, "IdEspecialidade", "EspecialidadeId", "SpecialityId", "SpecialitiesId");
+                }
             }
 
-            // Seed idempotente (evita duplicados)
-            foreach (var c in consultas)
-            {
-                bool exists = db.Consulta.Any(x =>
-                    x.IdMedico == c.IdMedico &&
-                    x.IdUtenteSaude == c.IdUtenteSaude &&
-                    x.DataConsulta == c.DataConsulta &&
-                    x.HoraInicio == c.HoraInicio);
-
-                if (!exists)
-                    db.Consulta.Add(c);
-            }
-
+            db.Consulta.AddRange(consultas);
             db.SaveChanges();
         }
+
 
         // ---------------------------------------------------------------------
         // GOALS (automáticos por cliente)
@@ -1437,5 +1386,105 @@ namespace HealthWellbeing.Data
             db.FoodNutritionalComponent.AddRange(list);
             db.SaveChanges();
         }
+        private static bool TrySetAnyProperty(object target, object value, params string[] possibleNames)
+        {
+            if (target == null || value == null) return false;
+
+            var t = target.GetType();
+            var vType = value.GetType();
+
+            foreach (var name in possibleNames)
+            {
+                var prop = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (prop == null || !prop.CanWrite) continue;
+
+                if (prop.PropertyType.IsAssignableFrom(vType))
+                {
+                    prop.SetValue(target, value);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static bool TrySetAnyInt(object target, int value, params string[] possibleNames)
+        {
+            if (target == null) return false;
+
+            var t = target.GetType();
+
+            foreach (var name in possibleNames)
+            {
+                var prop = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (prop == null || !prop.CanWrite) continue;
+
+                if (prop.PropertyType == typeof(int))
+                {
+                    prop.SetValue(target, value);
+                    return true;
+                }
+
+                if (prop.PropertyType == typeof(int?))
+                {
+                    prop.SetValue(target, (int?)value);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static object? TryGetAnyPropertyValue(object target, params string[] possibleNames)
+        {
+            if (target == null) return null;
+
+            var t = target.GetType();
+
+            foreach (var name in possibleNames)
+            {
+                var prop = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (prop == null || !prop.CanRead) continue;
+
+                return prop.GetValue(target);
+            }
+
+            return null;
+        }
+
+        private static int? TryGetEntityId(object entity)
+        {
+            if (entity == null) return null;
+
+            var t = entity.GetType();
+
+            // nomes comuns
+            var common = new[]
+            {
+        "Id", "ID",
+        "IdMedico", "MedicoId", "DoctorId",
+        "UtenteSaudeId", "IdUtenteSaude",
+        "IdEspecialidade", "EspecialidadeId", "SpecialityId", "SpecialitiesId"
+    };
+
+            foreach (var name in common)
+            {
+                var p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                if (p != null && p.CanRead && p.PropertyType == typeof(int))
+                    return (int)p.GetValue(entity)!;
+
+                if (p != null && p.CanRead && p.PropertyType == typeof(int?))
+                    return (int?)p.GetValue(entity);
+            }
+
+            // fallback: primeira propriedade int que termina em "Id"
+            var fallback = t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(p => p.CanRead && p.PropertyType == typeof(int) &&
+                                     p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase));
+
+            if (fallback != null)
+                return (int)fallback.GetValue(entity)!;
+
+            return null;
+        }
+
     }
 }
