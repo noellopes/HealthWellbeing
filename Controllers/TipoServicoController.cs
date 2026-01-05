@@ -24,7 +24,6 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Index(string? successMessage = null)
         {
             ViewBag.SuccessMessage = successMessage;
-            // Certifique-se que o DbSet no seu Context se chama "TipoServicos"
             return View(await _context.TipoServicos.ToListAsync());
         }
 
