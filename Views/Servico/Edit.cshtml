@@ -1,45 +1,63 @@
 ﻿@model HealthWellbeing.Models.Servico
 
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Editar Serviço";
 }
 
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<h4>ServicoModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i> Editar Serviço
+        </h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-4"></div>
+
             <input type="hidden" asp-for="ServicoId" />
-            <div class="form-group">
+
+            <div class="mb-3">
                 <label asp-for="Nome" class="control-label"></label>
                 <input asp-for="Nome" class="form-control" />
                 <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="mb-3">
                 <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
+                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="mb-3">
                 <label asp-for="Preco" class="control-label"></label>
-                <input asp-for="Preco" class="form-control" />
+                <input asp-for="Preco" class="form-control" type="number" step="0.01" />
                 <span asp-validation-for="Preco" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="mb-3">
                 <label asp-for="DuracaoMinutos" class="control-label"></label>
-                <input asp-for="DuracaoMinutos" class="form-control" />
+                <input asp-for="DuracaoMinutos" class="form-control" type="number" />
                 <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="TipoServico" class="control-label"></label>
-                <input asp-for="TipoServico" class="form-control" />
-                <span asp-validation-for="TipoServico" class="text-danger"></span>
+
+            <div class="mb-3">
+                <label asp-for="TipoServicoId" class="control-label">Tipo de Serviço</label>
+                <select asp-for="TipoServicoId" class="form-control"
+                        asp-items="ViewBag.TipoServicoId">
+                    <option value="">-- Selecione o Tipo de Serviço --</option>
+                </select>
+                <span asp-validation-for="TipoServicoId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+
+            <div class="d-flex justify-content-start gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i> Guardar Alterações
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+                </a>
             </div>
         </form>
     </div>

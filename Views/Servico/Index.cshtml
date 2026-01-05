@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Serviços";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+   
 
 }
 
@@ -33,9 +33,15 @@
                 <td>@Html.DisplayFor(modelItem => item.DuracaoMinutos)</td>
                 <td>@Html.DisplayFor(modelItem => item.TipoServico.Nome)</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ServicoId" class="btn btn-sm btn-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.ServicoId" class="btn btn-sm btn-info">Detals</a>
-                    <a asp-action="Delete" asp-route-id="@item.ServicoId" class="btn btn-sm btn-danger">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.ServicoId" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Details" asp-route-id="@item.ServicoId" class="btn btn-sm btn-info">
+                        <i class="bi bi-eye"></i> Detalhes
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.ServicoId" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
                 </td>
             </tr>
         }
