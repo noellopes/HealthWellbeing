@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace HealthWellbeing.Models
 {
-    public class PaginationInfo<T>
+    public class PaginationInfos<T>
     {
         public IEnumerable<T> Items { get; set; } = new List<T>();
 
@@ -19,9 +19,9 @@ namespace HealthWellbeing.Models
 
         public int LastPageShow => Math.Min(TotalPages, CurrentPage + 2);
 
-        public PaginationInfo() { }
+        public PaginationInfos() { }
 
-        public PaginationInfo(IEnumerable<T> items, int totalItems, int currentPage, int itemsPerPage)
+        public PaginationInfos(IEnumerable<T> items, int totalItems, int currentPage, int itemsPerPage)
         {
             Items = items;
             TotalItems = totalItems;

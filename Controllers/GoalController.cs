@@ -138,7 +138,7 @@ namespace HealthWellbeing.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            var model = new PaginationInfo<Goal>(items, totalItems, page, pageSize);
+            var model = new PaginationInfos<Goal>(items, totalItems, page, pageSize);
 
             return View(model);
         }

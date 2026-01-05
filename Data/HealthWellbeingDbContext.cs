@@ -30,8 +30,11 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.NutritionistClientPlan> NutritionistClientPlan { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodIntake> FoodIntake { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodPlanDay> FoodPlanDay { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.UtenteSaude> UtenteSaude { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Consulta> Consulta { get; set; } = default!;
 
-
+        public DbSet<HealthWellbeing.Models.Doctor> Doctor { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.Specialities> Specialities { get; set; } = default!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,11 +60,6 @@ namespace HealthWellbeing.Data
             }
         }
 
-        public DbSet<HealthWellbeing.Models.UtenteSaude> UtenteSaude { get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Consulta> Consulta { get; set; } = default!;
-
-        public DbSet<HealthWellbeing.Models.Doctor> Doctor{ get; set; } = default!;
-        public DbSet<HealthWellbeing.Models.Specialities> Specialities { get; set; } = default!;
 
     }
     

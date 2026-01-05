@@ -42,7 +42,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfo<Plan>(items, totalItems, page, itemsPerPage);
+            var model = new PaginationInfos<Plan>(items, totalItems, page, itemsPerPage);
 
             ViewBag.Search = search;
 
