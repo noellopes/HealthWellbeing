@@ -1,6 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModel;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

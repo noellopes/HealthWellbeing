@@ -63,7 +63,7 @@ namespace HealthWellbeing.Models
         [Range(0, 300, ErrorMessage = "Height must be positive.")]
         public int HeightCm { get; set; } = 170;
 
-        
+
         [Range(1.0, 2.5)]
         public double ActivityFactor { get; set; } = 1.5;
 
@@ -82,7 +82,7 @@ namespace HealthWellbeing.Models
                 return 30; // fallback razoável
             }
         }
-    
+
         public Member? Membership { get; set; }
 
 
@@ -91,9 +91,9 @@ namespace HealthWellbeing.Models
         public ICollection<Goal>? Goals { get; set; }
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
-    }
-		[DataType(DataType.Date)]
-		public DateTime RegistrationDate { get; set; } = DateTime.Now;
-		public Member? Membership { get; set; }
-	}
+
+        //[DataType(DataType.Date)]
+        //public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        //public Member? Membership { get; set; }
+    } 
 }

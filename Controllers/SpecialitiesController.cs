@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModel; // ← importante para PaginationInfo
+using HealthWellbeing.ViewModels; // ← importante para PaginationInfo
 
 namespace HealthWellbeing.Controllers
 {
