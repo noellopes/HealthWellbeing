@@ -61,6 +61,8 @@ namespace HealthWellbeing.Controllers
 
             var consumivel = await _context.Consumivel
                 .Include(c => c.CategoriaConsumivel)
+                .Include(c => c.FornecedoresConsumiveis)
+                    .ThenInclude(fc => fc.Fornecedor)
                 .FirstOrDefaultAsync(c => c.ConsumivelId == id);
 
             if (consumivel == null) return View("InvalidConsumivel");
