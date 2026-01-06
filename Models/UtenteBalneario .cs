@@ -5,55 +5,55 @@ namespace HealthWellbeing.Models
     public class UtenteBalneario
     {
         [Key]
-        //Infos Utente
         public int UtenteBalnearioId { get; set; }
 
         [Required(ErrorMessage = "O nome é obrigatório")]
-        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres.")]
-        public string? NomeCompleto { get; set; } = string.Empty;
+        [StringLength(100, ErrorMessage = "O nome não pode exceder 100 caracteres")]
+        public string NomeCompleto { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "A data de nascimento é obrigatória")]
         [DataType(DataType.Date)]
         public DateTime DataNascimento { get; set; }
 
         [Required(ErrorMessage = "O sexo é obrigatório")]
-        public  Sexo Sexo { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Selecione o sexo")]
+        public Sexo Sexo { get; set; }
 
-        [StringLength(9, ErrorMessage = "O NIF deve ter 9 caracteres.")]
-        public string? NIF { get; set; } = string.Empty;
+        [Required(ErrorMessage = "O NIF é obrigatório")]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "O NIF deve ter exatamente 9 dígitos")]
+        public string NIF { get; set; } = string.Empty;
 
-        [Phone]
-        [StringLength(15)]
-        public string? Contacto { get; set; } = string.Empty;
+        [Required(ErrorMessage = "O contacto é obrigatório")]
+        [RegularExpression(@"^(91|92|93|96)\d{7}$",
+            ErrorMessage = "Número inválido (91, 92, 93 ou 96 + 7 dígitos)")]
+        public string Contacto { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "A morada é obrigatória")]
         [StringLength(200)]
-        public string? Morada { get; set; } = string.Empty;
+        public string Morada { get; set; } = string.Empty;
 
-
-
-        //DadosMedicos
-        public DadosMedicos DadosMedicos { get; set; } = new DadosMedicos();
-
-
-        //Dados administrativos
         [Required]
         [DataType(DataType.Date)]
         public DateTime DataInscricao { get; set; }
 
-        public  SeguroSaude SeguroSaude { get; set; } = new SeguroSaude();
+        public bool Ativo { get; set; } = true;
 
-        public bool Ativo { get; set; }
-
+        public DadosMedicos DadosMedicos { get; set; } = new();
+        public SeguroSaude SeguroSaude { get; set; } = new();
     }
-    
-        public enum Sexo
-        {
-             Masculino,
-             Feminino,
-             Outro
-        }
 
-        public class DadosMedicos
+    public enum Sexo
+    {
+        Nenhum = 0,
+        Masculino = 1,
+        Feminino = 2,
+        Outro = 3
+    }
+
+
+
+
+public class DadosMedicos
         
         {
             [Key]
@@ -74,7 +74,7 @@ namespace HealthWellbeing.Models
              [Key]
               public int SeguroSaudeId { get; set; }
 
-             [Required(ErrorMessage = "O nome da seguradora é obrigatório")]
+            // [Required(ErrorMessage = "O nome da seguradora é obrigatório")]
              [StringLength(100)]
               public string NomeSeguradora { get; set; } = string.Empty;
 

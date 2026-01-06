@@ -1,55 +1,67 @@
 ﻿@model HealthWellbeing.Models.UtenteBalneario
+@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Criar Utente";
 }
 
 <h2>@ViewData["Title"]</h2>
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Nome -->
     <div class="form-group">
         <label asp-for="NomeCompleto"></label>
         <input asp-for="NomeCompleto" class="form-control" />
         <span asp-validation-for="NomeCompleto" class="text-danger"></span>
     </div>
 
+    <!-- Data de Nascimento -->
     <div class="form-group">
         <label asp-for="DataNascimento"></label>
         <input asp-for="DataNascimento" type="date" class="form-control" />
+        <span asp-validation-for="DataNascimento" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="DataInscricao"></label>
-        <input asp-for="DataInscricao" type="date" class="form-control" />
-        <span asp-validation-for="DataInscricao" class="text-danger"></span>
-    </div>
-
-
+    <!-- Sexo -->
     <div class="form-group">
         <label asp-for="Sexo"></label>
-        <select asp-for="Sexo" class="form-control" asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.Sexo>()"></select>
+        <select asp-for="Sexo"
+                asp-items="Html.GetEnumSelectList<Sexo>()"
+                class="form-control">
+            <option value="">-- Selecione --</option>
+        </select>
+        <span asp-validation-for="Sexo" class="text-danger"></span>
     </div>
 
+    <!-- NIF -->
     <div class="form-group">
         <label asp-for="NIF"></label>
         <input asp-for="NIF" class="form-control" />
+        <span asp-validation-for="NIF" class="text-danger"></span>
     </div>
 
+    <!-- Contacto -->
     <div class="form-group">
         <label asp-for="Contacto"></label>
         <input asp-for="Contacto" class="form-control" />
+        <span asp-validation-for="Contacto" class="text-danger"></span>
     </div>
 
+    <!-- Morada -->
     <div class="form-group">
         <label asp-for="Morada"></label>
         <input asp-for="Morada" class="form-control" />
+        <span asp-validation-for="Morada" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Ativo"></label>
-        <input asp-for="Ativo" type="checkbox" />
+    <!-- Ativo -->
+    <div class="form-check mt-2">
+        <input asp-for="Ativo" class="form-check-input" />
+        <label asp-for="Ativo" class="form-check-label"></label>
     </div>
 
     <button type="submit" class="btn btn-success mt-3">Guardar</button>
@@ -57,7 +69,5 @@
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
