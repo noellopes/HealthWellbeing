@@ -26,6 +26,8 @@ namespace HealthWellbeing.Controllers
             {
                
                 await AtualizarQuantidadeMaximaConsumivel(id);
+                await AtualizarQuantidadeAtualConsumivel(id);
+
 
             }
 
