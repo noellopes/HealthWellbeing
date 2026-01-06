@@ -67,5 +67,81 @@ namespace HealthWellbeing.Services
                 .ToList();
         }
 
+        //Pesquisa pelo nome
+        public int Count(string? search)
+        {
+            var query = _context.Utentes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.NomeCompleto.Contains(search) ||
+                    u.NIF.Contains(search));
+            }
+
+            return query.Count();
+        }
+
+        public List<UtenteBalneario> GetPage(int page, int pageSize, string? search)
+        {
+            var query = _context.Utentes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.NomeCompleto.Contains(search) ||
+                    u.NIF.Contains(search));
+            }
+
+            return query
+                .OrderBy(u => u.NomeCompleto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+        //Pesquisar ativos
+        public int Count(string? search, bool? ativo)
+        {
+            var query = _context.Utentes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.NomeCompleto.Contains(search) ||
+                    u.NIF.Contains(search));
+            }
+
+            if (ativo.HasValue)
+            {
+                query = query.Where(u => u.Ativo == ativo.Value);
+            }
+
+            return query.Count();
+        }
+
+        public List<UtenteBalneario> GetPage(int page, int pageSize, string? search, bool? ativo)
+        {
+            var query = _context.Utentes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.NomeCompleto.Contains(search) ||
+                    u.NIF.Contains(search));
+            }
+
+            if (ativo.HasValue)
+            {
+                query = query.Where(u => u.Ativo == ativo.Value);
+            }
+
+            return query
+                .OrderBy(u => u.NomeCompleto)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+
     }
 }

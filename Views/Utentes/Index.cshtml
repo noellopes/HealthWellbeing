@@ -12,6 +12,30 @@
 
 </p>
 
+<!--Formulario de pesquisa [ Nome / NIF / Estado]-->
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text"
+               name="search"
+               value="@ViewData["Search"]"
+               class="form-control"
+               placeholder="Pesquisar por nome ou NIF" />
+    </div>
+
+    <div class="col-md-3">
+        <select name="ativo" class="form-select">
+            <option value="">Todos</option>
+            <option value="true" selected="@(ViewData["Ativo"]?.ToString() == "True")">Ativos</option>
+            <option value="false" selected="@(ViewData["Ativo"]?.ToString() == "False")">Inativos</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+    </div>
+</form>
+
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -52,7 +76,11 @@
         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
             <a class="page-link"
                asp-action="Index"
-               asp-route-page="@(Model.CurrentPage - 1)">Anterior</a>
+               asp-route-page="@(Model.CurrentPage - 1)"
+               asp-route-search="@ViewData["Search"]"
+               asp-route-ativo="@ViewData["Ativo"]">
+                Anterior
+            </a>
         </li>
 
         <!-- Números das páginas -->
@@ -61,7 +89,11 @@
             <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                 <a class="page-link"
                    asp-action="Index"
-                   asp-route-page="@i">@i</a>
+                   asp-route-page="@i"
+                   asp-route-search="@ViewData["Search"]"
+                   asp-route-ativo="@ViewData["Ativo"]">
+                    @i
+                </a>
             </li>
         }
 
@@ -69,7 +101,11 @@
         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
             <a class="page-link"
                asp-action="Index"
-               asp-route-page="@(Model.CurrentPage + 1)">Seguinte</a>
+               asp-route-page="@(Model.CurrentPage + 1)"
+               asp-route-search="@ViewData["Search"]"
+               asp-route-ativo="@ViewData["Ativo"]">
+                Seguinte
+            </a>
         </li>
 
     </ul>

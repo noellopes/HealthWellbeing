@@ -12,19 +12,24 @@ public class UtentesController : Controller
         _utenteService = utenteService;
     }
 
-    public IActionResult Index(int page = 1)
+    public IActionResult Index(int page = 1, string? search = null, bool? ativo = null)
     {
         int pageSize = 10;
 
-        int total = _utenteService.Count();
+        int total = _utenteService.Count(search, ativo);
 
         var vm = new Paginacao<UtenteBalneario>(page, total)
         {
-            Items = _utenteService.GetPage(page, pageSize)
+            Items = _utenteService.GetPage(page, pageSize, search, ativo)
         };
+
+        ViewData["Search"] = search;
+        ViewData["Ativo"] = ativo;
 
         return View(vm);
     }
+
+
 
     public IActionResult Create()
     {
