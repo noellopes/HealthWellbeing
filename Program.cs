@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+var connectionString = builder.Configuration.GetConnectionString("HealthWellbeingConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -55,20 +57,14 @@ else
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         SeedData.SeedDefaultAdmin(userManager);
 
-        SeedData.SeedUsers(userManager);
-
         var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
-        SeedData.Populate(context);
+        SeedData.SeedUsers(userManager, context);
+        SeedData.SeedPopulateClientsAsUsers(userManager, context);
+        SeedData.SeedDefaultAdmin(userManager);
+        SeedDataExercicio.Populate(context);
+        SeedDataTipoExercicio.Populate(context);
+        SeedDataProblemaSaude.Populate(context);
     }
-
-	using (var serviceScope = app.Services.CreateScope())
-	{
-        var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        SeedData.Populate(dbContext);
-        SeedDataExercicio.Populate(dbContext);
-        SeedDataTipoExercicio.Populate(dbContext);
-        SeedDataProblemaSaude.Populate(dbContext);
-	}
 }
 
 app.UseHttpsRedirection();

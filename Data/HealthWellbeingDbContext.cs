@@ -105,6 +105,18 @@ namespace HealthWellbeing.Data
                 .WithMany(r => r.Componentes)
                 .HasForeignKey(c => c.ReceitaId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // IdentityUser (0..1) <-> (0..1) Client
+            modelBuilder.Entity<Client>()
+                .HasIndex(c => c.IdentityUserId)
+                .IsUnique()
+                .HasFilter("[IdentityUserId] IS NOT NULL");
+
+            modelBuilder.Entity<Client>()
+                .HasOne(c => c.IdentityUser)
+                .WithOne()
+                .HasForeignKey<Client>(c => c.IdentityUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
