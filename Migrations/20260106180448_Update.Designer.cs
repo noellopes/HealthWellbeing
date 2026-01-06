@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260106000539_UpdateCostumerEvent")]
-    partial class UpdateCostumerEvent
+    [Migration("20260106180448_Update")]
+    partial class Update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,7 +80,8 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("ActivityDescription")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ActivityName")
                         .IsRequired()
@@ -1263,19 +1264,19 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Activity", "Activity")
                         .WithMany("CustomerActivities")
                         .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Customer", "Customer")
                         .WithMany("CustomerActivities")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Event", "Event")
                         .WithMany("CustomerActivities")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Activity");
 
@@ -1308,13 +1309,13 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Customer", "Customer")
                         .WithMany("CustomerEvents")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Event", "Event")
                         .WithMany("CustomerEvents")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Customer");

@@ -1,0 +1,116 @@
+﻿@model IEnumerable<HealthWellbeing.Models.CustomerEvent>
+
+@{
+    ViewData["Title"] = "Past Events History";
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<div class="container py-5">
+
+    <div class="mb-4 d-flex align-items-center justify-content-between">
+        <div>
+            <a asp-action="Index" class="text-decoration-none text-muted mb-2 d-inline-block">
+                <i class="bi bi-arrow-left me-1"></i> Back to Calendar
+            </a>
+            <h1 class="fw-bold text-dark">Event History</h1>
+            <p class="text-muted">List of events you participated in that have ended or you completed.</p>
+        </div>
+
+        <div class="bg-secondary bg-opacity-10 text-secondary rounded-pill px-4 py-2 fw-bold">
+            Completed Events: @Model.Count()
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+            <i class="bi bi-archive display-1 text-muted opacity-25"></i>
+            <h3 class="mt-3 text-muted">No history yet</h3>
+            <p class="text-muted">You haven't finished any events yet.</p>
+            <a asp-action="Index" class="btn btn-primary rounded-pill mt-3">Check Active Events</a>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                @* Agrupar por Data do Evento *@
+                @foreach (var group in Model.GroupBy(x => x.Event.EventStart.Date))
+                {
+                    <div class="mb-5">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-secondary rounded-pill px-3 py-2 me-3">
+                                @group.Key.ToString("dd MMM yyyy")
+                            </span>
+                            <div class="h-1 flex-grow-1 bg-secondary opacity-25 rounded" style="height: 2px;"></div>
+                        </div>
+
+                        <div class="list-group shadow-sm rounded-4 border-0">
+                            @foreach (var item in group)
+                            {
+                                // --- NOVA LÓGICA VISUAL ---
+                                // Se for Completed: Verde. Se Expired ou Passado: Cinzento.
+                                bool isCompleted = item.Status == "Completed";
+                                string iconColor = isCompleted ? "bg-success text-white" : "bg-secondary bg-opacity-25 text-secondary";
+                                string icon = isCompleted ? "bi-trophy-fill" : "bi-check-all";
+
+                                <div class="list-group-item border-0 p-4 d-flex align-items-center justify-content-between hover-bg">
+                                    <div class="d-flex align-items-center">
+                                        <div class="@iconColor rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <i class="bi @icon fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-1 fw-bold text-dark">@item.Event?.EventName</h5>
+                                            <div class="text-muted small">
+                                                <span class="text-uppercase badge bg-light text-dark border me-2">@item.Event?.EventType?.EventTypeName</span>
+
+                                                @if (isCompleted)
+                                                {
+                                                    <span class="text-success fw-bold">Completed on @item.CompletionDate?.ToString("dd MMM")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Ended on @item.Event?.EventEnd.ToString("dd MMM, HH:mm")</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        @if (item.PointsEarned > 0)
+                                        {
+                                            <span class="fs-5 fw-bold text-success">+@item.PointsEarned</span>
+                                            <div class="small text-muted">points earned</div>
+                                        }
+                                        else
+                                        {
+                                            <span class="fs-6 text-muted">Participated</span>
+                                        }
+                                    </div>
+                                </div>
+                                @if (item != group.Last())
+                                {
+                                    <hr class="my-0 opacity-10">
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .hover-bg:hover {
+        background-color: #f8f9fa;
+    }
+</style>

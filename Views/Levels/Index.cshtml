@@ -6,22 +6,18 @@
     var successMessage = TempData["SuccessMessage"] as string;
     var errorMessage = TempData["ErrorMessage"] as string;
 
-    // Captura os valores de pesquisa para facilitar a leitura no HTML
     var searchNumber = ViewBag.SearchNumber as string;
-    // Tenta ir buscar ao QueryString se o ViewBag falhar para o ID da categoria
     var searchCategoryId = ViewBag.SearchCategoryId?.ToString() ?? Context.Request.Query["searchCategoryId"].ToString();
     var searchDescription = ViewBag.SearchDescription as string;
     var searchPoints = ViewBag.SearchPoints as string;
 
-    // Lógica para decidir se a aba de pesquisa começa aberta
-    bool hasSearch = !string.IsNullOrEmpty(searchNumber) || 
-                     !string.IsNullOrEmpty(searchCategoryId) || 
-                     !string.IsNullOrEmpty(searchDescription) || 
+    bool hasSearch = !string.IsNullOrEmpty(searchNumber) ||
+                     !string.IsNullOrEmpty(searchCategoryId) ||
+                     !string.IsNullOrEmpty(searchDescription) ||
                      !string.IsNullOrEmpty(searchPoints);
 }
 
 <style>
-    /* Estilo "Top Level" */
     #successToast, #errorToast {
         min-width: 28rem;
         max-width: 40rem;
@@ -29,7 +25,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(16,185,129,0.06);
         font-size: 1.02rem;
     }
-    
+
     #errorToast {
         box-shadow: 0 10px 30px rgba(0,0,0,0.28), 0 0 0 6px rgba(220,53,69,0.06);
     }
@@ -42,10 +38,10 @@
         font-weight: 600;
     }
 
-    .toast-body .bi {
-        font-size: 1.5rem;
-        opacity: .95;
-    }
+        .toast-body .bi {
+            font-size: 1.5rem;
+            opacity: .95;
+        }
 </style>
 
 <div class="container py-4">
@@ -103,15 +99,13 @@
     <div class="collapse mt-2 mb-3 @(hasSearch ? "show" : "")" id="levelSearch">
         <div class="card card-body">
             <form asp-action="Index" method="get" class="row g-3 align-items-end">
-
                 <div class="col-md-3">
                     <label class="form-label">Level Number</label>
                     <input id="searchNumber" name="searchNumber"
                            value="@searchNumber"
                            class="form-control" type="number" min="1" max="100"
-                           placeholder="Exact number (1–100)" />
+                           placeholder="Exact number" />
                 </div>
-
                 <div class="col-md-3">
                     <label class="form-label">Category</label>
                     <select id="searchCategoryId" name="searchCategoryId"
@@ -120,15 +114,13 @@
                         <option value="">All Categories</option>
                     </select>
                 </div>
-
                 <div class="col-md-3">
                     <label class="form-label">Description</label>
                     <input id="searchDescription" name="searchDescription"
                            value="@searchDescription"
-                           class="form-control" 
-                           placeholder="Keywords (ex: Cardio)..." />
+                           class="form-control"
+                           placeholder="Keywords..." />
                 </div>
-
                 <div class="col-md-3">
                     <label class="form-label">Points Limit</label>
                     <input id="searchPoints" name="searchPoints"
@@ -136,39 +128,36 @@
                            class="form-control" type="number" min="0"
                            placeholder="Exact value" />
                 </div>
-
                 <div class="col-12 mt-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search me-1"></i> Search
                     </button>
-
                     <a asp-action="Index" class="btn btn-secondary">Clear</a>
                 </div>
-
             </form>
         </div>
     </div>
 
     <div class="collapse mt-2 mb-3" id="calcLevelBox">
-        <div class="card card-body">
-            <label class="form-label fw-bold">Calculate Level</label>
+        <div class="card card-body border-info">
+            <label class="form-label fw-bold text-info"><i class="bi bi-calculator"></i> Level Simulator</label>
             <div class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label small text-muted mb-1">Total Points</label>
                     <input id="pointsInput" type="number" min="0" class="form-control" placeholder="Enter points..." />
                 </div>
                 <div class="col-md-2">
-                    <button id="calcBtn" class="btn btn-primary w-100">Calculate</button>
+                    <button id="calcBtn" class="btn btn-info w-100 text-white">Check Level</button>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label small text-muted mb-1">Result</label>
+                    <label class="form-label small text-muted mb-1">Result Level</label>
                     <input id="calcResult" type="text" class="form-control fw-bold" readonly placeholder="Level..." />
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label small text-muted mb-1">Next Level Progress</label>
+                    <label class="form-label small text-muted mb-1">Progress</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light">Remaining</span>
-                        <input id="calcRemaining" type="text" class="form-control" readonly placeholder="Pts left over..." />
+                        <span class="input-group-text bg-light">Needs</span>
+                        <input id="calcRemaining" type="text" class="form-control" readonly placeholder="Pts for next..." />
                     </div>
                 </div>
             </div>
@@ -198,7 +187,6 @@
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
-
                     <tbody>
                         @if (Model.Items != null && Model.Items.Any())
                         {
@@ -206,12 +194,12 @@
                             {
                                 <tr>
                                     <td>
-                                        <span class="badge bg-primary rounded-pill">@Html.DisplayFor(_ => item.LevelNumber)</span>
+                                        <span class="badge bg-primary rounded-pill" style="font-size: 0.9em;">@Html.DisplayFor(_ => item.LevelNumber)</span>
                                     </td>
                                     <td>
                                         @if (item.Category != null)
                                         {
-                                            @item.Category.Name
+                                            <span class="fw-semibold">@item.Category.Name</span>
                                         }
                                         else
                                         {
@@ -222,16 +210,20 @@
                                     <td>@Html.DisplayFor(_ => item.LevelPointsLimit)</td>
 
                                     <td class="text-end">
-                                        <div class="btn-group">
-                                            <a asp-action="Details" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-info" title="Details">Details</a>
+                                        <a asp-action="Edit" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-warning text-dark me-1" title="Edit">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
 
-                                            <a asp-action="Edit" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-warning" title="Edit">Edit</a>
+                                        <a asp-action="Details" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-info text-dark me-1" title="Details">
+                                            <i class="bi bi-info-circle"></i> Details
+                                        </a>
 
-                                            <a asp-action="Delete" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-danger" title="Delete">Delete</a>
-                                        </div>
+                                        <a asp-action="Delete" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-danger text-white" title="Delete">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
                                     </td>
                                 </tr>
                             }
@@ -239,7 +231,10 @@
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">No levels found.</td>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    No levels found matching your criteria.
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -299,10 +294,9 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
             // Toasts initialization
             const toasts = document.querySelectorAll('.toast');
-            if (bootstrap?.Toast) {
+            if (window.bootstrap?.Toast) {
                 toasts.forEach(t => bootstrap.Toast.getOrCreateInstance(t).show());
             }
 
@@ -323,10 +317,11 @@
                         return;
                     }
 
-                    calcResult.value = "...";
+                    calcResult.value = "Calculating...";
                     calcRemaining.value = "...";
 
                     try {
+                        // Faz o pedido ao Controller que agora consulta a Base de Dados
                         const url = '@Url.Action("CalculateLevel", "Levels")' + `?points=${points}`;
                         const response = await fetch(url);
 
@@ -335,7 +330,12 @@
                         const data = await response.json();
 
                         calcResult.value = `Level ${data.level}`;
-                        calcRemaining.value = `${data.remaining} pts`;
+
+                        if(data.remaining > 0) {
+                            calcRemaining.value = `${data.remaining} pts for next level`;
+                        } else {
+                            calcRemaining.value = "Max Level Reached";
+                        }
 
                     } catch (error) {
                         console.error("Error:", error);

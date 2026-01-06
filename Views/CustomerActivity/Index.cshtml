@@ -1,0 +1,180 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Activity>
+
+@{
+    ViewData["Title"] = "Activities Library";
+    int currentLevel = ViewBag.CustomerLevel;
+    var successMessage = TempData["SuccessMessage"];
+
+    // Ler o dicionário de contagens
+    var counts = ViewBag.ActivityCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<div class="container py-5">
+
+    @* --- Cabeçalho com Botão History --- *@
+    <div class="row align-items-center mb-4">
+        <div class="col-md-5">
+            <h1 class="fw-bold text-dark">Activities Library</h1>
+            <p class="text-muted mb-0">Find exercises and habits to boost your score.</p>
+        </div>
+        <div class="col-md-7">
+            <div class="d-flex gap-3 justify-content-md-end mt-3 mt-md-0">
+
+                <a asp-action="History" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-bold d-flex align-items-center shadow-sm">
+                    <i class="bi bi-clock-history me-2"></i> History
+                </a>
+
+                <div class="bg-white px-4 py-2 rounded-pill shadow-sm border d-flex align-items-center">
+                    <span class="text-muted small me-2 text-uppercase fw-bold">Current Level:</span>
+                    <span class="fs-4 fw-bold text-primary">@currentLevel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --- Barra de Pesquisa --- *@
+    <div class="card border-0 shadow-sm rounded-4 mb-5 bg-white">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label for="searchName" class="form-label fw-bold small text-muted text-uppercase">Activity Name</label>
+                    <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control bg-light border-0" placeholder="e.g. Running, Meditation..." />
+                </div>
+                <div class="col-md-4">
+                    <label for="searchType" class="form-label fw-bold small text-muted text-uppercase">Category</label>
+                    <select id="searchType" name="searchType" class="form-select bg-light border-0" asp-items="ViewBag.TypesList">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold">Search</button>
+                    </div>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(ViewBag.SearchName) || ViewBag.SearchType != null)
+            {
+                <div class="mt-2 text-end">
+                    <a asp-action="Index" class="text-decoration-none text-muted small"><i class="bi bi-x-circle me-1"></i> Clear Filters</a>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* --- Grelha de Atividades --- *@
+    @if (!Model.Items.Any())
+    {
+        <div class="text-center py-5 bg-light rounded-3 border border-1">
+            <div class="text-muted opacity-50 mb-2"><i class="bi bi-search display-4"></i></div>
+            <h5 class="text-muted fw-bold">No activities found</h5>
+            <p class="text-muted small mb-0">Try clearing your filters.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model.Items)
+            {
+                // Obter a contagem
+                int myCount = counts.ContainsKey(item.ActivityId) ? counts[item.ActivityId] : 0;
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm rounded-4 border-0 border-top border-4 border-info hover-lift">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-light text-dark border">@item.ActivityType?.Name</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                    + @item.ActivityReward pts
+                                </span>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-2 text-dark">@item.ActivityName</h5>
+
+                            <div class="mb-3" style="min-height: 25px;">
+                                @if (myCount > 0)
+                                {
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill">
+                                        <i class="bi bi-check-all me-1"></i> Completed: @myCount times
+                                    </span>
+                                }
+                            </div>
+
+                            <p class="card-text text-muted small text-truncate">@item.ActivityDescription</p>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 p-4 pt-0">
+                            <div class="d-grid">
+                                <a asp-action="Details" asp-route-id="@item.ActivityId" class="btn btn-outline-primary rounded-pill fw-bold">
+                                    View & Log Activity
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* --- Paginação Corrigida --- *@
+        <div class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm shadow-sm">
+                    @* Botão Previous *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-start" asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType">Previous</a>
+                    </li>
+
+                    @* Números das Páginas *@
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link border-0" asp-action="Index"
+                               asp-route-page="@p"
+                               asp-route-searchName="@ViewBag.SearchName"
+                               asp-route-searchType="@ViewBag.SearchType">@p</a>
+                        </li>
+                    }
+
+                    @* Botão Next *@
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link border-0 rounded-end" asp-action="Index"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           asp-route-searchName="@ViewBag.SearchName"
+                           asp-route-searchType="@ViewBag.SearchType">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+
+    .page-link {
+        color: #333;
+    }
+</style>
