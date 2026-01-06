@@ -76,6 +76,8 @@ internal class SeedData
         var clients = PopulateClients(dbContext);
         var anyClientUpdated = false;
 
+        if (clients == null) return;
+
         foreach (var client in clients)
         {
             var email = client.Email?.Trim();
@@ -2055,6 +2057,8 @@ internal class SeedData
 
     private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
     {
+        if (dbContext.Client.Any()) return null;
+
 
         // Lista com 25 clientes
         var clients = new List<Client>()
