@@ -32,7 +32,7 @@
         <select asp-for="Sexo"
                 asp-items="Html.GetEnumSelectList<Sexo>()"
                 class="form-control">
-            <option value="">-- Selecione --</option>
+            <option value="0">-- Selecione --</option>
         </select>
         <span asp-validation-for="Sexo" class="text-danger"></span>
     </div>

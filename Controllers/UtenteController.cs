@@ -2,7 +2,9 @@
 using HealthWellbeing.Services;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class UtentesController : Controller
 {
     private readonly UtenteService _utenteService;
@@ -41,16 +43,32 @@ public class UtentesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create(UtenteBalneario utente)
     {
+        if (!ModelState.IsValid)
+            return View(utente);
+
         utente.DataInscricao = DateTime.Today;
 
-        if (!ModelState.IsValid)
+        utente.DadosMedicos = new DadosMedicos
         {
-            return View(utente);
-        }
+            HistoricoClinico = "",
+            IndicacoesTerapeuticas = "",
+            ContraIndicacoes = "",
+            MedicoResponsavel = ""
+        };
+
+        utente.SeguroSaude = new SeguroSaude
+        {
+            NomeSeguradora = "N/A",
+            NumeroApolice = ""
+        };
 
         _utenteService.Add(utente);
+
+        TempData["Success"] = "Cliente criado com sucesso.";
+
         return RedirectToAction(nameof(Index));
     }
+
 
 
     public IActionResult Edit(int id)
@@ -84,16 +102,7 @@ public class UtentesController : Controller
     }
 
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    [ActionName("Delete")]
-    public IActionResult DeleteConfirmed(int id)
-    {
-        _utenteService.Delete(id);
-        return RedirectToAction(nameof(Index));
-    }
-
-
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         var utente = _utenteService.GetById(id);
@@ -102,5 +111,18 @@ public class UtentesController : Controller
 
         return View(utente);
     }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [ValidateAntiForgeryToken]
+    [ActionName("Delete")]
+    public IActionResult DeleteConfirmed(int utenteBalnearioId)
+    {
+        _utenteService.Delete(utenteBalnearioId);
+        TempData["Success"] = "Cliente eliminado com sucesso.";
+        return RedirectToAction(nameof(Index));
+    }
+
+
 
 }

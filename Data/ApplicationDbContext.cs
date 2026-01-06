@@ -27,19 +27,19 @@ namespace HealthWellbeing.Data
         {
             base.OnModelCreating(builder);
 
-            // RELAÇÃO 1–1 Utente → DadosMedicos
+            // Utente -> DadosMedicos (1–1)
             builder.Entity<UtenteBalneario>()
-                .HasOne(u => u.DadosMedicos)
-                .WithOne()
-                .HasForeignKey<UtenteBalneario>(u => u.DadosMedicos)
-                .OnDelete(DeleteBehavior.Cascade);
+            .HasOne(u => u.DadosMedicos)
+            .WithOne(d => d.UtenteBalneario)
+            .HasForeignKey<UtenteBalneario>(u => u.DadosMedicosId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // RELAÇÃO 1–1 Utente → SeguroSaude
+            // Utente -> SeguroSaude (1–1)
             builder.Entity<UtenteBalneario>()
-                .HasOne(u => u.SeguroSaude)
-                .WithOne()
-                .HasForeignKey<UtenteBalneario>(u => u.SeguroSaude)
-                .OnDelete(DeleteBehavior.Cascade);
+             .HasOne(u => u.SeguroSaude)
+             .WithOne(s => s.UtenteBalneario)
+             .HasForeignKey<UtenteBalneario>(u => u.SeguroSaudeId)
+             .OnDelete(DeleteBehavior.Cascade);
 
             // Regras adicionais (Fluent API)
             builder.Entity<UtenteBalneario>()

@@ -227,13 +227,13 @@ namespace HealthWellbeing.Migrations
                     NomeCompleto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DataNascimento = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Sexo = table.Column<int>(type: "int", nullable: false),
-                    NIF = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NIF = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
                     Contacto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Morada = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     DataInscricao = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    DadosMedicosId = table.Column<int>(type: "int", nullable: false),
-                    SeguroSaudeId = table.Column<int>(type: "int", nullable: false)
+                    DadosMedicosId = table.Column<int>(type: "int", nullable: true),
+                    SeguroSaudeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -373,12 +373,16 @@ namespace HealthWellbeing.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Utentes_DadosMedicosId",
                 table: "Utentes",
-                column: "DadosMedicosId");
+                column: "DadosMedicosId",
+                unique: true,
+                filter: "[DadosMedicosId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Utentes_SeguroSaudeId",
                 table: "Utentes",
-                column: "SeguroSaudeId");
+                column: "SeguroSaudeId",
+                unique: true,
+                filter: "[SeguroSaudeId] IS NOT NULL");
         }
 
         /// <inheritdoc />

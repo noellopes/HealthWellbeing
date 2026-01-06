@@ -1,14 +1,14 @@
 ﻿@model HealthWellbeing.Models.UtenteBalneario
 
 @{
-    ViewData["Title"] = "Apagar Utente";
+    ViewData["Title"] = "Eliminar Utente";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2>Eliminar Utente</h2>
 
-<div class="alert alert-danger">
-    <strong>Atenção!</strong>
-    Tem a certeza que quer apagar este utente?
+<div class="alert alert-warning">
+    <strong>Atenção:</strong><br />
+    Ao eliminar este cliente, <b>os dados médicos e o seguro de saúde associados serão também eliminados</b>.
 </div>
 
 <dl class="row">
@@ -17,12 +17,20 @@
 
     <dt class="col-sm-3">NIF</dt>
     <dd class="col-sm-9">@Model.NIF</dd>
+
+    <dt class="col-sm-3">Contacto</dt>
+    <dd class="col-sm-9">@Model.Contacto</dd>
 </dl>
 
 <form asp-action="Delete" method="post">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="UtenteBalnearioId" />
 
-    <button type="submit" class="btn btn-danger">Apagar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-danger">
+        Confirmar Eliminação
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
 </form>

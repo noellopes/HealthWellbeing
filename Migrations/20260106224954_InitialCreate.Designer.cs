@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106193329_InitialCreate")]
+    [Migration("20260106224954_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -220,7 +220,7 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DadosMedicosId")
+                    b.Property<int?>("DadosMedicosId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DataInscricao")
@@ -236,14 +236,15 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("NIF")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(9)
+                        .HasColumnType("nvarchar(9)");
 
                     b.Property<string>("NomeCompleto")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("SeguroSaudeId")
+                    b.Property<int?>("SeguroSaudeId")
                         .HasColumnType("int");
 
                     b.Property<int>("Sexo")
@@ -251,9 +252,13 @@ namespace HealthWellbeing.Migrations
 
                     b.HasKey("UtenteBalnearioId");
 
-                    b.HasIndex("DadosMedicosId");
+                    b.HasIndex("DadosMedicosId")
+                        .IsUnique()
+                        .HasFilter("[DadosMedicosId] IS NOT NULL");
 
-                    b.HasIndex("SeguroSaudeId");
+                    b.HasIndex("SeguroSaudeId")
+                        .IsUnique()
+                        .HasFilter("[SeguroSaudeId] IS NOT NULL");
 
                     b.ToTable("Utentes");
                 });
@@ -501,16 +506,14 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.UtenteBalneario", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.DadosMedicos", "DadosMedicos")
-                        .WithMany()
-                        .HasForeignKey("DadosMedicosId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("UtenteBalneario")
+                        .HasForeignKey("HealthWellbeing.Models.UtenteBalneario", "DadosMedicosId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("HealthWellbeing.Models.SeguroSaude", "SeguroSaude")
-                        .WithMany()
-                        .HasForeignKey("SeguroSaudeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("UtenteBalneario")
+                        .HasForeignKey("HealthWellbeing.Models.UtenteBalneario", "SeguroSaudeId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("DadosMedicos");
 
@@ -565,6 +568,18 @@ namespace HealthWellbeing.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.DadosMedicos", b =>
+                {
+                    b.Navigation("UtenteBalneario")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.SeguroSaude", b =>
+                {
+                    b.Navigation("UtenteBalneario")
                         .IsRequired();
                 });
 
