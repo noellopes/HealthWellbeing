@@ -6,24 +6,19 @@ using HealthWellbeing.ViewModels;
 using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers {
-
     [Authorize]
     public class MyBadgesController : Controller {
-
         private readonly HealthWellbeingDbContext _context;
 
         public MyBadgesController(HealthWellbeingDbContext context) {
             _context = context;
         }
 
-        // ==========================================
-        // ACTION: Index (Lista de Badges)
-        // ==========================================
         public async Task<IActionResult> Index() {
             var userEmail = User.Identity?.Name;
             if (string.IsNullOrEmpty(userEmail)) return RedirectToAction("Login", "Account");
 
-            // 1. Obter Cliente
+            // Get Customer (ID only, Read-only for performance)
             var customer = await _context.Customer
                 .AsNoTracking()
                 .Select(c => new { c.Email, c.CustomerId })
@@ -34,19 +29,21 @@ namespace HealthWellbeing.Controllers {
                 return RedirectToAction("Index", "Home");
             }
 
-            // 2. Obter Badges Ganhos (Para pintar a verde/branco)
+            // Get Earned Badges (Dictionary for O(1) lookup performance)
             var earnedBadgesDict = await _context.CustomerBadge
+                .AsNoTracking()
                 .Where(cb => cb.CustomerId == customer.CustomerId)
                 .ToDictionaryAsync(cb => cb.BadgeId, cb => cb.DateAwarded);
 
-            // 3. Obter Catálogo de Badges
+            // Get Full Badge Catalog (Including Types)
             var badges = await _context.Badge
                 .Include(b => b.BadgeType)
-                .OrderBy(b => b.BadgeName)
+                .OrderBy(b => b.BadgeType.BadgeTypeName)
+                .ThenBy(b => b.RewardPoints)
                 .AsNoTracking()
                 .ToListAsync();
 
-            // 4. Mapear para ViewModel
+            // Map to ViewModel
             var model = badges.Select(b => new MyBadge {
                 Badge = b,
                 IsEarned = earnedBadgesDict.ContainsKey(b.BadgeId),
@@ -56,37 +53,28 @@ namespace HealthWellbeing.Controllers {
             return View(model);
         }
 
-        // ==========================================
-        // ACTION: Details (Cálculo de Progresso Real)
-        // ==========================================
         public async Task<IActionResult> Details(int? id) {
             if (id == null) return NotFound();
 
             var userEmail = User.Identity?.Name;
 
+            // Validate Customer existence
             var customer = await _context.Customer
                 .Select(c => new { c.Email, c.CustomerId })
                 .FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            if (customer == null) {
-                TempData["ErrorMessage"] = "Customer profile not found.";
-                return RedirectToAction("Index", "Home");
-            }
+            if (customer == null) return RedirectToAction("Index", "Home");
 
-            // 1. Carregar o Badge e as Regras (Requirements)
+            // Load Badge and specific Requirements
             var badgeEntity = await _context.Badge
                 .Include(b => b.BadgeType)
-                // Incluímos os Tipos para mostrar os nomes na View (ex: "Yoga Class")
-                .Include(b => b.BadgeRequirements!)
-                    .ThenInclude(r => r.EventTypes)
-                .Include(b => b.BadgeRequirements!)
-                    .ThenInclude(r => r.ActivityTypes)
+                .Include(b => b.BadgeRequirements)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.BadgeId == id);
 
             if (badgeEntity == null) return NotFound();
 
-            // 2. Verificar se já ganhou
+            // Check if already earned
             var earnedInfo = await _context.CustomerBadge
                 .Where(cb => cb.CustomerId == customer.CustomerId && cb.BadgeId == id)
                 .Select(cb => cb.DateAwarded)
@@ -94,25 +82,23 @@ namespace HealthWellbeing.Controllers {
 
             bool isEarned = earnedInfo != default(DateTime);
 
-            // 3. LOOP DE CÁLCULO INTELIGENTE
-            // Vamos iterar sobre cada requisito e perguntar à BD: "Quantos o user já fez?"
+            // Progress Calculation Logic
             var progressDict = new Dictionary<int, int>();
 
             if (badgeEntity.BadgeRequirements != null) {
                 foreach (var req in badgeEntity.BadgeRequirements) {
-
-                    // Se o badge já foi ganho, assumimos meta cumprida (100%) para ficar bonito visualmente.
-                    // Caso contrário, calculamos o real.
+                    // If earned, we assume 100% completion
                     if (isEarned) {
                         progressDict[req.BadgeRequirementId] = req.TargetValue;
                     }
                     else {
-                        // AQUI ESTÁ A LÓGICA QUE PEDISTE:
+                        // Calculate real-time progress from DB
                         progressDict[req.BadgeRequirementId] = await CalculateRealProgressAsync(customer.CustomerId, req);
                     }
                 }
             }
 
+            // Initialize ViewModel
             var model = new MyBadge {
                 Badge = badgeEntity,
                 IsEarned = isEarned,
@@ -123,45 +109,41 @@ namespace HealthWellbeing.Controllers {
             return View(model);
         }
 
-        // ==========================================
-        // O CÉREBRO DA LÓGICA (PRIVATE HELPER)
-        // ==========================================
         private async Task<int> CalculateRealProgressAsync(int customerId, BadgeRequirement req) {
-
-            // O Switch decide qual tabela consultar com base no Enum RequirementType
+            // Switch logic based on RequirementType Enum
             switch (req.RequirementType) {
-
-                // CASO 1: Participar em QUALQUER Evento
-                // Query: Tabela EventCustomer -> Count simples pelo CustomerId
+                // CASE 1: Participate in ANY Event
+                // Validation: Must be 'Completed' to count
                 case RequirementType.ParticipateAnyEvent:
-                    return await _context.EventCustomer
-                        .CountAsync(ec => ec.CustomerId == customerId);
+                    return await _context.CustomerEvent
+                        .CountAsync(ce => ce.CustomerId == customerId
+                                       && ce.Status == "Completed");
 
-                // CASO 2: Participar num Tipo de Evento ESPECÍFICO (Linked via EventType)
-                // Query: Tabela EventCustomer -> JOIN Event -> Filtrar por EventTypeId do Requisito
+                // CASE 2: Participate in SPECIFIC Event Type
+                // Validation: Must be 'Completed' AND match EventTypeId
                 case RequirementType.ParticipateSpecificEventType:
-                    if (req.EventTypeId == null) return 0; // Salvaguarda
+                    if (req.EventTypeId == null) return 0;
 
-                    return await _context.EventCustomer
-                        .Include(ec => ec.Event) // Precisamos de ir à tabela Event saber o tipo
-                        .CountAsync(ec => ec.CustomerId == customerId
-                                       && ec.Event.EventTypeId == req.EventTypeId);
+                    return await _context.CustomerEvent
+                        .Include(ce => ce.Event)
+                        .CountAsync(ce => ce.CustomerId == customerId
+                                       && ce.Status == "Completed"
+                                       && ce.Event.EventTypeId == req.EventTypeId);
 
-                // CASO 3: Completar QUALQUER Atividade
-                // Query: Tabela ActivityCustomer -> Count simples
+                // CASE 3: Complete ANY Activity
+                // No status check needed for activities (existence implies completion)
                 case RequirementType.CompleteAnyActivity:
-                    return await _context.ActivityCustomer
-                        .CountAsync(ac => ac.CustomerId == customerId);
+                    return await _context.CustomerActivity
+                        .CountAsync(ca => ca.CustomerId == customerId);
 
-                // CASO 4: Completar Tipo de Atividade ESPECÍFICA (Linked via ActivityType)
-                // Query: Tabela ActivityCustomer -> JOIN Activity -> Filtrar por ActivityTypeId
+                // CASE 4: Complete SPECIFIC Activity Type
                 case RequirementType.CompleteSpecificActivityType:
-                    if (req.ActivityTypeId == null) return 0; // Salvaguarda
+                    if (req.ActivityTypeId == null) return 0;
 
-                    return await _context.ActivityCustomer
-                        .Include(ac => ac.Activity) // Precisamos de ir à tabela Activity saber o tipo
-                        .CountAsync(ac => ac.CustomerId == customerId
-                                       && ac.Activity.ActivityTypeId == req.ActivityTypeId);
+                    return await _context.CustomerActivity
+                        .Include(ca => ca.Activity)
+                        .CountAsync(ca => ca.CustomerId == customerId
+                                       && ca.Activity.ActivityTypeId == req.ActivityTypeId);
 
                 default:
                     return 0;

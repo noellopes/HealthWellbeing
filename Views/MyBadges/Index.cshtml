@@ -3,135 +3,160 @@
 @{
     ViewData["Title"] = "My Badges";
 
-    // Header Stats Calculation
-    int totalPointsEarned = Model.Where(m => m.IsEarned).Sum(m => m.Badge.RewardPoints);
-    int totalBadges = Model.Count();
-    int earnedBadges = Model.Count(m => m.IsEarned);
-    int progressPercent = totalBadges > 0 ? (earnedBadges * 100) / totalBadges : 0;
+    // ==========================================
+    // VIEW LOGIC: Dashboard Stats Calculation
+    // ==========================================
+    // Calculates totals and percentages for the top dashboard
+    var totalBadges = Model.Count();
+    var earnedBadges = Model.Count(b => b.IsEarned);
+    var totalPoints = Model.Where(b => b.IsEarned).Sum(b => b.Badge.RewardPoints);
+
+    // Avoid division by zero
+    var completionPercent = totalBadges > 0 ? (double)earnedBadges / totalBadges * 100 : 0;
+
+    // Grouping: Organizes badges by Type (e.g., "Cardio", "Mindfulness")
+    var groupedBadges = Model.GroupBy(b => b.Badge.BadgeType?.BadgeTypeName ?? "General")
+                             .OrderBy(g => g.Key);
 }
 
 <div class="container py-5">
 
-    @* --- HEADER --- *@
-    <div class="row align-items-center mb-5">
-        <div class="col-md-7">
-            <h1 class="display-5 fw-bold text-primary">
-                <i class="bi bi-patch-check-fill me-2"></i>My Badges
-            </h1>
-            <p class="lead text-muted">
-                Track your achievements and see what you need to do next.
-            </p>
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-6">
+            <h1 class="fw-bold display-5 text-dark">My Achievements</h1>
+            <p class="text-muted lead">Track your progress and unlock rewards.</p>
         </div>
-        <div class="col-md-5">
-            <div class="card bg-white border-0 shadow-sm rounded-4">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-end mb-2">
-                        <h6 class="text-uppercase text-muted fw-bold small mb-0">Total Score</h6>
-                        <h2 class="fw-bold text-primary mb-0">@totalPointsEarned <span class="fs-6 text-dark">pts</span></h2>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+
+                    <div class="row text-center">
+                        <div class="col-6 border-end">
+                            <h3 class="fw-bold text-primary mb-0">@earnedBadges <span class="text-muted fs-6 fw-normal">/ @totalBadges</span></h3>
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Badges Unlocked</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="fw-bold text-success mb-0">@totalPoints</h3>
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Total Points</small>
+                        </div>
                     </div>
 
-                    @* Global Progress Bar *@
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: @progressPercent%" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="mt-2 small text-muted text-end">
-                        @earnedBadges of @totalBadges badges unlocked
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="text-muted">Collection Progress</small>
+                            <small class="fw-bold text-dark">@completionPercent.ToString("0")%</small>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-gradient-primary"
+                                 role="progressbar"
+                                 style="width: @completionPercent.ToString("0")%"
+                                 aria-valuenow="@completionPercent"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    @* --- BADGES GRID --- *@
     @if (!Model.Any()) {
-        <div class="alert alert-info rounded-3 shadow-sm" role="alert">
-            <i class="bi bi-info-circle-fill me-2"></i>
-            No badges defined in the system yet.
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle me-2"></i>No badges available at the moment.
         </div>
     }
     else {
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            @foreach (var item in Model) {
-                bool isEarned = item.IsEarned;
+        foreach (var group in groupedBadges) {
 
-                // Visual Logic
-                string cardStyle = isEarned ? "border-success shadow-sm" : "bg-light border-0 opacity-75 grayscale-effect";
-                string icon = isEarned ? "bi-trophy-fill text-warning" : "bi-lock-fill text-secondary";
-                string badgeColor = isEarned ? "bg-primary" : "bg-secondary";
+            <div class="mb-5">
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="fw-bold mb-0 text-dark">@group.Key</h4>
+                    <span class="ms-3 badge bg-light text-secondary border rounded-pill">
+                        @group.Count() Badges
+                    </span>
+                    <hr class="flex-grow-1 ms-3 text-muted opacity-25">
+                </div>
 
-                // Terminology: Accurate status
-                string statusText = isEarned ? "Unlocked" : "Locked";
-                string statusColor = isEarned ? "text-success" : "text-muted";
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                    @foreach (var item in group) {
 
-                <div class="col">
-                    <div class="card h-100 rounded-4 overflow-hidden transition-hover @cardStyle">
-                        <div class="card-body text-center d-flex flex-column pt-5">
+                        // --- LOGIC: Dynamic Styling ---
+                        var isEarned = item.IsEarned;
 
-                            @* Main Icon *@
-                            <div class="mb-3">
-                                <i class="bi @icon display-3 drop-shadow"></i>
-                            </div>
+                        // Visual State: Earned (Green/Shadow) vs Locked (Grey/Flat)
+                        var cardClass = isEarned ? "border-success border-opacity-25 shadow-sm" : "border-light bg-light opacity-75";
+                        var iconColor = isEarned ? "text-warning" : "text-secondary";
 
-                            <h5 class="card-title fw-bold mb-1">@item.Badge.BadgeName</h5>
+                        // Icon Logic: 'Patch/Check' for earned, 'Award' silhouette for unearned
+                        var iconClass = isEarned ? "bi-patch-check-fill" : "bi-award";
 
-                            <div class="mb-3">
-                                <span class="badge @badgeColor bg-opacity-10 text-dark border">
-                                    @item.Badge.BadgeType?.BadgeTypeName
-                                </span>
-                            </div>
+                        var btnClass = isEarned ? "btn-outline-success" : "btn-outline-secondary";
+                        var btnText = isEarned ? "View Details" : "View Requirements";
 
-                            <p class="card-text small text-muted mb-4 px-2">
-                                @item.Badge.BadgeDescription
-                            </p>
+                        <div class="col">
+                            <div class="card h-100 @cardClass transition-hover" style="transition: transform 0.2s;">
+                                <div class="card-body text-center p-4 d-flex flex-column">
 
-                            @* Footer *@
-                            <div class="mt-auto w-100">
-                                <div class="d-flex justify-content-between align-items-center mb-3 border-top pt-3">
-                                    <span class="fw-bold @(isEarned ? "text-primary" : "text-muted")">
-                                        +@item.Badge.RewardPoints pts
-                                    </span>
-                                    <small class="fw-bold @statusColor">
-                                        @statusText
-                                    </small>
-                                </div>
+                                    <div class="position-absolute top-0 end-0 p-3">
+                                        @if (isEarned) {
+                                            <i class="bi bi-check-circle-fill text-success fs-5" title="Unlocked"></i>
+                                        }
+                                        else {
+                                            <i class="bi bi-lock text-muted fs-5" title="Locked"></i>
+                                        }
+                                    </div>
 
-                                <div class="d-grid">
-                                    @* BUTTON: Always "View Details" because the action is the same *@
-                                    <a asp-action="Details" asp-route-id="@item.Badge.BadgeId" class="btn btn-sm rounded-pill @(isEarned ? "btn-outline-primary" : "btn-primary")">
-                                        View Details
-                                    </a>
+                                    <div class="mb-3 mt-2">
+                                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm p-3"
+                                             style="width: 80px; height: 80px;">
+                                            <i class="bi @iconClass display-4 @iconColor"></i>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="card-title fw-bold mb-1 text-truncate">@item.Badge.BadgeName</h5>
+
+                                    <div class="mb-3">
+                                        <small class="text-muted fw-bold">@item.Badge.RewardPoints pts</small>
+                                    </div>
+
+                                    <p class="card-text text-muted small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        @item.Badge.BadgeDescription
+                                    </p>
+
+                                    <div class="mt-3">
+                                        <a asp-action="Details" asp-route-id="@item.Badge.BadgeId"
+                                           class="btn @btnClass btn-sm w-100 stretched-link fw-semibold">
+                                            @btnText
+                                        </a>
+                                    </div>
+
+                                    @if (isEarned && item.DateAwarded.HasValue) {
+                                        <div class="mt-2">
+                                            <small class="text-muted" style="font-size: 0.7rem;">
+                                                Earned: @item.DateAwarded.Value.ToString("MMM dd, yyyy")
+                                            </small>
+                                        </div>
+                                    }
+
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
-            }
-        </div>
+            </div>
+        }
     }
 </div>
 
-<style>
-    /* CSS: Visual effects for interactivity */
-    .transition-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
+@section Scripts {
+    <style>
+        /* Utility: Simple hover effect for cards */
         .transition-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+            border-color: var(--bs-primary) !important;
         }
-
-    .grayscale-effect {
-        filter: grayscale(100%);
-        transition: all 0.3s ease;
-    }
-
-        .grayscale-effect:hover {
-            filter: grayscale(0%);
-            opacity: 1;
-        }
-
-    .drop-shadow {
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    }
-</style>
+    </style>
+}

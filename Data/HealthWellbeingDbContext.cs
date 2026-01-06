@@ -43,7 +43,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.CustomerBadge> CustomerBadge { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Employee> Employee { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Customer> Customer { get; set; } = default!;
-        public DbSet<UtenteEvent> UtenteEvent { get; set; }
+        public DbSet<HealthWellbeing.Models.CustomerEvent> CustomerEvent { get; set; }
         public DbSet<HealthWellbeing.Models.CustomerActivity> CustomerActivity { get; set; } = default!;  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -111,23 +111,43 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(ea => ea.ActivityId);
 
 
-            modelBuilder.Entity<CustomerActivity>(entity => {
+            modelBuilder.Entity<CustomerEvent>(entity =>
+            {
+                entity.HasKey(ce => ce.CustomerEventId);
+
+                entity.HasIndex(ce => new { ce.CustomerId, ce.EventId });
+
+                entity.HasOne(ce => ce.Customer)
+                      .WithMany(c => c.CustomerEvents)
+                      .HasForeignKey(ce => ce.CustomerId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ce => ce.Event)
+                      .WithMany(e => e.CustomerEvents)
+                      .HasForeignKey(ce => ce.EventId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<CustomerActivity>(entity =>
+            {
                 entity.HasKey(ca => ca.CustomerActivityId);
+
+                entity.HasIndex(ca => new { ca.CustomerId, ca.EventId});
 
                 entity.HasOne(ca => ca.Customer)
                       .WithMany(c => c.CustomerActivities)
                       .HasForeignKey(ca => ca.CustomerId)
-                      .OnDelete(DeleteBehavior.NoAction);
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ca => ca.Activity)
                       .WithMany(a => a.CustomerActivities)
                       .HasForeignKey(ca => ca.ActivityId)
-                      .OnDelete(DeleteBehavior.NoAction);
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(ca => ca.Event)
                       .WithMany(e => e.CustomerActivities)
                       .HasForeignKey(ca => ca.EventId)
-                      .OnDelete(DeleteBehavior.NoAction);
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
 

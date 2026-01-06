@@ -102,7 +102,7 @@ namespace HealthWellbeing.Data
 
             var activities = new List<Activity>
             {
-                // 1. HÁBITOS DIÁRIOS (8 itens)
+                // 1. HÁBITOS DIÁRIOS
                 new Activity { ActivityName = "Beber 2L de água", ActivityType = tHabito, ActivityDescription = "Meta diária.", ActivityReward = 20 },
                 new Activity { ActivityName = "Dormir 8 horas", ActivityType = tHabito, ActivityDescription = "Sono reparador.", ActivityReward = 25 },
                 new Activity { ActivityName = "Subir escadas", ActivityType = tHabito, ActivityDescription = "Evitar elevador.", ActivityReward = 15 },
@@ -112,7 +112,7 @@ namespace HealthWellbeing.Data
                 new Activity { ActivityName = "Diário de bem-estar", ActivityType = tHabito, ActivityDescription = "Registar dia.", ActivityReward = 10 },
                 new Activity { ActivityName = "Ler 10 páginas", ActivityType = tHabito, ActivityDescription = "Hábito de leitura.", ActivityReward = 15 },
 
-                // 2. TREINO (8 itens)
+                // 2. TREINO 
                 new Activity { ActivityName = "Treino Força 30min", ActivityType = tTreino, ActivityDescription = "Musculação.", ActivityReward = 40 },
                 new Activity { ActivityName = "Cardio 30min", ActivityType = tTreino, ActivityDescription = "Corrida/Bike.", ActivityReward = 35 },
                 new Activity { ActivityName = "Aula de Grupo", ActivityType = tTreino, ActivityDescription = "Zumba/Pilates.", ActivityReward = 30 },
@@ -122,7 +122,7 @@ namespace HealthWellbeing.Data
                 new Activity { ActivityName = "Ciclismo 10km", ActivityType = tTreino, ActivityDescription = "Bicicleta.", ActivityReward = 55 },
                 new Activity { ActivityName = "Treino Calistenia", ActivityType = tTreino, ActivityDescription = "Peso do corpo.", ActivityReward = 45 },
 
-                // 3. NUTRIÇÃO (8 itens)
+                // 3. NUTRIÇÃO 
                 new Activity { ActivityName = "Sem Fast-Food", ActivityType = tNutri, ActivityDescription = "Comer limpo.", ActivityReward = 25 },
                 new Activity { ActivityName = "Refeição Equilibrada", ActivityType = tNutri, ActivityDescription = "Prato saudável.", ActivityReward = 20 },
                 new Activity { ActivityName = "Registo Alimentar", ActivityType = tNutri, ActivityDescription = "Log refeições.", ActivityReward = 15 },
@@ -132,7 +132,7 @@ namespace HealthWellbeing.Data
                 new Activity { ActivityName = "Meal Prep Semanal", ActivityType = tNutri, ActivityDescription = "Planear semana.", ActivityReward = 35 },
                 new Activity { ActivityName = "Dia Vegetariano", ActivityType = tNutri, ActivityDescription = "Sem carne.", ActivityReward = 40 },
 
-                // 4. MINDFULNESS (8 itens)
+                // 4. MINDFULNESS 
                 new Activity { ActivityName = "Meditação 10min", ActivityType = tMind, ActivityDescription = "Foco.", ActivityReward = 15 },
                 new Activity { ActivityName = "Respiração Profunda", ActivityType = tMind, ActivityDescription = "5 minutos.", ActivityReward = 10 },
                 new Activity { ActivityName = "Pausa Digital", ActivityType = tMind, ActivityDescription = "2h sem ecrãs.", ActivityReward = 20 },
@@ -142,7 +142,7 @@ namespace HealthWellbeing.Data
                 new Activity { ActivityName = "Relaxamento Noturno", ActivityType = tMind, ActivityDescription = "Pré-sono.", ActivityReward = 10 },
                 new Activity { ActivityName = "Gestão Stress", ActivityType = tMind, ActivityDescription = "Técnicas coping.", ActivityReward = 25 },
 
-                // 5. DESAFIOS (8 itens)
+                // 5. DESAFIOS
                 new Activity { ActivityName = "5 Treinos/Semana", ActivityType = tDesafio, ActivityDescription = "Consistência.", ActivityReward = 100 },
                 new Activity { ActivityName = "Hidratação 7 Dias", ActivityType = tDesafio, ActivityDescription = "2L/dia.", ActivityReward = 120 },
                 new Activity { ActivityName = "Semana Limpa", ActivityType = tDesafio, ActivityDescription = "Zero processados.", ActivityReward = 130 },
@@ -351,7 +351,6 @@ namespace HealthWellbeing.Data
             {
                 if (evt.ActivityTypeId == null) continue;
 
-                // --- CORREÇÃO: Comparar ID com ID ---
                 var matchingActivities = activities
                     .Where(a => a.ActivityTypeId == evt.ActivityTypeId)
                     .ToList();
@@ -996,31 +995,22 @@ namespace HealthWellbeing.Data
 
             dbContext.BadgeType.AddRange(new List<BadgeType>
             {
-                // --- 1. Os Originais (Mantidos para compatibilidade com PopulateBadges) ---
                 new BadgeType { BadgeTypeName = "Consistência", BadgeTypeDescription = "Premiar a regularidade e criação de hábitos saudáveis." },
                 new BadgeType { BadgeTypeName = "Evento", BadgeTypeDescription = "Participação em eventos especiais do ginásio." },
                 new BadgeType { BadgeTypeName = "Performance", BadgeTypeDescription = "Atingir marcos de superação física." },
                 new BadgeType { BadgeTypeName = "Social", BadgeTypeDescription = "Interação e espírito de comunidade." },
-
-                // --- 2. Categorias de Treino Específico ---
                 new BadgeType { BadgeTypeName = "Força", BadgeTypeDescription = "Conquistas relacionadas com musculação, powerlifting e ganhos de força." },
                 new BadgeType { BadgeTypeName = "Cardio", BadgeTypeDescription = "Distinções para atividades de resistência cardiovascular (corrida, ciclismo, natação)." },
                 new BadgeType { BadgeTypeName = "Flexibilidade", BadgeTypeDescription = "Evolução em Yoga, Pilates e mobilidade geral." },
                 new BadgeType { BadgeTypeName = "Alta Intensidade", BadgeTypeDescription = "Domínio de treinos HIIT e Crossfit." },
-
-                // --- 3. Bem-Estar e Saúde Mental ---
                 new BadgeType { BadgeTypeName = "Mindfulness", BadgeTypeDescription = "Foco na saúde mental, meditação e gestão de stress." },
                 new BadgeType { BadgeTypeName = "Nutrição", BadgeTypeDescription = "Hábitos alimentares saudáveis, cozinha e escolhas inteligentes." },
                 new BadgeType { BadgeTypeName = "Hidratação", BadgeTypeDescription = "Foco exclusivo na ingestão correta de líquidos." },
                 new BadgeType { BadgeTypeName = "Sono & Recuperação", BadgeTypeDescription = "Qualidade do descanso e práticas de recuperação ativa." },
-
-                // --- 4. Gamification & Lifestyle ---
                 new BadgeType { BadgeTypeName = "Desafio", BadgeTypeDescription = "Conclusão de desafios temporários lançados pela plataforma." },
                 new BadgeType { BadgeTypeName = "Fidelidade", BadgeTypeDescription = "Recompensas por tempo de permanência e antiguidade no clube." },
                 new BadgeType { BadgeTypeName = "Iniciação", BadgeTypeDescription = "Passos iniciais para novos membros se ambientarem." },
                 new BadgeType { BadgeTypeName = "Exploração", BadgeTypeDescription = "Experimentar novas modalidades e sair da zona de conforto." },
-
-                // --- 5. Horários e Hábitos ---
                 new BadgeType { BadgeTypeName = "Madrugador", BadgeTypeDescription = "Para quem treina consistentemente nas primeiras horas do dia." },
                 new BadgeType { BadgeTypeName = "Notívago", BadgeTypeDescription = "Para quem prefere treinar ao final do dia ou noite." },
                 new BadgeType { BadgeTypeName = "Fim de Semana", BadgeTypeDescription = "Atividade física mantida aos sábados e domingos." },
@@ -1033,7 +1023,6 @@ namespace HealthWellbeing.Data
         private static void PopulateBadges(HealthWellbeingDbContext dbContext) {
             if (dbContext.Badge.Any()) return;
 
-            // 1. Buscar os IDs dos Pais (BadgeTypes) que acabámos de criar
             var tConsistencia = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Consistência");
             var tEvento = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Evento");
             var tPerformance = dbContext.BadgeType.FirstOrDefault(t => t.BadgeTypeName == "Performance");
@@ -1043,42 +1032,42 @@ namespace HealthWellbeing.Data
 
             dbContext.Badge.AddRange(new List<Badge>
             {
-        // Badges de Consistência
-        new Badge {
-            BadgeName = "Rato de Ginásio",
-            BadgeDescription = "Participar ativamente na vida do clube.",
-            RewardPoints = 500,
-            BadgeTypeId = tConsistencia.BadgeTypeId
-        },
-        new Badge {
-            BadgeName = "Hidratação Mestra",
-            BadgeDescription = "Criar o hábito diário de beber água.",
-            RewardPoints = 300,
-            BadgeTypeId = tConsistencia.BadgeTypeId
-        },
+                // Badges de Consistência
+                new Badge {
+                    BadgeName = "Rato de Ginásio",
+                    BadgeDescription = "Participar ativamente na vida do clube.",
+                    RewardPoints = 500,
+                    BadgeTypeId = tConsistencia.BadgeTypeId
+                },
+                new Badge {
+                    BadgeName = "Hidratação Mestra",
+                    BadgeDescription = "Criar o hábito diário de beber água.",
+                    RewardPoints = 300,
+                    BadgeTypeId = tConsistencia.BadgeTypeId
+                },
 
-        // Badges de Evento
-        new Badge {
-            BadgeName = "Maratonista",
-            BadgeDescription = "Completar a grande prova de resistência.",
-            RewardPoints = 1000,
-            BadgeTypeId = tEvento.BadgeTypeId
-        },
-        new Badge {
-            BadgeName = "Yogi Master",
-            BadgeDescription = "Dedicação total à mente e corpo.",
-            RewardPoints = 600,
-            BadgeTypeId = tEvento.BadgeTypeId
-        },
+                // Badges de Evento
+                new Badge {
+                    BadgeName = "Maratonista",
+                    BadgeDescription = "Completar a grande prova de resistência.",
+                    RewardPoints = 1000,
+                    BadgeTypeId = tEvento.BadgeTypeId
+                },
+                new Badge {
+                    BadgeName = "Yogi Master",
+                    BadgeDescription = "Dedicação total à mente e corpo.",
+                    RewardPoints = 600,
+                    BadgeTypeId = tEvento.BadgeTypeId
+                },
 
-        // Badges de Performance
-        new Badge {
-            BadgeName = "Monstro do Cardio",
-            BadgeDescription = "Acumular quilómetros de corrida.",
-            RewardPoints = 800,
-            BadgeTypeId = tPerformance.BadgeTypeId
-        }
-    });
+                // Badges de Performance
+                new Badge {
+                    BadgeName = "Monstro do Cardio",
+                    BadgeDescription = "Acumular quilómetros de corrida.",
+                    RewardPoints = 800,
+                    BadgeTypeId = tPerformance.BadgeTypeId
+                }
+            });
 
             dbContext.SaveChanges();
         }
@@ -1166,23 +1155,19 @@ namespace HealthWellbeing.Data
             var historyList = new List<CustomerActivity>();
             var random = new Random();
 
-            // =================================================================================
-            // CENÁRIO 1: A Consistente (Maria Utente)
-            // Objetivo: Testar gráficos de linha temporal e streaks.
-            // =================================================================================
             var maria = customers.FirstOrDefault(c => c.Email == "maria@ipg.pt");
             if (maria != null && actAgua != null && actSono != null) {
-                // Bebe água todos os dias nos últimos 10 dias
+
                 for (int i = 0; i < 10; i++) {
                     historyList.Add(new CustomerActivity {
                         CustomerId = maria.CustomerId,
                         ActivityId = actAgua.ActivityId,
-                        EventId = null, // Sem evento associado
+                        EventId = null, 
                         CompletionDate = DateTime.Now.AddDays(-i).AddHours(random.Next(9, 20)),
                         PointsEarned = actAgua.ActivityReward
                     });
                 }
-                // Dormiu bem 5 vezes alternadas
+
                 for (int i = 0; i < 10; i += 2) {
                     historyList.Add(new CustomerActivity {
                         CustomerId = maria.CustomerId,
@@ -1194,10 +1179,7 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // =================================================================================
-            // CENÁRIO 2: O Evento de Grupo (Aula de Zumba)
-            // Objetivo: Testar listagens filtradas por EventId.
-            // =================================================================================
+
             if (evtZumba != null && actZumba != null) {
                 // Vamos pôr a Katia, a Ana e a Rita na mesma aula
                 var attendeesEmails = new[] { "katia.lima@ipg.pt", "ana.pereira@ipg.pt", "rita.carvalho@ipg.pt" };
@@ -1207,29 +1189,23 @@ namespace HealthWellbeing.Data
                     historyList.Add(new CustomerActivity {
                         CustomerId = att.CustomerId,
                         ActivityId = actZumba.ActivityId,
-                        EventId = evtZumba.EventId, // Ligação FK ao Evento
-                        CompletionDate = evtZumba.EventStart, // Data síncrona com o evento
-                        PointsEarned = actZumba.ActivityReward + 15 // Bónus por ir ao evento presencial
+                        EventId = evtZumba.EventId,
+                        CompletionDate = evtZumba.EventStart,
+                        PointsEarned = actZumba.ActivityReward + 15 
                     });
                 }
             }
 
-            // =================================================================================
-            // CENÁRIO 3: O "Pro" (Pedro Mendes)
-            // Objetivo: Testar rankings e pontuações altas.
-            // =================================================================================
             var pedro = customers.FirstOrDefault(c => c.Email == "pedro.mendes@ipg.pt");
             if (pedro != null && evtMaratona != null && actCorrida != null) {
-                // Pedro correu a Maratona
                 historyList.Add(new CustomerActivity {
                     CustomerId = pedro.CustomerId,
                     ActivityId = actCorrida.ActivityId,
                     EventId = evtMaratona.EventId,
-                    CompletionDate = evtMaratona.EventStart.AddHours(3), // Acabou 3h depois
-                    PointsEarned = 1000 // Pontuação massiva manual
+                    CompletionDate = evtMaratona.EventStart.AddHours(3), 
+                    PointsEarned = 1000 
                 });
 
-                // Pedro treina muito (5 treinos aleatórios no último mês)
                 for (int i = 0; i < 5; i++) {
                     historyList.Add(new CustomerActivity {
                         CustomerId = pedro.CustomerId,
@@ -1241,10 +1217,6 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // =================================================================================
-            // CENÁRIO 4: O Iniciante (Luis Vaz)
-            // Objetivo: Testar perfis com pouco histórico.
-            // =================================================================================
             var luis = customers.FirstOrDefault(c => c.Email == "luis.vaz@ipg.pt");
             if (luis != null && actYoga != null) {
                 historyList.Add(new CustomerActivity {
@@ -1256,11 +1228,6 @@ namespace HealthWellbeing.Data
                 });
             }
 
-            // =================================================================================
-            // CENÁRIO 5: Volume de Dados (Random Noise)
-            // Objetivo: Encher tabelas para paginação (Page 1, Page 2...).
-            // =================================================================================
-            // Vamos criar mais 30 registos aleatórios distribuídos pelos outros customers
             for (int i = 0; i < 30; i++) {
                 var randomCustomer = customers[random.Next(customers.Count)];
                 var randomActivity = activities[random.Next(activities.Count)];
@@ -1268,13 +1235,12 @@ namespace HealthWellbeing.Data
                 historyList.Add(new CustomerActivity {
                     CustomerId = randomCustomer.CustomerId,
                     ActivityId = randomActivity.ActivityId,
-                    EventId = null, // Maioria é sem evento
-                    CompletionDate = DateTime.Now.AddDays(-random.Next(1, 60)), // Últimos 2 meses
+                    EventId = null, 
+                    CompletionDate = DateTime.Now.AddDays(-random.Next(1, 60)), 
                     PointsEarned = randomActivity.ActivityReward
                 });
             }
 
-            // 3. Guardar na Base de Dados
             if (historyList.Any()) {
                 dbContext.CustomerActivity.AddRange(historyList);
                 dbContext.SaveChanges();
@@ -1296,14 +1262,11 @@ namespace HealthWellbeing.Data
             var bHidra = badges.FirstOrDefault(b => b.BadgeName == "Hidratação Mestra");
             var bMara = badges.FirstOrDefault(b => b.BadgeName == "Maratonista");
             var bYogi = badges.FirstOrDefault(b => b.BadgeName == "Yogi Master");
-            var bCardio = badges.FirstOrDefault(b => b.BadgeName == "Monstro do Cardio"); // Vamos deixar este vazio ou quase vazio para testes
+            var bCardio = badges.FirstOrDefault(b => b.BadgeName == "Monstro do Cardio"); 
 
             var customerBadges = new List<CustomerBadge>();
             var random = new Random();
 
-            // --- CENÁRIO A: "Rato de Ginásio" (MUITO POPULAR) ---
-            // Atribuir aos primeiros 20 clientes (quase toda a gente tem)
-            // Isto serve para testar o alerta vermelho no Delete.
             if (bRato != null) {
                 foreach (var c in customers.Take(20)) {
                     customerBadges.Add(new CustomerBadge {
@@ -1314,8 +1277,6 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // --- CENÁRIO B: "Hidratação Mestra" (MÉDIA POPULARIDADE) ---
-            // Atribuir a clientes alternados (índices pares)
             if (bHidra != null) {
                 for (int i = 0; i < customers.Count; i += 2) {
                     customerBadges.Add(new CustomerBadge {
@@ -1326,8 +1287,6 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // --- CENÁRIO C: "Maratonista" (ESPECÍFICO / ELITE) ---
-            // Atribuir apenas a perfis atléticos (Steve Rogers, Xena, etc.)
             if (bMara != null) {
                 var athletes = customers.Where(c =>
                     c.Name.Contains("Steve") ||
@@ -1345,8 +1304,6 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // --- CENÁRIO D: "Yogi Master" (RARO) ---
-            // Atribuir apenas ao Yoda (testar "Used by 1 customer")
             if (bYogi != null) {
                 var yoda = customers.FirstOrDefault(c => c.Name.Contains("Yoda"));
                 if (yoda != null) {
@@ -1358,11 +1315,6 @@ namespace HealthWellbeing.Data
                 }
             }
 
-            // --- CENÁRIO E: "Monstro do Cardio" ---
-            // NÃO VAMOS ATRIBUIR A NINGUÉM (ou deixa vazio).
-            // Isto serve para quando fores ao Delete deste badge, veres a mensagem verde "Safe to Delete".
-
-            // Garantir que não há duplicados antes de adicionar (caso a lógica acima se sobreponha)
             var uniqueBadges = customerBadges
                 .GroupBy(cb => new { cb.CustomerId, cb.BadgeId })
                 .Select(g => g.First())
@@ -1370,6 +1322,141 @@ namespace HealthWellbeing.Data
 
             dbContext.CustomerBadge.AddRange(uniqueBadges);
             dbContext.SaveChanges();
+        }
+
+        private static void PopulateCustomerEvents(HealthWellbeingDbContext dbContext) {
+            if (dbContext.CustomerEvent.Any()) return;
+
+            var customers = dbContext.Customer.ToList();
+            var events = dbContext.Event.ToList();
+
+            if (!customers.Any() || !events.Any()) return;
+
+            var customerEvents = new List<CustomerEvent>();
+
+            var pedro = customers.FirstOrDefault(c => c.Email == "pedro.mendes@ipg.pt"); 
+            var maria = customers.FirstOrDefault(c => c.Email == "maria@ipg.pt");       
+            var katia = customers.FirstOrDefault(c => c.Email == "katia.lima@ipg.pt");
+            var ana = customers.FirstOrDefault(c => c.Email == "ana.pereira@ipg.pt");
+            var bruno = customers.FirstOrDefault(c => c.Email == "bruno.silva@ipg.pt");
+
+            var evtCrossfit = events.FirstOrDefault(e => e.EventName == "Competição CrossFit"); 
+            var evtTenis = events.FirstOrDefault(e => e.EventName == "Torneio Ténis");          
+            var evtMaratona = events.FirstOrDefault(e => e.EventName == "Maratona");            
+            var evtZumba = events.FirstOrDefault(e => e.EventName == "Aula Zumba");             
+
+            if (pedro != null && evtCrossfit != null) {
+                customerEvents.Add(new CustomerEvent {
+                    CustomerId = pedro.CustomerId,
+                    EventId = evtCrossfit.EventId,
+                    RegistrationDate = evtCrossfit.EventStart.AddDays(-5),
+                    CompletionDate = evtCrossfit.EventEnd,
+                    Status = "Completed",
+                    PointsEarned = 500
+                });
+            }
+
+            if (maria != null && ana != null && evtTenis != null) {
+                customerEvents.Add(new CustomerEvent {
+                    CustomerId = maria.CustomerId,
+                    EventId = evtTenis.EventId,
+                    RegistrationDate = evtTenis.EventStart.AddDays(-2),
+                    CompletionDate = evtTenis.EventEnd,
+                    Status = "Completed",
+                    PointsEarned = 150
+                });
+
+                customerEvents.Add(new CustomerEvent {
+                    CustomerId = ana.CustomerId,
+                    EventId = evtTenis.EventId,
+                    RegistrationDate = evtTenis.EventStart.AddDays(-3),
+                    CompletionDate = evtTenis.EventEnd,
+                    Status = "Completed",
+                    PointsEarned = 150
+                });
+            }
+
+            if (bruno != null && evtTenis != null) {
+                customerEvents.Add(new CustomerEvent {
+                    CustomerId = bruno.CustomerId,
+                    EventId = evtTenis.EventId,
+                    RegistrationDate = evtTenis.EventStart.AddDays(-1),
+                    CompletionDate = evtTenis.EventEnd,
+                    Status = "Completed",
+                    PointsEarned = 100
+                });
+            }
+
+            if (pedro != null && evtMaratona != null) {
+                customerEvents.Add(new CustomerEvent {
+                    CustomerId = pedro.CustomerId,
+                    EventId = evtMaratona.EventId,
+                    RegistrationDate = DateTime.Now.AddDays(-20),
+                    CompletionDate = null,
+                    Status = "Enrolled",
+                    PointsEarned = 0
+                });
+            }
+
+            if (evtZumba != null) {
+                if (katia != null) {
+                    customerEvents.Add(new CustomerEvent {
+                        CustomerId = katia.CustomerId,
+                        EventId = evtZumba.EventId,
+                        RegistrationDate = DateTime.Now.AddHours(-2),
+                        CompletionDate = null,
+                        Status = "Enrolled",
+                        PointsEarned = 0
+                    });
+                }
+                if (ana != null) {
+                    customerEvents.Add(new CustomerEvent {
+                        CustomerId = ana.CustomerId,
+                        EventId = evtZumba.EventId,
+                        RegistrationDate = DateTime.Now.AddHours(-5),
+                        CompletionDate = null,
+                        Status = "Enrolled",
+                        PointsEarned = 0
+                    });
+                }
+                if (maria != null) {
+                    customerEvents.Add(new CustomerEvent {
+                        CustomerId = maria.CustomerId,
+                        EventId = evtZumba.EventId,
+                        RegistrationDate = DateTime.Now.AddHours(-1),
+                        CompletionDate = null,
+                        Status = "Enrolled",
+                        PointsEarned = 0
+                    });
+                }
+            }
+
+            var futureEvents = events.Where(e => e.EventStart > DateTime.Now).ToList();
+            var random = new Random();
+
+            if (futureEvents.Any()) {
+                foreach (var customer in customers.Skip(5).Take(15)) {
+                    var randomEvent = futureEvents[random.Next(futureEvents.Count)];
+
+                    bool alreadyExists = customerEvents.Any(ce => ce.CustomerId == customer.CustomerId && ce.EventId == randomEvent.EventId);
+
+                    if (!alreadyExists) {
+                        customerEvents.Add(new CustomerEvent {
+                            CustomerId = customer.CustomerId,
+                            EventId = randomEvent.EventId,
+                            RegistrationDate = DateTime.Now.AddDays(-random.Next(1, 5)),
+                            CompletionDate = null,
+                            Status = "Enrolled",
+                            PointsEarned = 0
+                        });
+                    }
+                }
+            }
+
+            if (customerEvents.Any()) {
+                dbContext.CustomerEvent.AddRange(customerEvents);
+                dbContext.SaveChanges();
+            }
         }
 
         internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager) {

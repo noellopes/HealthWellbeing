@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260105163827_Update")]
-    partial class Update
+    [Migration("20260106000539_UpdateCostumerEvent")]
+    partial class UpdateCostumerEvent
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -428,6 +428,40 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Customer");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerActivity", b =>
+                {
+                    b.Property<int>("CustomerActivityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerActivityId"));
+
+                    b.Property<int>("ActivityId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("int");
+
+                    b.HasKey("CustomerActivityId");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("CustomerId", "EventId");
+
+                    b.ToTable("CustomerActivity");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.CustomerBadge", b =>
                 {
                     b.Property<int>("CustomerId")
@@ -444,6 +478,43 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("BadgeId");
 
                     b.ToTable("CustomerBadge");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerEvent", b =>
+                {
+                    b.Property<int>("CustomerEventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerEventId"));
+
+                    b.Property<DateTime?>("CompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsEarned")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("CustomerEventId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("CustomerId", "EventId");
+
+                    b.ToTable("CustomerEvent");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Employee", b =>
@@ -1187,6 +1258,32 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Level");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerActivity", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Activity", "Activity")
+                        .WithMany("CustomerActivities")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Customer", "Customer")
+                        .WithMany("CustomerActivities")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Event", "Event")
+                        .WithMany("CustomerActivities")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Event");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.CustomerBadge", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Badge", "Badge")
@@ -1204,6 +1301,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Badge");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.CustomerEvent", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Customer", "Customer")
+                        .WithMany("CustomerEvents")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Event", "Event")
+                        .WithMany("CustomerEvents")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
@@ -1315,6 +1431,8 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Activity", b =>
                 {
+                    b.Navigation("CustomerActivities");
+
                     b.Navigation("EventActivities");
                 });
 
@@ -1347,11 +1465,19 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.Customer", b =>
                 {
+                    b.Navigation("CustomerActivities");
+
                     b.Navigation("CustomerBadges");
+
+                    b.Navigation("CustomerEvents");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
+                    b.Navigation("CustomerActivities");
+
+                    b.Navigation("CustomerEvents");
+
                     b.Navigation("EventActivities");
                 });
 

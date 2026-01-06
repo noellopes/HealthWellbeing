@@ -44,11 +44,11 @@ namespace HealthWellbeing.Models {
         [Required(ErrorMessage = "Please select a {0}.")]
         public int LevelId { get; set; }
 
-        [Display(Name = "Scoring Strategy")]
         public Level? Level { get; set; }
 
         public virtual ICollection<CustomerBadge>? CustomerBadges { get; set; }
         public virtual ICollection<CustomerActivity>? CustomerActivities { get; set; }
+        public virtual ICollection<CustomerEvent>? CustomerEvents { get; set; }
     }
 }
 

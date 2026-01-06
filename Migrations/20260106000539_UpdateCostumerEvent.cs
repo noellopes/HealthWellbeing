@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class Update : Migration
+    public partial class UpdateCostumerEvent : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -714,6 +714,41 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerActivity",
+                columns: table => new
+                {
+                    CustomerActivityId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    ActivityId = table.Column<int>(type: "int", nullable: false),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PointsEarned = table.Column<int>(type: "int", nullable: false),
+                    EventId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerActivity", x => x.CustomerActivityId);
+                    table.ForeignKey(
+                        name: "FK_CustomerActivity_Activity_ActivityId",
+                        column: x => x.ActivityId,
+                        principalTable: "Activity",
+                        principalColumn: "ActivityId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerActivity_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerActivity_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "EventId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CustomerBadge",
                 columns: table => new
                 {
@@ -736,6 +771,36 @@ namespace HealthWellbeing.Migrations
                         principalTable: "Customer",
                         principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerEvent",
+                columns: table => new
+                {
+                    CustomerEventId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PointsEarned = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerEvent", x => x.CustomerEventId);
+                    table.ForeignKey(
+                        name: "FK_CustomerEvent_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerEvent_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "EventId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -790,9 +855,34 @@ namespace HealthWellbeing.Migrations
                 column: "LevelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomerActivity_ActivityId",
+                table: "CustomerActivity",
+                column: "ActivityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerActivity_CustomerId_EventId",
+                table: "CustomerActivity",
+                columns: new[] { "CustomerId", "EventId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerActivity_EventId",
+                table: "CustomerActivity",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomerBadge_BadgeId",
                 table: "CustomerBadge",
                 column: "BadgeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerEvent_CustomerId_EventId",
+                table: "CustomerEvent",
+                columns: new[] { "CustomerId", "EventId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerEvent_EventId",
+                table: "CustomerEvent",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_Email",
@@ -875,7 +965,13 @@ namespace HealthWellbeing.Migrations
                 name: "BeneficioTipoExercicio");
 
             migrationBuilder.DropTable(
+                name: "CustomerActivity");
+
+            migrationBuilder.DropTable(
                 name: "CustomerBadge");
+
+            migrationBuilder.DropTable(
+                name: "CustomerEvent");
 
             migrationBuilder.DropTable(
                 name: "Employee");
