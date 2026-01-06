@@ -40,6 +40,16 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+/*
+ * using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    DBClienteBalneario.Seed(context);
+}
+*/
+
+
+
 app.Run();
 
 

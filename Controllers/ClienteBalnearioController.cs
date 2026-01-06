@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HealthWellbeing.Models.Enums;
+
 
 
 namespace HealthWellbeing.Controllers
@@ -12,8 +14,26 @@ namespace HealthWellbeing.Controllers
         // LISTA FAKE (simula BD)
         private static List<ClienteBalnearioModel> _clientes = new()
         {
-            new ClienteBalnearioModel { ClienteBalnearioId = 1, NomeCompleto = "Maria Silva", Email="maria@gmail.com", Telemovel="912345678", Morada="Rua A", TipoCliente="Regular" },
-            new ClienteBalnearioModel { ClienteBalnearioId = 2, NomeCompleto = "João Pereira", Email="joao@gmail.com", Telemovel="913456789", Morada="Rua B", TipoCliente="VIP" }
+            new ClienteBalnearioModel
+        {
+                  ClienteBalnearioId = 1,
+                  NomeCompleto = "Maria Silva",
+                  Email = "maria@gmail.com",
+                  Telemovel = "912345678",
+                  Morada = "Rua A",
+                  TipoCliente = TipoCliente.Normal
+        },
+            new ClienteBalnearioModel
+        {
+                 ClienteBalnearioId = 2,
+                 NomeCompleto = "João Pereira",
+                 Email = "joao@gmail.com",
+                 Telemovel = "913456789",
+                 Morada = "Rua B",
+                 TipoCliente = TipoCliente.Vip
+        }
+
+          
         };
 
 

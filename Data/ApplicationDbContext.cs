@@ -17,7 +17,7 @@ namespace HealthWellbeing.Data
         public DbSet<AgendamentoModel> Agendamentos { get; set; }
         public DbSet<TipoServico> TipoServicos{ get; set; }
 
-        public DbSet<ClienteBalnearioModel> Clientes { get; set; }
+        public DbSet<ClienteBalnearioModel> ClienteBalneario { get; set; }
     }
 }
 

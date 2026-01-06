@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.ClienteBalnearioModel
+@using HealthWellbeing.Models.Enums
 
 <h2>Detalhes do Cliente</h2>
 
@@ -19,7 +20,10 @@
 
     <dt class="col-sm-3">Tipo de Cliente</dt>
     <dd class="col-sm-9">
-        <span class="badge @(Model.TipoCliente == "VIP" ? "bg-warning text-dark" : "bg-secondary")">
+        <span class="badge
+                          @(Model.TipoCliente == TipoCliente.Vip ? "bg-warning text-dark" :
+                            Model.TipoCliente == TipoCliente.Socio ? "bg-info text-dark" :
+                            "bg-secondary")">
             @Model.TipoCliente
         </span>
     </dd>

@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.ClienteBalnearioModel>
+@using HealthWellbeing.Models.Enums
+
 
 <h2>Lista de Clientes do Balneário</h2>
 
@@ -46,9 +48,13 @@
                 <td>@item.Email</td>
                 <td>@item.Telemovel</td>
                 <td>
-                    <span class="badge @(item.TipoCliente == "VIP" ? "bg-warning text-dark" : "bg-secondary")">
-                        @item.TipoCliente
-                    </span>
+                <span class="badge
+                          @(item.TipoCliente == TipoCliente.Vip ? "bg-warning text-dark" :
+                                item.TipoCliente == TipoCliente.Socio ? "bg-info text-dark" :
+                                "bg-secondary")">
+                    @item.TipoCliente
+                </span>
+
                 </td>
                 <td>
                     <a asp-action="Edit"
