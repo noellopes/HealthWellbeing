@@ -157,13 +157,19 @@ namespace HealthWellbeing.Data
             dbContext.SaveChanges();
         }
 
-        private static void PopulateCustomers(HealthWellbeingDbContext dbContext) {
+        private static void PopulateCustomers(HealthWellbeingDbContext dbContext)
+        {
             if (dbContext.Customer.Any()) return;
 
-            var defaultLevel = dbContext.Level.FirstOrDefault(l => l.LevelNumber == 1);
+            // 1. Carregar TODOS os níveis e ordenar do Maior para o Menor por Pontos
+            // Se não houver níveis, não faz nada para evitar erros.
+            var allLevels = dbContext.Level
+                .OrderByDescending(l => l.LevelPointsLimit)
+                .ToList();
 
-            if (defaultLevel == null) return;
+            if (!allLevels.Any()) return;
 
+            // Lista completa de utilizadores
             var customers = new[]
             {
                 new Customer { Name = "Maria Utente", Email = "maria@ipg.pt", PhoneNumber = "+351 910000002", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-6), TotalPoints = 500 },
@@ -178,26 +184,39 @@ namespace HealthWellbeing.Data
                 new Customer { Name = "Hugo Almeida", Email = "hugo.almeida@ipg.pt", PhoneNumber = "+351 936547896", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-8), TotalPoints = 890 },
                 new Customer { Name = "Inês Rodrigues", Email = "ines.rodrigues@ipg.pt", PhoneNumber = "+351 921456987", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-4), TotalPoints = 210 },
                 new Customer { Name = "João Soares", Email = "joao.soares@ipg.pt", PhoneNumber = "+351 915632478", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-50), TotalPoints = 300 },
-                new Customer { Name = "Katia Lima", Email = "katia.lima@ipg.pt", PhoneNumber = "+351 911223344", Gender = "Feminino", RegistrationDate = DateTime.Now.AddYears(-1), TotalPoints = 2100 }, 
-                new Customer { Name = "Luis Vaz", Email = "luis.vaz@ipg.pt", PhoneNumber = "+351 922334455", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-5), TotalPoints = 50 }, 
+                new Customer { Name = "Katia Lima", Email = "katia.lima@ipg.pt", PhoneNumber = "+351 911223344", Gender = "Feminino", RegistrationDate = DateTime.Now.AddYears(-1), TotalPoints = 2100 },
+                new Customer { Name = "Luis Vaz", Email = "luis.vaz@ipg.pt", PhoneNumber = "+351 922334455", Gender = "Masculino", RegistrationDate = DateTime.Now.AddDays(-5), TotalPoints = 50 },
                 new Customer { Name = "Marta Ferreira", Email = "marta.ferreira@ipg.pt", PhoneNumber = "+351 933445566", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-5), TotalPoints = 600 },
                 new Customer { Name = "Nuno Gomes", Email = "nuno.gomes@ipg.pt", PhoneNumber = "+351 966778899", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-10), TotalPoints = 1500 },
                 new Customer { Name = "Olivia Sousa", Email = "olivia.sousa@ipg.pt", PhoneNumber = "+351 919887766", Gender = "Feminino", RegistrationDate = DateTime.Now.AddDays(-1), TotalPoints = 0 },
-                new Customer { Name = "Pedro Mendes", Email = "pedro.mendes@ipg.pt", PhoneNumber = "+351 928776655", Gender = "Masculino", RegistrationDate = DateTime.Now.AddYears(-3), TotalPoints = 5000 }, 
+                new Customer { Name = "Pedro Mendes", Email = "pedro.mendes@ipg.pt", PhoneNumber = "+351 928776655", Gender = "Masculino", RegistrationDate = DateTime.Now.AddYears(-3), TotalPoints = 5000 },
                 new Customer { Name = "Rita Carvalho", Email = "rita.carvalho@ipg.pt", PhoneNumber = "+351 937665544", Gender = "Feminino", RegistrationDate = DateTime.Now.AddMonths(-2), TotalPoints = 150 },
                 new Customer { Name = "Tiago Antunes", Email = "tiago.antunes@ipg.pt", PhoneNumber = "+351 965544332", Gender = "Masculino", RegistrationDate = DateTime.Now.AddMonths(-7), TotalPoints = 800 }
             };
 
-            foreach (var cust in customers) {
-                if (!dbContext.Customer.Any(c => c.Email == cust.Email)) {
-                    cust.Level = defaultLevel;
+            foreach (var cust in customers)
+            {
+                if (!dbContext.Customer.Any(c => c.Email == cust.Email))
+                {
+
+                    // 2. LÓGICA AUTOMÁTICA DE NÍVEL
+                    // Procura o primeiro nível (do maior para o menor) onde os pontos do cliente encaixam
+                    var correctLevel = allLevels.FirstOrDefault(l => cust.TotalPoints >= l.LevelPointsLimit);
+
+                    // Se não encontrou nenhum (ex: tem 50 pts mas o nível 1 começa nos 100),
+                    // atribui o nível mais baixo da lista (normalmente o nível 1 ou 0)
+                    if (correctLevel == null)
+                    {
+                        correctLevel = allLevels.Last();
+                    }
+
+                    cust.Level = correctLevel;
                     dbContext.Customer.Add(cust);
                 }
             }
 
             dbContext.SaveChanges();
         }
-
         private static void PopulateEventTypes(HealthWellbeingDbContext dbContext) {
 
             if (dbContext.EventType.Any()) return;

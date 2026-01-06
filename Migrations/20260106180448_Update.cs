@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateCostumerEvent : Migration
+    public partial class Update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -321,7 +321,7 @@ namespace HealthWellbeing.Migrations
                     ActivityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ActivityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ActivityDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActivityDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ActivityReward = table.Column<int>(type: "int", nullable: false),
                     ActivityTypeId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -732,20 +732,17 @@ namespace HealthWellbeing.Migrations
                         name: "FK_CustomerActivity_Activity_ActivityId",
                         column: x => x.ActivityId,
                         principalTable: "Activity",
-                        principalColumn: "ActivityId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "ActivityId");
                     table.ForeignKey(
                         name: "FK_CustomerActivity_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "CustomerId");
                     table.ForeignKey(
                         name: "FK_CustomerActivity_Event_EventId",
                         column: x => x.EventId,
                         principalTable: "Event",
-                        principalColumn: "EventId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "EventId");
                 });
 
             migrationBuilder.CreateTable(
@@ -793,14 +790,12 @@ namespace HealthWellbeing.Migrations
                         name: "FK_CustomerEvent_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "CustomerId");
                     table.ForeignKey(
                         name: "FK_CustomerEvent_Event_EventId",
                         column: x => x.EventId,
                         principalTable: "Event",
-                        principalColumn: "EventId",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "EventId");
                 });
 
             migrationBuilder.CreateIndex(

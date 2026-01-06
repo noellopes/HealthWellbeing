@@ -6,16 +6,17 @@
     bool isEnrolled = ViewBag.IsEnrolled;
     bool canJoin = currentLevel >= Model.MinLevel;
     bool isHappening = Model.EventStart <= DateTime.Now && Model.EventEnd >= DateTime.Now;
+
+    // Lista de atividades completas vinda do Controller
+    List<int> completedActivities = ViewBag.CompletedActivityIds as List<int> ?? new List<int>();
 }
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthWellbeing</title>
-
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 
 <div class="container py-5">
@@ -34,7 +35,7 @@
 
                     @if (isHappening)
                     {
-                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm">
+                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm animate-pulse">
                             <i class="bi bi-record-circle me-1"></i> Happening Now
                         </span>
                     }
@@ -106,14 +107,29 @@
                     <div class="d-flex flex-column gap-3">
                         @foreach (var ea in Model.EventActivities)
                         {
-                            <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+
+                            // Verifica se está feito
+                            bool isDone = completedActivities.Contains(ea.ActivityId);
+
+                            // Estilos condicionais
+                            string rowClass = isDone ? "bg-success bg-opacity-10 border-success" : "border-bottom";
+                            string iconBg = isDone ? "bg-success text-white" : "bg-primary bg-opacity-10 text-primary";
+                            string icon = isDone ? "bi-check-lg" : "bi-activity";
+
+                            <div class="d-flex align-items-center justify-content-between p-3 rounded-3 @rowClass">
                                 <div class="d-flex align-items-start gap-3">
-                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
-                                        <i class="bi bi-activity"></i>
+                                    <div class="@iconBg rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                                        <i class="bi @icon"></i>
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-bold mb-1 text-dark">@ea.Activity.ActivityName</h6>
+                                        <h6 class="fw-bold mb-1 text-dark">
+                                            @ea.Activity.ActivityName
+                                            @if (isDone)
+                                            {
+                                                <span class="badge bg-success ms-2">Completed</span>
+                                            }
+                                        </h6>
                                         <p class="text-muted small mb-1">@ea.Activity.ActivityDescription</p>
                                         <span class="badge bg-warning text-dark border border-warning border-opacity-25 fw-normal rounded-1">
                                             @ea.Activity.ActivityType?.Name
@@ -121,8 +137,8 @@
                                     </div>
                                 </div>
 
-                                <div class="ms-3">
-                                    <span class="badge bg-primary rounded-pill px-3 py-2">
+                                <div class="ms-3 text-end">
+                                    <span class="badge @(isDone ? "bg-success" : "bg-primary") rounded-pill px-3 py-2">
                                         + @ea.Activity.ActivityReward pts
                                     </span>
                                 </div>
@@ -152,3 +168,25 @@
         </div>
     </div>
 </div>
+
+@* --- CSS EXCLUSIVO PARA O DETALHE --- *@
+<style>
+    /* Animação para o badge Live */
+    @@keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+
+    .animate-pulse {
+        animation: pulse-red 2s infinite;
+    }
+</style>
