@@ -122,6 +122,43 @@ namespace HealthWellbeing.Controllers
             return View(plano);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SalvarProgressoGlobal(List<PlanoExercicioExercicio> exercicios)
+        {
+            if (exercicios == null || !exercicios.Any())
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Pega o ID do plano do primeiro item para redirecionar no fim
+            int planoId = exercicios.First().PlanoExerciciosId;
+
+            // --- SEGURANÇA: Verificar se o user pode editar este plano ---
+            // (Podes copiar a lógica de segurança que fizeste no método Edit/Details aqui)
+
+            foreach (var itemInput in exercicios)
+            {
+                var itemDb = await _context.Set<PlanoExercicioExercicio>()
+                    .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == itemInput.PlanoExerciciosId &&
+                                             pe.ExercicioId == itemInput.ExercicioId);
+
+                if (itemDb != null)
+                {
+                    itemDb.Concluido = itemInput.Concluido;
+
+                    // AQUI É GUARDADO O PESO
+                    itemDb.PesoUsado = itemInput.PesoUsado;
+
+                    _context.Update(itemDb);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = planoId });
+        }
+
         // POST: AtualizarProgresso
         [HttpPost]
         [ValidateAntiForgeryToken]
