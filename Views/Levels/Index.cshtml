@@ -210,16 +210,20 @@
                                     <td>@Html.DisplayFor(_ => item.LevelPointsLimit)</td>
 
                                     <td class="text-end">
-                                        <div class="btn-group">
-                                            <a asp-action="Details" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-info" title="Details"><i class="bi bi-eye"></i></a>
+                                        <a asp-action="Edit" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-warning text-dark me-1" title="Edit">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
 
-                                            <a asp-action="Edit" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
+                                        <a asp-action="Details" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-info text-dark me-1" title="Details">
+                                            <i class="bi bi-info-circle"></i> Details
+                                        </a>
 
-                                            <a asp-action="Delete" asp-route-id="@item.LevelId"
-                                               class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
-                                        </div>
+                                        <a asp-action="Delete" asp-route-id="@item.LevelId"
+                                           class="btn btn-sm btn-danger text-white" title="Delete">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
                                     </td>
                                 </tr>
                             }
