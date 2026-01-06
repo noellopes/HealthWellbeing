@@ -64,6 +64,65 @@ internal class SeedData
         EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }, dbContext).Wait();
     }
 
+    internal static void SeedPopulateClientsAsUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        SeedPopulateClientsAsUsersAsync(userManager, dbContext).GetAwaiter().GetResult();
+    }
+
+    private static async Task SeedPopulateClientsAsUsersAsync(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+
+        dbContext.Database.EnsureCreated();
+
+        var clients = PopulateClients(dbContext);
+        var anyClientUpdated = false;
+
+        foreach (var client in clients)
+        {
+            var email = client.Email?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                continue;
+
+            var user = await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(email);
+
+            if (user == null)
+            {
+                user = new IdentityUser(email)
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+
+                var createResult = await userManager.CreateAsync(user, "Secret123$");
+                if (!createResult.Succeeded)
+                {
+                    // If creation failed due to a race/duplicate, try loading it again.
+                    user = await userManager.FindByEmailAsync(email) ?? await userManager.FindByNameAsync(email);
+                    if (user == null)
+                        continue;
+                }
+            }
+
+            if (!await userManager.IsInRoleAsync(user, "Cliente"))
+            {
+                await userManager.AddToRoleAsync(user, "Cliente");
+            }
+
+            if (!string.Equals(client.IdentityUserId, user.Id, StringComparison.Ordinal))
+            {
+                client.IdentityUserId = user.Id;
+                anyClientUpdated = true;
+            }
+        }
+
+        if (anyClientUpdated)
+        {
+            await dbContext.SaveChangesAsync();
+        }
+    }
+
     private static async Task<IdentityUser> EnsureUserIsCreatedAsync(
         UserManager<IdentityUser> userManager,
         string username,
@@ -1998,11 +2057,6 @@ internal class SeedData
 
     private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
     {
-        // Verifica se já existem clientes para não duplicar
-        if (dbContext.Client.Any())
-        {
-            return dbContext.Client.ToList();
-        }
 
         // Lista com 25 clientes
         var clients = new List<Client>()
