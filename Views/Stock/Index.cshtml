@@ -1,5 +1,6 @@
 ﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Stock>
 
+
 @{
     ViewData["Title"] = "Gestão de Stock";
 }
@@ -101,9 +102,11 @@
                 {
                     foreach (var item in Model.Items)
                     {
-                        var min = item.Consumivel?.QuantidadeMinima ?? item.QuantidadeMinima;
-                        var max = item.Consumivel?.QuantidadeMaxima ?? item.QuantidadeMaxima;
+                        var min = item.Consumivel.QuantidadeMinima;
+                        var max = item.Consumivel.QuantidadeMaxima;
                         var atual = item.QuantidadeAtual;
+
+                        
 
                         var percentagem = max > 0
                         ? (int)((double)atual / max * 100)
@@ -125,16 +128,28 @@
                         }
 
                         <tr>
+                            <!-- CONSUMÍVEL -->
                             <td>
                                 <span class="text-muted me-1">📦</span>
-                                @item.Consumivel?.Nome
+                                @item.Consumivel.Nome
+                                @item.QuantidadeAtual
+                                @item.Consumivel.QuantidadeMinima
+                                @item.Consumivel.QuantidadeMaxima
+                                @item.DataUltimaAtualizacao
+
                             </td>
 
-                            <td>
-                                <span class="text-muted me-1">📍</span>
-                                @item.Zona?.NomeZona
+                            <!-- BOTÃO VER ZONAS -->
+                            <td class="text-center">
+                                <a asp-controller="ZonaArmazenamento"
+                                   asp-action="Index"
+                                   asp-route-searchConsumivel="@item.ConsumivelID"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Ver zonas
+                                </a>
                             </td>
 
+                            <!-- QUANTIDADE -->
                             <td class="text-center">
                                 <div class="fw-bold mb-1">@atual</div>
                                 <div class="progress" style="height:6px;">
@@ -147,13 +162,16 @@
                             <td class="text-center">@min</td>
                             <td class="text-center">@max</td>
 
+                            <!-- ÚLTIMA ATUALIZAÇÃO (REMOVIDA) -->
                             <td class="text-center text-muted">
                                 @item.DataUltimaAtualizacao.ToString("dd/MM/yyyy HH:mm")
                             </td>
+
                         </tr>
                     }
                 }
             </tbody>
+
 
         </table>
     </div>
