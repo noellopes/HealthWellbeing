@@ -233,29 +233,43 @@ namespace HealthWellbeing.Controllers
         // POST: UtenteGrupo7/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Adicionei profissionalSaudeId aos parâmetros bind, mas vamos validar abaixo
         public async Task<IActionResult> Create([Bind("UtenteGrupo7Id,Nome,ObjetivoFisicoId,ProfissionalSaudeId")] UtenteGrupo7 utenteGrupo7, int[] selectedProblemas)
         {
-            var currentUserId = _userManager.GetUserId(User);
+            // Obter o utilizador atual completo (necessário para verificar e adicionar Roles)
+            var user = await _userManager.GetUserAsync(User);
+            var currentUserId = user.Id;
+
+            bool isAdmin = await _userManager.IsInRoleAsync(user, "Administrador");
+            bool isProf = await _userManager.IsInRoleAsync(user, "ProfissionalSaude");
+
+            if (isAdmin || isProf)
+            {
+                TempData["MensagemErro"] = "Erro: Contas de Administrador ou Profissional de Saúde não podem criar perfil de Utente.";
+
+                await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
+                await PopularProblemasSaudeCheckboxes(utenteGrupo7);
+                await PopularProfissionaisDropDownList(utenteGrupo7.ProfissionalSaudeId);
+
+                return View(utenteGrupo7);
+            }
+
             utenteGrupo7.UserId = currentUserId;
             ModelState.Remove("UserId");
 
-            // SEGURANÇA: Apenas Admin pode definir o ProfissionalSaudeId
-            if (!User.IsInRole("Administrador"))
+            // SEGURANÇA: Apenas Admin pode definir o ProfissionalSaudeId no formulário
+            // (Mas como bloqueámos o Admin acima, esta linha é redundante para o próprio criador, 
+            // mas boa de manter caso a lógica mude no futuro)
+            if (!isAdmin)
             {
-                // Se não é admin, garante que o campo fica nulo ou ignorado,
-                // prevenindo que um utilizador malicioso tente injetar este valor.
                 utenteGrupo7.ProfissionalSaudeId = null;
             }
 
-            // Validações
             bool existeRegisto = await _context.UtenteGrupo7.AnyAsync(u => u.Nome.ToLower() == utenteGrupo7.Nome.ToLower());
             if (existeRegisto) ModelState.AddModelError("Nome", "Já existe um Utente com este nome.");
 
             bool existeid = await _context.UtenteGrupo7.AnyAsync(u => u.UserId == currentUserId);
             if (existeid) ModelState.AddModelError("Nome", "Só pode registrar-se uma vez.");
 
-            // Problemas de Saude
             utenteGrupo7.UtenteProblemasSaude = new List<UtenteGrupo7ProblemaSaude>();
             if (selectedProblemas != null)
             {
@@ -267,11 +281,22 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
+                // 2. Guardar os dados do perfil na BD
                 _context.Add(utenteGrupo7);
                 await _context.SaveChangesAsync();
+
+                // 3. ATRIBUIR ROLE "Utente" AUTOMATICAMENTE
+                // Só atribuímos se não tiver nenhuma das roles proibidas (já verificado acima)
+                // e se ainda não tiver a role "Utente".
+                if (!await _userManager.IsInRoleAsync(user, "Utente"))
+                {
+                    await _userManager.AddToRoleAsync(user, "Utente");
+                }
+
                 return RedirectToAction(nameof(Details), new { id = utenteGrupo7.UtenteGrupo7Id, SuccessMessage = "Utente criado com sucesso" });
             }
 
+            // Se falhar (ModelState inválido), recarrega tudo
             await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
             await PopularProblemasSaudeCheckboxes(utenteGrupo7);
             await PopularProfissionaisDropDownList(utenteGrupo7.ProfissionalSaudeId);
