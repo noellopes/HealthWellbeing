@@ -9,21 +9,21 @@ namespace HealthWellbeingRoom.Models
             HealthWellbeingDbContext context,
             int consumivelId)
         {
-            // 🔹 Obter consumível atualizado
+            // Obter consumível atualizado
             var consumivel = context.Consumivel
                 .FirstOrDefault(c => c.ConsumivelId == consumivelId);
 
             if (consumivel == null)
                 return;
 
-            // 🔹 Obter stock correspondente
+            // Obter stock correspondente
             var stock = context.Stock
                 .FirstOrDefault(s => s.ConsumivelID == consumivelId);
 
             if (stock == null)
                 return;
 
-            // 🔒 Stock espelha SEMPRE o consumível
+            // Stock espelha SEMPRE o consumível
             if (stock.UsaValoresDoConsumivel)
             {
                 stock.QuantidadeAtual = consumivel.QuantidadeAtual;

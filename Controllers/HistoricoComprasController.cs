@@ -16,9 +16,8 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
         
-        // =====================================================
         // INDEX — Histórico de Compras (ENTRADAS)
-        // =====================================================
+        
         public IActionResult Index(int page = 1)
         {
             int itemsPerPage = 10;
@@ -39,7 +38,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToList();
 
-            // 🔹 AQUI ESTÁ A ÚNICA LÓGICA NOVA
+            
             foreach (var m in movimentosPagina)
             {
                 if (m.Fornecedor == null && m.Stock?.Consumivel != null)
@@ -70,9 +69,7 @@ namespace HealthWellbeing.Controllers
             return View(paginated);
         }
 
-        // =====================================================
         // DETALHES
-        // =====================================================
         public IActionResult Details(int id)
         {
             var movimento = _context.HistoricoCompras
@@ -87,9 +84,8 @@ namespace HealthWellbeing.Controllers
             return View(movimento);
         }
 
-        // =====================================================
         // CONFIRMAR REMOÇÃO (GET)
-        // =====================================================
+        
         public IActionResult Delete(int id)
         {
             var movimento = _context.HistoricoCompras
@@ -104,9 +100,8 @@ namespace HealthWellbeing.Controllers
             return View(movimento);
         }
 
-        // =====================================================
         // REMOVER MOVIMENTO (POST)
-        // =====================================================
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -128,9 +123,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // FORMULÁRIO DE ENTRADA (GET)
-        // =====================================================
+        
         public IActionResult CreateEntrada()
         {
             ViewBag.Stocks = _context.Stock
@@ -142,9 +136,8 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // =====================================================
         // PROCESSAR ENTRADA (POST)
-        // =====================================================
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateEntrada(HistoricoCompras movimento)
@@ -194,9 +187,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // FORMULÁRIO DE SAÍDA (GET)
-        // =====================================================
+        
         public IActionResult CreateSaida()
         {
             ViewBag.Stocks = _context.Stock
@@ -206,9 +198,8 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // =====================================================
         // PROCESSAR SAÍDA (POST)
-        // =====================================================
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CreateSaida(HistoricoCompras movimento)
@@ -239,7 +230,7 @@ namespace HealthWellbeing.Controllers
                 return View(movimento);
             }
 
-            // ✔ Saída (sem fornecedor)
+            // ✔ Saída 
             movimento.Tipo = "Saida";
             movimento.Data = DateTime.Now;
             movimento.FornecedorId = null;

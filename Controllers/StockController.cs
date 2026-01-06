@@ -16,9 +16,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // 🔒 GARANTE STOCK = ESPELHO DO CONSUMÍVEL
-        // =====================================================
+        // Garantir Stock
         private void GarantirStockBase()
         {
             var consumiveis = _context.Consumivel.ToList();
@@ -63,10 +61,7 @@ namespace HealthWellbeing.Controllers
             _context.SaveChanges();
         }
 
-
-        // =====================================================
-        // 🔄 RESET TOTAL DO STOCK
-        // =====================================================
+        //  RESET TOTAL DO STOCK
         public IActionResult ResetStock()
         {
             _context.Stock.RemoveRange(_context.Stock);
@@ -82,20 +77,20 @@ namespace HealthWellbeing.Controllers
         // INDEX
         // =====================================================
         public IActionResult Index(
-    int page = 1,
-    string searchNome = "",
-    bool stockCritico = false)
+            int page = 1,
+            string searchNome = "",
+            bool stockCritico = false)
         {
-            // 🔑 Garante que o stock reflete o consumível
+            // Garante que o stock reflete o consumível
             GarantirStockBase();
 
-            // 🔹 Query base: STOCK
+            // Query base: STOCK
             var query = _context.Stock
                 .Include(s => s.Consumivel)
                 .Include(s => s.Zona)
                 .AsQueryable();
 
-            // 🔍 Filtro por nome do consumível
+            // Filtro por nome do consumível
             if (!string.IsNullOrWhiteSpace(searchNome))
             {
                 query = query.Where(s =>
@@ -103,7 +98,7 @@ namespace HealthWellbeing.Controllers
                 ViewBag.SearchNome = searchNome;
             }
 
-            // ⚠️ Stock crítico (baseado no consumível)
+            // Stock crítico (baseado no consumível)
             if (stockCritico)
             {
                 query = query.Where(s =>
@@ -111,7 +106,7 @@ namespace HealthWellbeing.Controllers
                 ViewBag.StockCritico = true;
             }
 
-            // 📄 Paginação
+            // Paginação
             int totalItems = query.Count();
             var pagination = new PaginationInfo<Stock>(page, totalItems, 10);
 
@@ -124,19 +119,14 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-
-        // =====================================================
         // CREATE ❌ (DESATIVADO)
-        // =====================================================
         public IActionResult Create()
         {
             TempData["Error"] = "O stock é criado automaticamente a partir dos consumíveis.";
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // EDIT → APENAS ZONA
-        // =====================================================
         public IActionResult Edit(int id)
         {
             var stock = _context.Stock
@@ -169,9 +159,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // DELETE
-        // =====================================================
+        
         public IActionResult Delete(int id)
         {
             var stock = _context.Stock

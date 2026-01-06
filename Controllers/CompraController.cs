@@ -16,9 +16,8 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // =====================================================
         // INDEX
-        // =====================================================
+        
         [HttpGet]
         public IActionResult Index(int? consumivelId)
         {
@@ -45,9 +44,8 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // =====================================================
-        // CRIAR REGISTO (PASSO INTERMÉDIO)
-        // =====================================================
+        // CRIAR REGISTO 
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CriarRegistoCompra(int consumivelId, int quantidade)
@@ -61,9 +59,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction("RegistoCompra", new { consumivelId, quantidade });
         }
 
-        // =====================================================
         // ESCOLHA DE FORNECEDOR
-        // =====================================================
+        
         [HttpGet]
         public IActionResult RegistoCompra(int consumivelId, int quantidade)
         {
@@ -84,9 +81,8 @@ namespace HealthWellbeing.Controllers
             return View(vm);
         }
 
-        // =====================================================
         // CONFIRMAR COMPRA
-        // =====================================================
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmarRegisto(RegistoCompra model)
@@ -138,7 +134,7 @@ namespace HealthWellbeing.Controllers
                     fc.ConsumivelId == model.ConsumivelId
                 );
 
-            // 🟢 1 — Registar COMPRA
+            //  Registar COMPRA
             var compra = new Compra
             {
                 ConsumivelId = model.ConsumivelId,
@@ -151,7 +147,7 @@ namespace HealthWellbeing.Controllers
 
             _context.Compra.Add(compra);
 
-            // 🔹 Zona (FONTE DA VERDADE)
+            // 🔹 Zona 
             var zona = _context.ZonaArmazenamento
                 .Where(z => z.ConsumivelId == model.ConsumivelId && z.Ativa)
                 .OrderBy(z => z.QuantidadeAtual)
@@ -164,12 +160,12 @@ namespace HealthWellbeing.Controllers
             
             _context.SaveChanges();
 
-            // 🔹 Recalcular TOTAL do Consumível (soma das zonas)
+            // 🔹 Recalcular TOTAL do Consumível 
             consumivel.QuantidadeAtual = _context.ZonaArmazenamento
                 .Where(z => z.ConsumivelId == consumivel.ConsumivelId)
                 .Sum(z => z.QuantidadeAtual);
 
-            // 🔑 SINCRONIZA STOCK AUTOMATICAMENTE
+            // Sincronizar stock automaticamente
             SincronizaCompra.AtualizarStockAposCompra(
                 _context,
                 consumivel.ConsumivelId
@@ -194,9 +190,7 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction("Index", "HistoricoCompras");
         }
 
-        // =====================================================
         // HISTÓRICO SIMPLES
-        // =====================================================
         public IActionResult Historico()
         {
             return View(_context.Compra
