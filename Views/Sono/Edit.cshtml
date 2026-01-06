@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Editar Registo de Sono";
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
+    string maxDate = DateTime.Now.ToString("yyyy-MM-dd");
 }
 
 <div class="container mt-4">
@@ -9,14 +11,13 @@
 
     <form asp-action="Edit" method="post">
         @Html.AntiForgeryToken()
-
         <input type="hidden" asp-for="SonoId" />
 
         <div asp-validation-summary="All" class="text-danger small"></div>
 
         <div class="mb-3">
             <label asp-for="Data" class="form-label">Data do Registo *</label>
-            <input asp-for="Data" class="form-control" type="date">
+            <input asp-for="Data" class="form-control" type="date" max="@maxDate">
             <span asp-validation-for="Data" class="text-danger small"></span>
         </div>
 
@@ -35,16 +36,21 @@
         </div>
 
         <div class="mb-3">
-            <label asp-for="HorasSono" class="form-label">Total de Horas (Calculado automaticamente ao guardar)</label>
-            <input asp-for="HorasSono" class="form-control bg-light" readonly title="Este valor será recalculado ao guardar">
-            <span asp-validation-for="HorasSono" class="text-danger small"></span>
+            <label asp-for="HorasSono" class="form-label">Total de Horas (Calculado automaticamente)</label>
+            <input asp-for="HorasSono" class="form-control bg-light" readonly>
         </div>
 
+        @if (isStaff)
+        {
         <div class="mb-3">
-            <label asp-for="UtenteGrupo7Id" class="form-label">Utente Associado *</label>
+            <label class="form-label">Utente Associado</label>
+
+            // Se for Staff, mostra a dropdown para poder mudar
             <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id"></select>
             <span asp-validation-for="UtenteGrupo7Id" class="text-danger small"></span>
         </div>
+        }
+        
 
         <div class="mt-4">
             <button type="submit" class="btn btn-success">

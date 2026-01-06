@@ -1,87 +1,138 @@
 ﻿@model HealthWellbeing.Models.TipoExercicio
 
 @{
-    ViewData["Title"] = "Eliminar";
+    ViewData["Title"] = "Eliminar Tipo de Exercício";
+
+    bool podeEliminar = ViewBag.PodeEliminar ?? true;
+    int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
-<h1>Eliminar</h1>
+<div class="container mt-4">
 
-<h3>Tem a certeza que deseja eliminar isto?</h3>
-<div>
-    <h4>Tipo de Exercício</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NomeTipoExercicios)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DescricaoTipoExercicios)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CaracteristicasTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
-        </dd>
+    @* --- MENSAGENS DE ERRO (Usando o teu padrão StatusMessage ou o ErrorMessage que eu sugeri) --- *@
+    @if (TempData["StatusMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["StatusMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-        <dt class="col-sm-2">
-            Benefícios Associados
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
-            {
-                <ul class="list-unstyled">
-                    @foreach (var item in Model.TipoExercicioBeneficios)
+    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
+
+    @* --- AVISO DE BLOQUEIO --- *@
+    @if (!podeEliminar)
+    {
+        <div class="alert alert-warning shadow-sm border-warning" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h4>
+            <p>
+                Não é possível eliminar o tipo <strong>@Model.NomeTipoExercicios</strong> porque ele está a ser utilizado em
+                <strong>@numExercicios</strong> exercício(s).
+            </p>
+            <hr>
+            <p class="mb-0">Tens de remover este tipo dos exercícios associados antes de o poderes apagar.</p>
+        </div>
+    }
+    else
+    {
+        <p class="lead">Tem a certeza que deseja eliminar este tipo de exercício? Esta ação <strong>não pode ser desfeita</strong>.</p>
+    }
+
+    <div class="card mb-4 shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+            Dados do Tipo de Exercício
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nome</dt>
+                <dd class="col-sm-9 fw-bold">@Html.DisplayFor(model => model.NomeTipoExercicios)</dd>
+
+                <dt class="col-sm-3">Exercícios Associados</dt>
+                <dd class="col-sm-9">
+                    @if (numExercicios > 0)
                     {
-                        if (item.Beneficio != null)
-                        {
-                            <li class="mb-1">
-                                <span class="badge bg-primary">@item.Beneficio.NomeBeneficio</span>
-                            </li>
-                        }
+                        <span class="badge bg-warning text-dark">@numExercicios</span>
                     }
-                </ul>
+                    else
+                    {
+                        <span class="badge bg-success">0 (Livre para eliminar)</span>
+                    }
+                </dd>
+
+                <hr class="my-2" />
+
+                <dt class="col-sm-3">Descrição</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.DescricaoTipoExercicios)</dd>
+
+                <dt class="col-sm-3">Características</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.CaracteristicasTipoExercicios)</dd>
+
+                <hr class="my-2" />
+
+                <dt class="col-sm-3">Benefícios</dt>
+                <dd class="col-sm-9">
+                    @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.TipoExercicioBeneficios)
+                            {
+                                if (item.Beneficio != null)
+                                {
+                                    <li class="mb-1"><span class="badge bg-primary">@item.Beneficio.NomeBeneficio</span></li>
+                                }
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhum benefício associado</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 text-danger">Contraindicações</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Contraindicacao != null && Model.Contraindicacao.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var item in Model.Contraindicacao)
+                            {
+                                if (item.ProblemaSaude != null)
+                                {
+                                    <li class="mb-1"><span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span></li>
+                                }
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Nenhuma contraindicação registada</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="TipoExercicioId" value="@Model.TipoExercicioId" />
+
+        <div class="d-flex">
+            @if (podeEliminar)
+            {
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
             }
             else
             {
-                <span class="text-muted">Nenhum benefício associado</span>
+                <button type="button" class="btn btn-secondary me-2" disabled title="Existem exercícios associados">
+                    <i class="fas fa-trash-alt"></i> Eliminar (Bloqueado)
+                </button>
             }
-        </dd>
 
-        <dt class="col-sm-2 text-danger">
-            Contraindicações
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.Contraindicacao != null && Model.Contraindicacao.Any())
-            {
-                <ul class="list-unstyled">
-                    @foreach (var item in Model.Contraindicacao)
-                    {
-                        if (item.ProblemaSaude != null)
-                        {
-                            <li class="mb-1">
-                                <span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span>
-                            </li>
-                        }
-                    }
-                </ul>
-            }
-            else
-            {
-                <span class="text-muted">Nenhuma contraindicação registada</span>
-            }
-        </dd>
-    </dl>
-
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="TipoExercicioId" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
     </form>
 </div>

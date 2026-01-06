@@ -163,30 +163,24 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Equipamento/Delete/5
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // 1. Carregar o equipamento INCLUINDO a lista de exercícios
-            // O nome "ExercicioEquipamentos" bate certo com o seu Model
             var equipamento = await _context.Equipamento
-                .Include(e => e.ExercicioEquipamentos)
+                .Include(e => e.ExercicioEquipamentos) // Necessário para contar os usos
                 .FirstOrDefaultAsync(m => m.EquipamentoId == id);
 
             if (equipamento == null)
             {
-                TempData["SuccessMessage"] = "Este equipamento já foi eliminado.";
+                TempData["ErrorMessage"] = "Este equipamento já não existe.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // 2. Verificar quantos exercícios usam este equipamento
-            // CORREÇÃO: Uso de '?' para segurança caso a lista seja nula
+            // Lógica visual: Verificar se está em uso para avisar o utilizador antes de ele clicar
             int numExercicios = equipamento.ExercicioEquipamentos?.Count ?? 0;
 
-            // 3. Passar essa informação para a View
             ViewBag.NumExercicios = numExercicios;
             ViewBag.PodeEliminar = numExercicios == 0;
 
@@ -196,32 +190,34 @@ namespace HealthWellbeing.Controllers
         // POST: Equipamento/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
+        public async Task<IActionResult> DeleteConfirmed(int EquipamentoId) // Mudei para EquipamentoId para ser explícito
         {
-            var equipamento = await _context.Equipamento
-                .Include(e => e.ExercicioEquipamentos)
-                .FirstOrDefaultAsync(m => m.EquipamentoId == id);
+            var equipamento = await _context.Equipamento.FindAsync(EquipamentoId);
 
-            if (equipamento != null)
+            if (equipamento == null) return RedirectToAction(nameof(Index));
+
+            try
             {
-                // Verificação de Segurança Final
-                // CORREÇÃO: Uso de '?' para segurança
-                if (equipamento.ExercicioEquipamentos != null && equipamento.ExercicioEquipamentos.Any())
-                {
-                    TempData["ErrorMessage"] = "Não é possível eliminar este equipamento porque existem exercícios associados.";
-                    return RedirectToAction(nameof(Index));
-                }
-
                 _context.Equipamento.Remove(equipamento);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Equipamento foi apagado com sucesso.";
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Este equipamento já tinha sido eliminado.";
-            }
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Equipamento eliminado com sucesso.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                // Este bloco apanha o erro se a Base de Dados recusar apagar (regra Restrict)
+                TempData["ErrorMessage"] = "Não é possível eliminar este equipamento porque ele está associado a um ou mais exercícios.";
+
+                // Redireciona de volta para a página de Delete para mostrar o erro
+                return RedirectToAction(nameof(Delete), new { id = EquipamentoId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o equipamento.";
+                return RedirectToAction(nameof(Delete), new { id = EquipamentoId });
+            }
         }
 
         private bool EquipamentoExists(int id)

@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace HealthWellbeing.Controllers
 {
@@ -31,41 +30,51 @@ namespace HealthWellbeing.Controllers
             var query = _context.Sono.Include(s => s.UtenteGrupo7).AsQueryable();
             var userId = _userManager.GetUserId(User);
 
-            // --- LÓGICA DE PERMISSÕES ---
+            bool isAdmin = User.IsInRole("Administrador");
+            bool isProf = User.IsInRole("ProfissionalSaude");
 
-            // 1. Verificar se é Admin ou Profissional
-            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
-
-            if (isStaff)
+            if (isAdmin)
             {
-                // CENÁRIO STAFF:
-                // Pode ver tudo, mas pode querer filtrar por um utente específico.
+                // 1. ADMINISTRADOR: Vê tudo
+                ViewData["ListaUtentes"] = new SelectList(
+                    await _context.UtenteGrupo7.OrderBy(u => u.Nome).ToListAsync(),
+                    "UtenteGrupo7Id",
+                    "Nome",
+                    searchUtenteId
+                );
+            }
+            else if (isProf)
+            {
+                // 2. PROFISSIONAL: 
+                query = query.Where(s => s.UtenteGrupo7.ProfissionalSaudeId == userId);
 
-                // Carrega a lista de utentes para a Dropdown na View
-                ViewData["ListaUtentes"] = new SelectList(_context.UtenteGrupo7.OrderBy(u => u.Nome), "UtenteGrupo7Id", "Nome", searchUtenteId);
+                // b) Dropdown apenas com os meus utentes
+                var meusUtentes = await _context.UtenteGrupo7
+                    .Where(u => u.ProfissionalSaudeId == userId)
+                    .OrderBy(u => u.Nome)
+                    .ToListAsync();
 
-                // Se selecionou alguém na dropdown, aplica o filtro
-                if (searchUtenteId.HasValue)
-                {
-                    query = query.Where(s => s.UtenteGrupo7Id == searchUtenteId.Value);
-                    ViewBag.CurrentUtenteFilter = searchUtenteId.Value; // Para manter o filtro na paginação
-                }
+                ViewData["ListaUtentes"] = new SelectList(meusUtentes, "UtenteGrupo7Id", "Nome", searchUtenteId);
             }
             else
             {
-                // CENÁRIO UTENTE NORMAL:
-                // Só vê os registos associados ao seu Login ID
+                // 3. UTENTE: Vê apenas os seus próprios registos
                 query = query.Where(s => s.UtenteGrupo7.UserId == userId);
             }
 
-            // Filtro de Data
+
+            if (searchUtenteId.HasValue)
+            {
+                query = query.Where(s => s.UtenteGrupo7Id == searchUtenteId.Value);
+                ViewBag.CurrentUtenteFilter = searchUtenteId.Value;
+            }
+
             if (searchData.HasValue)
             {
                 query = query.Where(s => s.Data.Date == searchData.Value.Date);
                 ViewBag.SearchData = searchData.Value.ToString("yyyy-MM-dd");
             }
 
-            // Paginação
             int totalItems = await query.CountAsync();
             var pagination = new PaginationInfo<Sono>(page, totalItems);
 
@@ -89,8 +98,16 @@ namespace HealthWellbeing.Controllers
 
             if (sono == null) return NotFound();
 
-            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
+            // Segurança: Impedir ver detalhes de outros se não for Staff
+            var userId = _userManager.GetUserId(User);
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 
+            if (!isStaff && sono.UtenteGrupo7.UserId != userId)
+            {
+                return Forbid();
+            }
+
+            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
             return View(sono);
         }
 
@@ -98,23 +115,15 @@ namespace HealthWellbeing.Controllers
         [Authorize]
         public async Task<IActionResult> Create()
         {
-            // Verifica se é Staff (Admin ou Profissional)
-            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 
             if (isStaff)
             {
-                // CENÁRIO 1: STAFF
-                // Carregamos a lista de todos os utentes para a Dropdown
                 ViewData["UtenteGrupo7Id"] = new SelectList(
-                    _context.UtenteGrupo7.OrderBy(u => u.Nome),
-                    "UtenteGrupo7Id",
-                    "Nome"
-                );
+                    _context.UtenteGrupo7.OrderBy(u => u.Nome), "UtenteGrupo7Id", "Nome");
             }
             else
             {
-                // CENÁRIO 2: UTENTE NORMAL
-                // Verificamos se ele já tem perfil criado
                 var userId = _userManager.GetUserId(User);
                 var temPerfil = await _context.UtenteGrupo7.AnyAsync(u => u.UserId == userId);
 
@@ -123,7 +132,6 @@ namespace HealthWellbeing.Controllers
                     TempData["Error"] = "Precisa criar um perfil de Utente antes de registar o sono.";
                     return RedirectToAction("Create", "UtenteGrupo7");
                 }
-                // Não carregamos ViewData["UtenteGrupo7Id"] porque ele não vai ver a lista
             }
 
             return View();
@@ -135,27 +143,21 @@ namespace HealthWellbeing.Controllers
         [Authorize]
         public async Task<IActionResult> Create([Bind("SonoId,Data,HoraDeitar,HoraLevantar,HorasSono,UtenteGrupo7Id")] Sono sono)
         {
-            // Remover validação da propriedade de navegação (objeto completo)
             ModelState.Remove("UtenteGrupo7");
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 
-            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("Profissional");
+            if (sono.Data.Date > DateTime.Now.Date)
+            {
+                ModelState.AddModelError("Data", "Não é permitido registar sono em datas futuras.");
+            }
 
             if (isStaff)
             {
-                // --- LÓGICA DE STAFF ---
-                // O ID vem da Dropdown (sono.UtenteGrupo7Id já deve vir preenchido)
-
-                if (sono.UtenteGrupo7Id == 0) // Validação extra
-                {
+                if (sono.UtenteGrupo7Id == 0)
                     ModelState.AddModelError("UtenteGrupo7Id", "Por favor selecione um Utente.");
-                }
-                // Não removemos o erro do UtenteGrupo7Id do ModelState porque aqui ele É obrigatório no form
             }
             else
             {
-                // --- LÓGICA DE UTENTE NORMAL ---
-                // Ignoramos o que vem do form (se vier) e usamos o Login
-
                 var userId = _userManager.GetUserId(User);
                 var utente = await _context.UtenteGrupo7.FirstOrDefaultAsync(u => u.UserId == userId);
 
@@ -164,15 +166,11 @@ namespace HealthWellbeing.Controllers
                     ModelState.AddModelError("", "Erro: Perfil de Utente não encontrado.");
                     return View(sono);
                 }
-
-                // Forçamos o ID correto
                 sono.UtenteGrupo7Id = utente.UtenteGrupo7Id;
-
-                // Removemos o erro de validação, pois o campo estava vazio/invisível no HTML
                 ModelState.Remove("UtenteGrupo7Id");
             }
 
-            // --- VALIDAÇÃO DE DUPLICADOS (Igual para os dois) ---
+            // Validação de Duplicados
             bool existeRegisto = await _context.Sono
                 .AnyAsync(s => s.UtenteGrupo7Id == sono.UtenteGrupo7Id && s.Data == sono.Data);
 
@@ -183,7 +181,6 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                // Cálculo de horas
                 TimeSpan diferenca = sono.HoraLevantar - sono.HoraDeitar;
                 if (diferenca.TotalMinutes < 0) diferenca = diferenca.Add(new TimeSpan(24, 0, 0));
                 sono.HorasSono = diferenca;
@@ -193,16 +190,10 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Details), new { id = sono.SonoId, SuccessMessage = "Registo criado com sucesso!" });
             }
 
-            // SE FALHAR E TIVERMOS DE VOLTAR À VIEW:
-            // Se for Staff, temos de recarregar a lista para a dropdown não desaparecer
             if (isStaff)
             {
                 ViewData["UtenteGrupo7Id"] = new SelectList(
-                    _context.UtenteGrupo7.OrderBy(u => u.Nome),
-                    "UtenteGrupo7Id",
-                    "Nome",
-                    sono.UtenteGrupo7Id
-                );
+                    _context.UtenteGrupo7.OrderBy(u => u.Nome), "UtenteGrupo7Id", "Nome", sono.UtenteGrupo7Id);
             }
 
             return View(sono);
@@ -213,15 +204,25 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            var sono = await _context.Sono.FindAsync(id);
+            var sono = await _context.Sono
+                .Include(s => s.UtenteGrupo7)
+                .FirstOrDefaultAsync(s => s.SonoId == id);
+
             if (sono == null) return NotFound();
 
-            ViewData["UtenteGrupo7Id"] = new SelectList(
-                _context.UtenteGrupo7.OrderBy(u => u.Nome),
-                "UtenteGrupo7Id",
-                "Nome",
-                sono.UtenteGrupo7Id
-            );
+            var userId = _userManager.GetUserId(User);
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
+
+            if (!isStaff && sono.UtenteGrupo7.UserId != userId) return Forbid();
+
+            if (isStaff)
+            {
+                ViewData["UtenteGrupo7Id"] = new SelectList(
+                    _context.UtenteGrupo7.OrderBy(u => u.Nome), "UtenteGrupo7Id", "Nome", sono.UtenteGrupo7Id);
+            }
+
+            ViewBag.NomeUtenteAtual = sono.UtenteGrupo7?.Nome;
+
             return View(sono);
         }
 
@@ -232,15 +233,16 @@ namespace HealthWellbeing.Controllers
         {
             if (id != sono.SonoId) return NotFound();
 
-            // Remover validação de navegação
             ModelState.Remove("UtenteGrupo7");
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 
-            // VALIDAÇÃO DE DUPLICADOS NA EDIÇÃO
-            // Verifica se existe OUTRO registo (com ID diferente) para o mesmo utente na mesma data
+            if (sono.Data.Date > DateTime.Now.Date)
+            {
+                ModelState.AddModelError("Data", "Não é permitido alterar para datas futuras.");
+            }
+
             bool existeOutro = await _context.Sono
-                .AnyAsync(s => s.UtenteGrupo7Id == sono.UtenteGrupo7Id
-                            && s.Data == sono.Data
-                            && s.SonoId != id);
+                .AnyAsync(s => s.UtenteGrupo7Id == sono.UtenteGrupo7Id && s.Data == sono.Data && s.SonoId != id);
 
             if (existeOutro)
             {
@@ -252,49 +254,45 @@ namespace HealthWellbeing.Controllers
                 try
                 {
                     var sonoExistente = await _context.Sono.FindAsync(id);
+                    if (sonoExistente == null) return View("InvalidSono", sono);
 
-                    // Tratamento de registo apagado por outro user
-                    if (sonoExistente == null)
+                    // --- 2. SEGURANÇA: IMPEDIR MUDANÇA DE UTENTE ---
+                    if (isStaff)
                     {
-                        if (sonoExistente == null)
-                        {
-                            // Passamos o modelo 'sono' (que contém os dados do form) para a View de recuperação
-                            return View("InvalidSono", sono);
-                        }
+                        // Staff pode mudar o utente se quiser, usamos o valor do form
+                        sonoExistente.UtenteGrupo7Id = sono.UtenteGrupo7Id;
                     }
+                    // Se NÃO for staff, ignoramos o 'sono.UtenteGrupo7Id' que vem do form 
+                    // e mantemos o 'sonoExistente.UtenteGrupo7Id' inalterado.
 
-                    // --- LÓGICA DE CÁLCULO AUTOMÁTICO ---
+                    // Atualizar restantes dados
+                    sonoExistente.Data = sono.Data;
+                    sonoExistente.HoraDeitar = sono.HoraDeitar;
+                    sonoExistente.HoraLevantar = sono.HoraLevantar;
+
+                    // Recalcular horas
                     TimeSpan diferenca = sono.HoraLevantar - sono.HoraDeitar;
-                    if (diferenca.TotalMinutes < 0)
-                    {
-                        diferenca = diferenca.Add(new TimeSpan(24, 0, 0));
-                    }
-                    sono.HorasSono = diferenca;
+                    if (diferenca.TotalMinutes < 0) diferenca = diferenca.Add(new TimeSpan(24, 0, 0));
+                    sonoExistente.HorasSono = diferenca;
 
-                    // Atualizar valores
-                    _context.Entry(sonoExistente).CurrentValues.SetValues(sono);
+                    _context.Update(sonoExistente);
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Details), new { id = sono.SonoId, SuccessMessage = "Registo de sono editado com sucesso" });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SonoExists(sono.SonoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!SonoExists(sono.SonoId)) return NotFound();
+                    else throw;
                 }
             }
-            ViewData["UtenteGrupo7Id"] = new SelectList(
-                _context.UtenteGrupo7.OrderBy(u => u.Nome),
-                "UtenteGrupo7Id",
-                "Nome",
-                sono.UtenteGrupo7Id
-            );
+
+            if (isStaff)
+            {
+                ViewData["UtenteGrupo7Id"] = new SelectList(
+                    _context.UtenteGrupo7.OrderBy(u => u.Nome), "UtenteGrupo7Id", "Nome", sono.UtenteGrupo7Id);
+            }
+
             return View(sono);
         }
 
@@ -313,8 +311,13 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
+            // Segurança Delete GET
+            var userId = _userManager.GetUserId(User);
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 
+            if (!isStaff && sono.UtenteGrupo7.UserId != userId) return Forbid();
+
+            ViewData["NomeUtente"] = sono.UtenteGrupo7.Nome;
             return View(sono);
         }
 
@@ -323,18 +326,21 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var sono = await _context.Sono.FindAsync(id);
+            var sono = await _context.Sono
+                .Include(s => s.UtenteGrupo7)
+                .FirstOrDefaultAsync(s => s.SonoId == id);
 
-            if (sono != null)
-            {
-                _context.Sono.Remove(sono);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Registo de sono apagado com sucesso.";
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Este registo já tinha sido eliminado.";
-            }
+            if (sono == null) return RedirectToAction(nameof(Index));
+
+            // Segurança Delete POST
+            var userId = _userManager.GetUserId(User);
+            bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
+
+            if (!isStaff && sono.UtenteGrupo7.UserId != userId) return Forbid();
+
+            _context.Sono.Remove(sono);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Registo de sono apagado com sucesso.";
 
             return RedirectToAction(nameof(Index));
         }

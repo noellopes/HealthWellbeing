@@ -340,10 +340,10 @@ namespace HealthWellBeing.Controllers
             if (id == null) return NotFound();
 
             var tipoExercicio = await _context.TipoExercicio
-                .Include(t => t.TipoExercicioBeneficios)
-                    .ThenInclude(tb => tb.Beneficio)
-                .Include(t => t.Contraindicacao)
-                    .ThenInclude(tp => tp.ProblemaSaude)
+                .Include(t => t.TipoExercicioBeneficios).ThenInclude(tb => tb.Beneficio)
+                .Include(t => t.Contraindicacao).ThenInclude(tp => tp.ProblemaSaude)
+                // IMPORTANTE: Incluir a relação com Exercícios para verificar se está em uso
+                .Include(t => t.ExercicioTipoExercicios)
                 .FirstOrDefaultAsync(m => m.TipoExercicioId == id);
 
             if (tipoExercicio == null)
@@ -352,24 +352,41 @@ namespace HealthWellBeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            int numExercicios = tipoExercicio.ExercicioTipoExercicios?.Count ?? 0;
+
+            ViewBag.NumExercicios = numExercicios;
+            ViewBag.PodeEliminar = numExercicios == 0;
+
             return View(tipoExercicio);
         }
 
         // POST: TipoExercicio/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int TipoExercicioId)
         {
-            var tipoExercicio = await _context.TipoExercicio.FindAsync(id);
-            if (tipoExercicio != null)
+            var tipoExercicio = await _context.TipoExercicio.FindAsync(TipoExercicioId);
+
+            if (tipoExercicio == null) return RedirectToAction(nameof(Index));
+
+            try
             {
                 _context.TipoExercicio.Remove(tipoExercicio);
                 await _context.SaveChangesAsync();
 
-                TempData["StatusMessage"] = $"Sucesso: O Tipo de Exercício '{tipoExercicio.NomeTipoExercicios}' foi eliminado com sucesso.";
+                TempData["StatusMessage"] = $"Sucesso: O Tipo de Exercício foi eliminado com sucesso.";
+                return RedirectToAction(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateException)
+            {
+                TempData["StatusMessage"] = "Erro: Não é possível eliminar este Tipo de Exercício porque está associado a um ou mais exercícios.";
+                return RedirectToAction(nameof(Delete), new { id = TipoExercicioId });
+            }
+            catch (Exception)
+            {
+                TempData["StatusMessage"] = "Erro: Ocorreu um erro inesperado ao tentar eliminar o registo.";
+                return RedirectToAction(nameof(Delete), new { id = TipoExercicioId });
+            }
         }
 
         private bool TipoExercicioExists(int id)

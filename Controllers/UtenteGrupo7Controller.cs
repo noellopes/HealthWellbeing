@@ -177,17 +177,16 @@ namespace HealthWellbeing.Controllers
 
             var utenteGrupo7 = await _context.UtenteGrupo7
                 .Include(u => u.ObjetivoFisico)
-                .Include(u => u.UtenteProblemasSaude)
-                    .ThenInclude(up => up.ProblemaSaude)
+                .Include(u => u.UtenteProblemasSaude).ThenInclude(up => up.ProblemaSaude)
+                // REMOVIDO: .Include(u => u.ProfissionalSaude) <-- Isto dava erro porque não existe relação
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
             if (utenteGrupo7 == null) return NotFound();
 
-            // Verificação de Segurança de Visualização
+            // --- VERIFICAÇÕES DE SEGURANÇA (MANTIDAS) ---
             var currentUserId = _userManager.GetUserId(User);
             if (!User.IsInRole("Administrador"))
             {
-                // Se for Profissional, só vê se for dele. Se for User, só vê se for ele mesmo.
                 if (User.IsInRole("ProfissionalSaude"))
                 {
                     if (utenteGrupo7.ProfissionalSaudeId != currentUserId) return Forbid();
@@ -197,6 +196,26 @@ namespace HealthWellbeing.Controllers
                     if (utenteGrupo7.UserId != currentUserId) return Forbid();
                 }
             }
+
+            // --- LÓGICA NOVA: BUSCAR O EMAIL DO PROFISSIONAL ---
+            string emailProfissional = "Não Atribuído";
+
+            if (!string.IsNullOrEmpty(utenteGrupo7.ProfissionalSaudeId))
+            {
+                // Usamos o UserManager para encontrar o user pelo ID (guid)
+                var userProfissional = await _userManager.FindByIdAsync(utenteGrupo7.ProfissionalSaudeId);
+                if (userProfissional != null)
+                {
+                    emailProfissional = userProfissional.Email;
+                }
+                else
+                {
+                    emailProfissional = "Utilizador não encontrado (ID inválido)";
+                }
+            }
+
+            // Passamos o email para a View via ViewBag
+            ViewBag.EmailProfissional = emailProfissional;
 
             return View(utenteGrupo7);
         }
@@ -374,12 +393,13 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var utenteGrupo7 = await _context.UtenteGrupo7
+                .Include(u => u.ObjetivoFisico) // É bom incluir para mostrar o nome do objetivo também
                 .Include(u => u.Sonos)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
             if (utenteGrupo7 == null) return NotFound();
 
-            // LOGICA DE SEGURANÇA PARA DELETE
+            // LOGICA DE SEGURANÇA
             var currentUserId = _userManager.GetUserId(User);
 
             if (User.IsInRole("Administrador"))
@@ -388,7 +408,6 @@ namespace HealthWellbeing.Controllers
             }
             else if (User.IsInRole("ProfissionalSaude"))
             {
-                // Profissional só apaga os seus
                 if (utenteGrupo7.ProfissionalSaudeId != currentUserId)
                 {
                     TempData["ErrorMessage"] = "Não tem permissão para eliminar este utente.";
@@ -397,10 +416,22 @@ namespace HealthWellbeing.Controllers
             }
             else
             {
-                // Utilizador normal NÃO PODE APAGAR (conforme a tua lógica de que só Admin e Pro podem)
                 TempData["ErrorMessage"] = "Apenas administradores e profissionais de saúde podem eliminar registos.";
                 return RedirectToAction(nameof(Index));
             }
+
+            // --- NOVA LÓGICA: BUSCAR EMAIL DO PROFISSIONAL ---
+            string emailProfissional = "Não Atribuído";
+            if (!string.IsNullOrEmpty(utenteGrupo7.ProfissionalSaudeId))
+            {
+                var userProf = await _userManager.FindByIdAsync(utenteGrupo7.ProfissionalSaudeId);
+                if (userProf != null)
+                {
+                    emailProfissional = userProf.Email;
+                }
+            }
+            ViewBag.EmailProfissional = emailProfissional;
+            // ------------------------------------------------
 
             int numDependencias = utenteGrupo7.Sonos?.Count ?? 0;
             ViewBag.NumDependencias = numDependencias;

@@ -140,14 +140,22 @@ namespace HealthWellbeing.Controllers
         // GET: ProblemaSaudes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return View("invalidProblemaSaude");
+            if (id == null) return NotFound();
 
             var problemaSaude = await _context.ProblemaSaude
+                .Include(p => p.ExercicioAfetado)
                 .FirstOrDefaultAsync(m => m.ProblemaSaudeId == id);
 
             if (problemaSaude == null)
-                return View("invalidProblemaSaude");
+            {
+                TempData["ErrorMessage"] = "Este problema de saúde já não existe.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            int numExercicios = problemaSaude.ExercicioAfetado?.Count ?? 0;
+
+            ViewBag.NumExercicios = numExercicios;
+            ViewBag.PodeEliminar = numExercicios == 0;
 
             return View(problemaSaude);
         }
@@ -155,17 +163,30 @@ namespace HealthWellbeing.Controllers
         // POST: ProblemaSaudes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int ProblemaSaudeId)
         {
-            var problemaSaude = await _context.ProblemaSaude.FindAsync(id);
+            var problemaSaude = await _context.ProblemaSaude.FindAsync(ProblemaSaudeId);
 
-            if (problemaSaude == null)
-                return View("invalidProblemaSaude");
+            if (problemaSaude == null) return RedirectToAction(nameof(Index));
 
-            _context.ProblemaSaude.Remove(problemaSaude);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.ProblemaSaude.Remove(problemaSaude);
+                await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Problema de saúde eliminado com sucesso.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                TempData["ErrorMessage"] = "Não é possível eliminar este problema de saúde porque está associado a exercícios (contraindicação).";
+                return RedirectToAction(nameof(Delete), new { id = ProblemaSaudeId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o registo.";
+                return RedirectToAction(nameof(Delete), new { id = ProblemaSaudeId });
+            }
         }
 
         private bool ProblemaSaudeExists(int id)

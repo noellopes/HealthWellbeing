@@ -433,48 +433,62 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.ExercicioGrupoMusculares).ThenInclude(gm => gm.GrupoMuscular)
                 .Include(e => e.ExercicioEquipamentos).ThenInclude(eq => eq.Equipamento)
                 .Include(e => e.Contraindicacoes).ThenInclude(cp => cp.ProblemaSaude)
-                // --- CORRIGIDO: ExercicioObjetivos ---
                 .Include(e => e.ExercicioTipoExercicios).ThenInclude(et => et.TipoExercicio)
                 .Include(e => e.ExercicioObjetivos).ThenInclude(eb => eb.ObjetivoFisico)
+                // NOVO: Incluir Planos para verificar se podemos apagar
+                .Include(e => e.PlanoExercicioExercicios)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
 
             if (exercicio == null)
             {
-                TempData["SuccessMessage"] = "Este exercicio já foi eliminado";
+                TempData["ErrorMessage"] = "Este exercício já não existe ou foi eliminado.";
                 return RedirectToAction(nameof(Index));
             }
+
+            // LÓGICA DE BLOQUEIO:
+            // Contamos quantos planos usam este exercício.
+            int numPlanos = exercicio.PlanoExercicioExercicios?.Count ?? 0;
+
+            ViewBag.NumPlanos = numPlanos;
+            // Se numPlanos == 0, pode apagar. As outras tabelas (genero, equip, etc) o Cascade resolve.
+            ViewBag.PodeEliminar = numPlanos == 0;
 
             return View(exercicio);
         }
 
         // POST: Exercicios/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int ExercicioId)
         {
+            // Carregamos novamente para garantir a validação no servidor
             var exercicio = await _context.Exercicio
-                .Include(e => e.ExercicioGeneros)
-                .Include(e => e.ExercicioGrupoMusculares)
-                .Include(e => e.ExercicioEquipamentos)
-                .Include(e => e.Contraindicacoes)
-                // --- CORRIGIDO: ExercicioObjetivos ---
-                .Include(e => e.ExercicioObjetivos)
-                .Include(e => e.ExercicioTipoExercicios)
-                .FirstOrDefaultAsync(e => e.ExercicioId == id);
+                .Include(e => e.PlanoExercicioExercicios)
+                .FirstOrDefaultAsync(e => e.ExercicioId == ExercicioId);
 
-            if (exercicio != null)
+            if (exercicio == null) return RedirectToAction(nameof(Index));
+
+            // Validação de Segurança (backend)
+            if (exercicio.PlanoExercicioExercicios != null && exercicio.PlanoExercicioExercicios.Any())
+            {
+                TempData["ErrorMessage"] = "Não é possível eliminar este exercício porque ele faz parte de Planos de Treino ativos.";
+                return RedirectToAction(nameof(Delete), new { id = ExercicioId });
+            }
+
+            try
             {
                 _context.Exercicio.Remove(exercicio);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Exercicio foi apagado com sucesso";
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Este exercicio já tinha sido eliminado";
-            }
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Exercício eliminado com sucesso.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro ao tentar eliminar. Verifique as dependências.";
+                return RedirectToAction(nameof(Delete), new { id = ExercicioId });
+            }
         }
 
         private bool ExercicioExists(int id)

@@ -52,8 +52,10 @@
                 @if (User.IsInRole("Administrador"))
                 {
                     <tr>
-                        <th class="text-secondary">Profissional Atribuído (ID):</th>
-                        <td class="text-primary font-monospace">@(Model.ProfissionalSaudeId ?? "Não Atribuído")</td>
+                        <th class="text-secondary">Profissional Atribuído:</th>
+                        <td class="text-primary font-monospace">
+                            @ViewBag.EmailProfissional
+                        </td>
                     </tr>
                 }
 
@@ -66,7 +68,6 @@
                         }
                         else
                         {
-
                             <span class="badge bg-warning text-dark">Nenhum</span>
                         }
                     </td>

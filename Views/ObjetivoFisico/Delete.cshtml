@@ -1,46 +1,88 @@
 ﻿@model HealthWellbeing.Models.ObjetivoFisico
 
 @{
-    ViewData["Title"] = "Apagar Objetivo";
+    ViewData["Title"] = "Eliminar Objetivo Físico";
+
+    bool podeEliminar = ViewBag.PodeEliminar ?? true;
+    int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
 
-            <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
-                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2 fs-4"></i>
-                <div>
-                    <strong>Atenção!</strong> Tem a certeza que pretende eliminar este registo?
-                    <div class="small">Esta ação não pode ser revertida.</div>
-                </div>
-            </div>
+    @* --- MENSAGENS DE ERRO --- *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-            <div class="card border-danger shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="bi bi-trash3 me-2"></i>Eliminar Objetivo</h4>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title text-center text-secondary mb-4">Resumo do Registo</h5>
+    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
-                    <dl class="row justify-content-center">
-                        <dt class="col-sm-4 text-end">Nome:</dt>
-                        <dd class="col-sm-6 fw-bold">@Html.DisplayFor(model => model.NomeObjetivo)</dd>
-                    </dl>
-                </div>
-                <div class="card-footer bg-light d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Cancelar
-                    </a>
+    @* --- AVISO DE BLOQUEIO --- *@
+    @if (!podeEliminar)
+    {
+        <div class="alert alert-warning shadow-sm border-warning" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h4>
+            <p>
+                Não é possível eliminar o objetivo <strong>@Model.NomeObjetivo</strong> porque ele está associado a
+                <strong>@numExercicios</strong> exercício(s).
+            </p>
+            <hr>
+            <p class="mb-0">Tens de remover este objetivo dos exercícios antes de o poderes apagar.</p>
+        </div>
+    }
+    else
+    {
+        <p class="lead">Tem a certeza que deseja eliminar este objetivo? Esta ação <strong>não pode ser desfeita</strong>.</p>
+    }
 
-                    <form asp-action="Delete">
-                        <input type="hidden" asp-for="ObjetivoFisicoId" />
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash-fill"></i> Confirmar Eliminação
-                        </button>
-                    </form>
-                </div>
-            </div>
+    <div class="card mb-4 shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+            Dados do Objetivo
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nome do Objetivo</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.NomeObjetivo)</dd>
+
+                <dt class="col-sm-3">Exercícios Associados</dt>
+                <dd class="col-sm-9">
+                    @if (numExercicios > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@numExercicios</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">0 (Livre para eliminar)</span>
+                    }
+                </dd>
+            </dl>
         </div>
     </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ObjetivoFisicoId" value="@Model.ObjetivoFisicoId" />
+
+        <div class="d-flex">
+            @if (podeEliminar)
+            {
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary me-2" disabled title="Existem exercícios associados">
+                    <i class="fas fa-trash-alt"></i> Eliminar (Bloqueado)
+                </button>
+            }
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </form>
 </div>

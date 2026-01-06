@@ -188,66 +188,58 @@ namespace HealthWellbeing.Controllers
             return View(genero);
         }
 
-        // GET: Genero/Delete
+        // GET: Genero/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // 1. Carregar o género INCLUINDO a lista de exercícios associados
             var genero = await _context.Genero
-                .Include(g => g.ExercicioGeneros) // Importante: Carregar a relação
+                .Include(g => g.ExercicioGeneros)
                 .FirstOrDefaultAsync(m => m.GeneroId == id);
 
             if (genero == null)
             {
-                TempData["SuccessMessage"] = "Este gênero já foi eliminado.";
+                TempData["ErrorMessage"] = "Este género já não existe.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // 2. Verificar quantos exercícios usam este género
-            int numExercicios = genero.ExercicioGeneros.Count;
+            // Lógica Visual
+            int numExercicios = genero.ExercicioGeneros?.Count ?? 0;
 
-            // 3. Passar essa informação para a View
             ViewBag.NumExercicios = numExercicios;
             ViewBag.PodeEliminar = numExercicios == 0;
 
             return View(genero);
         }
 
-        // POST: Genero/Delete
+        // POST: Genero/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int GeneroId)
         {
-            // 1. Carregar novamente com a relação para garantir segurança no Back-end
-            var genero = await _context.Genero
-                .Include(g => g.ExercicioGeneros)
-                .FirstOrDefaultAsync(m => m.GeneroId == id);
+            var genero = await _context.Genero.FindAsync(GeneroId);
 
-            if (genero != null)
+            if (genero == null) return RedirectToAction(nameof(Index));
+
+            try
             {
-                // 2. Verificação de Segurança Final
-                if (genero.ExercicioGeneros.Any())
-                {
-                    // Se alguém tentar forçar a eliminação via código malicioso ou URL
-                    TempData["ErrorMessage"] = "Não é possível eliminar este gênero porque existem exercícios associados.";
-                    return RedirectToAction(nameof(Index));
-                }
-
                 _context.Genero.Remove(genero);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Gênero foi apagado com sucesso.";
-            }
-            else
-            {
-                // Caso o género já não exista
-                TempData["SuccessMessage"] = "Este gênero já tinha sido eliminado.";
-            }
 
-            return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Gênero eliminado com sucesso.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                // Apanha o erro da Base de Dados (Restrict)
+                TempData["ErrorMessage"] = "Não é possível eliminar este gênero porque está associado a um ou mais exercícios.";
+                return RedirectToAction(nameof(Delete), new { id = GeneroId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o gênero.";
+                return RedirectToAction(nameof(Delete), new { id = GeneroId });
+            }
         }
 
         private bool GeneroExists(int id)

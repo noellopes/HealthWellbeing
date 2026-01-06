@@ -1,36 +1,101 @@
 ﻿@model HealthWellbeing.Models.ProblemaSaude
 
 @{
-    ViewData["Title"] = "Apagar Problema de Saúde";
+    ViewData["Title"] = "Eliminar Problema de Saúde";
+
+    bool podeEliminar = ViewBag.PodeEliminar ?? true;
+    int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
-<h1>Apagar Problema de Saúde</h1>
+<div class="container mt-4">
 
-<div class="alert alert-danger">
-    Tens a certeza que queres apagar este problema de saúde?
+    @* --- MENSAGENS DE ERRO --- *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
+
+    @* --- AVISO DE BLOQUEIO --- *@
+    @if (!podeEliminar)
+    {
+        <div class="alert alert-warning shadow-sm border-warning" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h4>
+            <p>
+                Não é possível eliminar o problema <strong>@Model.ProblemaNome</strong> porque ele está definido como contraindicação em
+                <strong>@numExercicios</strong> exercício(s).
+            </p>
+            <hr>
+            <p class="mb-0">Tens de remover este problema de saúde dos exercícios associados antes de o poderes apagar.</p>
+        </div>
+    }
+    else
+    {
+        <p class="lead">Tem a certeza que deseja eliminar este problema de saúde? Esta ação <strong>não pode ser desfeita</strong>.</p>
+    }
+
+    <div class="card mb-4 shadow-sm border-danger">
+        <div class="card-header bg-danger text-white fw-bold">
+            Dados do Problema de Saúde
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nome</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ProblemaNome)</dd>
+
+                <dt class="col-sm-3">Categoria</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ProblemaCategoria)</dd>
+
+                <dt class="col-sm-3">Zona Atingida</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.ZonaAtingida)</dd>
+
+                <dt class="col-sm-3">Gravidade</dt>
+                <dd class="col-sm-9">
+                    <span class="badge bg-secondary">@Model.Gravidade / 10</span>
+                </dd>
+
+                <hr class="my-2" />
+
+                <dt class="col-sm-3">Exercícios Afetados</dt>
+                <dd class="col-sm-9">
+                    @if (numExercicios > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@numExercicios (Contraindicação)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">0 (Livre para eliminar)</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ProblemaSaudeId" value="@Model.ProblemaSaudeId" />
+
+        <div class="d-flex">
+            @if (podeEliminar)
+            {
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary me-2" disabled title="Existem exercícios associados">
+                    <i class="fas fa-trash-alt"></i> Eliminar (Bloqueado)
+                </button>
+            }
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </form>
 </div>
-
-<table class="table table-bordered">
-    <tr>
-        <th>Categoria</th>
-        <td>@Model.ProblemaCategoria</td>
-    </tr>
-    <tr>
-        <th>Nome</th>
-        <td>@Model.ProblemaNome</td>
-    </tr>
-    <tr>
-        <th>Zona Atingida</th>
-        <td>@Model.ZonaAtingida</td>
-    </tr>
-    <tr>
-        <th>Gravidade</th>
-        <td>@Model.Gravidade / 10</td>
-    </tr>
-</table>
-
-<form asp-action="Delete">
-    <input type="hidden" asp-for="ProblemaSaudeId" />
-    <button type="submit" class="btn btn-danger">Apagar</button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-</form>

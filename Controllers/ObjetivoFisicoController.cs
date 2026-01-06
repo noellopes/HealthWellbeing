@@ -137,9 +137,19 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var objetivoFisico = await _context.ObjetivoFisico
+                .Include(o => o.ExercicioObjetivos)
                 .FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
 
-            if (objetivoFisico == null) return NotFound();
+            if (objetivoFisico == null)
+            {
+                TempData["ErrorMessage"] = "Este objetivo já não existe.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            int numExercicios = objetivoFisico.ExercicioObjetivos?.Count ?? 0;
+
+            ViewBag.NumExercicios = numExercicios;
+            ViewBag.PodeEliminar = numExercicios == 0;
 
             return View(objetivoFisico);
         }
@@ -147,17 +157,30 @@ namespace HealthWellbeing.Controllers
         // POST: ObjetivoFisico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int ObjetivoFisicoId) 
         {
-            var objetivoFisico = await _context.ObjetivoFisico.FindAsync(id);
-            if (objetivoFisico != null)
+            var objetivoFisico = await _context.ObjetivoFisico.FindAsync(ObjetivoFisicoId);
+
+            if (objetivoFisico == null) return RedirectToAction(nameof(Index));
+
+            try
             {
                 _context.ObjetivoFisico.Remove(objetivoFisico);
                 await _context.SaveChangesAsync();
-                TempData["StatusMessage"] = "Sucesso: Objetivo eliminado.";
-            }
 
-            return RedirectToAction(nameof(Index));
+                TempData["StatusMessage"] = "Sucesso: Objetivo eliminado.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                TempData["ErrorMessage"] = "Não é possível eliminar este objetivo porque está associado a um ou mais exercícios.";
+                return RedirectToAction(nameof(Delete), new { id = ObjetivoFisicoId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o objetivo.";
+                return RedirectToAction(nameof(Delete), new { id = ObjetivoFisicoId });
+            }
         }
 
         private bool ObjetivoFisicoExists(int id)

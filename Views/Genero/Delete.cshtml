@@ -2,13 +2,25 @@
 
 @{
     ViewData["Title"] = "Eliminar Gênero";
+
     bool podeEliminar = ViewBag.PodeEliminar ?? true;
     int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
 <div class="container mt-4">
+
+    @* --- MENSAGENS DE ERRO --- *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
+    @* --- AVISO DE BLOQUEIO --- *@
     @if (!podeEliminar)
     {
         <div class="alert alert-warning shadow-sm border-warning" role="alert">
@@ -52,7 +64,7 @@
 
     <form asp-action="Delete" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="GeneroId" />
+        <input type="hidden" name="GeneroId" value="@Model.GeneroId" />
 
         <div class="d-flex">
             @if (podeEliminar)

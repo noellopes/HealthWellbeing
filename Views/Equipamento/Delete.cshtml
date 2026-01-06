@@ -2,14 +2,25 @@
 
 @{
     ViewData["Title"] = "Eliminar Equipamento";
-    // Recupera os dados enviados pelo Controller para saber se pode apagar
+
     bool podeEliminar = ViewBag.PodeEliminar ?? true;
     int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
 <div class="container mt-4">
+
+    @* --- BLOCO DE MENSAGENS DE ERRO (NOVO) --- *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
+    @* Lógica Visual: Se já sabemos que não dá, mostramos aviso amarelo *@
     @if (!podeEliminar)
     {
         <div class="alert alert-warning shadow-sm border-warning" role="alert">
@@ -53,7 +64,8 @@
 
     <form asp-action="Delete" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="EquipamentoId" />
+        @* Alterado para corresponder ao parâmetro do Controller *@
+        <input type="hidden" name="EquipamentoId" value="@Model.EquipamentoId" />
 
         <div class="d-flex">
             @if (podeEliminar)
