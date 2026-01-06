@@ -43,5 +43,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Observações")]
         [MaxLength(4000, ErrorMessage = "As observações não podem ter mais de 4000 caracteres.")]
         public string? Observacoes { get; set; }
+        public ICollection<DoctorConsulta>? ConsultaDoctors { get; set; }
     }
 }
