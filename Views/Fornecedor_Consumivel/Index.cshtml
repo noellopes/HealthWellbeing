@@ -1,120 +1,89 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Fornecedor_Consumivel>
 
 @{
-    ViewData["Title"] = "Fornecedores por Consumível";
+    ViewData["Title"] = "Associações Fornecedor–Consumível";
 }
+
+<style>
+    .btn-acao {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        padding: 4px 10px;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
 
 <div class="container mt-4">
 
-    <!-- TÍTULO + AÇÃO -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="fw-bold text-primary mb-0">
-            💰 Fornecedores & Preços
+            🔗 Fornecedor – Consumível
         </h2>
-
-        <a asp-action="Create" class="btn btn-success px-4">
-            ➕ Nova Associação
+        <a asp-action="Create" class="btn btn-success shadow-sm btn-acao">
+            ➕ Adicionar Novo
         </a>
     </div>
 
-    <!-- DESCRIÇÃO -->
-    <div class="alert alert-light border shadow-sm mb-4">
-        <span class="text-muted">
-            Aqui são apresentados os fornecedores associados a cada consumível,
-            com respetivo preço unitário e tempo estimado de entrega.
-        </span>
-    </div>
-
-    <!-- TABELA -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle shadow-sm">
-
-            <thead class="text-center fw-semibold" style="background-color:#d7e9ff;">
-                <tr>
-                    <th>Fornecedor</th>
-                    <th>Consumível</th>
-                    <th style="width:160px;">Tempo de Entrega</th>
-                    <th style="width:160px;">Preço Unitário</th>
-                    <th style="width:170px;">Ações</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                @if (!Model.Any())
-                {
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            Nenhuma associação registada.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover align-middle">
+                <thead class="table-primary">
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-4">
-                            Nenhuma associação fornecedor–consumível encontrada.
-                        </td>
+                        <th>Fornecedor</th>
+                        <th>Consumível</th>
+                        <th>Tempo de Entrega</th>
+                        <th>Preço</th>
+                        <th class="text-center" style="width: 230px;">Ações</th>
                     </tr>
-                }
-                else
-                {
-                    foreach (var item in Model)
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
                     {
                         <tr>
-                            <!-- FORNECEDOR -->
+                            <td class="fw-semibold">
+                                @item.Fornecedor.NomeEmpresa
+                            </td>
                             <td>
-                                <span class="text-muted me-1">🏢</span>
-                                @item.Fornecedor?.NomeEmpresa
+                                @item.Consumivel.Nome
                             </td>
-
-                            <!-- CONSUMÍVEL -->
                             <td>
-                                <span class="text-muted me-1">📦</span>
-                                @item.Consumivel?.Nome
+                                @item.TempoEntrega
                             </td>
-
-                            <!-- TEMPO DE ENTREGA -->
+                            <td>
+                                @item.Preco
+                            </td>
                             <td class="text-center">
-                                @if (item.TempoEntrega.HasValue)
-                                {
-                                    <span class="badge bg-info text-dark">
-                                        @item.TempoEntrega dias
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">—</span>
-                                }
-                            </td>
-
-                            <!-- PREÇO -->
-                            <td class="text-center fw-bold">
-                                @item.Preco.ToString("0.00") €
-                            </td>
-
-                            <!-- AÇÕES -->
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <a asp-action="Details"
-                                       asp-route-id="@item.FornecedorConsumivelId"
-                                       class="btn btn-sm btn-info text-white"
-                                       title="Ver detalhes">
-                                        👁
-                                    </a>
-
-                                    <a asp-action="Edit"
-                                       asp-route-id="@item.FornecedorConsumivelId"
-                                       class="btn btn-sm btn-warning"
-                                       title="Editar">
-                                        ✏
-                                    </a>
-
-                                    <a asp-action="Delete"
-                                       asp-route-id="@item.FornecedorConsumivelId"
-                                       class="btn btn-sm btn-danger"
-                                       title="Eliminar">
-                                        🗑
-                                    </a>
-                                </div>
+                                <a asp-action="Details"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-info text-white me-1 btn-acao">
+                                    Ver
+                                </a>
+                                <a asp-action="Edit"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-warning text-white me-1 btn-acao">
+                                    Editar
+                                </a>
+                                <a asp-action="Delete"
+                                   asp-route-id="@item.FornecedorConsumivelId"
+                                   class="btn btn-sm btn-danger btn-acao">
+                                    Eliminar
+                                </a>
                             </td>
                         </tr>
                     }
-                }
-            </tbody>
-
-        </table>
-    </div>
-
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
