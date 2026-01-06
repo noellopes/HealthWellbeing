@@ -33,15 +33,5 @@ namespace HealthWellbeing.Models
         [Display(Name = "Tipo de Cliente")]
         public TipoCliente TipoCliente { get; set; }
 
-        /*
-        // Foreign Key
-        [Required]
-        [Display(Name = "Utente do Balneário")]
-        public int UtenteBalnearioId { get; set; }
-        /*
-        // Navegação
-        [ForeignKey(nameof(UtenteBalnearioId))]
-        public UtenteBalneario? UtenteBalneario { get; set; } = null!;
-        */
     }
 }

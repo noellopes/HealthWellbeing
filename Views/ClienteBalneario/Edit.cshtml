@@ -1,9 +1,14 @@
 ﻿@model HealthWellbeing.Models.ClienteBalnearioModel
-<input type="hidden" asp-for="ClienteBalnearioId" />
+@using HealthWellbeing.Models.Enums
+
+
+
 
 <h2>Novo Cliente</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ClienteBalnearioId" />
+
     <div class="form-group">
         <label asp-for="NomeCompleto"></label>
         <input asp-for="NomeCompleto" class="form-control" />
@@ -29,10 +34,11 @@
 
     <div class="form-group">
         <label asp-for="TipoCliente"></label>
-        <select asp-for="TipoCliente" class="form-control">
-            <option>Regular</option>
-            <option>VIP</option>
+        <select asp-for="TipoCliente"
+                asp-items="Html.GetEnumSelectList<TipoCliente>()"
+                class="form-control">
         </select>
+
     </div>
 
     <button type="submit" class="btn btn-success">Guardar</button>

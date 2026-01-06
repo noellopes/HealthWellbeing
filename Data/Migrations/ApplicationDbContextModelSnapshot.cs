@@ -84,21 +84,14 @@ namespace HealthWellbeing.Data.Migrations
 
                     b.Property<string>("Telemovel")
                         .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
-
-                    b.Property<string>("TipoCliente")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UtenteBalnearioId")
+                    b.Property<int>("TipoCliente")
                         .HasColumnType("int");
 
                     b.HasKey("ClienteBalnearioId");
 
-                    b.HasIndex("UtenteBalnearioId");
-
-                    b.ToTable("ClienteBalneario");
+                    b.ToTable("ClienteBalneario", "dbo");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.DadosMedicos", b =>
@@ -523,17 +516,6 @@ namespace HealthWellbeing.Data.Migrations
                     b.Navigation("Servico");
 
                     b.Navigation("Terapeuta");
-
-                    b.Navigation("UtenteBalneario");
-                });
-
-            modelBuilder.Entity("HealthWellbeing.Models.ClienteBalnearioModel", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
-                        .WithMany()
-                        .HasForeignKey("UtenteBalnearioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("UtenteBalneario");
                 });

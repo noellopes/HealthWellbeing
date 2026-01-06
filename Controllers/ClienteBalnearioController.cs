@@ -1,59 +1,38 @@
-﻿using HealthWellbeing.Models;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using HealthWellbeing.Models.Enums;
-
-
 
 namespace HealthWellbeing.Controllers
 {
     public class ClienteBalnearioController : Controller
     {
-        // LISTA FAKE (simula BD)
-        private static List<ClienteBalnearioModel> _clientes = new()
+        private readonly ApplicationDbContext _context;
+
+        public ClienteBalnearioController(ApplicationDbContext context)
         {
-            new ClienteBalnearioModel
-        {
-                  ClienteBalnearioId = 1,
-                  NomeCompleto = "Maria Silva",
-                  Email = "maria@gmail.com",
-                  Telemovel = "912345678",
-                  Morada = "Rua A",
-                  TipoCliente = TipoCliente.Normal
-        },
-            new ClienteBalnearioModel
-        {
-                 ClienteBalnearioId = 2,
-                 NomeCompleto = "João Pereira",
-                 Email = "joao@gmail.com",
-                 Telemovel = "913456789",
-                 Morada = "Rua B",
-                 TipoCliente = TipoCliente.Vip
+            _context = context;
         }
-
-          
-        };
-
 
         public IActionResult Index(string search, int page = 1)
         {
             int pageSize = 5;
 
-            var lista = _clientes.AsQueryable();
+            var query = _context.ClienteBalneario.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                lista = lista.Where(c =>
-                    c.NomeCompleto.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    c.Email.Contains(search, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(c =>
+                    c.NomeCompleto.Contains(search) ||
+                    c.Email.Contains(search));
             }
 
-            int totalItems = lista.Count();
+            int totalItems = query.Count();
             int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            var clientesPaginados = lista
+            var clientesPaginados = query
                 .OrderBy(c => c.NomeCompleto)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -66,13 +45,10 @@ namespace HealthWellbeing.Controllers
             return View(clientesPaginados);
         }
 
-
         public IActionResult Create()
         {
             return View();
         }
-
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -81,10 +57,8 @@ namespace HealthWellbeing.Controllers
             if (!ModelState.IsValid)
                 return View(cliente);
 
-            cliente.ClienteBalnearioId = _clientes.Any()
-            ? _clientes.Max(c => c.ClienteBalnearioId) + 1
-            : 1;
-
+            _context.ClienteBalneario.Add(cliente);
+            _context.SaveChanges();
 
             TempData["Success"] = "Cliente criado com sucesso.";
 
@@ -93,50 +67,63 @@ namespace HealthWellbeing.Controllers
 
         public IActionResult Edit(int id)
         {
-            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
-            if (cliente == null) return NotFound();
-
-            return View(cliente);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(ClienteBalnearioModel cliente)
-        {
-            if (!ModelState.IsValid)
-                return View(cliente);
-
-            var existente = _clientes.First(c => c.ClienteBalnearioId == cliente.ClienteBalnearioId);
-            existente.NomeCompleto = cliente.NomeCompleto;
-            existente.Email = cliente.Email;
-            existente.Telemovel = cliente.Telemovel;
-            existente.Morada = cliente.Morada;
-            existente.TipoCliente = cliente.TipoCliente;
-
-            TempData["Success"] = "Cliente atualizado com sucesso.";
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Delete(int id)
-        {
-            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
-            if (cliente != null)
-            {
-                _clientes.Remove(cliente);
-
-                TempData["Success"] = "Cliente removido com sucesso.";
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Details(int id)
-        {
-            var cliente = _clientes.FirstOrDefault(c => c.ClienteBalnearioId == id);
+            var cliente = _context.ClienteBalneario.Find(id);
             if (cliente == null)
                 return NotFound();
 
             return View(cliente);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, ClienteBalnearioModel cliente)
+        {
+            if (id != cliente.ClienteBalnearioId)
+                return BadRequest();
+
+            if (!ModelState.IsValid)
+                return View(cliente);
+
+            var clienteDb = _context.ClienteBalneario.Find(id);
+            if (clienteDb == null)
+                return NotFound();
+
+            // Atualizar campos manualmente (MELHOR PRÁTICA)
+            clienteDb.NomeCompleto = cliente.NomeCompleto;
+            clienteDb.Email = cliente.Email;
+            clienteDb.Telemovel = cliente.Telemovel;
+            clienteDb.Morada = cliente.Morada;
+            clienteDb.TipoCliente = cliente.TipoCliente;
+
+            _context.SaveChanges();
+
+            TempData["Success"] = "Cliente atualizado com sucesso.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        public IActionResult Delete(int id)
+        {
+            var cliente = _context.ClienteBalneario.Find(id);
+            if (cliente == null)
+                return NotFound();
+
+            _context.ClienteBalneario.Remove(cliente);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Cliente removido com sucesso.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Details(int id)
+        {
+            var cliente = _context.ClienteBalneario.Find(id);
+            if (cliente == null)
+                return NotFound();
+
+            return View(cliente);
+        }
     }
 }

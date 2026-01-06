@@ -1,4 +1,6 @@
 ﻿@model HealthWellbeing.Models.ClienteBalnearioModel
+@using HealthWellbeing.Models.Enums
+
 
 
 <h2>Novo Cliente</h2>
@@ -30,11 +32,14 @@
 
     <div class="form-group">
         <label asp-for="TipoCliente"></label>
-        <select asp-for="TipoCliente" class="form-control">
-            <option>Regular</option>
-            <option>VIP</option>
+        <select asp-for="TipoCliente"
+                asp-items="Html.GetEnumSelectList<TipoCliente>()"
+                class="form-control">
+            <option value="">-- Selecionar --</option>
         </select>
+        <span asp-validation-for="TipoCliente" class="text-danger"></span>
     </div>
+
 
     <button type="submit" class="btn btn-success">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary">Voltar</a>
