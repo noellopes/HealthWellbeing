@@ -1,22 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace HealthWellbeing.Models
-{
-    public class ActivityType
-    {
+namespace HealthWellbeing.Models {
+    public class ActivityType {
         public int ActivityTypeId { get; set; }
 
-        [Required(ErrorMessage = "O nome é obrigatório.")]
-        [Display(Name = "Nome do Tipo")]
+        [Required(ErrorMessage = "Type Name is required.")]
+        [Display(Name = "Type Name")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A descrição é obrigatória.")]
-        [StringLength(200, ErrorMessage = "A descrição não pode ter mais de 200 caracteres.")]
-        [Display(Name = "Descrição")]
+        [Required(ErrorMessage = "Description is required.")]
+        [StringLength(200, ErrorMessage = "Description cannot exceed 200 characters.")]
         public string Description { get; set; } = string.Empty;
 
-        // Relação: Um tipo tem muitas atividades
-        public virtual ICollection<Activity> Activities { get; set; }
+        public virtual ICollection<Activity> Activities { get; set; } = new List<Activity>();
     }
 }

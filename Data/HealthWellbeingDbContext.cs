@@ -88,9 +88,6 @@ namespace HealthWellbeing.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-
-
-
             modelBuilder.Entity<Activity>()
                 .HasOne(a => a.ActivityType)
                 .WithMany(at => at.Activities)
@@ -120,12 +117,12 @@ namespace HealthWellbeing.Data
                 entity.HasOne(ce => ce.Customer)
                       .WithMany(c => c.CustomerEvents)
                       .HasForeignKey(ce => ce.CustomerId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(ce => ce.Event)
                       .WithMany(e => e.CustomerEvents)
                       .HasForeignKey(ce => ce.EventId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<CustomerActivity>(entity =>
@@ -137,17 +134,17 @@ namespace HealthWellbeing.Data
                 entity.HasOne(ca => ca.Customer)
                       .WithMany(c => c.CustomerActivities)
                       .HasForeignKey(ca => ca.CustomerId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(ca => ca.Activity)
                       .WithMany(a => a.CustomerActivities)
                       .HasForeignKey(ca => ca.ActivityId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(ca => ca.Event)
                       .WithMany(e => e.CustomerActivities)
                       .HasForeignKey(ca => ca.EventId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.NoAction);
             });
         }
 
