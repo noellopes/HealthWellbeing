@@ -58,6 +58,7 @@ else
         SeedData.SeedDefaultAdmin(userManager);
 
         var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
+        SeedData.Populate(context);
         SeedData.SeedUsers(userManager, context);
         SeedData.SeedPopulateClientsAsUsers(userManager, context);
         SeedData.SeedDefaultAdmin(userManager);
