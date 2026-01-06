@@ -1,72 +1,149 @@
 ﻿@model HealthWellbeing.Models.Activity
 
 @{
-    ViewData["Title"] = "Detalhes da Activity";
+    ViewData["Title"] = "Activity Details";
 }
 
-<div class="container my-4">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h1 class="h5 mb-1">@ViewData["Title"]</h1>
-                    <h4 class="h6 text-muted mb-3">Activity</h4>
-                    <hr />
+        <div class="col-md-9 col-lg-7">
 
-                    <dl class="row mb-0">
-                        <!-- Id -->
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(m => m.ActivityId)
-                        </dt>
-                        <dd class="col-sm-8 mb-2">
-                            @Html.DisplayFor(m => m.ActivityId)
-                        </dd>
+            @* --- CARD CONTAINER --- *@
+            <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
 
-                        <!-- Name -->
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(m => m.ActivityName)
-                        </dt>
-                        <dd class="col-sm-8 mb-2">
-                            @Html.DisplayFor(m => m.ActivityName)
-                        </dd>
-
-                        <!-- Type -->
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(m => m.ActivityType)
-                        </dt>
-                        <dd class="col-sm-8 mb-2">
-                            @Html.DisplayFor(m => m.ActivityType)
-                        </dd>
-
-                        <!-- Description -->
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(m => m.ActivityDescription)
-                        </dt>
-                        <dd class="col-sm-8 mb-2">
-                            @Html.DisplayFor(m => m.ActivityDescription)
-                        </dd>
-
-                        <!-- Reward -->
-                        <dt class="col-sm-4 text-muted">
-                            @Html.DisplayNameFor(m => m.ActivityReward)
-                        </dt>
-                        <dd class="col-sm-8 mb-2">
-                            @Html.DisplayFor(m => m.ActivityReward)
-                        </dd>
-                    </dl>
+                @* --- HEADER (Info/Cyan to distinguish from Badges) --- *@
+                <div class="card-header bg-info bg-gradient text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-25 p-2 rounded-3">
+                            <i class="bi bi-activity fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Activity Details</h5>
+                            <p class="mb-0 small text-white opacity-90">View complete activity information</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-footer bg-white d-flex justify-content-between">
-                    <div>
-                        <a asp-action="Edit"
-                           asp-route-id="@Model?.ActivityId"
-                           class="btn btn-primary me-2">
-                            Editar
-                        </a>
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            Voltar à lista
-                        </a>
+                @* --- BODY --- *@
+                <div class="card-body p-4">
+
+                    @* --- SECTION 1: GENERAL INFO --- *@
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3">General Information</h6>
+
+                    <div class="row g-3 mb-4">
+                        @* Name *@
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-dark mb-1">Name</label>
+                            <div class="p-2 border rounded-3 bg-light text-dark">
+                                @Html.DisplayFor(model => model.ActivityName)
+                            </div>
+                        </div>
+
+                        @* Type *@
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark mb-1">Type</label>
+                            <div class="p-2 border rounded-3 bg-light text-dark">
+                                @Html.DisplayFor(model => model.ActivityType.Name)
+                            </div>
+                        </div>
                     </div>
+
+                    @* --- SECTION 2: REWARD CONFIGURATION --- *@
+                    <div class="row g-3 mb-4">
+                        @* Points *@
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-dark mb-1">Reward Points</label>
+                            <div class="p-2 border rounded-3 bg-light text-dark d-flex align-items-center">
+                                <span class="fw-bold me-1">@Model.ActivityReward</span>
+                                <span class="small text-muted">pts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- SECTION 3: DESCRIPTION --- *@
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark mb-1">Description</label>
+                        <div class="p-3 border rounded-3 bg-light text-secondary" style="min-height: 80px;">
+                            @if (!string.IsNullOrEmpty(Model.ActivityDescription)) {
+                                @Model.ActivityDescription
+                            }
+                            else {
+                                <span class="fst-italic opacity-50">No description provided.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <hr class="my-4 opacity-10" />
+
+                    @* --- SECTION 4: SYSTEM DEPENDENCIES & STATS --- *@
+                    <h6 class="fw-bold text-uppercase text-muted small mb-3">System Usage & Stats</h6>
+
+                    <div class="row g-3 mb-4">
+                        @* Linked Events Count *@
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center p-3 border rounded-3">
+                                <div class="p-2 bg-primary bg-opacity-10 text-primary rounded-circle me-3">
+                                    <i class="bi bi-calendar-event fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-muted text-uppercase fw-bold">Linked Events</div>
+                                    <div class="fw-bold text-dark">
+                                        @(Model.EventActivities?.Count ?? 0) <span class="fw-normal small text-muted">events</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* Customer History Count *@
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center p-3 border rounded-3">
+                                <div class="p-2 bg-success bg-opacity-10 text-success rounded-circle me-3">
+                                    <i class="bi bi-people-fill fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="small text-muted text-uppercase fw-bold">Completed By</div>
+                                    <div class="fw-bold text-dark">
+                                        @(Model.CustomerActivities?.Count ?? 0) <span class="fw-normal small text-muted">customers</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- ACTION BUTTONS --- *@
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                            Back to List
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model.ActivityId" class="btn btn-warning px-4 shadow-sm">
+                            Edit
+                        </a>
+                        @{
+                            bool canDelete = (Model.EventActivities?.Count ?? 0) == 0 && (Model.CustomerActivities?.Count ?? 0) == 0;
+                        }
+                        @if (canDelete) {
+                            <a asp-action="Delete" asp-route-id="@Model.ActivityId" class="btn btn-danger px-4 shadow-sm">
+                                Delete
+                            </a>
+                        }
+                        else {
+                            <button class="btn btn-outline-danger px-4 shadow-sm" disabled title="Cannot delete: Active usage detected">
+                                <i class="bi bi-lock-fill me-1"></i> In Use
+                            </button>
+                        }
+                    </div>
+
                 </div>
             </div>
         </div>

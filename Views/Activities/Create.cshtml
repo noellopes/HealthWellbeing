@@ -1,63 +1,111 @@
 ﻿@model HealthWellbeing.Models.Activity
 
 @{
-    ViewData["Title"] = "Criar Activity";
+    ViewData["Title"] = "Create Activity";
 }
 
-<div class="container">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm my-4">
-                <div class="card-body">
-                    <h1 class="h3 mb-1">@ViewData["Title"]</h1>
-                    <h4 class="h6 text-muted mb-3">Activity</h4>
+        <div class="col-md-10 col-lg-8">
 
-                    <form asp-action="Create" novalidate>
-                        <div asp-validation-summary="ModelOnly"
-                             class="alert alert-danger"
-                             role="alert"></div>
+            @* --- CARD CONTAINER --- *@
+            <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
 
-                        <!-- Activity_Name -->
-                        <div class="mb-3">
-                            <label asp-for="ActivityName" class="form-label"></label>
-                            <input asp-for="ActivityName" class="form-control" />
-                            <span asp-validation-for="ActivityName"
-                                  class="text-danger"></span>
+                @* --- HEADER --- *@
+                <div class="card-header bg-success text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-25 p-2 rounded-3">
+                            @* Usei clipboard-plus para diferenciar de pastas/badges *@
+                            <i class="bi bi-clipboard-plus fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Create New Activity</h5>
+                            <p class="mb-0 small opacity-75">Define a new activity for users</p>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- FORM BODY --- *@
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
+
+                        @* Name & Type *@
+                        <div class="row g-4 mb-4">
+
+                            @* 1. Activity Name *@
+                            <div class="col-md-7">
+                                <label asp-for="ActivityName" class="form-label fw-bold text-dark mb-1">
+                                    Name
+                                </label>
+                                <input asp-for="ActivityName" class="form-control shadow-sm" placeholder="e.g. Morning Yoga Session" />
+                                <span asp-validation-for="ActivityName" class="text-danger small"></span>
+                            </div>
+
+                            @* 2. Activity Type *@
+                            <div class="col-md-5">
+                                <label asp-for="ActivityTypeId" class="form-label fw-bold text-dark mb-1">
+                                    Activity Category
+                                </label>
+                                <select asp-for="ActivityTypeId" class="form-select shadow-sm" asp-items="ViewBag.ActivityTypeId">
+                                    <option value="" selected disabled>Select category...</option>
+                                </select>
+                                <span asp-validation-for="ActivityTypeId" class="text-danger small"></span>
+                            </div>
                         </div>
 
-                        <!-- Activity_Type -->
-                        <div class="mb-3">
-                            <label asp-for="ActivityType" class="form-label"></label>
-                            <input asp-for="ActivityType" class="form-control" />
-                            <span asp-validation-for="ActivityType"
-                                  class="text-danger"></span>
+                        @* Points *@
+                        <div class="mb-4">
+                            <label asp-for="ActivityReward" class="form-label fw-bold text-dark mb-1">
+                                Reward Points
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <input asp-for="ActivityReward" class="form-control" placeholder="e.g. 50" type="number" min="0" />
+                                <span class="input-group-text bg-light text-muted">pts</span>
+                            </div>
+                            <div class="form-text small text-muted">Points earned when completing this activity.</div>
+                            <span asp-validation-for="ActivityReward" class="text-danger small"></span>
                         </div>
 
-                        <!-- Activity_Description -->
-                        <div class="mb-3">
-                            <label asp-for="ActivityDescription" class="form-label"></label>
-                            <textarea asp-for="ActivityDescription"
-                                      class="form-control"
-                                      rows="3"></textarea>
-                            <span asp-validation-for="ActivityDescription"
-                                  class="text-danger"></span>
+                        @* Description *@
+                        <div class="mb-5">
+                            <label asp-for="ActivityDescription" class="form-label fw-bold text-dark mb-1">
+                                Description
+                            </label>
+                            <textarea asp-for="ActivityDescription" class="form-control shadow-sm" placeholder="Describe the activity details and requirements..." style="height: 120px"></textarea>
+                            <span asp-validation-for="ActivityDescription" class="text-danger small"></span>
                         </div>
 
-                        <!-- Activity_Reward -->
-                        <div class="mb-3">
-                            <label asp-for="ActivityReward" class="form-label"></label>
-                            <input asp-for="ActivityReward" class="form-control" />
-                            <span asp-validation-for="ActivityReward"
-                                  class="text-danger"></span>
+                        @* --- ACTION BUTTONS --- *@
+                        <div class="d-flex justify-content-end gap-2">
+
+                            @* Back to List *@
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Back to List
+                            </a>
+
+                            @* Create Button *@
+                            <button type="submit" class="btn btn-success px-4 shadow-sm">
+                                Create
+                            </button>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Criar</button>
-                            <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
-                        </div>
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
