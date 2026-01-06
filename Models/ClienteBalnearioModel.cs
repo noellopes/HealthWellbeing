@@ -21,9 +21,11 @@ namespace HealthWellbeing.Models
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O telemóvel é obrigatório")]
-        [RegularExpression(@"^9\d{8}$", ErrorMessage = "O telemóvel deve ter 9 dígitos e começar por 9")]
+        [RegularExpression(@"^(91|92|93|96)\d{7}$",
+        ErrorMessage = "O telemóvel deve começar por 91, 92, 93 ou 96 e ter 9 dígitos")]
         [Display(Name = "Telemóvel")]
         public string Telemovel { get; set; } = string.Empty;
+
 
         [Required(ErrorMessage = "A morada é obrigatória")]
         [StringLength(200, ErrorMessage = "A morada não pode ultrapassar 200 caracteres")]
