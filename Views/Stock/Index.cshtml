@@ -23,12 +23,17 @@
         </div>
     </div>
 
-    <!-- FILTROS (ESTILO ZONAS) -->
-    <form method="get" asp-action="Index" class="card shadow-sm mb-4">
+    <!-- FILTROS -->
+    <form method="get"
+          asp-action="Index"
+          class="card shadow-sm mb-4"
+          id="filtroStockForm">
+
         <div class="card-body">
             <div class="row g-3 align-items-center">
 
-                <div class="col-md-4">
+                <!-- 🔍Pesquisa por consumível -->
+                <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text text-muted">🔍</span>
                         <input type="text"
@@ -39,35 +44,31 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text text-muted">📍</span>
-                        <input type="text"
-                               name="searchZona"
-                               value="@ViewBag.SearchZona"
-                               class="form-control"
-                               placeholder="Procurar por zona..." />
+                <div class="col-md-2"></div>
+
+                <!-- ⚠️ Stock crítico -->
+                <div class="col-md-5 d-flex justify-content-end align-items-center gap-3">
+
+                    <div class="form-check d-flex align-items-center gap-1">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="stockCritico"
+                               value="true"
+                               id="chkStockCritico"
+                               @(ViewBag.StockCritico == true ? "checked" : "") />
+                        <label class="form-check-label text-muted" for="chkStockCritico">
+                            ⚠️ Só stock crítico
+                        </label>
                     </div>
-                </div>
 
-                <div class="col-md-2 d-flex align-items-center gap-2">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="stockCritico"
-                           value="true"
-                           @(ViewBag.StockCritico == true ? "checked" : "") />
-                    <label class="form-check-label text-muted">
-                        ⚠️ Só stock crítico
-                    </label>
-                </div>
-
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn btn-primary px-4">
                         Filtrar
                     </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
                         Limpar
                     </a>
+
                 </div>
 
             </div>
@@ -101,38 +102,32 @@
                 {
                     foreach (var item in Model.Items)
                     {
-                        var min = item.Consumivel?.QuantidadeMinima ?? item.QuantidadeMinima;
-                        var max = item.Consumivel?.QuantidadeMaxima ?? item.QuantidadeMaxima;
+                        var min = item.Consumivel.QuantidadeMinima;
+                        var max = item.Consumivel.QuantidadeMaxima;
                         var atual = item.QuantidadeAtual;
 
                         var percentagem = max > 0
                         ? (int)((double)atual / max * 100)
                         : 0;
 
-                        string barraClasse;
-
-                        if (atual <= min)
-                        {
-                            barraClasse = "bg-danger";
-                        }
-                        else if (atual <= min + 40)
-                        {
-                            barraClasse = "bg-warning";
-                        }
-                        else
-                        {
-                            barraClasse = "bg-success";
-                        }
+                        string barraClasse =
+                        atual <= min ? "bg-danger" :
+                        atual <= min + 40 ? "bg-warning" :
+                        "bg-success";
 
                         <tr>
                             <td>
                                 <span class="text-muted me-1">📦</span>
-                                @item.Consumivel?.Nome
+                                @item.Consumivel.Nome
                             </td>
 
-                            <td>
-                                <span class="text-muted me-1">📍</span>
-                                @item.Zona?.NomeZona
+                            <td class="text-center">
+                                <a asp-controller="ZonaArmazenamento"
+                                   asp-action="Index"
+                                   asp-route-searchConsumivel="@item.ConsumivelID"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Ver zonas
+                                </a>
                             </td>
 
                             <td class="text-center">
@@ -154,7 +149,6 @@
                     }
                 }
             </tbody>
-
         </table>
     </div>
 
@@ -165,21 +159,30 @@
             @if (Model.CurrentPage > 1)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)">«</a>
+                    <a class="page-link"
+                       asp-route-page="@(Model.CurrentPage - 1)">
+                        «
+                    </a>
                 </li>
             }
 
             @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
             {
                 <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-route-page="@i">@i</a>
+                    <a class="page-link"
+                       asp-route-page="@i">
+                        @i
+                    </a>
                 </li>
             }
 
             @if (Model.CurrentPage < Model.TotalPages)
             {
                 <li class="page-item">
-                    <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)">»</a>
+                    <a class="page-link"
+                       asp-route-page="@(Model.CurrentPage + 1)">
+                        »
+                    </a>
                 </li>
             }
 
@@ -187,3 +190,17 @@
     </nav>
 
 </div>
+
+<!-- 🔑 AUTO-FILTRO DA CHECKBOX -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chk = document.getElementById("chkStockCritico");
+        const form = document.getElementById("filtroStockForm");
+
+        if (chk && form) {
+            chk.addEventListener("change", function () {
+                form.submit();
+            });
+        }
+    });
+</script>

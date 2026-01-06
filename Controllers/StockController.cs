@@ -16,9 +16,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // 🔒 GARANTE STOCK = ESPELHO DO CONSUMÍVEL
-        // =====================================================
+        // Garantir Stock
         private void GarantirStockBase()
         {
             var consumiveis = _context.Consumivel.ToList();
@@ -30,12 +28,12 @@ namespace HealthWellbeing.Controllers
             foreach (var c in consumiveis)
             {
                 var stock = _context.Stock
+                    .Include(s => s.Consumivel)
                     .FirstOrDefault(s => s.ConsumivelID == c.ConsumivelId);
 
                 if (stock == null)
                 {
-                    // cria stock
-                    var zonaAleatoria = zonas[rnd.Next(zonas.Count)];
+                    var zonaAleatoria = zonas.First();
 
                     _context.Stock.Add(new Stock
                     {
@@ -50,21 +48,20 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    // 🔁 sincroniza stock existente
-                    stock.QuantidadeAtual = c.QuantidadeAtual;
-                    stock.QuantidadeMinima = c.QuantidadeMinima;
-                    stock.QuantidadeMaxima = c.QuantidadeMaxima;
-                    stock.UsaValoresDoConsumivel = true;
-                    stock.DataUltimaAtualizacao = DateTime.Now;
+                    if (stock.UsaValoresDoConsumivel)
+                    {
+                        stock.QuantidadeAtual = c.QuantidadeAtual;
+                        stock.QuantidadeMinima = c.QuantidadeMinima;
+                        stock.QuantidadeMaxima = c.QuantidadeMaxima;
+                        stock.DataUltimaAtualizacao = DateTime.Now;
+                    }
                 }
             }
 
             _context.SaveChanges();
         }
 
-        // =====================================================
-        // 🔄 RESET TOTAL DO STOCK
-        // =====================================================
+        //  RESET TOTAL DO STOCK
         public IActionResult ResetStock()
         {
             _context.Stock.RemoveRange(_context.Stock);
@@ -82,38 +79,34 @@ namespace HealthWellbeing.Controllers
         public IActionResult Index(
             int page = 1,
             string searchNome = "",
-            string searchZona = "",
             bool stockCritico = false)
         {
+            // Garante que o stock reflete o consumível
             GarantirStockBase();
 
+            // Query base: STOCK
             var query = _context.Stock
                 .Include(s => s.Consumivel)
                 .Include(s => s.Zona)
                 .AsQueryable();
 
-            if (stockCritico)
-            {
-                query = query.Where(s =>
-                    s.QuantidadeAtual <= s.Consumivel.QuantidadeMinima + 40
-                );
-
-                ViewBag.StockCritico = true;
-            }
-
-
+            // Filtro por nome do consumível
             if (!string.IsNullOrWhiteSpace(searchNome))
             {
-                query = query.Where(s => s.Consumivel.Nome.Contains(searchNome));
+                query = query.Where(s =>
+                    s.Consumivel.Nome.Contains(searchNome));
                 ViewBag.SearchNome = searchNome;
             }
 
-            if (!string.IsNullOrWhiteSpace(searchZona))
+            // Stock crítico (baseado no consumível)
+            if (stockCritico)
             {
-                query = query.Where(s => s.Zona.NomeZona.Contains(searchZona));
-                ViewBag.SearchZona = searchZona;
+                query = query.Where(s =>
+                    s.QuantidadeAtual <= s.QuantidadeMinima + 40);
+                ViewBag.StockCritico = true;
             }
 
+            // Paginação
             int totalItems = query.Count();
             var pagination = new PaginationInfo<Stock>(page, totalItems, 10);
 
@@ -126,18 +119,14 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // =====================================================
         // CREATE ❌ (DESATIVADO)
-        // =====================================================
         public IActionResult Create()
         {
             TempData["Error"] = "O stock é criado automaticamente a partir dos consumíveis.";
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // EDIT → APENAS ZONA
-        // =====================================================
         public IActionResult Edit(int id)
         {
             var stock = _context.Stock
@@ -170,9 +159,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =====================================================
         // DELETE
-        // =====================================================
+        
         public IActionResult Delete(int id)
         {
             var stock = _context.Stock
