@@ -1,38 +1,90 @@
 ﻿@model HealthWellbeing.Models.ActivityType
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Activity Type";
 }
 
-<h1>Create</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
 
-<h4>ActivityType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+
+            @* --- CARD CONTAINER --- *@
+            <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
+
+                @* --- HEADER --- *@
+                <div class="card-header bg-success text-white p-4 rounded-top-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-25 p-2 rounded-3">
+                            <i class="bi bi-folder-plus fs-4 text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold">Create New Activity Type</h5>
+                            <p class="mb-0 small opacity-75">Define a new classification for activities</p>
+                        </div>
+                    </div>
+                </div>
+
+                @* --- FORM BODY --- *@
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="Create">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4" role="alert"></div>
+
+                        @* Name *@
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-bold text-dark mb-1">
+                                Activity Type Name
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <input asp-for="Name" class="form-control" placeholder="e.g. Cardio, Mindfulness..." />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        @* Description *@
+                        <div class="mb-5">
+                            <label asp-for="Description" class="form-label fw-bold text-dark mb-1">
+                                Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control shadow-sm" placeholder="Describe what kind of activities belong here..." style="height: 120px"></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        @* --- ACTION BUTTONS --- *@
+                        <div class="d-flex justify-content-end gap-2">
+
+                            @* Back to List *@
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Back to List
+                            </a>
+
+                            @* Create Button *@
+                            <button type="submit" class="btn btn-success px-4 shadow-sm">
+                                Create
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

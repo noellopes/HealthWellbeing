@@ -1,39 +1,81 @@
 ﻿@model HealthWellbeing.Models.ActivityType
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Activity Type";
 }
 
-<h1>Edit</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
 
-<h4>ActivityType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ActivityTypeId" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            @* --- HEADER --- *@
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-warning text-dark bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 48px; height: 48px;">
+                    <i class="bi bi-pencil-square fs-4"></i>
+                </div>
+                <div>
+                    <h2 class="h4 mb-0 fw-bold text-dark">Edit Activity Type</h2>
+                    <p class="mb-0 small text-muted">Modify activity type details</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+
+            @* --- CARD --- *@
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden border-top border-4 border-warning animate__animated animate__fadeInUp">
+                <div class="card-body p-4 p-md-5">
+
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 rounded-3"></div>
+                        <input type="hidden" asp-for="ActivityTypeId" />
+
+                        @* --- 1. NAME --- *@
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-bold text-uppercase small text-muted">Activity Type Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-secondary">
+                                    <i class="bi bi-tag-fill"></i>
+                                </span>
+                                <input asp-for="Name" class="form-control bg-light border-start-0 ps-0" placeholder="e.g. Cardio" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        @* --- 2. DESCRIPTION --- *@
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold text-uppercase small text-muted">Description</label>
+                            <textarea asp-for="Description" class="form-control bg-light" rows="4" placeholder="Describe this type..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        @* --- BUTTONS --- *@
+                        <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                                Back to List
+                            </a>
+                            <button type="submit" class="btn btn-warning px-4 shadow-sm">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

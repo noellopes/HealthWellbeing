@@ -1,41 +1,190 @@
-﻿@model IEnumerable<HealthWellbeing.Models.ActivityType>
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.ActivityType>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Activity Types";
+    var successMessage = TempData["SuccessMessage"];
+    var errorMessage = TempData["ErrorMessage"];
 }
 
-<h1>Index</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HealthWellbeing</title>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ActivityTypeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ActivityTypeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ActivityTypeId">Delete</a>
-            </td>
-        </tr>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@* --- FEEDBACK MESSAGES --- *@
+@if (successMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+@if (errorMessage != null) {
+    <div class="container py-4">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@* --- EMPTY STATE --- *@
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName)) {
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+        <i class="bi bi-grid-1x2" style="font-size: 3rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">No Categories Found</h4>
+            <p>No activity types are currently defined. Create one to organize your activities.</p>
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-success shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Create New Category
+    </a>
+}
+else {
+    @* --- HEADER & SEARCH TOGGLE --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 text-secondary">Overview</h2>
+        <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-primary shadow-sm" data-bs-toggle="collapse" data-bs-target="#typeSearch" aria-expanded="false" aria-controls="typeSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </a>
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Create New
+            </a>
+        </div>
+    </div>
+
+    @* --- SEARCH FORM --- *@
+    <div class="collapse mt-2 mb-4" id="typeSearch">
+        <div class="card card-body border-0 shadow-sm rounded-4 bg-light">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+                @* 1. Name *@
+                <div class="col-md-9">
+                    <label for="searchName" class="form-label fw-bold small text-muted text-uppercase">Category Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-tag"></i></span>
+                        <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control border-start-0 ps-0" placeholder="Search category name..." type="search" />
+                    </div>
+                </div>
+
+                @* 2. Buttons *@
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm">
+                            Apply
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary w-100 shadow-sm text-decoration-none">
+                            Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* --- NO RESULTS (Filters) --- *@
+    @if (!Model.Items.Any()) {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found.</h5>
+                <p class="mb-0">Try adjusting your search filter.</p>
+            </div>
+        </div>
+    }
+    else {
+        @* --- DATA TABLE --- *@
+        <div class="table-responsive shadow-sm rounded-3">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 30%;">Name</th>
+                        <th style="width: 45%;">Description</th>
+                        <th style="width: 25%;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items) {
+                        <tr>
+                            @* 1. Name *@
+                            <td>
+                                <div class="fw-bold text-dark">@item.Name</div>
+                            </td>
+
+                            @* 2. Description *@
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Description)) {
+                                    <span class="text-muted small">
+                                        @(item.Description.Length > 60 ? item.Description.Substring(0, 60) + "..." : item.Description)
+                                    </span>
+                                }
+                                else {
+                                    <span class="text-muted fst-italic opacity-50 small">No description</span>
+                                }
+                            </td>
+
+                            @* 3. Actions *@
+                            <td class="text-end text-nowrap">
+                                <a asp-action="Edit" asp-route-id="@item.ActivityTypeId" class="btn btn-sm btn-warning me-1 shadow-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.ActivityTypeId" class="btn btn-sm btn-info me-1 shadow-sm">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.ActivityTypeId" class="btn btn-sm btn-danger shadow-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @* --- PAGINATION FOOTER --- *@
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 border-top">
+                <div class="small text-muted">
+                    Showing @Model.FirstItemOnPage - @Model.LastItemOnPage of @Model.TotalItems
+                </div>
+
+                <nav aria-label="Types page">
+                    <ul class="pagination mb-0">
+                        @* First Page *@
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchName="@ViewBag.SearchName">First</a>
+                        </li>
+
+                        @* Page Numbers *@
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchName="@ViewBag.SearchName">@p</a>
+                            </li>
+                        }
+
+                        @* Last Page *@
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchName="@ViewBag.SearchName">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    }
+}
