@@ -25,8 +25,6 @@ internal class SeedData
         PopulateDoctor(dbContext);
         PopulateUtenteSaude(dbContext);
 
-        var clients = PopulateClients(dbContext);
-        PopulateMember(dbContext, clients);
         PopulateTrainingType(dbContext);
         PopulatePlan(dbContext);
 
@@ -2346,27 +2344,6 @@ internal class SeedData
         dbContext.SaveChanges();
 
         return clients;
-    }
-
-    private static void PopulateMember(HealthWellbeingDbContext dbContext, List<Client> clients)
-    {
-        if (dbContext.Member.Any()) return;
-
-        var clientNamesToMakeMembers = new List<string> { "Alice Wonderland", "Charlie Brown", "David Copperfield" };
-
-        var members = clients
-            .Where(c => clientNamesToMakeMembers.Contains(c.Name))
-            .Select(c => new Member
-            {
-                ClientId = c.ClientId,
-            })
-            .ToList();
-
-        if (members.Any())
-        {
-            dbContext.Member.AddRange(members);
-            dbContext.SaveChanges();
-        }
     }
 
     private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)
