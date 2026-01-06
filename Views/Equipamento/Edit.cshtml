@@ -14,9 +14,19 @@
         <div asp-validation-summary="All" class="text-danger small"></div>
 
         <div class="mb-3">
-            <label asp-for="NomeEquipamento" class="form-label">Nome do Equipamento *</label>
-            <input asp-for="NomeEquipamento" class="form-control" placeholder="Ex: Halteres, Passadeira, Bicicleta">
+            <label asp-for="NomeEquipamento" class="form-label fw-bold">Nome do Equipamento *</label>
+            <input asp-for="NomeEquipamento" class="form-control" />
             <span asp-validation-for="NomeEquipamento" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3 form-check p-3 border rounded bg-light">
+            <input class="form-check-input" type="checkbox" asp-for="RequerPeso" id="checkPeso">
+            <label class="form-check-label fw-bold" for="checkPeso">
+                Requer registo de carga/peso?
+            </label>
+            <div class="form-text text-muted">
+                Marque se este equipamento implica o uso de pesos que devem ser registados.
+            </div>
         </div>
 
         <div class="mt-4">

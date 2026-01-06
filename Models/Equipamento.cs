@@ -9,7 +9,7 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "O nome do equipamento é obrigatório.")]
         [StringLength(50, ErrorMessage = "O nome do equipamento não pode exceder 50 caracteres.")]
         public string NomeEquipamento { get; set; }
-
+        public bool RequerPeso { get; set; } = false;
         public ICollection<ExercicioEquipamento>? ExercicioEquipamentos { get; set; }
     }
 }

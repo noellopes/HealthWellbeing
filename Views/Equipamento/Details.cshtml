@@ -2,8 +2,8 @@
 
 @{
     ViewData["Title"] = "Detalhes do Equipamento";
-    // Recupera a mensagem de sucesso da URL se existir (vinda do Edit/Create)
     string? successMessage = Context.Request.Query["SuccessMessage"];
+    bool isStaff = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
 <div class="container mt-4">
@@ -13,12 +13,16 @@
             <a asp-action="Index" class="btn btn-secondary me-2">
                 <i class="fas fa-arrow-left"></i> Voltar à Lista
             </a>
-            <a asp-action="Edit" asp-route-id="@Model.EquipamentoId" class="btn btn-warning me-2">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-            <a asp-action="Delete" asp-route-id="@Model.EquipamentoId" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i> Apagar
-            </a>
+
+            @if (isStaff)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.EquipamentoId" class="btn btn-warning me-2">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <a asp-action="Delete" asp-route-id="@Model.EquipamentoId" class="btn btn-danger">
+                    <i class="fas fa-trash-alt"></i> Apagar
+                </a>
+            }
         </div>
     </div>
 
@@ -26,9 +30,8 @@
     {
         <div class="container py-4">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                @successMessage
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </div>
     }
@@ -38,17 +41,22 @@
             <h3 class="mb-0">@Model.NomeEquipamento</h3>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold">Informações</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <th class="text-secondary">Nome do Equipamento:</th>
-                            <td>@Model.NomeEquipamento</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-secondary">Nome:</dt>
+                <dd class="col-sm-9 fw-bold">@Model.NomeEquipamento</dd>
+
+                <dt class="col-sm-3 text-secondary">Requer Carga/Peso:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.RequerPeso)
+                    {
+                        <span class="badge bg-warning text-dark"><i class="bi bi-check-circle-fill"></i> Sim (Obrigatório)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Não</span>
+                    }
+                </dd>
+            </dl>
         </div>
     </div>
 </div>

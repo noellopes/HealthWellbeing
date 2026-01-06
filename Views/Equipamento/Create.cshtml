@@ -8,27 +8,33 @@
 
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
-
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-3">
         <label asp-for="NomeEquipamento" class="form-label fw-bold">Nome do Equipamento *</label>
-        <input asp-for="NomeEquipamento" class="form-control" placeholder="Ex: Passadeira, Halteres, Elásticos" />
+        <input asp-for="NomeEquipamento" class="form-control" placeholder="Ex: Passadeira, Halteres" />
         <span asp-validation-for="NomeEquipamento" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3 form-check p-3 bg-light border rounded">
+        <input class="form-check-input" type="checkbox" asp-for="RequerPeso" id="checkPeso">
+        <label class="form-check-label fw-bold" for="checkPeso">
+            Requer registo de carga/peso?
+        </label>
+        <div class="form-text">
+            Marque se este equipamento implica o uso de pesos (ex: Halteres, Máquinas) que devem ser registados.
+        </div>
     </div>
 
     <div class="mt-4">
         <button type="submit" class="btn btn-success me-2">
             <i class="fas fa-save"></i> Criar Equipamento
         </button>
-
         <a asp-action="Index" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Voltar à Lista
         </a>

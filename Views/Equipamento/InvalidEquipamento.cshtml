@@ -27,14 +27,13 @@
             <h5 class="card-title">Deseja salvar os dados como um novo registo?</h5>
             <p class="card-text">
                 Ainda temos os dados que acabou de editar ("<strong>@Model.NomeEquipamento</strong>").
-                Pode clicar abaixo para o adicionar novamente à base de dados como um novo Equipamento.
+                Pode clicar abaixo para o adicionar novamente.
             </p>
 
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
-
-                @* Importante: Manter o nome para passar para o Create *@
                 <input type="hidden" asp-for="NomeEquipamento" />
+                <input type="hidden" asp-for="RequerPeso" />
 
                 <div class="d-flex gap-2 mt-3">
                     <button type="submit" class="btn btn-success">
