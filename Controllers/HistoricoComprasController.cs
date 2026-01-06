@@ -15,16 +15,14 @@ namespace HealthWellbeing.Controllers
         {
             _context = context;
         }
-        // ⚠️ USAR APENAS UMA VEZ — DEPOIS APAGAR
         
-
-
         // =====================================================
         // INDEX — Histórico de Compras (ENTRADAS)
         // =====================================================
         public IActionResult Index(int page = 1)
         {
             int itemsPerPage = 10;
+            var rnd = new Random();
 
             var query = _context.HistoricoCompras
                 .Where(m => m.Tipo == "Entrada")
@@ -40,6 +38,25 @@ namespace HealthWellbeing.Controllers
                 .Skip((page - 1) * itemsPerPage)
                 .Take(itemsPerPage)
                 .ToList();
+
+            // 🔹 AQUI ESTÁ A ÚNICA LÓGICA NOVA
+            foreach (var m in movimentosPagina)
+            {
+                if (m.Fornecedor == null && m.Stock?.Consumivel != null)
+                {
+                    var fornecedoresPossiveis = _context.Fornecedor_Consumivel
+                        .Where(fc => fc.ConsumivelId == m.Stock.Consumivel.ConsumivelId)
+                        .Include(fc => fc.Fornecedor)
+                        .Select(fc => fc.Fornecedor)
+                        .ToList();
+
+                    if (fornecedoresPossiveis.Any())
+                    {
+                        m.Fornecedor =
+                            fornecedoresPossiveis[rnd.Next(fornecedoresPossiveis.Count)];
+                    }
+                }
+            }
 
             var paginated = new PaginationInfo<HistoricoCompras>(
                 page,

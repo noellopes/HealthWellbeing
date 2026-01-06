@@ -15,24 +15,24 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        // =====================================================
+        // INDEX
+        // =====================================================
         [HttpGet]
         public IActionResult Index(int? consumivelId)
         {
             var consumiveis = _context.Consumivel.ToList();
 
+            ViewBag.Consumiveis = consumiveis;
+
             if (consumivelId == null)
-            {
-                ViewBag.Consumiveis = consumiveis;
                 return View();
-            }
 
             var consumivel = _context.Consumivel
                 .FirstOrDefault(c => c.ConsumivelId == consumivelId);
 
             if (consumivel == null)
                 return NotFound();
-
-            ViewBag.Consumiveis = consumiveis;
 
             ViewBag.QuantidadeAtual = consumivel.QuantidadeAtual;
             ViewBag.QuantidadeMinima = consumivel.QuantidadeMinima;
@@ -44,7 +44,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-
+        // =====================================================
+        // CRIAR REGISTO (PASSO INTERMÉDIO)
+        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult CriarRegistoCompra(int consumivelId, int quantidade)
@@ -58,6 +60,9 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction("RegistoCompra", new { consumivelId, quantidade });
         }
 
+        // =====================================================
+        // ESCOLHA DE FORNECEDOR
+        // =====================================================
         [HttpGet]
         public IActionResult RegistoCompra(int consumivelId, int quantidade)
         {
@@ -77,13 +82,16 @@ namespace HealthWellbeing.Controllers
 
             return View(vm);
         }
+
+        // =====================================================
+        // CONFIRMAR COMPRA
+        // =====================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ConfirmarRegisto(RegistoCompra model)
         {
             if (!ModelState.IsValid)
             {
-                // Recarregar fornecedores caso haja erro
                 model.Fornecedores = _context.Fornecedor_Consumivel
                     .Where(fc => fc.ConsumivelId == model.ConsumivelId)
                     .Include(fc => fc.Fornecedor)
@@ -94,14 +102,15 @@ namespace HealthWellbeing.Controllers
                 return View("RegistoCompra", model);
             }
 
-            // 🔹 Consumível (fonte única de verdade)
+            // 🔹 Consumível
             var consumivel = _context.Consumivel
                 .FirstOrDefault(c => c.ConsumivelId == model.ConsumivelId);
 
             if (consumivel == null)
                 return NotFound();
 
-            int limitePermitido = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
+            int limitePermitido =
+                consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
             if (model.Quantidade > limitePermitido)
             {
@@ -120,7 +129,7 @@ namespace HealthWellbeing.Controllers
                 return View("RegistoCompra", model);
             }
 
-            // 🔹 Fornecedor selecionado
+            // 🔹 Fornecedor
             var fornecedor = _context.Fornecedor_Consumivel
                 .Include(fc => fc.Fornecedor)
                 .First(fc =>
@@ -138,38 +147,53 @@ namespace HealthWellbeing.Controllers
                 TempoEntrega = fornecedor.TempoEntrega ?? 0,
                 DataCompra = DateTime.Now
             };
-            
+
             _context.Compra.Add(compra);
 
-            // 🔹 Obter o stock associado ao consumível
+            // 🔹 Zona (FONTE DA VERDADE)
+            var zona = _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == model.ConsumivelId && z.Ativa)
+                .OrderBy(z => z.QuantidadeAtual)
+                .FirstOrDefault();
+
+            if (zona == null)
+                return BadRequest("Não existe zona ativa para este consumível.");
+
+            zona.QuantidadeAtual += model.Quantidade;
+
+            // 🔹 Recalcular TOTAL do Consumível (soma das zonas)
+            consumivel.QuantidadeAtual = _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivel.ConsumivelId)
+                .Sum(z => z.QuantidadeAtual);
+
+            // 🔹 Stock (espelho)
             var stock = _context.Stock
-                .FirstOrDefault(s => s.ConsumivelID == model.ConsumivelId);
+                .FirstOrDefault(s => s.ConsumivelID == consumivel.ConsumivelId);
 
             if (stock == null)
                 return BadRequest("Stock não encontrado para este consumível.");
 
+            stock.QuantidadeAtual = consumivel.QuantidadeAtual;
+            stock.DataUltimaAtualizacao = DateTime.Now;
+
+            // 🔹 Histórico
             _context.HistoricoCompras.Add(new HistoricoCompras
             {
-                StockId = stock.StockId,          // 🔗 ligação correta
+                StockId = stock.StockId,
                 Quantidade = model.Quantidade,
-                FornecedorId = fornecedor.FornecedorId, // opcional mas recomendado
+                FornecedorId = fornecedor.FornecedorId,
                 Tipo = "Entrada",
-                Data = DateTime.Now,
-                
+                Data = DateTime.Now
             });
-
-
-            // 🟢 2 — Atualizar APENAS o Consumível
-            consumivel.QuantidadeAtual += model.Quantidade;
 
             _context.SaveChanges();
 
-            // ✅ 3 — Ir para o HISTÓRICO DE COMPRAS
             return RedirectToAction("Index", "HistoricoCompras");
         }
 
-
-
+        // =====================================================
+        // HISTÓRICO SIMPLES
+        // =====================================================
         public IActionResult Historico()
         {
             return View(_context.Compra

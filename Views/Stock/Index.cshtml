@@ -24,12 +24,13 @@
         </div>
     </div>
 
-    <!-- FILTROS (ESTILO ZONAS) -->
+    <!-- FILTROS -->
     <form method="get" asp-action="Index" class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3 align-items-center">
 
-                <div class="col-md-4">
+                <!-- 🔍 Pesquisa por consumível (ESQUERDA) -->
+                <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text text-muted">🔍</span>
                         <input type="text"
@@ -40,40 +41,38 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text text-muted">📍</span>
-                        <input type="text"
-                               name="searchZona"
-                               value="@ViewBag.SearchZona"
-                               class="form-control"
-                               placeholder="Procurar por zona..." />
+                <!-- Espaço flexível -->
+                <div class="col-md-2"></div>
+
+                <!-- ⚠️ Stock crítico + botões (DIREITA) -->
+                <div class="col-md-5 d-flex justify-content-end align-items-center gap-3">
+
+                    <div class="form-check d-flex align-items-center gap-1">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="stockCritico"
+                               value="true"
+                               id="stockCritico"
+                               @(ViewBag.StockCritico == true ? "checked" : "") />
+                        <label class="form-check-label text-muted" for="stockCritico">
+                            ⚠️ Só stock crítico
+                        </label>
                     </div>
-                </div>
 
-                <div class="col-md-2 d-flex align-items-center gap-2">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="stockCritico"
-                           value="true"
-                           @(ViewBag.StockCritico == true ? "checked" : "") />
-                    <label class="form-check-label text-muted">
-                        ⚠️ Só stock crítico
-                    </label>
-                </div>
-
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="btn btn-primary px-4">
                         Filtrar
                     </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
                         Limpar
                     </a>
+
                 </div>
 
             </div>
         </div>
     </form>
+
 
     <!-- TABELA -->
     <div class="table-responsive">
@@ -132,11 +131,7 @@
                             <td>
                                 <span class="text-muted me-1">📦</span>
                                 @item.Consumivel.Nome
-                                @item.QuantidadeAtual
-                                @item.Consumivel.QuantidadeMinima
-                                @item.Consumivel.QuantidadeMaxima
-                                @item.DataUltimaAtualizacao
-
+                          
                             </td>
 
                             <!-- BOTÃO VER ZONAS -->
