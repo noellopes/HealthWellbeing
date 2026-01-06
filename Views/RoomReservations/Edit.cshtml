@@ -13,38 +13,20 @@
         <form asp-action="Edit" method="post" id="edit-form">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="RoomReservationId" />
+            <input type="hidden" asp-for="ConsultationId" />
 
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="row g-3">
 
-                <!-- ID da Consulta (desativado) -->
+                <!-- Data da Consulta (bloqueada) -->
                 <div class="col-md-6">
-                    <label asp-for="ConsultationId" class="form-label fw-bold">ID da Consulta</label>
-                    <input asp-for="ConsultationId" class="form-control" disabled />
-                    <input type="hidden" asp-for="ConsultationId" />
-                    <span asp-validation-for="ConsultationId" class="text-danger small"></span>
-                </div>
-
-                <!-- Data da Consulta -->
-                <div class="col-md-6">
-                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta(*)</label>
-                    <input asp-for="ConsultationDate" type="date" class="form-control" required />
-                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
-                </div>
-
-                <!-- Hora de Início -->
-                <div class="col-md-6">
-                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
-                    <input asp-for="StartHour" type="time" class="form-control" required />
-                    <span asp-validation-for="StartHour" class="text-danger small"></span>
-                </div>
-
-                <!-- Hora de Fim -->
-                <div class="col-md-6">
-                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
-                    <input asp-for="EndHour" type="time" class="form-control" required />
-                    <span asp-validation-for="EndHour" class="text-danger small"></span>
+                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta</label>
+                    <input type="date"
+                           class="form-control"
+                           value="@Model.ConsultationDate.ToString("yyyy-MM-dd")"
+                           readonly />
+                    <input type="hidden" asp-for="ConsultationDate" />
                 </div>
 
                 <!-- Sala -->
@@ -56,11 +38,26 @@
                     <span asp-validation-for="RoomId" class="text-danger small"></span>
                 </div>
 
-                <!-- Responsável -->
+                <!-- Hora de Fim -->
                 <div class="col-md-6">
-                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável(*)</label>
-                    <input asp-for="ResponsibleName" class="form-control" required />
-                    <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
+                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim(*)</label>
+                    <input asp-for="EndHour" type="time" class="form-control" required />
+                    <span asp-validation-for="EndHour" class="text-danger small"></span>
+                </div>
+
+
+                <!-- Hora de Início -->
+                <div class="col-md-6">
+                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início(*)</label>
+                    <input asp-for="StartHour" type="time" class="form-control" required />
+                    <span asp-validation-for="StartHour" class="text-danger small"></span>
+                </div>
+
+                <!-- Responsável (bloqueado) -->
+                <div class="col-md-6">
+                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável</label>
+                    <input asp-for="ResponsibleName" class="form-control" readonly />
+                    <input type="hidden" asp-for="ResponsibleName" />
                 </div>
 
                 <!-- Observações -->
@@ -96,7 +93,6 @@
             const form = document.getElementById("edit-form");
             const saveBtn = document.getElementById("save-btn");
 
-            // Guardar valores iniciais
             const initial = new FormData(form);
 
             function checkChanges() {
@@ -113,11 +109,9 @@
                 saveBtn.disabled = !changed;
             }
 
-            // Monitorizar alterações
             form.addEventListener("input", checkChanges);
             form.addEventListener("change", checkChanges);
 
-            // Desativar botão ao carregar
             saveBtn.disabled = true;
         });
     </script>

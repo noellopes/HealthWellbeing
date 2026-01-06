@@ -421,11 +421,48 @@ namespace HealthWellbeingRoom.Controllers
 
             return View(reservation);
         }
-        //------------------------------------------------------CREATE-------------------------------------------------------------------------------------
+        //------------------------------------------------------CHOOSEROOM-------------------------------------------------------------------------------------
 
+        private async Task<Room?> EscolherSalaAleatoriaPorEspecialidade(
+            int specialtyId,
+            DateTime data,
+            TimeSpan inicio,
+            TimeSpan fim)
+                {
+            var salasDaEspecialidade = await _context.Room
+                .Where(r => r.SpecialtyId == specialtyId)
+                .ToListAsync();
+
+            if (!salasDaEspecialidade.Any())
+                return null;
+
+            var salasDisponiveis = salasDaEspecialidade
+                .Where(sala => !_context.RoomReservations.Any(reserva =>
+                    reserva.RoomId == sala.RoomId &&
+                    reserva.Status == "Ativa" &&
+                    reserva.ConsultationDate == data &&
+                    reserva.StartHour < fim &&
+                    inicio < reserva.EndHour))
+                .ToList();
+
+            if (!salasDisponiveis.Any())
+                return null;
+
+            var random = new Random();
+            int index = random.Next(salasDisponiveis.Count);
+
+            return salasDisponiveis[index];
+        }
+
+        //------------------------------------------------------CREATE-------------------------------------------------------------------------------------
         // GET: RoomReservations/Create
         [Authorize(Roles = "logisticsTechnician")]
-        public async Task<IActionResult> Create(int? roomId, int? consultationId)
+        public async Task<IActionResult> Create(
+            int? roomId,
+            int? consultationId,
+            DateTime? ConsultationDate,
+            TimeOnly? StartTime,
+            TimeOnly? EndTime)
         {
             Consultation? consultation = null;
 
@@ -435,25 +472,51 @@ namespace HealthWellbeingRoom.Controllers
                     .FirstOrDefaultAsync(c => c.ConsultationId == consultationId.Value);
             }
 
+            // 1. Se vierem valores da lista de consultas, usar esses
+            var finalDate = ConsultationDate ?? consultation?.ConsultationDate ?? DateTime.Today;
+            var finalStart = StartTime ?? consultation?.StartTime;
+            var finalEnd = EndTime ?? consultation?.EndTime;
+
+            // 2. Escolher sala aleatória com base na especialidade
+            int specialtyId = consultation?.SpecialtyId ?? 0;
+
+            Room? salaEscolhida = null;
+
+            if (specialtyId > 0 && finalStart.HasValue && finalEnd.HasValue)
+            {
+                salaEscolhida = await EscolherSalaAleatoriaPorEspecialidade(
+                    specialtyId,
+                    finalDate,
+                    finalStart.Value.ToTimeSpan(),
+                    finalEnd.Value.ToTimeSpan()
+                );
+            }
+
+            // 3. Preencher dropdowns com base nos valores escolhidos
             await PreencherDropdowns(
-                selectedRoomId: roomId ?? consultation?.RoomId,
-                selectedSpecialityId: consultation?.SpecialtyId,
-                consultationDate: consultation?.ConsultationDate,
+                selectedRoomId: salaEscolhida?.RoomId ?? roomId ?? consultation?.RoomId,
+                selectedSpecialityId: specialtyId,
+                consultationDate: finalDate,
+                startHour: finalStart?.ToTimeSpan(),
+                endHour: finalEnd?.ToTimeSpan(),
                 excludeReservationId: null
             );
 
+            // 4. Criar o modelo já preenchido
             var model = new RoomReservation
             {
-                RoomId = roomId ?? consultation?.RoomId ?? 0,
+                RoomId = salaEscolhida?.RoomId ?? roomId ?? consultation?.RoomId ?? 0,
                 ConsultationId = consultation?.ConsultationId ?? 0,
-                SpecialtyId = consultation?.SpecialtyId,
+                SpecialtyId = specialtyId,
                 ResponsibleName = consultation?.DoctorName ?? string.Empty,
-                ConsultationDate = consultation?.ConsultationDate ?? DateTime.Today,
+
+                ConsultationDate = finalDate,
+                StartHour = finalStart?.ToTimeSpan() ?? default,
+                EndHour = finalEnd?.ToTimeSpan() ?? default
             };
 
             return View(model);
         }
-
 
         //------------------------------------------------------CREATE POST-------------------------------------------------------------------------------------
         [HttpPost]
@@ -684,11 +747,27 @@ namespace HealthWellbeingRoom.Controllers
                 return View(roomReservation);
             }
 
-            // ===================== ATUALIZA =====================
+            // ===================== ATUALIZA RESERVA + CONSULTA =====================
 
             try
             {
+                // Atualiza a reserva
                 _context.Update(roomReservation);
+
+                // Atualiza também a consulta associada
+                var consulta = await _context.Consultations
+                    .FirstOrDefaultAsync(c => c.ConsultationId == roomReservation.ConsultationId);
+
+                if (consulta != null)
+                {
+                    consulta.ConsultationDate = roomReservation.ConsultationDate;
+                    consulta.StartTime = TimeOnly.FromTimeSpan(roomReservation.StartHour);
+                    consulta.EndTime = TimeOnly.FromTimeSpan(roomReservation.EndHour);
+                    consulta.RoomId = roomReservation.RoomId;
+
+                    _context.Update(consulta);
+                }
+
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Reserva atualizada com sucesso!";
             }
