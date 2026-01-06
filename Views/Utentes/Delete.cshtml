@@ -1,25 +1,28 @@
 ﻿@model HealthWellbeing.Models.UtenteBalneario
 
 @{
-    ViewData["Title"] = "Eliminar Utente";
+    ViewData["Title"] = "Apagar Utente";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<h4>Tem a certeza que pretende eliminar este registo?</h4>
-
-<div>
-    <h4>@Model.NomeCompleto</h4>
-    <dl class="row">
-        <dt class="col-sm-3">Data de Nascimento</dt>
-        <dd class="col-sm-9">@Model.DataNascimento.ToShortDateString()</dd>
-        <dt class="col-sm-3">Contacto</dt>
-        <dd class="col-sm-9">@Model.Contacto</dd>
-    </dl>
+<div class="alert alert-danger">
+    <strong>Atenção!</strong>
+    Tem a certeza que quer apagar este utente?
 </div>
 
+<dl class="row">
+    <dt class="col-sm-3">Nome</dt>
+    <dd class="col-sm-9">@Model.NomeCompleto</dd>
+
+    <dt class="col-sm-3">NIF</dt>
+    <dd class="col-sm-9">@Model.NIF</dd>
+</dl>
+
 <form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="UtenteBalnearioId" />
-    <button type="submit" class="btn btn-danger">Eliminar</button>
+
+    <button type="submit" class="btn btn-danger">Apagar</button>
     <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
 </form>

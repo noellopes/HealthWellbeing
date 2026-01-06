@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeing.Models.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
@@ -20,7 +21,7 @@ namespace HealthWellbeing.Models
         public Sexo Sexo { get; set; }
 
         [Required(ErrorMessage = "O NIF é obrigatório")]
-        [RegularExpression(@"^\d{9}$", ErrorMessage = "O NIF deve ter exatamente 9 dígitos")]
+        [Nif(ErrorMessage = "O NIF é inválido.")]
         public string NIF { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O contacto é obrigatório")]

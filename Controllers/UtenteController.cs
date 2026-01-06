@@ -44,9 +44,63 @@ public class UtentesController : Controller
         utente.DataInscricao = DateTime.Today;
 
         if (!ModelState.IsValid)
+        {
             return View(utente);
+        }
 
         _utenteService.Add(utente);
         return RedirectToAction(nameof(Index));
     }
+
+
+    public IActionResult Edit(int id)
+    {
+        var utente = _utenteService.GetById(id);
+        if (utente == null)
+            return NotFound();
+
+        return View(utente);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(UtenteBalneario utente)
+    {
+        if (!ModelState.IsValid)
+            return View(utente);
+
+        _utenteService.Update(utente);
+        return RedirectToAction(nameof(Index));
+    }
+
+
+    public IActionResult Details(int id)
+    {
+        var utente = _utenteService.GetById(id);
+        if (utente == null)
+            return NotFound();
+
+        return View(utente);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [ActionName("Delete")]
+    public IActionResult DeleteConfirmed(int id)
+    {
+        _utenteService.Delete(id);
+        return RedirectToAction(nameof(Index));
+    }
+
+
+    public IActionResult Delete(int id)
+    {
+        var utente = _utenteService.GetById(id);
+        if (utente == null)
+            return NotFound();
+
+        return View(utente);
+    }
+
 }

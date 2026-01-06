@@ -1,4 +1,5 @@
 ﻿@model HealthWellbeing.Models.UtenteBalneario
+@using HealthWellbeing.Models
 
 @{
     ViewData["Title"] = "Editar Utente";
@@ -7,7 +8,11 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
     <input type="hidden" asp-for="UtenteBalnearioId" />
+    <input type="hidden" asp-for="DataInscricao" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group">
         <label asp-for="NomeCompleto"></label>
@@ -18,39 +23,45 @@
     <div class="form-group">
         <label asp-for="DataNascimento"></label>
         <input asp-for="DataNascimento" type="date" class="form-control" />
+        <span asp-validation-for="DataNascimento" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Sexo"></label>
-        <select asp-for="Sexo" class="form-control" asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.Sexo>()"></select>
+        <select asp-for="Sexo"
+                asp-items="Html.GetEnumSelectList<Sexo>()"
+                class="form-control">
+        </select>
+        <span asp-validation-for="Sexo" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="NIF"></label>
         <input asp-for="NIF" class="form-control" />
+        <span asp-validation-for="NIF" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Contacto"></label>
         <input asp-for="Contacto" class="form-control" />
+        <span asp-validation-for="Contacto" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Morada"></label>
         <input asp-for="Morada" class="form-control" />
+        <span asp-validation-for="Morada" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Ativo"></label>
-        <input asp-for="Ativo" type="checkbox" />
+    <div class="form-check mt-2">
+        <input asp-for="Ativo" class="form-check-input" />
+        <label asp-for="Ativo" class="form-check-label"></label>
     </div>
 
-    <button type="submit" class="btn btn-primary mt-3">Guardar Alterações</button>
+    <button type="submit" class="btn btn-success mt-3">Guardar</button>
     <a asp-action="Index" class="btn btn-secondary mt-3">Voltar</a>
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
