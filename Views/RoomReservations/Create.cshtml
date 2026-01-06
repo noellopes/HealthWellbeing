@@ -5,7 +5,7 @@
 }
 
 <h1 class="mb-4 text-success">
-    <i class="bi bi-calendar-plus"></i> Criar Reserva da sala
+    <i class="bi bi-calendar-plus"></i> Confirmar Reserva da sala
 </h1>
 
 <div class="card shadow-sm">
@@ -15,77 +15,69 @@
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            @* Id da consulta apenas em hidden *@
+            <!-- Hidden para garantir envio -->
             <input asp-for="ConsultationId" type="hidden" />
+            <input asp-for="SpecialtyId" type="hidden" />
+            <input asp-for="RoomId" type="hidden" />
+            <input asp-for="StartHour" type="hidden" />
+            <input asp-for="EndHour" type="hidden" />
+            <input asp-for="ConsultationDate" type="hidden" />
 
             <div class="row g-3">
 
                 <!-- ===================== LINHA 1 ===================== -->
                 <div class="col-md-6">
-                    <label asp-for="ConsultationDate" class="form-label fw-bold">Data da Consulta*</label>
-                    <input asp-for="ConsultationDate"
-                           type="date"
+                    <label class="form-label fw-bold">Data da Consulta</label>
+                    <input type="date"
                            class="form-control"
-                           id="consultation-date"
-                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                    <span asp-validation-for="ConsultationDate" class="text-danger small"></span>
+                           value="@Model.ConsultationDate.ToString("yyyy-MM-dd")"
+                           readonly />
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="SpecialtyId" class="form-label fw-bold">Especialidade</label>
-
-                    @* hidden para o valor ser enviado no POST *@
-                    <input asp-for="SpecialtyId" type="hidden" />
-
-                    <select asp-for="SpecialtyId"
-                            class="form-select"
-                            asp-items="@(ViewBag.Specialties as SelectList)"
-                            disabled>
-                        <option value="">Selecione a especialidade...</option>
-                    </select>
-
-                    <span asp-validation-for="SpecialtyId" class="text-danger small"></span>
+                    <label class="form-label fw-bold">Especialidade</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@((ViewBag.Specialties as SelectList)?.FirstOrDefault(x => x.Value == Model.SpecialtyId.ToString())?.Text ?? "Especialidade não encontrada")"
+                           readonly />
                 </div>
-
 
                 <!-- ===================== LINHA 2 ===================== -->
                 <div class="col-md-6">
-                    <label asp-for="StartHour" class="form-label fw-bold">Hora de Início**</label>
-                    <input asp-for="StartHour" type="time" class="form-control" id="StartHour" />
-                    <span asp-validation-for="StartHour" class="text-danger small"></span>
+                    <label class="form-label fw-bold">Hora de Início</label>
+                    <input type="time"
+                           class="form-control"
+                           value="@Model.StartHour.ToString(@"hh\:mm")"
+                           readonly />
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="EndHour" class="form-label fw-bold">Hora de Fim***</label>
-                    <input asp-for="EndHour" type="time" class="form-control" id="EndHour" />
-                    <span asp-validation-for="EndHour" class="text-danger small"></span>
+                    <label class="form-label fw-bold">Hora de Fim</label>
+                    <input type="time"
+                           class="form-control"
+                           value="@Model.EndHour.ToString(@"hh\:mm")"
+                           readonly />
                 </div>
 
                 <!-- ===================== LINHA 3 ===================== -->
                 <div class="col-md-6">
-                    <label asp-for="RoomId" class="form-label fw-bold">Sala****</label>
-                    <select asp-for="RoomId"
-                            class="form-select"
-                            asp-items="@(ViewBag.Rooms as SelectList)"
-                            id="room-select"
-                            required>
-                        <option value="">Selecione a sala...</option>
-                    </select>
-                    <span asp-validation-for="RoomId" class="text-danger small"></span>
+                    <label class="form-label fw-bold">Sala*</label>
+                    <input type="text"
+                           class="form-control"
+                           value="@((ViewBag.Rooms as SelectList)?.FirstOrDefault(x => x.Value == Model.RoomId.ToString())?.Text ?? "Sala não encontrada")"
+                           readonly />
                 </div>
 
                 <div class="col-md-6">
-                    <label asp-for="ResponsibleName" class="form-label fw-bold">Responsável</label>
+                    <label class="form-label fw-bold">Responsável</label>
                     <input asp-for="ResponsibleName"
                            class="form-control"
-                           placeholder="Ex: Dr. João Silva"
                            readonly />
-                    <span asp-validation-for="ResponsibleName" class="text-danger small"></span>
                 </div>
 
                 <!-- ===================== OBSERVAÇÕES ===================== -->
                 <div class="col-md-12">
-                    <label asp-for="Notes" class="form-label fw-bold">Observações (Opcional)</label>
+                    <label asp-for="Notes" class="form-label fw-bold">Observações**</label>
                     <textarea asp-for="Notes"
                               class="form-control"
                               rows="3"
@@ -97,7 +89,7 @@
 
             <div class="text-end mt-4 gap-2 border-top pt-3">
                 <button type="submit" class="btn btn-success btn-sm" style="min-width:150px">
-                    <i class="bi bi-check-circle me-1"></i> Criar reserva
+                    <i class="bi bi-check-circle me-1"></i> Confirmar reserva
                 </button>
             </div>
 
@@ -108,14 +100,12 @@
 
 <div class="mt-4 d-flex justify-content-between">
 
-    <!-- Lista de Salas (ESQUERDA) -->
     <a asp-controller="Rooms"
        asp-action="Index"
        class="btn btn-primary btn-sm">
         <i class="bi bi-house-door-fill me-1"></i> Lista de Salas
     </a>
 
-    <!-- Lista de Reservas (DIREITA) -->
     <div class="text-end">
         <a asp-action="Consultation"
            class="btn btn-success btn-sm me-2">
@@ -134,12 +124,11 @@
 <div class="alert alert-info d-flex align-items-start mt-4" role="alert">
     <i class="bi bi-info-circle-fill me-2"></i>
     <div>
-        (*) - "Data da consulta não pode ser no passado";<br />
-        (**) - "A hora de início deve ser igual ou superior à hora atual (se a data for hoje)";<br />
-        (***) - "A hora de fim deve ser sempre maior do que a hora de início";<br />
-        (****) - "Introduzir primeiro Data e horas de início e fim para filtrar a sala disponível".
+        (*) - "Sala compativel com a Especialidade da consulta";<br />
+        (**) - "A observacao é opcional";<br />
     </div>
 </div>
+
 
 @section Scripts {
     @{
