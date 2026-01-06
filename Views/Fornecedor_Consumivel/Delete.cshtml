@@ -1,64 +1,96 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Eliminar";
+    ViewData["Title"] = "Eliminar Associação";
 }
 
-<div class="container mt-4">
+<style>
+    .delete-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
 
-    <h2 class="fw-bold text-danger mb-4">
-        🗑 Eliminar Associação
-    </h2>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
 
-    <div class="alert alert-warning shadow-sm">
-        ⚠️ Tem a certeza que deseja eliminar esta associação?
-        Esta ação <strong>não pode ser revertida</strong>.
-    </div>
+    .card-header {
+        background-color: #dc3545;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
 
-    <div class="card shadow-sm mb-4">
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+
+    .confirm-text {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 12px 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="card">
+        <div class="card-header">
+            🗑️ Eliminar Associação Fornecedor–Consumível
+        </div>
+
         <div class="card-body">
+            <div class="confirm-text">
+                ⚠️ Tens a certeza que queres eliminar esta associação? Esta ação não pode ser desfeita.
+            </div>
 
-            <dl class="row mb-0">
-
-                <dt class="col-sm-3 text-muted">Fornecedor</dt>
-                <dd class="col-sm-9 fw-semibold">
-                    @Model.Fornecedor?.NomeEmpresa
+            <dl class="row mb-4">
+                <dt class="col-sm-4 details-label">Fornecedor</dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Fornecedor.Email)
                 </dd>
 
-                <dt class="col-sm-3 text-muted">Consumível</dt>
-                <dd class="col-sm-9">
-                    @Model.Consumivel?.Nome
+                <dt class="col-sm-4 details-label">Consumível</dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Consumivel.Nome)
                 </dd>
 
-                <dt class="col-sm-3 text-muted">Tempo de Entrega</dt>
-                <dd class="col-sm-9">
-                    @(Model.TempoEntrega.HasValue ? $"{Model.TempoEntrega} dias" : "—")
+                <dt class="col-sm-4 details-label">
+                    @Html.DisplayNameFor(model => model.TempoEntrega)
+                </dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.TempoEntrega)
                 </dd>
 
-                <dt class="col-sm-3 text-muted">Preço</dt>
-                <dd class="col-sm-9 fw-bold text-success">
-                    @Model.Preco.ToString("0.00") €
+                <dt class="col-sm-4 details-label">
+                    @Html.DisplayNameFor(model => model.Preco)
+                </dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Preco)
                 </dd>
-
             </dl>
 
+            <form asp-action="Delete" class="d-flex justify-content-end mt-3">
+                <input type="hidden" asp-for="FornecedorConsumivelId" />
+                <button type="submit" class="btn btn-danger me-2">
+                    Eliminar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </form>
         </div>
     </div>
-
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="FornecedorConsumivelId" />
-
-        <div class="d-flex gap-2">
-            <button type="submit"
-                    class="btn btn-danger px-4">
-                ❌ Eliminar
-            </button>
-
-            <a asp-action="Index"
-               class="btn btn-outline-secondary px-4">
-                Cancelar
-            </a>
-        </div>
-    </form>
-
 </div>
