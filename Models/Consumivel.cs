@@ -42,5 +42,8 @@ namespace HealthWellbeing.Models
         //}
         // Navegação
         public CategoriaConsumivel? CategoriaConsumivel { get; set; }
+
+        public ICollection<Fornecedor_Consumivel> FornecedoresConsumiveis { get; set; } = new List<Fornecedor_Consumivel>();
+
     }
 }
