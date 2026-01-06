@@ -50,7 +50,13 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    
+                    if (stock.UsaValoresDoConsumivel)
+                    {
+                        stock.QuantidadeAtual = c.QuantidadeAtual;
+                        stock.QuantidadeMinima = c.QuantidadeMinima;
+                        stock.QuantidadeMaxima = c.QuantidadeMaxima;
+                        stock.DataUltimaAtualizacao = DateTime.Now;
+                    }
                 }
             }
 

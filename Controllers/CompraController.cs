@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.Models.ViewModels;
+using HealthWellbeingRoom.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -160,33 +161,35 @@ namespace HealthWellbeing.Controllers
                 return BadRequest("Não existe zona ativa para este consumível.");
 
             zona.QuantidadeAtual += model.Quantidade;
+            
+            _context.SaveChanges();
 
             // 🔹 Recalcular TOTAL do Consumível (soma das zonas)
             consumivel.QuantidadeAtual = _context.ZonaArmazenamento
                 .Where(z => z.ConsumivelId == consumivel.ConsumivelId)
                 .Sum(z => z.QuantidadeAtual);
 
-            // 🔹 Stock (espelho)
-            var stock = _context.Stock
-                .FirstOrDefault(s => s.ConsumivelID == consumivel.ConsumivelId);
-
-            if (stock == null)
-                return BadRequest("Stock não encontrado para este consumível.");
-
-            stock.QuantidadeAtual = consumivel.QuantidadeAtual;
-            stock.DataUltimaAtualizacao = DateTime.Now;
+            // 🔑 SINCRONIZA STOCK AUTOMATICAMENTE
+            SincronizaCompra.AtualizarStockAposCompra(
+                _context,
+                consumivel.ConsumivelId
+            );
 
             // 🔹 Histórico
             _context.HistoricoCompras.Add(new HistoricoCompras
             {
-                StockId = stock.StockId,
+                StockId = _context.Stock
+                    .Where(s => s.ConsumivelID == consumivel.ConsumivelId)
+                    .Select(s => s.StockId)
+                    .First(),
+
                 Quantidade = model.Quantidade,
                 FornecedorId = fornecedor.FornecedorId,
                 Tipo = "Entrada",
                 Data = DateTime.Now
             });
 
-            _context.SaveChanges();
+            
 
             return RedirectToAction("Index", "HistoricoCompras");
         }
