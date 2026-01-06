@@ -239,13 +239,17 @@ namespace HealthWellbeing.Controllers
             var user = await _userManager.GetUserAsync(User);
             var currentUserId = user.Id;
 
+            ModelState.Remove("UserId");
+            ModelState.Remove("UtenteProblemasSaude");
+            ModelState.Remove("HistoricoAtividades");
+
             bool isAdmin = await _userManager.IsInRoleAsync(user, "Administrador");
             bool isProf = await _userManager.IsInRoleAsync(user, "ProfissionalSaude");
 
             if (isAdmin || isProf)
             {
                 TempData["MensagemErro"] = "Erro: Contas de Administrador ou Profissional de Saúde não podem criar perfil de Utente.";
-
+                ModelState.Remove("ProfissionalSaudeId");
                 await PopularObjetivosDropDownList(utenteGrupo7.ObjetivoFisicoId);
                 await PopularProblemasSaudeCheckboxes(utenteGrupo7);
                 await PopularProfissionaisDropDownList(utenteGrupo7.ProfissionalSaudeId);
@@ -349,6 +353,13 @@ namespace HealthWellbeing.Controllers
             if (id != utenteGrupo7.UtenteGrupo7Id) return NotFound();
 
             ModelState.Remove("UserId");
+            ModelState.Remove("UtenteProblemasSaude");
+            ModelState.Remove("HistoricoAtividades");
+            ModelState.Remove("Sonos");
+            ModelState.Remove("AvaliacaoFisicas");
+            ModelState.Remove("PlanoExercicios");
+
+            ModelState.Remove("UserId");
 
             var utenteToUpdate = await _context.UtenteGrupo7
                 .Include(u => u.UtenteProblemasSaude)
@@ -418,65 +429,15 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var utenteGrupo7 = await _context.UtenteGrupo7
-                .Include(u => u.ObjetivoFisico) // É bom incluir para mostrar o nome do objetivo também
+                .Include(u => u.ObjetivoFisico)
                 .Include(u => u.Sonos)
+                .Include(u => u.AvaliacaoFisicas)
+                .Include(u => u.PlanoExercicios)
                 .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
 
             if (utenteGrupo7 == null) return NotFound();
 
-            // LOGICA DE SEGURANÇA
-            var currentUserId = _userManager.GetUserId(User);
-
-            if (User.IsInRole("Administrador"))
-            {
-                // Admin pode apagar qualquer um
-            }
-            else if (User.IsInRole("ProfissionalSaude"))
-            {
-                if (utenteGrupo7.ProfissionalSaudeId != currentUserId)
-                {
-                    TempData["ErrorMessage"] = "Não tem permissão para eliminar este utente.";
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Apenas administradores e profissionais de saúde podem eliminar registos.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // --- NOVA LÓGICA: BUSCAR EMAIL DO PROFISSIONAL ---
-            string emailProfissional = "Não Atribuído";
-            if (!string.IsNullOrEmpty(utenteGrupo7.ProfissionalSaudeId))
-            {
-                var userProf = await _userManager.FindByIdAsync(utenteGrupo7.ProfissionalSaudeId);
-                if (userProf != null)
-                {
-                    emailProfissional = userProf.Email;
-                }
-            }
-            ViewBag.EmailProfissional = emailProfissional;
-            // ------------------------------------------------
-
-            int numDependencias = utenteGrupo7.Sonos?.Count ?? 0;
-            ViewBag.NumDependencias = numDependencias;
-            ViewBag.PodeEliminar = numDependencias == 0;
-
-            return View(utenteGrupo7);
-        }
-
-        // POST: UtenteGrupo7/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var utenteGrupo7 = await _context.UtenteGrupo7
-                .Include(u => u.Sonos)
-                .FirstOrDefaultAsync(m => m.UtenteGrupo7Id == id);
-
-            if (utenteGrupo7 == null) return RedirectToAction(nameof(Index));
-
-            // LOGICA DE SEGURANÇA (Repetir a verificação do GET para garantir segurança)
+            // Verificações de Segurança
             var currentUserId = _userManager.GetUserId(User);
             if (!User.IsInRole("Administrador"))
             {
@@ -486,19 +447,49 @@ namespace HealthWellbeing.Controllers
                 }
                 else
                 {
-                    return Forbid();
+                    if (utenteGrupo7.UserId != currentUserId) return Forbid();
                 }
             }
 
-            if ((utenteGrupo7.Sonos?.Count ?? 0) > 0)
+            // Dados para a View
+            string emailProfissional = "Não Atribuído";
+            if (!string.IsNullOrEmpty(utenteGrupo7.ProfissionalSaudeId))
             {
-                TempData["ErrorMessage"] = "Não é possível eliminar o utente. Existem registos associados.";
+                var userProf = await _userManager.FindByIdAsync(utenteGrupo7.ProfissionalSaudeId);
+                if (userProf != null) emailProfissional = userProf.Email;
+            }
+            ViewBag.EmailProfissional = emailProfissional;
+
+            int totalDependencias = (utenteGrupo7.Sonos?.Count ?? 0) +
+                                    (utenteGrupo7.AvaliacaoFisicas?.Count ?? 0) +
+                                    (utenteGrupo7.PlanoExercicios?.Count ?? 0);
+
+            ViewBag.NumDependencias = totalDependencias;
+            ViewBag.PodeEliminar = true; // Agora é sempre true porque configurámos Cascade Delete
+
+            return View(utenteGrupo7);
+        }
+
+        // POST: UtenteGrupo7/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var utenteGrupo7 = await _context.UtenteGrupo7.FindAsync(id);
+            if (utenteGrupo7 == null) return RedirectToAction(nameof(Index));
+
+            try
+            {
+                // O EF Core vai disparar o Cascade Delete configurado no DbContext
+                _context.UtenteGrupo7.Remove(utenteGrupo7);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Utente e todos os dados associados foram eliminados.";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Erro ao eliminar o utente.";
                 return RedirectToAction(nameof(Delete), new { id = id });
             }
-
-            _context.UtenteGrupo7.Remove(utenteGrupo7);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Utente apagado com sucesso.";
 
             return RedirectToAction(nameof(Index));
         }

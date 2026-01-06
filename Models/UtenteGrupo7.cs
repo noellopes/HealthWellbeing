@@ -22,6 +22,7 @@ namespace HealthWellbeing.Models
 
         public ICollection<UtenteGrupo7ProblemaSaude>? UtenteProblemasSaude { get; set; }
         public ICollection<HistoricoAtividade> HistoricoAtividades { get; set; }
-            = new List<HistoricoAtividade>();
+        public ICollection<AvaliacaoFisica>? AvaliacaoFisicas { get; set; }
+        public ICollection<PlanoExercicios>? PlanoExercicios { get; set; }
     }
 }
