@@ -1,0 +1,85 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.ViewModels.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "Gestão de Utilizadores";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3 text-primary"><i class="fas fa-users-cog"></i> Gestão de Utilizadores</h2>
+
+    <div class="card card-body bg-light mb-4 shadow-sm">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+            <div class="col-md-9">
+                <label for="searchEmail" class="form-label fw-bold">Pesquisar por Email</label>
+                <input id="searchEmail" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control" placeholder="exemplo@email.com" />
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filtrar</button>
+                <a asp-action="Index" class="btn btn-secondary w-100">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Items)
+                {
+                    <tr>
+                        <td class="fw-bold">@user.Email</td>
+                        <td>
+                            @foreach (var role in user.Roles)
+                            {
+                                var cor = role == "Administrador" ? "danger" : role == "ProfissionalSaude" ? "success" : "info";
+
+                                <span class="badge bg-@cor me-1">
+                                    @role
+                                </span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <form asp-action="ChangeToAdmin" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Admin</button>
+                            </form>
+                            <form asp-action="ChangeToProfissional" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-success">Profissional</button>
+                            </form>
+                            <form asp-action="ChangeToClient" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Utente</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                <a class="page-link" asp-route-page="1" asp-route-searchEmail="@ViewBag.SearchEmail">Início</a>
+            </li>
+
+            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            {
+                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-route-page="@p" asp-route-searchEmail="@ViewBag.SearchEmail">@p</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-searchEmail="@ViewBag.SearchEmail">Fim</a>
+            </li>
+        </ul>
+    </nav>
+</div>
