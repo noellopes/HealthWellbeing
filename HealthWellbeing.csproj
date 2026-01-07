@@ -28,4 +28,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.EntityFrameworkCore" Version="8.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\FoodPlan\" />
+  </ItemGroup>
+
 </Project>
