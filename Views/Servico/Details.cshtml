@@ -41,8 +41,7 @@
             <dt class="col-sm-3 fw-bold text-muted">Tipo de Serviço</dt>
             <dd class="col-sm-9">@Html.DisplayFor(m => m.TipoServico.Nome)</dd>
         </dl>
-    </div>
-</div>
+   
 
 <div class="mt-4 d-flex justify-content-start gap-2">
     <a asp-action="Edit" asp-route-id="@Model.ServicoId" class="btn btn-primary">
@@ -51,4 +50,6 @@
     <a asp-action="Index" class="btn btn-secondary">
         <i class="bi bi-arrow-left-circle me-1"></i> Voltar
     </a>
+</div>
+    </div>
 </div>
