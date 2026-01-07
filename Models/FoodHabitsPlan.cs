@@ -1,0 +1,25 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HealthWellbeing.Models
+{
+    public class FoodHabitsPlan
+    {
+        [Key]
+        public int FoodHabitsPlanId { get; set; }
+        public int ClientId { get; set; }
+
+        [Required(ErrorMessage = "Starting date is required.")]
+        [DataType(DataType.Date)]
+        public DateTime StartingDate { get; set; }
+
+        [Required(ErrorMessage = "Ending date is required.")]
+        [DataType(DataType.Date)]
+        public DateTime EndingDate { get; set; }
+
+        public bool Done { get; set; }
+        public Client? Client { get; set; }
+
+        public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
+        public ICollection<FoodPlan>? FoodPlans { get; set; }
+    }
+}

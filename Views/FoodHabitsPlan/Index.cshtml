@@ -1,17 +1,17 @@
 ﻿@using HealthWellbeing.Models
-@using HealthWellbeing.ViewModels;
-@model PaginationInfo<HealthWellbeing.Models.NutritionalComponent>
+@using HealthWellbeing.ViewModels
+@model PaginationInfo<FoodHabitsPlan>
 
 @{
-    ViewData["Title"] = "Nutritional Components";
+    ViewData["Title"] = "Food Habits Plans";
     string search = ViewBag.Search as string ?? "";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="d-flex align-items-center">
         <h1 class="h4 mb-0">
-            <i class="bi bi-clipboard2-data-fill me-2 text-primary"></i>
-            Nutritional Components
+            <i class="bi bi-calendar2-check-fill me-2 text-primary"></i>
+            Plans
         </h1>
     </div>
 
@@ -21,14 +21,14 @@
                    name="search"
                    value="@search"
                    class="form-control form-control-sm me-2"
-                   placeholder="Search by name or unit" />
+                   placeholder="Search by date (YYYY-MM-DD) or status" />
             <button type="submit" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-search"></i>
             </button>
         </form>
 
         <a asp-action="Create" class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Component
+            <i class="bi bi-plus-circle me-1"></i> Add Plan
         </a>
     </div>
 </div>
@@ -40,8 +40,8 @@
     <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
         <div class="ps-3">
-            <h4 class="alert-heading mb-1">No components</h4>
-            <p class="mb-0">There are no components matching your search.</p>
+            <h4 class="alert-heading mb-1">No plans</h4>
+            <p class="mb-0">There are no plans matching your search.</p>
         </div>
     </div>
 }
@@ -51,9 +51,9 @@ else
         <table class="table table-striped table-bordered align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Name</th>
-                    <th>Unit</th>
-                    <th>Basis</th>
+                    <th>Starting Date</th>
+                    <th>Ending Date</th>
+                    <th>Status</th>
                     <th class="text-center" style="width: 180px;">Actions</th>
                 </tr>
             </thead>
@@ -61,19 +61,32 @@ else
                 @foreach (var item in Model.Items)
                 {
                     <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Unit</td>
-                        <td>@item.Basis</td>
+                        <td>@item.StartingDate.ToShortDateString()</td>
+                        <td>@item.EndingDate.ToShortDateString()</td>
+                        <td>
+                            @if (item.Done)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Done
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-hourglass-split me-1"></i> In progress
+                                </span>
+                            }
+                        </td>
                         <td class="text-center">
-                            <a asp-action="Details" asp-route-id="@item.NutritionalComponentId"
+                            <a asp-action="Details" asp-route-id="@item.FoodHabitsPlanId"
                                class="btn btn-sm btn-info text-white me-1">
                                 <i class="bi bi-eye-fill"></i>
                             </a>
-                            <a asp-action="Edit" asp-route-id="@item.NutritionalComponentId"
+                            <a asp-action="Edit" asp-route-id="@item.FoodHabitsPlanId"
                                class="btn btn-sm btn-warning text-white me-1">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
-                            <a asp-action="Delete" asp-route-id="@item.NutritionalComponentId"
+                            <a asp-action="Delete" asp-route-id="@item.FoodHabitsPlanId"
                                class="btn btn-sm btn-danger">
                                 <i class="bi bi-trash-fill"></i>
                             </a>
@@ -86,7 +99,7 @@ else
 
     @if (Model.TotalPages > 1)
     {
-        <nav aria-label="Nutritional components pagination">
+        <nav aria-label="Plans pagination">
             <ul class="pagination justify-content-center mt-3">
                 <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                     <a class="page-link"
