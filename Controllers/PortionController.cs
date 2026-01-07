@@ -42,7 +42,7 @@ namespace HealthWellbeing.Controllers
 
             ViewBag.Search = search;
 
-            return View(new PaginationInfo<Portion>(items, totalItems, page, pageSize));
+            return View(new PaginationInfoFoodHabits<Portion>(items, totalItems, page, pageSize));
         }
 
         // GET: Portion/Details/5

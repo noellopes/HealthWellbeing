@@ -41,7 +41,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfo<Food>(items, totalItems, page, itemsPerPage);
+            var model = new PaginationInfoFoodHabits<Food>(items, totalItems, page, itemsPerPage);
 
             ViewBag.Search = search;
 
