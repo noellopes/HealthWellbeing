@@ -92,38 +92,65 @@ else
                     </div>
 
                     @* Lista de dispositivos *@
-                    <ul class="list-group list-group-flush">
+                    <div class="card-body">
                         @foreach (var item in sala.Dispositivo)
                         {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+
                                 <div>
                                     <strong>@item.NomeDispositivo</strong>
-                                    <div class="small text-muted">
+                                    <br>
+                                    <small class="text-muted">
                                         Necessário: @item.QtdNecessaria | Na Sala: @item.QtdNaSala
-                                    </div>
+                                    </small>
                                 </div>
 
+                                @* Lógica dos Botões e Avisos *@
                                 @if (item.EmFalta)
                                 {
                                     <div class="text-end">
                                         <span class="badge bg-danger mb-1">Faltam @item.QtdFalta</span>
                                         <br>
-                                        @* Botão RESOLVER: Leva ao Inventário filtrado pelo nome do que falta *@
-                                        <a asp-controller="MedicalDevice" asp-action="Index"
-                                           asp-route-searchName="@item.NomeDispositivo"
-                                           class="btn btn-sm btn-outline-danger py-0"
-                                           style="font-size: 0.75rem;">
-                                            <i class="bi bi-box-seam"></i> Resolver
-                                        </a>
+
+                                        @if (sala.HoraFim.HasValue && DateTime.Now > sala.HoraFim.Value)
+                                        {
+                                            @* O tempo da SALA já acabou *@
+                                            <span class="badge bg-secondary text-white border"
+                                                  title="O horário desta consulta já terminou.">
+                                                <i class="bi bi-hourglass-bottom"></i> Expirado
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @* Ainda está a tempo -> Verifica se é Técnico *@
+                                            @if (User.IsInRole("logisticsTechnician"))
+                                            {
+                                                <a asp-controller="MedicalDevice" asp-action="Index"
+                                                   asp-route-searchName="@item.NomeDispositivo"
+                                                   asp-route-origem="planeamento"
+                                                   class="btn btn-sm btn-outline-danger py-0"
+                                                   style="font-size: 0.75rem;">
+                                                    <i class="bi bi-box-seam"></i> Resolver
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-light text-muted border"
+                                                      title="Apenas a Logística pode movimentar stock"
+                                                      style="cursor: not-allowed;">
+                                                    <i class="bi bi-lock-fill"></i> Ação Bloqueada
+                                                </span>
+                                            }
+                                        }
                                     </div>
                                 }
                                 else
                                 {
                                     <span class="text-success fs-4"><i class="bi bi-check-circle-fill"></i></span>
                                 }
-                            </li>
+                            </div>
                         }
-                    </ul>
+                    </div>
                 </div>
             </div>
         }
