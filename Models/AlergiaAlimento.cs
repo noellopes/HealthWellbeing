@@ -3,7 +3,7 @@
     public class AlergiaAlimento
     {
 
-        public int AlergiaId { get; set; } 
+        public int AlergiaId { get; set; }
 
         public Alergia? Alergia { get; set; }
 
