@@ -46,7 +46,7 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             // Alterado para TipoServicoId (singular) para bater com a View
-            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
             return View();
         }
 

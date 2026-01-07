@@ -34,7 +34,7 @@ namespace HealthWellbeing.Models
     [DisplayName("Tipo de Serviço")]
     public int TipoServicoId { get; set; }
 
-    [ForeignKey("TipoServicoId")]
-    public virtual TipoServicos? TipoServico { get; set; } 
+    [ForeignKey("TipoServicosId")]
+    public  TipoServicos? TipoServico { get; set; } 
 }
     }
