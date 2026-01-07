@@ -701,6 +701,30 @@ internal class SeedData
         context.SaveChanges();
     }
 
+    private static void PopulateFoodHabits(HealthWellbeingDbContext context)
+    {
+        if (context.FoodHabitsPlan != null && !context.FoodHabitsPlan.Any())
+        {
+            var plans = new List<FoodHabitsPlan>();
+            DateTime today = DateTime.Today;
+            var clients = context.Client.OrderBy(c => c.ClientId).ToList();
+
+            for (int i = 0; i < 30; i++)
+            {
+                plans.Add(new FoodHabitsPlan
+                {
+                    ClientId = clients[i].ClientId,
+                    StartingDate = today.AddDays(-i * 7),
+                    EndingDate = today.AddDays(-i * 7 + 30),
+                    Done = i % 3 == 0
+                });
+            }
+
+            context.FoodHabitsPlan.AddRange(plans);
+            context.SaveChanges();
+        }
+    }
+
     private static void PopulateReceitas(HealthWellbeingDbContext context)
     {
         if (context.Receita.Any())
