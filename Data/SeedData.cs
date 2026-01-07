@@ -43,7 +43,7 @@ internal class SeedData
 
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
     {
-        EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
+        EnsureRoleIsCreatedAsync(roleManager, "Administrador").Wait();
         EnsureRoleIsCreatedAsync(roleManager, "Cliente").Wait();
         EnsureRoleIsCreatedAsync(roleManager, "Nutricionista").Wait();
     }
@@ -60,6 +60,7 @@ internal class SeedData
     {
         EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }).Wait();
         EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "admin@health.com", "Secret123$", new[] { "Administrador" }).Wait();
     }
 
     private static async Task EnsureUserIsCreatedAsync(
@@ -85,7 +86,7 @@ internal class SeedData
 
     internal static void SeedDefaultAdmin(UserManager<IdentityUser> userManager)
     {
-        EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Administrator"]).Wait();
+        EnsureUserIsCreatedAsync(userManager, "admin@ipg.pt", "Secret123$", ["Administrador"]).Wait();
     }
 
     private static void PopulateCategorias(HealthWellbeingDbContext context)

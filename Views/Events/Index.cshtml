@@ -147,7 +147,7 @@ else
                            asp-route-page="1"
                            asp-route-searchName="@ViewBag.SearchName"
                            asp-route-searchType="@ViewBag.SearchType"
-                           asp-route-searchStatus="@ViewBag.SearchStatus">First</a>
+                           asp-route-searchStatus="@ViewBag.SearchName">First</a>
                     </li>
 
                     @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
@@ -165,8 +165,8 @@ else
                         <a class="page-link" asp-action="Index"
                            asp-route-page="@Model.TotalPages"
                            asp-route-searchName="@ViewBag.SearchName"
-                           asp-route-searchType="@ViewBag.SearchType"
-                           asp-route-searchStatus="@ViewBag.SearchStatus">Last</a>
+                           asp-route-searchType="@ViewBag.SearchStatus"
+                           asp-route-searchStatus="@ViewBag.SearchType">Last</a>
                     </li>
                 </ul>
             </nav>
