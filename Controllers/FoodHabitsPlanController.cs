@@ -10,11 +10,11 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class PlanController : Controller
+    public class FoodHabitsPlanController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public PlanController(HealthWellbeingDbContext context)
+        public FoodHabitsPlanController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -22,7 +22,7 @@ namespace HealthWellbeing.Controllers
         // GET: Plans
         public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
-            var query = _context.Plan.AsQueryable();
+            var query = _context.FoodHabitsPlan.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -42,7 +42,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfo<Plan>(items, totalItems, page, itemsPerPage);
+            var model = new PaginationInfo<FoodHabitsPlan>(items, totalItems, page, itemsPerPage);
 
             ViewBag.Search = search;
 
@@ -58,7 +58,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var plan = await _context.Plan
+            var plan = await _context.FoodHabitsPlan
                 .Include(p => p.NutritionistClientPlans)
                     .ThenInclude(ncp => ncp.Client)
                 .Include(p => p.NutritionistClientPlans)
@@ -67,7 +67,7 @@ namespace HealthWellbeing.Controllers
                     .ThenInclude(fp => fp.Food)
                 .Include(p => p.FoodPlans)
                     .ThenInclude(fp => fp.Portion)
-                .FirstOrDefaultAsync(p => p.PlanId == id);
+                .FirstOrDefaultAsync(p => p.FoodHabitsPlanId == id);
 
             if (plan == null)
             {
@@ -109,7 +109,7 @@ namespace HealthWellbeing.Controllers
             var end = plan.EndingDate.Date;
 
             var intakes = await _context.FoodIntake
-                .Where(fi => fi.PlanId == plan.PlanId &&
+                .Where(fi => fi.PlanId == plan.FoodHabitsPlanId &&
                              fi.Date >= start && fi.Date <= end)
                 .ToListAsync();
 
@@ -130,7 +130,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PlanId,StartingDate,EndingDate,Done")] Plan plan)
+        public async Task<IActionResult> Create([Bind("PlanId,StartingDate,EndingDate,Done")] FoodHabitsPlan plan)
         {
             if (ModelState.IsValid)
             {
@@ -149,7 +149,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var plan = await _context.Plan.FindAsync(id);
+            var plan = await _context.FoodHabitsPlan.FindAsync(id);
             if (plan == null)
             {
                 return NotFound();
@@ -162,9 +162,9 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PlanId,StartingDate,EndingDate,Done")] Plan plan)
+        public async Task<IActionResult> Edit(int id, [Bind("PlanId,StartingDate,EndingDate,Done")] FoodHabitsPlan plan)
         {
-            if (id != plan.PlanId)
+            if (id != plan.FoodHabitsPlanId)
             {
                 return NotFound();
             }
@@ -178,7 +178,7 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PlanExists(plan.PlanId))
+                    if (!PlanExists(plan.FoodHabitsPlanId))
                     {
                         return NotFound();
                     }
@@ -200,8 +200,8 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var plan = await _context.Plan
-                .FirstOrDefaultAsync(m => m.PlanId == id);
+            var plan = await _context.FoodHabitsPlan
+                .FirstOrDefaultAsync(m => m.FoodHabitsPlanId == id);
             if (plan == null)
             {
                 return NotFound();
@@ -215,10 +215,10 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var plan = await _context.Plan.FindAsync(id);
+            var plan = await _context.FoodHabitsPlan.FindAsync(id);
             if (plan != null)
             {
-                _context.Plan.Remove(plan);
+                _context.FoodHabitsPlan.Remove(plan);
             }
 
             await _context.SaveChangesAsync();
@@ -227,7 +227,7 @@ namespace HealthWellbeing.Controllers
 
         private bool PlanExists(int id)
         {
-            return _context.Plan.Any(e => e.PlanId == id);
+            return _context.FoodHabitsPlan.Any(e => e.FoodHabitsPlanId == id);
         }
     }
 }

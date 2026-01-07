@@ -332,15 +332,15 @@ internal static class SeedData
         // =====================================================================
         // PLANS (≈ 30)
         // =====================================================================
-        if (db.Plan != null && !db.Plan.Any())
+        if (db.FoodHabitsPlan != null && !db.FoodHabitsPlan.Any())
         {
-            var plans = new List<Plan>();
+            var plans = new List<FoodHabitsPlan>();
             DateTime today = DateTime.Today;
             var clients = db.Client.OrderBy(c => c.ClientId).ToList();
 
             for (int i = 0; i < 30; i++)
             {
-                plans.Add(new Plan
+                plans.Add(new FoodHabitsPlan
                 {
                     ClientId = clients[i].ClientId,
                     StartingDate = today.AddDays(-i * 7),
@@ -349,7 +349,7 @@ internal static class SeedData
                 });
             }
 
-            db.Plan.AddRange(plans);
+            db.FoodHabitsPlan.AddRange(plans);
             db.SaveChanges();
         }
 
@@ -396,7 +396,7 @@ internal static class SeedData
         {
             var clients = db.Client.OrderBy(c => c.ClientId).ToList();
             var nutritionists = db.Nutritionist.OrderBy(n => n.NutritionistId).ToList();
-            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var plans = db.FoodHabitsPlan.OrderBy(p => p.FoodHabitsPlanId).ToList();
 
             if (clients.Any() && nutritionists.Any() && plans.Any())
             {
@@ -413,7 +413,7 @@ internal static class SeedData
                         {
                             ClientId = clients[i].ClientId,
                             NutritionistId = nutritionists[j].NutritionistId,
-                            PlanId = plan.PlanId
+                            PlanId = plan.FoodHabitsPlanId
                         });
 
                         counter++;
@@ -432,7 +432,7 @@ internal static class SeedData
         // =====================================================================
         if (!db.FoodPlan.Any())
         {
-            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var plans = db.FoodHabitsPlan.OrderBy(p => p.FoodHabitsPlanId).ToList();
             var foods = db.Food.OrderBy(f => f.FoodId).ToList();
             var portions = db.Portion.OrderBy(p => p.PortionId).ToList();
 
@@ -441,7 +441,7 @@ internal static class SeedData
                 var defaultPortion = portions.First();
                 var foodPlans = new List<FoodPlan>();
 
-                void AddFoodsToPlan(Plan plan, int startIndex, int count)
+                void AddFoodsToPlan(FoodHabitsPlan plan, int startIndex, int count)
                 {
                     for (int i = 0; i < count && (startIndex + i) < foods.Count; i++)
                     {
@@ -449,7 +449,7 @@ internal static class SeedData
 
                         foodPlans.Add(new FoodPlan
                         {
-                            PlanId = plan.PlanId,
+                            PlanId = plan.FoodHabitsPlanId,
                             FoodId = food.FoodId,
                             PortionId = defaultPortion.PortionId
                         });
@@ -473,7 +473,7 @@ internal static class SeedData
         if (db.FoodPlanDay != null && !db.FoodPlanDay.Any())
         {
             var today = DateTime.Today;
-            var plans = db.Plan.OrderBy(p => p.PlanId).ToList();
+            var plans = db.FoodHabitsPlan.OrderBy(p => p.FoodHabitsPlanId).ToList();
             var baseFoodPlans = db.FoodPlan
                 .AsNoTracking()
                 .OrderBy(fp => fp.PlanId)
@@ -487,7 +487,7 @@ internal static class SeedData
 
                 foreach (var plan in plans)
                 {
-                    var foodsForPlan = baseFoodPlans.Where(fp => fp.PlanId == plan.PlanId).ToList();
+                    var foodsForPlan = baseFoodPlans.Where(fp => fp.PlanId == plan.FoodHabitsPlanId).ToList();
                     if (!foodsForPlan.Any()) continue;
 
                     // cria 7 dias de plano
@@ -499,7 +499,7 @@ internal static class SeedData
                         {
                             list.Add(new FoodPlanDay
                             {
-                                PlanId = plan.PlanId,
+                                PlanId = plan.FoodHabitsPlanId,
                                 FoodId = fp.FoodId,
                                 PortionId = fp.PortionId,
                                 Date = date,

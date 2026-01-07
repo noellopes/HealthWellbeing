@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260107005453_New")]
+    partial class New
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -499,33 +502,6 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("NutritionistClientPlan");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
-                {
-                    b.Property<int>("PlanId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"));
-
-                    b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Done")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("EndingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartingDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("PlanId");
-
-                    b.HasIndex("ClientId");
-
-                    b.ToTable("Plan");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Portion", b =>
                 {
                     b.Property<int>("PortionId")
@@ -823,17 +799,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.Client", "Client")
-                        .WithMany()
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Client");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.Alergy", b =>
                 {
                     b.Navigation("ClientAlergies");
@@ -866,8 +831,6 @@ namespace HealthWellbeing.Migrations
                 {
                     b.Navigation("FoodPlans");
 
-            modelBuilder.Entity("HealthWellbeing.Models.Nutritionist", b =>
-                {
                     b.Navigation("NutritionistClientPlans");
                 });
 

@@ -26,7 +26,7 @@ namespace HealthWellbeing.Models
         public DateTime? ScheduledTime { get; set; }
         public string? MealType { get; set; }
 
-        public Plan? Plan { get; set; }
+        public FoodHabitsPlan? Plan { get; set; }
         public Food? Food { get; set; }
         public Portion? Portion { get; set; }
     }

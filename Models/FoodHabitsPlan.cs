@@ -2,10 +2,10 @@
 
 namespace HealthWellbeing.Models
 {
-    public class Plan
+    public class FoodHabitsPlan
     {
         [Key]
-        public int PlanId { get; set; }
+        public int FoodHabitsPlanId { get; set; }
         public int ClientId { get; set; }
 
         [Required(ErrorMessage = "Starting date is required.")]

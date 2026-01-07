@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.Plan
+﻿@model HealthWellbeing.Models.FoodHabitsPlan
 
 @{
     ViewData["Title"] = "Delete Plan";
@@ -54,7 +54,7 @@
         </dl>
 
         <form asp-action="Delete" method="post">
-            <input type="hidden" asp-for="PlanId" />
+            <input type="hidden" asp-for="FoodHabitsPlanId" />
             <div class="mt-3 d-flex gap-2">
                 <button type="submit" class="btn btn-danger">
                     <i class="bi bi-trash-fill me-1"></i> Delete
