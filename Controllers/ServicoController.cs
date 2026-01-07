@@ -132,7 +132,6 @@ namespace HealthWellbeing.Controllers
                     if (!ServicoExists(servico.ServicoId)) return NotFound();
                     else throw;
                 }
-                return RedirectToAction(nameof(Details), new { id = servico.ServicoId, successMessage = "Serviço criado com sucesso!" });
             }
 
             ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicosId);
