@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Serviços";
-    string? successMessage = Context.Request.Query["successMessage"];
+    string? successMessage = TempData["SuccessMessage"] as string;
 }
 
 @if (!string.IsNullOrEmpty(successMessage))

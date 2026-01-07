@@ -104,21 +104,34 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            var servico = await _context.Servicos.FindAsync(id);
+            var servico = await _context.Servicos
+        .Include(s => s.TipoServico)
+        .FirstOrDefaultAsync(s => s.ServicoId == id);
             if (servico == null) return NotFound();
 
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicosId);
+            ViewBag.TipoServicosId = new SelectList(
+        _context.TipoServicos,
+        "TipoServicosId",
+        "Nome",
+        servico.TipoServicosId 
+    );
             return View(servico);
         }
 
         // POST: Servico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
+        public async Task<IActionResult> Edit(int id, Servico servico)
         {
-            if (id != servico.ServicoId) return NotFound();
+            if (id != servico.ServicoId)
+                return NotFound();
 
-            ModelState.Remove("TipoServicos");
+            ModelState.Remove("TipoServico");
+
+            if (servico.TipoServicosId == 0)
+            {
+                ModelState.AddModelError("TipoServicosId", "Selecione um tipo de serviço válido.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -126,15 +139,26 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(servico);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Serviço atualizado com sucesso!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServicoExists(servico.ServicoId)) return NotFound();
-                    else throw;
+                    if (!_context.Servicos.Any(e => e.ServicoId == servico.ServicoId))
+                        return NotFound();
+                    else
+                        throw;
                 }
             }
 
-            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicosId);
+            
+            ViewBag.TipoServicosId = new SelectList(
+                _context.TipoServicos,
+                "TipoServicosId",
+                "Nome",
+                servico.TipoServicosId
+            );
+
             return View(servico);
         }
 
@@ -162,6 +186,8 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Servicos.Remove(servico);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Serviço eliminado com sucesso!";
             }
 
             return RedirectToAction(nameof(Index));
