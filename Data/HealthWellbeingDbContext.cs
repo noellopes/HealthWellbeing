@@ -54,4 +54,3 @@ namespace HealthWellbeing.Data
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }
-}

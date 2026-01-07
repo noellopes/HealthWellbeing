@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +10,6 @@ namespace HealthWellbeing.Controllers
     {
         private readonly HealthWellbeingDbContext _context;
 
-        // Corrigido: Removido parênteses extra
         public ServicoController(HealthWellbeingDbContext context)
         {
             _context = context;
@@ -23,7 +18,6 @@ namespace HealthWellbeing.Controllers
         // GET: Servico
         public async Task<IActionResult> Index()
         {
-            // Otimizado: Carrega os dados com Include e retorna a variável correta
             var servicos = await _context.Servicos
                 .Include(s => s.TipoServico)
                 .ToListAsync();
@@ -48,7 +42,6 @@ namespace HealthWellbeing.Controllers
 
             return View(servico);
         }
-
         // GET: Servico/Create
         public IActionResult Create()
         {
@@ -57,12 +50,10 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: Servico/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
         {
-            // Remove a validação do objeto de navegação para não dar erro de ModelState
             ModelState.Remove("TipoServico");
 
             if (ModelState.IsValid)
@@ -78,7 +69,6 @@ namespace HealthWellbeing.Controllers
             ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
             return View(servico);
         }
-
         // GET: Servico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
