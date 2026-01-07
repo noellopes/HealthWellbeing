@@ -8,13 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\**" />
     <Compile Remove="Views\UtenteSaude\Images\**" />
-    <Content Remove="Migrations\**" />
     <Content Remove="Views\UtenteSaude\Images\**" />
-    <EmbeddedResource Remove="Migrations\**" />
     <EmbeddedResource Remove="Views\UtenteSaude\Images\**" />
-    <None Remove="Migrations\**" />
     <None Remove="Views\UtenteSaude\Images\**" />
     <Compile Remove="Data\Migrations\**" />
     <Content Remove="Data\Migrations\**" />

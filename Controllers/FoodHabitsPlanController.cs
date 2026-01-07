@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -41,7 +42,7 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfo<FoodHabitsPlan>(items, totalItems, page, itemsPerPage);
+            var model = new PaginationInfoFoodHabits<FoodHabitsPlan>(items, totalItems, page, itemsPerPage);
 
             ViewBag.Search = search;
 
