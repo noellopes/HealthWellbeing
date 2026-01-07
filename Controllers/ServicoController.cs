@@ -46,13 +46,14 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create()
         {
             // Alterado para TipoServicoId (singular) para bater com a View
-            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
+            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
+        public async Task<IActionResult> Create(
+     [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicosId")] Servico servico)
         {
             ModelState.Remove("TipoServico");
 
@@ -60,13 +61,20 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(servico);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { successMessage = "Serviço criado com sucesso!" });
+                TempData["SuccessMessage"] = "Serviço criado com sucesso!";
+                return RedirectToAction(nameof(Index));
             }
 
-            // Recarregar em caso de erro (singular aqui também)
-            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicoId);
+            ViewBag.TipoServicosId = new SelectList(
+                _context.TipoServicos,
+                "TipoServicosId",
+                "Nome",
+                servico.TipoServicosId
+            );
+
             return View(servico);
         }
+
         // GET: Servico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -75,7 +83,7 @@ namespace HealthWellbeing.Controllers
             var servico = await _context.Servicos.FindAsync(id);
             if (servico == null) return NotFound();
 
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicosId);
             return View(servico);
         }
 
@@ -103,7 +111,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Details), new { id = servico.ServicoId, successMessage = "Serviço criado com sucesso!" });
             }
 
-            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicoId);
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicosId);
             return View(servico);
         }
 

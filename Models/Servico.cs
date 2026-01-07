@@ -32,7 +32,7 @@ namespace HealthWellbeing.Models
     
     [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
     [DisplayName("Tipo de Serviço")]
-    public int TipoServicoId { get; set; }
+    public int TipoServicosId { get; set; }
 
     [ForeignKey("TipoServicosId")]
     public  TipoServicos? TipoServico { get; set; } 
