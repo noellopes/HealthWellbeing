@@ -3,7 +3,18 @@
     
         public class Paginacao
         {
-            public int PaginaCorrente { get; set; }
+        private int totalRegistos;
+        private int pagina;
+        private int pageSize;
+
+        public Paginacao(int totalRegistos, int pagina, int pageSize)
+        {
+            this.totalRegistos = totalRegistos;
+            this.pagina = pagina;
+            this.pageSize = pageSize;
+        }
+
+        public int PaginaCorrente { get; set; }
             public int ItemTotal { get; set; }
             public int TamanhoPagina { get; set; } = 6;
             public int PaginaTotal => (int)Math.Ceiling((decimal)ItemTotal / TamanhoPagina);

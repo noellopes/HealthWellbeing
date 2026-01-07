@@ -1,7 +1,9 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 
 
 namespace HealthWellbeing.Controllers
@@ -27,22 +29,21 @@ namespace HealthWellbeing.Controllers
                 consulta = consulta.Where(x => x.Nome.Contains(pesquisarNome));
             }
 
-           
+
+            int pageSize = 6;
+            int totalRegistos = await consulta.CountAsync();
+
             var model = new TipoServicoViewModel
             {
                 PesquisarNome = pesquisarNome,
-                paginacao = new Paginacao
-                {
-                    PaginaCorrente = pagina,
-                    ItemTotal = await consulta.CountAsync()
-                },
-              
+                paginacao = new Paginacao(totalRegistos, pagina, pageSize),
                 ListaServicos = await consulta
                     .OrderBy(x => x.Nome)
-                    .Skip((pagina - 1) * 6)
-                    .Take(6)
+                    .Skip((pagina - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync()
             };
+
 
             return View(model);
         }

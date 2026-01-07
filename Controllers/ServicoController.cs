@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +17,37 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Servico
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string? pesquisarNome, int pagina = 1)
         {
-            var servicos = await _context.Servicos
-                .Include(s => s.TipoServico)
-                .ToListAsync();
+            int pageSize = 5;
 
-            return View(servicos);
+            var query = _context.Servicos
+                                .Include(s => s.TipoServico)
+                                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(pesquisarNome))
+            {
+                query = query.Where(s => s.Nome.Contains(pesquisarNome));
+            }
+
+            int totalRegistos = query.Count();
+
+            var servicos = query
+                .OrderBy(s => s.Nome)
+                .Skip((pagina - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new ServicoViewModel
+            {
+                ListaServicos = servicos,
+                PesquisarNome = pesquisarNome,
+                paginacao = new Paginacao(totalRegistos, pagina, pageSize)
+            };
+
+            return View(viewModel);
         }
+
 
         // GET: Servico/Details/5
         public async Task<IActionResult> Details(int? id)
