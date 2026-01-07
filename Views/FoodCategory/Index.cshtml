@@ -7,117 +7,114 @@
     string search = ViewBag.Search as string ?? "";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center">
-        <h1 class="h4 mb-0">
-            <i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>
-            Food Categories
-        </h1>
-    </div>
+<div class="container my-4">
+    <div class="fi-wrapper">
+        <!-- HEADER -->
+        <div class="fi-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-grid-3x3-gap-fill me-2 text-primary" style="font-size: 1.25rem;"></i>
+                        <h1 class="h5 mb-0 fi-titlebar">Food Categories</h1>
+                    </div>
+                </div>
 
-    <div class="d-flex align-items-center gap-2">
-        <form asp-action="Index" method="get" class="d-flex">
-            <input type="search"
-                   name="search"
-                   value="@search"
-                   class="form-control form-control-sm me-2"
-                   placeholder="Search by category" />
-            <button type="submit" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-search"></i>
-            </button>
-        </form>
+                <!-- Filters -->
+                <form asp-action="Index" method="get" class="fi-toolbar d-flex flex-wrap gap-2 align-items-end">
+                    <div>
+                        <label class="form-label" for="search">Search</label>
+                        <input id="search" name="search" type="text"
+                               value="@search" class="form-control form-control-sm" placeholder="Search by category" />
+                    </div>
 
-        <a asp-action="Create" class="btn btn-success btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Category
-        </a>
-    </div>
-</div>
+                    <div>
+                        <button type="submit" class="btn fi-btn-primary">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                    </div>
+                </form>
 
-<hr />
+                <a asp-action="Create" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Add Category
+                </a>
+            </div>
+        </div>
 
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
-        <div class="ps-3">
-            <h4 class="alert-heading mb-1">No categories</h4>
-            <p class="mb-0">There are no categories matching your search.</p>
+        <hr />
+
+        <!-- CONTENT -->
+        <div class="fi-panel">
+            @if (!Model.Items.Any())
+            {
+                <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 2rem;"></i>
+                    <div class="ps-3">
+                        <h4 class="alert-heading mb-1">No categories found</h4>
+                        <p class="mb-0">There are no categories matching your search.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped table-bordered align-middle fi-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th class="text-center" style="width: 180px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.Category</td>
+                                    <td>@item.Description</td>
+                                    <td class="text-center">
+                                        <a asp-action="Details" asp-route-id="@item.CategoryId" class="btn btn-sm btn-info text-white me-1">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning text-white me-1">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PAGINATION -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Food categories pagination">
+                        <ul class="pagination justify-content-center mt-3">
+                            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" asp-route-search="@search" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@search">@i</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" asp-route-search="@search" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
         </div>
     </div>
-}
-else
-{
-    <div class="table-responsive mt-3">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Category</th>
-                    <th>Description</th>
-                    <th class="text-center" style="width: 180px;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td>@item.Category</td>
-                        <td>@item.Description</td>
-                        <td class="text-center">
-                            <a asp-action="Details" asp-route-id="@item.CategoryId"
-                               class="btn btn-sm btn-info text-white me-1">
-                                <i class="bi bi-eye-fill"></i>
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@item.CategoryId"
-                               class="btn btn-sm btn-warning text-white me-1">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a asp-action="Delete" asp-route-id="@item.CategoryId"
-                               class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    @if (Model.TotalPages > 1)
-    {
-        <nav aria-label="Food categories pagination">
-            <ul class="pagination justify-content-center mt-3">
-                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage - 1)"
-                       asp-route-search="@search"
-                       aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-
-                @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
-                {
-                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-page="@i"
-                           asp-route-search="@search">
-                            @i
-                        </a>
-                    </li>
-                }
-
-                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
-                       asp-route-page="@(Model.CurrentPage + 1)"
-                       asp-route-search="@search"
-                       aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    }
-}
+</div>

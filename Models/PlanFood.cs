@@ -18,7 +18,7 @@ namespace HealthWellbeing.Models
         public int FoodId { get; set; }
 
         public Portion? Portion { get; set; }
-        public Plan? Plan { get; set; }
+        public FoodHabitsPlan? Plan { get; set; }
         public Food? Food { get; set; }
     }
 }
