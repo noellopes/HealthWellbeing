@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260105075330_AdicionarCamposFaltantes")]
-    partial class AdicionarCamposFaltantes
+    [Migration("20260107051615_InitialHealthWellbeing")]
+    partial class InitialHealthWellbeing
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,6 +96,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("int");
 
                     b.Property<decimal>("Weigth")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Activity_Id");
@@ -209,12 +210,15 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("GorduraGPor100g")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("HidratosGPor100g")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("KcalPor100g")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
@@ -222,6 +226,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("ProteinaGPor100g")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("AlimentoId");
@@ -521,7 +526,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
 
                     b.HasKey("ExercicioId");
 
-                    b.ToTable("Exercicio");
+                    b.ToTable("Exercicios");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Genero", b =>
@@ -651,6 +656,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("PlanId");
@@ -729,6 +735,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceitaId"));
 
                     b.Property<decimal>("CaloriasPorPorcao")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Descricao")
@@ -736,9 +743,11 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<decimal>("Gorduras")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("HidratosCarbono")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsLactoseFree")
@@ -764,6 +773,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .HasColumnType("int");
 
                     b.Property<decimal>("Proteinas")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("TempoPreparo")
@@ -833,7 +843,6 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ServicoId"));
 
                     b.Property<string>("Descricao")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DuracaoMinutos")
@@ -850,12 +859,9 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.Property<int>("TipoServicoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoServicosId")
-                        .HasColumnType("int");
-
                     b.HasKey("ServicoId");
 
-                    b.HasIndex("TipoServicosId");
+                    b.HasIndex("TipoServicoId");
 
                     b.ToTable("Servicos");
                 });
@@ -1259,7 +1265,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.HasOne("HealthWellbeing.Models.Servico", "Servico")
                         .WithMany()
                         .HasForeignKey("ServicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
@@ -1269,7 +1275,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
                         .WithMany()
                         .HasForeignKey("TipoServicoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
@@ -1361,7 +1367,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 {
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
                         .WithMany()
-                        .HasForeignKey("TipoServicosId")
+                        .HasForeignKey("TipoServicoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

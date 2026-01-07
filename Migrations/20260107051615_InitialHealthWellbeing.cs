@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.HealthWellbeingDb
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class InicialLimpa : Migration
+    public partial class InitialHealthWellbeing : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     Activity_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NumberSets = table.Column<int>(type: "int", nullable: true),
                     NumberReps = table.Column<int>(type: "int", nullable: true),
-                    Weigth = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Weigth = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,7 +122,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 });
 
             migrationBuilder.CreateTable(
-                name: "Exercicio",
+                name: "Exercicios",
                 columns: table => new
                 {
                     ExercicioId = table.Column<int>(type: "int", nullable: false)
@@ -139,7 +139,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Exercicio", x => x.ExercicioId);
+                    table.PrimaryKey("PK_Exercicios", x => x.ExercicioId);
                 });
 
             migrationBuilder.CreateTable(
@@ -192,7 +192,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DurationDays = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -243,10 +243,10 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     ModoPreparo = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     TempoPreparo = table.Column<int>(type: "int", nullable: false),
                     Porcoes = table.Column<int>(type: "int", nullable: false),
-                    CaloriasPorPorcao = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Proteinas = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    HidratosCarbono = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Gorduras = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CaloriasPorPorcao = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Proteinas = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    HidratosCarbono = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Gorduras = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     IsVegetariana = table.Column<bool>(type: "bit", nullable: false),
                     IsVegan = table.Column<bool>(type: "bit", nullable: false),
                     IsLactoseFree = table.Column<bool>(type: "bit", nullable: false)
@@ -411,10 +411,10 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoriaAlimentoId = table.Column<int>(type: "int", nullable: false),
                     Calories = table.Column<int>(type: "int", nullable: false),
-                    KcalPor100g = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProteinaGPor100g = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    HidratosGPor100g = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    GorduraGPor100g = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    KcalPor100g = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ProteinaGPor100g = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    HidratosGPor100g = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    GorduraGPor100g = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -481,9 +481,9 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 {
                     table.PrimaryKey("PK_ExercicioGenero", x => new { x.ExercicioId, x.GeneroId });
                     table.ForeignKey(
-                        name: "FK_ExercicioGenero_Exercicio_ExercicioId",
+                        name: "FK_ExercicioGenero_Exercicios_ExercicioId",
                         column: x => x.ExercicioId,
-                        principalTable: "Exercicio",
+                        principalTable: "Exercicios",
                         principalColumn: "ExercicioId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -505,9 +505,9 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 {
                     table.PrimaryKey("PK_ExercicioGrupoMuscular", x => new { x.ExercicioId, x.GrupoMuscularId });
                     table.ForeignKey(
-                        name: "FK_ExercicioGrupoMuscular_Exercicio_ExercicioId",
+                        name: "FK_ExercicioGrupoMuscular_Exercicios_ExercicioId",
                         column: x => x.ExercicioId,
-                        principalTable: "Exercicio",
+                        principalTable: "Exercicios",
                         principalColumn: "ExercicioId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -659,18 +659,17 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                     ServicoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nome = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descricao = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Preco = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DuracaoMinutos = table.Column<int>(type: "int", nullable: false),
-                    TipoServicoId = table.Column<int>(type: "int", nullable: false),
-                    TipoServicosId = table.Column<int>(type: "int", nullable: false)
+                    TipoServicoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Servicos", x => x.ServicoId);
                     table.ForeignKey(
-                        name: "FK_Servicos_TipoServicos_TipoServicosId",
-                        column: x => x.TipoServicosId,
+                        name: "FK_Servicos_TipoServicos_TipoServicoId",
+                        column: x => x.TipoServicoId,
                         principalTable: "TipoServicos",
                         principalColumn: "TipoServicosId",
                         onDelete: ReferentialAction.Cascade);
@@ -753,8 +752,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         name: "FK_Agendamento_Servicos_ServicoId",
                         column: x => x.ServicoId,
                         principalTable: "Servicos",
-                        principalColumn: "ServicoId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "ServicoId");
                     table.ForeignKey(
                         name: "FK_Agendamento_Terapeuta_TerapeutaId",
                         column: x => x.TerapeutaId,
@@ -764,8 +762,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                         name: "FK_Agendamento_TipoServicos_TipoServicoId",
                         column: x => x.TipoServicoId,
                         principalTable: "TipoServicos",
-                        principalColumn: "TipoServicosId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "TipoServicosId");
                     table.ForeignKey(
                         name: "FK_Agendamento_UtenteBalneario_UtenteBalnearioId",
                         column: x => x.UtenteBalnearioId,
@@ -850,9 +847,9 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 column: "ProfissionalExecutanteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Servicos_TipoServicosId",
+                name: "IX_Servicos_TipoServicoId",
                 table: "Servicos",
-                column: "TipoServicosId");
+                column: "TipoServicoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Training_TrainerId",
@@ -978,7 +975,7 @@ namespace HealthWellbeing.Migrations.HealthWellbeingDb
                 name: "Genero");
 
             migrationBuilder.DropTable(
-                name: "Exercicio");
+                name: "Exercicios");
 
             migrationBuilder.DropTable(
                 name: "Client");

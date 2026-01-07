@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
@@ -45,8 +45,8 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Create
         public IActionResult Create()
         {
-            // Corrigido: Nome da FK e nomes da tabela consistentes
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
+            // Alterado para TipoServicoId (singular) para bater com a View
+            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
             return View();
         }
 
@@ -60,13 +60,11 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(servico);
                 await _context.SaveChangesAsync();
-
-                // TempData é melhor para mensagens de sucesso que QueryStrings
-                TempData["SuccessMessage"] = "Serviço criado com sucesso!";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { successMessage = "Serviço criado com sucesso!" });
             }
 
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
+            // Recarregar em caso de erro (singular aqui também)
+            ViewBag.TipoServicoId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicoId);
             return View(servico);
         }
         // GET: Servico/Edit/5
@@ -88,7 +86,7 @@ namespace HealthWellbeing.Controllers
         {
             if (id != servico.ServicoId) return NotFound();
 
-            ModelState.Remove("TipoServico");
+            ModelState.Remove("TipoServicos");
 
             if (ModelState.IsValid)
             {
@@ -102,10 +100,10 @@ namespace HealthWellbeing.Controllers
                     if (!ServicoExists(servico.ServicoId)) return NotFound();
                     else throw;
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = servico.ServicoId, successMessage = "Serviço criado com sucesso!" });
             }
 
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", servico.TipoServicoId);
             return View(servico);
         }
 
