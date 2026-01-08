@@ -24,7 +24,6 @@ namespace HealthWellbeing.Models
         [Key]
         public int AgendamentoId { get; set; }
 
-        // --- RELACIONAMENTOS (Opcionais) ---
 
         [Display(Name = "Cliente")]
         public int? UtenteBalnearioId { get; set; } // Opcional (Nullable)
@@ -50,8 +49,6 @@ namespace HealthWellbeing.Models
         [ForeignKey("TipoServicoId")]
         public TipoServicos TipoServico { get; set; }
 
-        // --- TEMPO, DURAÇÃO E CÁLCULO ---
-
         [Required(ErrorMessage = "A data e hora de início são obrigatórias.")]
         [Display(Name = "Hora de Início")]
         [DataType(DataType.DateTime)]
@@ -74,8 +71,6 @@ namespace HealthWellbeing.Models
         {
             get => HoraInicio.Date;
         }
-
-        // --- FINANCEIROS E ESTADO ---
 
         [Required(ErrorMessage = "O preço é obrigatório.")]
         [Column(TypeName = "decimal(18, 2)")]
