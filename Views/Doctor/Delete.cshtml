@@ -1,7 +1,9 @@
-﻿@model HealthWellbeing.Models.Doctor
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.Doctor
 
 @{
     ViewData["Title"] = "Eliminar Médico";
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
 }
 
 <style>
@@ -46,33 +48,33 @@
         box-shadow: 0 2px 3px rgba(0,0,0,.2);
     }
 
-    .top-nav {
+    .utente-actions {
         display: flex;
         gap: 8px;
         flex-wrap: wrap;
         justify-content: flex-end;
     }
 
-    .top-btn {
+    .utente-btn {
         padding: 8px 14px;
         border-radius: 18px;
         border: none;
         background: #2d79a0;
         color: #fff;
-        font-weight: 700;
+        font-weight: 600;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
 
-        .top-btn:hover {
+        .utente-btn:hover {
             filter: brightness(1.05);
         }
 
     .utente-body {
         background: #e6f3fb;
-        min-height: 360px;
+        min-height: 260px;
         margin: 8px;
         border-radius: 8px;
         padding: 18px;
@@ -85,23 +87,31 @@
         border-radius: 0 0 8px 8px;
     }
 
-    .detail-card {
-        background: #fff;
+    .danger-card {
+        background: #ffffff;
         border-radius: 12px;
         padding: 16px;
         border: 1px solid rgba(97,166,199,.45);
         box-shadow: 0 2px 10px rgba(0,0,0,.08);
     }
 
-    .detail-title {
-        color: #1f4f6a;
-        font-weight: 900;
-        font-size: 1.25rem;
+    .danger-data {
+        background: #ffe8ea;
+        border: 1px solid rgba(220,53,69,.35);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
     }
 
-    .detail-sub {
-        margin: 6px 0 14px 0;
-        color: #2b546c;
+    .danger-title {
+        margin: 0;
+        color: #8a1f2b;
+        font-weight: 900;
+    }
+
+    .danger-sub {
+        margin: 8px 0 0 0;
+        color: #7a2a33;
         font-weight: 600;
     }
 
@@ -129,83 +139,76 @@
             font-weight: 800;
             word-break: break-word;
         }
-
-    .danger-btn {
-        background-color: #8a1f2b;
-        color: #fff;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 8px;
-    }
-
-    .cancel-btn {
-        background-color: #f1f1f1;
-        color: #6c757d;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 8px;
-    }
-
-        .danger-btn:hover, .cancel-btn:hover {
-            filter: brightness(1.05);
-        }
 </style>
 
 <div class="utente-wrapper">
     <div class="utente-card">
         <div class="utente-panel">
+
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
-                        <img src="https://example.com/logo.png" alt="Logo HealthWellbeing" class="logo-img" />
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
                     </div>
 
-                    <div class="top-nav">
-                        <a class="top-btn" asp-action="Index">
-                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-x-circle"></i> Cancelar
                         </a>
                     </div>
                 </div>
             </div>
 
             <div class="utente-body">
-                <div class="detail-card">
-                    <h2 class="detail-title">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Médico
+                <div class="danger-card">
+
+                    <h2 class="danger-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Eliminar Médico
                     </h2>
-                    <p class="detail-sub">
-                        Tens a certeza que queres apagar este médico? Esta ação não pode ser desfeita.
+                    <p class="danger-sub">
+                        Tem a certeza que pretende eliminar este médico? Esta ação não pode ser desfeita.
                     </p>
 
-                    <div class="info-item">
-                        <span class="lbl">Nome</span>
-                        <span class="val">@Model.Nome</span>
+                    <div class="danger-data">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-5">
+                                <div class="info-item">
+                                    <span class="lbl">Nome</span>
+                                    <span class="val">@nome</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="info-item">
+                                    <span class="lbl">Telemóvel</span>
+                                    <span class="val">@Model.Telemovel</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <div class="info-item">
+                                    <span class="lbl">Email</span>
+                                    <span class="val">@Model.Email</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <span class="lbl">Telemóvel</span>
-                        <span class="val">@Model.Telemovel</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="lbl">Email</span>
-                        <span class="val">@Model.Email</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="lbl">Especialidade</span>
-                        <span class="val">@Model.Especialidade?.Nome</span>
-                    </div>
+
+                    <form asp-action="Eliminar" asp-route-id="@Model.IdMedico" method="post" class="mt-3 d-flex gap-2 flex-wrap">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdMedico" />
+
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                        </a>
+                    </form>
+
                 </div>
-
-                <form asp-action="Delete" asp-route-id="@Model.IdMedico" method="post" class="d-flex gap-3 mt-4">
-                    @Html.AntiForgeryToken()
-
-                    <button type="submit" class="danger-btn">
-                        <i class="bi bi-trash"></i> Apagar
-                    </button>
-
-                    <a asp-action="Index" class="cancel-btn">
-                        <i class="bi bi-x-circle"></i> Cancelar
-                    </a>
-                </form>
             </div>
 
             <div class="utente-footer-bar"></div>
