@@ -14,7 +14,7 @@ namespace HealthWellbeing.Data
         {
         }
 
-        public DbSet<HealthWellbeing.Models.AgendamentoBalneario> Agendamento { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.AgendamentoBalneario> Agendamentos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Servico> Servicos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.TipoServicos> TipoServicos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Terapeuta> Terapeuta { get; set; } = default!;

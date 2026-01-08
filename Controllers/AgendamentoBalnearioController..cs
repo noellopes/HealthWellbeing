@@ -11,11 +11,11 @@ using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
-    public class AgendamentoController : Controller
+    public class AgendamentoBalnearioController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
 
-        public AgendamentoController(HealthWellbeingDbContext context)
+        public AgendamentoBalnearioController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
@@ -23,7 +23,7 @@ namespace HealthWellbeing.Controllers
         // GET: Agendamento
         public async Task<IActionResult> Index()
         {
-            var HealthWellbeingDbContext = _context.Agendamento.Include(a => a.Servico).Include(a => a.Terapeuta).Include(a => a.UtenteBalneario);
+            var HealthWellbeingDbContext = _context.Agendamentos.Include(a => a.Servico).Include(a => a.Terapeuta).Include(a => a.UtenteBalneario);
             return View(await HealthWellbeingDbContext.ToListAsync());
         }
 
@@ -35,17 +35,17 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamentoModel = await _context.Agendamento
+            var agendamentos = await _context.Agendamentos
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.UtenteBalneario)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
-            if (agendamentoModel == null)
+            if (agendamentos == null)
             {
                 return NotFound();
             }
 
-            return View(agendamentoModel);
+            return View(agendamentos);
         }
 
         // GET: Agendamento/Create
@@ -84,7 +84,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamento = await _context.Agendamento.FindAsync(id);
+            var agendamento = await _context.Agendamentos.FindAsync(id);
             if (agendamento == null)
             {
                 return NotFound();
@@ -141,17 +141,17 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamento = await _context.Agendamento
+            var agendamentos = await _context.Agendamentos
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.UtenteBalneario)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
-            if (agendamento == null)
+            if (agendamentos == null)
             {
                 return NotFound();
             }
 
-            return View(agendamento);
+            return View(agendamentos);
         }
 
         // POST: Agendamento/Delete/5
@@ -159,10 +159,10 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var agendamento = await _context.Agendamento.FindAsync(id);
+            var agendamento = await _context.Agendamentos.FindAsync(id);
             if (agendamento != null)
             {
-                _context.Agendamento.Remove(agendamento);
+                _context.Agendamentos.Remove(agendamento);
             }
 
             await _context.SaveChangesAsync();
@@ -171,7 +171,7 @@ namespace HealthWellbeing.Controllers
 
         private bool AgendamentoModelExists(int id)
         {
-            return _context.Agendamento.Any(e => e.AgendamentoId == id);
+            return _context.Agendamentos.Any(e => e.AgendamentoId == id);
         }
     }
 }

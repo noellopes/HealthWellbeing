@@ -26,7 +26,7 @@ namespace HealthWellbeing.Models
 
 
         [Display(Name = "Cliente")]
-        public int? UtenteBalnearioId { get; set; } // Opcional (Nullable)
+        public int? UtenteBalnearioId { get; set; } 
         [ForeignKey("UtenteBalnearioId")]
         public UtenteBalneario UtenteBalneario { get; set; }
 
@@ -59,13 +59,13 @@ namespace HealthWellbeing.Models
         [Range(1, 480, ErrorMessage = "A duração deve estar entre 1 e 480 minutos.")]
         public int DuracaoMinutos { get; set; }
 
-        [NotMapped] // Propriedade calculada para a lógica de conflito
+        [NotMapped]
         public DateTime HoraFimCalculada
         {
             get => HoraInicio.AddMinutes(DuracaoMinutos);
         }
 
-        [NotMapped] // Propriedade calculada para a View Index
+        [NotMapped] 
         [Display(Name = "Data da Reserva")]
         public DateTime DataReserva
         {

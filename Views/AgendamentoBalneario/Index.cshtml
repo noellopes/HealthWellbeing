@@ -1,59 +1,90 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.AgendamentoBalneario>
 
+
 @{
     ViewData["Title"] = "Agendamentos";
 }
 
-<h1>Index</h1>
+<h1 class="mb-4 fw-bold">Agendamento Balneario</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Criar Novo Agendamento</a>
+    <a asp-action="Create" class="btn btn-success btn-lg shadow-sm">
+        <i class="bi bi-plus-circle me-2"></i>Criar Novo Agendamento
+    </a>
 </p>
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.HoraInicio)
-            </th>
-           
-            <th>
-                @Html.DisplayNameFor(model => model.Estado)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UtenteBalneario)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Terapeuta)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Servico)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.HoraInicio)
-            </td>
-           
-            <td>
-                @Html.DisplayFor(modelItem => item.Estado)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UtenteBalneario.UtenteBalnearioId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Terapeuta.TerapeutaId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Servico.ServicoId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AgendamentoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AgendamentoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AgendamentoId">Delete</a>
-            </td>
-        </tr>
+
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-dark text-white">
+            <tr>
+                <th class="py-3">@Html.DisplayNameFor(model => model.UtenteBalneario)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.Terapeuta)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.Servico)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.TipoServico)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.HoraInicio)</th>
+                <th class="py-3">Duração (min)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.Preco)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.Descricao)</th>
+                <th class="py-3">@Html.DisplayNameFor(model => model.Estado)</th>
+                <th class="py-3 text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-semibold">
+                        @(item.UtenteBalneario != null ? item.UtenteBalneario.NomeCompleto : "---")
+                    </td>
+                    <td>
+                        @(item.Terapeuta != null ? item.Terapeuta.Nome : "---")
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Servico.Nome)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TipoServico.Nome)</td>
+
+                    <!-- Data formatada sem quebrar linha -->
+                    <td class="text-nowrap">@item.HoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
+
+                    <td>@Html.DisplayFor(modelItem => item.DuracaoMinutos)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Preco)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
+
+                    <td>
+                        @{
+                            var estadoClass = item.Estado.ToString() switch
+                            {
+                                "Confirmado" => "bg-success",
+                                "Pendente" => "bg-warning text-dark",
+                                "Cancelado" => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+                        }
+                        <span class="badge @estadoClass">@Html.DisplayFor(modelItem => item.Estado)</span>
+                    </td>
+
+                    <!-- AÇÕES: Classe text-nowrap força ficar na mesma linha -->
+                    <td class="text-center text-nowrap">
+                        <div class="btn-group btn-group-sm shadow-sm" role="group">
+                            <a asp-action="Edit" asp-route-id="@item.AgendamentoId" class="btn btn-primary text-white" title="Editar">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.AgendamentoId" class="btn btn-warning text-dark" title="Detalhes">
+                                <i class="bi bi-info-circle"></i> Details
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.AgendamentoId" class="btn btn-danger text-white" title="Apagar">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info mt-4 shadow-sm" role="alert">
+        <i class="bi bi-info-circle me-2"></i>Não existem agendamentos registados.
+    </div>
 }

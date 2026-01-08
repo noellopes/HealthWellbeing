@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.AgendamentoBalneario 
+﻿@model HealthWellbeing.Models.AgendamentoBalneario
 
 @{
     ViewData["Title"] = "Criar Novo Agendamento";
@@ -77,6 +77,50 @@
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
 
+            @* ✅ BLOCO SCRIPT: MANTIDO E CORRIGIDO PARA SER O ÚNICO ✅ *@
+            @section Scripts {
+                @{
+                    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+                }
+
+                <script>
+                    $(document).ready(function () {
+                        // Usa o ID do dropdown de Serviço
+                        $('#ServicoId').change(function () {
+                            var servicoId = $(this).val();
+
+                            // Garante que um Serviço foi realmente selecionado (ID > 0)
+                            if (servicoId) {
+
+                                $.ajax({
+                                    url: '@Url.Action("ObterDetalhesServico", "Servico")', // Chamada ao método criado acima
+                                    type: 'GET',
+                                    data: { id: servicoId },
+                                    success: function (data) {
+                                        if (data) {
+                                            // 1. Preenche a Duração e o Preço (campos de input)
+                                            $('#DuracaoMinutos').val(data.duracao);
+                                            $('#Preco').val(data.preco);
+
+                                            // 2. Preenche o Tipo de Serviço (dropdown)
+                                            $('#TipoServicoId').val(data.tipoServicoId);
+                                        }
+                                    },
+                                    error: function (error) {
+                                        console.log("Erro ao buscar detalhes do serviço:", error);
+                                    }
+                                });
+                            } else {
+                                // Limpar os campos se o usuário desmarcar a seleção
+                                $('#DuracaoMinutos').val('');
+                                $('#Preco').val('');
+                                $('#TipoServicoId').val('');
+                            }
+                        });
+                    });
+                </script>
+            }
+
             <div class="d-flex justify-content-start gap-2">
                 <button type="submit" class="btn btn-success">
                     <i class="bi bi-check-circle me-1"></i> Criar Agendamento
@@ -88,9 +132,3 @@
         </form>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
