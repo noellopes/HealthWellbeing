@@ -299,33 +299,53 @@
                     </div>
 
                     <!-- Paginação -->
-                    <nav aria-label="Paginação de médicos">
-                        <ul class="pagination justify-content-center">
-
-                            <li class="page-item @(isFirst ? "disabled" : "")">
-                                <a class="page-link"
-                                   href="@(isFirst ? "#" : Url.Action("Index", "Doctors", new { page = Model.CurrentPage - 1, searchName }))">
-                                    «
-                                </a>
-                            </li>
-
-                            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    <nav aria-label="Doctors page">
+                        <ul class="pagination">
+                            @if (Model.CurrentPage == 1)
                             {
-                                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                                    <a class="page-link"
-                                       href="@(p == Model.CurrentPage ? "#" : Url.Action("Index", "Doctors", new { page = p, searchName }))">
-                                        @p
-                                    </a>
+                                <li class="page-item disabled">
+                                    <a class="page-link">Primeira</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index">Primeira</a>
                                 </li>
                             }
 
-                            <li class="page-item @(isLast ? "disabled" : "")">
-                                <a class="page-link"
-                                   href="@(isLast ? "#" : Url.Action("Index", "Doctors", new { page = Model.CurrentPage + 1, searchName }))">
-                                    »
-                                </a>
-                            </li>
+                            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                            {
+                                if (p == Model.CurrentPage)
+                                {
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#">@p</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" asp-action="Index" asp-route-page="@p">
+                                            @p
+                                        </a>
+                                    </li>
+                                }
+                            }
 
+                            @if (Model.CurrentPage == Model.TotalPages)
+                            {
+                                <li class="page-item disabled">
+                                    <a class="page-link">Última</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">
+                                        Última
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </nav>
                 }
