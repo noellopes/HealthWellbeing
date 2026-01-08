@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260105165822_MigracaoInicial")]
-    partial class MigracaoInicial
+    [Migration("20260106005429_CascadeDoctorConsulta")]
+    partial class CascadeDoctorConsulta
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -326,6 +326,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("IdUtenteSaude")
                         .HasColumnType("int");
 
+                    b.Property<string>("Observacoes")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<string>("SearchTerm")
                         .HasColumnType("nvarchar(max)");
 
@@ -369,6 +373,21 @@ namespace HealthWellbeing.Migrations
                     b.HasIndex("IdEspecialidade");
 
                     b.ToTable("Doctor");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.DoctorConsulta", b =>
+                {
+                    b.Property<int>("IdMedico")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdConsulta")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdMedico", "IdConsulta");
+
+                    b.HasIndex("IdConsulta");
+
+                    b.ToTable("DoctorConsulta");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
@@ -1420,6 +1439,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Especialidade");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.DoctorConsulta", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consulta", "Consulta")
+                        .WithMany("ConsultaDoctors")
+                        .HasForeignKey("IdConsulta")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Doctor", "Medico")
+                        .WithMany("DoctorConsultas")
+                        .HasForeignKey("IdMedico")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Consulta");
+
+                    b.Navigation("Medico");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Event", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.EventType", "EventType")
@@ -1676,11 +1714,18 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("UtenteSaude");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Consulta", b =>
+                {
+                    b.Navigation("ConsultaDoctors");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
                 {
                     b.Navigation("AgendaMedica");
 
                     b.Navigation("Consultas");
+
+                    b.Navigation("DoctorConsultas");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeingRoom.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
@@ -23,7 +24,7 @@ namespace HealthWellbeing.Models
 
         public string Estado =>
             DataCancelamento.HasValue ? "Cancelada" :
-            (DataConsulta.Date < DateTime.Today) ? "Expirada" :
+            (DataConsulta.Date < DateTime.Now) ? "Expirada" :
             (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
 
         public string? SearchTerm { get; set; }
@@ -39,5 +40,18 @@ namespace HealthWellbeing.Models
         [ForeignKey(nameof(UtenteSaude))]
         public int IdUtenteSaude { get; set; }
         public UtenteSaude? UtenteSaude { get; set; }
+
+        [Display(Name = "Observações")]
+        [MaxLength(4000, ErrorMessage = "As observações não podem ter mais de 4000 caracteres.")]
+        public string? Observacoes { get; set; }
+
+        //[ForeignKey(nameof(Room))]
+        //public int IdSala { get; set; }
+        //public Room? sala { get; set; }
+
+        //[ForeignKey(nameof(Room))]
+        //public int IdConsumivel { get; set; }
+        //public ConsumablesExpenses? consumivel { get; set; }
+        public ICollection<DoctorConsulta>? ConsultaDoctors { get; set; }
     }
 }

@@ -59,14 +59,19 @@
                             <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
                                 <li><a class="dropdown-item" asp-controller="UtenteSaude" asp-action="Index">Utentes</a>
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-controller="Doctor" asp-action="Index">Doctor</a>
+                                <li><a class="dropdown-item" asp-controller="Doctor" asp-action="Index">Médicos</a>
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-controller="Specialities" asp-action="Index">Specialities</a>
+                                <li><a class="dropdown-item" asp-controller="Specialities" asp-action="Index">Especialidadess</a>
                                 <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Marcar">Consultas</a>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Marcar">Marcar Consulta</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Relatorio"> Relatório Global</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Index"> Histórico consultas</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="AgendaMedicas" asp-action="Index"> Agenda médica</a>
                             </ul>
                         </li>
-                        
                     </ul>
 
                     <partial name="_LoginPartial" />

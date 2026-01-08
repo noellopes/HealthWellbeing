@@ -1,0 +1,57 @@
+﻿@model HealthWellbeing.ViewModel.RelatorioConsultasVM
+
+@{
+    ViewData["Title"] = "Relatório Geral de Consultas";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Consultas marcadas (total)</h6>
+                <h2 class="mb-0">@Model.TotalMarcadas</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Consultas canceladas</h6>
+                <h2 class="mb-0">@Model.TotalCanceladas</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Consultas não canceladas</h6>
+                <h2 class="mb-0">@Model.TotalNaoCanceladas</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-success">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Consultas realizadas</h6>
+                <h2 class="mb-0">@Model.TotalRealizadas</h2>
+                <small class="text-muted">(já passaram e têm observações)</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-warning">
+            <div class="card-body text-center">
+                <h6 class="text-muted">Consultas faltadas</h6>
+                <h2 class="mb-0">@Model.TotalFaltadas</h2>
+                <small class="text-muted">(já passaram, não canceladas, sem observações)</small>
+            </div>
+        </div>
+    </div>
+</div>
+

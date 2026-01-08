@@ -21,6 +21,8 @@ namespace HealthWellbeing.Data
         public DbSet<Doctor> Doctor { get; set; } = default!;
         public DbSet<Specialities> Specialities { get; set; } = default!;
         public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
+        public DbSet<DoctorConsulta> DoctorConsulta { get; set; } = default!;
+
 
         // -------------------------
         // NUTRIÇÃO / PLANOS
@@ -113,6 +115,21 @@ namespace HealthWellbeing.Data
                 .WithMany(d => d.AgendaMedica)
                 .HasForeignKey(a => a.IdMedico)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DoctorConsulta>()
+                .HasKey(dc => new { dc.IdMedico, dc.IdConsulta });
+
+            modelBuilder.Entity<DoctorConsulta>()
+               .HasOne(dc => dc.Medico)
+               .WithMany(d => d.DoctorConsultas)
+               .HasForeignKey(dc => dc.IdMedico)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<DoctorConsulta>()
+               .HasOne(dc => dc.Consulta)
+               .WithMany(c => c.ConsultaDoctors)
+               .HasForeignKey(dc => dc.IdConsulta)
+               .OnDelete(DeleteBehavior.NoAction);
 
             // -------------------------
             // ÍNDICES ÚNICOS
