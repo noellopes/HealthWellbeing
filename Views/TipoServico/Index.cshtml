@@ -114,8 +114,13 @@
 
     </table>
 
-</div>
-
+@if (!Model.ListaServicos.Any())
+{
+        <div class="alert alert-info mt-4 shadow-sm" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            Não existem tipos de serviços registados.
+        </div>
+}
 
 @* PAGINAÇÃO *@
 
