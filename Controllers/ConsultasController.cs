@@ -117,8 +117,26 @@ namespace HealthWellbeing.Controllers
                 .Include(c => c.Speciality)
                 .AsQueryable();
 
-            if (!User.IsInRole("DiretorClinico"))
+            if (User.IsInRole("Utente"))
             {
+                // Utente so ve as suas consultas
+                var utente = await GetUtenteFromLoggedUser();
+                if (utente == null)
+                    return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
+
+                consultasQuery = consultasQuery.Where(c => c.IdUtenteSaude == utente.UtenteSaudeId);
+            }
+            else if (User.IsInRole("Medico"))
+            {
+                // Médico só vê as suas consultas
+                var medico = await GetDoctorFromLoggedUser();
+                if (medico == null)
+                    return Content("Não existe um médico associado ao teu utilizador (email não encontrado em Doctor).");
+                consultasQuery = consultasQuery.Where(c => c.IdMedico == medico.IdMedico);
+            }
+            else if (!User.IsInRole("DiretorClinico"))
+            {
+                // Médico / Rececionista: só consultas futuras não canceladas
                 consultasQuery = consultasQuery.Where(c =>
                     !c.DataCancelamento.HasValue &&
                     c.DataConsulta >= DateTime.Now
@@ -453,6 +471,27 @@ namespace HealthWellbeing.Controllers
             }
         }
 
+        private async Task<UtenteSaude?> GetUtenteFromLoggedUser()
+        {
+            var email = User?.Identity?.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            return await _context.UtenteSaude
+                .Include(u => u.Client)
+                .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
+        }
+
+        private async Task<Doctor?> GetDoctorFromLoggedUser()
+        {
+            var email = User?.Identity?.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            return await _context.Doctor
+                .FirstOrDefaultAsync(d => d.Email == email);
+        }
+
         private async Task FillGridPreferencial(MarcarConsultaGridVM vm, int idEspecialidade)
         {
             vm.Datas = GetProximosDiasUteis(DateOnly.FromDateTime(DateTime.Today), 15);
@@ -647,6 +686,25 @@ namespace HealthWellbeing.Controllers
 
             TempData["SuccessMessage"] = "Consulta cancelada e o horário ficou disponível.";
             return RedirectToAction(nameof(Index));
+
+            // Utente só cancela as suas consultas
+            if (User.IsInRole("Utente"))
+            {
+                var utente = await GetUtenteFromLoggedUser();
+                if (utente == null || consulta.IdUtenteSaude != utente.UtenteSaudeId)
+                    return Forbid();
+            }
+
+            // Médico só cancela as suas consultas
+
+            if (!consulta.DataCancelamento.HasValue)
+            {
+                consulta.DataCancelamento = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["SuccessMessage"] = "Consulta cancelada e o horário ficou disponível.";
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize(Roles = "Utente,Medico,Rececionista,DiretorClinico")]
@@ -661,19 +719,26 @@ namespace HealthWellbeing.Controllers
 
             if (consulta == null) return NotFound();
 
-            // ✅ Segurança básica: Utente só vê as suas, Médico só vê as suas
+            // Utente só vê as próprias
             if (User.IsInRole("Utente"))
             {
-                var email = User.Identity?.Name?.Trim();
-                if (string.IsNullOrWhiteSpace(email))
-                    return Content("Utilizador sem email no Identity.");
-
-                var utente = await _context.UtenteSaude
-                    .Include(u => u.Client)
-                    .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
-
+                var utente = await GetUtenteFromLoggedUser();
                 if (utente == null)
-                    return Content("Este utilizador não é Utente (não existe UtenteSaude associado ao Client).");
+                    return Content("Não existe um utente associado ao teu utilizador.");
+
+                if (consulta.IdUtenteSaude != utente.UtenteSaudeId)
+                    return Forbid(); // 403
+            }
+
+            // Médico só vê as suas
+            if (User.IsInRole("Medico"))
+            {
+                var doctor = await GetDoctorFromLoggedUser(); // igual ao que tens noutro controller
+                if (doctor == null)
+                    return Content("Não existe um médico associado ao teu utilizador.");
+
+                if (consulta.IdMedico != doctor.IdMedico)
+                    return Forbid();
             }
 
             if (User.IsInRole("Medico"))
