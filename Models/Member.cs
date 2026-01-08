@@ -8,5 +8,7 @@ namespace HealthWellbeing.Models
 
         public int ClientId { get; set; } = default!;
         public Client? Client { get; set; } = default;
+
+        public ICollection<MemberPlan> MemberPlans { get; set; } = new List<MemberPlan>();
     }
 }

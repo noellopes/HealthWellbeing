@@ -1,60 +1,71 @@
 ﻿@model HealthWellbeing.Models.Client
 
 @{
-    ViewData["Title"] = "Register New Client";
+    ViewData["Title"] = "New Client Registration";
 }
 
-<h1 class="display-4 text-primary mb-4">Register New Client</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-person-plus-fill me-2"></i>Register New Client</h1>
 
-<h4 class="mb-3">Enter Client Details</h4>
-<hr class="mb-4" />
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="card-title mb-0 fw-bold">Client Membership Form</h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted small mb-4">Complete the fields below to add a new client to the Health & Wellbeing directory.</p>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-        <div class="card shadow-lg p-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name" class="form-control shadow-sm" placeholder="First and Last Name" />
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email" class="form-label fw-bold"></label>
+                        <input asp-for="Email" class="form-control shadow-sm" type="email" placeholder="example@email.com" />
+                        <span asp-validation-for="Email" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Phone" class="form-label fw-bold"></label>
+                        <input asp-for="Phone" class="form-control shadow-sm" type="tel" placeholder="e.g. 912345678" />
+                        <span asp-validation-for="Phone" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BirthDate" class="form-label fw-bold"></label>
+                        <input asp-for="BirthDate" class="form-control shadow-sm" type="date" />
+                        <span asp-validation-for="BirthDate" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Address" class="form-label fw-bold"></label>
+                        <input asp-for="Address" class="form-control shadow-sm" placeholder="Current residential address" />
+                        <span asp-validation-for="Address" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Gender" class="form-label fw-bold"></label>
+                        <select asp-for="Gender" class="form-select shadow-sm">
+                            <option value="">Choose gender...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="invalid-feedback"></span>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label fw-bold"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Phone" class="form-label fw-bold"></label>
-                    <input asp-for="Phone" class="form-control" />
-                    <span asp-validation-for="Phone" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label fw-bold"></label>
-                    <input asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="BirthDate" class="form-label fw-bold"></label>
-                    <input asp-for="BirthDate" type="date" class="form-control" />
-                    <span asp-validation-for="BirthDate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Gender" class="form-label fw-bold"></label>
-                    <input asp-for="Gender" class="form-control" />
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Register Client" class="btn btn-primary btn-lg shadow" />
-
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-success px-5 shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i> Create Client
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        Back to List
                     </a>
                 </div>
             </form>
@@ -66,4 +77,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    @* Incluir o mesmo script de validação visual do Edit aqui *@
 }

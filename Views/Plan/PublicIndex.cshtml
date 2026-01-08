@@ -1,0 +1,26 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Plan>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Gym Plans & Pricing</h1>
+        <p class="lead text-muted">Choose the best plan for your fitness goals</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 text-center">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h3 class="my-0 fw-bold">@item.Name</h3>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title text-primary">€@item.Price<small class="text-muted fw-light">/@item.DurationDays days</small></h1>
+                        <p class="mt-3 mb-4 text-muted">@item.Description</p>
+                        <a asp-action="Subscribe" asp-route-id="@item.PlanId" class="w-100 btn btn-lg btn-outline-primary">Subscribe Now</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

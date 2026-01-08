@@ -4,59 +4,80 @@
     ViewData["Title"] = "Edit Client";
 }
 
-<h1 class="display-4 text-primary mb-4">Edit Client</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-pencil-square me-2"></i>Edit Client</h1>
 
-<h4 class="mb-3">Client Details</h4>
-<hr class="mb-4" />
+    @if (ViewBag.ClientWasDeleted != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center p-4 border border-danger rounded shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3" style="font-size: 2rem;"></i>
+            <div>
+                <h4 class="alert-heading">Concurrent Change Detected</h4>
+                <p class="mb-0">The client you were editing was removed by another user. You can still use this form to re-register the client as a new entry.</p>
+            </div>
+        </div>
+    }
 
-<div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-        <div class="card shadow-lg p-4">
-            <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="card-title mb-0 fw-bold">Update Client Information</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
 
                 <input type="hidden" asp-for="ClientId" />
+                <input type="hidden" asp-for="RegistrationDate" />
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="row g-3">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name" class="form-control shadow-sm" placeholder="Enter full name" />
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Email" class="form-label fw-bold"></label>
+                        <input asp-for="Email" class="form-control shadow-sm" type="email" placeholder="email@example.com" />
+                        <span asp-validation-for="Email" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Phone" class="form-label fw-bold"></label>
+                        <input asp-for="Phone" class="form-control shadow-sm" type="tel" />
+                        <span asp-validation-for="Phone" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BirthDate" class="form-label fw-bold"></label>
+                        <input asp-for="BirthDate" class="form-control shadow-sm" type="date" />
+                        <span asp-validation-for="BirthDate" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="Address" class="form-label fw-bold"></label>
+                        <input asp-for="Address" class="form-control shadow-sm" />
+                        <span asp-validation-for="Address" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Gender" class="form-label fw-bold"></label>
+                        <select asp-for="Gender" class="form-select shadow-sm">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <span asp-validation-for="Gender" class="invalid-feedback"></span>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label fw-bold"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Phone" class="form-label fw-bold"></label>
-                    <input asp-for="Phone" class="form-control" />
-                    <span asp-validation-for="Phone" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label fw-bold"></label>
-                    <input asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="BirthDate" class="form-label fw-bold"></label>
-                    <input asp-for="BirthDate" type="date" class="form-control" />
-                    <span asp-validation-for="BirthDate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Gender" class="form-label fw-bold"></label>
-                    <input asp-for="Gender" class="form-control" />
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
-
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        Cancel
                     </a>
                 </div>
             </form>
@@ -68,4 +89,19 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Adiciona a classe 'is-invalid' do Bootstrap aos campos com erros do servidor
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                var errorSpans = document.querySelectorAll('.field-validation-error, .invalid-feedback');
+                errorSpans.forEach(function (span) {
+                    var name = span.getAttribute('data-valmsg-for') || span.getAttribute('asp-for');
+                    if (!name) return;
+                    var input = document.querySelector('[name="' + name + '"]');
+                    if (input) input.classList.add('is-invalid');
+                });
+            });
+        })();
+    </script>
 }

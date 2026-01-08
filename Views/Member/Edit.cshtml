@@ -1,71 +1,58 @@
-﻿@model HealthWellbeing.Models.Client
+﻿@model HealthWellbeing.Models.Member
 
 @{
-    ViewData["Title"] = "Edit Member Details";
+    ViewData["Title"] = "Edit Membership";
 }
 
-<h1 class="display-4 text-primary mb-4">Edit Member Details</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-pencil-square me-2"></i>Edit Membership</h1>
 
-<h4 class="mb-3">Client Information</h4>
-<hr class="mb-4" />
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="card-title mb-0 fw-bold">Update Membership Details</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-        <div class="card shadow-lg p-4">
+                <input type="hidden" asp-for="MemberId" />
 
-            <!-- O formulário vai fazer POST para a ação "Edit" do MemberController -->
-            <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
-
-                <!-- O ClientId está escondido, mas é essencial para o POST -->
-                <input type="hidden" asp-for="ClientId" />
-
-                <!-- O resto do formulário é igual ao seu Client/Edit.cshtml -->
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label asp-for="ClientId" class="form-label fw-bold">Associated Client</label>
+                        <select asp-for="ClientId" class="form-select shadow-sm" asp-items="ViewBag.ClientId">
+                            <option value="">-- Change associated client --</option>
+                        </select>
+                        <span asp-validation-for="ClientId" class="invalid-feedback"></span>
+                        <div class="form-text mt-2">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Changing the client will transfer all gym history to the new profile.
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label fw-bold"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Phone" class="form-label fw-bold"></label>
-                    <input asp-for="Phone" class="form-control" />
-                    <span asp-validation-for="Phone" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label fw-bold"></label>
-                    <input asp-for="Address" class="form-control" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="BirthDate" class="form-label fw-bold"></label>
-                    <input asp-for="BirthDate" type="date" class="form-control" />
-                    <span asp-validation-for="BirthDate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Gender" class="form-label fw-bold"></label>
-                    <input asp-for="Gender" class="form-control" />
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
-
-                    <!-- MUDANÇA: O "Back" volta para a lista de Membros -->
-                    <a asp-controller="Member" asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
+                        Cancel
                     </a>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div class="alert alert-light border shadow-sm">
+            <h6 class="fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Current Client Details:</h6>
+            <hr />
+            <div class="row">
+                <div class="col-sm-4"><strong>Name:</strong> @Model.Client?.Name</div>
+                <div class="col-sm-4"><strong>Email:</strong> @Model.Client?.Email</div>
+                <div class="col-sm-4"><strong>Member Since:</strong> @Model.Client?.RegistrationDate.Year</div>
+            </div>
         </div>
     </div>
 </div>
@@ -74,4 +61,19 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Script do professor para integrar erros do C# com o CSS do Bootstrap
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                var errorSpans = document.querySelectorAll('.field-validation-error, .invalid-feedback');
+                errorSpans.forEach(function (span) {
+                    var name = span.getAttribute('data-valmsg-for') || span.getAttribute('asp-for');
+                    if (!name) return;
+                    var input = document.querySelector('[name=\"' + name + '\"]');
+                    if (input) input.classList.add('is-invalid');
+                });
+            });
+        })();
+    </script>
 }

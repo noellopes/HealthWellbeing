@@ -1,0 +1,15 @@
+﻿@model HealthWellbeing.Models.Member
+
+@{
+    ViewData["Title"] = "Invalid Member";
+}
+
+<div class="container py-5 text-center">
+    <div class="alert alert-warning p-5 shadow-sm rounded-4 border-warning">
+        <i class="bi bi-shield-exclamation text-warning fs-1 d-block mb-3"></i>
+        <h2 class="alert-heading">Membership Not Found</h2>
+        <p>The membership record you are trying to access is no longer available in the system.</p>
+        <hr>
+        <a asp-action="Index" class="btn btn-warning px-5 mt-3">Return to Members Directory</a>
+    </div>
+</div>

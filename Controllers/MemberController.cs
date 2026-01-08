@@ -21,14 +21,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Member
-        // Implementada a paginação e pesquisa seguindo o padrão do BooksController
+        // Implementa a paginação e pesquisa filtrando através da entidade Client
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
             var membersQuery = _context.Member
                 .Include(m => m.Client)
                 .AsQueryable();
 
-            // Filtros de Pesquisa através da entidade Client (Relacionamento 1:1)
+            // Filtros de Pesquisa (Lógica de navegação entre Member -> Client)
             if (!string.IsNullOrEmpty(searchName))
             {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Name.Contains(searchName));
@@ -44,7 +44,7 @@ namespace HealthWellbeing.Controllers
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Email.Contains(searchEmail));
             }
 
-            // Lógica de Paginação usando o ViewModel Genérico
+            // Lógica de Paginação usando o ViewModel genérico
             int totalMembers = await membersQuery.CountAsync();
             var pagination = new PaginationInfo<Member>(page, totalMembers);
 
@@ -54,7 +54,7 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            // Guardar termos de pesquisa para a View (Links de paginação)
+            // ViewBag para manter os filtros nos links de paginação
             ViewBag.SearchName = searchName;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchEmail = searchEmail;
@@ -69,6 +69,8 @@ namespace HealthWellbeing.Controllers
 
             var member = await _context.Member
                 .Include(m => m.Client)
+                .Include(m => m.MemberPlans)
+                    .ThenInclude(mp => mp.Plan)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null) return NotFound();
@@ -77,31 +79,58 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Member/Create
-        public IActionResult Create()
+        public IActionResult Create(int? clientId)
         {
-            // Lista apenas clientes que ainda não são membros (opcional, para integridade)
-            var clientsWithoutMembership = _context.Client
-                .Where(c => c.Membership == null)
-                .ToList();
+            var clients = _context.Client.Where(c => c.Membership == null).OrderBy(c => c.Name).ToList();
+            var plans = _context.Plan.OrderBy(p => p.Price).ToList(); // Lista de planos para o dropdown
 
-            ViewData["ClientId"] = new SelectList(clientsWithoutMembership, "ClientId", "Name");
+            ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", clientId);
+            ViewData["PlanId"] = new SelectList(plans, "PlanId", "Name");
+
             return View();
         }
 
         // POST: Member/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MemberId,ClientId")] Member member)
+        public async Task<IActionResult> Create(int ClientId, int PlanId)
         {
+            if (ClientId == 0 || PlanId == 0)
+            {
+                ModelState.AddModelError("", "You must select both a Client and a Plan.");
+            }
+
             if (ModelState.IsValid)
             {
+                // 1. Criar o Member
+                var member = new Member { ClientId = ClientId };
                 _context.Add(member);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Membership successfully created.";
+                await _context.SaveChangesAsync(); // Grava para obter o MemberId
+
+                // 2. Criar a Inscrição (MemberPlan)
+                var plan = await _context.Plan.FindAsync(PlanId);
+                if (plan != null)
+                {
+                    var memberPlan = new MemberPlan
+                    {
+                        MemberId = member.MemberId,
+                        PlanId = PlanId,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(plan.DurationDays),
+                        Status = "Active"
+                    };
+                    _context.Add(memberPlan);
+                    await _context.SaveChangesAsync();
+                }
+
+                TempData["Message"] = "Membership and Plan subscription completed successfully.";
+                TempData["MessageType"] = "success";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
-            return View(member);
+
+            ViewData["ClientId"] = new SelectList(_context.Client.Where(c => c.Membership == null), "ClientId", "Name", ClientId);
+            ViewData["PlanId"] = new SelectList(_context.Plan, "PlanId", "Name", PlanId);
+            return View();
         }
 
         // GET: Member/Edit/5
@@ -109,9 +138,13 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
-            var member = await _context.Member.Include(m => m.Client).FirstOrDefaultAsync(m => m.MemberId == id);
+            var member = await _context.Member
+                .Include(m => m.Client)
+                .FirstOrDefaultAsync(m => m.MemberId == id);
+
             if (member == null) return NotFound();
 
+            // Na edição permitimos trocar o cliente, se necessário
             ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
             return View(member);
         }
@@ -147,15 +180,14 @@ namespace HealthWellbeing.Controllers
         {
             if (id == null) return NotFound();
 
+            // Importante carregar os planos para o aviso de segurança na vista de remoção
             var member = await _context.Member
                 .Include(m => m.Client)
+                .Include(m => m.MemberPlans)
+                    .ThenInclude(mp => mp.Plan)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
-            if (member == null)
-            {
-                TempData["SuccessMessage"] = "This membership has already been removed.";
-                return RedirectToAction(nameof(Index));
-            }
+            if (member == null) return RedirectToAction(nameof(Index));
 
             return View(member);
         }
@@ -170,7 +202,7 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Member.Remove(member);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Membership successfully deleted.";
+                TempData["SuccessMessage"] = "Membership terminated successfully.";
             }
 
             return RedirectToAction(nameof(Index));

@@ -4,85 +4,88 @@
     ViewData["Title"] = "Client Details";
 }
 
-<h1 class="display-4 text-primary mb-4">Client Details</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary"><i class="bi bi-person-badge me-2"></i>Client Details</h1>
 
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">@Model.Name</h4>
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-person-lines-fill me-2"></i>Personal Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted fw-bold">Full Name</dt>
+                        <dd class="col-sm-8">@Model.Name</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Email Address</dt>
+                        <dd class="col-sm-8 mt-2">@Model.Email</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Phone</dt>
+                        <dd class="col-sm-8 mt-2">@Model.Phone</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Birth Date</dt>
+                        <dd class="col-sm-8 mt-2">@Model.BirthDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Address</dt>
+                        <dd class="col-sm-8 mt-2">@Model.Address</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-award me-2"></i>Membership & Active Plans</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    @if (Model.Membership != null)
+                    {
+                        <div class="mb-4">
+                            <span class="h4 d-block text-success mb-1">Active Member</span>
+                            <small class="text-muted">Registered since: @Model.RegistrationDate.Year</small>
+                        </div>
+
+                        <hr />
+
+                        <div class="mt-4">
+                            <h6>Current Active Plan:</h6>
+                            @if (Model.Membership.MemberPlans != null && Model.Membership.MemberPlans.Any())
+                            {
+                                foreach (var mp in Model.Membership.MemberPlans)
+                                {
+                                    <div class="p-3 bg-light border rounded mb-2">
+                                        <h5 class="text-primary mb-1">@mp.Plan.Name</h5>
+                                        <p class="small text-muted mb-0">Expires on: @mp.EndDate.ToShortDateString()</p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-light border">No active plan assigned.</div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="py-5 text-muted">
+                            <i class="bi bi-shield-lock-fill fs-1 d-block mb-3 text-light"></i>
+                            <p>This client is not yet a registered member of the gym.</p>
+                            <a class="btn btn-outline-primary btn-sm mt-2">Convert to Member</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Email)
-            </dt>
-            <dd class="col-sm-9">
-                <a href="mailto:@Model.Email" class="text-decoration-none">@Html.DisplayFor(model => model.Email)</a>
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Phone)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Phone)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Address)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Address)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.BirthDate)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.BirthDate)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Gender)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Gender)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.RegistrationDate)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.RegistrationDate)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Membership)
-            </dt>
-            <dd class="col-sm-9">
-                @if (Model.Membership != null)
-                {
-                    <span class="badge bg-success">Yes</span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">No</span>
-                }
-            </dd>
-        </dl>
+    <div class="mt-2 d-flex justify-content-end gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.ClientId" class="btn btn-warning shadow-sm">
+            <i class="bi bi-pencil-square me-1"></i> Edit Client
+        </a>
+        <a asp-action="Index" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+        </a>
     </div>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ClientId" class="btn btn-primary me-2 shadow-sm">
-        <i class="bi bi-pencil-square"></i> Edit
-    </a>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Back to List
-    </a>
 </div>

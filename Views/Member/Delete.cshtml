@@ -1,54 +1,78 @@
 ﻿@model HealthWellbeing.Models.Member
 
 @{
-    ViewData["Title"] = "Delete Member";
+    ViewData["Title"] = "Terminate Membership";
+    // Verificamos se existem planos ativos para personalizar o aviso
+    var hasActivePlans = Model.MemberPlans != null && Model.MemberPlans.Any(mp => mp.Status == "Active");
 }
 
-<h1 class="display-4 text-danger mb-3">Delete Member</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7 text-center">
 
-<h3 class="alert alert-warning border-0 shadow-sm p-3" role="alert">
-    ⚠️ Are you sure you want to delete the member with ID:
-    <strong class="text-danger">@Model.MemberId</strong>?
-</h3>
-<hr class="mb-4" />
+            @if (hasActivePlans)
+            {
+                <div class="alert alert-danger p-4 shadow-sm border-0 mb-4 rounded-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-1 text-danger d-block mb-3"></i>
+                    <h2 class="alert-heading fw-bold">Critical Warning!</h2>
+                    <p class="lead"><strong>@Model.Client?.Name</strong> has active training plans associated with this membership.</p>
+                    <hr>
+                    <p class="mb-0 small">Deleting this membership will immediately terminate access to these plans and may result in loss of billing history.</p>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning p-4 shadow-sm border-0 mb-4 rounded-4" role="alert">
+                    <i class="bi bi-trash3-fill fs-1 text-warning d-block mb-3"></i>
+                    <h2 class="alert-heading">Confirm Termination</h2>
+                    <p class="mb-0">Are you sure you want to terminate the membership of <strong>@Model.Client?.Name</strong>?</p>
+                </div>
+            }
 
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Member Information to be Deleted</h5>
-    </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.MemberId)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.MemberId)
-            </dd>
+            <div class="card shadow-sm border-0 mb-4 text-start">
+                <div class="card-header bg-light fw-bold text-muted small uppercase">
+                    Membership Summary
+                </div>
+                <div class="card-body p-4">
+                    <div class="row gy-3">
+                        <div class="col-sm-5 text-muted fw-bold">Member ID:</div>
+                        <div class="col-sm-7">#@Model.MemberId</div>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.ClientId)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.ClientId)
-            </dd>
+                        <div class="col-sm-5 text-muted fw-bold">Associated Client:</div>
+                        <div class="col-sm-7">@Model.Client?.Name</div>
 
-            @* If the Member model has more fields, you can display them too *@
-            @* Example:
-            <dt class="col-sm-3 fw-bold">Name</dt>
-            <dd class="col-sm-9">@Model.Name</dd>
-            *@
-        </dl>
+                        <dt class="col-sm-5 text-muted fw-bold">Active Contracts:</dt>
+                        <dd class="col-sm-7">
+                            @if (Model.MemberPlans != null && Model.MemberPlans.Any())
+                            {
+                                foreach (var plan in Model.MemberPlans.Where(p => p.Status == "Active"))
+                                {
+                                    <span class="badge bg-success me-1">@plan.Plan.Name</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted italic">None</span>
+                            }
+                        </dd>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="MemberId" />
+
+                <div class="d-grid gap-2 d-md-block">
+                    <button type="submit" class="btn btn-danger btn-lg px-5 shadow-sm me-md-2">
+                        <i class="bi bi-person-x-fill me-2"></i> Confirm Termination
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-5 shadow-sm">
+                        Keep Membership
+                    </a>
+                </div>
+            </form>
+
+        </div>
     </div>
 </div>
-
-<form asp-action="Delete" class="d-flex align-items-center mt-4">
-    <input type="hidden" asp-for="MemberId" />
-
-    <button type="submit" class="btn btn-danger btn-lg shadow-sm me-3">
-        <i class="bi bi-trash"></i> Confirm Delete
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary btn-lg">
-        <i class="bi bi-x-circle"></i> Cancel
-    </a>
-</form>

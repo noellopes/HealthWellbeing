@@ -1,74 +1,36 @@
 ﻿@model HealthWellbeing.Models.Member
 
-@{
-    ViewData["Title"] = "Confirm New Membership";
-
-    // Recuperar todos os detalhes do cliente do ViewBag
-    string clientName = ViewBag.ClientName as string ?? "Error: Client Name Not Found";
-    string clientPhone = ViewBag.ClientPhone as string ?? "N/A";
-    string clientEmail = ViewBag.ClientEmail as string ?? "N/A";
-}
-
-<h1 class="display-4 text-info mb-4"><i class="bi bi-person-plus-fill"></i> Confirm New Membership</h1>
-
-<div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-        <div class="card shadow-lg p-4">
-            <h4 class="card-title text-info">Membership Registration</h4>
-            <hr class="mb-4" />
-
-            <div class="alert alert-primary mb-4" role="alert">
-                <p class="lead mb-1">
-                    Please confirm that you want to create a new membership record for the client below.
-                </p>
-                <p class="mb-0">
-                    No further details are required for this basic membership link.
-                </p>
-            </div>
-
-            <!-- --- ALTERAÇÃO AQUI --- -->
-            <!-- Mostrar os novos detalhes do Cliente -->
-            <div class="mb-3 p-3 border rounded bg-light">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 fw-bold">Client Name:</dt>
-                    <dd class="col-sm-8 fs-5 text-dark">@clientName</dd>
-
-                    <dt class="col-sm-4 fw-bold">Phone:</dt>
-                    <dd class="col-sm-8 text-dark">@clientPhone</dd>
-
-                    <dt class="col-sm-4 fw-bold">Email:</dt>
-                    <dd class="col-sm-8 text-dark">@clientEmail</dd>
-
-                    <dt class="col-sm-4 fw-bold mt-2">Client ID:</dt>
-                    <dd class="col-sm-8 text-muted mt-2">@Model.ClientId</dd>
-                </dl>
-            </div>
-            <!-- --- FIM DA ALTERAÇÃO --- -->
-
-
+<div class="container py-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white py-3">
+            <h4 class="mb-0"><i class="bi bi-person-plus-fill me-2"></i>New Membership & Plan</h4>
+        </div>
+        <div class="card-body p-4">
             <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <input type="hidden" asp-for="ClientId" />
+                <div class="mb-3">
+                    <label class="form-label fw-bold">1. Select Client</label>
+                    <select name="ClientId" class="form-select" asp-items="ViewBag.ClientId">
+                        <option value="">-- Choose Client --</option>
+                    </select>
+                </div>
 
-                <div class="mb-3 d-flex justify-content-between pt-3">
-                    <button type="submit" class="btn btn-success btn-lg shadow">
-                        <i class="bi bi-check-circle"></i> Confirm and Create Member
+                <div class="mb-4">
+                    <label class="form-label fw-bold">2. Select Initial Plan</label>
+                    <select name="PlanId" class="form-select" asp-items="ViewBag.PlanId">
+                        <option value="">-- Choose Subscription Plan --</option>
+                    </select>
+                    <div class="form-text">As per gym policy, a plan must be selected to activate membership.</div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                    <button type="submit" class="btn btn-success px-5 shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i> Activate Membership
                     </button>
-
-                    <a asp-controller="Client" asp-action="Index" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-x-circle"></i> Cancel
-                    </a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        // Include validation scripts even though we only have a hidden field,
-        // in case more fields are added later.
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

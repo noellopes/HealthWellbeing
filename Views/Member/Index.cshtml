@@ -1,180 +1,109 @@
 ﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Member>
-@using HealthWellbeing.Models
 
 @{
-    ViewData["Title"] = "Members";
-
-    var searchName = ViewBag.SearchName;
-    var searchPhone = ViewBag.SearchPhone;
-    var searchEmail = ViewBag.SearchEmail;
+    ViewData["Title"] = "Members Directory";
+    var successMessage = TempData["SuccessMessage"];
 }
 
-<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary fw-bold"><i class="bi bi-card-checklist me-2"></i>@ViewData["Title"]</h1>
 
-@* Bloco para mostrar mensagens de sucesso/erro *@
-@if (TempData["Message"] != null)
-{
-    var message = TempData["Message"].ToString();
-    var messageType = TempData["MessageType"]?.ToString() ?? "info";
+    @if (successMessage != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-start border-4 border-success" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @successMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <div class="alert alert-@messageType alert-dismissible fade show shadow-sm" role="alert">
-        @Html.Raw(message)
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0"><i class="bi bi-table me-2"></i>Active Membership List</h5>
+            <a asp-action="Create" class="btn btn-success px-3 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Membership
+            </a>
+        </div>
+        <div class="card-body bg-light">
+            @* Formulário de Pesquisa - Seguindo o estilo do Clients *@
+            <form asp-action="Index" method="get" class="row g-2 mb-4">
+                <div class="col-md-3">
+                    <input type="text" name="searchName" value="@ViewBag.SearchName" class="form-control shadow-sm" placeholder="Member Name...">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control shadow-sm" placeholder="Email...">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="searchPhone" value="@ViewBag.SearchPhone" class="form-control shadow-sm" placeholder="Phone...">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
+                        <i class="bi bi-search me-1"></i> Search
+                    </button>
+                </div>
+            </form>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4 mb-0">Member List</h2>
-    <div class="d-flex justify-content-end">
-
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#memberSearch" aria-expanded="false" aria-controls="memberSearch">
-            <i class="bi bi-search me-1"></i> Search
-        </a>
-
-        @* O botão "Create New" foi removido daqui, 
-           porque a criação de Membros é feita a partir da página de Clientes *@
-
-    </div>
-</div>
-
-@* Formulário de Pesquisa (3 colunas, sem filtro de "Member") *@
-<div class="collapse mt-2 mb-2" id="memberSearch">
-    <div class="card card-body shadow-sm">
-
-        <form asp-action="Index" method="get" class="row g-2">
-
-            @* 1. Name (col-md-4) *@
-            <div class="col-md-4">
-                <label for="searchName" class="form-label">Name</label>
-                <input id="searchName" name="searchName" value="@searchName" class="form-control" placeholder="Search by name" type="search" />
+            <div class="table-responsive bg-white rounded shadow-sm">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light border-bottom">
+                        <tr>
+                            <th class="ps-3">Member ID</th>
+                            <th>Client Name</th>
+                            <th>Contact</th>
+                            <th class="text-end pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="ps-3">
+                                    <span class="badge rounded-pill bg-secondary shadow-sm">#@item.MemberId</span>
+                                </td>
+                                <td class="fw-bold">@item.Client?.Name</td>
+                                <td>
+                                    <div class="small text-primary">@item.Client?.Email</div>
+                                    <div class="small text-muted">@item.Client?.Phone</div>
+                                </td>
+                                <td class="text-end pe-3">
+                                    @* Botões de Ação: Idênticos ao estilo do Clients *@
+                                    <div class="btn-group shadow-sm" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.MemberId" class="btn btn-sm btn-warning" title="Edit">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.MemberId" class="btn btn-sm btn-info text-white" title="Details">
+                                            <i class="bi bi-info-circle"></i> Details
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MemberId" class="btn btn-sm btn-danger" title="Delete">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
 
-            @* 2. Phone (col-md-4) *@
-            <div class="col-md-4">
-                <label for="searchPhone" class="form-label">Phone</label>
-                <input id="searchPhone" name="searchPhone" value="@searchPhone" class="form-control" placeholder="Search by phone" type="search" />
-            </div>
-
-            @* 3. Email (col-md-4) *@
-            <div class="col-md-4">
-                <label for="searchEmail" class="form-label">Email</label>
-                <input id="searchEmail" name="searchEmail" value="@searchEmail" class="form-control" placeholder="Search by email" type="search" />
-            </div>
-
-            @* Botões *@
-            <div class="col-12 d-flex gap-2 mt-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Search
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    Clear
-                </a>
-            </div>
-
-        </form>
-    </div>
-</div>
-
-
-@* Verificação de Itens *@
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning mt-4" role="alert">
-        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> No Members Found</h4>
-        <p>There are no members matching your criteria. Try adjusting your search.</p>
-    </div>
-}
-else
-{
-    @* Tabela de Membros *@
-    <div class="table-responsive shadow-sm rounded">
-        <table class="table table-striped table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    <th>Member ID</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        @* Aceder aos dados do Cliente (item.Client) *@
-                        <td class="fw-bold">@Html.DisplayFor(modelItem => item.Client.Name)</td>
-                        <td>@Html.DisplayFor(modelItem => item.MemberId)</td>
-
-                        <td class="text-end">
-                            <div class="btn-group" role="group">
-                                @* O ID aqui é o item.MemberId *@
-                                <a asp-action="Edit" asp-route-id="@item.MemberId" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.MemberId" class="btn btn-sm btn-info">
-                                    <i class="bi bi-info-circle"></i> Details
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.MemberId" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    @* Secção de Paginação (sem o searchMember) *@
-    <nav aria-label="Member pages" class="mt-3">
-        <ul class="pagination">
-
-            @* Botão "First" *@
-            @if (Model.CurrentPage == 1)
-            {
-                <li class="page-item disabled"><a class="page-link">First</a></li>
-            }
-            else
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index"
-                       asp-route-searchName="@searchName"
-                       asp-route-searchPhone="@searchPhone"
-                       asp-route-searchEmail="@searchEmail">First</a>
-                </li>
-            }
-
-            @* Links das Páginas (ex: 1, 2, 3) *@
-            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-            {
-                if (p == Model.CurrentPage)
-                {
-                    <li class="page-item active"><a class="page-link" href="#">@p</a></li>
-                }
-                else
-                {
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-route-page="@p"
-                           asp-route-searchName="@searchName"
-                           asp-route-searchPhone="@searchPhone"
-                           asp-route-searchEmail="@searchEmail">@p</a>
+            @* Paginação - Seguindo o estilo do Clients *@
+            <nav aria-label="Member navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link shadow-sm" asp-action="Index" asp-route-page="1"
+                           asp-route-searchName="@ViewBag.SearchName">First</a>
                     </li>
-                }
-            }
-
-            @* Botão "Last" *@
-            @if (Model.CurrentPage == Model.TotalPages)
-            {
-                <li class="page-item disabled"><a class="page-link">Last</a></li>
-            }
-            else
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages"
-                       asp-route-searchName="@searchName"
-                       asp-route-searchPhone="@searchPhone"
-                       asp-route-searchEmail="@searchEmail">Last</a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                    {
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link shadow-sm" asp-action="Index" asp-route-page="@p"
+                               asp-route-searchName="@ViewBag.SearchName">@p</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link shadow-sm" asp-action="Index" asp-route-page="@Model.TotalPages"
+                           asp-route-searchName="@ViewBag.SearchName">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>

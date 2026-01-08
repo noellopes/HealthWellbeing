@@ -21,31 +21,27 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Client
+        // Implementa paginação e pesquisa com inclusão de Planos para o relatório
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
             var clientsQuery = _context.Client
                 .Include(c => c.Membership)
+                    .ThenInclude(m => m.MemberPlans.Where(mp => mp.Status == "Active"))
+                        .ThenInclude(mp => mp.Plan)
                 .AsQueryable();
 
-            // Filtros de Pesquisa
+            // Lógica de filtros
             if (!string.IsNullOrEmpty(searchName))
-            {
                 clientsQuery = clientsQuery.Where(c => c.Name.Contains(searchName));
-            }
 
             if (!string.IsNullOrEmpty(searchPhone))
-            {
                 clientsQuery = clientsQuery.Where(c => c.Phone.Contains(searchPhone));
-            }
 
             if (!string.IsNullOrEmpty(searchEmail))
-            {
                 clientsQuery = clientsQuery.Where(c => c.Email.Contains(searchEmail));
-            }
 
-            // Lógica de Paginação
             int totalClients = await clientsQuery.CountAsync();
-            var pagination = new PaginationInfo<Client>(page, totalClients);
+            var pagination = new PaginationInfo<Client>(page, totalClients, 5); // 5 itens por página
 
             pagination.Items = await clientsQuery
                 .OrderBy(c => c.Name)
@@ -53,7 +49,6 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            // Manter os termos de pesquisa na View para os links de paginação
             ViewBag.SearchName = searchName;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchEmail = searchEmail;
@@ -68,6 +63,8 @@ namespace HealthWellbeing.Controllers
 
             var client = await _context.Client
                 .Include(c => c.Membership)
+                    .ThenInclude(m => m.MemberPlans.Where(mp => mp.Status == "Active"))
+                        .ThenInclude(mp => mp.Plan)
                 .FirstOrDefaultAsync(m => m.ClientId == id);
 
             if (client == null) return NotFound();
@@ -88,10 +85,10 @@ namespace HealthWellbeing.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Verifica se o email já existe para evitar duplicações
+                // Validação de Email Único (Regra de Negócio)
                 if (_context.Client.Any(c => c.Email == client.Email))
                 {
-                    ModelState.AddModelError("Email", "This email is already registered.");
+                    ModelState.AddModelError("Email", "This email is already registered in our system.");
                     return View(client);
                 }
 
@@ -99,14 +96,14 @@ namespace HealthWellbeing.Controllers
                 _context.Add(client);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Client successfully registered.";
+                TempData["SuccessMessage"] = "Client successfully registered."; // Feedback conforme o professor
                 return RedirectToAction(nameof(Index));
             }
             return View(client);
         }
 
         // GET: Client/Edit/5
-        public async Task<IActionResult> Edit(int? id) // Alterado para int?
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
@@ -129,11 +126,16 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(client);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Client information updated.";
+                    TempData["SuccessMessage"] = "Client information successfully updated.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.ClientId)) return NotFound();
+                    if (!ClientExists(client.ClientId))
+                    {
+                        // Se o cliente foi apagado por outro user durante a edição
+                        ViewBag.ClientWasDeleted = true;
+                        return View(client);
+                    }
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -142,16 +144,17 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Client/Delete/5
-        public async Task<IActionResult> Delete(int? id) // Alterado para int?
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var client = await _context.Client
+                .Include(c => c.Membership)
                 .FirstOrDefaultAsync(m => m.ClientId == id);
 
             if (client == null)
             {
-                TempData["ErrorMessage"] = "The client has already been removed.";
+                // Redireciona se o cliente já não existir (Invalid Client logic)
                 return RedirectToAction(nameof(Index));
             }
 
@@ -161,14 +164,14 @@ namespace HealthWellbeing.Controllers
         // POST: Client/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id) // Alterado para int
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var client = await _context.Client.FindAsync(id);
             if (client != null)
             {
                 _context.Client.Remove(client);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Client successfully deleted.";
+                TempData["SuccessMessage"] = "Client successfully removed from the system.";
             }
 
             return RedirectToAction(nameof(Index));
