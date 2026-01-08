@@ -2,7 +2,6 @@
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Data
 {
@@ -17,6 +16,8 @@ namespace HealthWellbeing.Data
         public DbSet<Alergia> Alergia { get; set; } = default!;
         public DbSet<Alimento> Alimentos { get; set; } = default!;
         public DbSet<AlergiaAlimento> AlergiaAlimento { get; set; }
+        public DbSet<ClientAlergia> ClientAlergia { get; set; }
+        public DbSet<ClientRestricao> ClientRestricao { get; set; }
         public DbSet<AlimentoSubstituto> AlimentoSubstitutos { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<RestricaoAlimentarAlimento> RestricaoAlimentarAlimento { get; set; }
@@ -45,6 +46,11 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Genero> Genero { get; set; } = default!;
         public DbSet<ProfissionalExecutante> ProfissionalExecutante { get; set; }
+        public DbSet<HealthWellbeing.Models.PlanoAlimentar> PlanoAlimentar { get; set; }
+        public DbSet<HealthWellbeing.Models.Meta> Meta { get; set; }
+
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -85,7 +91,6 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(aa => aa.AlimentoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-
             // N:N RestricaoAlimentar ↔ Alimento
             modelBuilder.Entity<RestricaoAlimentarAlimento>()
                 .HasKey(ra => new { ra.RestricaoAlimentarId, ra.AlimentoId });
@@ -117,6 +122,55 @@ namespace HealthWellbeing.Data
                 .WithOne()
                 .HasForeignKey<Client>(c => c.IdentityUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientAlergia>()
+                .HasKey(aa => new { aa.ClientId, aa.AlergiaId });
+
+            modelBuilder.Entity<ClientAlergia>()
+                .HasOne(c => c.Client)
+                .WithMany(a => a.Alergias)
+                .HasForeignKey(a => a.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientAlergia>()
+                .HasOne(a => a.Alergia)
+                .WithMany(c => c.ClientesAssociados)
+                .HasForeignKey(a => a.AlergiaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientRestricao>()
+                .HasKey(aa => new { aa.ClientId, aa.RestricaoAlimentarId });
+
+            modelBuilder.Entity<ClientRestricao>()
+                .HasOne(c => c.Client)
+                .WithMany(a => a.RestricoesAlimentares)
+                .HasForeignKey(a => a.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientRestricao>()
+                .HasOne(a => a.RestricaoAlimentar)
+                .WithMany(c => c.ClientesAssociados)
+                .HasForeignKey(a => a.RestricaoAlimentarId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PlanoAlimentar>()
+                .HasOne(p => p.Client)
+                .WithOne(c => c.PlanoAlimentar)
+                .HasForeignKey<PlanoAlimentar>(p => p.ClientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<PlanoAlimentar>()
+                .HasOne(p => p.Meta)
+                .WithMany()
+                .HasForeignKey(p => p.MetaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PlanoAlimentar>()
+                .HasMany(p => p.Receitas)
+                .WithOne()
+                .HasForeignKey("PlanoAlimentarId")
+                .OnDelete(DeleteBehavior.SetNull);
+
         }
     }
 }

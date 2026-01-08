@@ -6,7 +6,7 @@ namespace HealthWellbeing.Models
 {
 	public class Client
 	{
-		public string ClientId { get; set; } = string.Empty;
+		public string ClientId { get; set; }
 
 		[Required(ErrorMessage = "First and last name are necessary.")]
 		[StringLength(100, MinimumLength = 6, ErrorMessage = "The name must have at least 6 chars and no more than 100.")]
@@ -40,6 +40,14 @@ namespace HealthWellbeing.Models
 		public string? IdentityUserId { get; set; }
 
 		public IdentityUser? IdentityUser { get; set; }
+		public int PlanoAlimentarId { get; set; }
+
+		public PlanoAlimentar? PlanoAlimentar { get; set; }
+
+		public ICollection<ClientAlergia>? Alergias { get; set; }
+		public ICollection<ClientRestricao>? RestricoesAlimentares { get; set; }
+
+
 	}
 }
 
