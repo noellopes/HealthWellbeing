@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellBeing.Controllers
 {
-    [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
+    [Authorize]
     public class TipoExercicioController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -84,6 +84,7 @@ namespace HealthWellBeing.Controllers
         }
 
         // GET: TipoExercicio/Create
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public IActionResult Create()
         {
             ViewData["Beneficios"] = _context.Beneficio.OrderBy(b => b.NomeBeneficio).ToList();
@@ -93,6 +94,7 @@ namespace HealthWellBeing.Controllers
         // POST: TipoExercicio/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Create(
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
             TipoExercicio tipoExercicio,
@@ -136,6 +138,7 @@ namespace HealthWellBeing.Controllers
         }
 
         // GET: TipoExercicio/Edit/5
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -161,6 +164,7 @@ namespace HealthWellBeing.Controllers
         // POST: TipoExercicio/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Edit(
             int id,
             [Bind("TipoExercicioId,NomeTipoExercicios,DescricaoTipoExercicios,CaracteristicasTipoExercicios")]
@@ -239,6 +243,7 @@ namespace HealthWellBeing.Controllers
         }
 
         // GET: TipoExercicio/Delete/5
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -264,6 +269,7 @@ namespace HealthWellBeing.Controllers
         // POST: TipoExercicio/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
         public async Task<IActionResult> DeleteConfirmed(int TipoExercicioId)
         {
             var tipoExercicio = await _context.TipoExercicio.FindAsync(TipoExercicioId);
