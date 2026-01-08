@@ -1,7 +1,10 @@
-﻿@model HealthWellbeing.Models.Specialities
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.Specialities
 
 @{
     ViewData["Title"] = "Apagar Especialidade";
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
+    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model!.Descricao : "—";
 }
 
 <style>
@@ -59,7 +62,7 @@
         border: none;
         background: #2d79a0;
         color: #fff;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -86,7 +89,7 @@
     }
 
     .danger-card {
-        background: #ffffff;
+        background: #fff;
         border-radius: 12px;
         padding: 16px;
         border: 1px solid rgba(97,166,199,.45);
@@ -138,25 +141,13 @@
             word-break: break-word;
         }
 
-    .delete-btn {
-        background-color: #8a1f2b;
-        color: #fff;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 8px;
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-
-    .cancel-btn {
-        background-color: #f1f1f1;
-        color: #6c757d;
-        font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 8px;
-    }
-
-        .cancel-btn:hover, .delete-btn:hover {
-            filter: brightness(1.05);
-        }
 </style>
 
 <div class="utente-wrapper">
@@ -172,7 +163,7 @@
 
                     <div class="utente-actions">
                         <a asp-action="Index" class="utente-btn">
-                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                            <i class="bi bi-x-circle"></i> Cancelar
                         </a>
                     </div>
                 </div>
@@ -190,40 +181,39 @@
 
                     <div class="danger-data">
                         <div class="row g-2">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-5">
                                 <div class="info-item">
                                     <span class="lbl">Nome</span>
-                                    <span class="val">@Model.Nome</span>
+                                    <span class="val">@nome</span>
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-7">
                                 <div class="info-item">
                                     <span class="lbl">Descrição</span>
-                                    <span class="val">@Model.Descricao</span>
+                                    <span class="val">@descricao</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <form asp-action="Delete" method="post">
+                    <form asp-action="Delete" asp-route-id="@Model.IdEspecialidade" method="post" class="mt-3 d-flex gap-2 flex-wrap">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="IdEspecialidade" />
-                        <div class="d-flex justify-content-end gap-3 mt-4">
-                            <button type="submit" class="delete-btn">
-                                <i class="bi bi-trash me-1"></i> Apagar
-                            </button>
-                            <a asp-action="Index" class="cancel-btn">
-                                <i class="bi bi-x-circle me-1"></i> Cancelar
-                            </a>
-                        </div>
+
+                        <button type="submit" class="btn btn-danger hb-btn">
+                            <i class="bi bi-trash"></i> Apagar
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary hb-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
                     </form>
 
                 </div>
             </div>
 
             <div class="utente-footer-bar"></div>
-
         </div>
     </div>
 </div>

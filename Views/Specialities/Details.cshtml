@@ -1,158 +1,304 @@
-﻿@model HealthWellbeing.Models.Specialities
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.Specialities
 
 @{
-    
-    ViewData["Title"] = Model.Nome;
+    ViewData["Title"] = Model?.Nome ?? "Especialidade";
+
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
+    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model!.Descricao : "—";
+    var oqueE = !string.IsNullOrWhiteSpace(Model?.OqueEDescricao) ? Model!.OqueEDescricao : null;
 }
 
-<div class="container">
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-   
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb small">
-            <li class="breadcrumb-item">
-                <a asp-controller="Home" asp-action="Index">Início</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a asp-controller="Specialities" asp-action="Index">Especialidades</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                @Model.Nome
-            </li>
-        </ol>
-    </nav>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-   
-    <section class="bg-light border rounded-3 p-4 mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="display-6 mb-3">@Model.Nome</h1>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-                <p class="lead mb-0">
-                    @Html.DisplayFor(m => m.Descricao)
-                </p>
-            </div>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                <div class="d-grid gap-2 d-md-block">
-                    <a asp-controller="Consultas" asp-action="Index"
-                       class="btn btn-primary me-md-2 mb-2">
-                        Marcar consulta
-                    </a>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-                    <a asp-controller="Exame" asp-action="Index"
-                       class="btn btn-outline-primary mb-2">
-                        Ver exames
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
 
-    <div class="row">
-        
-        <div class="col-lg-8">
-            <section class="mb-4">
-                <h2 class="h5 mb-3">O que é a especialidade de @Model.Nome?</h2>
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
 
-                @if (!string.IsNullOrWhiteSpace(Model.OqueEDescricao))
-                {
-                    <p>@Model.OqueEDescricao</p>
-                }
-                else
-                {
-                    <p class="text-muted">
-                        (Sem descrição detalhada. Pode adicionar no botão <strong>Editar</strong>.)
-                    </p>
-                }
-            </section>
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-            <section class="mb-4">
-                <h2 class="h5 mb-3">Quando deve procurar esta especialidade?</h2>
-                <p class="mb-2">
-                    Procure esta especialidade sempre que tiver sintomas relacionados com esta área
-                    ou quando for encaminhado pelo seu médico assistente.
-                </p>
-                <p class="mb-0">
-                    Nesta página encontra informação geral sobre a especialidade e acesso rápido
-                    a consultas, exames e profissionais de saúde.
-                </p>
-            </section>
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
 
-            <section class="mb-4">
-                <h2 class="h5 mb-3">Como o HealthWellbeing o pode ajudar</h2>
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2">✓ Consultas com médicos especializados nesta área</li>
-                    <li class="mb-2">✓ Exames complementares de diagnóstico</li>
-                    <li class="mb-2">✓ Acompanhamento personalizado ao longo do tratamento</li>
-                </ul>
-            </section>
-        </div>
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        
-        <div class="col-lg-4">
+        .hb-btn.btn-sm {
+            padding: 6px 12px !important;
+        }
 
-           
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <h3 class="h6 card-title">Consultas e Exames</h3>
-                    <p class="small text-muted">
-                        Veja as consultas e exames relacionados com esta especialidade
-                        e faça a sua marcação.
-                    </p>
-                    <div class="d-grid gap-2">
-                        <a asp-controller="Consultas" asp-action="Index"
-                           class="btn btn-outline-primary btn-sm">
-                            Ver consultas
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .details-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .details-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+    }
+
+    .info-item {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 10px;
+        padding: 10px 12px;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #2b546c;
+            opacity: .85;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #1f4f6a;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+    .side-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .side-title {
+        margin: 0 0 6px 0;
+        font-weight: 800;
+        color: #1f4f6a;
+        font-size: 1rem;
+    }
+
+    .side-sub {
+        margin: 0 0 12px 0;
+        color: #2b546c;
+        font-size: .9rem;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + ações -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
                         </a>
-                        <a asp-controller="Exame" asp-action="Index"
-                           class="btn btn-outline-secondary btn-sm">
-                            Ver exames
+
+                        <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade" class="utente-btn">
+                            <i class="bi bi-pencil-square"></i> Editar
                         </a>
                     </div>
                 </div>
             </div>
 
-            
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <h3 class="h6 card-title">Corpo clínico</h3>
-                    <p class="small text-muted">
-                        Consulte os médicos e outros profissionais de saúde
-                        associados ao HealthWellbeing.
-                    </p>
-                    <a asp-controller="Doctor" asp-action="Index"
-                       class="btn btn-outline-primary btn-sm w-100">
-                        Ver médicos
-                    </a>
+            <!-- CORPO -->
+            <div class="utente-body">
+
+                <div class="row g-3">
+                    <!-- ESQUERDA: detalhes -->
+                    <div class="col-12 col-lg-8">
+                        <div class="details-card">
+                            <h2 class="details-title">@nome</h2>
+                            <p class="details-sub">@descricao</p>
+
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <span class="lbl">O que é a especialidade de @nome?</span>
+                                        <span class="val">
+                                            @if (!string.IsNullOrWhiteSpace(oqueE))
+                                            {
+                                                @oqueE
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">(Sem descrição detalhada. Pode adicionar no botão <strong>Editar</strong>.)</span>
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <span class="lbl">Quando deve procurar esta especialidade?</span>
+                                        <span class="val">
+                                            Procure esta especialidade sempre que tiver sintomas relacionados com esta área
+                                            ou quando for encaminhado pelo seu médico assistente.
+                                            <br />
+                                            Nesta página encontra informação geral sobre a especialidade e acesso rápido
+                                            a consultas e profissionais de saúde.
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="info-item">
+                                        <span class="lbl">Como o HealthWellbeing o pode ajudar</span>
+                                        <span class="val">
+                                            <ul class="list-unstyled mb-0">
+                                                <li class="mb-2">✓ Consultas com médicos especializados nesta área</li>
+                                                <li class="mb-2">✓ Exames complementares de diagnóstico</li>
+                                                <li class="mb-0">✓ Acompanhamento personalizado ao longo do tratamento</li>
+                                            </ul>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- DIREITA: 3 cards -->
+                    <div class="col-12 col-lg-4">
+
+                        <!-- Card 1 -->
+                        <div class="side-card mb-3">
+                            <h3 class="side-title">Consultas</h3>
+                            <p class="side-sub">
+                                Veja as consultas relacionadas com esta especialidade e faça a sua marcação.
+                            </p>
+
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Consultas" asp-action="Index" class="btn btn-primary hb-btn">
+                                    <i class="bi bi-calendar-check"></i> Marcar consulta
+                                </a>
+
+                                <a asp-controller="Consultas" asp-action="Index" class="btn btn-outline-primary hb-btn">
+                                    <i class="bi bi-eye"></i> Ver consultas
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="side-card mb-3">
+                            <h3 class="side-title">Corpo clínico</h3>
+                            <p class="side-sub">
+                                Consulte os médicos e outros profissionais de saúde associados ao HealthWellbeing.
+                            </p>
+
+                            <a asp-controller="Doctor" asp-action="Index" class="btn btn-outline-primary hb-btn w-100">
+                                <i class="bi bi-heart-pulse"></i> Ver médicos
+                            </a>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="side-card">
+                            <h3 class="side-title">Informação adicional</h3>
+                            <p class="side-sub mb-2">
+                                Traga sempre os seus exames anteriores e a lista de medicação que está a fazer.
+                            </p>
+                            <p class="side-sub mb-0">
+                                Em caso de urgência, dirija-se ao serviço de atendimento permanente.
+                            </p>
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
 
-           
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h3 class="h6 card-title">Informação adicional</h3>
-                    <p class="small text-muted mb-1">
-                        Traga sempre os seus exames anteriores e a lista de medicação
-                        que está a fazer para uma melhor avaliação.
-                    </p>
-                    <p class="small text-muted mb-0">
-                        Em caso de urgência, dirija-se ao serviço de atendimento permanente.
-                    </p>
-                </div>
-            </div>
+            <div class="utente-footer-bar"></div>
         </div>
     </div>
-
-    
-    <div class="mt-4 d-flex justify-content-between">
-        <a asp-action="Index" class="btn btn-link p-0">
-            ← Voltar à lista de especialidades
-        </a>
-
-        <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade"
-           class="btn btn-outline-secondary btn-sm">
-            Editar especialidade
-        </a>
-    </div>
 </div>
+
