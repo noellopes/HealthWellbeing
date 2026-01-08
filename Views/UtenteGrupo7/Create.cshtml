@@ -7,14 +7,34 @@
 
 <div class="container mt-4">
 
-    @if (TempData["MensagemErro"] != null)
+    @if (TempData["StatusMessage"] != null)
     {
-        <div class="alert alert-warning alert-dismissible fade show border-start border-warning border-4 shadow-sm mb-4" role="alert">
+        var message = TempData["StatusMessage"].ToString();
+        var alertClass = "alert-info";
+        var icon = "ℹ️";
+
+        if (message.StartsWith("Erro"))
+        {
+            alertClass = "alert-danger";
+            icon = "❌";
+        }
+        else if (message.StartsWith("Aviso"))
+        {
+            alertClass = "alert-warning";
+            icon = "⚠️";
+        }
+        else if (message.StartsWith("Sucesso"))
+        {
+            alertClass = "alert-success";
+            icon = "✅";
+        }
+
+        <div class="alert @alertClass alert-dismissible fade show border-start border-4 shadow-sm mb-4" role="alert">
             <div class="d-flex align-items-center">
-                <h2 class="me-3 mb-0">⚠️</h2>
+                <h2 class="me-3 mb-0">@icon</h2>
                 <div>
-                    <h5 class="alert-heading fw-bold mb-1">Aviso</h5>
-                    <p class="mb-0 text-dark">@TempData["MensagemErro"]</p>
+                    <h5 class="alert-heading fw-bold mb-1">Notificação</h5>
+                    <p class="mb-0 text-dark">@message</p>
                 </div>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

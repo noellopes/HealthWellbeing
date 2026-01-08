@@ -6,6 +6,10 @@ namespace HealthWellbeing.ViewModels
     {
         public string NomeUtente { get; set; }
 
+        public double PesoAtual { get; set; }
+        public double AlturaAtual { get; set; }
+        public double IMC => (AlturaAtual > 0) ? Math.Round(PesoAtual / (AlturaAtual * AlturaAtual), 2) : 0;
+
         // --- Estatísticas Gerais  ---
         public string ExercicioFavorito { get; set; } = "Nenhum";
         public double VolumeTotalAcumulado { get; set; } 

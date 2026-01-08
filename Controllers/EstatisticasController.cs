@@ -75,8 +75,8 @@ namespace HealthWellbeing.Controllers
 
             if (utente == null)
             {
-                TempData["ErrorMessage"] = "Ficha de utente não encontrada.";
-                return RedirectToAction("Index", "Home");
+                TempData["StatusMessage"] = "Aviso: Tem de terminar a configuração do seu perfil.";
+                return RedirectToAction("Create", "UtenteGrupo7");
             }
 
             return RedirectToAction("Utente", new { id = utente.UtenteGrupo7Id });
@@ -101,6 +101,11 @@ namespace HealthWellbeing.Controllers
                 .Where(p => p.UtenteGrupo7Id == id)
                 .OrderBy(p => p.PlanoExerciciosId)
                 .ToListAsync();
+
+            var ultimaAvaliacao = await _context.AvaliacaoFisica
+                .Where(a => a.UtenteGrupo7Id == id)
+                .OrderByDescending(a => a.DataMedicao)
+                .FirstOrDefaultAsync();
 
             var todosExerciciosList = planos
                 .SelectMany(p => p.PlanoExercicioExercicios ?? new List<PlanoExercicioExercicio>())
@@ -175,7 +180,9 @@ namespace HealthWellbeing.Controllers
                 ExercicioFavorito = exercicioFavorito,
                 VolumeTotalAcumulado = volumeTotalVida,
                 TotalPlanosAtribuidos = planos.Count,
-                TotalPlanos100Porcento = planosFeitos
+                TotalPlanos100Porcento = planosFeitos,
+                PesoAtual = ultimaAvaliacao != null ? ultimaAvaliacao.Peso : 0,
+                AlturaAtual = ultimaAvaliacao != null ? (ultimaAvaliacao.Altura / 100.0) : 0
             };
 
             return View(viewModel);

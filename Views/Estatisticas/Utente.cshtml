@@ -2,6 +2,33 @@
 
 @{
     ViewData["Title"] = "Relatório - " + Model.NomeUtente;
+
+    string imcClasse = "bg-secondary";
+    string imcCategoria = "Sem Dados";
+
+    if (Model.IMC > 0)
+    {
+        if (Model.IMC < 18.5)
+        {
+            imcClasse = "bg-info";
+            imcCategoria = "Abaixo do Peso";
+        }
+        else if (Model.IMC < 24.9)
+        {
+            imcClasse = "bg-success";
+            imcCategoria = "Peso Normal";
+        }
+        else if (Model.IMC < 29.9)
+        {
+            imcClasse = "bg-warning";
+            imcCategoria = "Sobrepeso";
+        }
+        else
+        {
+            imcClasse = "bg-danger";
+            imcCategoria = "Obesidade";
+        }
+    }
 }
 
 <div class="container py-4">
@@ -18,33 +45,59 @@
     </div>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card @imcClasse text-white shadow-sm h-100 border-0">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    @if (Model.IMC > 0)
+                    {
+                        <h1 class="display-6 fw-bold mb-0">@Model.IMC</h1>
+                        <small class="text-white-50 text-uppercase fw-bold">@imcCategoria</small>
+
+                        <div class="d-flex justify-content-center gap-3 mt-2 border-top border-white border-opacity-25 pt-2">
+                            <span style="font-size: 0.85rem;"><i class="bi bi-arrow-bar-up"></i> @Model.AlturaAtual m</span>
+                            <span style="font-size: 0.85rem;"><i class="bi bi-speedometer"></i> @Model.PesoAtual kg</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <h1 class="display-6 fw-bold mb-0">--</h1>
+                        <small class="text-white-50">Sem dados biométricos</small>
+                        <div class="mt-2"><i class="bi bi-clipboard-x fs-4"></i></div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-primary text-white shadow-sm h-100 border-0">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
                     <h1 class="display-6 fw-bold mb-0">@Model.VolumeTotalAcumulado <span class="fs-5">kg</span></h1>
-                    <small class="text-white-50 text-uppercase fw-bold">Volume Total Levantado</small>
+                    <small class="text-white-50 text-uppercase fw-bold">Volume Total</small>
                     <div class="mt-2"><i class="bi bi-trophy-fill fs-4"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-success text-white shadow-sm h-100 border-0">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
                     <h1 class="display-6 fw-bold mb-0">
                         @Model.TotalPlanos100Porcento <span class="fs-5 text-white-50">/ @Model.TotalPlanosAtribuidos</span>
                     </h1>
-                    <small class="text-white-50 text-uppercase fw-bold">Planos Concluídos a 100%</small>
+                    <small class="text-white-50 text-uppercase fw-bold">Planos a 100%</small>
                     <div class="mt-2"><i class="bi bi-check-circle-fill fs-4"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-xl-3 col-md-6">
             <div class="card bg-light text-dark shadow-sm h-100 border-0">
                 <div class="card-body text-center d-flex flex-column justify-content-center">
-                    <h4 class="fw-bold mb-1 text-primary">@Model.ExercicioFavorito</h4>
-                    <small class="text-muted text-uppercase fw-bold">Exercício Mais Frequente</small>
+                    <h4 class="fw-bold mb-1 text-primary text-truncate px-2" title="@Model.ExercicioFavorito">
+                        @(string.IsNullOrEmpty(Model.ExercicioFavorito) ? "-" : Model.ExercicioFavorito)
+                    </h4>
+                    <small class="text-muted text-uppercase fw-bold">Exercício Favorito</small>
                     <div class="mt-2"><i class="bi bi-heart-fill text-danger fs-4"></i></div>
                 </div>
             </div>
@@ -52,7 +105,6 @@
     </div>
 
     <div class="row">
-
         <div class="col-lg-8 mb-4">
             <div class="card shadow-sm h-100 border-0">
                 <div class="card-header bg-white py-3 border-0">
@@ -68,9 +120,7 @@
                             @foreach (var barra in Model.EvolucaoCarga)
                             {
                                 <div class="d-flex flex-column align-items-center justify-content-end h-100 px-1" style="flex: 1;">
-
                                     <small class="fw-bold text-dark mb-1 small">@barra.ValorReal</small>
-
                                     <div class="bg-primary rounded-top w-100 shadow-sm opacity-75"
                                          style="height: @barra.AlturaPercentagem%; min-height: 4px; max-width: 60px; transition: height 0.5s;"
                                          data-bs-toggle="tooltip"
@@ -79,7 +129,6 @@
                                 </div>
                             }
                         </div>
-
                         <div class="d-flex justify-content-around mt-2 text-muted small fw-bold">
                             @foreach (var barra in Model.EvolucaoCarga)
                             {
@@ -107,25 +156,14 @@
                     <small class="text-muted">Proporção global de exercícios concluídos.</small>
                 </div>
                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
-
                     <div class="position-relative mb-4 mt-2"
-                         style="
-                            width: 220px;
-                            height: 220px;
-                            border-radius: 50%;
-                            /* O truque do Donut sem JS */
-                            background: conic-gradient(
-                                #198754 0% @Model.PercentagemConclusao%,
-                                #e9ecef @Model.PercentagemConclusao% 100%
-                            );">
-
+                         style="width: 220px; height: 220px; border-radius: 50%; background: conic-gradient(#198754 0% @Model.PercentagemConclusao%, #e9ecef @Model.PercentagemConclusao% 100%);">
                         <div class="position-absolute top-50 start-50 translate-middle bg-white rounded-circle d-flex flex-column justify-content-center align-items-center shadow-sm"
                              style="width: 160px; height: 160px;">
                             <span class="display-4 fw-bold text-dark">@Model.PercentagemConclusao<span class="fs-4">%</span></span>
                             <small class="text-success text-uppercase fw-bold" style="font-size: 0.7rem;">Concluído</small>
                         </div>
                     </div>
-
                     <div class="w-100 px-2">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
