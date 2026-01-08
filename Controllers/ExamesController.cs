@@ -9,10 +9,12 @@ using HealthWellBeing.Models;
 using HealthWellbeing.Data;
 using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    // Permite que Admin e Tecnicos acedam ao Controller
+    [Authorize(Roles = "Admin,Tecnico")]
     public class ExamesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -36,6 +38,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.PesquisaUtente = pesquisaUtente;
             ViewBag.PesquisaData = pesquisaData;
 
+            // Inicia a query com todos os Includes necessários
             var examesQuery = _context.Exames
                 .Include(e => e.ExameTipo)
                 .Include(e => e.MaterialEquipamentoAssociado)
@@ -45,6 +48,17 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.Utente)
                 .AsQueryable();
 
+            // ============================================================
+            // FILTRO POR TÉCNICO LOGADO
+            // Se não for Admin, filtra apenas os exames do técnico atual
+            // ============================================================
+            if (!User.IsInRole("Admin") && User.IsInRole("Tecnico"))
+            {
+                var userEmail = User.Identity.Name;
+                examesQuery = examesQuery.Where(e => e.ProfissionalExecutante.Email == userEmail);
+            }
+
+            // Filtros de pesquisa existentes
             if (!string.IsNullOrEmpty(pesquisaUtente))
             {
                 examesQuery = examesQuery.Where(e => e.Utente.Nome.Contains(pesquisaUtente));
@@ -55,6 +69,7 @@ namespace HealthWellbeing.Controllers
                 examesQuery = examesQuery.Where(e => e.DataHoraMarcacao.Date == pesquisaData.Value.Date);
             }
 
+            // Paginação
             int totalExames = await examesQuery.CountAsync();
             var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, itemsPerPage: 10);
 
@@ -65,6 +80,31 @@ namespace HealthWellbeing.Controllers
                 .ToListAsync();
 
             return View(paginationInfo);
+        }
+
+        // GET: Exames/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var exame = await _context.Exames
+                .Include(e => e.Utente)
+                .Include(e => e.ExameTipo)
+                .Include(e => e.SalaDeExame)
+                .Include(e => e.MedicoSolicitante)
+                .Include(e => e.ProfissionalExecutante)
+                .Include(e => e.MaterialEquipamentoAssociado)
+                .FirstOrDefaultAsync(m => m.ExameId == id);
+
+            if (exame == null) return NotFound();
+
+            // Segurança: Se for técnico, não pode ver detalhes de exames de outros
+            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && exame.ProfissionalExecutante.Email != User.Identity.Name)
+            {
+                return Forbid();
+            }
+
+            return View(exame);
         }
 
         // GET: Exames/Create
@@ -140,6 +180,8 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exames/Delete/5
+        // Apenas Admin pode apagar exames
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -153,6 +195,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exame = await _context.Exames.FindAsync(id);
@@ -171,46 +214,29 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Exames/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-            var exame = await _context.Exames.Include(e => e.Utente).Include(e => e.ExameTipo).Include(e => e.SalaDeExame).Include(e => e.MedicoSolicitante).Include(e => e.ProfissionalExecutante).Include(e => e.MaterialEquipamentoAssociado).FirstOrDefaultAsync(m => m.ExameId == id);
-            if (exame == null) return NotFound();
-            return View(exame);
-        }
-
-        // --- MÉTODO AJAX CORRIGIDO ---
+        // --- MÉTODO AJAX ---
         [HttpGet]
         public async Task<JsonResult> GetMateriaisPorTipo(int id)
         {
             try
             {
-                // 1. Tenta buscar materiais específicos na tabela de ligação 'ExameTipoRecursos'
-                // CORREÇÃO AQUI: Usar a propriedade '.Recurso' conforme o teu Model
                 var materiaisEspecificos = await _context.ExameTipoRecursos
                     .Where(x => x.ExameTipoId == id)
-                    .Include(x => x.Recurso) // <--- O teu model chama-lhe 'Recurso'
+                    .Include(x => x.Recurso)
                     .Select(x => new
                     {
-                        // value = ID do material, text = Nome do material
                         value = x.MaterialEquipamentoAssociadoId,
-                        text = x.Recurso.NomeEquipamento // <--- Aceder via 'Recurso'
+                        text = x.Recurso.NomeEquipamento
                     })
                     .ToListAsync();
 
-                // Se encontrou, retorna
                 if (materiaisEspecificos.Any())
                 {
                     return Json(new { isFallback = false, data = materiaisEspecificos });
                 }
             }
-            catch
-            {
-                // Ignora erros (tabela vazia, etc) e usa fallback
-            }
+            catch { }
 
-            // 2. FALLBACK: Retorna TODOS os materiais
             var todosMateriais = await _context.MaterialEquipamentoAssociado
                 .Select(x => new
                 {

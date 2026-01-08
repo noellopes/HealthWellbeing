@@ -9,13 +9,14 @@
 
     var dataVal = ViewBag.PesquisaData as DateTime?;
     string dataFormatada = dataVal.HasValue ? dataVal.Value.ToString("yyyy-MM-dd") : "";
+
+    // Verifica se é Técnico para personalizar o título
+    bool isTecnico = User.IsInRole("Tecnico") && !User.IsInRole("Admin");
 }
 
 <div class="container mt-4">
 
     @* --- BLOCO DE AVISOS --- *@
-
-    @* Aviso de Sucesso (Verde) *@
     @if (!string.IsNullOrEmpty(sucessoMensagem))
     {
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -24,7 +25,6 @@
         </div>
     }
 
-    @* Aviso de Erro (Vermelho) *@
     @if (!string.IsNullOrEmpty(erroMensagem))
     {
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
@@ -32,19 +32,41 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    @* ----------------------- *@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0 text-secondary">
-                Exames Marcados
+                @if (isTecnico)
+                {
+                    <text>Meus Exames para Executar</text>
+                }
+                else
+                {
+
+                    <text>Exames Marcados</text>
+                }
                 <span class="badge bg-secondary fs-6 align-middle ms-2" title="Total de Exames">@Model.TotalItems</span>
             </h1>
-            <p class="text-muted small mb-0">Gerencie todas as marcações da clínica</p>
+            <p class="text-muted small mb-0">
+                @if (isTecnico)
+                {
+                    <text>Visualize e registe a execução dos seus exames atribuídos</text>
+                }
+                else
+                {
+
+                    <text>Gerencie todas as marcações da clínica</text>
+                }
+            </p>
         </div>
-        <a asp-action="Create" class="btn btn-success shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Nova Marcação
-        </a>
+
+        @* Apenas Admin ou Rececionista (se existisse) criariam novos exames *@
+        @if (!isTecnico)
+        {
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Nova Marcação
+            </a>
+        }
     </div>
 
     @* --- Filtros --- *@
@@ -83,7 +105,7 @@
             <div class="card-body text-center py-5">
                 <div class="text-muted mb-3"><i class="bi bi-calendar-x display-4"></i></div>
                 <h5 class="text-muted">Nenhum exame encontrado</h5>
-                <p class="small text-muted">Tente ajustar os filtros ou crie uma nova marcação.</p>
+                <p class="small text-muted">Não existem exames para os critérios selecionados.</p>
             </div>
         }
         else
@@ -97,7 +119,7 @@
                             <th>Tipo de Exame</th>
                             <th>Sala</th>
                             <th>Estado</th>
-                            <th class="text-end pe-4" style="min-width: 280px;">Ações</th>
+                            <th class="text-end pe-4" style="min-width: 200px;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -132,15 +154,21 @@
                                     <span class="badge @badgeClass rounded-pill px-3">@exame.Estado</span>
                                 </td>
                                 <td class="text-end pe-4 text-nowrap">
+                                    @* Se for técnico e o exame estiver pendente/marcado, o botão Edit serve como "Executar" *@
                                     <a asp-action="Edit" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                                        <i class="bi bi-pencil-square"></i> Editar
+                                        <i class="bi bi-pencil-square"></i> @(isTecnico ? "Executar" : "Editar")
                                     </a>
+
                                     <a asp-action="Details" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-info me-1" title="Detalhes">
                                         <i class="bi bi-eye"></i> Detalhes
                                     </a>
-                                    <a asp-action="Delete" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </a>
+
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </a>
+                                    }
                                 </td>
                             </tr>
                         }

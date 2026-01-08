@@ -24,6 +24,8 @@ namespace HealthWellbeing.Data
             await SeedRoles(roleManager);
             await SeedDefaultAdmin(userManager);
             await SeedGroupMembers(userManager);
+            await SeedProfissionalLogin(userManager);
+            await SeedRecepcionistaLogin(userManager);
 
             // 2. Dados Clínicos
             await SeedDadosClinicos(dbContext);
@@ -264,6 +266,11 @@ namespace HealthWellbeing.Data
                 if (!await roleManager.RoleExistsAsync(role)) await roleManager.CreateAsync(new IdentityRole(role));
         }
 
+        internal static async Task SeedProfissionalLogin(UserManager<IdentityUser> userManager)
+        {
+            // Usando o email que já existe no teu Seed de Dados Clínicos (rui@h.pt)
+            await CriarUser(userManager, "Kandonga123@gmail.com", "Tecnico");
+        }
         internal static async Task SeedDefaultAdmin(UserManager<IdentityUser> userManager)
         {
             await CriarUser(userManager, "admin@healthwellbeing.com", "Admin");
@@ -274,6 +281,13 @@ namespace HealthWellbeing.Data
             string[] emails = { "diogomassano@ipg.pt", "dinisgomes@ipg.pt", "rafaelrodrigues@ipg.pt", "joaquimgoncalves@ipg.pt" };
             foreach (var email in emails) await CriarUser(userManager, email, "Admin");
         }
+
+        // Novo método para o João Martins
+        internal static async Task SeedRecepcionistaLogin(UserManager<IdentityUser> userManager)
+        {
+            await CriarUser(userManager, "JoaoMartinsRec@gmail.com", "Recepcionista");
+        }
+        
 
         private static async Task CriarUser(UserManager<IdentityUser> um, string email, string role)
         {
