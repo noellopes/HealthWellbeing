@@ -19,7 +19,6 @@ namespace HealthWellbeing.Data
         public DbSet<Beneficio> Beneficio { get; set; } = default!;
         public DbSet<TipoExercicioBeneficio> TipoExercicioBeneficio { get; set; } = default!;
         public DbSet<ProblemaSaude> ProblemaSaude { get; set; } = default!;
-        public DbSet<TipoExercicioProblemaSaude> TipoExercicioProblemaSaude { get; set; } = default!;
         public DbSet<Musculo> Musculo { get; set; } = default!;
         public DbSet<GrupoMuscular> GrupoMuscular { get; set; } = default!;
         public DbSet<Genero> Genero { get; set; } = default!;
@@ -231,33 +230,6 @@ namespace HealthWellbeing.Data
                 .WithMany(b => b.TipoExercicioBeneficios)
                 .HasForeignKey(tb => tb.BeneficioId);
 
-            // TipoExercicioProblemaSaude
-            modelBuilder.Entity<TipoExercicioProblemaSaude>()
-                .HasKey(tb => new { tb.TipoExercicioId, tb.ProblemaSaudeId });
-
-            modelBuilder.Entity<TipoExercicioProblemaSaude>()
-                .HasOne(tb => tb.TipoExercicio)
-                .WithMany(t => t.Contraindicacao)
-                .HasForeignKey(tb => tb.TipoExercicioId);
-
-            modelBuilder.Entity<TipoExercicioProblemaSaude>()
-                .HasOne(tb => tb.ProblemaSaude)
-                .WithMany(b => b.TipoExercicioAfetado)
-                .HasForeignKey(tb => tb.ProblemaSaudeId);
-
-            // ObjetivoTipoExercicio
-            modelBuilder.Entity<ObjetivoTipoExercicio>()
-                .HasKey(ot => new { ot.ObjetivoFisicoId, ot.TipoExercicioId });
-
-            modelBuilder.Entity<ObjetivoTipoExercicio>()
-                .HasOne(ot => ot.ObjetivoFisico)
-                .WithMany(o => o.ObjetivoTipoExercicio)
-                .HasForeignKey(ot => ot.ObjetivoFisicoId);
-
-            modelBuilder.Entity<ObjetivoTipoExercicio>()
-                .HasOne(ot => ot.TipoExercicio)
-                .WithMany(t => t.ObjetivoTipoExercicio)
-                .HasForeignKey(ot => ot.TipoExercicioId);
         }
     }
 }

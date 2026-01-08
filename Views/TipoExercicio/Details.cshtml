@@ -1,84 +1,76 @@
-﻿@model HealthWellbeing.Models.TipoExercicio
+﻿@using HealthWellbeing.Data
+@model HealthWellbeing.Models.TipoExercicio
+
 
 @{
     ViewData["Title"] = "Detalhes";
+    bool podeGerir = User.IsInRole(SeedData.Roles.Administrador) || User.IsInRole(SeedData.Roles.Profissional);
 }
 
-<h1>Detalhes</h1>
-
-<div>
-    <h4>Tipo de Exercício</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NomeTipoExercicios)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DescricaoTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DescricaoTipoExercicios)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CaracteristicasTipoExercicios)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.CaracteristicasTipoExercicios)
-        </dd>
-
-        <dt class="col-sm-2">
-            Benefícios Associados
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-dark">@Model.NomeTipoExercicios</h1>
+            <span class="badge bg-light text-secondary border mt-2">ID: @Model.TipoExercicioId</span>
+        </div>
+        <div>
+            @if (podeGerir)
             {
-                <ul class="list-unstyled">
-                    @foreach (var item in Model.TipoExercicioBeneficios)
+                <a asp-action="Edit" asp-route-id="@Model.TipoExercicioId" class="btn btn-warning shadow-sm me-2">
+                    <i class="bi bi-pencil-square me-1"></i> Editar
+                </a>
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h5 class="text-uppercase text-muted fs-6 fw-bold mb-3"><i class="bi bi-file-text me-2"></i>Informação Geral</h5>
+
+                    <div class="mb-4">
+                        <label class="fw-bold text-dark mb-1">Descrição</label>
+                        <p class="text-muted bg-light p-3 rounded">@Model.DescricaoTipoExercicios</p>
+                    </div>
+
+                    <div>
+                        <label class="fw-bold text-dark mb-1">Características Principais</label>
+                        <p class="text-muted bg-light p-3 rounded mb-0">@Model.CaracteristicasTipoExercicios</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title h6 mb-0"><i class="bi bi-heart-pulse me-2"></i>Benefícios</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
                     {
-                        if (item.Beneficio != null)
-                        {
-                            <li class="mb-1">
-                                <span class="badge bg-primary">@item.Beneficio.NomeBeneficio</span>
-                            </li>
-                        }
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var item in Model.TipoExercicioBeneficios)
+                            {
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 py-2 px-3 rounded-pill">
+                                    @item.Beneficio?.NomeBeneficio
+                                </span>
+                            }
+                        </div>
                     }
-                </ul>
-            }
-            else
-            {
-                <span class="text-muted">Nenhum benefício associado</span>
-            }
-        </dd>
-
-        <dt class="col-sm-2 text-danger">
-            Contraindicações
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.Contraindicacao != null && Model.Contraindicacao.Any())
-            {
-                <ul class="list-unstyled">
-                    @foreach (var item in Model.Contraindicacao)
+                    else
                     {
-                        if (item.ProblemaSaude != null)
-                        {
-                            <li class="mb-1">
-                                <span class="badge bg-danger">@item.ProblemaSaude.ProblemaNome</span>
-                            </li>
-                        }
+                        <div class="text-center text-muted py-3">
+                            <i class="bi bi-dash-circle fs-4 d-block mb-2"></i>
+                            Nenhum benefício associado.
+                        </div>
                     }
-                </ul>
-            }
-            else
-            {
-                <span class="text-muted">Nenhuma contraindicação registada</span>
-            }
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TipoExercicioId" class="btn btn-warning">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
