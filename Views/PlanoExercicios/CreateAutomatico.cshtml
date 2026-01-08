@@ -18,13 +18,14 @@
                         <h5 class="alert-heading text-success">Como funciona?</h5>
                         <p class="mb-0">
                             O nosso algoritmo analisa o seu <strong>Objetivo Físico</strong> e os seus <strong>Problemas de Saúde</strong>
-                            para selecionar os melhores exercícios para si.
+                            para selecionar os melhores exercícios. Pode refinar a pesquisa abaixo.
                         </p>
                     </div>
 
                     <form asp-action="CreateAutomatico" method="post" class="mt-4">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                        @* --- SELEÇÃO DE UTENTE (Staff vs Utente) --- *@
                         @if (isStaff)
                         {
                             <div class="form-group mb-4">
@@ -45,19 +46,79 @@
                         }
 
                         <div class="mb-4">
-                            <label for="quantidadeExercicios" class="form-label fw-bold">Quantos exercícios deseja no plano?</label>
+                            <label for="quantidadeExercicios" class="form-label fw-bold">Quantos exercícios deseja?</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-list-ol"></i></span>
-                                <input type="number"
-                                       id="quantidadeExercicios"
-                                       name="quantidadeExercicios"
-                                       class="form-control form-control-lg"
-                                       value="5"
-                                       min="1"
-                                       max="15"
-                                       required />
+                                <input type="number" id="quantidadeExercicios" name="quantidadeExercicios" class="form-control form-control-lg" value="5" min="1" max="15" required />
                             </div>
-                            <small class="text-muted">Recomendado: Entre 3 e 8 exercícios.</small>
+                        </div>
+
+                        @* --- NOVOS FILTROS AVANÇADOS --- *@
+                        <div class="accordion mb-4 shadow-sm" id="accordionFiltros">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button collapsed fw-bold text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiltros" aria-expanded="false" aria-controls="collapseFiltros">
+                                        <i class="bi bi-sliders me-2"></i> Preferências de Treino (Opcional)
+                                    </button>
+                                </h2>
+                                <div id="collapseFiltros" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionFiltros">
+                                    <div class="accordion-body bg-light">
+                                        <div class="row">
+                                            @* 1. TIPOS DE EXERCÍCIO *@
+                                            <div class="col-md-4 mb-3">
+                                                <label class="fw-bold mb-2 text-secondary">Tipos</label>
+                                                <div class="card p-2" style="max-height: 200px; overflow-y: auto;">
+                                                    @if (ViewBag.Tipos != null)
+                                                    {
+                                                        foreach (var item in ViewBag.Tipos)
+                                                        {
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="filtroTipos" value="@item.TipoExercicioId" id="tipo_@item.TipoExercicioId">
+                                                                <label class="form-check-label" for="tipo_@item.TipoExercicioId">@item.NomeTipoExercicios</label>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            @* 2. GRUPOS MUSCULARES *@
+                                            <div class="col-md-4 mb-3">
+                                                <label class="fw-bold mb-2 text-secondary">Músculos</label>
+                                                <div class="card p-2" style="max-height: 200px; overflow-y: auto;">
+                                                    @if (ViewBag.Grupos != null)
+                                                    {
+                                                        foreach (var item in ViewBag.Grupos)
+                                                        {
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="filtroGrupos" value="@item.GrupoMuscularId" id="grupo_@item.GrupoMuscularId">
+                                                                <label class="form-check-label" for="grupo_@item.GrupoMuscularId">@item.GrupoMuscularNome</label>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            @* 3. EQUIPAMENTOS *@
+                                            <div class="col-md-4 mb-3">
+                                                <label class="fw-bold mb-2 text-secondary">Equipamento</label>
+                                                <div class="card p-2" style="max-height: 200px; overflow-y: auto;">
+                                                    @if (ViewBag.Equipamentos != null)
+                                                    {
+                                                        foreach (var item in ViewBag.Equipamentos)
+                                                        {
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="filtroEquipamentos" value="@item.EquipamentoId" id="eq_@item.EquipamentoId">
+                                                                <label class="form-check-label" for="eq_@item.EquipamentoId">@item.NomeEquipamento</label>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted"><i class="bi bi-info-circle"></i> Deixe em branco para considerar todos.</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">

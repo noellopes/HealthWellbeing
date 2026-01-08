@@ -301,18 +301,21 @@ namespace HealthWellbeing.Controllers
             return View(planoExercicios);
         }
 
-        // GET: CreateAutomatico
         public async Task<IActionResult> CreateAutomatico()
         {
             var user = await _userManager.GetUserAsync(User);
             bool isStaff = await IsStaff(user);
 
+            // --- CARREGAR LISTAS PARA FILTROS ---
+            ViewBag.Tipos = await _context.TipoExercicio.OrderBy(t => t.NomeTipoExercicios).ToListAsync();
+            ViewBag.Grupos = await _context.GrupoMuscular.OrderBy(g => g.GrupoMuscularNome).ToListAsync();
+            ViewBag.Equipamentos = await _context.Equipamento.OrderBy(e => e.NomeEquipamento).ToListAsync();
+
             if (isStaff)
             {
-                // Carregar dropdown filtrada
                 IQueryable<UtenteGrupo7> queryUtentes = _context.UtenteGrupo7;
 
-                if (!User.IsInRole("Administrador")) // É Profissional
+                if (!User.IsInRole("Administrador"))
                 {
                     queryUtentes = queryUtentes.Where(u => u.ProfissionalSaudeId == user.Id);
                 }
@@ -321,7 +324,6 @@ namespace HealthWellbeing.Controllers
             }
             else
             {
-                // Utente a criar para si mesmo
                 var utente = await _context.UtenteGrupo7.FirstOrDefaultAsync(u => u.UserId == user.Id);
 
                 if (utente == null)
@@ -338,10 +340,14 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: CreateAutomatico
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateAutomatico(PlanoExercicios planoInput, int quantidadeExercicios)
+        public async Task<IActionResult> CreateAutomatico(
+    PlanoExercicios planoInput,
+    int quantidadeExercicios,
+    int[] filtroTipos,
+    int[] filtroGrupos,
+    int[] filtroEquipamentos)
         {
             if (quantidadeExercicios <= 0) quantidadeExercicios = 5;
 
@@ -349,10 +355,10 @@ namespace HealthWellbeing.Controllers
             bool isStaff = await IsStaff(user);
             int targetUtenteId;
 
+            // 1. Definição do Utente Alvo e Segurança
             if (isStaff)
             {
                 targetUtenteId = planoInput.UtenteGrupo7Id;
-                // Segurança extra: verificar se o utente pertence ao profissional
                 if (!User.IsInRole("Administrador"))
                 {
                     bool pertence = await _context.UtenteGrupo7.AnyAsync(u => u.UtenteGrupo7Id == targetUtenteId && u.ProfissionalSaudeId == user.Id);
@@ -366,69 +372,85 @@ namespace HealthWellbeing.Controllers
                 targetUtenteId = utenteDb.UtenteGrupo7Id;
             }
 
-            // Lógica de geração automática (MANTIDA IGUAL)
-            var utenteCompleto = await _context.UtenteGrupo7
+            // 2. Carregar Dados de Saúde do Utente
+            var utente = await _context.UtenteGrupo7
                 .Include(u => u.UtenteProblemasSaude)
                 .Include(u => u.ObjetivoFisico)
                 .FirstOrDefaultAsync(u => u.UtenteGrupo7Id == targetUtenteId);
 
-            if (utenteCompleto == null) return NotFound("Utente não encontrado.");
+            if (utente == null) return NotFound("Utente não encontrado.");
 
-            var idsProblemasSaude = utenteCompleto.UtenteProblemasSaude.Select(up => up.ProblemaSaudeId).ToList();
+            var idsProibidos = utente.UtenteProblemasSaude.Select(up => up.ProblemaSaudeId).ToList();
 
-            var exerciciosQuery = _context.Exercicio
+            // 3. Query Base: Apenas exercícios seguros (exclui contraindicações)
+            var baseQuery = _context.Exercicio
                 .Include(e => e.Contraindicacoes)
                 .Include(e => e.ExercicioObjetivos)
-                .AsQueryable();
+                .Include(e => e.ExercicioTipoExercicios)
+                .Include(e => e.ExercicioGrupoMusculares)
+                .Include(e => e.ExercicioEquipamentos)
+                .Where(e => !e.Contraindicacoes.Any(c => idsProibidos.Contains(c.ProblemaSaudeId)));
 
-            if (idsProblemasSaude.Any())
+            // 4. Query Prioritária: Base + Filtros do utilizador
+            var queryPrioritaria = baseQuery.AsQueryable();
+
+            if (utente.ObjetivoFisicoId.HasValue)
+                queryPrioritaria = queryPrioritaria.Where(e => e.ExercicioObjetivos.Any(eo => eo.ObjetivoFisicoId == utente.ObjetivoFisicoId));
+
+            if (filtroTipos != null && filtroTipos.Any())
+                queryPrioritaria = queryPrioritaria.Where(e => e.ExercicioTipoExercicios.Any(et => filtroTipos.Contains(et.TipoExercicioId)));
+
+            if (filtroGrupos != null && filtroGrupos.Any())
+                queryPrioritaria = queryPrioritaria.Where(e => e.ExercicioGrupoMusculares.Any(eg => filtroGrupos.Contains(eg.GrupoMuscularId)));
+
+            if (filtroEquipamentos != null && filtroEquipamentos.Any())
+                queryPrioritaria = queryPrioritaria.Where(e => e.ExercicioEquipamentos.Any(eq => filtroEquipamentos.Contains(eq.EquipamentoId)));
+
+            // 5. Seleção Inteligente
+            var exerciciosPerfeitos = await queryPrioritaria.ToListAsync();
+            var listaFinal = new List<Exercicio>();
+
+            if (exerciciosPerfeitos.Count >= quantidadeExercicios)
             {
-                exerciciosQuery = exerciciosQuery.Where(e =>
-                    !e.Contraindicacoes.Any(c => idsProblemasSaude.Contains(c.ProblemaSaudeId)));
+                // Temos suficientes com os filtros exatos
+                listaFinal = exerciciosPerfeitos.OrderBy(x => Guid.NewGuid()).Take(quantidadeExercicios).ToList();
+                TempData["SuccessMessage"] = "Plano gerado respeitando todas as preferências!";
+            }
+            else
+            {
+                // Não chega, vamos completar com exercícios gerais seguros
+                listaFinal.AddRange(exerciciosPerfeitos);
+
+                int faltam = quantidadeExercicios - listaFinal.Count;
+                var idsJaSelecionados = listaFinal.Select(x => x.ExercicioId).ToList();
+
+                var exerciciosExtra = await baseQuery
+                    .Where(e => !idsJaSelecionados.Contains(e.ExercicioId))
+                    .OrderBy(x => Guid.NewGuid())
+                    .Take(faltam)
+                    .ToListAsync();
+
+                listaFinal.AddRange(exerciciosExtra);
+                TempData["InfoMessage"] = $"Encontrámos {exerciciosPerfeitos.Count} exercícios com os seus filtros e completámos o resto com opções seguras.";
             }
 
-            if (utenteCompleto.ObjetivoFisicoId.HasValue)
+            if (!listaFinal.Any())
             {
-                exerciciosQuery = exerciciosQuery.Where(e =>
-                    e.ExercicioObjetivos.Any(eo => eo.ObjetivoFisicoId == utenteCompleto.ObjetivoFisicoId));
-            }
-
-            var candidatos = await exerciciosQuery.ToListAsync();
-
-            if (!candidatos.Any())
-            {
-                // Fallback: Tenta buscar sem filtro de objetivo, apenas restrições médicas
-                candidatos = await _context.Exercicio
-                   .Include(e => e.Contraindicacoes)
-                   .Where(e => !e.Contraindicacoes.Any(c => idsProblemasSaude.Contains(c.ProblemaSaudeId)))
-                   .ToListAsync();
-            }
-
-            var selecionados = candidatos.OrderBy(x => Guid.NewGuid()).Take(quantidadeExercicios).ToList();
-
-            if (!selecionados.Any())
-            {
-                ModelState.AddModelError("", "Não existem exercícios compatíveis com as restrições médicas.");
-                ViewBag.IsStaff = isStaff;
-                if (isStaff)
-                {
-                    IQueryable<UtenteGrupo7> q = _context.UtenteGrupo7;
-                    if (!User.IsInRole("Administrador")) q = q.Where(u => u.ProfissionalSaudeId == user.Id);
-                    ViewData["UtenteGrupo7Id"] = new SelectList(await q.ToListAsync(), "UtenteGrupo7Id", "Nome");
-                }
-                else
-                {
-                    ViewBag.UtenteFixoId = targetUtenteId;
-                    ViewBag.UtenteFixoNome = utenteCompleto.Nome;
-                }
+                ModelState.AddModelError("", "Não existem exercícios seguros para as suas contraindicações médicas.");
+                await CarregarViewBagsManual(user, targetUtenteId); // Helper existente no teu código
                 return View(planoInput);
             }
 
-            var novoPlano = new PlanoExercicios { UtenteGrupo7Id = targetUtenteId };
+            // 6. Gravar
+            var novoPlano = new PlanoExercicios
+            {
+                UtenteGrupo7Id = targetUtenteId
+            };
+
             _context.Add(novoPlano);
             await _context.SaveChangesAsync();
 
-            var juncoes = selecionados.Select(ex => new PlanoExercicioExercicio
+            var juncoes = listaFinal.Select(ex => new PlanoExercicioExercicio
             {
                 PlanoExerciciosId = novoPlano.PlanoExerciciosId,
                 ExercicioId = ex.ExercicioId,
@@ -625,6 +647,13 @@ namespace HealthWellbeing.Controllers
             ViewBag.TodosExercicios = await _context.Exercicio
                 .Select(e => new SelectListItem { Value = e.ExercicioId.ToString(), Text = e.ExercicioNome })
                 .ToListAsync();
+        }
+
+        private async Task CarregarListasFiltros()
+        {
+            ViewBag.Tipos = await _context.TipoExercicio.OrderBy(t => t.NomeTipoExercicios).ToListAsync();
+            ViewBag.Grupos = await _context.GrupoMuscular.OrderBy(g => g.GrupoMuscularNome).ToListAsync();
+            ViewBag.Equipamentos = await _context.Equipamento.OrderBy(e => e.NomeEquipamento).ToListAsync();
         }
     }
 }
