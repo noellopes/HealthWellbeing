@@ -156,6 +156,39 @@
         border-radius: 12px;
         padding: 12px;
     }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .agenda-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .agenda-btn:hover {
+            filter: brightness(1.05);
+        }
 </style>
 
 <div class="utente-wrapper">
@@ -172,12 +205,12 @@
                     </div>
 
                     <div class="utente-actions">
-                        <!-- Estes 3 botões seguem o teu protótipo (ajusta controllers/actions ao teu projeto) -->
-                        <a class="utente-btn alt" asp-controller="Medicos" asp-action="Index">
+                        <!-- 3 botões ) -->
+                        <a class="utente-btn alt" asp-controller="Doctor" asp-action="Index">
                             <i class="bi bi-heart-pulse"></i> Médicos
                         </a>
 
-                        <a class="utente-btn active-lock">
+                        <a class="utente-btn active-lock" asp-controller="Specialities" asp-action="Index">
                             <i class="bi bi-clipboard2-pulse"></i> Especialidades
                         </a>
 
@@ -190,10 +223,22 @@
 
             <!-- CORPO -->
             <div class="utente-body">
+                <!-- Bem-vindo + Agenda Médica -->
+                <div class="welcome-row">
+                    <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
+
+                    <!-- Ajusta para o teu módulo de agendas -->
+                    <a class="agenda-btn"
+                       asp-controller="AgendaMedicas"
+                       asp-action="Index">
+                        <i class="bi bi-calendar2-week"></i> Agenda Médica
+                    </a>
+                </div>
                 <div class="content-card">
+                    
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
-                            <h2 class="content-title">Especialidades</h2>
+                            <h3 class="content-title">Especialidades</h3>
                             <p class="content-sub">Gere e consulta as especialidades médicas.</p>
                         </div>
 
