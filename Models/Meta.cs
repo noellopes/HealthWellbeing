@@ -1,0 +1,37 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace HealthWellbeing.Models
+{
+    public class Meta
+    {
+        [Key]
+        public int MetaId { get; set; }
+
+        [Required(ErrorMessage = "Client is required.")]
+        public string ClientId { get; set; }
+
+        public Client? Client { get; set; }
+
+        [Required(ErrorMessage = "Meta name is required.")]
+        [StringLength(200)]
+        public string MetaDescription { get; set; } = string.Empty;
+
+
+        [Range(0, 20000, ErrorMessage = "Daily calories must be a positive value.")]
+        public int DailyCalories { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily protein must be a positive value.")]
+        public int DailyProtein { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily fat must be a positive value.")]
+        public int DailyFat { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily hydrates must be a positive value.")]
+        public int DailyHydrates { get; set; }
+
+        [Range(0, 1000, ErrorMessage = "Daily vitamins must be a positive value.")]
+        public int DailyVitamins { get; set; }
+
+    }
+}

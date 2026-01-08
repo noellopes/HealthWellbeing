@@ -33,5 +33,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Alimento Associado")]
         
         public ICollection<AlergiaAlimento>? AlimentosAssociados { get; set; }
+        public ICollection<ClientAlergia>? ClientesAssociados { get; set; }
     }
 }
