@@ -3,13 +3,19 @@
 @{
     ViewData["Title"] = "Especialidades";
     var q = ViewBag.SearchQuery as string ?? "";
+    var podeGerirEspecialidades =
+        User.IsInRole("Administrador") || User.IsInRole("DiretorClinico");
 }
 
 <div class="d-flex align-items-center justify-content-between mb-3">
     <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        + Nova Especialidade
-    </a>
+
+    @if (podeGerirEspecialidades)
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            + Nova Especialidade
+        </a>
+    }
 </div>
 
 <div class="card shadow-sm">
@@ -61,30 +67,30 @@
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title mb-0">@item.Nome</h5>
 
-                                    <div class="btn-group btn-group-sm">
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-outline-secondary"
-                                           onclick="event.stopPropagation();">
-                                            Editar
-                                        </a>
-                                        <a asp-action="Delete"
-                                           asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-outline-danger"
-                                           onclick="event.stopPropagation();">
-                                            Eliminar
-                                        </a>
-                                    </div>
+                                    @if (podeGerirEspecialidades)
+                                    {
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Edit"
+                                               asp-route-id="@item.IdEspecialidade"
+                                               class="btn btn-outline-secondary"
+                                               onclick="event.stopPropagation();">
+                                                Editar
+                                            </a>
+                                            <a asp-action="Delete"
+                                               asp-route-id="@item.IdEspecialidade"
+                                               class="btn btn-outline-danger"
+                                               onclick="event.stopPropagation();">
+                                                Eliminar
+                                            </a>
+                                        </div>
+                                    }
                                 </div>
-
-                                
                             </div>
                         </div>
                     </div>
                 }
             </div>
 
-            @* PAGINAÇÃO *@
             @if (Model.TotalPages > 1)
             {
                 <nav aria-label="Navegação de páginas" class="mt-3">

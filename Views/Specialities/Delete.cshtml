@@ -1,37 +1,27 @@
 ﻿@model HealthWellbeing.Models.Specialities
 
 @{
-    ViewData["Title"] = "Apagar Especialidade";
+    ViewData["Title"] = "Eliminar Especialidade";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0 text-danger">@ViewData["Title"]</h1>
-    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
+<h1 class="h4 mb-3 text-danger">Eliminar Especialidade</h1>
+
+<div class="alert alert-warning">
+    Tem a certeza que pretende eliminar a especialidade
+    <strong>@Model.Nome</strong>?
+    <br />
+    Esta ação não poderá ser revertida.
 </div>
 
-<div class="card border-danger shadow-sm">
-    <div class="card-header bg-danger text-white fw-semibold">
-        Confirmação de eliminação
-    </div>
-
+<div class="card shadow-sm mb-3">
     <div class="card-body">
-        <p class="mb-4">Tens a certeza de que queres apagar esta especialidade?</p>
-
-        <dl class="row mb-0">
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Nome)</dt>
-            <dd class="col-sm-9 fw-semibold">@Html.DisplayFor(m => m.Nome)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Descricao)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.Descricao)</dd>
-        </dl>
-    </div>
-
-    <div class="card-footer d-flex justify-content-end gap-2">
-        <form asp-action="Delete" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="IdEspecialidade" />
-            <button type="submit" class="btn btn-danger">Apagar</button>
-        </form>
-        <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+        <p><strong>Nome:</strong> @Model.Nome</p>
+        <p><strong>Descrição:</strong> @Model.Descricao</p>
     </div>
 </div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="IdEspecialidade" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>

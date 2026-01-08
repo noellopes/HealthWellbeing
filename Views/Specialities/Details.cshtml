@@ -40,10 +40,7 @@
                         Marcar consulta
                     </a>
 
-                    <a asp-controller="Exame" asp-action="Index"
-                       class="btn btn-outline-primary mb-2">
-                        Ver exames
-                    </a>
+                    
                 </div>
             </div>
         </div>
@@ -95,9 +92,9 @@
            
             <div class="card mb-3 shadow-sm">
                 <div class="card-body">
-                    <h3 class="h6 card-title">Consultas e Exames</h3>
+                    <h3 class="h6 card-title">Consultas</h3>
                     <p class="small text-muted">
-                        Veja as consultas e exames relacionados com esta especialidade
+                        Veja as consultas relacionadas com esta especialidade
                         e faça a sua marcação.
                     </p>
                     <div class="d-grid gap-2">
@@ -105,10 +102,7 @@
                            class="btn btn-outline-primary btn-sm">
                             Ver consultas
                         </a>
-                        <a asp-controller="Exame" asp-action="Index"
-                           class="btn btn-outline-secondary btn-sm">
-                            Ver exames
-                        </a>
+                       
                     </div>
                 </div>
             </div>
@@ -146,8 +140,8 @@
 
     
     <div class="mt-4 d-flex justify-content-between">
-        <a asp-action="Index" class="btn btn-link p-0">
-            ← Voltar à lista de especialidades
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar à lista
         </a>
 
         <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade"

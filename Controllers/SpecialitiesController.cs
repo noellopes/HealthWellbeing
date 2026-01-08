@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
@@ -19,14 +20,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities
+        // Utente, Medico, Rececionista, DiretorClinico e Administrador podem VER
+        [Authorize(Roles = "Utente,Medico,Rececionista,DiretorClinico,Administrador")]
         public async Task<IActionResult> Index(string? q, int page = 1)
         {
-            
             if (page < 1) page = 1;
 
             var query = _context.Specialities.AsQueryable();
 
-            
             if (!string.IsNullOrWhiteSpace(q))
             {
                 q = q.Trim();
@@ -38,7 +39,6 @@ namespace HealthWellbeing.Controllers
 
             var totalItems = await query.CountAsync();
 
-            
             if (totalItems == 0)
             {
                 var emptyPagination = new PaginationInfo<Specialities>(
@@ -50,18 +50,16 @@ namespace HealthWellbeing.Controllers
                 emptyPagination.Items = new System.Collections.Generic.List<Specialities>();
 
                 ViewBag.SearchQuery = q;
-                ViewBag.NoResults = !string.IsNullOrWhiteSpace(q); // para mostrar mensagem "não encontrado"
+                ViewBag.NoResults = !string.IsNullOrWhiteSpace(q);
                 return View(emptyPagination);
             }
 
-            //  paginação
             var pagination = new PaginationInfo<Specialities>(
                 currentPage: page,
                 totalItems: totalItems,
                 itemsPerPage: 9
             );
 
-            
             if (pagination.TotalPages > 0 && page > pagination.TotalPages)
             {
                 pagination = new PaginationInfo<Specialities>(
@@ -86,6 +84,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities/Details/5
+        [Authorize(Roles = "Utente,Medico,Rececionista,DiretorClinico,Administrador")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -99,6 +98,8 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities/Create
+        // Só DiretorClinico e Administrador podem GERIR
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public IActionResult Create()
         {
             return View();
@@ -107,6 +108,7 @@ namespace HealthWellbeing.Controllers
         // POST: Specialities/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public async Task<IActionResult> Create(
             [Bind("IdEspecialidade,Nome,Descricao,OqueEDescricao")]
             Specialities specialities)
@@ -121,6 +123,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities/Edit/5
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -134,6 +137,7 @@ namespace HealthWellbeing.Controllers
         // POST: Specialities/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public async Task<IActionResult> Edit(
             int id,
             [Bind("IdEspecialidade,Nome,Descricao,OqueEDescricao")]
@@ -163,6 +167,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Specialities/Delete/5
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -178,6 +183,7 @@ namespace HealthWellbeing.Controllers
         // POST: Specialities/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var specialities = await _context.Specialities.FindAsync(id);
