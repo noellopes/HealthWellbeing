@@ -4,48 +4,209 @@
     ViewData["Title"] = "Agenda Médica (15 dias úteis)";
 }
 
-<h2>@ViewData["Title"]</h2>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-@if (User.IsInRole("Medico"))
-{
-    <a class="btn btn-primary mb-3" asp-action="MinhaAgenda15Dias">
-        Definir a minha agenda (15 dias)
-    </a>
-}
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-@foreach (var esp in Model)
-{
-    <h3 class="mt-4">@esp.Especialidade</h3>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-    <div class="table-responsive mb-4">
-        <table class="table table-sm table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th style="min-width:180px;">Médico</th>
-                    @foreach (var d in esp.Datas)
-                    {
-                        <th style="min-width:160px;">
-                            @d.ToString("dd/MM") <br />
-                            <small>@d.DayOfWeek</small>
-                        </th>
-                    }
-                </tr>
-            </thead>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-            <tbody>
-                @foreach (var medico in esp.Medicos)
-                {
-                    <tr>
-                        <td>@medico.Medico</td>
-                        @foreach (var d in esp.Datas)
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .hb-btn.btn-sm {
+            padding: 6px 12px !important;
+        }
+
+    .section-title {
+        margin: 16px 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        @if (User.IsInRole("Medico"))
                         {
-                            <td>
-                                @(medico.HorariosPorData.TryGetValue(d, out var txt) ? txt : "-")
-                            </td>
+                            <a class="utente-btn" asp-action="MinhaAgenda15Dias">
+                                <i class="bi bi-calendar-plus"></i> Definir a minha agenda (15 dias)
+                            </a>
                         }
-                    </tr>
-                }
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">@ViewData["Title"]</h2>
+                    </div>
+
+                    @if (Model == null || !Model.Any())
+                    {
+                        <div class="alert alert-warning mb-0">
+                            Não existem dados de agenda para apresentar.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var esp in Model)
+                        {
+                            <h3 class="section-title">@esp.Especialidade</h3>
+
+                            <div class="table-responsive mb-4">
+                                <table class="table table-sm table-striped table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="min-width:180px;">Médico</th>
+                                            @foreach (var d in esp.Datas)
+                                            {
+                                                <th style="min-width:160px;">
+                                                    @d.ToString("dd/MM")<br />
+                                                    <small class="text-muted">@d.DayOfWeek</small>
+                                                </th>
+                                            }
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @foreach (var medico in esp.Medicos)
+                                        {
+                                            <tr>
+                                                <td class="fw-semibold">@medico.Medico</td>
+                                                @foreach (var d in esp.Datas)
+                                                {
+                                                    <td>
+                                                        @(medico.HorariosPorData.TryGetValue(d, out var txt) ? txt : "-")
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
-}
+</div>

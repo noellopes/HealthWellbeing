@@ -1,47 +1,199 @@
-﻿@model HealthWellbeing.Models.AgendaMedica
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.AgendaMedica
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Criar Agenda Médica";
 }
 
-<h1>Create</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<h4>AgendaMedica</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="IdMedico" class="control-label"></label>
-                <select asp-for="IdMedico" class ="form-control" asp-items="ViewBag.IdMedico"></select>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .details-title {
+        margin: 0 0 8px 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .details-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #1f4f6a;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="DiaSemana" class="control-label"></label>
-                <select asp-for="DiaSemana" class="form-control"></select>
-                <span asp-validation-for="DiaSemana" class="text-danger"></span>
+
+            <div class="utente-body">
+                <div class="details-card">
+                    <h2 class="details-title">
+                        <i class="bi bi-calendar-plus me-2"></i> Criar Agenda Médica
+                    </h2>
+                    <p class="details-sub">Preenche os dados para adicionar um novo horário ao médico.</p>
+
+                    <form asp-action="Create" method="post" class="row g-3">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="col-12">
+                            <label asp-for="IdMedico" class="form-label"></label>
+                            <select asp-for="IdMedico" class="form-select" asp-items="ViewBag.IdMedico"></select>
+                            <span asp-validation-for="IdMedico" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label asp-for="DiaSemana" class="form-label"></label>
+                            <select asp-for="DiaSemana" class="form-select"></select>
+                            <span asp-validation-for="DiaSemana" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label asp-for="HoraInicio" class="form-label"></label>
+                            <input asp-for="HoraInicio" class="form-control" />
+                            <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <label asp-for="HoraFim" class="form-label"></label>
+                            <input asp-for="HoraFim" class="form-control" />
+                            <span asp-validation-for="HoraFim" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-12 d-flex gap-2 flex-wrap mt-2">
+                            <button type="submit" class="btn btn-success hb-btn">
+                                <i class="bi bi-check2-circle"></i> Criar
+                            </button>
+
+                            <a asp-action="Index" class="btn btn-secondary hb-btn">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="HoraInicio" class="control-label"></label>
-                <input asp-for="HoraInicio" class="form-control" />
-                <span asp-validation-for="HoraInicio" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HoraFim" class="control-label"></label>
-                <input asp-for="HoraFim" class="form-control" />
-                <span asp-validation-for="HoraFim" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
