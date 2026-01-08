@@ -6,7 +6,7 @@ namespace HealthWellbeing.Models
     {   
         public int MemberId { get; set; } = default!;
 
-        public string ClientId { get; set; } = string.Empty;
+        public int ClientId { get; set; } = default!;
         public Client? Client { get; set; } = default;
     }
 }

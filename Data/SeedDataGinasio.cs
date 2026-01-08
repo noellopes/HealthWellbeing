@@ -13,28 +13,13 @@ internal class SeedDataGinasio
 
         dbContext.Database.EnsureCreated();
 
-        // 1. Popula Clientes e guarda a lista
         var clients = PopulateClients(dbContext);
-
-        // 2. Popula Membros e guarda a lista
         var members = PopulateMember(dbContext, clients);
-
-        // 3. Popula Tipos de Treino e guarda a lista (necessário para criar Treinos)
         var trainingTypes = PopulateTrainingType(dbContext);
-
-        // 4. Popula Planos e GUARDA A LISTA (Corrige o erro da imagem)
         var plans = PopulatePlan(dbContext);
-
-        // 5. Popula Treinadores e guarda a lista
         var trainers = PopulateTrainer(dbContext);
-
-        // 6. Popula Treinos e GUARDA A LISTA (Corrige o erro da imagem)
         var trainings = PopulateTraining(dbContext, trainers);
-
-        // 7. Popula Inscrições (MemberPlan) usando as listas guardadas
         PopulateMemberPlan(dbContext, members, plans);
-
-        // 8. Popula Planos de Treino (TrainingPlan) usando as listas guardadas
         PopulateTrainingPlan(dbContext, plans, trainings);
     }
 
@@ -44,33 +29,20 @@ internal class SeedDataGinasio
 
         var clients = new List<Client>()
         {
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Alice Wonderland", Email = "alice.w@example.com", Phone = "555-1234567", Address = "10 Downing St, London", BirthDate = new DateTime(1990, 5, 15), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-300) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Bob The Builder", Email = "bob.builder@work.net", Phone = "555-9876543", Address = "Construction Site 5A", BirthDate = new DateTime(1985, 10, 20), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-150) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Charlie Brown", Email = "charlie.b@peanuts.com", Phone = "555-4567890", Address = "123 Comic Strip Ave", BirthDate = new DateTime(2000, 1, 1), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-50) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "David Copperfield", Email = "david.c@magic.com", Phone = "555-9001002", Address = "Las Vegas Strip", BirthDate = new DateTime(1960, 9, 16), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-25) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Eve Harrington", Email = "eve.h@stage.net", Phone = "555-3330009", Address = "Broadway St", BirthDate = new DateTime(1995, 2, 28), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-10) },
-            // Adicione mais clientes aqui se necessário para ter variedade
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Frank Castle", Email = "frank.c@punisher.com", Phone = "555-1110001", Address = "Hells Kitchen, NY", BirthDate = new DateTime(1978, 3, 16), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-40) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Grace Hopper", Email = "grace.h@navy.mil", Phone = "555-2220002", Address = "Arlington, VA", BirthDate = new DateTime(1906, 12, 9), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-100) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Harry Potter", Email = "harry.p@hogwarts.wiz", Phone = "555-3330003", Address = "4 Privet Drive, Surrey", BirthDate = new DateTime(1980, 7, 31), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-12) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Jack Sparrow", Email = "jack.s@pirate.sea", Phone = "555-5550005", Address = "Tortuga", BirthDate = new DateTime(1980, 4, 1), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-8) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Mona Lisa", Email = "mona.l@art.com", Phone = "555-8880008", Address = "The Louvre, Paris", BirthDate = new DateTime(1993, 6, 15), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-50) },
-             new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Neo Anderson", Email = "neo.a@matrix.com", Phone = "555-9990009", Address = "Zion", BirthDate = new DateTime(1971, 9, 13), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-2) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Olivia Pope", Email = "olivia.p@gladiator.com", Phone = "555-1010010", Address = "Washington D.C.", BirthDate = new DateTime(1977, 4, 2), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-60) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Peter Parker", Email = "peter.p@bugle.com", Phone = "555-2020011", Address = "Queens, NY", BirthDate = new DateTime(2001, 8, 10), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-7) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Quinn Fabray", Email = "quinn.f@glee.com", Phone = "555-3030012", Address = "Lima, Ohio", BirthDate = new DateTime(1994, 7, 19), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-33) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Rachel Green", Email = "rachel.g@friends.com", Phone = "555-4040013", Address = "Central Perk, NY", BirthDate = new DateTime(1970, 5, 5), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-45) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Steve Rogers", Email = "steve.r@avengers.com", Phone = "555-5050014", Address = "Brooklyn, NY", BirthDate = new DateTime(1918, 7, 4), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-11) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Tony Stark", Email = "tony.s@stark.com", Phone = "555-6060015", Address = "Malibu Point, CA", BirthDate = new DateTime(1970, 5, 29), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-90) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Ursula Buffay", Email = "ursula.b@friends.tv", Phone = "555-7070016", Address = "Riff's Bar, NY", BirthDate = new DateTime(1968, 2, 22), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-14) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Victor Frankenstein", Email = "victor.f@science.ch", Phone = "555-8080017", Address = "Geneva, Switzerland", BirthDate = new DateTime(1790, 10, 10), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-200) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Walter White", Email = "walter.w@heisenberg.com", Phone = "555-9090018", Address = "Albuquerque, NM", BirthDate = new DateTime(1958, 9, 7), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-28) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Xena Warrior", Email = "xena.w@myth.gr", Phone = "555-0100019", Address = "Amphipolis, Greece", BirthDate = new DateTime(1968, 3, 29), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-1) },
-            new Client { ClientId = Guid.NewGuid().ToString("N"), Name = "Yoda Master", Email = "yoda.m@jedi.org", Phone = "555-1210020", Address = "Dagobah System", BirthDate = new DateTime(1000, 1, 1), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-500) }
+            new Client { Name = "Alice Wonderland", Email = "alice.w@example.com", Phone = "912345678", Address = "10 Downing St, London", BirthDate = new DateTime(1990, 5, 15), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-300) },
+            new Client { Name = "Bob The Builder", Email = "bob.builder@work.net", Phone = "919876543", Address = "Construction Site 5A", BirthDate = new DateTime(1985, 10, 20), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-150) },
+            new Client { Name = "Charlie Brown", Email = "charlie.b@peanuts.com", Phone = "914567890", Address = "123 Comic Strip Ave", BirthDate = new DateTime(2000, 1, 1), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-50) },
+            new Client { Name = "David Copperfield", Email = "david.c@magic.com", Phone = "910001002", Address = "Las Vegas Strip", BirthDate = new DateTime(1960, 9, 16), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-25) },
+            new Client { Name = "Eve Harrington", Email = "eve.h@stage.net", Phone = "913330009", Address = "Broadway St", BirthDate = new DateTime(1995, 2, 28), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-10) },
+            new Client { Name = "Frank Castle", Email = "frank.c@punisher.com", Phone = "911110001", Address = "Hells Kitchen, NY", BirthDate = new DateTime(1978, 3, 16), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-40) },
+            new Client { Name = "Grace Hopper", Email = "grace.h@navy.mil", Phone = "912220002", Address = "Arlington, VA", BirthDate = new DateTime(1906, 12, 9), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-100) },
+            new Client { Name = "Harry Potter", Email = "harry.p@hogwarts.wiz", Phone = "913330003", Address = "4 Privet Drive, Surrey", BirthDate = new DateTime(1980, 7, 31), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-12) },
+            new Client { Name = "Jack Sparrow", Email = "jack.s@pirate.sea", Phone = "915550005", Address = "Tortuga", BirthDate = new DateTime(1980, 4, 1), Gender = "Male", RegistrationDate = DateTime.Now.AddDays(-8) },
+            new Client { Name = "Mona Lisa", Email = "mona.l@art.com", Phone = "918880008", Address = "The Louvre, Paris", BirthDate = new DateTime(1993, 6, 15), Gender = "Female", RegistrationDate = DateTime.Now.AddDays(-50) }
         };
 
         dbContext.Client.AddRange(clients);
-        dbContext.SaveChanges();
+        dbContext.SaveChanges(); // Aqui a BD gera os IDs (1, 2, 3...) e preenche a lista 'clients'
         return clients;
     }
 
@@ -78,24 +50,17 @@ internal class SeedDataGinasio
     {
         if (dbContext.Member.Any()) return dbContext.Member.ToList();
 
-        // Vamos converter quase todos os clientes em membros para termos dados suficientes
-        // Saltamos apenas alguns para teste
         var members = new List<Member>();
 
-        // Vamos converter os primeiros 15 clientes em membros
-        int count = 0;
-        foreach (var client in clients)
+        // Associamos os clientes aos membros usando o novo ID inteiro gerado
+        foreach (var client in clients.Take(15)) // Convertemos os primeiros 15 em membros
         {
-            if (count < 18) // Convertemos 18 clientes em membros
-            {
-                members.Add(new Member { ClientId = client.ClientId });
-            }
-            count++;
+            members.Add(new Member { ClientId = client.ClientId });
         }
 
         dbContext.Member.AddRange(members);
         dbContext.SaveChanges();
-        return members; // Retorna a lista de membros criados
+        return members;
     }
 
     private static List<TrainingType> PopulateTrainingType(HealthWellbeingDbContext dbContext)

@@ -32,9 +32,6 @@ else
 	{
 		var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
 		SeedDataGinasio.Populate(dbContext);
-		SeedDataExercicio.Populate(dbContext);
-		SeedDataTipoExercicio.Populate(dbContext);
-		SeedDataProblemaSaude.Populate(dbContext);
 	}
 }
 

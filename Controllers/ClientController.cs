@@ -21,12 +21,13 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Client
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "", string searchMember = "")
+        public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
             var clientsQuery = _context.Client
                 .Include(c => c.Membership)
                 .AsQueryable();
 
+            // Filtros de Pesquisa
             if (!string.IsNullOrEmpty(searchName))
             {
                 clientsQuery = clientsQuery.Where(c => c.Name.Contains(searchName));
@@ -42,52 +43,34 @@ namespace HealthWellbeing.Controllers
                 clientsQuery = clientsQuery.Where(c => c.Email.Contains(searchEmail));
             }
 
-            if (!string.IsNullOrEmpty(searchMember))
-            {
-                if (searchMember == "Yes")
-                {
-                    clientsQuery = clientsQuery.Where(c => c.Membership != null);
-                }
-                else if (searchMember == "No")
-                {
-                    clientsQuery = clientsQuery.Where(c => c.Membership == null);
-                }
-            }
+            // Lógica de Paginação
+            int totalClients = await clientsQuery.CountAsync();
+            var pagination = new PaginationInfo<Client>(page, totalClients);
 
+            pagination.Items = await clientsQuery
+                .OrderBy(c => c.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            // Manter os termos de pesquisa na View para os links de paginação
             ViewBag.SearchName = searchName;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchEmail = searchEmail;
-            ViewBag.SearchMember = searchMember;
 
-            int numberClients = await clientsQuery.CountAsync();
-
-            var clientsInfo = new PaginationInfo<Client>(page, numberClients, 5);
-
-            clientsInfo.Items = await clientsQuery
-                .OrderBy(c => c.Name)
-                .Skip(clientsInfo.ItemsToSkip)
-                .Take(clientsInfo.ItemsPerPage)
-                .ToListAsync();
-
-            return View(clientsInfo);
+            return View(pagination);
         }
 
         // GET: Client/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var client = await _context.Client
                 .Include(c => c.Membership)
                 .FirstOrDefaultAsync(m => m.ClientId == id);
 
-            if (client == null)
-            {
-                return View("InvalidClient");
-            }
+            if (client == null) return NotFound();
 
             return View(client);
         }
@@ -98,60 +81,47 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-		// POST: Client/Create
-		// To protect from overposting attacks, enable the specific properties you want to bind to.
-		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender")] Client client)
-		{
-			if (ModelState.IsValid)
-			{
-				// Geração do ClientID aqui, ANTES de adicionar ao DBContext
-				client.ClientId = Guid.NewGuid().ToString("N");
-				client.RegistrationDate = DateTime.Now; // Defina a data de registo aqui também
-
-				_context.Add(client);
-				await _context.SaveChangesAsync();
-				return RedirectToAction(nameof(ClientCreatedConfirmation), new { clientId = client.ClientId, clientName = client.Name });
-			}
-			return View(client);
-		}
-		public IActionResult ClientCreatedConfirmation(string clientId, string clientName)
-		{
-			// Passa o ID e Nome para a View
-			ViewBag.ClientId = clientId;
-			ViewBag.ClientName = clientName;
-			return View();
-		}
-
-		// GET: Client/Edit/5
-		public async Task<IActionResult> Edit(string id)
+        // POST: Client/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender")] Client client)
         {
-            if (id == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
+                // Verifica se o email já existe para evitar duplicações
+                if (_context.Client.Any(c => c.Email == client.Email))
+                {
+                    ModelState.AddModelError("Email", "This email is already registered.");
+                    return View(client);
+                }
 
-            var client = await _context.Client.FindAsync(id);
-            if (client == null)
-            {
-                return NotFound();
+                client.RegistrationDate = DateTime.Now;
+                _context.Add(client);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Client successfully registered.";
+                return RedirectToAction(nameof(Index));
             }
             return View(client);
         }
 
+        // GET: Client/Edit/5
+        public async Task<IActionResult> Edit(int? id) // Alterado para int?
+        {
+            if (id == null) return NotFound();
+
+            var client = await _context.Client.FindAsync(id);
+            if (client == null) return NotFound();
+
+            return View(client);
+        }
+
         // POST: Client/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Name,Email,Phone,Address,BirthDate,Gender,Membership")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("ClientId,Name,Email,Phone,Address,BirthDate,Gender,RegistrationDate")] Client client)
         {
-            if (id != client.ClientId)
-            {
-                return NotFound();
-            }
+            if (id != client.ClientId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -159,17 +129,12 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(client);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Client information updated.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientExists(client.ClientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!ClientExists(client.ClientId)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -177,18 +142,17 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Client/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int? id) // Alterado para int?
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var client = await _context.Client
                 .FirstOrDefaultAsync(m => m.ClientId == id);
+
             if (client == null)
             {
-                return NotFound();
+                TempData["ErrorMessage"] = "The client has already been removed.";
+                return RedirectToAction(nameof(Index));
             }
 
             return View(client);
@@ -197,19 +161,20 @@ namespace HealthWellbeing.Controllers
         // POST: Client/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(int id) // Alterado para int
         {
             var client = await _context.Client.FindAsync(id);
             if (client != null)
             {
                 _context.Client.Remove(client);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Client successfully deleted.";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClientExists(string id)
+        private bool ClientExists(int id)
         {
             return _context.Client.Any(e => e.ClientId == id);
         }

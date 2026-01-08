@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -18,206 +20,143 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // --- AÇÃO INDEX ATUALIZADA ---
         // GET: Member
+        // Implementada a paginação e pesquisa seguindo o padrão do BooksController
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
-            // Criar a query base, incluindo o Cliente
             var membersQuery = _context.Member
                 .Include(m => m.Client)
                 .AsQueryable();
 
-            // Adicionar lógica de pesquisa (através do Cliente)
-            // Adicionámos "m.Client != null" para segurança
+            // Filtros de Pesquisa através da entidade Client (Relacionamento 1:1)
             if (!string.IsNullOrEmpty(searchName))
             {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Name.Contains(searchName));
             }
+
             if (!string.IsNullOrEmpty(searchPhone))
             {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Phone.Contains(searchPhone));
             }
+
             if (!string.IsNullOrEmpty(searchEmail))
             {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Email.Contains(searchEmail));
             }
 
-            // Passar a pesquisa para o ViewBag
+            // Lógica de Paginação usando o ViewModel Genérico
+            int totalMembers = await membersQuery.CountAsync();
+            var pagination = new PaginationInfo<Member>(page, totalMembers);
+
+            pagination.Items = await membersQuery
+                .OrderBy(m => m.Client != null ? m.Client.Name : "")
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            // Guardar termos de pesquisa para a View (Links de paginação)
             ViewBag.SearchName = searchName;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchEmail = searchEmail;
 
-            // Adicionar lógica de paginação
-            int numberMembers = await membersQuery.CountAsync();
-            // Quantos itens por página quiser
-            var membersInfo = new PaginationInfo<Member>(page, numberMembers, 5);
-
-            membersInfo.Items = await membersQuery
-                .OrderBy(m => m.Client.Name) // Ordenar pelo nome do cliente
-                .Skip(membersInfo.ItemsToSkip)
-                .Take(membersInfo.ItemsPerPage)
-                .ToListAsync();
-
-            return View(membersInfo);
+            return View(pagination);
         }
-
-        // --- FIM DA AÇÃO INDEX ATUALIZADA ---
-
 
         // GET: Member/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var member = await _context.Member
-                .Include(m => m.Client) // Include the Client data
-                .FirstOrDefaultAsync(m => m.MemberId == id);
-
-            if (member == null)
-            {
-                return NotFound();
-            }
-
-            return View(member);
-        }
-
-        // --- CREATE ACTIONS ---
-        public IActionResult Create(string clientId)
-        {
-            if (string.IsNullOrEmpty(clientId))
-            {
-                TempData["Message"] = "Client ID is required to create a membership.";
-                return RedirectToAction("Index", "Client");
-            }
-            var client = _context.Client.Find(clientId);
-            if (client == null)
-            {
-                TempData["Message"] = $"Client ID '{clientId}' not found.";
-                return RedirectToAction("Index", "Client");
-            }
-            if (_context.Member.Any(m => m.ClientId == clientId))
-            {
-                TempData["Message"] = $"Client <strong>{client.Name}</strong> is already an active member.";
-                TempData["MessageType"] = "warning";
-                return RedirectToAction("Index", "Client");
-            }
-
-            var member = new Member { ClientId = clientId };
-            // Passar todos os detalhes para a View de confirmação
-            ViewBag.ClientName = client.Name;
-            ViewBag.ClientPhone = client.Phone;
-            ViewBag.ClientEmail = client.Email;
-
-            return View(member);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ClientId")] Member member)
-        {
-            if (string.IsNullOrEmpty(member.ClientId))
-            {
-                ModelState.AddModelError("ClientId", "Client ID is missing.");
-            }
-
-            var client = await _context.Client.FindAsync(member.ClientId);
-
-            if (ModelState.IsValid && client != null)
-            {
-                member.Client = client;
-                _context.Add(member);
-                await _context.SaveChangesAsync();
-
-                TempData["Message"] = $"Membership successfully created for Client: <strong>{client.Name}</strong>";
-                TempData["MessageType"] = "success";
-                return RedirectToAction("Index", "Client");
-            }
-
-            // Se o ModelState falhar, repopular o ViewBag
-            ViewBag.ClientName = client?.Name ?? "Unknown Client";
-            ViewBag.ClientPhone = client?.Phone ?? "N/A";
-            ViewBag.ClientEmail = client?.Email ?? "N/A";
-
-            return View(member);
-        }
-
-        // GET: Member/Edit/5 (O 'id' aqui é o MemberId)
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            // 1. Encontrar o Membro E incluir o Cliente associado
             var member = await _context.Member
                 .Include(m => m.Client)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
-            if (member == null || member.Client == null)
-            {
-                return NotFound();
-            }
+            if (member == null) return NotFound();
 
-            // 2. Enviar o OBJETO CLIENTE (e não o Membro) para a View
-            return View(member.Client);
+            return View(member);
+        }
+
+        // GET: Member/Create
+        public IActionResult Create()
+        {
+            // Lista apenas clientes que ainda não são membros (opcional, para integridade)
+            var clientsWithoutMembership = _context.Client
+                .Where(c => c.Membership == null)
+                .ToList();
+
+            ViewData["ClientId"] = new SelectList(clientsWithoutMembership, "ClientId", "Name");
+            return View();
+        }
+
+        // POST: Member/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("MemberId,ClientId")] Member member)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(member);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Membership successfully created.";
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
+            return View(member);
+        }
+
+        // GET: Member/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var member = await _context.Member.Include(m => m.Client).FirstOrDefaultAsync(m => m.MemberId == id);
+            if (member == null) return NotFound();
+
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
+            return View(member);
         }
 
         // POST: Member/Edit/5
-        // A View vai enviar os dados de um Client, por isso o [Bind] é para o Client
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // O 'id' (MemberId) é ignorado, e o 'ClientId' vem do form
-        public async Task<IActionResult> Edit(string ClientId, [Bind("ClientId,Name,Email,Phone,Address,BirthDate,Gender")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("MemberId,ClientId")] Member member)
         {
-            // 1. Validar que o ClientId do form corresponde ao objeto
-            if (ClientId != client.ClientId)
-            {
-                return NotFound();
-            }
+            if (id != member.MemberId) return NotFound();
 
-            // 2. Validar o modelo do CLIENTE
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // 3. Atualizar o CLIENTE na base de dados
-                    _context.Update(client);
+                    _context.Update(member);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Membership information updated.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Client.Any(e => e.ClientId == client.ClientId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!MemberExists(member.MemberId)) return NotFound();
+                    else throw;
                 }
-                // 4. Redirecionar de volta para o ÍNDICE DE MEMBROS
-                TempData["Message"] = $"Dados do cliente <strong>{client.Name}</strong> atualizados com sucesso.";
-                TempData["MessageType"] = "success";
                 return RedirectToAction(nameof(Index));
             }
-
-            // Se o modelo falhar, volta à View de Edição
-            return View(client);
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
+            return View(member);
         }
 
         // GET: Member/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-            // É importante incluir o Cliente aqui para a View de Delete
+
             var member = await _context.Member
                 .Include(m => m.Client)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
-            if (member == null) return NotFound();
+
+            if (member == null)
+            {
+                TempData["SuccessMessage"] = "This membership has already been removed.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(member);
         }
 
@@ -230,12 +169,9 @@ namespace HealthWellbeing.Controllers
             if (member != null)
             {
                 _context.Member.Remove(member);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Membership successfully deleted.";
             }
-            await _context.SaveChangesAsync();
-
-            // Mensagem de sucesso para a página de Membros
-            TempData["Message"] = "Membership successfully deleted.";
-            TempData["MessageType"] = "success";
 
             return RedirectToAction(nameof(Index));
         }
