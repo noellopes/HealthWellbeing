@@ -10,36 +10,20 @@ namespace HealthWellbeing.Data
 {
     public static class SeedData
     {
-        public static void Populate(HealthWellbeingDbContext dbContext)
+        public static void Populate(HealthWellbeingDbContext? dbContext)
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
             // Garante que a BD existe
             dbContext.Database.EnsureCreated();
 
-            // 1. Gêneros (Dependência para Exercícios)
             PopulateGeneros(dbContext);
-
-            // 2. Grupos Musculares e Músculos (Dependência para Exercícios)
             PopulateGruposMusculares(dbContext);
-
-            // 3. Equipamentos (NOVO - Dependência para Exercícios)
             PopulateEquipamentos(dbContext);
-
-            // 4. Exercícios (Depende de 1, 2 e 3)
-            // 3. Tipos de Exercício e Benefícios (AGORA CRIAMOS OS BENEFÍCIOS PRIMEIRO!)
-            PopulateBeneficios(dbContext); // Deve vir primeiro para ter os IDs
-            PopulateTiposExercicio(dbContext); // Depende dos IDs de Benefícios
-
-            // 4. Exercícios (Depende de 1 e 2)
-            PopulateExercicios(dbContext);
-
-            // 5. Problemas de Saúde (Independente)
-            PopulateProblemasSaude(dbContext);
-
-            // 6. Tipos de Exercício e Benefícios (Independente)
+            PopulateProblemasSaude(dbContext);   // 🔥 TEM DE VIR ANTES
+            PopulateBeneficios(dbContext);
             PopulateTiposExercicio(dbContext);
-
+            PopulateExercicios(dbContext);
         }
 
         private static void PopulateGeneros(HealthWellbeingDbContext dbContext)
@@ -62,7 +46,8 @@ namespace HealthWellbeing.Data
             if (dbContext.GrupoMuscular.Any()) return;
 
             // --- Criação dos Grupos ---
-            var grupos = new[]{
+            var grupos = new[]
+            {
             new GrupoMuscular { GrupoMuscularNome = "Peito", LocalizacaoCorporal = "Frente do tronco" },
             new GrupoMuscular { GrupoMuscularNome = "Costas", LocalizacaoCorporal = "Parte posterior do tronco" },
             new GrupoMuscular { GrupoMuscularNome = "Bíceps", LocalizacaoCorporal = "Parte frontal do braço" },
@@ -95,8 +80,10 @@ namespace HealthWellbeing.Data
             new GrupoMuscular { GrupoMuscularNome = "Lombares", LocalizacaoCorporal = "Parte inferior das costas" },
             new GrupoMuscular { GrupoMuscularNome = "Peitoral Maior", LocalizacaoCorporal = "Centro do peito" },
             new GrupoMuscular { GrupoMuscularNome = "Peitoral Menor", LocalizacaoCorporal = "Parte interna do peito" },
-            new GrupoMuscular { GrupoMuscularNome = "Serrátil Anterior", LocalizacaoCorporal = "Lateral do tórax" }
-};
+            new GrupoMuscular { GrupoMuscularNome = "Serrátil Anterior", LocalizacaoCorporal = "Lateral do tórax" },
+            new GrupoMuscular { GrupoMuscularNome = "Pernas", LocalizacaoCorporal = "Membros inferiores" }
+
+            };
 
             dbContext.GrupoMuscular.AddRange(grupos);
             dbContext.SaveChanges();
@@ -105,8 +92,9 @@ namespace HealthWellbeing.Data
             var gruposDb = dbContext.GrupoMuscular.ToList();
             Func<string, int> getId = nome => gruposDb.First(g => g.GrupoMuscularNome == nome).GrupoMuscularId;
 
-            var musculos = new[]{
-            new Musculo { Nome_Musculo = "Peitoral Maior", GrupoMuscularId = getId("Peito") },
+            var musculos = new[]
+            {
+                new Musculo { Nome_Musculo = "Peitoral Maior", GrupoMuscularId = getId("Peito") },
             new Musculo { Nome_Musculo = "Peitoral Menor", GrupoMuscularId = getId("Peito") },
             new Musculo { Nome_Musculo = "Subclávio", GrupoMuscularId = getId("Peito") },
             new Musculo { Nome_Musculo = "Serrátil Anterior", GrupoMuscularId = getId("Peito") },
@@ -132,10 +120,10 @@ namespace HealthWellbeing.Data
             new Musculo { Nome_Musculo = "Flexor Ulnar do Carpo", GrupoMuscularId = getId("Antebraços") },
             new Musculo { Nome_Musculo = "Extensor Radial do Carpo", GrupoMuscularId = getId("Antebraços") },
             new Musculo { Nome_Musculo = "Extensor Ulnar do Carpo", GrupoMuscularId = getId("Antebraços") },
-            new Musculo { Nome_Musculo = "Reto Abdominal", GrupoMuscularId = getId("Abdômen") },
-            new Musculo { Nome_Musculo = "Oblíquo Externo", GrupoMuscularId = getId("Abdômen") },
-            new Musculo { Nome_Musculo = "Oblíquo Interno", GrupoMuscularId = getId("Abdômen") },
-            new Musculo { Nome_Musculo = "Transverso do Abdômen", GrupoMuscularId = getId("Abdômen") },
+            new Musculo { Nome_Musculo = "Reto Abdominal", GrupoMuscularId = getId("Abdómen") },
+            new Musculo { Nome_Musculo = "Oblíquo Externo", GrupoMuscularId = getId("Abdómen") },
+            new Musculo { Nome_Musculo = "Oblíquo Interno", GrupoMuscularId = getId("Abdómen") },
+            new Musculo { Nome_Musculo = "Transverso do Abdômen", GrupoMuscularId = getId("Abdómen") },
             new Musculo { Nome_Musculo = "Glúteo Máximo", GrupoMuscularId = getId("Glúteos") },
             new Musculo { Nome_Musculo = "Glúteo Médio", GrupoMuscularId = getId("Glúteos") },
             new Musculo { Nome_Musculo = "Glúteo Mínimo", GrupoMuscularId = getId("Glúteos") },
@@ -152,10 +140,11 @@ namespace HealthWellbeing.Data
             new Musculo { Nome_Musculo = "Adutor Curto", GrupoMuscularId = getId("Adutores") },
             new Musculo { Nome_Musculo = "Adutor Magno", GrupoMuscularId = getId("Adutores") },
             new Musculo { Nome_Musculo = "Tensor da Fáscia Lata", GrupoMuscularId = getId("Abdutores") },
-            new Musculo { Nome_Musculo = "Gastrocnêmio", GrupoMuscularId = getId("Panturrilhas") },
+            new Musculo { Nome_Musculo = "Gastrocnémio", GrupoMuscularId = getId("Panturrilhas") },
             new Musculo { Nome_Musculo = "Sóleo", GrupoMuscularId = getId("Panturrilhas") },
             new Musculo { Nome_Musculo = "Plantar", GrupoMuscularId = getId("Panturrilhas") }
-};
+
+            };
 
             dbContext.Musculo.AddRange(musculos);
             dbContext.SaveChanges();
@@ -165,7 +154,8 @@ namespace HealthWellbeing.Data
         {
             if (dbContext.Equipamento.Any()) return;
 
-            var equipamentos = new[]{
+            var equipamentos = new[]
+            {
             new Equipamento { NomeEquipamento = "Halteres" },
             new Equipamento { NomeEquipamento = "Barra Olímpica" },
             new Equipamento { NomeEquipamento = "Banco de Musculação" },
@@ -214,7 +204,8 @@ namespace HealthWellbeing.Data
         {
             if (dbContext.ProblemaSaude.Any()) return;
 
-            var problemas = new[]{
+            var problemas = new[]
+            {
             new ProblemaSaude { ProblemaCategoria = "Muscular", ProblemaNome = "Tendinite", ZonaAtingida = "Braço", Gravidade = 6 },
             new ProblemaSaude { ProblemaCategoria = "Muscular", ProblemaNome = "Distensão muscular", ZonaAtingida = "Coxa", Gravidade = 5 },
             new ProblemaSaude { ProblemaCategoria = "Muscular", ProblemaNome = "Rutura muscular", ZonaAtingida = "Gémeos", Gravidade = 8 },
@@ -225,7 +216,7 @@ namespace HealthWellbeing.Data
             new ProblemaSaude { ProblemaCategoria = "Articular", ProblemaNome = "Luxação do ombro", ZonaAtingida = "Ombro", Gravidade = 7 },
             new ProblemaSaude { ProblemaCategoria = "Articular", ProblemaNome = "Entorse", ZonaAtingida = "Tornozelo", Gravidade = 5 },
             new ProblemaSaude { ProblemaCategoria = "Articular", ProblemaNome = "Bursite", ZonaAtingida = "Ombro", Gravidade = 6 },
-            new ProblemaSaude { ProblemaCategoria = "Cardíaco", ProblemaNome = "Hipertensão arterial", ZonaAtingida = "Coração", Gravidade = 8 },
+            new ProblemaSaude { ProblemaCategoria = "Cardíaco", ProblemaNome = "Hipertensão Arterial", ZonaAtingida = "Coração", Gravidade = 8 },
             new ProblemaSaude { ProblemaCategoria = "Cardíaco", ProblemaNome = "Arritmia cardíaca", ZonaAtingida = "Coração", Gravidade = 7 },
             new ProblemaSaude { ProblemaCategoria = "Cardíaco", ProblemaNome = "Insuficiência cardíaca", ZonaAtingida = "Coração", Gravidade = 9 },
             new ProblemaSaude { ProblemaCategoria = "Cardíaco", ProblemaNome = "Doença coronária", ZonaAtingida = "Coração", Gravidade = 9 },
@@ -276,7 +267,8 @@ namespace HealthWellbeing.Data
             // Usa ToHashSet para verificação eficiente
             var beneficiosExistentes = dbContext.Beneficio.Select(b => b.NomeBeneficio).ToHashSet();
 
-            var todosBeneficios = new[] {
+            var todosBeneficios = new[]
+            {
             new Beneficio { NomeBeneficio = "Melhora da resistência cardiovascular", DescricaoBeneficio = "Aumenta a capacidade do coração e pulmões de fornecer oxigénio aos músculos." },
             new Beneficio { NomeBeneficio = "Fortalecimento muscular", DescricaoBeneficio = "Aumenta a força, resistência e tamanho das fibras musculares." },
             new Beneficio { NomeBeneficio = "Aumento da flexibilidade", DescricaoBeneficio = "Melhora a amplitude de movimento nas articulações, prevenindo lesões." },
@@ -284,13 +276,13 @@ namespace HealthWellbeing.Data
             new Beneficio { NomeBeneficio = "Perda de peso", DescricaoBeneficio = "Auxilia no controlo do peso, aumentando o gasto calórico e melhorando o metabolismo." },
             new Beneficio { NomeBeneficio = "Melhora da coordenação e equilíbrio", DescricaoBeneficio = "Desenvolve a capacidade do corpo de realizar movimentos complexos e manter a postura." },
             new Beneficio { NomeBeneficio = "Aumento da densidade óssea", DescricaoBeneficio = "Estimula o aumento da massa óssea, prevenindo a osteoporose." },
-            new Beneficio { NomeBeneficio = "Melhoria da qualidade do sono", DescricaoBeneficio = "Regula os ciclos de sono, promovendo um descanso mais profundo." },
-            new Beneficio { NomeBeneficio = "Aumento da capacidade pulmonar", DescricaoBeneficio = "Fortalece os músculos respiratórios e melhora a oxigenação." },
-            new Beneficio { NomeBeneficio = "Controlo glicémico", DescricaoBeneficio = "Ajuda a regular os níveis de açúcar no sangue." },
-            new Beneficio { NomeBeneficio = "Promoção da saúde mental", DescricaoBeneficio = "Reduz sintomas de depressão e melhora a concentração." },
-            new Beneficio { NomeBeneficio = "Recuperação ativa", DescricaoBeneficio = "Reduz dores musculares e acelera a recuperação pós-exercício." },
-            new Beneficio { NomeBeneficio = "Melhora da postura corporal", DescricaoBeneficio = "Fortalece músculos estabilizadores e reduz desequilíbrios posturais." },
-            new Beneficio { NomeBeneficio = "Estímulo do sistema imunitário", DescricaoBeneficio = "Melhora a resposta do organismo contra infeções." },
+            new Beneficio { NomeBeneficio = "Melhoria da Qualidade do Sono", DescricaoBeneficio = "Regula os ciclos de sono, promovendo um descanso mais profundo." },
+            new Beneficio { NomeBeneficio = "Aumento da Capacidade Pulmonar", DescricaoBeneficio = "Fortalece os músculos respiratórios e melhora a oxigenação." },
+            new Beneficio { NomeBeneficio = "Controlo Glicémico", DescricaoBeneficio = "Ajuda a regular os níveis de açúcar no sangue." },
+            new Beneficio { NomeBeneficio = "Promoção da Saúde Mental", DescricaoBeneficio = "Reduz sintomas de depressão e melhora a concentração." },
+            new Beneficio { NomeBeneficio = "Recuperação Ativa", DescricaoBeneficio = "Reduz dores musculares e acelera a recuperação pós-exercício." },
+            new Beneficio { NomeBeneficio = "Melhora da Postura Corporal", DescricaoBeneficio = "Fortalece músculos estabilizadores e reduz desequilíbrios posturais." },
+            new Beneficio { NomeBeneficio = "Estímulo do Sistema Imunitário", DescricaoBeneficio = "Melhora a resposta do organismo contra infeções." },
             new Beneficio { NomeBeneficio = "Desenvolvimento da agilidade", DescricaoBeneficio = "Aumenta a rapidez e eficiência dos movimentos." },
             new Beneficio { NomeBeneficio = "Aumento da força funcional", DescricaoBeneficio = "Melhora a capacidade de realizar tarefas do dia a dia." },
             new Beneficio { NomeBeneficio = "Prevenção de lesões", DescricaoBeneficio = "Fortalece músculos e articulações, reduzindo o risco de lesões." },
@@ -311,9 +303,9 @@ namespace HealthWellbeing.Data
             new Beneficio { NomeBeneficio = "Aumento da consciência corporal", DescricaoBeneficio = "Melhora o controlo e perceção do próprio corpo." },
             new Beneficio { NomeBeneficio = "Melhoria da respiração", DescricaoBeneficio = "Ensina padrões respiratórios mais eficientes." },
             new Beneficio { NomeBeneficio = "Redução da rigidez muscular", DescricaoBeneficio = "Diminui tensões acumuladas nos músculos." },
-            new Beneficio { NomeBeneficio = "Promoção de hábitos saudáveis", DescricaoBeneficio = "Incentiva um estilo de vida mais ativo e equilibrado." }
+            new Beneficio { NomeBeneficio = "Promoção de hábitos saudáveis", DescricaoBeneficio = "Incentiva um estilo de vida mais ativo e equilibrado." },
+            new Beneficio { NomeBeneficio = "Desenvolvimento de Agilidade", DescricaoBeneficio = "Incentiva um estilo de vida mais ativo e equilibrado." }
             };
-
 
             // Filtra e adiciona apenas os benefícios que ainda não existem
             var beneficiosParaAdicionar = todosBeneficios
@@ -370,7 +362,7 @@ namespace HealthWellbeing.Data
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Fortalecimento muscular").BeneficioId },
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da densidade óssea").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Controle Glicémico").BeneficioId }
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Controlo Glicémico").BeneficioId }
                     }
                 },
                 new TipoExercicio
@@ -519,105 +511,48 @@ namespace HealthWellbeing.Data
                 },
                 new TipoExercicio
                 {
-                    NomeTipoExercicios = "Cross Training",
-                    DescricaoTipoExercicios = "Treino variado que combina força, resistência e capacidade cardiovascular.",
-                    CaracteristicasTipoExercicios = "Circuitos intensos, exercícios funcionais e levantamento de peso.",
-                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
-                    {
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da resistência cardiovascular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Fortalecimento muscular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Perda de peso").BeneficioId }
-                    }
-                },
-                new TipoExercicio
-                {
-                    NomeTipoExercicios = "Treino Intervalado Moderado",
-                    DescricaoTipoExercicios = "Alterna períodos de esforço moderado com descanso ativo.",
-                    CaracteristicasTipoExercicios = "Ritmo controlado, adequado para iniciantes e reabilitação.",
-                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
-                    {
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da resistência cardiovascular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Recuperação Ativa").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Redução da fadiga").BeneficioId }
-                    }
-                },
-                new TipoExercicio
-                {
-                    NomeTipoExercicios = "Treino de Core",
-                    DescricaoTipoExercicios = "Focado no fortalecimento dos músculos abdominais e lombares.",
-                    CaracteristicasTipoExercicios = "Pranchas, exercícios isométricos e movimentos de estabilidade.",
-                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
-                    {
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Fortalecimento muscular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da Postura Corporal").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Prevenção de lesões").BeneficioId }
-                    }
-                },
-                new TipoExercicio
-                {
-                    NomeTipoExercicios = "Alongamentos Terapêuticos",
-                    DescricaoTipoExercicios = "Alongamentos direcionados para alívio de tensões e reabilitação.",
-                    CaracteristicasTipoExercicios = "Movimentos lentos e controlados, foco em zonas específicas.",
+                    NomeTipoExercicios = "Alongamentos",
+                    DescricaoTipoExercicios = "Exercícios destinados a alongar músculos e melhorar a flexibilidade geral.",
+                    CaracteristicasTipoExercicios = "Movimentos lentos e controlados, mantidos por alguns segundos.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da flexibilidade").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Redução da rigidez muscular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Recuperação Ativa").BeneficioId }
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Redução do stress").BeneficioId },
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da mobilidade articular").BeneficioId }
                     }
                 },
+
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Treino de Resistência",
-                    DescricaoTipoExercicios = "Exercícios focados na manutenção do esforço por longos períodos.",
-                    CaracteristicasTipoExercicios = "Séries longas, cargas moderadas e ritmo constante.",
+                    DescricaoTipoExercicios = "Treino focado em aumentar a resistência muscular ao longo do tempo.",
+                    CaracteristicasTipoExercicios = "Repetições elevadas com cargas moderadas.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da resistência muscular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhoria da composição corporal").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da tolerância ao esforço").BeneficioId }
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Fortalecimento muscular").BeneficioId },
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhoria da composição corporal").BeneficioId }
                     }
                 },
-                new TipoExercicio
-                {
-                    NomeTipoExercicios = "Reabilitação Funcional",
-                    DescricaoTipoExercicios = "Exercícios orientados para recuperação de lesões e limitações físicas.",
-                    CaracteristicasTipoExercicios = "Baixo impacto, progressão gradual e controlo dos movimentos.",
-                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
-                    {
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Prevenção de lesões").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da mobilidade articular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Recuperação Ativa").BeneficioId }
-                    }
-                },
+
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Treino Postural",
-                    DescricaoTipoExercicios = "Focado na correção de desequilíbrios musculares e alinhamento corporal.",
-                    CaracteristicasTipoExercicios = "Exercícios de estabilização e consciência corporal.",
+                    DescricaoTipoExercicios = "Exercícios focados na correção postural e alinhamento corporal.",
+                    CaracteristicasTipoExercicios = "Trabalho de consciência corporal e fortalecimento estabilizador.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da Postura Corporal").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Redução da rigidez muscular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da consciência corporal").BeneficioId }
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da consciência corporal").BeneficioId },
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Prevenção de lesões").BeneficioId }
                     }
                 },
-                new TipoExercicio
-                {
-                    NomeTipoExercicios = "Treino de Baixo Impacto",
-                    DescricaoTipoExercicios = "Atividades que reduzem o impacto nas articulações.",
-                    CaracteristicasTipoExercicios = "Movimentos suaves, adequado para idosos ou pessoas com limitações.",
-                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
-                    {
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da saúde articular").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Promoção do envelhecimento saudável").BeneficioId },
-                        new TipoExercicioBeneficio { BeneficioId = GetBen("Redução do risco cardiovascular").BeneficioId }
-                    }
-                },
+
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Treino de Equilíbrio",
-                    DescricaoTipoExercicios = "Exercícios específicos para melhorar a estabilidade corporal.",
-                    CaracteristicasTipoExercicios = "Apoio unipodal, superfícies instáveis e controlo postural.",
+                    DescricaoTipoExercicios = "Exercícios destinados a melhorar estabilidade e controlo corporal.",
+                    CaracteristicasTipoExercicios = "Exercícios unilaterais e superfícies instáveis.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da coordenação e equilíbrio").BeneficioId },
@@ -625,16 +560,30 @@ namespace HealthWellbeing.Data
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da consciência corporal").BeneficioId }
                     }
                 },
+
                 new TipoExercicio
                 {
                     NomeTipoExercicios = "Treino Respiratório",
-                    DescricaoTipoExercicios = "Exercícios focados na melhoria da eficiência respiratória.",
-                    CaracteristicasTipoExercicios = "Respiração controlada, exercícios diafragmáticos.",
+                    DescricaoTipoExercicios = "Exercícios focados no controlo da respiração e eficiência pulmonar.",
+                    CaracteristicasTipoExercicios = "Respiração controlada, diafragmática e consciente.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
                     {
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Melhoria da respiração").BeneficioId },
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Aumento da Capacidade Pulmonar").BeneficioId },
                         new TipoExercicioBeneficio { BeneficioId = GetBen("Redução do stress").BeneficioId }
+                    }
+                },
+
+                new TipoExercicio
+                {
+                    NomeTipoExercicios = "Treino de Baixo Impacto",
+                    DescricaoTipoExercicios = "Atividades físicas suaves que reduzem o impacto nas articulações.",
+                    CaracteristicasTipoExercicios = "Movimentos controlados, ideais para iniciantes ou reabilitação.",
+                    TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
+                    {
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Melhora da saúde articular").BeneficioId },
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Recuperação Ativa").BeneficioId },
+                        new TipoExercicioBeneficio { BeneficioId = GetBen("Promoção do envelhecimento saudável").BeneficioId }
                     }
                 }
 
@@ -733,7 +682,7 @@ namespace HealthWellbeing.Data
                     Repeticoes = 1,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") } },
                     ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
                     Contraindicacoes = new List<ExercicioProblemaSaude>()
                 },
@@ -810,6 +759,291 @@ namespace HealthWellbeing.Data
                 },
                 new Exercicio
                 {
+                    ExercicioNome = "Elevação Lateral de Ombros",
+                    Descricao = "Exercício isolado para os ombros.",
+                    Duracao = 8,
+                    Intencidade = 5,
+                    CaloriasGastas = 30,
+                    Instrucoes = "Elevar os halteres lateralmente até à altura dos ombros.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Curl de Bíceps",
+                    Descricao = "Exercício clássico para fortalecimento do bíceps.",
+                    Duracao = 8,
+                    Intencidade = 6,
+                    CaloriasGastas = 35,
+                    Instrucoes = "Flexionar os braços trazendo os halteres até aos ombros.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Bíceps") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Extensão de Tríceps",
+                    Descricao = "Exercício isolado para os tríceps.",
+                    Duracao = 8,
+                    Intencidade = 6,
+                    CaloriasGastas = 35,
+                    Instrucoes = "Estender os braços acima da cabeça segurando o halter.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Leg Press",
+                    Descricao = "Exercício de força para membros inferiores.",
+                    Duracao = 12,
+                    Intencidade = 7,
+                    CaloriasGastas = 90,
+                    Instrucoes = "Empurrar a plataforma com os pés mantendo costas apoiadas.",
+                    Repeticoes = 12,
+                    Series = 4,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Máquina de Leg Press") }
+                    },
+                    Contraindicacoes = (GetProbId("Artrose") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrose") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Elevação de Gémeos",
+                    Descricao = "Exercício para fortalecimento das panturrilhas.",
+                    Duracao = 6,
+                    Intencidade = 5,
+                    CaloriasGastas = 25,
+                    Instrucoes = "Elevar os calcanhares mantendo o corpo alinhado.",
+                    Repeticoes = 20,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Puxada na Máquina",
+                    Descricao = "Exercício para fortalecimento das costas.",
+                    Duracao = 12,
+                    Intencidade = 7,
+                    CaloriasGastas = 75,
+                    Instrucoes = "Puxar a barra da máquina em direção ao peito mantendo as costas direitas.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Costas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Máquina de Pulldown") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Afundos",
+                    Descricao = "Exercício unilateral para pernas e glúteos.",
+                    Duracao = 12,
+                    Intencidade = 6,
+                    CaloriasGastas = 70,
+                    Instrucoes = "Dar um passo à frente e flexionar ambos os joelhos.",
+                    Repeticoes = 12,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
+                    Contraindicacoes = (GetProbId("Artrose") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrose") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Step Up",
+                    Descricao = "Exercício funcional para pernas.",
+                    Duracao = 10,
+                    Intencidade = 5,
+                    CaloriasGastas = 60,
+                    Instrucoes = "Subir e descer de um step alternando as pernas.",
+                    Repeticoes = 15,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Step") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Russian Twist",
+                    Descricao = "Exercício para abdómen e oblíquos.",
+                    Duracao = 8,
+                    Intencidade = 6,
+                    CaloriasGastas = 40,
+                    Instrucoes = "Sentado, rodar o tronco alternando os lados.",
+                    Repeticoes = 20,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Medicine Ball") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Burpees",
+                    Descricao = "Exercício de corpo inteiro de alta intensidade.",
+                    Duracao = 10,
+                    Intencidade = 8,
+                    CaloriasGastas = 120,
+                    Instrucoes = "Agachar, apoiar mãos no chão, saltar para prancha e voltar.",
+                    Repeticoes = 10,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
+                    Contraindicacoes = (GetProbId("Hipertensão Arterial") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hipertensão Arterial") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Salto à Corda",
+                    Descricao = "Exercício cardiovascular intenso.",
+                    Duracao = 15,
+                    Intencidade = 7,
+                    CaloriasGastas = 130,
+                    Instrucoes = "Saltar continuamente mantendo ritmo constante.",
+                    Repeticoes = 1,
+                    Series = 1,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Corda de Saltar") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+
+                new Exercicio
+                {
+                    ExercicioNome = "Alongamento Geral",
+                    Descricao = "Exercício leve para mobilidade e relaxamento.",
+                    Duracao = 10,
+                    Intencidade = 2,
+                    CaloriasGastas = 15,
+                    Instrucoes = "Alongar suavemente os principais grupos musculares.",
+                    Repeticoes = 1,
+                    Series = 1,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Core") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>
+                    {
+                        new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
+                    },
+                    Contraindicacoes = new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
+                    ExercicioNome = "Mountain Climbers",
+                    Descricao = "Exercício cardiovascular e de core.",
+                    Duracao = 10,
+                    Intencidade = 7,
+                    CaloriasGastas = 100,
+                    Instrucoes = "Em posição de prancha, alternar joelhos em direção ao peito.",
+                    Repeticoes = 1,
+                    Series = 3,
+                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
+                    {
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") },
+                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
+                    },
+                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
+                    Contraindicacoes = (GetProbId("Asma") > 0)
+                        ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Asma") } }
+                        : new List<ExercicioProblemaSaude>()
+                },
+                new Exercicio
+                {
                     ExercicioNome = "Supino Reto",
                     Descricao = "Força para peitoral.",
                     Duracao = 15,
@@ -843,204 +1077,11 @@ namespace HealthWellbeing.Data
                     Repeticoes = 20,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") } },
+                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") } },
                     ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Burpee",
-                    Descricao = "Exercício funcional de corpo inteiro.",
-                    Duracao = 12,
-                    Intencidade = 9,
-                    CaloriasGastas = 120,
-                    Instrucoes = "Agachar, apoiar mãos no chão, estender pernas, voltar e saltar.",
-                    Repeticoes = 10,
-                    Series = 4,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Afundo",
-                    Descricao = "Exercício unilateral para membros inferiores.",
-                    Duracao = 10,
-                    Intencidade = 6,
-                    CaloriasGastas = 60,
-                    Instrucoes = "Dar um passo à frente e fletir o joelho mantendo tronco direito.",
-                    Repeticoes = 12,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Glúteos") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Elevação Lateral de Ombros",
-                    Descricao = "Fortalecimento dos deltoides.",
-                    Duracao = 8,
-                    Intencidade = 5,
-                    CaloriasGastas = 40,
-                    Instrucoes = "Elevar halteres lateralmente até à altura dos ombros.",
-                    Repeticoes = 15,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero>
-                    {
-                        new ExercicioGenero { GeneroId = GetGenId("Masculino") },
-                        new ExercicioGenero { GeneroId = GetGenId("Feminino") }
-                    },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
-                    },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Mountain Climbers",
-                    Descricao = "Cardio intenso com foco no core.",
-                    Duracao = 10,
-                    Intencidade = 8,
-                    CaloriasGastas = 100,
-                    Instrucoes = "Em posição de prancha, alternar joelhos em direção ao peito.",
-                    Repeticoes = 20,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Rosca Bíceps",
-                    Descricao = "Exercício isolado para bíceps.",
-                    Duracao = 8,
-                    Intencidade = 6,
-                    CaloriasGastas = 45,
-                    Instrucoes = "Flexionar braços elevando os halteres.",
-                    Repeticoes = 12,
-                    Series = 4,
-                    ExercicioGeneros = new List<ExercicioGenero>
-                    {
-                        new ExercicioGenero { GeneroId = GetGenId("Masculino") },
-                        new ExercicioGenero { GeneroId = GetGenId("Feminino") }
-                    },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Bíceps") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
-                    },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Extensão de Tríceps",
-                    Descricao = "Fortalecimento do tríceps.",
-                    Duracao = 8,
-                    Intencidade = 6,
-                    CaloriasGastas = 40,
-                    Instrucoes = "Estender braços segurando halteres atrás da cabeça.",
-                    Repeticoes = 12,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero>
-                    {
-                        new ExercicioGenero { GeneroId = GetGenId("Masculino") },
-                        new ExercicioGenero { GeneroId = GetGenId("Feminino") }
-                    },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Halteres") }
-                    },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Bicicleta Abdominal",
-                    Descricao = "Trabalho dinâmico do core.",
-                    Duracao = 6,
-                    Intencidade = 6,
-                    CaloriasGastas = 50,
-                    Instrucoes = "Alternar cotovelo com joelho oposto em posição deitado.",
-                    Repeticoes = 20,
-                    Series = 3,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdômen") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Caminhada na Passadeira",
-                    Descricao = "Cardio de baixo impacto.",
-                    Duracao = 25,
-                    Intencidade = 4,
-                    CaloriasGastas = 120,
-                    Instrucoes = "Caminhar a ritmo constante.",
-                    Repeticoes = 1,
-                    Series = 1,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>
-                    {
-                        new ExercicioEquipamento { EquipamentoId = GetEqId("Passadeira") }
-                    },
-                    Contraindicacoes = new List<ExercicioProblemaSaude>()
-                },
-                new Exercicio
-                {
-                    ExercicioNome = "Alongamento Global",
-                    Descricao = "Alongamento geral para recuperação.",
-                    Duracao = 10,
-                    Intencidade = 2,
-                    CaloriasGastas = 20,
-                    Instrucoes = "Alongar suavemente todos os grupos musculares.",
-                    Repeticoes = 1,
-                    Series = 1,
-                    ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
-                    ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
-                    {
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Costas") },
-                        new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") }
-                    },
-                    ExercicioEquipamentos = new List<ExercicioEquipamento>(),
                     Contraindicacoes = new List<ExercicioProblemaSaude>()
                 }
             };
-
 
             // Lógica extra para adicionar múltiplas contraindicações ao Supino se existirem
             var supino = exercicios.FirstOrDefault(e => e.ExercicioNome == "Supino Reto");
@@ -1049,97 +1090,10 @@ namespace HealthWellbeing.Data
                 if (GetProbId("Tendinite") > 0) supino.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") });
                 if (GetProbId("Hipertensão Arterial") > 0) supino.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hipertensão Arterial") });
             }
-            var flexao = exercicios.FirstOrDefault(e => e.ExercicioNome == "Flexão");
-            if (flexao != null)
-            {
-                if (GetProbId("Tendinite") > 0)
-                    flexao.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") });
-            }
-
-            var agachamento = exercicios.FirstOrDefault(e => e.ExercicioNome == "Agachamento");
-            if (agachamento != null)
-            {
-                if (GetProbId("Artrite") > 0)
-                    agachamento.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrite") });
-            }
-
-            var prancha = exercicios.FirstOrDefault(e => e.ExercicioNome == "Prancha");
-            if (prancha != null)
-            {
-                if (GetProbId("Hérnia Discal") > 0)
-                    prancha.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hérnia Discal") });
-            }
-
-            var remada = exercicios.FirstOrDefault(e => e.ExercicioNome == "Remada com Halteres");
-            if (remada != null)
-            {
-                if (GetProbId("Escoliose") > 0)
-                    remada.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Escoliose") });
-            }
-
-            var corrida = exercicios.FirstOrDefault(e => e.ExercicioNome == "Corrida no Lugar");
-            if (corrida != null)
-            {
-                if (GetProbId("Asma") > 0)
-                    corrida.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Asma") });
-                if (GetProbId("Hipertensão Arterial") > 0)
-                    corrida.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hipertensão Arterial") });
-            }
-
-            var elevacaoPelvica = exercicios.FirstOrDefault(e => e.ExercicioNome == "Elevação Pélvica");
-            if (elevacaoPelvica != null)
-            {
-                if (GetProbId("Lombalgia") > 0)
-                    elevacaoPelvica.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Lombalgia") });
-            }
-
-            var abdominal = exercicios.FirstOrDefault(e => e.ExercicioNome == "Abdominal Crunch");
-            if (abdominal != null)
-            {
-                if (GetProbId("Hérnia Discal") > 0)
-                    abdominal.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hérnia Discal") });
-            }
-
-            var burpee = exercicios.FirstOrDefault(e => e.ExercicioNome == "Burpee");
-            if (burpee != null)
-            {
-                if (GetProbId("Problemas Cardíacos") > 0)
-                    burpee.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Problemas Cardíacos") });
-            }
-
-            var afundo = exercicios.FirstOrDefault(e => e.ExercicioNome == "Afundo");
-            if (afundo != null)
-            {
-                if (GetProbId("Artrite") > 0)
-                    afundo.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrite") });
-            }
-
-            var rosca = exercicios.FirstOrDefault(e => e.ExercicioNome == "Rosca Bíceps");
-            if (rosca != null)
-            {
-                if (GetProbId("Tendinite") > 0)
-                    rosca.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") });
-            }
-
-            var extensaoTriceps = exercicios.FirstOrDefault(e => e.ExercicioNome == "Extensão de Tríceps");
-            if (extensaoTriceps != null)
-            {
-                if (GetProbId("Tendinite") > 0)
-                    extensaoTriceps.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Tendinite") });
-            }
-
-            var caminhada = exercicios.FirstOrDefault(e => e.ExercicioNome == "Caminhada na Passadeira");
-            if (caminhada != null)
-            {
-                if (GetProbId("Artrose") > 0)
-                    caminhada.Contraindicacoes.Add(new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Artrose") });
-            }
 
             dbContext.Exercicio.AddRange(exercicios);
             dbContext.SaveChanges();
-            }
-            
-
+        }
 
         public static class Roles
         {
