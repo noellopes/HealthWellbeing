@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HealthWellbeingRoom.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthWellbeing.Models
@@ -44,8 +45,12 @@ namespace HealthWellbeing.Models
         [MaxLength(4000, ErrorMessage = "As observações não podem ter mais de 4000 caracteres.")]
         public string? Observacoes { get; set; }
 
-        [ForeignKey(nameof(Room))]
-        public int IdSala { get; set; }
-        public Room? sala { get; set; }
+        //[ForeignKey(nameof(Room))]
+        //public int IdSala { get; set; }
+        //public Room? sala { get; set; }
+
+        //[ForeignKey(nameof(Room))]
+        //public int IdConsumivel { get; set; }
+        //public ConsumablesExpenses? consumivel { get; set; }
     }
 }
