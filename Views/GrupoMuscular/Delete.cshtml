@@ -2,19 +2,51 @@
 
 @{
     ViewData["Title"] = "Eliminar Grupo Muscular";
+
+    bool podeEliminar = ViewBag.PodeEliminar ?? true;
+    int numExercicios = ViewBag.NumExercicios ?? 0;
+    int numMusculos = ViewBag.NumMusculos ?? 0;
 }
 
 <div class="container mt-4">
-    @if (ViewBag.Error != null)
+
+    @* --- MENSAGENS DE ERRO --- *@
+    @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
-            @ViewBag.Error
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    
+
     <h1 class="text-danger mb-3"><i class="fas fa-trash-alt"></i> @ViewData["Title"]</h1>
 
-    <p class="lead">Tem a certeza que deseja eliminar este grupo muscular? Esta ação não pode ser desfeita.</p>
+    @* --- AVISO DE BLOQUEIO --- *@
+    @if (!podeEliminar)
+    {
+        <div class="alert alert-warning shadow-sm border-warning" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h4>
+            <p>
+                Não é possível eliminar o grupo muscular <strong>@Model.GrupoMuscularNome</strong> devido às seguintes associações:
+            </p>
+            <ul>
+                @if (numExercicios > 0)
+                {
+                    <li>Está associado a <strong>@numExercicios</strong> exercício(s).</li>
+                }
+                @if (numMusculos > 0)
+                {
+                    <li>Contém <strong>@numMusculos</strong> músculo(s) registado(s).</li>
+                }
+            </ul>
+            <hr>
+            <p class="mb-0">Tens de remover as associações antes de o poderes apagar.</p>
+        </div>
+    }
+    else
+    {
+        <p class="lead">Tem a certeza que deseja eliminar este grupo muscular? Esta ação <strong>não pode ser desfeita</strong>.</p>
+    }
 
     <div class="card mb-4 shadow-sm border-danger">
         <div class="card-header bg-danger text-white fw-bold">
@@ -23,22 +55,58 @@
         <div class="card-body">
             <dl class="row mb-0">
                 <dt class="col-sm-3">Nome do Grupo</dt>
-                <dd class="col-sm-9">@Model.GrupoMuscularNome</dd>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.GrupoMuscularNome)</dd>
 
                 <dt class="col-sm-3">Localização Corporal</dt>
-                <dd class="col-sm-9">@Model.LocalizacaoCorporal</dd>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.LocalizacaoCorporal)</dd>
+
+                <hr class="my-2">
+
+                <dt class="col-sm-3">Exercícios Associados</dt>
+                <dd class="col-sm-9">
+                    @if (numExercicios > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@numExercicios</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">0</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Músculos Registados</dt>
+                <dd class="col-sm-9">
+                    @if (numMusculos > 0)
+                    {
+                        <span class="badge bg-warning text-dark">@numMusculos</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">0</span>
+                    }
+                </dd>
             </dl>
         </div>
     </div>
 
     <form asp-action="Delete" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="GrupoMuscularId" />
+        <input type="hidden" name="GrupoMuscularId" value="@Model.GrupoMuscularId" />
 
         <div class="d-flex">
-            <button type="submit" class="btn btn-danger me-2">
-                <i class="fas fa-trash-alt"></i> Eliminar
-            </button>
+            @if (podeEliminar)
+            {
+                <button type="submit" class="btn btn-danger me-2">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-secondary me-2" disabled title="Remova as associações primeiro">
+                    <i class="fas fa-trash-alt"></i> Eliminar (Bloqueado)
+                </button>
+            }
+
             <a asp-action="Index" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Voltar à Lista
             </a>

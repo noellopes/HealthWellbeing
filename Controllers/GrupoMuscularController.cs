@@ -167,17 +167,28 @@ namespace HealthWellbeing.Controllers
         // GET: GrupoMuscular/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var grupoMuscular = await _context.GrupoMuscular
+                .Include(g => g.ExercicioGrupoMusculares) // Verificar uso em Exercícios
+                .Include(g => g.Musculos)                 // Verificar se tem Músculos filhos
                 .FirstOrDefaultAsync(m => m.GrupoMuscularId == id);
+
             if (grupoMuscular == null)
             {
-                return RedirectToAction(nameof(InvalidGrupoMuscular), new GrupoMuscular { GrupoMuscularId = id.Value });
+                TempData["ErrorMessage"] = "Este grupo muscular já não existe.";
+                return RedirectToAction(nameof(Index));
             }
+
+            // Lógica Visual: Contagens
+            int numExercicios = grupoMuscular.ExercicioGrupoMusculares?.Count ?? 0;
+            int numMusculos = grupoMuscular.Musculos?.Count ?? 0;
+
+            ViewBag.NumExercicios = numExercicios;
+            ViewBag.NumMusculos = numMusculos;
+
+            // Só pode eliminar se não tiver exercícios E não tiver músculos associados
+            ViewBag.PodeEliminar = (numExercicios == 0 && numMusculos == 0);
 
             return View(grupoMuscular);
         }
@@ -185,40 +196,30 @@ namespace HealthWellbeing.Controllers
         // POST: GrupoMuscular/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int GrupoMuscularId) // Parâmetro explícito
         {
-            var grupoMuscular = await _context.GrupoMuscular
-                .FirstOrDefaultAsync(g => g.GrupoMuscularId == id);
+            var grupoMuscular = await _context.GrupoMuscular.FindAsync(GrupoMuscularId);
 
-            if (grupoMuscular == null)
-            {
-                ViewBag.Error = "Grupo muscular não encontrado.";
-                return View();
-            }
+            if (grupoMuscular == null) return RedirectToAction(nameof(Index));
 
             try
             {
                 _context.GrupoMuscular.Remove(grupoMuscular);
                 await _context.SaveChangesAsync();
 
-                
                 TempData["SuccessMessage"] = $"Grupo muscular '{grupoMuscular.GrupoMuscularNome}' eliminado com sucesso.";
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                // Erro de restrição (Foreign Key)
+                TempData["ErrorMessage"] = "Não é possível eliminar este grupo muscular porque está associado a exercícios ou possui músculos registados.";
+                return RedirectToAction(nameof(Delete), new { id = GrupoMuscularId });
             }
             catch (Exception)
             {
-                int numberMusculos = await _context.Musculo.Where(m => m.GrupoMuscularId == id).CountAsync();
-
-                if (numberMusculos > 0)
-                {
-                    ViewBag.Error = $"Não é possível eliminar este grupo muscular porque está associado a {numberMusculos} músculos. Elimine primeiro esses músculos.";
-                }
-                else
-                {
-                    ViewBag.Error = "Ocorreu um erro ao eliminar o grupo muscular. Tente novamente ou contacte o suporte.";
-                }
-
-                return View(grupoMuscular);
+                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o grupo muscular.";
+                return RedirectToAction(nameof(Delete), new { id = GrupoMuscularId });
             }
         }
 
