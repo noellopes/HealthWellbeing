@@ -14,15 +14,11 @@ namespace HealthWellbeing.Models
         [StringLength(250, ErrorMessage = "A descrição deve ter no máximo 250 caracteres.")]
         public string DescricaoTipoExercicios { get; set; }
 
-        [Required(ErrorMessage = "As caracetrísticas do tipo de exercicios são obrigatórias.")]
-        [StringLength(250, ErrorMessage = "As caracetrísticas devem ter no máximo 250 caracteres.")]
+        [Required(ErrorMessage = "As características do tipo de exercicios são obrigatórias.")]
+        [StringLength(250, ErrorMessage = "As características devem ter no máximo 250 caracteres.")]
         public string CaracteristicasTipoExercicios { get; set; }
 
         public ICollection<TipoExercicioBeneficio>? TipoExercicioBeneficios { get; set; }
-
-        public ICollection<TipoExercicioProblemaSaude>? Contraindicacao { get; set; }
-
-        public ICollection<ObjetivoTipoExercicio>? ObjetivoTipoExercicio { get; set; }
         public ICollection<ExercicioTipoExercicio>? ExercicioTipoExercicios { get; set; }
     }
 }

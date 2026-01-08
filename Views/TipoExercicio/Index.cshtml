@@ -4,222 +4,141 @@
     ViewData["Title"] = "Tipos de Exercício";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 text-primary fw-bold"><i class="bi bi-activity me-2"></i>@ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-success shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Criar Novo
+    </a>
+</div>
 
 @if (TempData["StatusMessage"] is string statusMessage)
 {
-    string alertClass = "alert-info";
-
-    if (statusMessage.StartsWith("Sucesso:"))
-    {
-        alertClass = "alert-success";
-    }
-    else if (statusMessage.StartsWith("Aviso:"))
-    {
-        alertClass = "alert-warning";
-    }
-    else if (statusMessage.StartsWith("Erro:"))
-    {
-        alertClass = "alert-danger";
-    }
-
-
-    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+    var alertType = statusMessage.StartsWith("Sucesso") ? "success" : (statusMessage.StartsWith("Erro") ? "danger" : "warning");
+    <div class="alert alert-@alertType alert-dismissible fade show shadow-sm" role="alert">
         @statusMessage
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
     </div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4">Lista</h2>
-    <div>
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
-            <i class="bi bi-search me-1"></i> Pesquisa
-        </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Criar Novo
-        </a>
-    </div>
+<div class="mb-3">
+    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+        <i class="bi bi-funnel me-1"></i> Pesquisa Avançada
+    </button>
 </div>
 
-<div class="collapse mb-3" id="searchForm">
-    <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-
-            <div class="col-md-6">
-                <label for="searchNome" class="form-label">Nome</label>
-                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Procurar por nome" />
+<div class="collapse mb-4" id="filterCollapse">
+    <div class="card card-body bg-light border-0 shadow-sm">
+        <form asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="searchNome" class="form-label fw-bold">Nome</label>
+                <input type="text" class="form-control" id="searchNome" name="searchNome" value="@ViewBag.SearchNome" placeholder="Procurar por nome...">
             </div>
-
-            <div class="col-md-6">
-                <label for="searchBeneficio" class="form-label">Benefício</label>
-                <input id="searchBeneficio" name="searchBeneficio" value="@ViewBag.SearchBeneficio" class="form-control" placeholder="Procurar por benefício" />
+            <div class="col-md-4">
+                <label for="searchBeneficio" class="form-label fw-bold">Benefício</label>
+                <input type="text" class="form-control" id="searchBeneficio" name="searchBeneficio" value="@ViewBag.SearchBeneficio" placeholder="Procurar por benefício...">
             </div>
-
-            <div class="col-12 mt-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">
                     <i class="bi bi-search me-1"></i> Procurar
                 </button>
-                <a asp-action="Index" class="btn btn-secondary">Limpar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Limpar
+                </a>
             </div>
         </form>
     </div>
 </div>
 
-
 @if (!Model.Items.Any())
 {
-    <div class="alert alert-warning">Nenhum tipo de exercício encontrado.</div>
+    <div class="alert alert-warning text-center">
+        <i class="bi bi-info-circle me-2"></i> Nenhum registo encontrado com os critérios fornecidos.
+    </div>
 }
 else
 {
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Benefícios</th>
-                    <th>Contraindicações</th>
-                    <th style="width: 220px;">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>@item.NomeTipoExercicios</td>
-
-                        <td>
-                            @if (item.TipoExercicioBeneficios != null && item.TipoExercicioBeneficios.Any())
-                            {
-                                @foreach (var tb in item.TipoExercicioBeneficios.Take(3))
-                                {
-                                    if (tb.Beneficio != null)
-                                    {
-                                        <span class="badge bg-primary me-1 mb-1">@tb.Beneficio.NomeBeneficio</span>
-                                    }
-                                }
-
-                                @if (item.TipoExercicioBeneficios.Count > 3)
-                                {
-                                    <span class="badge bg-secondary">+@(item.TipoExercicioBeneficios.Count - 3) mais</span>
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">Nenhum</span>
-                            }
-                        </td>
-
-                        <td>
-                            @if (item.Contraindicacao != null && item.Contraindicacao.Any())
-                            {
-                                @foreach (var tp in item.Contraindicacao.Take(3))
-                                {
-                                    if (tp.ProblemaSaude != null)
-                                    {
-                                        <span class="badge bg-danger me-1 mb-1">@tp.ProblemaSaude.ProblemaNome</span>
-                                    }
-                                }
-                                @if (item.Contraindicacao.Count > 3)
-                                {
-                                    <span class="badge bg-secondary">+@(item.Contraindicacao.Count - 3)</span>
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-muted">Nenhuma</span>
-                            }
-                        </td>
-
-                        <td class="text-nowrap">
-                            <a asp-action="Edit" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-warning">Editar</a>
-                            <a asp-action="Details" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-info">Detalhes</a>
-                            <a asp-action="Delete" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-danger">Apagar</a>
-                        </td>
+                        <th class="ps-4">Nome</th>
+                        <th>Benefícios</th>
+                        <th class="text-center" style="width: 300px;">Ações</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                @{
-                    var routeData = new Dictionary<string, string>
-                        {
-                        { "searchUtente", ViewBag.SearchUtente },
-                        { "dataInicio", ViewBag.DataInicio },
-                        { "dataFim", ViewBag.DataFim }
-                        };
-                }
-
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link"><i class="bi bi-chevron-left"></i> Anterior</span>
-                    </li>
-                }
-                else
-                {
-                    routeData["page"] = "1";
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a primeira página">
-                            <i class="bi bi-chevron-double-left"></i> Primeira
-                        </a>
-                    </li>
-
-                    routeData["page"] = (Model.CurrentPage - 1).ToString();
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Página anterior">
-                            <i class="bi bi-chevron-left"></i> Anterior
-                        </a>
-                    </li>
-                }
-
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
                     {
-                        <li class="page-item active"><span class="page-link">@p</span></li>
+                        <tr>
+                            <td class="ps-4 fw-bold">@item.NomeTipoExercicios</td>
+                            <td>
+                                @if (item.TipoExercicioBeneficios != null && item.TipoExercicioBeneficios.Any())
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach (var tb in item.TipoExercicioBeneficios.Take(3))
+                                        {
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10">
+                                                @tb.Beneficio?.NomeBeneficio
+                                            </span>
+                                        }
+                                        @if (item.TipoExercicioBeneficios.Count > 3)
+                                        {
+                                            <span class="badge bg-secondary text-white small">+@(item.TipoExercicioBeneficios.Count - 3)</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fst-italic">Sem benefícios associados</span>
+                                }
+                            </td>
+             
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-warning">Editar</a>
+                                <a asp-action="Details" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-info">Detalhes</a>
+                                <a asp-action="Delete" asp-route-id="@item.TipoExercicioId" class="btn btn-sm btn-danger">Apagar</a>
+                            </td>
+                        </tr>
                     }
-                    else
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card-footer bg-white py-3">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    @{
+                        var routeData = new Dictionary<string, string>
+                                {
+                                { "searchNome", ViewBag.SearchNome },
+                                { "searchBeneficio", ViewBag.SearchBeneficio }
+                                };
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        @{
+                            routeData["page"] = (Model.CurrentPage - 1).ToString();
+                        }
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData">Anterior</a>
+                    </li>
+
+                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                     {
                         routeData["page"] = p.ToString();
-                        <li class="page-item">
+                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
                             <a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a>
                         </li>
                     }
-                }
 
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled">
-                        <span class="page-link">Próxima <i class="bi bi-chevron-right"></i></span>
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        @{
+                            routeData["page"] = (Model.CurrentPage + 1).ToString();
+                        }
+                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData">Próximo</a>
                     </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Última <i class="bi bi-chevron-double-right"></i></span>
-                    </li>
-                }
-                else
-                {
-                    routeData["page"] = (Model.CurrentPage + 1).ToString();
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Próxima página">
-                            Próxima <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-
-                    routeData["page"] = Model.TotalPages.ToString();
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a última página">
-                            Última <i class="bi bi-chevron-double-right"></i>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+                </ul>
+            </nav>
+        </div>
     </div>
 }

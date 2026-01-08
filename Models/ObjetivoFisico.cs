@@ -10,7 +10,6 @@ namespace HealthWellbeing.Models
         [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres.")]
         public string NomeObjetivo { get; set; }
 
-        public ICollection<ObjetivoTipoExercicio>? ObjetivoTipoExercicio { get; set; }
         public ICollection<UtenteGrupo7>? Utentes { get; set; }
         public ICollection<ExercicioObjetivoFisico>? ExercicioObjetivos { get; set; }
     }
