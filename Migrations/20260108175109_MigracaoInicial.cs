@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoAtual : Migration
+    public partial class MigracaoInicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -930,6 +930,28 @@ namespace HealthWellbeing.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "DoctorConsulta",
+                columns: table => new
+                {
+                    IdMedico = table.Column<int>(type: "int", nullable: false),
+                    IdConsulta = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DoctorConsulta", x => new { x.IdMedico, x.IdConsulta });
+                    table.ForeignKey(
+                        name: "FK_DoctorConsulta_Consulta_IdConsulta",
+                        column: x => x.IdConsulta,
+                        principalTable: "Consulta",
+                        principalColumn: "IdConsulta");
+                    table.ForeignKey(
+                        name: "FK_DoctorConsulta_Doctor_IdMedico",
+                        column: x => x.IdMedico,
+                        principalTable: "Doctor",
+                        principalColumn: "IdMedico");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AgendaMedica_IdMedico",
                 table: "AgendaMedica",
@@ -974,6 +996,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Doctor_IdEspecialidade",
                 table: "Doctor",
                 column: "IdEspecialidade");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DoctorConsulta_IdConsulta",
+                table: "DoctorConsulta",
+                column: "IdConsulta");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Event_EventTypeId",
@@ -1142,7 +1169,7 @@ namespace HealthWellbeing.Migrations
                 name: "ClientAlergy");
 
             migrationBuilder.DropTable(
-                name: "Consulta");
+                name: "DoctorConsulta");
 
             migrationBuilder.DropTable(
                 name: "Event");
@@ -1202,10 +1229,7 @@ namespace HealthWellbeing.Migrations
                 name: "Alergy");
 
             migrationBuilder.DropTable(
-                name: "Doctor");
-
-            migrationBuilder.DropTable(
-                name: "UtenteSaude");
+                name: "Consulta");
 
             migrationBuilder.DropTable(
                 name: "EventType");
@@ -1247,10 +1271,16 @@ namespace HealthWellbeing.Migrations
                 name: "TrainingType");
 
             migrationBuilder.DropTable(
-                name: "Specialities");
+                name: "Doctor");
+
+            migrationBuilder.DropTable(
+                name: "UtenteSaude");
 
             migrationBuilder.DropTable(
                 name: "FoodCategory");
+
+            migrationBuilder.DropTable(
+                name: "Specialities");
 
             migrationBuilder.DropTable(
                 name: "Client");
