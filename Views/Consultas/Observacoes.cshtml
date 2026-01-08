@@ -1,39 +1,203 @@
-﻿@model HealthWellbeing.ViewModel.ConsultaObservacoesVM
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.ViewModel.ConsultaObservacoesVM
 
 @{
     ViewData["Title"] = "Observações";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="card">
-    <div class="card-body">
-        <form asp-action="Observacoes" method="post">
-            @Html.AntiForgeryToken()
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-            <input type="hidden" asp-for="IdConsulta" />
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-            <div class="mb-3">
-                <label asp-for="Observacoes" class="form-label"></label>
-                <textarea asp-for="Observacoes" class="form-control" rows="10"
-                          placeholder="Escreva aqui as observações relativas à consulta..."></textarea>
-                <span asp-validation-for="Observacoes" class="text-danger"></span>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-weight: 800;
+        color: #1f4f6a;
+    }
+
+    .hw-textarea {
+        border-radius: 14px !important;
+        border: 2px solid rgba(45,121,160,.55) !important;
+        background: #eef7fd !important;
+        color: #1f4f6a !important;
+        font-weight: 700;
+        box-shadow: 0 1px 0 rgba(0,0,0,.03);
+    }
+
+        .hw-textarea:focus {
+            border-color: #2d79a0 !important;
+            box-shadow: 0 0 0 .2rem rgba(45,121,160,.25) !important;
+            background: #fff !important;
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <button type="button" id="btnVoltarTop" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-save me-1"></i> Guardar
-                </button>
+            <div class="utente-body">
+                <div class="details-card">
 
-                <button type="button" id="btnVoltar" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left me-1"></i> Voltar atrás
-                </button>
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">
+                            <i class="bi bi-journal-text me-2"></i> @ViewData["Title"]
+                        </h2>
+                    </div>
+
+                    <form asp-action="Observacoes" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdConsulta" />
+
+                        <div class="mb-3">
+                            <label asp-for="Observacoes" class="form-label"></label>
+                            <textarea asp-for="Observacoes"
+                                      class="form-control hw-textarea"
+                                      rows="10"
+                                      placeholder="Escreva aqui as observações relativas à consulta..."></textarea>
+                            <span asp-validation-for="Observacoes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-success hb-btn">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+
+                            <button type="button" id="btnVoltar" class="btn btn-secondary hb-btn">
+                                <i class="bi bi-arrow-left"></i> Voltar atrás
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
             </div>
 
-        </form>
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -41,10 +205,10 @@
     <script>
         (function () {
             const form = document.querySelector('form');
-            const textarea = document.getElementById('Observacoes'); // id gerado pelo asp-for normalmente é "Observacoes"
+            const textarea = document.getElementById('Observacoes');
             const btnVoltar = document.getElementById('btnVoltar');
+            const btnVoltarTop = document.getElementById('btnVoltarTop');
 
-            // valor inicial (o que veio da BD)
             const initialValue = (textarea?.value || "");
             let isDirty = false;
 
@@ -54,23 +218,23 @@
                 });
             }
 
-            // se clicar no "Voltar atrás"
-            btnVoltar?.addEventListener('click', function () {
+            function goBack() {
                 if (isDirty) {
                     const ok = confirm("Pretende sair sem guardar?");
                     if (!ok) return;
                 }
                 window.history.back();
-            });
+            }
 
-            // opcional: se tentar fechar/refresh da página com alterações
+            btnVoltar?.addEventListener('click', goBack);
+            btnVoltarTop?.addEventListener('click', goBack);
+
             window.addEventListener('beforeunload', function (e) {
                 if (!isDirty) return;
                 e.preventDefault();
                 e.returnValue = '';
             });
 
-            // quando submeter (Guardar), não mostrar avisos
             form?.addEventListener('submit', function () {
                 isDirty = false;
             });

@@ -4,54 +4,234 @@
     ViewData["Title"] = "Relatório Geral de Consultas";
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="row g-3">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Consultas marcadas (total)</h6>
-                <h2 class="mb-0">@Model.TotalMarcadas</h2>
-            </div>
-        </div>
-    </div>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Consultas canceladas</h6>
-                <h2 class="mb-0">@Model.TotalCanceladas</h2>
-            </div>
-        </div>
-    </div>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Consultas não canceladas</h6>
-                <h2 class="mb-0">@Model.TotalNaoCanceladas</h2>
-            </div>
-        </div>
-    </div>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-    <div class="col-md-6">
-        <div class="card shadow-sm border-success">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Consultas realizadas</h6>
-                <h2 class="mb-0">@Model.TotalRealizadas</h2>
-                <small class="text-muted">(já passaram e têm observações)</small>
-            </div>
-        </div>
-    </div>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-    <div class="col-md-6">
-        <div class="card shadow-sm border-warning">
-            <div class="card-body text-center">
-                <h6 class="text-muted">Consultas faltadas</h6>
-                <h2 class="mb-0">@Model.TotalFaltadas</h2>
-                <small class="text-muted">(já passaram, não canceladas, sem observações)</small>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .metric-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        height: 100%;
+        text-align: center;
+    }
+
+    .metric-label {
+        margin: 0;
+        color: #2b546c;
+        font-weight: 800;
+        font-size: .95rem;
+        opacity: .9;
+    }
+
+    .metric-value {
+        margin: 6px 0 0 0;
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 2rem;
+    }
+
+    .metric-sub {
+        margin: 6px 0 0 0;
+        color: #2b546c;
+        opacity: .8;
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .metric-success {
+        border-color: rgba(25,135,84,.35);
+        background: #e9fff1;
+    }
+
+    .metric-warn {
+        border-color: rgba(255,193,7,.45);
+        background: #fff3cd;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" asp-controller="Consultas" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
             </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">
+                            <i class="bi bi-clipboard-data me-2"></i> @ViewData["Title"]
+                        </h2>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <div class="metric-card">
+                                <p class="metric-label">Consultas marcadas (total)</p>
+                                <p class="metric-value">@Model.TotalMarcadas</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="metric-card">
+                                <p class="metric-label">Consultas canceladas</p>
+                                <p class="metric-value">@Model.TotalCanceladas</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="metric-card">
+                                <p class="metric-label">Consultas não canceladas</p>
+                                <p class="metric-value">@Model.TotalNaoCanceladas</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="metric-card metric-success">
+                                <p class="metric-label">Consultas realizadas</p>
+                                <p class="metric-value">@Model.TotalRealizadas</p>
+                                <p class="metric-sub">(já passaram e têm observações)</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="metric-card metric-warn">
+                                <p class="metric-label">Consultas faltadas</p>
+                                <p class="metric-value">@Model.TotalFaltadas</p>
+                                <p class="metric-sub">(já passaram, não canceladas, sem observações)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
         </div>
     </div>
 </div>
-

@@ -3,11 +3,19 @@
 
 @{
     ViewData["Title"] = "Eliminar Consulta";
-    var dataMarcacao = Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm");
-    var dataConsulta = Model.DataConsulta.ToString("dd/MM/yyyy HH:mm");
-    var dataCancelamento = Model.DataCancelamento.HasValue ? Model.DataCancelamento.Value.ToString("dd/MM/yyyy HH:mm") : "—";
-    var horaInicio = Model.HoraInicio.ToString("HH\\:mm");
-    var horaFim = Model.HoraFim.ToString("HH\\:mm");
+
+    var dataMarcacao = Model?.DataMarcacao.ToString("dd/MM/yyyy HH:mm") ?? "—";
+    var dataConsulta = Model?.DataConsulta.ToString("dd/MM/yyyy HH:mm") ?? "—";
+    var dataCancelamento = Model?.DataCancelamento.HasValue == true
+        ? Model.DataCancelamento!.Value.ToString("dd/MM/yyyy HH:mm")
+        : "—";
+
+    var horaInicio = Model?.HoraInicio.ToString(@"hh\:mm") ?? "—";
+    var horaFim = Model?.HoraFim.ToString(@"hh\:mm") ?? "—";
+
+    var medico = Model?.Doctor?.Nome ?? "—";
+    var especialidade = Model?.Speciality?.Nome ?? "—";
+    var emailUtente = Model?.UtenteSaude?.Client?.Email ?? "—";
 }
 
 <style>
@@ -70,6 +78,7 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        white-space: nowrap;
     }
 
         .utente-btn:hover {
@@ -166,7 +175,7 @@
 
                     <div class="utente-actions">
                         <a asp-action="Index" class="utente-btn">
-                            <i class="bi bi-x-circle"></i> Cancelar
+                            <i class="bi bi-arrow-left"></i> Voltar
                         </a>
                     </div>
                 </div>
@@ -218,6 +227,27 @@
                                     <span class="val">@horaFim</span>
                                 </div>
                             </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="info-item">
+                                    <span class="lbl">Médico</span>
+                                    <span class="val">@medico</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="info-item">
+                                    <span class="lbl">Especialidade</span>
+                                    <span class="val">@especialidade</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="info-item">
+                                    <span class="lbl">Email do Utente</span>
+                                    <span class="val">@emailUtente</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -230,7 +260,7 @@
                         </button>
 
                         <a asp-action="Index" class="btn btn-secondary hb-btn">
-                            <i class="bi bi-arrow-left"></i> Voltar
+                            <i class="bi bi-x-circle"></i> Cancelar
                         </a>
                     </form>
 
