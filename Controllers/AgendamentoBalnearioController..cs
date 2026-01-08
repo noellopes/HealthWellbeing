@@ -1,4 +1,10 @@
-﻿using System;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,11 +22,48 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Agendamento
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string pesquisarNomeUtente, int pagina = 1)
         {
-            var HealthWellbeingDbContext = _context.Agendamentos.Include(a => a.Servico).Include(a => a.Terapeuta).Include(a => a.UtenteBalneario);
-            return View(await HealthWellbeingDbContext.ToListAsync());
+            int itensPorPagina = 5;
+
+            var query = _context.Agendamentos
+                .Include(a => a.UtenteBalneario)
+                .Include(a => a.Terapeuta)
+                .Include(a => a.Servico)
+                .Include(a => a.TipoServico)
+                .AsQueryable();
+
+            // Pesquisa pelo nome do cliente
+            if (!string.IsNullOrEmpty(pesquisarNomeUtente))
+            {
+                query = query.Where(a =>
+                    a.UtenteBalneario != null &&
+                    a.UtenteBalneario.NomeCompleto.Contains(pesquisarNomeUtente));
+            }
+
+            int totalItens = await query.CountAsync();
+
+            var agendamentos = await query
+                .OrderByDescending(a => a.HoraInicio)
+                .Skip((pagina - 1) * itensPorPagina)
+                .Take(itensPorPagina)
+                .ToListAsync();
+
+            var viewModel = new AgendamentoBalnearioViewModel
+            {
+                ListaAgendamentos = agendamentos,
+                PesquisarNomeUtente = pesquisarNomeUtente,
+                paginacao = new Paginacao(
+                    totalRegistos: totalItens,
+                    pagina: pagina,
+                    pageSize: itensPorPagina
+                )
+            };
+
+            return View(viewModel);
         }
+
+
 
         // GET: Agendamento/Details/5
         public async Task<IActionResult> Details(int? id)
