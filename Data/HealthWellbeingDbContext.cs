@@ -34,7 +34,6 @@ namespace HealthWellbeing.Data
         public DbSet<ObjetivoFisico> ObjetivoFisico { get; set; } = default!;
         public DbSet<UtenteGrupo7ProblemaSaude> UtenteProblemaSaude { get; set; } = default!;
         public DbSet<LimitacaoMedica> LimitacaoMedica { get; set; } = default!;
-        public DbSet<PlanoExercicioExercicio> PlanoExercicioExercicios { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
