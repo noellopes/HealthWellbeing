@@ -21,6 +21,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Medico,Rececisnista,DiretorClinico")]
         // GET: /AgendaMedicas
         public async Task<IActionResult> Index()
         {
@@ -139,16 +140,21 @@ namespace HealthWellbeing.Controllers
 
             foreach (var dia in vm.Dias.Where(d => datas15Uteis.Contains(d.Data)))
             {
-                // manhã
                 await UpsertPeriodo(doctor.IdMedico, dia.Data, "Manha", dia.Manha);
-
-                // tarde
                 await UpsertPeriodo(doctor.IdMedico, dia.Data, "Tarde", dia.Tarde);
+            }
+
+            // <- se alguma validação em UpsertPeriodo falhou, ModelState fica inválido aqui
+            if (!ModelState.IsValid)
+            {
+                // voltar a mostrar o formulário com as mensagens de erro
+                return View(vm);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(MinhaAgenda15Dias));
         }
+
 
         private async Task UpsertPeriodo(int idMedico, DateOnly data, string periodo, MedicoAgendaVM? p)
         {
@@ -167,13 +173,40 @@ namespace HealthWellbeing.Controllers
                 return;
             }
 
-            // validação hora
+            // validação hora fim > hora início
             if (p.HoraFim <= p.HoraInicio)
             {
-                ModelState.AddModelError("", $"Hora fim tem de ser posterior à hora início em {data:dd/MM/yyyy} ({periodo}).");
+                ModelState.AddModelError("",
+                    $"Hora fim tem de ser posterior à hora início em {data:dd/MM/yyyy} ({periodo}).");
                 return;
             }
 
+            // limites de período (ajusta para TimeOnly se for o teu caso)
+            var limiteManhaFim = new TimeOnly(14, 0, 0);      // 14:00
+            var limiteTardeMax = new TimeOnly(23, 59, 59);    // antes da meia-noite
+
+            if (periodo == "Manha")
+            {
+                // manhã só pode até às 13:59:59
+                if (p.HoraInicio >= limiteManhaFim || p.HoraFim > limiteManhaFim)
+                {
+                    ModelState.AddModelError("",
+                        $"No período da manhã de {data:dd/MM/yyyy} o horário tem de ser antes das 14:00.");
+                    return;
+                }
+            }
+            else if (periodo == "Tarde")
+            {
+                // tarde tem de começar às 14:00 ou depois, e terminar antes da meia-noite
+                if (p.HoraInicio < limiteManhaFim || p.HoraFim <= limiteManhaFim || p.HoraFim > limiteTardeMax)
+                {
+                    ModelState.AddModelError("",
+                        $"No período da tarde de {data:dd/MM/yyyy} o horário tem de ser >= 14:00 e antes da 00:00.");
+                    return;
+                }
+            }
+
+            // se chegou aqui, está tudo válido → insere ou atualiza
             if (existente == null)
             {
                 _context.AgendaMedica.Add(new AgendaMedica
@@ -181,7 +214,7 @@ namespace HealthWellbeing.Controllers
                     IdMedico = idMedico,
                     Data = data,
                     DiaSemana = data.DayOfWeek, // só visual
-                    Periodo = periodo,          // "Manha" / "Tarde"
+                    Periodo = periodo,        // "Manha" / "Tarde"
                     HoraInicio = p.HoraInicio,
                     HoraFim = p.HoraFim
                 });
