@@ -1,6 +1,5 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.AgendamentoBalneario>
 
-
 @{
     ViewData["Title"] = "Agendamentos";
 }
@@ -39,8 +38,6 @@
                     <td>
                         @(item.Terapeuta != null ? item.Terapeuta.Nome : "---")
                     </td>
-                    <td>@Html.DisplayFor(modelItem => item.Servico.Nome)</td>
-                    <td>@Html.DisplayFor(modelItem => item.TipoServico.Nome)</td>
 
                     <!-- Data formatada sem quebrar linha -->
                     <td class="text-nowrap">@item.HoraInicio.ToString("dd/MM/yyyy HH:mm")</td>
@@ -62,7 +59,6 @@
                         <span class="badge @estadoClass">@Html.DisplayFor(modelItem => item.Estado)</span>
                     </td>
 
-                    <!-- AÇÕES: Classe text-nowrap força ficar na mesma linha -->
                     <td class="text-center text-nowrap">
                         <div class="btn-group btn-group-sm shadow-sm" role="group">
                             <a asp-action="Edit" asp-route-id="@item.AgendamentoId" class="btn btn-primary text-white" title="Editar">
