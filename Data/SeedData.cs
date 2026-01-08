@@ -10,7 +10,7 @@ namespace HealthWellbeing.Data
 {
     public static class SeedData
     {
-        public static void Populate(HealthWellbeingDbContext dbContext, UserManager<IdentityUser> userManager)
+        public static void Populate(HealthWellbeingDbContext dbContext)
         {
             if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
 
@@ -39,11 +39,6 @@ namespace HealthWellbeing.Data
 
             // 6. Tipos de Exercício e Benefícios (Independente)
             PopulateTiposExercicio(dbContext);
-            Populate5Utentes(dbContext, userManager);
-            PopulatePlanosParaUtentes(dbContext);
-            PopulateExerciciosDosPlanos(dbContext);
-            PopulateHistoricoUtenteEspecial(dbContext);
-            MarcarExerciciosConcluidos(dbContext);
 
         }
 
@@ -1261,110 +1256,6 @@ namespace HealthWellbeing.Data
                     await userManager.AddToRoleAsync(utenteUser, Roles.Utente);
                 }
             }
-        }
-        private static void Populate5Utentes(HealthWellbeingDbContext dbContext, UserManager<IdentityUser> userManager)
-        {
-            if (dbContext.UtenteGrupo7.Any()) return;
-
-            var objetivo = dbContext.ObjetivoFisico.First();
-
-            var emails = new[]
-            {
-            "utente1@ginasio.com",
-            "utente2@ginasio.com",
-            "utente3@ginasio.com",
-            "utente4@ginasio.com",
-            "utente5@ginasio.com" // ESTE VAI TER 5 PLANOS
-            };
-
-            for (int i = 0; i < emails.Length; i++)
-            {
-                var user = userManager.Users.First(u => u.Email == emails[i]);
-
-                dbContext.UtenteGrupo7.Add(new UtenteGrupo7
-                {
-                    UserId = user.Id,
-                    Nome = $"Utente {i + 1}",
-                    ObjetivoFisicoId = objetivo.ObjetivoFisicoId
-                });
-            }
-
-            dbContext.SaveChanges();
-        }
-        private static void PopulatePlanosParaUtentes(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.PlanoExercicios.Any()) return;
-
-            var utentes = dbContext.UtenteGrupo7.ToList();
-
-            foreach (var utente in utentes)
-            {
-                int totalPlanos = utente.Nome == "Utente 5" ? 5 : 1;
-
-                for (int i = 0; i < totalPlanos; i++)
-                {
-                    dbContext.PlanoExercicios.Add(new PlanoExercicios
-                    {
-                        UtenteGrupo7Id = utente.UtenteGrupo7Id
-                    });
-                }
-            }
-
-            dbContext.SaveChanges();
-        }
-        private static void PopulateExerciciosDosPlanos(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.PlanoExercicioExercicios.Any()) return;
-
-            var exercicios = dbContext.Exercicio.Take(6).ToList();
-            var planos = dbContext.PlanoExercicios.ToList();
-
-            foreach (var plano in planos)
-            {
-                foreach (var ex in exercicios.Take(3))
-                {
-                    dbContext.PlanoExercicioExercicios.Add(new PlanoExercicioExercicio
-                    {
-                        PlanoExerciciosId = plano.PlanoExerciciosId,
-                        ExercicioId = ex.ExercicioId,
-                        Concluido = false
-                    });
-                }
-            }
-
-            dbContext.SaveChanges();
-        }
-        private static void PopulateHistoricoUtenteEspecial(HealthWellbeingDbContext dbContext)
-        {
-            if (dbContext.HistoricoAtividades.Any()) return;
-
-            var utente5 = dbContext.UtenteGrupo7.First(u => u.Nome == "Utente 5");
-            var exercicios = dbContext.Exercicio.Take(3).ToList();
-
-            foreach (var ex in exercicios)
-            {
-                dbContext.HistoricoAtividades.Add(new HistoricoAtividade
-                {
-                    UtenteGrupo7Id = utente5.UtenteGrupo7Id,
-                    ExercicioId = ex.ExercicioId,
-                    DataRealizacao = DateTime.Now.AddDays(-1)
-                });
-            }
-
-            dbContext.SaveChanges();
-        }
-        private static void MarcarExerciciosConcluidos(HealthWellbeingDbContext dbContext)
-        {
-            var plano = dbContext.PlanoExercicios
-                .Include(p => p.PlanoExercicioExercicios)
-                .First(p => p.UtenteGrupo7.Nome == "Utente 5");
-
-            foreach (var ex in plano.PlanoExercicioExercicios.Take(3))
-            {
-                ex.Concluido = true;
-            }
-
-            dbContext.SaveChanges();
         }
     }
 }
