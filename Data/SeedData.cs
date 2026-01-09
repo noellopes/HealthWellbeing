@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 internal class SeedData
 {
@@ -197,31 +198,60 @@ internal class SeedData
         }
     }
 
-    private static void PopulateGoals(HealthWellbeingDbContext dbContext)
+    private static void PopulateGoals(HealthWellbeingDbContext context)
     {
-        if (dbContext.Goal != null && !dbContext.Goal.Any())
+        if (context.Goal == null) return;
+
+        // Evitar duplicar (se já houver goals, não mexe)
+        if (context.Goal.Any()) return;
+
+        var clients = context.Client
+            .AsNoTracking()
+            .OrderBy(c => c.ClientId)
+            .ToList();
+
+        if (!clients.Any()) return;
+
+        var rnd = new Random(123);
+
+        // Templates simples para variar valores
+        var templates = new[]
         {
-            var clients = dbContext.Client.OrderBy(c => c.ClientId).ToList();
+        new { Name = "Maintenance", Cal = 2100, Prot = 120, Fat = 70, Hyd = 260, Vit = 60 },
+        new { Name = "Weight Loss", Cal = 1700, Prot = 140, Fat = 55, Hyd = 220, Vit = 65 },
+        new { Name = "Muscle Gain", Cal = 2600, Prot = 170, Fat = 80, Hyd = 300, Vit = 70 },
+        new { Name = "Recomposition", Cal = 2200, Prot = 150, Fat = 65, Hyd = 260, Vit = 65 },
+    };
 
-            var goals = new List<Goal>();
-            foreach (var c in clients)
+        var goals = new List<Goal>();
+
+        foreach (var c in clients)
+        {
+            var t = templates[rnd.Next(templates.Length)];
+
+            // Pequena variação para não serem todos iguais
+            int calVar = rnd.Next(-150, 151);          // -150..+150
+            int protVar = rnd.Next(-10, 11);           // -10..+10
+            int fatVar = rnd.Next(-8, 9);              // -8..+8
+            int hydVar = rnd.Next(-40, 41);            // -40..+40
+            int vitVar = rnd.Next(-5, 6);              // -5..+5
+
+            goals.Add(new Goal
             {
-                goals.Add(new Goal
-                {
-                    ClientId = c.ClientId,
-                    GoalName = "Maintenance",
-                    DailyCalories = 2000,
-                    DailyProtein = 120,
-                    DailyFat = 70,
-                    DailyHydrates = 250,
-                    DailyVitamins = 60
-                });
-            }
-
-            dbContext.Goal.AddRange(goals);
-            dbContext.SaveChanges();
+                ClientId = c.ClientId,
+                GoalName = t.Name,
+                DailyCalories = Math.Max(1200, t.Cal + calVar),
+                DailyProtein = Math.Max(50, t.Prot + protVar),
+                DailyFat = Math.Max(30, t.Fat + fatVar),
+                DailyHydrates = Math.Max(100, t.Hyd + hydVar),
+                DailyVitamins = Math.Max(30, t.Vit + vitVar)
+            });
         }
+
+        context.Goal.AddRange(goals);
+        context.SaveChanges();
     }
+
 
     private static void PopulateFoodHabitsPlans(HealthWellbeingDbContext dbContext)
     {
