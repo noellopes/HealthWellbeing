@@ -140,6 +140,16 @@
                     </div>
 
                     <div class="utente-actions">
+                        
+                        @if (User.IsInRole("Utente"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        else if (User.IsInRole("Rececionista"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+
                         @if (User.IsInRole("Medico"))
                         {
                             <a class="utente-btn" asp-action="MinhaAgenda15Dias">
