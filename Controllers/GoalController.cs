@@ -72,12 +72,10 @@ namespace HealthWellbeing.Controllers
 
         private void CalculateAndFillMacros(Client client, Goal goal)
         {
-            
             goal.DailyCalories = (int)Math.Round(
                 CalculateGoalCalories(client, goal.GoalName)
             );
 
-            
             double proteinFactor = goal.GoalName switch
             {
                 "gain" => 1.6,
@@ -89,21 +87,18 @@ namespace HealthWellbeing.Controllers
             goal.DailyProtein = (int)Math.Round(proteinGrams);
             double proteinKcal = proteinGrams * 4;
 
-            
             double fatKcal = goal.DailyCalories * 0.30;
             double fatGrams = fatKcal / 9;
             goal.DailyFat = (int)Math.Round(fatGrams);
 
-           
             double carbsKcal = goal.DailyCalories - (proteinKcal + fatKcal);
             if (carbsKcal < 0) carbsKcal = 0;
 
             goal.DailyHydrates = (int)Math.Round(carbsKcal / 4);
-
         }
 
         // =====================================================
-        //  INDEX
+        //  INDEX (PaginationInfo + search)
         // =====================================================
         public async Task<IActionResult> Index(int page = 1, string? search = "")
         {
@@ -144,9 +139,6 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-
-
-
         // =====================================================
         // DETAILS
         // =====================================================
@@ -164,27 +156,25 @@ namespace HealthWellbeing.Controllers
         }
 
         // =====================================================
-        //  CREATE
+        // CREATE
         // =====================================================
         public IActionResult Create()
         {
-            ViewData["ClientId"] =
-                new SelectList(_context.Client, "ClientId", "Email");
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name");
 
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            [Bind("ClientId,GoalName")] Goal goal)
+        public async Task<IActionResult> Create([Bind("ClientId,GoalName")] Goal goal)
         {
             var client = await _context.Client.FindAsync(goal.ClientId);
             if (client == null)
             {
                 ModelState.AddModelError("", "Client not found.");
-                ViewData["ClientId"] =
-                    new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", goal.ClientId);
+
                 return View(goal);
             }
 
@@ -197,14 +187,11 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ClientId"] =
-                new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
-
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
             return View(goal);
         }
-
-        // ====================================================
-        //  EDIT
+        // =====================================================
+        // EDIT
         // =====================================================
         public async Task<IActionResult> Edit(int? id)
         {
@@ -213,17 +200,25 @@ namespace HealthWellbeing.Controllers
             var goal = await _context.Goal.FindAsync(id);
             if (goal == null) return NotFound();
 
-            ViewData["ClientId"] =
-                new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            // Dropdown de clientes
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+
+            // Dropdown de GoalName
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+            new { Value = "gain", Text = "Gain" },
+            new { Value = "lose", Text = "Lose" },
+            new { Value = "maintain", Text = "Maintain" }
+                }, "Value", "Text", goal.GoalName
+            );
 
             return View(goal);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(
-            int id,
-            [Bind("GoalId,ClientId,GoalName")] Goal goal)
+        public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,GoalName")] Goal goal)
         {
             if (id != goal.GoalId) return NotFound();
 
@@ -231,9 +226,22 @@ namespace HealthWellbeing.Controllers
             if (client == null)
             {
                 ModelState.AddModelError("", "Client not found.");
+                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+
+                
+                ViewBag.GoalOptions = new SelectList(
+                    new[]
+                    {
+                 new { Value = "lose", Text = "Weight Loss" },
+                 new { Value = "maintain", Text = "Maintenance" },
+                 new { Value = "gain", Text = "Muscle Gain" }
+                    }, "Value", "Text", goal.GoalName
+                );
+
                 return View(goal);
             }
 
+            // Calcula macros automaticamente
             CalculateAndFillMacros(client, goal);
 
             if (ModelState.IsValid)
@@ -243,11 +251,21 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+            new { Value = "gain", Text = "Gain" },
+            new { Value = "lose", Text = "Lose" },
+            new { Value = "maintain", Text = "Maintain" }
+                }, "Value", "Text", goal.GoalName
+            );
+
             return View(goal);
         }
-
         // =====================================================
-        //  DELETE
+        // DELETE
         // =====================================================
         public async Task<IActionResult> Delete(int? id)
         {
