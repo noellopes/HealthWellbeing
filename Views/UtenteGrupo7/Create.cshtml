@@ -3,140 +3,160 @@
 @{
     ViewData["Title"] = "Criar Novo Utente";
     var problemasSaude = ViewBag.ProblemasSaudeCheckboxes as List<SelectListItem>;
+    // Se for Admin ou Profissional, esta variável fica true
+    bool acessoNegado = User.IsInRole("Administrador") || User.IsInRole("ProfissionalSaude");
 }
 
 <div class="container mt-4">
 
-    @if (TempData["StatusMessage"] != null)
+    @if (acessoNegado)
     {
-        var message = TempData["StatusMessage"].ToString();
-        var alertClass = "alert-info";
-        var icon = "ℹ️";
-
-        if (message.StartsWith("Erro"))
-        {
-            alertClass = "alert-danger";
-            icon = "❌";
-        }
-        else if (message.StartsWith("Aviso"))
-        {
-            alertClass = "alert-warning";
-            icon = "⚠️";
-        }
-        else if (message.StartsWith("Sucesso"))
-        {
-            alertClass = "alert-success";
-            icon = "✅";
-        }
-
-        <div class="alert @alertClass alert-dismissible fade show border-start border-4 shadow-sm mb-4" role="alert">
-            <div class="d-flex align-items-center">
-                <h2 class="me-3 mb-0">@icon</h2>
-                <div>
-                    <h5 class="alert-heading fw-bold mb-1">Notificação</h5>
-                    <p class="mb-0 text-dark">@message</p>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8">
+                <div class="card shadow border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0"><i class="bi bi-slash-circle"></i> Ação Não Permitida</h4>
+                    </div>
+                    <div class="card-body text-center p-5">
+                        <h1 class="display-4 text-danger mb-3"><i class="bi bi-person-x-fill"></i></h1>
+                        <h3 class="fw-bold">Acesso Restrito</h3>
+                        <p class="lead mt-3">
+                            Como <strong>Administrador</strong> ou <strong>Profissional de Saúde</strong>,
+                            não pode criar perfis de Utente manualmente nesta secção.
+                        </p>
+                        <p class="text-muted">
+                            Os Utentes devem registar-se autonomamente ou o perfil deve ser criado através do painel de administração específico (se aplicável).
+                        </p>
+                        <hr />
+                        <a href="/" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-arrow-left"></i> Voltar ao Início
+                        </a>
+                    </div>
                 </div>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+    else
+    {
+        @if (TempData["StatusMessage"] != null)
+        {
+            var message = TempData["StatusMessage"].ToString();
+            var alertClass = "alert-info";
+            var icon = "ℹ️";
 
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+            if (message.StartsWith("Erro"))
+            {
+                alertClass = "alert-danger";
+                icon = "❌";
+            }
+            else if (message.StartsWith("Aviso"))
+            {
+                alertClass = "alert-warning";
+                icon = "⚠️";
+            }
+            else if (message.StartsWith("Sucesso"))
+            {
+                alertClass = "alert-success";
+                icon = "✅";
+            }
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="text-success fw-bold">Novo Perfil de Utente</h2>
-            </div>
-
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Dados Pessoais e Clínicos</h5>
+            <div class="alert @alertClass alert-dismissible fade show border-start border-4 shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <h2 class="me-3 mb-0">@icon</h2>
+                    <div>
+                        <h5 class="alert-heading fw-bold mb-1">Notificação</h5>
+                        <p class="mb-0 text-dark">@message</p>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <form asp-action="Create" method="post">
-                        @Html.AntiForgeryToken()
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
 
-                        <input type="hidden" name="UserId" value="@ViewBag.UserId" />
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger small mb-3"></div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="text-success fw-bold">Novo Perfil de Utente</h2>
+                </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="Nome" class="form-label fw-bold">Nome Completo <span class="text-danger">*</span></label>
-                                <input asp-for="Nome" class="form-control form-control-lg" placeholder="Insira o seu nome" />
-                                <span asp-validation-for="Nome" class="text-danger small"></span>
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Dados Pessoais e Clínicos</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="UserId" value="@ViewBag.UserId" />
+
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger small mb-3"></div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="Nome" class="form-label fw-bold">Nome Completo <span class="text-danger">*</span></label>
+                                    <input asp-for="Nome" class="form-control form-control-lg" placeholder="Insira o seu nome" />
+                                    <span asp-validation-for="Nome" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label asp-for="ObjetivoFisicoId" class="form-label fw-bold">Objetivo Físico</label>
+                                    <select asp-for="ObjetivoFisicoId" class="form-select form-select-lg" asp-items="ViewBag.ObjetivoFisicoId">
+                                        <option value="">-- Selecione o seu objetivo --</option>
+                                    </select>
+                                    <span asp-validation-for="ObjetivoFisicoId" class="text-danger small"></span>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-4">
-                                <label asp-for="ObjetivoFisicoId" class="form-label fw-bold">Objetivo Físico</label>
-                                <select asp-for="ObjetivoFisicoId" class="form-select form-select-lg" asp-items="ViewBag.ObjetivoFisicoId">
-                                    <option value="">-- Selecione o seu objetivo --</option>
-                                </select>
-                                <span asp-validation-for="ObjetivoFisicoId" class="text-danger small"></span>
-                            </div>
-                        </div>
 
-                        @if (User.IsInRole("Administrador"))
-                        {
-                            <div class="mb-4 p-3 bg-light border rounded border-primary">
-                                <label asp-for="ProfissionalSaudeId" class="form-label fw-bold text-primary">
-                                    👨‍⚕️ Atribuir Profissional de Saúde (Admin)
-                                </label>
-                                <select asp-for="ProfissionalSaudeId" class="form-select" asp-items="ViewBag.ProfissionalSaudeId">
-                                    <option value="">-- Nenhum (Utente sem acompanhamento) --</option>
-                                </select>
-                            </div>
-                        }
+                            <div class="mb-4">
+                                <label class="form-label fw-bold d-block">Histórico Médico / Problemas de Saúde</label>
+                                <small class="text-muted d-block mb-2">
+                                    Selecione todas as condições que possui. Isto é fundamental para o sistema
+                                    <strong>bloquear exercícios perigosos</strong> para si.
+                                </small>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold d-block">Histórico Médico / Problemas de Saúde</label>
-                            <small class="text-muted d-block mb-2">
-                                Selecione todas as condições que possui. Isto é fundamental para o sistema
-                                <strong>bloquear exercícios perigosos</strong> para si.
-                            </small>
+                                <div class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;">
+                                    @if (problemasSaude != null && problemasSaude.Any())
+                                    {
+                                        <div class="row">
+                                            @foreach (var p in problemasSaude)
+                                            {
+                                                <div class="col-md-6 col-lg-4 mb-2">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" name="selectedProblemas"
+                                                               value="@p.Value"
+                                                               class="form-check-input"
+                                                               id="prob_@p.Value"
+                                                               @(p.Selected ? "checked" : "") />
 
-                            <div class="border p-3 rounded bg-light" style="max-height: 300px; overflow-y: auto;">
-                                @if (problemasSaude != null && problemasSaude.Any())
-                                {
-                                    <div class="row">
-                                        @foreach (var p in problemasSaude)
-                                        {
-                                            <div class="col-md-6 col-lg-4 mb-2">
-                                                <div class="form-check">
-                                                    <input type="checkbox" name="selectedProblemas"
-                                                           value="@p.Value"
-                                                           class="form-check-input"
-                                                           id="prob_@p.Value"
-                                                           @(p.Selected ? "checked" : "") />
-
-                                                    <label class="form-check-label text-dark" for="prob_@p.Value">
-                                                        @p.Text
-                                                    </label>
+                                                        <label class="form-check-label text-dark" for="prob_@p.Value">
+                                                            @p.Text
+                                                        </label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="text-muted fst-italic text-center py-2">
-                                        Não existem problemas de saúde registados no sistema.
-                                    </div>
-                                }
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted fst-italic text-center py-2">
+                                            Não existem problemas de saúde registados no sistema.
+                                        </div>
+                                    }
+                                </div>
                             </div>
-                        </div>
 
-                        <hr />
+                            <hr />
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                            <a asp-action="Index" class="btn btn-outline-secondary px-4 me-md-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success btn-lg px-5">Gravar Perfil</button>
-                        </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4 me-md-2">Cancelar</a>
+                                <button type="submit" class="btn btn-success btn-lg px-5">Gravar Perfil</button>
+                            </div>
 
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 </div>
 
 @section Scripts {
