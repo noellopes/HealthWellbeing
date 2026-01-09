@@ -1,15 +1,25 @@
-﻿@using HealthWellbeing.Models
+﻿```cshtml
+@using HealthWellbeing.Models
 @model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.Specialities>
 
 @{
     ViewData["Title"] = "Especialidades";
+
     var q = ViewBag.SearchQuery as string ?? "";
+
     var podeGerirEspecialidades =
         User.IsInRole("Administrador") || User.IsInRole("DiretorClinico");
+
+    bool isFirst = Model.CurrentPage <= 1;
+    bool isLast = Model.CurrentPage >= Model.TotalPages;
+
+    var saudacao =
+        User.IsInRole("Administrador") ? "Bem-vindo, Administrador" :
+        User.IsInRole("DiretorClinico") ? "Bem-vindo, Diretor Clínico" :
+        "Bem-vindo";
 }
 
 <style>
-    /* Tema base (igual ao resto do teu projeto) */
     .utente-wrapper {
         background: #1f4f6a;
         border-radius: 10px;
@@ -65,7 +75,7 @@
         border: none;
         background: #2d79a0;
         color: #fff;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -82,6 +92,7 @@
             opacity: .92;
             pointer-events: none;
             cursor: default;
+            box-shadow: inset 0 0 0 2px rgba(255,255,255,.18);
         }
 
         .utente-btn:hover {
@@ -103,7 +114,6 @@
         border-radius: 0 0 8px 8px;
     }
 
-    /* Card branco interno */
     .content-card {
         background: #fff;
         border-radius: 12px;
@@ -122,41 +132,6 @@
         margin: 6px 0 0 0;
         color: #2b546c;
         font-weight: 600;
-    }
-
-    /* Cards de especialidade */
-    .spec-card {
-        background: #f7fbfe;
-        border: 1px solid rgba(97,166,199,.35);
-        border-radius: 14px;
-        padding: 14px;
-        height: 100%;
-        box-shadow: 0 2px 10px rgba(0,0,0,.06);
-        transition: transform .06s ease, filter .06s ease;
-    }
-
-        .spec-card:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.01);
-        }
-
-    .spec-name {
-        color: #1f4f6a;
-        font-weight: 900;
-        font-size: 1.05rem;
-        margin: 0;
-    }
-
-    .spec-actions .btn {
-        border-radius: 999px;
-    }
-
-    /* Pesquisa */
-    .search-wrap {
-        background: #f7fbfe;
-        border: 1px solid rgba(97,166,199,.35);
-        border-radius: 12px;
-        padding: 12px;
     }
 
     .welcome-row {
@@ -191,19 +166,91 @@
         .agenda-btn:hover {
             filter: brightness(1.05);
         }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .search-wrap {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .hw-input {
+        border-radius: 14px !important;
+        border: 2px solid rgba(45,121,160,.55) !important;
+        background: #eef7fd !important;
+        color: #1f4f6a !important;
+        font-weight: 700;
+    }
+
+        .hw-input:focus {
+            border-color: #2d79a0 !important;
+            box-shadow: 0 0 0 .2rem rgba(45,121,160,.25) !important;
+            background: #fff !important;
+        }
+
+    .spec-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 14px;
+        padding: 14px;
+        height: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        transition: transform .06s ease, filter .06s ease, box-shadow .1s ease;
+        cursor: pointer;
+    }
+
+        .spec-card:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.01);
+            box-shadow: 0 4px 14px rgba(0,0,0,.10);
+        }
+
+    .spec-name {
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 1.05rem;
+        margin: 0;
+    }
+
+    .spec-hint {
+        margin-top: 8px;
+        color: #2b546c;
+        opacity: .85;
+        font-weight: 700;
+        font-size: .9rem;
+    }
+
+    .spec-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .pagination {
+        justify-content: center;
+        margin-bottom: 0;
+    }
 </style>
 
 <div class="utente-wrapper">
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- TOPO: Logo + menu -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
                         <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
-                             alt="Logo HealthWellbeing"
-                             class="logo-img" />
+                             alt="Logo HealthWellbeing" class="logo-img" />
                     </div>
 
                     <div class="utente-actions">
@@ -211,7 +258,7 @@
                             <i class="bi bi-heart-pulse"></i> Médicos
                         </a>
 
-                        <a class="utente-btn active-lock" asp-controller="Specialities" asp-action="Index">
+                        <a class="utente-btn active-lock" href="#" aria-disabled="true" tabindex="-1">
                             <i class="bi bi-clipboard2-pulse"></i> Especialidades
                         </a>
 
@@ -222,62 +269,71 @@
                 </div>
             </div>
 
-            <!-- CORPO -->
             <div class="utente-body">
-                <!-- Bem-vindo + Agenda Médica -->
-                <div class="welcome-row">
-                    <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
 
-                    <a class="agenda-btn"
-                       asp-controller="AgendaMedicas"
-                       asp-action="Index">
+                <div class="welcome-row">
+                    <h2 class="welcome-title">@saudacao</h2>
+
+                    <a class="agenda-btn" asp-controller="AgendaMedicas" asp-action="Index">
                         <i class="bi bi-calendar2-week"></i> Agenda Médica
                     </a>
                 </div>
 
                 <div class="content-card">
+
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
                             <h3 class="content-title">Especialidades</h3>
                             <p class="content-sub">Gere e consulta as especialidades médicas.</p>
                         </div>
 
-                        @if (podeGerirEspecialidades)
-                        {
-                            <a asp-action="Create" class="btn btn-success">
-                                <i class="bi bi-plus-circle me-1"></i> Nova Especialidade
-                            </a>
-                        }
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-primary hb-btn"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#specSearch"
+                                    aria-expanded="false"
+                                    aria-controls="specSearch">
+                                <i class="bi bi-search"></i> Pesquisar
+                            </button>
+
+                            @if (podeGerirEspecialidades)
+                            {
+                                <a asp-action="Create" class="btn btn-success hb-btn">
+                                    <i class="bi bi-plus-circle"></i> Nova Especialidade
+                                </a>
+                            }
+                        </div>
                     </div>
 
-                    <!-- Pesquisa -->
-                    <div class="search-wrap mt-3">
-                        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-                            <div class="col-12 col-md-8">
-                                <label class="form-label fw-semibold">Pesquisar</label>
-                                <input type="text"
-                                       name="q"
-                                       value="@q"
-                                       class="form-control"
-                                       placeholder="Procurar por nome..." />
-                            </div>
+                    <div class="collapse mt-3 @(string.IsNullOrWhiteSpace(q) ? "" : "show")" id="specSearch">
+                        <div class="search-wrap">
+                            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                                <div class="col-12 col-lg-8">
+                                    <label class="form-label fw-bold" style="color:#1f4f6a;">Pesquisar</label>
+                                    <input type="text"
+                                           name="q"
+                                           value="@q"
+                                           class="form-control hw-input"
+                                           placeholder="Procurar por nome..." />
+                                </div>
 
-                            <div class="col-12 col-md-4 d-flex gap-2">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="bi bi-search me-1"></i> Pesquisar
-                                </button>
+                                <div class="col-12 col-lg-4 d-flex gap-2 flex-wrap">
+                                    <button type="submit" class="btn btn-primary hb-btn flex-grow-1">
+                                        <i class="bi bi-search"></i> Pesquisar
+                                    </button>
 
-                                @if (!string.IsNullOrWhiteSpace(q))
-                                {
-                                    <a asp-action="Index" class="btn btn-secondary w-100">
-                                        Limpar
-                                    </a>
-                                }
-                            </div>
-                        </form>
+                                    @if (!string.IsNullOrWhiteSpace(q))
+                                    {
+                                        <a asp-action="Index" class="btn btn-secondary hb-btn flex-grow-1">
+                                            Limpar
+                                        </a>
+                                    }
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
-                    <!-- Conteúdo -->
                     <div class="mt-3">
                         @if (Model.Items == null || !Model.Items.Any())
                         {
@@ -287,7 +343,7 @@
                                     <p class="mb-1">
                                         Não foram encontradas especialidades para <strong>"@q"</strong>.
                                     </p>
-                                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-2">Ver todas</a>
+                                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary hb-btn mt-2">Ver todas</a>
                                 }
                                 else
                                 {
@@ -302,8 +358,6 @@
                                 {
                                     <div class="col-12 col-md-6 col-lg-4">
                                         <div class="spec-card"
-                                             role="button"
-                                             style="cursor:pointer;"
                                              onclick="location.href='@Url.Action("Details", new { id = item.IdEspecialidade })'">
 
                                             <div class="d-flex justify-content-between align-items-start gap-2">
@@ -311,42 +365,39 @@
 
                                                 @if (podeGerirEspecialidades)
                                                 {
-                                                    <div class="spec-actions btn-group btn-group-sm">
+                                                    <div class="spec-actions" onclick="event.stopPropagation();">
                                                         <a asp-action="Edit"
                                                            asp-route-id="@item.IdEspecialidade"
-                                                           class="btn btn-outline-secondary"
-                                                           onclick="event.stopPropagation();">
-                                                            Editar
+                                                           class="btn btn-sm btn-warning text-white hb-btn">
+                                                            <i class="bi bi-pencil-square"></i> Editar
                                                         </a>
+
                                                         <a asp-action="Delete"
                                                            asp-route-id="@item.IdEspecialidade"
-                                                           class="btn btn-outline-danger"
-                                                           onclick="event.stopPropagation();">
-                                                            Eliminar
+                                                           class="btn btn-sm btn-danger hb-btn">
+                                                            <i class="bi bi-trash"></i> Eliminar
                                                         </a>
                                                     </div>
                                                 }
                                             </div>
 
-                                            <div class="mt-2 text-muted" style="font-size:.92rem;">
-                                                Clique para ver detalhes.
+                                            <div class="spec-hint">
+                                                <i class="bi bi-eye me-1"></i> Clique para ver detalhes
                                             </div>
                                         </div>
                                     </div>
                                 }
                             </div>
 
-                            <!-- Paginação -->
                             @if (Model.TotalPages > 1)
                             {
                                 <nav aria-label="Navegação de páginas" class="mt-4">
-                                    <ul class="pagination justify-content-center mb-0">
-                                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                    <ul class="pagination">
+
+                                        <li class="page-item @(isFirst ? "disabled" : "")">
                                             <a class="page-link"
-                                               asp-action="Index"
-                                               asp-route-page="@(Model.CurrentPage - 1)"
-                                               asp-route-q="@q">
-                                                Anterior
+                                               href="@(isFirst ? "#" : Url.Action("Index", "Specialities", new { page = Model.CurrentPage - 1, q }))">
+                                                «
                                             </a>
                                         </li>
 
@@ -354,27 +405,25 @@
                                         {
                                             <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
                                                 <a class="page-link"
-                                                   asp-action="Index"
-                                                   asp-route-page="@p"
-                                                   asp-route-q="@q">
+                                                   href="@(p == Model.CurrentPage ? "#" : Url.Action("Index", "Specialities", new { page = p, q }))">
                                                     @p
                                                 </a>
                                             </li>
                                         }
 
-                                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                        <li class="page-item @(isLast ? "disabled" : "")">
                                             <a class="page-link"
-                                               asp-action="Index"
-                                               asp-route-page="@(Model.CurrentPage + 1)"
-                                               asp-route-q="@q">
-                                                Seguinte
+                                               href="@(isLast ? "#" : Url.Action("Index", "Specialities", new { page = Model.CurrentPage + 1, q }))">
+                                                »
                                             </a>
                                         </li>
+
                                     </ul>
                                 </nav>
                             }
                         }
                     </div>
+
                 </div>
             </div>
 
@@ -382,3 +431,4 @@
         </div>
     </div>
 </div>
+```
