@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoInicial : Migration
+    public partial class MigracaoAtual : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -904,12 +904,8 @@ namespace HealthWellbeing.Migrations
                     SearchTerm = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdMedico = table.Column<int>(type: "int", nullable: false),
                     IdEspecialidade = table.Column<int>(type: "int", nullable: false),
-<<<<<<<< HEAD:Migrations/20260105165704_MigracaoInicial.cs
-                    IdUtenteSaude = table.Column<int>(type: "int", nullable: false)
-========
                     IdUtenteSaude = table.Column<int>(type: "int", nullable: false),
                     Observacoes = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true)
->>>>>>>> b188da69d4099c0c1968aa3c2613cf33cce7580f:Migrations/20260108175109_MigracaoInicial.cs
                 },
                 constraints: table =>
                 {
@@ -931,10 +927,29 @@ namespace HealthWellbeing.Migrations
                         column: x => x.IdUtenteSaude,
                         principalTable: "UtenteSaude",
                         principalColumn: "UtenteSaudeId",
-<<<<<<<< HEAD:Migrations/20260105165704_MigracaoInicial.cs
-                        onDelete: ReferentialAction.Cascade);
-========
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ConsultaUtente",
+                columns: table => new
+                {
+                    IdConsulta = table.Column<int>(type: "int", nullable: false),
+                    IdUtente = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConsultaUtente", x => new { x.IdConsulta, x.IdUtente });
+                    table.ForeignKey(
+                        name: "FK_ConsultaUtente_Consulta_IdConsulta",
+                        column: x => x.IdConsulta,
+                        principalTable: "Consulta",
+                        principalColumn: "IdConsulta");
+                    table.ForeignKey(
+                        name: "FK_ConsultaUtente_UtenteSaude_IdUtente",
+                        column: x => x.IdUtente,
+                        principalTable: "UtenteSaude",
+                        principalColumn: "UtenteSaudeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -957,7 +972,6 @@ namespace HealthWellbeing.Migrations
                         column: x => x.IdMedico,
                         principalTable: "Doctor",
                         principalColumn: "IdMedico");
->>>>>>>> b188da69d4099c0c1968aa3c2613cf33cce7580f:Migrations/20260108175109_MigracaoInicial.cs
                 });
 
             migrationBuilder.CreateIndex(
@@ -999,6 +1013,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Consulta_IdUtenteSaude",
                 table: "Consulta",
                 column: "IdUtenteSaude");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConsultaUtente_IdUtente",
+                table: "ConsultaUtente",
+                column: "IdUtente");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Doctor_IdEspecialidade",
@@ -1177,6 +1196,9 @@ namespace HealthWellbeing.Migrations
                 name: "ClientAlergy");
 
             migrationBuilder.DropTable(
+                name: "ConsultaUtente");
+
+            migrationBuilder.DropTable(
                 name: "DoctorConsulta");
 
             migrationBuilder.DropTable(
@@ -1228,12 +1250,6 @@ namespace HealthWellbeing.Migrations
                 name: "Training");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:Migrations/20260105165704_MigracaoInicial.cs
-                name: "Alimento");
-
-            migrationBuilder.DropTable(
-========
->>>>>>>> b188da69d4099c0c1968aa3c2613cf33cce7580f:Migrations/20260108175109_MigracaoInicial.cs
                 name: "Beneficio");
 
             migrationBuilder.DropTable(
@@ -1244,9 +1260,6 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "Consulta");
-
-            migrationBuilder.DropTable(
-                name: "UtenteSaude");
 
             migrationBuilder.DropTable(
                 name: "EventType");
