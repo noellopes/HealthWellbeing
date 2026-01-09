@@ -4,31 +4,40 @@
     ViewData["Title"] = "Editar Objetivo";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Objetivo</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-warning text-dark">
+                <i class="bi bi-pencil-square me-2"></i>Editar Objetivo
+            </h1>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="text-warning text-dark fw-bold mb-0">Dados do Objetivo</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
                         <input type="hidden" asp-for="ObjetivoFisicoId" />
 
-                        <div class="mb-3">
-                            <label asp-for="NomeObjetivo" class="form-label fw-bold">Nome do Objetivo</label>
+                        <div class="mb-4">
+                            <label asp-for="NomeObjetivo" class="form-label fw-bold text-muted small text-uppercase">Nome do Objetivo</label>
                             <input asp-for="NomeObjetivo" class="form-control" />
-                            <span asp-validation-for="NomeObjetivo" class="text-danger"></span>
+                            <span asp-validation-for="NomeObjetivo" class="text-danger small"></span>
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a asp-action="Index" class="btn btn-secondary me-md-2">
-                                <i class="bi bi-arrow-left"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-warning">
-                                <i class="bi bi-save"></i> Guardar Alterações
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning px-5 shadow-sm text-dark">
+                                <i class="bi bi-save me-2"></i>Guardar
                             </button>
                         </div>
                     </form>

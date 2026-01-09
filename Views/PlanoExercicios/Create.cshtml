@@ -2,80 +2,107 @@
 
 @{
     ViewData["Title"] = "Criar Plano Manual";
+    // Recupera a lista processada pelo Controller
+    var listaExercicios = ViewBag.ListaExerciciosProcessada as IEnumerable<HealthWellbeing.Controllers.PlanoExerciciosController.ExercicioViewModelManual>;
+    int? utenteId = ViewBag.UtenteSelecionadoId;
 }
 
 <h1 class="mb-3">Criar Plano Manualmente</h1>
 <hr />
 
-<div class="row">
-    <div class="col-md-12">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">1. Seleção do Utente</h5>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label asp-for="UtenteGrupo7Id" class="control-label fw-bold mb-2">Utente</label>
-                        <select asp-for="UtenteGrupo7Id" class="form-select form-select-lg" asp-items="ViewBag.UtenteGrupo7Id">
-                            <option value="">-- Selecione um utente --</option>
-                        </select>
-                        <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
-                    </div>
-                </div>
+<div class="card mb-4 border-primary">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">1. Selecionar Utente</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="get" class="row g-3 align-items-end">
+            <div class="col-md-10">
+                <label for="utenteId" class="form-label fw-bold">Escolha o Utente:</label>
+                <select name="utenteId" id="utenteId" class="form-select form-select-lg" asp-items="ViewBag.UtenteGrupo7Id">
+                    <option value="">-- Selecione --</option>
+                </select>
             </div>
-
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">2. Seleção de Exercícios</h5>
-                </div>
-                <div class="card-body">
-                    <small class="text-muted mb-3 d-block">Selecione os exercícios que farão parte deste plano:</small>
-
-                    <div class="row" style="max-height: 500px; overflow-y: auto;">
-                        @if (ViewBag.TodosExercicios != null)
-                        {
-                            @foreach (var item in (IEnumerable<SelectListItem>)ViewBag.TodosExercicios)
-                            {
-                                <div class="col-md-4 mb-3">
-                                    <div class="card h-100 border-light shadow-sm hover-shadow">
-                                        <div class="card-body p-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox"
-                                                       name="exerciciosSelecionados"
-                                                       value="@item.Value" id="ex_@item.Value" />
-
-                                                <label class="form-check-label fw-bold text-dark" for="ex_@item.Value">
-                                                    @item.Text
-                                                </label>
-                                            </div>
-                                            <div class="mt-2 text-end">
-                                                <a href="@Url.Action("Details", "Exercicio", new { id = item.Value })" target="_blank" class="small text-decoration-none">
-                                                    <i class="bi bi-info-circle"></i> Ver Detalhes
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <p class="text-danger">Não existem exercícios registados.</p>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group d-grid gap-2 d-md-block">
-                <button type="submit" class="btn btn-success btn-lg px-5">Gravar Plano</button>
-                <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Voltar</a>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-search"></i> Carregar
+                </button>
             </div>
         </form>
     </div>
 </div>
+
+@if (listaExercicios != null && utenteId.HasValue)
+{
+    <form asp-action="Create" method="post">
+        <input type="hidden" name="UtenteGrupo7Id" value="@utenteId" />
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">2. Selecionar Exercícios para o Plano</h5>
+            </div>
+            <div class="card-body">
+                <small class="text-muted mb-3 d-block">Marque os exercícios desejados abaixo:</small>
+
+                <div class="row" style="max-height: 600px; overflow-y: auto;">
+                    @if (listaExercicios.Any())
+                    {
+                        @foreach (var item in listaExercicios)
+                        {
+                            // Define a cor da borda dependendo se é perigoso ou não
+                            string borderClass = item.IsPerigoso ? "border-danger bg-light" : "border-light";
+
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 shadow-sm @borderClass">
+                                    <div class="card-body p-3">
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="exerciciosSelecionados"
+                                                   value="@item.Id" id="ex_@item.Id" />
+
+                                            <label class="form-check-label fw-bold text-dark" for="ex_@item.Id">
+                                                @item.Nome
+                                            </label>
+                                        </div>
+
+                                        @if (item.IsPerigoso)
+                                        {
+                                            <div class="alert alert-danger p-2 mt-2 mb-0 small fw-bold">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> Contraindicado para este utente!
+                                            </div>
+                                        }
+
+                                        <div class="mt-2 text-end">
+                                            <a href="@Url.Action("Details", "Exercicio", new { id = item.Id })" target="_blank" class="small text-decoration-none">
+                                                Ver Detalhes
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Não existem exercícios registados.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group d-grid gap-2 d-md-block">
+            <button type="submit" class="btn btn-success btn-lg px-5">Criar Plano</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Cancelar</a>
+        </div>
+    </form>
+}
+else
+{
+    <div class="alert alert-info text-center">
+        Por favor, selecione um utente e clique em "Carregar" para ver os exercícios disponíveis.
+    </div>
+}
 
 @section Scripts {
     @{

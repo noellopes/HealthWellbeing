@@ -6,62 +6,70 @@
     int numExercicios = ViewBag.NumExercicios ?? 0;
 }
 
-<div class="container py-5 d-flex justify-content-center">
-    <div class="card shadow-lg border-danger" style="max-width: 600px; width: 100%;">
-        <div class="card-header bg-danger text-white py-3 text-center">
-            <h4 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Eliminar Tipo de Exercício</h4>
-        </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
 
-        <div class="card-body p-4 text-center">
-            <h2 class="h4 mb-3 text-dark">@Model.NomeTipoExercicios</h2>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
 
-            @if (!podeEliminar)
-            {
-                <div class="alert alert-warning text-start shadow-sm border-warning mb-4">
-                    <div class="d-flex">
-                        <i class="bi bi-lock-fill fs-4 me-3"></i>
-                        <div>
-                            <strong>Ação Bloqueada!</strong>
-                            <p class="mb-0">Este tipo de exercício está a ser utilizado em <strong>@numExercicios</strong> ficha(s) de exercício. Remova a associação nos exercícios antes de eliminar este tipo.</p>
-                        </div>
+                    <div class="mb-4 text-danger">
+                        <i class="bi bi-trash3 display-1"></i>
                     </div>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted mb-4">Tem a certeza absoluta que deseja eliminar este registo? Esta ação é <strong>irreversível</strong>.</p>
-            }
 
-            <div class="bg-light p-3 rounded text-start mb-4 border small">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4 text-muted">Descrição:</dt>
-                    <dd class="col-sm-8 text-truncate">@Model.DescricaoTipoExercicios</dd>
+                    <h2 class="h3 mb-3 fw-bold text-danger">Eliminar Tipo de Exercício?</h2>
 
-                    <dt class="col-sm-4 text-muted">Benefícios:</dt>
-                    <dd class="col-sm-8">@(Model.TipoExercicioBeneficios?.Count ?? 0) associados</dd>
-                </dl>
-            </div>
-
-            <form asp-action="Delete">
-                <input type="hidden" name="TipoExercicioId" value="@Model.TipoExercicioId" />
-
-                <div class="d-flex justify-content-center gap-2">
-                    <a asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
-
-                    @if (podeEliminar)
+                    @if (!podeEliminar)
                     {
-                        <button type="submit" class="btn btn-danger px-4 shadow-sm">
-                            <i class="bi bi-trash-fill me-1"></i> Confirmar Eliminação
-                        </button>
+                        <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-start small mb-4">
+                            <h6 class="alert-heading fw-bold text-warning"><i class="bi bi-lock-fill me-1"></i> Ação Bloqueada</h6>
+                            <p class="mb-0 text-muted">
+                                Este tipo de exercício está a ser utilizado em <strong>@numExercicios</strong> ficha(s) de exercício.
+                                Remova a associação nos exercícios antes de eliminar este tipo.
+                            </p>
+                        </div>
                     }
                     else
                     {
-                        <button type="button" disabled class="btn btn-outline-danger px-4 opacity-50">
-                            <i class="bi bi-lock-fill me-1"></i> Bloqueado
-                        </button>
+                        <p class="text-muted mb-4">
+                            Tem a certeza absoluta que deseja eliminar o registo
+                            <strong class="text-dark">@Model.NomeTipoExercicios</strong>?
+                            <br>Esta ação é irreversível.
+                        </p>
                     }
+
+                    <div class="bg-light p-3 rounded mb-4 text-start small border">
+                        <div class="row mb-1">
+                            <div class="col-4 text-muted">Descrição:</div>
+                            <div class="col-8 text-dark text-truncate">@Model.DescricaoTipoExercicios</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 text-muted">Benefícios:</div>
+                            <div class="col-8 text-dark">@(Model.TipoExercicioBeneficios?.Count ?? 0) associados</div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" class="d-flex justify-content-center gap-2">
+                        <input type="hidden" name="TipoExercicioId" value="@Model.TipoExercicioId" />
+
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+
+                        @if (podeEliminar)
+                        {
+                            <button type="submit" class="btn btn-danger px-4 shadow-sm">
+                                <i class="bi bi-trash-fill me-1"></i> Confirmar
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" disabled class="btn btn-danger px-4 opacity-50">
+                                <i class="bi bi-lock-fill me-1"></i> Bloqueado
+                            </button>
+                        }
+                    </form>
+
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

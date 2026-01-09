@@ -4,45 +4,49 @@
     ViewData["Title"] = "Apagar Avaliação";
 }
 
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
 
-            <div class="alert alert-danger d-flex align-items-center shadow-sm" role="alert">
-                <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3 fs-3"></i>
-                <div>
-                    <strong>Atenção!</strong> Tem a certeza que pretende eliminar esta avaliação?
-                    <div class="small">Esta ação é irreversível.</div>
-                </div>
-            </div>
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center">
 
-            <div class="card border-danger shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="bi bi-trash3 me-2"></i>Eliminar Registo</h4>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-end">Utente:</dt>
-                        <dd class="col-sm-8 fw-bold">@Model.UtenteGrupo7.Nome</dd>
+                    <div class="mb-4 text-danger">
+                        <i class="bi bi-exclamation-circle display-1"></i>
+                    </div>
 
-                        <dt class="col-sm-4 text-end">Data:</dt>
-                        <dd class="col-sm-8">@Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")</dd>
+                    <h2 class="h3 mb-3 fw-bold text-danger">Eliminar Avaliação?</h2>
+                    <p class="text-muted mb-4">
+                        Tem a certeza que pretende eliminar a avaliação de
+                        <strong class="text-dark">@Model.UtenteGrupo7.Nome</strong> realizada a
+                        <strong>@Model.DataMedicao.ToString("dd/MM/yyyy")</strong>?
+                        <br>Esta ação não pode ser revertida.
+                    </p>
 
-                        <dt class="col-sm-4 text-end">Peso:</dt>
-                        <dd class="col-sm-8">@Model.Peso kg</dd>
-                    </dl>
-                </div>
-                <div class="card-footer bg-light d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Cancelar
-                    </a>
+                    <div class="bg-light p-3 rounded mb-4 text-start small border">
+                        <div class="row">
+                            <div class="col-6 text-muted">Peso:</div>
+                            <div class="col-6 fw-bold text-dark text-end">@Model.Peso kg</div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6 text-muted">Data da Criação:</div>
+                            <div class="col-6 fw-bold text-dark text-end">@Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                    </div>
 
-                    <form asp-action="Delete">
-                        <input type="hidden" asp-for="AvaliacaoFisicaId" />
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash-fill"></i> Confirmar Eliminação
-                        </button>
-                    </form>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                            Cancelar
+                        </a>
+
+                        <form asp-action="Delete">
+                            <input type="hidden" asp-for="AvaliacaoFisicaId" />
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash-fill me-1"></i> Confirmar
+                            </button>
+                        </form>
+                    </div>
+
                 </div>
             </div>
 

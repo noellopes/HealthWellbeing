@@ -1,54 +1,62 @@
 ﻿@using HealthWellbeing.Data
 @model HealthWellbeing.Models.TipoExercicio
 
-
 @{
     ViewData["Title"] = "Detalhes";
     bool podeGerir = User.IsInRole(SeedData.Roles.Administrador) || User.IsInRole(SeedData.Roles.Profissional);
 }
 
-<div class="container py-4">
+<div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-dark">@Model.NomeTipoExercicios</h1>
-            <span class="badge bg-light text-secondary border mt-2">ID: @Model.TipoExercicioId</span>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-file-earmark-text me-2"></i>@Model.NomeTipoExercicios
+            </h1>
+            <p class="text-muted mb-0 small mt-1">
+                ID: @Model.TipoExercicioId
+            </p>
         </div>
-        <div>
+        <div class="d-flex gap-2">
             @if (podeGerir)
             {
-                <a asp-action="Edit" asp-route-id="@Model.TipoExercicioId" class="btn btn-warning shadow-sm me-2">
-                    <i class="bi bi-pencil-square me-1"></i> Editar
+                <a asp-action="Edit" asp-route-id="@Model.TipoExercicioId" class="btn btn-warning shadow-sm text-dark">
+                    <i class="bi bi-pencil me-1"></i> Editar
                 </a>
             }
-            <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
-                <i class="bi bi-arrow-left me-1"></i> Voltar
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
             </a>
         </div>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+                    <h5 class="mb-0 fw-bold text-dark">Informação Geral</h5>
+                </div>
                 <div class="card-body p-4">
-                    <h5 class="text-uppercase text-muted fs-6 fw-bold mb-3"><i class="bi bi-file-text me-2"></i>Informação Geral</h5>
-
                     <div class="mb-4">
-                        <label class="fw-bold text-dark mb-1">Descrição</label>
-                        <p class="text-muted bg-light p-3 rounded">@Model.DescricaoTipoExercicios</p>
+                        <label class="d-block text-muted small text-uppercase fw-bold mb-2">Descrição</label>
+                        <div class="bg-light p-3 rounded border">
+                            @Model.DescricaoTipoExercicios
+                        </div>
                     </div>
 
                     <div>
-                        <label class="fw-bold text-dark mb-1">Características Principais</label>
-                        <p class="text-muted bg-light p-3 rounded mb-0">@Model.CaracteristicasTipoExercicios</p>
+                        <label class="d-block text-muted small text-uppercase fw-bold mb-2">Características Principais</label>
+                        <div class="bg-light p-3 rounded border">
+                            @Model.CaracteristicasTipoExercicios
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="card-title h6 mb-0"><i class="bi bi-heart-pulse me-2"></i>Benefícios</h5>
+                <div class="card-header bg-primary text-white pt-4 ps-4 pb-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-heart-pulse me-2"></i>Benefícios</h5>
                 </div>
                 <div class="card-body p-4">
                     @if (Model.TipoExercicioBeneficios != null && Model.TipoExercicioBeneficios.Any())
@@ -56,17 +64,18 @@
                         <div class="d-flex flex-wrap gap-2">
                             @foreach (var item in Model.TipoExercicioBeneficios)
                             {
-                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 py-2 px-3 rounded-pill">
-                                    @item.Beneficio?.NomeBeneficio
-                                </span>
+                                <div class="d-flex align-items-center bg-light border rounded-pill px-3 py-2 text-primary">
+                                    <i class="bi bi-check-circle-fill me-2 small"></i>
+                                    <span class="fw-bold">@item.Beneficio?.NomeBeneficio</span>
+                                </div>
                             }
                         </div>
                     }
                     else
                     {
-                        <div class="text-center text-muted py-3">
-                            <i class="bi bi-dash-circle fs-4 d-block mb-2"></i>
-                            Nenhum benefício associado.
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-dash-circle fs-3 d-block mb-2 opacity-50"></i>
+                            <p class="mb-0 small">Nenhum benefício associado.</p>
                         </div>
                     }
                 </div>

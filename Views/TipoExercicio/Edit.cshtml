@@ -6,85 +6,103 @@
     var selectedBeneficios = ViewData["SelectedBeneficios"] as List<int> ?? new List<int>();
 }
 
-<div class="container py-4" style="max-width: 900px;">
-    <div class="card border-0 shadow-lg">
-        <div class="card-header bg-warning bg-opacity-10 py-3 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 text-dark fw-bold">@ViewData["Title"]</h4>
-            <a asp-action="Index" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Voltar à Lista</a>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-warning text-dark">
+                <i class="bi bi-pencil-square me-2"></i>@ViewData["Title"]
+            </h1>
         </div>
-
-        <div class="card-body p-4">
-            <form asp-action="Edit">
-                <input type="hidden" asp-for="TipoExercicioId" />
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
-
-                <h5 class="text-muted fs-6 text-uppercase fw-bold mb-3">Dados Principais</h5>
-
-                <div class="form-floating mb-3">
-                    <input asp-for="NomeTipoExercicios" class="form-control" placeholder="Nome" />
-                    <label asp-for="NomeTipoExercicios">Nome do Exercício</label>
-                    <span asp-validation-for="NomeTipoExercicios" class="text-danger small"></span>
-                </div>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <div class="form-floating h-100">
-                            <textarea asp-for="DescricaoTipoExercicios" class="form-control" placeholder="Descrição" style="height: 120px"></textarea>
-                            <label asp-for="DescricaoTipoExercicios">Descrição</label>
-                            <span asp-validation-for="DescricaoTipoExercicios" class="text-danger small"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating h-100">
-                            <textarea asp-for="CaracteristicasTipoExercicios" class="form-control" placeholder="Características" style="height: 120px"></textarea>
-                            <label asp-for="CaracteristicasTipoExercicios">Características</label>
-                            <span asp-validation-for="CaracteristicasTipoExercicios" class="text-danger small"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="my-4 text-muted opacity-25">
-
-                <h5 class="text-muted fs-6 text-uppercase fw-bold mb-3">
-                    <i class="bi bi-heart-pulse text-danger me-1"></i> Benefícios Associados
-                </h5>
-
-                <div class="bg-light p-3 rounded border">
-                    @if (beneficios.Any())
-                    {
-                        <div class="row g-2">
-                            @foreach (var beneficio in beneficios)
-                            {
-                                <div class="col-sm-6 col-md-4 col-lg-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="selectedBeneficios"
-                                               value="@beneficio.BeneficioId"
-                                               id="chk_ben_@beneficio.BeneficioId"
-                                               @(selectedBeneficios.Contains(beneficio.BeneficioId) ? "checked" : "") />
-                                        <label class="form-check-label" for="chk_ben_@beneficio.BeneficioId">
-                                            @beneficio.NomeBeneficio
-                                        </label>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning mb-0">Nenhum benefício disponível.</div>
-                    }
-                </div>
-
-                <div class="mt-4 d-flex justify-content-end gap-2">
-                    <a asp-action="Index" class="btn btn-light border">Cancelar</a>
-                    <button type="submit" class="btn btn-primary px-5 shadow-sm fw-bold">
-                        <i class="bi bi-save me-1"></i> Guardar Alterações
-                    </button>
-                </div>
-            </form>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
         </div>
     </div>
+
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="TipoExercicioId" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-warning text-dark fw-bold mb-0">Dados Principais</h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+
+                        <div class="mb-3">
+                            <label asp-for="NomeTipoExercicios" class="form-label fw-bold text-muted small text-uppercase">Nome do Exercício</label>
+                            <input asp-for="NomeTipoExercicios" class="form-control" />
+                            <span asp-validation-for="NomeTipoExercicios" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DescricaoTipoExercicios" class="form-label fw-bold text-muted small text-uppercase">Descrição</label>
+                            <textarea asp-for="DescricaoTipoExercicios" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="DescricaoTipoExercicios" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CaracteristicasTipoExercicios" class="form-label fw-bold text-muted small text-uppercase">Características</label>
+                            <textarea asp-for="CaracteristicasTipoExercicios" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="CaracteristicasTipoExercicios" class="text-danger small"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-warning text-dark fw-bold mb-0">
+                            <i class="bi bi-heart-pulse me-2"></i>Benefícios Associados
+                        </h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        @if (beneficios.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var beneficio in beneficios)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-check p-3 border rounded bg-light">
+                                            <input class="form-check-input" type="checkbox"
+                                                   name="selectedBeneficios"
+                                                   value="@beneficio.BeneficioId"
+                                                   id="chk_ben_@beneficio.BeneficioId"
+                                                   @(selectedBeneficios.Contains(beneficio.BeneficioId) ? "checked" : "") />
+                                            <label class="form-check-label w-100 stretched-link" for="chk_ben_@beneficio.BeneficioId">
+                                                <span class="fw-bold d-block">@beneficio.NomeBeneficio</span>
+                                                @if (!string.IsNullOrEmpty(beneficio.DescricaoBeneficio))
+                                                {
+                                                    <small class="text-muted text-truncate d-block">@beneficio.DescricaoBeneficio</small>
+                                                }
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mb-0">
+                                <i class="bi bi-exclamation-triangle me-2"></i> Não existem benefícios registados.
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 text-end mt-2 mb-5">
+                <button type="submit" class="btn btn-warning btn-lg px-5 shadow-sm text-dark">
+                    <i class="bi bi-save me-2"></i>Guardar Alterações
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {

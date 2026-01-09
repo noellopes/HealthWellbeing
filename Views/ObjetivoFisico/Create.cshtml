@@ -4,29 +4,39 @@
     ViewData["Title"] = "Criar Objetivo";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Novo Objetivo Físico</h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-success">
+                <i class="bi bi-plus-circle me-2"></i>Novo Objetivo Físico
+            </h1>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
-                        <div class="mb-3">
-                            <label asp-for="NomeObjetivo" class="form-label fw-bold">Nome do Objetivo</label>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="text-success fw-bold mb-0">Detalhes do Registo</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="NomeObjetivo" class="form-label fw-bold text-muted small text-uppercase">Nome do Objetivo</label>
                             <input asp-for="NomeObjetivo" class="form-control" placeholder="Ex: Perda de Peso, Musculação ..." autofocus />
-                            <span asp-validation-for="NomeObjetivo" class="text-danger"></span>
+                            <span asp-validation-for="NomeObjetivo" class="text-danger small"></span>
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a asp-action="Index" class="btn btn-secondary me-md-2">
-                                <i class="bi bi-arrow-left"></i> Voltar
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-check-lg"></i> Criar Registo
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success px-5 shadow-sm">
+                                <i class="bi bi-check-lg me-2"></i>Criar
                             </button>
                         </div>
                     </form>
