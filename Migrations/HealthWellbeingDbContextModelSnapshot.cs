@@ -1289,7 +1289,6 @@ namespace HealthWellbeing.Migrations
                         .HasColumnType("nvarchar(9)");
 
                     b.Property<string>("Niss")
-                        .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
@@ -1307,7 +1306,8 @@ namespace HealthWellbeing.Migrations
                         .IsUnique();
 
                     b.HasIndex("Niss")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Niss] IS NOT NULL");
 
                     b.HasIndex("Nus")
                         .IsUnique();

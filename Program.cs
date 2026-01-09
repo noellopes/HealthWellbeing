@@ -22,7 +22,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// ✅ Identity com Roles (precisas disto para RoleManager funcionar)
+// Identity com Roles
 builder.Services
     .AddDefaultIdentity<IdentityUser>(options =>
     {
@@ -32,6 +32,15 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+
+// SESSION
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -66,7 +75,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ✅ FALTAVA ISTO
+app.UseSession(); // <- antes do Auth
+
 app.UseAuthentication();
 app.UseAuthorization();
 

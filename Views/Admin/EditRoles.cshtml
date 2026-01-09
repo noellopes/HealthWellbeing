@@ -1,0 +1,173 @@
+﻿@model HealthWellbeing.ViewModel.EditUserRolesVM
+@{
+    ViewData["Title"] = "Editar permissões";
+}
+
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
+
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .details-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .details-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Users" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+                    <h2 class="details-title">Editar permissões</h2>
+                    <p class="details-sub"><strong>@Model.Email</strong></p>
+
+                    @if (TempData["Msg"] != null)
+                    {
+                        <div class="alert alert-warning">@TempData["Msg"]</div>
+                    }
+
+                    <form asp-action="EditRoles" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="row g-2">
+                            @for (int i = 0; i < Model.AvailableRoles.Count; i++)
+                            {
+                                var role = Model.AvailableRoles[i];
+                                var rid = $"role_{i}";
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               id="@rid"
+                                               type="radio"
+                                               name="SelectedRole"
+                                               value="@role"
+                                               @(Model.SelectedRole == role ? "checked" : "") />
+                                        <label class="form-check-label" for="@rid">@role</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="mt-3 d-flex gap-2 flex-wrap">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                            <a class="btn btn-secondary" asp-action="Users">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>

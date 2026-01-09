@@ -214,6 +214,16 @@
                         {
                             <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
                         }
+                        else if (User.IsInRole("Rececionista"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        else if (User.IsInRole("Administrador"))
+                        {
+                           <a asp-action="Index" asp-controller="Admin" class="utente-btn">
+                               <i class="bi bi-arrow-left"></i> Voltar
+                           </a>
+                        }
                         
                     </div>
                 </div>
@@ -303,10 +313,12 @@
                                                         <a asp-action="Details" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-primary hb-btn">
                                                             <i class="bi bi-info-circle"></i> Detalhes
                                                         </a>
-
-                                                        <a asp-action="Observacoes" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-secondary hb-btn">
+                                                        @if (User.IsInRole("Medico"))
+                                                        {<a asp-action="Observacoes" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-secondary hb-btn">
                                                             <i class="bi bi-journal-text"></i> Observações
                                                         </a>
+                                                        }
+                                                        
 
                                                         <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
                                                             @Html.AntiForgeryToken()

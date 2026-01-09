@@ -70,11 +70,12 @@ namespace HealthWellbeing.ViewModel
         [StringLength(9)]
         public string Nif { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "O NISS é obrigatório.")]
+        // [Required(ErrorMessage = "O NISS é obrigatório.")]
         [Display(Name = "Número de Segurança Social")]
         [StringLength(11)]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = "O NISS deve ter 11 dígitos.")]
-        public string Niss { get; set; } = string.Empty;
+        [RegularExpression(@"^(\d{11})?$", ErrorMessage = "O NISS deve ter 11 dígitos.")]
+        public string? Niss { get; set; }
+
 
         [Required(ErrorMessage = "O NUS é obrigatório.")]
         [Display(Name = "Número de Utente de Saúde")]

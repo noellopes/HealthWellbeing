@@ -21,16 +21,11 @@ namespace HealthWellbeing.Controllers
         // GET: Specialities
         public async Task<IActionResult> Index(string? q, int page = 1)
         {
-            
-            if (page < 1) page = 1;
-
             var query = _context.Specialities.AsQueryable();
 
-            
+            // Filtro de pesquisa
             if (!string.IsNullOrWhiteSpace(q))
             {
-                q = q.Trim();
-
                 query = query.Where(s =>
                     s.Nome.Contains(q) ||
                     s.Descricao.Contains(q));
@@ -38,38 +33,11 @@ namespace HealthWellbeing.Controllers
 
             var totalItems = await query.CountAsync();
 
-            
-            if (totalItems == 0)
-            {
-                var emptyPagination = new PaginationInfo<Specialities>(
-                    currentPage: 1,
-                    totalItems: 0,
-                    itemsPerPage: 9
-                );
-
-                emptyPagination.Items = new System.Collections.Generic.List<Specialities>();
-
-                ViewBag.SearchQuery = q;
-                ViewBag.NoResults = !string.IsNullOrWhiteSpace(q); // para mostrar mensagem "não encontrado"
-                return View(emptyPagination);
-            }
-
-            //  paginação
             var pagination = new PaginationInfo<Specialities>(
                 currentPage: page,
                 totalItems: totalItems,
                 itemsPerPage: 9
             );
-
-            
-            if (pagination.TotalPages > 0 && page > pagination.TotalPages)
-            {
-                pagination = new PaginationInfo<Specialities>(
-                    currentPage: pagination.TotalPages,
-                    totalItems: totalItems,
-                    itemsPerPage: 9
-                );
-            }
 
             var items = await query
                 .OrderBy(s => s.Nome)
@@ -80,7 +48,6 @@ namespace HealthWellbeing.Controllers
             pagination.Items = items;
 
             ViewBag.SearchQuery = q;
-            ViewBag.NoResults = false;
 
             return View(pagination);
         }
@@ -111,6 +78,14 @@ namespace HealthWellbeing.Controllers
             [Bind("IdEspecialidade,Nome,Descricao,OqueEDescricao")]
             Specialities specialities)
         {
+            // 🔹 Verificar se já existe uma especialidade com o mesmo nome (case-insensitive)
+            if (await _context.Specialities
+                    .AnyAsync(s => s.Nome.ToLower() == specialities.Nome.ToLower()))
+            {
+                ModelState.AddModelError("Nome",
+                    "Já existe uma especialidade com este nome.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(specialities);
@@ -140,6 +115,15 @@ namespace HealthWellbeing.Controllers
             Specialities specialities)
         {
             if (id != specialities.IdEspecialidade) return NotFound();
+
+            // 🔹 Verificar se já existe OUTRA especialidade com o mesmo nome
+            if (await _context.Specialities
+                    .AnyAsync(s => s.Nome.ToLower() == specialities.Nome.ToLower()
+                                   && s.IdEspecialidade != specialities.IdEspecialidade))
+            {
+                ModelState.AddModelError("Nome",
+                    "Já existe outra especialidade com este nome.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -180,12 +164,28 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var specialities = await _context.Specialities.FindAsync(id);
-            if (specialities != null)
+            
+            var specialities = await _context.Specialities
+                .Include(s => s.Medicos)
+                .FirstOrDefaultAsync(s => s.IdEspecialidade == id);
+
+            if (specialities == null)
             {
-                _context.Specialities.Remove(specialities);
+                return NotFound();
             }
 
+            
+            if (specialities.Medicos != null && specialities.Medicos.Any())
+            {
+                ModelState.AddModelError(string.Empty,
+                    "Não é possível apagar esta especialidade porque existem médicos associados a ela.");
+
+                
+                return View("Delete", specialities);
+            }
+
+            
+            _context.Specialities.Remove(specialities);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

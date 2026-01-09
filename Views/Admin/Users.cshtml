@@ -1,0 +1,187 @@
+﻿@model HealthWellbeing.ViewModel.AdminUsersListVM
+@{
+    ViewData["Title"] = "Utilizadores";
+}
+
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
+
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .details-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .details-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+                    <h2 class="details-title">Utilizadores</h2>
+                    <p class="details-sub">Pesquisa e altera as permissões conforme as roles do SeedData.</p>
+
+                    <form method="get" class="row g-2 align-items-end mb-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Pesquisar</label>
+                            <input class="form-control" name="search" value="@Model.Search" placeholder="Email ou username" />
+                        </div>
+                        <div class="col-12 col-md-auto d-flex gap-2">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> Procurar
+                            </button>
+                            <a class="btn btn-secondary" asp-action="Users">Limpar</a>
+                        </div>
+                    </form>
+
+                    @if (TempData["Msg"] != null)
+                    {
+                        <div class="alert alert-info">@TempData["Msg"]</div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Username</th>
+                                    <th>Roles</th>
+                                    <th>Email confirmado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var u in Model.Users)
+                                {
+                                    <tr>
+                                        <td>@u.Email</td>
+                                        <td>@u.UserName</td>
+                                        <td>@u.Roles</td>
+                                        <td>@(u.EmailConfirmed ? "Sim" : "Não")</td>
+                                        <td class="text-end">
+                                            <a class="btn btn-sm btn-outline-primary"
+                                               asp-action="EditRoles"
+                                               asp-route-id="@u.UserId">
+                                                Editar permissões
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>

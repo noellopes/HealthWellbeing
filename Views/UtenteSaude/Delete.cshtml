@@ -154,7 +154,7 @@
 
                     <div class="utente-actions">
                         <a asp-action="Index" class="utente-btn">
-                            <i class="bi bi-x-circle"></i> Cancelar
+                            <i class="bi bi-arrow-left"></i> Voltar
                         </a>
                     </div>
                 </div>
@@ -162,6 +162,10 @@
 
             <div class="utente-body">
                 <div class="danger-card">
+                    @if (TempData["Msg"] != null)
+                    {
+                        <div class="alert alert-danger mt-3">@TempData["Msg"]</div>
+                    }
 
                     <h2 class="danger-title">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Utente
@@ -203,9 +207,7 @@
                             <i class="bi bi-trash"></i> Apagar
                         </button>
 
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Voltar
-                        </a>
+                      
                     </form>
 
                 </div>

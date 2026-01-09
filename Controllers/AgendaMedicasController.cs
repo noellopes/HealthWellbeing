@@ -21,7 +21,7 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Medico,Rececisnista,DiretorClinico")]
+        [Authorize(Roles = "Medico,Rececionista,DiretorClinico")]
         // GET: /AgendaMedicas
         public async Task<IActionResult> Index()
         {
