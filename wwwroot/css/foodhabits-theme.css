@@ -93,6 +93,57 @@
     padding: 14px;
 }
 
+/* ===== FoodHabits - Dark form controls ===== */
+.fi-wrapper .form-control,
+.fi-wrapper .form-select,
+.fi-wrapper textarea.form-control {
+    background: #0b2230;
+    color: #e8f7ff;
+    border: 1px solid rgba(34, 211, 238, .25);
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+    .fi-wrapper .form-control::placeholder {
+        color: rgba(232, 247, 255, .55);
+    }
+
+    .fi-wrapper .form-control:focus,
+    .fi-wrapper .form-select:focus,
+    .fi-wrapper textarea.form-control:focus {
+        border-color: rgba(34, 211, 238, .55);
+        box-shadow: 0 0 0 .2rem rgba(34, 211, 238, .12);
+        background: #0b2230;
+        color: #e8f7ff;
+    }
+
+/* Select arrow + options */
+.fi-wrapper .form-select {
+    background-color: #0b2230;
+}
+
+    .fi-wrapper .form-select option {
+        background: #0b2230;
+        color: #e8f7ff;
+    }
+
+/* Checkboxes / radios */
+.fi-wrapper .form-check-input {
+    background-color: #0b2230;
+    border: 1px solid rgba(34, 211, 238, .25);
+}
+
+    .fi-wrapper .form-check-input:checked {
+        background-color: #22d3ee;
+        border-color: #22d3ee;
+    }
+
+/* Date inputs calendar (where supported) */
+.fi-wrapper input[type="date"] {
+    color-scheme: dark;
+}
+
+
 /* ===== GRID: 2 colunas, Add no fundo ===== */
 .fi-grid {
     display: grid;
@@ -256,6 +307,24 @@ select.form-select {
     box-shadow: 0 10px 22px rgba(0,0,0,.25);
     color: var(--fi-text);
 }
+
+.fh-date {
+    background: #0b2230;
+    color: #e8f7ff;
+    border: 1px solid rgba(34,211,238,.25);
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+    .fh-date:focus {
+        border-color: rgba(34,211,238,.55);
+        box-shadow: 0 0 0 .2rem rgba(34,211,238,.12);
+    }
+
+.fh-date {
+    color-scheme: dark;
+}
+
 
 .fh-table {
     color: var(--fi-text);
