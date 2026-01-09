@@ -211,93 +211,263 @@ internal class SeedData
 
     private static void PopulateCategorias(HealthWellbeingDbContext context)
     {
-        if (context.CategoriaAlimento.Any())
+        var seedCategorias = new List<CategoriaAlimento>
+        {
+            // Mantém as 5 categorias originais primeiro (para estabilidade em bases novas)
+            new CategoriaAlimento { Name = "Frutas", Description = "Frutas frescas e derivados simples." },
+            new CategoriaAlimento { Name = "Vegetais", Description = "Hortícolas, folhas, legumes e cogumelos." },
+            new CategoriaAlimento { Name = "Grãos", Description = "Cereais, grãos e pseudocereais." },
+            new CategoriaAlimento { Name = "Laticínios", Description = "Laticínios e alternativas vegetais (bebidas/iogurtes/queijos)." },
+            new CategoriaAlimento { Name = "Carnes", Description = "Carnes (bovina/suína/aves) e enchidos." },
+
+            // Categorias adicionais (divisão mais realista e justa)
+            new CategoriaAlimento { Name = "Peixes e Mariscos", Description = "Peixes, mariscos e moluscos." },
+            new CategoriaAlimento { Name = "Ovos", Description = "Ovos e derivados." },
+            new CategoriaAlimento { Name = "Leguminosas", Description = "Feijões, lentilhas, grão-de-bico e similares." },
+            new CategoriaAlimento { Name = "Tubérculos", Description = "Batata, batata-doce e derivados." },
+            new CategoriaAlimento { Name = "Pães e Tortilhas", Description = "Pães, wraps e tortilhas." },
+            new CategoriaAlimento { Name = "Massas", Description = "Massas (ex.: lasanha, massa integral)." },
+            new CategoriaAlimento { Name = "Farinhas e Panificação", Description = "Farinhas e ingredientes base de panificação." },
+            new CategoriaAlimento { Name = "Oleaginosas e Sementes", Description = "Amendoim, amêndoas e sementes." },
+            new CategoriaAlimento { Name = "Óleos e Gorduras", Description = "Azeites, óleos, manteigas e margarinas." },
+            new CategoriaAlimento { Name = "Ervas e Especiarias", Description = "Ervas frescas/secas e especiarias." },
+            new CategoriaAlimento { Name = "Condimentos e Molhos", Description = "Vinagres, alcaparras, azeitonas e condimentos." },
+            new CategoriaAlimento { Name = "Açúcares e Adoçantes", Description = "Açúcares, mel, xaropes e adoçantes." },
+            new CategoriaAlimento { Name = "Proteínas Vegetais", Description = "Fontes de proteína vegetal (ex.: tofu)." },
+        };
+
+        var existingNames = new HashSet<string>(
+            context.CategoriaAlimento.Select(c => c.Name),
+            StringComparer.OrdinalIgnoreCase);
+
+        var toAdd = seedCategorias
+            .Where(c => !existingNames.Contains(c.Name))
+            .ToList();
+
+        if (toAdd.Count == 0)
         {
             return;
         }
 
-        context.CategoriaAlimento.AddRange(
-            new CategoriaAlimento { Name = "Frutas", Description = "Categoria de frutas." },
-            new CategoriaAlimento { Name = "Vegetais", Description = "Categoria de vegetais." },
-            new CategoriaAlimento { Name = "Grãos", Description = "Categoria de grãos." },
-            new CategoriaAlimento { Name = "Laticínios", Description = "Categoria de laticínios." },
-            new CategoriaAlimento { Name = "Carnes", Description = "Categoria de carnes." }
-        );
-
+        context.CategoriaAlimento.AddRange(toAdd);
         context.SaveChanges();
     }
 
     private static void PopulateAlimentos(HealthWellbeingDbContext context)
     {
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        int Cat(string nome)
+        {
+            if (!categoriasByNome.TryGetValue(nome, out var cat))
+                throw new InvalidOperationException($"CategoriaAlimento não encontrada para seed: '{nome}'.");
+            return cat.CategoriaAlimentoId;
+        }
+
         var seedAlimentos = new List<Alimento>
         {
-            new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = 1, Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = 2, Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = 3, Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Leite", Description = "Líquido rico em cálcio.", CategoriaAlimentoId = 4, Calories = 42, KcalPor100g = 42, ProteinaGPor100g = 3.4m, HidratosGPor100g = 5m, GorduraGPor100g = 1m },
-            new Alimento { Name = "Frango", Description = "Carne branca rica em proteínas.", CategoriaAlimentoId = 5, Calories = 165, KcalPor100g = 165, ProteinaGPor100g = 31m, HidratosGPor100g = 0m, GorduraGPor100g = 3.6m },
+            // Frutas
+            new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = Cat("Frutas"), Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Banana", Description = "Fruta energética, boa fonte de potássio.", CategoriaAlimentoId = Cat("Frutas"), Calories = 89, KcalPor100g = 89, ProteinaGPor100g = 1.1m, HidratosGPor100g = 23m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Limão", Description = "Fruta cítrica usada para temperar.", CategoriaAlimentoId = Cat("Frutas"), Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Laranja", Description = "Fruta cítrica, usada como sobremesa/acompanhamento.", CategoriaAlimentoId = Cat("Frutas"), Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.9m, HidratosGPor100g = 12m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Pêra", Description = "Fruta doce e suculenta, alternativa à maçã/banana.", CategoriaAlimentoId = Cat("Frutas"), Calories = 57, KcalPor100g = 57, ProteinaGPor100g = 0.4m, HidratosGPor100g = 15m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Morangos", Description = "Fruta com sabor ácido-doce, ótima em saladas e iogurtes.", CategoriaAlimentoId = Cat("Frutas"), Calories = 32, KcalPor100g = 32, ProteinaGPor100g = 0.7m, HidratosGPor100g = 7.7m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Manga", Description = "Fruta tropical doce, boa em batidos e sobremesas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 0.8m, HidratosGPor100g = 15m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Uvas", Description = "Fruta doce usada em lanches e saladas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 69, KcalPor100g = 69, ProteinaGPor100g = 0.7m, HidratosGPor100g = 18m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Pêssego", Description = "Fruta suave e aromática, boa em sobremesas.", CategoriaAlimentoId = Cat("Frutas"), Calories = 39, KcalPor100g = 39, ProteinaGPor100g = 0.9m, HidratosGPor100g = 9.5m, GorduraGPor100g = 0.3m },
 
-            // Novos alimentos para diversificar (IDs esperados: 6..15)
-            new Alimento { Name = "Banana", Description = "Fruta energética, boa fonte de potássio.", CategoriaAlimentoId = 1, Calories = 89, KcalPor100g = 89, ProteinaGPor100g = 1.1m, HidratosGPor100g = 23m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Batata", Description = "Tubérculo versátil.", CategoriaAlimentoId = 3, Calories = 77, KcalPor100g = 77, ProteinaGPor100g = 2m, HidratosGPor100g = 17m, GorduraGPor100g = 0.1m },
-            new Alimento { Name = "Pão", Description = "Fonte de carboidratos, feito geralmente de trigo.", CategoriaAlimentoId = 3, Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 49m, GorduraGPor100g = 3.2m },
-            new Alimento { Name = "Tofu", Description = "Produto de soja, boa alternativa proteica.", CategoriaAlimentoId = 4, Calories = 76, KcalPor100g = 76, ProteinaGPor100g = 8m, HidratosGPor100g = 1.9m, GorduraGPor100g = 4.8m },
-            new Alimento { Name = "Leite de Amêndoa", Description = "Alternativa vegetal ao leite.", CategoriaAlimentoId = 4, Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 0.4m, HidratosGPor100g = 0.3m, GorduraGPor100g = 1.1m },
-            new Alimento { Name = "Feijão", Description = "Leguminosa rica em fibras e proteínas.", CategoriaAlimentoId = 3, Calories = 347, KcalPor100g = 347, ProteinaGPor100g = 21m, HidratosGPor100g = 63m, GorduraGPor100g = 1.2m },
-            new Alimento { Name = "Aveia", Description = "Cereal integral, boa fonte de fibras.", CategoriaAlimentoId = 3, Calories = 389, KcalPor100g = 389, ProteinaGPor100g = 17m, HidratosGPor100g = 66m, GorduraGPor100g = 7m },
-            new Alimento { Name = "Queijo", Description = "Lácteo fermentado, fonte de cálcio.", CategoriaAlimentoId = 4, Calories = 402, KcalPor100g = 402, ProteinaGPor100g = 25m, HidratosGPor100g = 1.3m, GorduraGPor100g = 33m },
-            new Alimento { Name = "Salmão", Description = "Peixe gordo, rico em ômega-3.", CategoriaAlimentoId = 5, Calories = 208, KcalPor100g = 208, ProteinaGPor100g = 20m, HidratosGPor100g = 0m, GorduraGPor100g = 13m },
-            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = 3, Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m },
+            // Vegetais
+            new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Cebola", Description = "Base aromática comum em muitas receitas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Alho", Description = "Aromático usado em temperos e refogados.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 6.4m, HidratosGPor100g = 33m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Tomate", Description = "Vegetal usado em molhos e saladas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 18, KcalPor100g = 18, ProteinaGPor100g = 0.9m, HidratosGPor100g = 3.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Alface", Description = "Folha verde para saladas e sanduíches.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 1.4m, HidratosGPor100g = 2.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Couve", Description = "Folha verde muito usada em sopas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.5m, HidratosGPor100g = 5.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Abóbora", Description = "Vegetal rico em fibras; muito usado em sopas e purés.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 26, KcalPor100g = 26, ProteinaGPor100g = 1m, HidratosGPor100g = 6.5m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Espinafres", Description = "Folhas verdes ricas em ferro e folato.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.9m, HidratosGPor100g = 3.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Rúcula", Description = "Folha verde de sabor ligeiramente picante para saladas.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.6m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.7m },
+            new Alimento { Name = "Pimento Vermelho", Description = "Vegetal rico em vitamina C, usado cru ou assado.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 31, KcalPor100g = 31, ProteinaGPor100g = 1m, HidratosGPor100g = 6m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Alho Francês", Description = "Vegetal aromático (alho-poró), alternativa suave à cebola.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 61, KcalPor100g = 61, ProteinaGPor100g = 1.5m, HidratosGPor100g = 14.2m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Beringela", Description = "Vegetal versátil, boa alternativa em pratos com cogumelos.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 1m, HidratosGPor100g = 6m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Cogumelos", Description = "Cogumelos frescos, usados em risottos e molhos.", CategoriaAlimentoId = Cat("Vegetais"), Calories = 22, KcalPor100g = 22, ProteinaGPor100g = 3.1m, HidratosGPor100g = 3.3m, GorduraGPor100g = 0.3m },
 
-            // Alimentos adicionais para suportar associações de alergias/restrições
-            new Alimento { Name = "Ovo", Description = "Ovo de galinha, fonte de proteína.", CategoriaAlimentoId = 5, Calories = 155, KcalPor100g = 155, ProteinaGPor100g = 13m, HidratosGPor100g = 1.1m, GorduraGPor100g = 11m },
-            new Alimento { Name = "Trigo", Description = "Cereal com glúten, base para farinhas e pães.", CategoriaAlimentoId = 3, Calories = 339, KcalPor100g = 339, ProteinaGPor100g = 13m, HidratosGPor100g = 72m, GorduraGPor100g = 2.5m },
-            new Alimento { Name = "Amendoim", Description = "Oleaginosa rica em gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 567, KcalPor100g = 567, ProteinaGPor100g = 25.8m, HidratosGPor100g = 16.1m, GorduraGPor100g = 49.2m },
-            new Alimento { Name = "Amêndoa", Description = "Oleaginosa rica em fibras e gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 579, KcalPor100g = 579, ProteinaGPor100g = 21.2m, HidratosGPor100g = 21.7m, GorduraGPor100g = 49.9m },
-            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = 5, Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m },
+            // Ervas e Especiarias
+            new Alimento { Name = "Coentros", Description = "Erva aromática (coentro) usada para finalizar pratos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.1m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Salsa", Description = "Erva aromática usada como alternativa a coentros em muitos pratos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 36, KcalPor100g = 36, ProteinaGPor100g = 3m, HidratosGPor100g = 6.3m, GorduraGPor100g = 0.8m },
+            new Alimento { Name = "Manjericão", Description = "Erva aromática muito usada em molhos e saladas.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 3.2m, HidratosGPor100g = 2.7m, GorduraGPor100g = 0.6m },
+            new Alimento { Name = "Orégãos", Description = "Erva aromática (geralmente seca) usada em temperos.", CategoriaAlimentoId = Cat("Ervas e Especiarias"), Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 69m, GorduraGPor100g = 4.3m },
 
-            // Ingredientes base para receitas (mantidos no fim para não afetar IDs esperados 1..15)
-            new Alimento { Name = "Cebola", Description = "Base aromática comum em muitas receitas.", CategoriaAlimentoId = 2, Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.1m },
-            new Alimento { Name = "Alho", Description = "Aromático usado em temperos e refogados.", CategoriaAlimentoId = 2, Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 6.4m, HidratosGPor100g = 33m, GorduraGPor100g = 0.5m },
-            new Alimento { Name = "Tomate", Description = "Vegetal usado em molhos e saladas.", CategoriaAlimentoId = 2, Calories = 18, KcalPor100g = 18, ProteinaGPor100g = 0.9m, HidratosGPor100g = 3.9m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Alface", Description = "Folha verde para saladas e sanduíches.", CategoriaAlimentoId = 2, Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 1.4m, HidratosGPor100g = 2.9m, GorduraGPor100g = 0.2m },
-            new Alimento { Name = "Azeite", Description = "Gordura vegetal usada em temperos e cozinhados.", CategoriaAlimentoId = 2, Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
-            new Alimento { Name = "Limão", Description = "Fruta cítrica usada para temperar.", CategoriaAlimentoId = 1, Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Laranja", Description = "Fruta cítrica, usada como sobremesa/acompanhamento.", CategoriaAlimentoId = 1, Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.9m, HidratosGPor100g = 12m, GorduraGPor100g = 0.1m },
-            new Alimento { Name = "Mel", Description = "Adoçante natural, usado em saladas e bebidas.", CategoriaAlimentoId = 1, Calories = 304, KcalPor100g = 304, ProteinaGPor100g = 0.3m, HidratosGPor100g = 82m, GorduraGPor100g = 0m },
-            new Alimento { Name = "Azeitonas", Description = "Azeitonas (pretas/verdes), usadas como complemento.", CategoriaAlimentoId = 2, Calories = 115, KcalPor100g = 115, ProteinaGPor100g = 0.8m, HidratosGPor100g = 6.3m, GorduraGPor100g = 10.7m },
-            new Alimento { Name = "Couve", Description = "Folha verde muito usada em sopas.", CategoriaAlimentoId = 2, Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.5m, HidratosGPor100g = 5.6m, GorduraGPor100g = 0.4m },
-            new Alimento { Name = "Bacalhau", Description = "Peixe (bacalhau) usado em pratos tradicionais.", CategoriaAlimentoId = 5, Calories = 105, KcalPor100g = 105, ProteinaGPor100g = 23m, HidratosGPor100g = 0m, GorduraGPor100g = 0.9m },
-            new Alimento { Name = "Batata Palha", Description = "Batata frita em palha, usada em pratos como bacalhau à brás.", CategoriaAlimentoId = 3, Calories = 550, KcalPor100g = 550, ProteinaGPor100g = 6m, HidratosGPor100g = 50m, GorduraGPor100g = 35m },
-            new Alimento { Name = "Chouriço", Description = "Enchido tradicional usado em sopas e feijoadas.", CategoriaAlimentoId = 5, Calories = 350, KcalPor100g = 350, ProteinaGPor100g = 17m, HidratosGPor100g = 2m, GorduraGPor100g = 30m },
-            new Alimento { Name = "Bacon", Description = "Carne curada, usada como ingrediente em feijoadas.", CategoriaAlimentoId = 5, Calories = 541, KcalPor100g = 541, ProteinaGPor100g = 37m, HidratosGPor100g = 1.4m, GorduraGPor100g = 42m },
-            new Alimento { Name = "Cogumelos", Description = "Cogumelos frescos, usados em risottos e molhos.", CategoriaAlimentoId = 2, Calories = 22, KcalPor100g = 22, ProteinaGPor100g = 3.1m, HidratosGPor100g = 3.3m, GorduraGPor100g = 0.3m },
-            new Alimento { Name = "Manteiga", Description = "Gordura láctea usada em confeitaria e risottos.", CategoriaAlimentoId = 4, Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0.9m, HidratosGPor100g = 0.1m, GorduraGPor100g = 81m },
-            new Alimento { Name = "Coentros", Description = "Erva aromática (coentro) usada para finalizar pratos.", CategoriaAlimentoId = 2, Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.1m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.5m },
-            new Alimento { Name = "Massa de Lasanha", Description = "Massa para lasanha (seca).", CategoriaAlimentoId = 3, Calories = 371, KcalPor100g = 371, ProteinaGPor100g = 13m, HidratosGPor100g = 75m, GorduraGPor100g = 1.5m },
-            new Alimento { Name = "Queijo Parmesão", Description = "Queijo curado usado para finalizar pratos.", CategoriaAlimentoId = 4, Calories = 431, KcalPor100g = 431, ProteinaGPor100g = 38m, HidratosGPor100g = 4m, GorduraGPor100g = 29m },
-            new Alimento { Name = "Farinha de Trigo", Description = "Farinha usada em massas e empadões.", CategoriaAlimentoId = 3, Calories = 364, KcalPor100g = 364, ProteinaGPor100g = 10m, HidratosGPor100g = 76m, GorduraGPor100g = 1m },
-            new Alimento { Name = "Leite Condensado", Description = "Produto lácteo adoçado para sobremesas.", CategoriaAlimentoId = 4, Calories = 321, KcalPor100g = 321, ProteinaGPor100g = 7.9m, HidratosGPor100g = 55m, GorduraGPor100g = 8.7m },
-            new Alimento { Name = "Açúcar", Description = "Açúcar branco para confeitaria.", CategoriaAlimentoId = 3, Calories = 387, KcalPor100g = 387, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
-            new Alimento { Name = "Polvo", Description = "Molusco (polvo) usado em pratos tradicionais.", CategoriaAlimentoId = 5, Calories = 82, KcalPor100g = 82, ProteinaGPor100g = 15m, HidratosGPor100g = 2.2m, GorduraGPor100g = 1m },
+            // Condimentos e Molhos
+            new Alimento { Name = "Azeitonas", Description = "Azeitonas (pretas/verdes), usadas como complemento.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 115, KcalPor100g = 115, ProteinaGPor100g = 0.8m, HidratosGPor100g = 6.3m, GorduraGPor100g = 10.7m },
+            new Alimento { Name = "Alcaparras", Description = "Condimento salgado usado como alternativa às azeitonas em saladas.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.4m, HidratosGPor100g = 4.9m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Vinagre de Maçã", Description = "Condimento ácido usado como alternativa ao limão em temperos.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 21, KcalPor100g = 21, ProteinaGPor100g = 0m, HidratosGPor100g = 0.9m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Mostarda", Description = "Condimento usado em molhos e sanduíches.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 66, KcalPor100g = 66, ProteinaGPor100g = 4.4m, HidratosGPor100g = 5.8m, GorduraGPor100g = 3.6m },
+            new Alimento { Name = "Molho de Soja", Description = "Tempero líquido salgado (shoyu).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 53, KcalPor100g = 53, ProteinaGPor100g = 8.1m, HidratosGPor100g = 4.9m, GorduraGPor100g = 0.6m },
+            new Alimento { Name = "Molho de Tomate", Description = "Base de tomate cozinhada para massas e guisados.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.4m, HidratosGPor100g = 6.6m, GorduraGPor100g = 0.2m },
 
-            // Alimentos adicionais para substituições realistas
-            new Alimento { Name = "Bebida de Soja", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = 4, Calories = 33, KcalPor100g = 33, ProteinaGPor100g = 3m, HidratosGPor100g = 1.7m, GorduraGPor100g = 1.9m },
-            new Alimento { Name = "Iogurte Sem Lactose", Description = "Iogurte sem lactose (alternativa a laticínios).", CategoriaAlimentoId = 4, Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 4m, HidratosGPor100g = 6m, GorduraGPor100g = 2m },
-            new Alimento { Name = "Pão Sem Glúten", Description = "Pão preparado sem glúten.", CategoriaAlimentoId = 3, Calories = 250, KcalPor100g = 250, ProteinaGPor100g = 5m, HidratosGPor100g = 50m, GorduraGPor100g = 3m },
-            new Alimento { Name = "Farinha de Arroz", Description = "Farinha alternativa, naturalmente sem glúten.", CategoriaAlimentoId = 3, Calories = 366, KcalPor100g = 366, ProteinaGPor100g = 6m, HidratosGPor100g = 80m, GorduraGPor100g = 1m },
-            new Alimento { Name = "Adoçante (Stevia)", Description = "Adoçante com baixo teor calórico.", CategoriaAlimentoId = 3, Calories = 0, KcalPor100g = 0, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 0m },
-            new Alimento { Name = "Margarina Vegetal", Description = "Gordura vegetal usada como alternativa à manteiga.", CategoriaAlimentoId = 4, Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 80m },
+            // Óleos e Gorduras
+            new Alimento { Name = "Azeite", Description = "Gordura vegetal usada em temperos e cozinhados.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
+            new Alimento { Name = "Óleo de Girassol", Description = "Óleo vegetal neutro, alternativa ao azeite para cozinhar.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
+            new Alimento { Name = "Manteiga", Description = "Gordura láctea usada em confeitaria e risottos.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0.9m, HidratosGPor100g = 0.1m, GorduraGPor100g = 81m },
+            new Alimento { Name = "Margarina Vegetal", Description = "Gordura vegetal usada como alternativa à manteiga.", CategoriaAlimentoId = Cat("Óleos e Gorduras"), Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 80m },
+
+            // Grãos (cereais e pseudocereais)
+            new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = Cat("Grãos"), Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Aveia", Description = "Cereal integral, boa fonte de fibras.", CategoriaAlimentoId = Cat("Grãos"), Calories = 389, KcalPor100g = 389, ProteinaGPor100g = 17m, HidratosGPor100g = 66m, GorduraGPor100g = 7m },
+            new Alimento { Name = "Trigo", Description = "Cereal com glúten, base para farinhas e pães.", CategoriaAlimentoId = Cat("Grãos"), Calories = 339, KcalPor100g = 339, ProteinaGPor100g = 13m, HidratosGPor100g = 72m, GorduraGPor100g = 2.5m },
+            new Alimento { Name = "Quinoa", Description = "Pseudocereal sem glúten, alternativa ao arroz.", CategoriaAlimentoId = Cat("Grãos"), Calories = 120, KcalPor100g = 120, ProteinaGPor100g = 4.4m, HidratosGPor100g = 21.3m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Granola", Description = "Mistura de cereais; alternativa à aveia em pequenos-almoços.", CategoriaAlimentoId = Cat("Grãos"), Calories = 471, KcalPor100g = 471, ProteinaGPor100g = 10m, HidratosGPor100g = 64m, GorduraGPor100g = 20m },
+            new Alimento { Name = "Cuscuz", Description = "Cereal (geralmente de sêmola) usado como acompanhamento.", CategoriaAlimentoId = Cat("Grãos"), Calories = 112, KcalPor100g = 112, ProteinaGPor100g = 3.8m, HidratosGPor100g = 23.2m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Milho", Description = "Cereal usado em grãos, farinhas e preparações.", CategoriaAlimentoId = Cat("Grãos"), Calories = 365, KcalPor100g = 365, ProteinaGPor100g = 9.4m, HidratosGPor100g = 74m, GorduraGPor100g = 4.7m },
+            new Alimento { Name = "Cevada", Description = "Cereal usado em sopas e acompanhamentos.", CategoriaAlimentoId = Cat("Grãos"), Calories = 354, KcalPor100g = 354, ProteinaGPor100g = 12.5m, HidratosGPor100g = 73.5m, GorduraGPor100g = 2.3m },
+
+            // Leguminosas
+            new Alimento { Name = "Feijão", Description = "Leguminosa rica em fibras e proteínas.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 347, KcalPor100g = 347, ProteinaGPor100g = 21m, HidratosGPor100g = 63m, GorduraGPor100g = 1.2m },
+            new Alimento { Name = "Lentilhas", Description = "Leguminosa rica em proteínas e fibras.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 116, KcalPor100g = 116, ProteinaGPor100g = 9m, HidratosGPor100g = 20m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Grão-de-bico", Description = "Leguminosa usada em saladas, sopas e húmus.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 164, KcalPor100g = 164, ProteinaGPor100g = 8.9m, HidratosGPor100g = 27.4m, GorduraGPor100g = 2.6m },
+            new Alimento { Name = "Ervilhas", Description = "Leguminosa usada em sopas, arroz e saladas.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 81, KcalPor100g = 81, ProteinaGPor100g = 5.4m, HidratosGPor100g = 14m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Favas", Description = "Leguminosa rica em fibra e proteína.", CategoriaAlimentoId = Cat("Leguminosas"), Calories = 88, KcalPor100g = 88, ProteinaGPor100g = 7.6m, HidratosGPor100g = 18.7m, GorduraGPor100g = 0.7m },
+
+            // Tubérculos
+            new Alimento { Name = "Batata", Description = "Tubérculo versátil.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 77, KcalPor100g = 77, ProteinaGPor100g = 2m, HidratosGPor100g = 17m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Batata Palha", Description = "Batata frita em palha, usada em pratos tradicionais.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 550, KcalPor100g = 550, ProteinaGPor100g = 6m, HidratosGPor100g = 50m, GorduraGPor100g = 35m },
+            new Alimento { Name = "Inhame", Description = "Tubérculo usado em purés e sopas.", CategoriaAlimentoId = Cat("Tubérculos"), Calories = 118, KcalPor100g = 118, ProteinaGPor100g = 1.5m, HidratosGPor100g = 28m, GorduraGPor100g = 0.2m },
+
+            // Pães e Tortilhas
+            new Alimento { Name = "Pão", Description = "Fonte de hidratos, geralmente à base de trigo.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 265, KcalPor100g = 265, ProteinaGPor100g = 9m, HidratosGPor100g = 49m, GorduraGPor100g = 3.2m },
+            new Alimento { Name = "Pão Integral", Description = "Pão com maior teor de fibra, alternativa ao pão branco.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 247, KcalPor100g = 247, ProteinaGPor100g = 13m, HidratosGPor100g = 41m, GorduraGPor100g = 4.2m },
+            new Alimento { Name = "Pão Sem Glúten", Description = "Pão preparado sem glúten.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 250, KcalPor100g = 250, ProteinaGPor100g = 5m, HidratosGPor100g = 50m, GorduraGPor100g = 3m },
+            new Alimento { Name = "Tortilha de Milho", Description = "Tortilha sem glúten, alternativa ao pão.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 218, KcalPor100g = 218, ProteinaGPor100g = 5.7m, HidratosGPor100g = 44.6m, GorduraGPor100g = 2.9m },
+            new Alimento { Name = "Tortilha de Trigo", Description = "Wrap de trigo usado em sanduíches e tacos.", CategoriaAlimentoId = Cat("Pães e Tortilhas"), Calories = 327, KcalPor100g = 327, ProteinaGPor100g = 9m, HidratosGPor100g = 54m, GorduraGPor100g = 8.5m },
+
+            // Massas
+            new Alimento { Name = "Massa de Lasanha", Description = "Massa para lasanha (seca).", CategoriaAlimentoId = Cat("Massas"), Calories = 371, KcalPor100g = 371, ProteinaGPor100g = 13m, HidratosGPor100g = 75m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Massa Integral", Description = "Massa feita com farinha integral.", CategoriaAlimentoId = Cat("Massas"), Calories = 348, KcalPor100g = 348, ProteinaGPor100g = 12.5m, HidratosGPor100g = 67m, GorduraGPor100g = 2.5m },
+            new Alimento { Name = "Esparguete", Description = "Massa clássica, usada em pratos do dia-a-dia.", CategoriaAlimentoId = Cat("Massas"), Calories = 158, KcalPor100g = 158, ProteinaGPor100g = 5.8m, HidratosGPor100g = 30.9m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Esparguete Integral", Description = "Massa integral com mais fibra.", CategoriaAlimentoId = Cat("Massas"), Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 5.8m, HidratosGPor100g = 29.1m, GorduraGPor100g = 1.1m },
+
+            // Farinhas e Panificação
+            new Alimento { Name = "Farinha de Trigo", Description = "Farinha usada em massas e empadões.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 364, KcalPor100g = 364, ProteinaGPor100g = 10m, HidratosGPor100g = 76m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Farinha de Arroz", Description = "Farinha alternativa, naturalmente sem glúten.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 366, KcalPor100g = 366, ProteinaGPor100g = 6m, HidratosGPor100g = 80m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Farinha de Milho", Description = "Farinha naturalmente sem glúten para receitas e polenta.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 365, KcalPor100g = 365, ProteinaGPor100g = 7.3m, HidratosGPor100g = 76.9m, GorduraGPor100g = 3.9m },
+            new Alimento { Name = "Farinha de Aveia", Description = "Farinha de aveia, usada em panquecas e bolos.", CategoriaAlimentoId = Cat("Farinhas e Panificação"), Calories = 404, KcalPor100g = 404, ProteinaGPor100g = 14m, HidratosGPor100g = 66m, GorduraGPor100g = 9m },
+
+            // Laticínios e Alternativas
+            new Alimento { Name = "Leite", Description = "Líquido rico em cálcio.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 42, KcalPor100g = 42, ProteinaGPor100g = 3.4m, HidratosGPor100g = 5m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Leite de Amêndoa", Description = "Alternativa vegetal ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 0.4m, HidratosGPor100g = 0.3m, GorduraGPor100g = 1.1m },
+            new Alimento { Name = "Bebida de Soja", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 33, KcalPor100g = 33, ProteinaGPor100g = 3m, HidratosGPor100g = 1.7m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Bebida de Aveia", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 46, KcalPor100g = 46, ProteinaGPor100g = 1m, HidratosGPor100g = 7m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Bebida de Arroz", Description = "Bebida vegetal de sabor suave, alternativa ao leite.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.3m, HidratosGPor100g = 9.2m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Iogurte Natural", Description = "Iogurte natural, usado em pequenos-almoços e molhos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 61, KcalPor100g = 61, ProteinaGPor100g = 3.5m, HidratosGPor100g = 4.7m, GorduraGPor100g = 3.3m },
+            new Alimento { Name = "Iogurte Sem Lactose", Description = "Iogurte sem lactose (alternativa a laticínios).", CategoriaAlimentoId = Cat("Laticínios"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 4m, HidratosGPor100g = 6m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Iogurte de Soja", Description = "Iogurte vegetal, alternativa para dietas sem lactose.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 54, KcalPor100g = 54, ProteinaGPor100g = 4m, HidratosGPor100g = 3m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Queijo", Description = "Lácteo fermentado, fonte de cálcio.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 402, KcalPor100g = 402, ProteinaGPor100g = 25m, HidratosGPor100g = 1.3m, GorduraGPor100g = 33m },
+            new Alimento { Name = "Queijo Parmesão", Description = "Queijo curado usado para finalizar pratos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 431, KcalPor100g = 431, ProteinaGPor100g = 38m, HidratosGPor100g = 4m, GorduraGPor100g = 29m },
+            new Alimento { Name = "Queijo Vegan", Description = "Alternativa vegetal ao queijo.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 280, KcalPor100g = 280, ProteinaGPor100g = 2m, HidratosGPor100g = 6m, GorduraGPor100g = 25m },
+            new Alimento { Name = "Queijo Fresco", Description = "Queijo fresco, usado em saladas e lanches.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 98, KcalPor100g = 98, ProteinaGPor100g = 11m, HidratosGPor100g = 3m, GorduraGPor100g = 4m },
+            new Alimento { Name = "Requeijão", Description = "Lácteo cremoso usado em sanduíches e molhos.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 224, KcalPor100g = 224, ProteinaGPor100g = 8m, HidratosGPor100g = 3m, GorduraGPor100g = 20m },
+            new Alimento { Name = "Kefir", Description = "Bebida fermentada, alternativa ao iogurte.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 3.3m, HidratosGPor100g = 4.8m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Iogurte Grego", Description = "Iogurte com maior teor proteico e textura cremosa.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 59, KcalPor100g = 59, ProteinaGPor100g = 10m, HidratosGPor100g = 3.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Leite Condensado", Description = "Produto lácteo adoçado para sobremesas.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 321, KcalPor100g = 321, ProteinaGPor100g = 7.9m, HidratosGPor100g = 55m, GorduraGPor100g = 8.7m },
+            new Alimento { Name = "Leite Condensado Sem Lactose", Description = "Alternativa ao leite condensado tradicional.", CategoriaAlimentoId = Cat("Laticínios"), Calories = 315, KcalPor100g = 315, ProteinaGPor100g = 7.5m, HidratosGPor100g = 54m, GorduraGPor100g = 8m },
+
+            // Açúcares e Adoçantes
+            new Alimento { Name = "Açúcar", Description = "Açúcar branco para confeitaria.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 387, KcalPor100g = 387, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Adoçante (Stevia)", Description = "Adoçante com baixo teor calórico.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 0, KcalPor100g = 0, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Xilitol", Description = "Adoçante usado como alternativa ao açúcar em algumas receitas.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 240, KcalPor100g = 240, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Xarope de Agave", Description = "Adoçante natural líquido, alternativa ao mel.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 310, KcalPor100g = 310, ProteinaGPor100g = 0m, HidratosGPor100g = 76m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Mel", Description = "Adoçante natural, usado em saladas e bebidas.", CategoriaAlimentoId = Cat("Açúcares e Adoçantes"), Calories = 304, KcalPor100g = 304, ProteinaGPor100g = 0.3m, HidratosGPor100g = 82m, GorduraGPor100g = 0m },
+
+            // Proteínas Vegetais
+            new Alimento { Name = "Tofu", Description = "Produto de soja, boa alternativa proteica.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 76, KcalPor100g = 76, ProteinaGPor100g = 8m, HidratosGPor100g = 1.9m, GorduraGPor100g = 4.8m },
+            new Alimento { Name = "Tempeh", Description = "Fermentado de soja, rico em proteína.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 193, KcalPor100g = 193, ProteinaGPor100g = 20m, HidratosGPor100g = 9m, GorduraGPor100g = 11m },
+            new Alimento { Name = "Seitan", Description = "Proteína de glúten de trigo, alternativa vegetal à carne.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 143, KcalPor100g = 143, ProteinaGPor100g = 25m, HidratosGPor100g = 5m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Edamame", Description = "Soja verde, usada como snack ou em saladas.", CategoriaAlimentoId = Cat("Proteínas Vegetais"), Calories = 122, KcalPor100g = 122, ProteinaGPor100g = 11m, HidratosGPor100g = 10m, GorduraGPor100g = 5m },
+
+            // Oleaginosas e Sementes
+            new Alimento { Name = "Amendoim", Description = "Oleaginosa rica em gorduras saudáveis.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 567, KcalPor100g = 567, ProteinaGPor100g = 25.8m, HidratosGPor100g = 16.1m, GorduraGPor100g = 49.2m },
+            new Alimento { Name = "Amêndoa", Description = "Oleaginosa rica em fibras e gorduras saudáveis.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 579, KcalPor100g = 579, ProteinaGPor100g = 21.2m, HidratosGPor100g = 21.7m, GorduraGPor100g = 49.9m },
+            new Alimento { Name = "Noz", Description = "Oleaginosa rica em ômega-3 e antioxidantes.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 654, KcalPor100g = 654, ProteinaGPor100g = 15.2m, HidratosGPor100g = 13.7m, GorduraGPor100g = 65.2m },
+            new Alimento { Name = "Caju", Description = "Oleaginosa usada em snacks e culinária.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 553, KcalPor100g = 553, ProteinaGPor100g = 18.2m, HidratosGPor100g = 30.2m, GorduraGPor100g = 43.9m },
+            new Alimento { Name = "Avelã", Description = "Oleaginosa aromática, usada em snacks e sobremesas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 628, KcalPor100g = 628, ProteinaGPor100g = 15m, HidratosGPor100g = 16.7m, GorduraGPor100g = 60.8m },
+            new Alimento { Name = "Sementes de Girassol", Description = "Sementes ricas em gorduras saudáveis; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 584, KcalPor100g = 584, ProteinaGPor100g = 20.8m, HidratosGPor100g = 20m, GorduraGPor100g = 51.5m },
+            new Alimento { Name = "Sementes de Abóbora", Description = "Sementes ricas em magnésio; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 559, KcalPor100g = 559, ProteinaGPor100g = 30.2m, HidratosGPor100g = 10.7m, GorduraGPor100g = 49m },
+
+            // Carnes (inclui aves e enchidos)
+            new Alimento { Name = "Frango", Description = "Carne branca rica em proteínas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 165, KcalPor100g = 165, ProteinaGPor100g = 31m, HidratosGPor100g = 0m, GorduraGPor100g = 3.6m },
+            new Alimento { Name = "Peru", Description = "Carne magra; alternativa ao frango em várias preparações.", CategoriaAlimentoId = Cat("Carnes"), Calories = 135, KcalPor100g = 135, ProteinaGPor100g = 29m, HidratosGPor100g = 0m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Peito de Peru", Description = "Carne processada magra; alternativa ao bacon/chouriço em sanduíches.", CategoriaAlimentoId = Cat("Carnes"), Calories = 104, KcalPor100g = 104, ProteinaGPor100g = 18m, HidratosGPor100g = 2m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Carne de Vaca (Magra)", Description = "Carne magra, alternativa em pratos de proteína.", CategoriaAlimentoId = Cat("Carnes"), Calories = 187, KcalPor100g = 187, ProteinaGPor100g = 26m, HidratosGPor100g = 0m, GorduraGPor100g = 8m },
+            new Alimento { Name = "Chouriço", Description = "Enchido tradicional usado em sopas e feijoadas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 350, KcalPor100g = 350, ProteinaGPor100g = 17m, HidratosGPor100g = 2m, GorduraGPor100g = 30m },
+            new Alimento { Name = "Bacon", Description = "Carne curada, usada como ingrediente em feijoadas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 541, KcalPor100g = 541, ProteinaGPor100g = 37m, HidratosGPor100g = 1.4m, GorduraGPor100g = 42m },
+
+            // Peixes e Mariscos
+            new Alimento { Name = "Salmão", Description = "Peixe gordo, rico em ômega-3.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 208, KcalPor100g = 208, ProteinaGPor100g = 20m, HidratosGPor100g = 0m, GorduraGPor100g = 13m },
+            new Alimento { Name = "Bacalhau", Description = "Peixe (bacalhau) usado em pratos tradicionais.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 105, KcalPor100g = 105, ProteinaGPor100g = 23m, HidratosGPor100g = 0m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Atum", Description = "Peixe versátil, usado em saladas e sanduíches.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 132, KcalPor100g = 132, ProteinaGPor100g = 29m, HidratosGPor100g = 0m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Polvo", Description = "Molusco (polvo) usado em pratos tradicionais.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 82, KcalPor100g = 82, ProteinaGPor100g = 15m, HidratosGPor100g = 2.2m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Lula", Description = "Molusco usado como alternativa ao polvo e camarão em pratos do mar.", CategoriaAlimentoId = Cat("Peixes e Mariscos"), Calories = 92, KcalPor100g = 92, ProteinaGPor100g = 15.6m, HidratosGPor100g = 3.1m, GorduraGPor100g = 1.4m },
+
+            // Ovos
+            new Alimento { Name = "Ovo", Description = "Ovo de galinha, fonte de proteína.", CategoriaAlimentoId = Cat("Ovos"), Calories = 155, KcalPor100g = 155, ProteinaGPor100g = 13m, HidratosGPor100g = 1.1m, GorduraGPor100g = 11m },
+            new Alimento { Name = "Clara de Ovo", Description = "Parte branca do ovo, quase só proteína.", CategoriaAlimentoId = Cat("Ovos"), Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 11m, HidratosGPor100g = 0.7m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Gema de Ovo", Description = "Parte amarela do ovo, rica em gorduras e vitaminas.", CategoriaAlimentoId = Cat("Ovos"), Calories = 322, KcalPor100g = 322, ProteinaGPor100g = 16m, HidratosGPor100g = 3.6m, GorduraGPor100g = 27m },
         };
 
-        var existingNames = new HashSet<string>(
-            context.Alimentos.Select(a => a.Name),
-            StringComparer.OrdinalIgnoreCase);
+        var existentes = context.Alimentos
+            .ToList()
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-        var toAdd = seedAlimentos.Where(a => !existingNames.Contains(a.Name)).ToList();
-        if (toAdd.Count == 0) return;
+        var changed = false;
 
-        context.Alimentos.AddRange(toAdd);
+        foreach (var seed in seedAlimentos)
+        {
+            if (!existentes.TryGetValue(seed.Name, out var atual))
+            {
+                context.Alimentos.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (atual.CategoriaAlimentoId != seed.CategoriaAlimentoId)
+            {
+                atual.CategoriaAlimentoId = seed.CategoriaAlimentoId;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Description, seed.Description, StringComparison.Ordinal))
+            {
+                atual.Description = seed.Description;
+                changed = true;
+            }
+
+            if (atual.Calories != seed.Calories ||
+                atual.KcalPor100g != seed.KcalPor100g ||
+                atual.ProteinaGPor100g != seed.ProteinaGPor100g ||
+                atual.HidratosGPor100g != seed.HidratosGPor100g ||
+                atual.GorduraGPor100g != seed.GorduraGPor100g)
+            {
+                atual.Calories = seed.Calories;
+                atual.KcalPor100g = seed.KcalPor100g;
+                atual.ProteinaGPor100g = seed.ProteinaGPor100g;
+                atual.HidratosGPor100g = seed.HidratosGPor100g;
+                atual.GorduraGPor100g = seed.GorduraGPor100g;
+                changed = true;
+            }
+        }
+
+        if (!changed)
+        {
+            return;
+        }
 
         context.SaveChanges();
     }
@@ -568,9 +738,31 @@ internal class SeedData
         
         if (!alimentos.Any()) return;
 
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().CategoriaAlimentoId, StringComparer.OrdinalIgnoreCase);
+
+        int CatId(string nome)
+        {
+            if (!categoriasByNome.TryGetValue(nome, out var id))
+                throw new InvalidOperationException($"CategoriaAlimento não encontrada para associações de restrições: '{nome}'.");
+            return id;
+        }
+
         // Intolerância à Lactose - associa com laticínios
         var lactose = restricoes.First(r => r.Nome == "Intolerância à Lactose");
-        var laticinios = alimentos.Where(a => a.Name.Contains("Leite") || a.Name.Contains("Queijo")).Take(3);
+        var laticinios = alimentos
+            .Where(a =>
+                a.Name.Equals("Leite", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Equals("Manteiga", StringComparison.OrdinalIgnoreCase))
+            .Take(12);
         foreach (var alimento in laticinios)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -582,7 +774,22 @@ internal class SeedData
 
         // Vegana - associa com carnes, ovos, laticínios
         var vegana = restricoes.First(r => r.Nome == "Dieta Vegana");
-        var produtosAnimais = alimentos.Where(a => a.Name.Contains("Frango") || a.Name.Contains("Salmão") || a.Name.Contains("Queijo") || a.Name.Contains("Leite")).Take(4);
+        var catCarnes = CatId("Carnes");
+        var catPeixes = CatId("Peixes e Mariscos");
+        var catOvos = CatId("Ovos");
+
+        static bool IsDairyAnimalProduct(string name)
+            => name.Equals("Leite", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+               name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+               name.Equals("Manteiga", StringComparison.OrdinalIgnoreCase);
+
+        var produtosAnimais = alimentos
+            .Where(a => a.CategoriaAlimentoId == catCarnes || a.CategoriaAlimentoId == catPeixes || a.CategoriaAlimentoId == catOvos || IsDairyAnimalProduct(a.Name))
+            .Take(25);
         foreach (var alimento in produtosAnimais)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -594,7 +801,16 @@ internal class SeedData
 
         // Baixo Sódio - associa com alimentos processados
         var baixoSodio = restricoes.First(r => r.Nome == "Restrição de Sódio");
-        var alimentosProcessados = alimentos.Where(a => a.Name.Contains("Queijo") || a.Name.Contains("Pão")).Take(2);
+        var alimentosProcessados = alimentos
+            .Where(a =>
+                a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Chouriço", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Bacon", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Molho de Soja", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Alcaparras", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Azeitonas", StringComparison.OrdinalIgnoreCase))
+            .Take(10);
         foreach (var alimento in alimentosProcessados)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -606,7 +822,18 @@ internal class SeedData
 
         // Doença Celíaca - associa com trigo, pão
         var celiaca = restricoes.First(r => r.Nome == "Doença Celíaca");
-        var comGluten = alimentos.Where(a => a.Name.Contains("Pão") || a.Name.Contains("Aveia")).Take(3);
+        var comGluten = alimentos
+            .Where(a =>
+                a.Name.Contains("Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Farinha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Massa", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Esparguete", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cuscuz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cevada", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Tortilha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Seitan", StringComparison.OrdinalIgnoreCase))
+            .Take(15);
         foreach (var alimento in comGluten)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -618,7 +845,17 @@ internal class SeedData
 
         // Diabetes - associa com açúcares e carboidratos
         var diabetes = restricoes.First(r => r.Nome == "Diabetes - Controle de Açúcar");
-        var acucarados = alimentos.Where(a => a.Name.Contains("Banana") || a.Name.Contains("Batata Doce") || a.Name.Contains("Arroz")).Take(3);
+        var acucarados = alimentos
+            .Where(a =>
+                a.Name.Contains("Açúcar", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Mel", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Xarope", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Leite Condensado", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Banana", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Batata", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Arroz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Granola", StringComparison.OrdinalIgnoreCase))
+            .Take(12);
         foreach (var alimento in acucarados)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -630,7 +867,9 @@ internal class SeedData
 
         // Alergia a Frutos do Mar
         var frutosMar = restricoes.First(r => r.Nome == "Alergia a Frutos do Mar");
-        var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Camarão")).Take(1);
+        var frutosMarAlimentos = alimentos
+            .Where(a => a.CategoriaAlimentoId == catPeixes || a.Name.Contains("Camarão", StringComparison.OrdinalIgnoreCase))
+            .Take(10);
         foreach (var alimento in frutosMarAlimentos)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -666,7 +905,12 @@ internal class SeedData
 
         // Intolerância à Frutose - associa com frutas doces
         var frutose = restricoes.First(r => r.Nome == "Intolerância à Frutose");
-        var frutasDoces = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana") || a.Name.Contains("Batata Doce")).Take(3);
+        var frutasDoces = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Frutas") ||
+                a.Name.Contains("Mel", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Xarope", StringComparison.OrdinalIgnoreCase))
+            .Take(15);
         foreach (var alimento in frutasDoces)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -701,14 +945,16 @@ internal class SeedData
 
     private static void PopulateAlimentoSubstitutos(HealthWellbeingDbContext context)
     {
-        if (context.AlimentoSubstitutos.Any())
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+
+        if (!alimentos.Any())
         {
             return;
         }
 
-        var alimentosByNome = context.Alimentos
-            .AsNoTracking()
-            .ToList()
+        var alimentosByNome = alimentos
             .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
@@ -719,28 +965,259 @@ internal class SeedData
             return alimento.AlimentoId;
         }
 
-        var subs = new List<AlimentoSubstituto>
+        // Tags (alergias/restrições) por alimento para escolher substitutos mais compatíveis.
+        var alergiaIdsPorAlimento = context.AlergiaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(a => a.AlimentoId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.AlergiaId).ToHashSet());
+
+        var restricaoIdsPorAlimento = context.RestricaoAlimentarAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(r => r.AlimentoId)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.RestricaoAlimentarId).ToHashSet());
+
+        bool IsCompatível(int alimentoOriginalId, int candidatoId)
         {
-            // Lactose / laticínios
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Leite"), AlimentoSubstitutoRefId = GetAlimentoId("Leite de Amêndoa"), Motivo = "Alternativa sem lactose.", ProporcaoEquivalente = 1m, Observacoes = "Boa para bebidas, cereais e algumas receitas.", FatorSimilaridade = 0.75 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Leite"), AlimentoSubstitutoRefId = GetAlimentoId("Bebida de Soja"), Motivo = "Alternativa vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Boa para molhos e smoothies.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Queijo"), AlimentoSubstitutoRefId = GetAlimentoId("Tofu"), Motivo = "Alternativa para dietas sem lactose/veganas.", ProporcaoEquivalente = 1m, Observacoes = "Textura diferente; ajustar temperos.", FatorSimilaridade = 0.45 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Manteiga"), AlimentoSubstitutoRefId = GetAlimentoId("Azeite"), Motivo = "Alternativa sem lactose para cozinhar.", ProporcaoEquivalente = 0.75m, Observacoes = "Usar menos quantidade e ajustar ao gosto.", FatorSimilaridade = 0.6 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Manteiga"), AlimentoSubstitutoRefId = GetAlimentoId("Margarina Vegetal"), Motivo = "Alternativa vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Boa para barrar e algumas receitas.", FatorSimilaridade = 0.65 },
+            if (alimentoOriginalId == candidatoId)
+                return false;
 
-            // Glúten
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Pão"), AlimentoSubstitutoRefId = GetAlimentoId("Pão Sem Glúten"), Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1m, Observacoes = "Sabor/textura podem variar.", FatorSimilaridade = 0.8 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Farinha de Trigo"), AlimentoSubstitutoRefId = GetAlimentoId("Farinha de Arroz"), Motivo = "Alternativa para receitas sem glúten.", ProporcaoEquivalente = 1m, Observacoes = "Pode precisar de ajuste de líquidos.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Trigo"), AlimentoSubstitutoRefId = GetAlimentoId("Arroz"), Motivo = "Alternativa de grão sem glúten.", ProporcaoEquivalente = 1m, Observacoes = "Perfil nutricional diferente.", FatorSimilaridade = 0.5 },
+            if (alergiaIdsPorAlimento.TryGetValue(alimentoOriginalId, out var a1) &&
+                alergiaIdsPorAlimento.TryGetValue(candidatoId, out var a2) &&
+                a1.Overlaps(a2))
+            {
+                return false;
+            }
 
-            // Açúcar
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Açúcar"), AlimentoSubstitutoRefId = GetAlimentoId("Adoçante (Stevia)"), Motivo = "Alternativa com baixo teor calórico.", ProporcaoEquivalente = 0.2m, Observacoes = "Ajustar ao paladar e à receita.", FatorSimilaridade = 0.55 },
+            if (restricaoIdsPorAlimento.TryGetValue(alimentoOriginalId, out var r1) &&
+                restricaoIdsPorAlimento.TryGetValue(candidatoId, out var r2) &&
+                r1.Overlaps(r2))
+            {
+                return false;
+            }
 
-            // Proteína animal ↔ vegetal (útil para vegetariano/vegano)
-            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Frango"), AlimentoSubstitutoRefId = GetAlimentoId("Tofu"), Motivo = "Alternativa proteica vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Ideal em salteados e pratos com molho.", FatorSimilaridade = 0.55 },
-        };
+            return true;
+        }
 
-        context.AlimentoSubstitutos.AddRange(subs);
+        var existentesPairs = context.AlimentoSubstitutos
+            .AsNoTracking()
+            .Select(s => new { s.AlimentoOriginalId, s.AlimentoSubstitutoRefId })
+            .AsEnumerable()
+            .Select(s => (s.AlimentoOriginalId, s.AlimentoSubstitutoRefId))
+            .ToHashSet();
+
+        var counts = new Dictionary<int, int>();
+        foreach (var (o, _) in existentesPairs)
+        {
+            if (!counts.TryGetValue(o, out var c)) c = 0;
+            counts[o] = c + 1;
+        }
+
+        var novos = new List<AlimentoSubstituto>();
+        var novosPairs = new HashSet<(int AlimentoOriginalId, int AlimentoSubstitutoRefId)>();
+
+        var pairsTotal = new HashSet<(int, int)>(existentesPairs);
+
+        void AddSub(
+            string original,
+            string substituto,
+            string motivo,
+            decimal? proporcao = 1m,
+            string? observacoes = null,
+            double? fatorSimilaridade = 0.6)
+        {
+            var originalId = GetAlimentoId(original);
+            var substitutoId = GetAlimentoId(substituto);
+
+            AddSubById(originalId, substitutoId, motivo, proporcao, observacoes, fatorSimilaridade);
+        }
+
+        void AddSubById(
+            int originalId,
+            int substitutoId,
+            string motivo,
+            decimal? proporcao = 1m,
+            string? observacoes = null,
+            double? fatorSimilaridade = 0.6)
+        {
+            if (originalId == substitutoId)
+                return;
+
+            var key = (originalId, substitutoId);
+            if (pairsTotal.Contains(key) || !novosPairs.Add(key))
+                return;
+
+            novos.Add(new AlimentoSubstituto
+            {
+                AlimentoOriginalId = originalId,
+                AlimentoSubstitutoRefId = substitutoId,
+                Motivo = motivo,
+                ProporcaoEquivalente = proporcao,
+                Observacoes = observacoes,
+                FatorSimilaridade = fatorSimilaridade
+            });
+
+            pairsTotal.Add(key);
+            if (!counts.TryGetValue(originalId, out var c)) c = 0;
+            counts[originalId] = c + 1;
+        }
+
+        // --- Substituições realistas (cobertura ampla) ---
+        // Frutas
+        AddSub("Maçã", "Banana", "Fruta equivalente para lanches e sobremesas.", 1m, "Boa em batidos e saladas de fruta.", 0.75);
+        AddSub("Banana", "Maçã", "Alternativa de fruta para lanches.", 1m, "Textura diferente; ajustar a receita se for cozinhada.", 0.65);
+        AddSub("Laranja", "Maçã", "Alternativa de fruta para sobremesa/lanche.", 1m, "Menos sumo; ajustar se for para sumos.", 0.6);
+        AddSub("Limão", "Vinagre de Maçã", "Alternativa ácida para temperos.", 0.5m, "Adicionar aos poucos para não sobre-acidificar.", 0.7);
+        AddSub("Mel", "Xarope de Agave", "Alternativa de adoçante líquido.", 1m, "Sabor mais neutro; bom para iogurte e panquecas.", 0.7);
+        AddSub("Mel", "Açúcar", "Alternativa para adoçar.", 0.8m, "Pode necessitar de um pouco de líquido extra na receita.", 0.55);
+
+        // Vegetais / aromáticos
+        AddSub("Cenoura", "Abóbora", "Alternativa em sopas, purés e assados.", 1m, "Sabor mais doce; ajustar temperos.", 0.65);
+        AddSub("Cebola", "Alho Francês", "Alternativa mais suave para refogados.", 1m, "Cortar fino e cozinhar até ficar macio.", 0.75);
+        AddSub("Alho", "Cebola", "Alternativa aromática (perfil diferente).");
+        AddSub("Tomate", "Pimento Vermelho", "Alternativa em saladas e assados.", 1m, "Menos acidez; pode adicionar vinagre/limão.", 0.55);
+        AddSub("Alface", "Rúcula", "Alternativa de folhas para saladas.", 1m, "Sabor mais intenso.", 0.7);
+        AddSub("Couve", "Espinafres", "Alternativa de folhas verdes para sopas e salteados.", 1m, "Cozedura mais rápida.", 0.75);
+        AddSub("Coentros", "Salsa", "Alternativa de erva aromática.", 1m, "Ajustar quantidade ao gosto.", 0.8);
+        AddSub("Cogumelos", "Beringela", "Alternativa de textura em pratos com molho.", 1m, "Assar ou saltear para reduzir água.", 0.55);
+        AddSub("Azeitonas", "Alcaparras", "Alternativa salgada para saladas e molhos.", 0.5m, "São mais intensas; usar menos.", 0.65);
+        AddSub("Azeite", "Óleo de Girassol", "Alternativa de gordura para cozinhar.", 1m, "Sabor mais neutro; melhor em altas temperaturas.", 0.65);
+
+        // Grãos / farináceos
+        AddSub("Arroz", "Quinoa", "Alternativa sem glúten e rica em proteína.", 1m, "Lavar antes de cozinhar para reduzir amargor.", 0.7);
+        AddSub("Batata", "Batata Doce", "Alternativa de hidrato complexo.", 1m, "Mais doce; boa assada.", 0.75);
+        AddSub("Batata Doce", "Batata", "Alternativa de tubérculo.", 1m, "Menos doce; ajustar temperos.", 0.7);
+        AddSub("Batata Palha", "Batata", "Alternativa menos processada.", 1m, "Assar/cortar em palitos como substituição.", 0.5);
+        AddSub("Aveia", "Granola", "Alternativa para pequeno-almoço.", 1m, "Verificar açúcares adicionados.", 0.6);
+        AddSub("Feijão", "Lentilhas", "Alternativa de leguminosa.", 1m, "Cozinham mais rápido.", 0.75);
+        AddSub("Tofu", "Grão-de-bico", "Alternativa proteica vegetal.", 1m, "Bom em saladas, caril e húmus.", 0.55);
+        AddSub("Pão", "Pão Sem Glúten", "Alternativa para intolerância ao glúten.", 1m, "Sabor/textura podem variar.", 0.8);
+        AddSub("Pão Sem Glúten", "Tortilha de Milho", "Alternativa sem glúten para sanduíches/wraps.", 1m, "Aquecer ligeiramente para maior flexibilidade.", 0.75);
+        AddSub("Trigo", "Arroz", "Alternativa de grão sem glúten.", 1m, "Perfil nutricional diferente.", 0.5);
+        AddSub("Farinha de Trigo", "Farinha de Arroz", "Alternativa para receitas sem glúten.", 1m, "Pode precisar de ajuste de líquidos.", 0.7);
+        AddSub("Farinha de Arroz", "Farinha de Milho", "Alternativa sem glúten para panificação.", 1m, "Textura mais granulada; pode misturar com outras farinhas.", 0.6);
+        AddSub("Massa de Lasanha", "Massa Integral", "Alternativa mais rica em fibra.", 1m, "Ajustar tempo de cozedura.", 0.7);
+
+        // Açúcares / adoçantes
+        AddSub("Açúcar", "Adoçante (Stevia)", "Alternativa com baixo teor calórico.", 0.2m, "Ajustar ao paladar e à receita.", 0.55);
+        AddSub("Adoçante (Stevia)", "Xilitol", "Alternativa para confeitaria.", 1m, "Pode alterar textura; começar com pequenas quantidades.", 0.6);
+
+        // Laticínios e alternativas
+        AddSub("Leite", "Leite de Amêndoa", "Alternativa sem lactose.", 1m, "Boa para bebidas, cereais e algumas receitas.", 0.75);
+        AddSub("Leite", "Bebida de Soja", "Alternativa vegetal.", 1m, "Boa para molhos e smoothies.", 0.7);
+        AddSub("Leite de Amêndoa", "Bebida de Soja", "Alternativa vegetal.", 1m, "Escolher versão sem açúcar para receitas.", 0.7);
+        AddSub("Bebida de Soja", "Leite de Amêndoa", "Alternativa vegetal.", 1m, "Sabor ligeiramente diferente.", 0.7);
+        AddSub("Iogurte Sem Lactose", "Iogurte de Soja", "Alternativa vegetal ao iogurte.", 1m, "Boa em molhos frios e pequenos-almoços.", 0.7);
+        AddSub("Queijo", "Queijo Parmesão", "Alternativa de queijo em finalização.", 0.5m, "Mais intenso; usar menos.", 0.6);
+        AddSub("Queijo Parmesão", "Queijo", "Alternativa de queijo mais suave.", 1m, "Ajustar a quantidade ao gosto.", 0.6);
+        AddSub("Manteiga", "Azeite", "Alternativa sem lactose para cozinhar.", 0.75m, "Usar menos quantidade e ajustar ao gosto.", 0.6);
+        AddSub("Manteiga", "Margarina Vegetal", "Alternativa vegetal.", 1m, "Boa para barrar e algumas receitas.", 0.65);
+        AddSub("Margarina Vegetal", "Azeite", "Alternativa de gordura.", 0.75m, "Boa para cozinhar; não serve para barrar.", 0.55);
+        AddSub("Leite Condensado", "Leite Condensado Sem Lactose", "Alternativa para intolerância à lactose.", 1m, "Perfil semelhante para sobremesas.", 0.85);
+        AddSub("Leite Condensado Sem Lactose", "Leite Condensado", "Alternativa equivalente.", 1m, "Usar conforme disponibilidade.", 0.85);
+
+        // Proteínas / carnes e peixe
+        AddSub("Frango", "Peru", "Alternativa de carne magra.", 1m, "Boa em grelhados e assados.", 0.75);
+        AddSub("Frango", "Tofu", "Alternativa proteica vegetal.", 1m, "Ideal em salteados e pratos com molho.", 0.55);
+        AddSub("Ovo", "Tofu", "Alternativa em mexidos/omelete vegana.", 1m, "Temperar com cúrcuma e sal para cor/sabor.", 0.45);
+        AddSub("Salmão", "Bacalhau", "Alternativa de peixe.", 1m, "Ajustar gordura/temperos.", 0.6);
+        AddSub("Bacalhau", "Salmão", "Alternativa de peixe.", 1m, "Sabor mais gordo; ajustar azeite.", 0.6);
+        AddSub("Camarão", "Lula", "Alternativa de marisco.", 1m, "Tempo de cozedura diferente.", 0.55);
+        AddSub("Polvo", "Lula", "Alternativa de molusco.", 1m, "Cozedura mais rápida.", 0.6);
+        AddSub("Chouriço", "Bacon", "Alternativa em pratos tradicionais.", 1m, "Mais gorduroso; reduzir quantidade.", 0.6);
+        AddSub("Bacon", "Chouriço", "Alternativa em feijoadas e sopas.", 1m, "Mais especiado.", 0.6);
+        AddSub("Chouriço", "Peito de Peru", "Alternativa mais magra.", 1m, "Menos fumo/especiarias; ajustar tempero.", 0.45);
+        AddSub("Bacon", "Peito de Peru", "Alternativa mais magra.", 1m, "Adicionar um pouco de azeite para suculência.", 0.45);
+
+        // Oleaginosas
+        AddSub("Amendoim", "Amêndoa", "Alternativa de oleaginosa.", 1m, "Risco de alergia cruzada em algumas pessoas.", 0.7);
+        AddSub("Amêndoa", "Amendoim", "Alternativa de oleaginosa.", 1m, "Risco de alergia cruzada em algumas pessoas.", 0.7);
+
+        AddSub("Amendoim", "Sementes de Girassol", "Alternativa quando se evita amendoim.", 1m, "Boa em saladas e snacks.", 0.65);
+        AddSub("Amendoim", "Sementes de Abóbora", "Alternativa quando se evita amendoim.", 1m, "Boa em saladas e granolas.", 0.65);
+        AddSub("Amêndoa", "Sementes de Girassol", "Alternativa a oleaginosas.", 1m, "Boa em snacks e saladas.", 0.6);
+        AddSub("Amêndoa", "Sementes de Abóbora", "Alternativa a oleaginosas.", 1m, "Boa em snacks e saladas.", 0.6);
+
+        // Mais alternativas úteis
+        AddSub("Salmão", "Atum", "Alternativa de peixe.", 1m, "Boa em saladas, sanduíches e pratos simples.", 0.7);
+        AddSub("Bacalhau", "Atum", "Alternativa de peixe.", 1m, "Perfil diferente; ajustar sal/temperos.", 0.55);
+        AddSub("Carne de Vaca (Magra)", "Frango", "Alternativa de proteína.", 1m, "Mais leve; ajustar tempo de cozedura.", 0.6);
+        AddSub("Carne de Vaca (Magra)", "Peru", "Alternativa de proteína magra.", 1m, null, 0.6);
+
+        AddSub("Maçã", "Pêra", "Alternativa de fruta para lanches e sobremesas.", 1m, null, 0.75);
+        AddSub("Pêra", "Maçã", "Alternativa de fruta para lanches.", 1m, null, 0.75);
+        AddSub("Banana", "Morangos", "Alternativa de fruta para batidos e iogurtes.", 1m, "Mais ácido; pode adoçar.", 0.55);
+        AddSub("Morangos", "Banana", "Alternativa de fruta mais doce.", 1m, null, 0.55);
+        AddSub("Manga", "Banana", "Alternativa de fruta tropical.", 1m, null, 0.6);
+        AddSub("Banana", "Manga", "Alternativa de fruta tropical.", 1m, null, 0.6);
+
+        AddSub("Leite", "Bebida de Aveia", "Alternativa vegetal ao leite.", 1m, "Boa para café e cereais.", 0.7);
+        AddSub("Leite", "Bebida de Arroz", "Alternativa vegetal ao leite.", 1m, "Sabor suave; bom para bebidas.", 0.65);
+        AddSub("Iogurte Sem Lactose", "Iogurte Natural", "Alternativa quando não há versão sem lactose.", 1m, "Apenas se não houver restrição à lactose.", 0.5);
+        AddSub("Iogurte Natural", "Iogurte Sem Lactose", "Alternativa para intolerância à lactose.", 1m, null, 0.7);
+        AddSub("Queijo", "Queijo Vegan", "Alternativa para dietas sem lactose/veganas.", 1m, "Verificar ingredientes em caso de alergia a castanhas.", 0.55);
+        AddSub("Queijo Vegan", "Tofu", "Alternativa proteica vegetal.", 1m, "Textura diferente; ajustar temperos.", 0.45);
+
+        // --- Garantia: cada alimento tem pelo menos 5 substitutos ---
+        var alimentosOrdenados = alimentos
+            .OrderBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var candidatosPorCategoria = alimentosOrdenados
+            .GroupBy(a => a.CategoriaAlimentoId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        int GetCount(int alimentoId) => counts.TryGetValue(alimentoId, out var c) ? c : 0;
+
+        foreach (var alimento in alimentosOrdenados)
+        {
+            var originalId = alimento.AlimentoId;
+
+            // Primeiro tenta preencher com candidatos da mesma categoria e compatíveis
+            while (GetCount(originalId) < 5)
+            {
+                var candidatosCategoria = candidatosPorCategoria.TryGetValue(alimento.CategoriaAlimentoId, out var list)
+                    ? list
+                    : alimentosOrdenados;
+
+                Alimento? candidato = candidatosCategoria.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)) &&
+                    IsCompatível(originalId, c.AlimentoId));
+
+                // Depois tenta qualquer categoria, ainda compatível
+                candidato ??= alimentosOrdenados.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)) &&
+                    IsCompatível(originalId, c.AlimentoId));
+
+                // Por fim, fallback absoluto para garantir contagem (pode não ser compatível)
+                candidato ??= alimentosOrdenados.FirstOrDefault(c =>
+                    c.AlimentoId != originalId &&
+                    !pairsTotal.Contains((originalId, c.AlimentoId)));
+
+                if (candidato == null)
+                    break;
+
+                var motivo = candidato.CategoriaAlimentoId == alimento.CategoriaAlimentoId
+                    ? "Alternativa na mesma categoria."
+                    : "Alternativa com perfil semelhante (genérico).";
+
+                var obs = IsCompatível(originalId, candidato.AlimentoId)
+                    ? "Escolhido para evitar alergias/restrições quando possível."
+                    : "Fallback para atingir o mínimo de substitutos; pode não ser adequado a todas as restrições.";
+
+                AddSubById(originalId, candidato.AlimentoId, motivo, 1m, obs, IsCompatível(originalId, candidato.AlimentoId) ? 0.45 : 0.25);
+            }
+        }
+
+        if (novos.Count == 0)
+        {
+            return;
+        }
+
+        context.AlimentoSubstitutos.AddRange(novos);
         context.SaveChanges();
     }
 
@@ -2297,7 +2774,7 @@ internal class SeedData
         dbContext.SaveChanges();
     }
 
-    private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
+    private static List<Client>? PopulateClients(HealthWellbeingDbContext dbContext)
     {
         if (dbContext.Client.Any()) return null;
 
