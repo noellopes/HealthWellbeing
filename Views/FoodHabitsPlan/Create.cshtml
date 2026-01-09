@@ -1,55 +1,126 @@
-﻿@model HealthWellbeing.Models.FoodHabitsPlan
+﻿@model HealthWellbeing.ViewModels.FoodHabitsPlanFormVM
 
 @{
     ViewData["Title"] = "Create Plan";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center">
-        <h1 class="h4 mb-0">
-            <i class="bi bi-plus-circle-fill me-2 text-success"></i>
-            Create Plan
-        </h1>
-    </div>
+<div class="container my-4">
+    <div class="fi-wrapper">
 
-    <a asp-action="Index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i> Back to list
-    </a>
-</div>
+        <div class="fi-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-circle-fill" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                        <h1 class="h5 mb-0 fi-titlebar">Create Plan</h1>
+                    </div>
 
-<hr />
+                    <div class="mt-2 fi-badge">
+                        <i class="bi bi-list-check" style="color: var(--fi-cyan);"></i>
+                        <span>Client • Goal • Foods</span>
+                    </div>
+                </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="alert alert-warning" role="alert"></div>
-
-            <div class="mb-3">
-                <label asp-for="StartingDate" class="form-label"></label>
-                <input asp-for="StartingDate" class="form-control" />
-                <span asp-validation-for="StartingDate" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="EndingDate" class="form-label"></label>
-                <input asp-for="EndingDate" class="form-control" />
-                <span asp-validation-for="EndingDate" class="text-danger"></span>
-            </div>
-
-            <div class="form-check mb-3">
-                <input asp-for="Done" class="form-check-input" />
-                <label asp-for="Done" class="form-check-label"></label>
-            </div>
-
-            <div class="mt-3 d-flex gap-2">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check-circle-fill me-1"></i> Save
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-x-circle me-1"></i> Cancel
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Back
                 </a>
             </div>
-        </form>
+        </div>
+
+        <div class="fi-panel">
+            <form asp-action="Create" method="post" class="fi-toolbar">
+                <div asp-validation-summary="ModelOnly" class="alert alert-warning" role="alert" style="border-radius:14px;"></div>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-4">
+                        <label class="form-label">Client</label>
+                        <select asp-for="ClientId" asp-items="ViewBag.ClientId" class="form-select" id="clientSelect">
+                            <option value="">— Select —</option>
+                        </select>
+                        <span asp-validation-for="ClientId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <label class="form-label">Goal</label>
+                        <select asp-for="GoalId" class="form-select" id="goalSelect">
+                            <option value="">— Select —</option>
+                        </select>
+                        <span asp-validation-for="GoalId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label class="form-label">Start</label>
+                        <input asp-for="StartingDate" class="form-control" />
+                        <span asp-validation-for="StartingDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <label class="form-label">End</label>
+                        <input asp-for="EndingDate" class="form-control" />
+                        <span asp-validation-for="EndingDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <div class="fi-card p-3">
+                            <div class="fw-bold mb-2">Client allergies (automatic)</div>
+                            <div id="alergyBox" class="small" style="color: var(--fi-muted);">Select a client to load allergies.</div>
+                            <div id="alergyList" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="fi-card p-3">
+                            <div class="fw-bold mb-2">Foods</div>
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered align-middle fi-table mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:70px;">Pick</th>
+                                            <th>Food</th>
+                                            <th>Category</th>
+                                            <th style="width:220px;">Portion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Foods.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input asp-for="Foods[@i].Selected" class="form-check-input" />
+                                                    <input asp-for="Foods[@i].FoodId" type="hidden" />
+                                                </td>
+                                                <td class="fw-semibold">@Model.Foods[i].FoodName</td>
+                                                <td>@Model.Foods[i].CategoryName</td>
+                                                <td>
+                                                    <select asp-for="Foods[@i].PortionId" asp-items="ViewBag.PortionId" class="form-select"></select>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="small mt-2" style="color: var(--fi-muted);">
+                                Select foods and choose a portion for each selected item.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3 d-flex gap-2">
+                    <button type="submit" class="btn fi-btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>Save
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">Cancel</a>
+                </div>
+            </form>
+        </div>
+
     </div>
 </div>
 
@@ -57,4 +128,56 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        async function loadGoals(clientId, selectedGoalId) {
+            const goalSelect = document.getElementById("goalSelect");
+            goalSelect.innerHTML = '<option value="">— Select —</option>';
+            if (!clientId) return;
+
+            const res = await fetch(`/FoodHabitsPlan/GetGoals?clientId=${clientId}`);
+            const goals = await res.json();
+
+            for (const g of goals) {
+                const opt = document.createElement("option");
+                opt.value = g.goalId;
+                opt.textContent = g.goalName;
+                if (selectedGoalId && String(selectedGoalId) === String(g.goalId)) opt.selected = true;
+                goalSelect.appendChild(opt);
+            }
+        }
+
+        async function loadAlergies(clientId) {
+            const box = document.getElementById("alergyBox");
+            const list = document.getElementById("alergyList");
+            list.innerHTML = "";
+
+            if (!clientId) {
+                box.textContent = "Select a client to load allergies.";
+                return;
+            }
+
+            const res = await fetch(`/FoodHabitsPlan/GetClientAlergies?clientId=${clientId}`);
+            const al = await res.json();
+
+            if (!al.length) {
+                box.textContent = "This client has no allergies registered.";
+                return;
+            }
+
+            box.textContent = "";
+            for (const a of al) {
+                const badge = document.createElement("span");
+                badge.className = "badge bg-info text-dark";
+                badge.textContent = a.name;
+                list.appendChild(badge);
+            }
+        }
+
+        document.getElementById("clientSelect").addEventListener("change", async (e) => {
+            const clientId = e.target.value;
+            await loadGoals(clientId, null);
+            await loadAlergies(clientId);
+        });
+    </script>
 }

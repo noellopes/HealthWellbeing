@@ -58,6 +58,7 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.FoodIntake> FoodIntake { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.FoodPlanDay> FoodPlanDay { get; set; } = default!;
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
