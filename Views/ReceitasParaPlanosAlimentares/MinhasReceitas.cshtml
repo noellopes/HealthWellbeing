@@ -1,0 +1,68 @@
+@model HealthWellbeing.ViewModels.MinhasReceitasPlanoViewModel
+
+@{
+    ViewData["Title"] = "As Minhas Receitas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">As Minhas Receitas</h1>
+            <p class="text-muted mb-0">Receitas associadas ao seu plano alimentar.</p>
+        </div>
+        <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Aviso))
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> @Model.Aviso
+        </div>
+    }
+
+    @if (Model.Receitas != null && Model.Receitas.Count > 0)
+    {
+        <div class="row g-4">
+            @foreach (var r in Model.Receitas)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <h5 class="card-title mb-1">@r.Nome</h5>
+                                <span class="badge bg-primary">@r.TempoPreparo min</span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.Descricao))
+                            {
+                                <p class="text-muted small mb-2">@r.Descricao</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-2">Sem descrição.</p>
+                            }
+
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Resumo nutricional (por porção)</div>
+                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                    <span class="badge bg-success">@r.Calorias kcal</span>
+                                    <span class="badge bg-secondary">Proteínas: @r.Proteinas g</span>
+                                    <span class="badge bg-secondary">Hidratos: @r.HidratosCarbono g</span>
+                                    <span class="badge bg-secondary">Gorduras: @r.Gorduras g</span>
+                                </div>
+                                <div class="small text-muted mt-2">Porções: <strong>@r.Porcoes</strong></div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white d-flex justify-content-end">
+                            <a asp-controller="Receita" asp-action="Details" asp-route-id="@r.ReceitaId" class="btn btn-outline-primary">
+                                <i class="bi bi-eye"></i> Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
