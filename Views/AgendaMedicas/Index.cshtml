@@ -149,6 +149,10 @@
                         {
                             <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
                         }
+                        else if (User.IsInRole("DiretorClinico"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="Index"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
 
                         @if (User.IsInRole("Medico"))
                         {

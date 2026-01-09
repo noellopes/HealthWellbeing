@@ -218,6 +218,12 @@
                         {
                             <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
                         }
+                        else if (User.IsInRole("Administrador"))
+                        {
+                           <a asp-action="Index" asp-controller="Admin" class="utente-btn">
+                               <i class="bi bi-arrow-left"></i> Voltar
+                           </a>
+                        }
                         
                     </div>
                 </div>
