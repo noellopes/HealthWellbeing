@@ -91,8 +91,6 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            // 🔥 dados existem → permitir recuperação
             return View("invalidProblemaSaude", problemaSaude);
         }
 

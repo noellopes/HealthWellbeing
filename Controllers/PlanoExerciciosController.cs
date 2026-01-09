@@ -127,74 +127,101 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> SalvarProgressoGlobal(List<PlanoExercicioExercicio> exercicios)
         {
             if (exercicios == null || !exercicios.Any())
-            {
                 return RedirectToAction(nameof(Index));
-            }
 
-            // Pega o ID do plano do primeiro item para redirecionar no fim
             int planoId = exercicios.First().PlanoExerciciosId;
-
-            // --- SEGURANÇA: Verificar se o user pode editar este plano ---
-            // (Podes copiar a lógica de segurança que fizeste no método Edit/Details aqui)
 
             foreach (var itemInput in exercicios)
             {
                 var itemDb = await _context.Set<PlanoExercicioExercicio>()
-                    .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == itemInput.PlanoExerciciosId &&
-                                             pe.ExercicioId == itemInput.ExercicioId);
+                    .Include(pe => pe.PlanoExercicios)
+                        .ThenInclude(p => p.UtenteGrupo7)
+                    .FirstOrDefaultAsync(pe =>
+                        pe.PlanoExerciciosId == itemInput.PlanoExerciciosId &&
+                        pe.ExercicioId == itemInput.ExercicioId);
 
-                if (itemDb != null)
+                if (itemDb == null) continue;
+
+                bool estavaConcluido = itemDb.Concluido;
+
+                itemDb.Concluido = itemInput.Concluido;
+                itemDb.PesoUsado = itemInput.PesoUsado;
+
+                if (!estavaConcluido && itemInput.Concluido)
                 {
-                    itemDb.Concluido = itemInput.Concluido;
-
-                    // AQUI É GUARDADO O PESO
-                    itemDb.PesoUsado = itemInput.PesoUsado;
-
-                    _context.Update(itemDb);
+                    _context.HistoricoAtividades.Add(new HistoricoAtividade
+                    {
+                        DataRealizacao = DateTime.Now,
+                        ExercicioId = itemDb.ExercicioId,
+                        UtenteGrupo7Id = itemDb.PlanoExercicios.UtenteGrupo7Id,
+                        PlanoExerciciosId = itemDb.PlanoExerciciosId
+                    });
                 }
+
+                _context.Update(itemDb);
             }
 
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id = planoId });
         }
+
 
         // POST: AtualizarProgresso
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AtualizarProgresso(int planoId, int exercicioId, bool concluido, double? pesoUsado)
         {
+
             var user = await _userManager.GetUserAsync(User);
 
             var itemTreino = await _context.Set<PlanoExercicioExercicio>()
                 .Include(pe => pe.PlanoExercicios)
-                .ThenInclude(p => p.UtenteGrupo7)
-                .FirstOrDefaultAsync(pe => pe.PlanoExerciciosId == planoId && pe.ExercicioId == exercicioId);
+                    .ThenInclude(p => p.UtenteGrupo7)
+                .FirstOrDefaultAsync(pe =>
+                    pe.PlanoExerciciosId == planoId &&
+                    pe.ExercicioId == exercicioId);
 
             if (itemTreino == null) return NotFound();
 
-            // --- SEGURANÇA ---
-            // Utente pode atualizar o seu próprio. Staff pode atualizar os seus atribuídos.
             if (!User.IsInRole("Administrador"))
             {
                 if (User.IsInRole("ProfissionalSaude"))
                 {
-                    if (itemTreino.PlanoExercicios.UtenteGrupo7.ProfissionalSaudeId != user.Id) return Forbid();
+                    if (itemTreino.PlanoExercicios.UtenteGrupo7.ProfissionalSaudeId != user.Id)
+                        return Forbid();
                 }
                 else
                 {
-                    if (itemTreino.PlanoExercicios.UtenteGrupo7.UserId != user.Id) return Forbid();
+                    if (itemTreino.PlanoExercicios.UtenteGrupo7.UserId != user.Id)
+                        return Forbid();
                 }
             }
+
+            bool estavaConcluido = itemTreino.Concluido;
 
             itemTreino.Concluido = concluido;
             itemTreino.PesoUsado = pesoUsado;
 
-            _context.Update(itemTreino);
+            if (!estavaConcluido && concluido)
+            {
+                var historico = new HistoricoAtividade
+                {
+                    DataRealizacao = DateTime.Now,
+                    ExercicioId = exercicioId,
+                    UtenteGrupo7Id = itemTreino.PlanoExercicios.UtenteGrupo7Id,
+                    PlanoExerciciosId = planoId
+                };
+
+                _context.HistoricoAtividades.Add(historico);
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id = planoId });
         }
+
+
 
         // POST: ReiniciarPlano
         [HttpPost]

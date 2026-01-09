@@ -37,13 +37,11 @@ namespace HealthWellbeing.Controllers
                 .Include(h => h.UtenteGrupo7)
                 .AsQueryable();
 
-            // 🔐 utente normal só vê os seus
             if (!isStaff)
             {
                 query = query.Where(h => h.UtenteGrupo7.UserId == userId);
             }
 
-            // 🔍 FILTROS (IGUAL AO TEU EXEMPLO)
             if (!string.IsNullOrWhiteSpace(exercicio))
                 query = query.Where(h => h.Exercicio.ExercicioNome.Contains(exercicio));
 
@@ -66,7 +64,6 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            // manter filtros
             ViewBag.Exercicio = exercicio;
             ViewBag.Utente = utente;
             ViewBag.DataInicio = dataInicio?.ToString("yyyy-MM-dd");
