@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
@@ -45,6 +46,8 @@ namespace HealthWellbeing.Models
         public decimal Gorduras { get; set; }
 
         public ICollection<ComponenteReceita> Componentes { get; set; } = new List<ComponenteReceita>();
+
+        public ICollection<PlanoAlimentar> PlanosAlimentares { get; set; } = new List<PlanoAlimentar>();
 
         // N:N relationship with RestricaoAlimentar (keeping existing structure)
         public List<int> RestricoesAlimentarId { get; set; } = new List<int>();

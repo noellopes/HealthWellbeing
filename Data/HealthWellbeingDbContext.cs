@@ -49,6 +49,8 @@ namespace HealthWellbeing.Data
         public DbSet<HealthWellbeing.Models.PlanoAlimentar> PlanoAlimentar { get; set; }
         public DbSet<HealthWellbeing.Models.Meta> Meta { get; set; }
 
+        public DbSet<HealthWellbeing.Models.ReceitasParaPlanosAlimentares> ReceitasParaPlanosAlimentares { get; set; }
+
 
 
 
@@ -167,9 +169,23 @@ namespace HealthWellbeing.Data
 
             modelBuilder.Entity<PlanoAlimentar>()
                 .HasMany(p => p.Receitas)
-                .WithOne()
-                .HasForeignKey("PlanoAlimentarId")
-                .OnDelete(DeleteBehavior.SetNull);
+                .WithMany(r => r.PlanosAlimentares)
+                .UsingEntity<ReceitasParaPlanosAlimentares>(
+                    j => j
+                        .HasOne(pr => pr.Receita)
+                        .WithMany()
+                        .HasForeignKey(pr => pr.ReceitaId)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne(pr => pr.PlanoAlimentar)
+                        .WithMany()
+                        .HasForeignKey(pr => pr.PlanoAlimentarId)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.HasKey(pr => new { pr.PlanoAlimentarId, pr.ReceitaId });
+                        j.ToTable("ReceitasParaPlanosAlimentares");
+                    });
 
         }
     }

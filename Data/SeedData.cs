@@ -19,6 +19,14 @@ internal class SeedData
         PopulateReceitas(dbContext);
         PopulateComponentesReceita(dbContext);
 
+        // Clients and food-plan related seeds
+        PopulateClients(dbContext);
+        PopulateMetas(dbContext);
+        PopulatePlanosAlimentares(dbContext);
+        PopulateClientAlergias(dbContext);
+        PopulateClientRestricoes(dbContext);
+        PopulateReceitasParaPlanosAlimentares(dbContext);
+
         PopulateSpecialities(dbContext);
         // PopulateConsultas IS NOT WORKING
         // PopulateConsultas(dbContext);
@@ -60,6 +68,13 @@ internal class SeedData
     {
         EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }, dbContext).Wait();
         EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }, dbContext).Wait();
+
+        // In case a new Client profile was created here, ensure the dependent food-plan seed data exists too.
+        PopulateMetas(dbContext);
+        PopulatePlanosAlimentares(dbContext);
+        PopulateClientAlergias(dbContext);
+        PopulateClientRestricoes(dbContext);
+        PopulateReceitasParaPlanosAlimentares(dbContext);
     }
 
     internal static void SeedPopulateClientsAsUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
@@ -73,10 +88,8 @@ internal class SeedData
 
         dbContext.Database.EnsureCreated();
 
-        var clients = PopulateClients(dbContext);
+        var clients = PopulateClients(dbContext) ?? dbContext.Client.ToList();
         var anyClientUpdated = false;
-
-        if (clients == null) return;
 
         foreach (var client in clients)
         {
@@ -121,6 +134,13 @@ internal class SeedData
         {
             await dbContext.SaveChangesAsync();
         }
+
+        // Ensure food-plan related seed data after clients exist.
+        PopulateMetas(dbContext);
+        PopulatePlanosAlimentares(dbContext);
+        PopulateClientAlergias(dbContext);
+        PopulateClientRestricoes(dbContext);
+        PopulateReceitasParaPlanosAlimentares(dbContext);
     }
 
     private static async Task<IdentityUser> EnsureUserIsCreatedAsync(
@@ -2601,6 +2621,237 @@ internal class SeedData
         dbContext.SaveChanges();
 
         return clients;
+    }
+
+    private static void PopulateMetas(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client
+            .AsNoTracking()
+            .OrderBy(c => c.Email)
+            .ToList();
+
+        if (clients.Count == 0) return;
+
+        var existingClientIds = new HashSet<string>(
+            dbContext.Meta.AsNoTracking().Select(m => m.ClientId));
+
+        var templates = new (string desc, int kcal, int protein, int fat, int carbs, int vitamins)[]
+        {
+            ("Perda de peso (défice calórico)", 1800, 140, 60, 160, 100),
+            ("Manutenção (equilibrado)", 2200, 130, 70, 230, 110),
+            ("Ganho de massa (superávit)", 2800, 170, 80, 320, 120),
+            ("Baixo carboidrato (low-carb)", 2000, 160, 90, 100, 100),
+            ("Vegetariano (equilibrado)", 2100, 120, 70, 250, 120),
+            ("Performance / resistência", 2600, 150, 75, 330, 130),
+        };
+
+        var metasToAdd = new List<Meta>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+            if (existingClientIds.Contains(client.ClientId))
+                continue;
+
+            // Leave some clients without any goal/meta.
+            if (i % 5 == 0)
+                continue;
+
+            var t = templates[i % templates.Length];
+
+            metasToAdd.Add(new Meta
+            {
+                ClientId = client.ClientId,
+                MetaDescription = t.desc,
+                DailyCalories = t.kcal,
+                DailyProtein = t.protein,
+                DailyFat = t.fat,
+                DailyHydrates = t.carbs,
+                DailyVitamins = t.vitamins,
+            });
+        }
+
+        if (metasToAdd.Count == 0) return;
+
+        dbContext.Meta.AddRange(metasToAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulatePlanosAlimentares(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client
+            .AsNoTracking()
+            .OrderBy(c => c.Email)
+            .ToList();
+
+        if (clients.Count == 0) return;
+
+        var metasByClientId = dbContext.Meta
+            .AsNoTracking()
+            .GroupBy(m => m.ClientId)
+            .ToDictionary(g => g.Key, g => g.OrderBy(m => m.MetaId).First());
+
+        if (metasByClientId.Count == 0) return;
+
+        var existingPlansClientIds = new HashSet<string>(
+            dbContext.PlanoAlimentar.AsNoTracking().Select(p => p.ClientId));
+
+        var toAdd = new List<PlanoAlimentar>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+            if (!metasByClientId.TryGetValue(client.ClientId, out var meta))
+                continue;
+
+            if (existingPlansClientIds.Contains(client.ClientId))
+                continue;
+
+            // Not every client needs a food plan.
+            if (i % 3 == 0)
+                continue;
+
+            toAdd.Add(new PlanoAlimentar
+            {
+                ClientId = client.ClientId,
+                MetaId = meta.MetaId
+            });
+        }
+
+        if (toAdd.Count == 0) return;
+
+        dbContext.PlanoAlimentar.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateClientAlergias(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client.AsNoTracking().OrderBy(c => c.Email).ToList();
+        var alergias = dbContext.Alergia.AsNoTracking().OrderBy(a => a.AlergiaId).ToList();
+
+        if (clients.Count == 0 || alergias.Count == 0) return;
+
+        var existing = new HashSet<(string clientId, int alergiaId)>(
+            dbContext.ClientAlergia.AsNoTracking().Select(ca => new ValueTuple<string, int>(ca.ClientId, ca.AlergiaId)));
+
+        var toAdd = new List<ClientAlergia>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+
+            // Some clients have no allergies.
+            if (i % 4 == 0)
+                continue;
+
+            var a1 = alergias[i % alergias.Count].AlergiaId;
+            if (!existing.Contains((client.ClientId, a1)))
+            {
+                toAdd.Add(new ClientAlergia { ClientId = client.ClientId, AlergiaId = a1 });
+                existing.Add((client.ClientId, a1));
+            }
+
+            // A few clients have 2 allergies.
+            if (i % 9 == 0)
+            {
+                var a2 = alergias[(i + 3) % alergias.Count].AlergiaId;
+                if (a2 != a1 && !existing.Contains((client.ClientId, a2)))
+                {
+                    toAdd.Add(new ClientAlergia { ClientId = client.ClientId, AlergiaId = a2 });
+                    existing.Add((client.ClientId, a2));
+                }
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ClientAlergia.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateClientRestricoes(HealthWellbeingDbContext dbContext)
+    {
+        var clients = dbContext.Client.AsNoTracking().OrderBy(c => c.Email).ToList();
+        var restricoes = dbContext.RestricaoAlimentar.AsNoTracking().OrderBy(r => r.RestricaoAlimentarId).ToList();
+
+        if (clients.Count == 0 || restricoes.Count == 0) return;
+
+        var existing = new HashSet<(string clientId, int restricaoId)>(
+            dbContext.ClientRestricao.AsNoTracking().Select(cr => new ValueTuple<string, int>(cr.ClientId, cr.RestricaoAlimentarId)));
+
+        var toAdd = new List<ClientRestricao>();
+
+        for (var i = 0; i < clients.Count; i++)
+        {
+            var client = clients[i];
+
+            // Some clients have no restrictions.
+            if (i % 5 == 0)
+                continue;
+
+            var r1 = restricoes[i % restricoes.Count].RestricaoAlimentarId;
+            if (!existing.Contains((client.ClientId, r1)))
+            {
+                toAdd.Add(new ClientRestricao { ClientId = client.ClientId, RestricaoAlimentarId = r1 });
+                existing.Add((client.ClientId, r1));
+            }
+
+            // A few clients have 2 restrictions.
+            if (i % 7 == 0)
+            {
+                var r2 = restricoes[(i + 2) % restricoes.Count].RestricaoAlimentarId;
+                if (r2 != r1 && !existing.Contains((client.ClientId, r2)))
+                {
+                    toAdd.Add(new ClientRestricao { ClientId = client.ClientId, RestricaoAlimentarId = r2 });
+                    existing.Add((client.ClientId, r2));
+                }
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ClientRestricao.AddRange(toAdd);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateReceitasParaPlanosAlimentares(HealthWellbeingDbContext dbContext)
+    {
+        var planos = dbContext.PlanoAlimentar.AsNoTracking().OrderBy(p => p.PlanoAlimentarId).ToList();
+        var receitas = dbContext.Receita.AsNoTracking().OrderBy(r => r.ReceitaId).ToList();
+
+        if (planos.Count == 0 || receitas.Count == 0) return;
+
+        var existing = new HashSet<(int planoId, int receitaId)>(
+            dbContext.ReceitasParaPlanosAlimentares
+                .AsNoTracking()
+                .Select(x => new ValueTuple<int, int>(x.PlanoAlimentarId, x.ReceitaId)));
+
+        var toAdd = new List<ReceitasParaPlanosAlimentares>();
+
+        for (var i = 0; i < planos.Count; i++)
+        {
+            var plano = planos[i];
+            var start = (plano.PlanoAlimentarId * 3) % receitas.Count;
+            var count = 4 + (i % 4); // 4..7 recipes per plan
+
+            for (var j = 0; j < count; j++)
+            {
+                var receita = receitas[(start + j) % receitas.Count];
+                var key = (plano.PlanoAlimentarId, receita.ReceitaId);
+
+                if (existing.Contains(key))
+                    continue;
+
+                toAdd.Add(new ReceitasParaPlanosAlimentares
+                {
+                    PlanoAlimentarId = plano.PlanoAlimentarId,
+                    ReceitaId = receita.ReceitaId
+                });
+                existing.Add(key);
+            }
+        }
+
+        if (toAdd.Count == 0) return;
+        dbContext.ReceitasParaPlanosAlimentares.AddRange(toAdd);
+        dbContext.SaveChanges();
     }
 
     private static void PopulateTrainingType(HealthWellbeingDbContext dbContext)
