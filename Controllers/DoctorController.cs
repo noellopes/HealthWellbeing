@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors
-        public async Task<IActionResult> Index(int page = 1, string searchName = "" )
+        public async Task<IActionResult> Index(int page = 1, string searchName = "")
         {
             // Base query sem Includes (a menos que tenhas navegações para carregar)
             IQueryable<Doctor> doctorQuery = _context.Doctor
@@ -39,7 +40,7 @@ namespace HealthWellbeing.Controllers
             var pageSize = DoctorInfo.ItemsPerPage > 0 ? DoctorInfo.ItemsPerPage : 10;
             // aplica ordenação + paginação
             DoctorInfo.Items = await doctorQuery
-                .OrderBy(d => d.Nome)                   
+                .OrderBy(d => d.Nome)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -48,13 +49,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Doctors/Details
+        [Authorize(Roles = "DiretorClimico,Medico")]
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
             var doctor = await _context.Doctor
                 .Include(d => d.Especialidade)
                 .FirstOrDefaultAsync(m => m.IdMedico == id);
@@ -62,25 +64,36 @@ namespace HealthWellbeing.Controllers
             {
                 return NotFound();
             }
+            var medico = await GetDoctorFromLoggedUser();
+            if (medico == null)
+                return Content("Não existe um médico associado ao teu utilizador.");
 
+
+            if (medico.IdMedico != doctor.IdMedico)
+                return Forbid();
             return View(doctor);
+
         }
 
         // GET: Doctors/Create
+        [Authorize(Roles = "DiretorClimico")]
+
         public IActionResult Create()
         {
             ViewData["IdEspecialidade"] = new SelectList(
-                _context.Specialities,      
-                "IdEspecialidade",          
-                "Nome"                      
+                _context.Specialities,
+                "IdEspecialidade",
+                "Nome"
             );
 
             return View();
         }
 
         // POST: Doctors/Create
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClimico")]
         public async Task<IActionResult> Create([Bind("IdMedico,Nome,Telemovel,Email,IdEspecialidade")] Doctor doctor)
         {
             if (await _context.Doctor.AnyAsync(d => d.Email == doctor.Email))
@@ -100,12 +113,12 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-           
+
             ViewData["IdEspecialidade"] = new SelectList(
                 _context.Specialities,
                 "IdEspecialidade",
                 "Nome",
-                doctor.IdEspecialidade      
+                doctor.IdEspecialidade
             );
 
             return View(doctor);
@@ -205,6 +218,15 @@ namespace HealthWellbeing.Controllers
         private bool DoctorExists(int id)
         {
             return _context.Doctor.Any(e => e.IdMedico == id);
+        }
+        private async Task<Doctor?> GetDoctorFromLoggedUser()
+        {
+            var email = User?.Identity?.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            return await _context.Doctor
+                .FirstOrDefaultAsync(d => d.Email == email);
         }
     }
 }
