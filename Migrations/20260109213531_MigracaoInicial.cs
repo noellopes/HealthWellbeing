@@ -729,7 +729,8 @@ namespace HealthWellbeing.Migrations
                         name: "FK_Alergia_Food_FoodId",
                         column: x => x.FoodId,
                         principalTable: "Food",
-                        principalColumn: "FoodId");
+                        principalColumn: "FoodId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -927,7 +928,7 @@ namespace HealthWellbeing.Migrations
                         column: x => x.IdUtenteSaude,
                         principalTable: "UtenteSaude",
                         principalColumn: "UtenteSaudeId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -944,7 +945,8 @@ namespace HealthWellbeing.Migrations
                         name: "FK_ConsultaUtente_Consulta_IdConsulta",
                         column: x => x.IdConsulta,
                         principalTable: "Consulta",
-                        principalColumn: "IdConsulta");
+                        principalColumn: "IdConsulta",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ConsultaUtente_UtenteSaude_IdUtente",
                         column: x => x.IdUtente,
@@ -966,7 +968,8 @@ namespace HealthWellbeing.Migrations
                         name: "FK_DoctorConsulta_Consulta_IdConsulta",
                         column: x => x.IdConsulta,
                         principalTable: "Consulta",
-                        principalColumn: "IdConsulta");
+                        principalColumn: "IdConsulta",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DoctorConsulta_Doctor_IdMedico",
                         column: x => x.IdMedico,

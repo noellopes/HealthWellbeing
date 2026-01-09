@@ -1389,7 +1389,8 @@ namespace HealthWellbeing.Migrations
                 {
                     b.HasOne("HealthWellbeing.Models.Food", "Food")
                         .WithMany()
-                        .HasForeignKey("FoodId");
+                        .HasForeignKey("FoodId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Food");
                 });
@@ -1430,7 +1431,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.UtenteSaude", "UtenteSaude")
                         .WithMany()
                         .HasForeignKey("IdUtenteSaude")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Doctor");
@@ -1445,7 +1446,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Consulta", "Consulta")
                         .WithMany("ConsultaUtentes")
                         .HasForeignKey("IdConsulta")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.UtenteSaude", "Utente")
@@ -1475,7 +1476,7 @@ namespace HealthWellbeing.Migrations
                     b.HasOne("HealthWellbeing.Models.Consulta", "Consulta")
                         .WithMany("ConsultaDoctors")
                         .HasForeignKey("IdConsulta")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Doctor", "Medico")

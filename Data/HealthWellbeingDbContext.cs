@@ -7,9 +7,7 @@ namespace HealthWellbeing.Data
     public class HealthWellbeingDbContext : DbContext
     {
         public HealthWellbeingDbContext(DbContextOptions<HealthWellbeingDbContext> options)
-            : base(options)
-        {
-        }
+            : base(options) { }
 
         // -------------------------
         // PRINCIPAIS
@@ -24,7 +22,6 @@ namespace HealthWellbeing.Data
         public DbSet<DoctorConsulta> DoctorConsulta { get; set; } = default!;
         public DbSet<ConsultaUtente> ConsultaUtente { get; set; } = default!;
 
-
         // -------------------------
         // NUTRIÇÃO / PLANOS
         // -------------------------
@@ -32,7 +29,6 @@ namespace HealthWellbeing.Data
         public DbSet<Plan> Plan { get; set; } = default!;
         public DbSet<Nutritionist> Nutritionist { get; set; } = default!;
         public DbSet<NutritionistClientPlan> NutritionistClientPlan { get; set; } = default!;
-
         public DbSet<FoodCategory> FoodCategory { get; set; } = default!;
         public DbSet<Food> Food { get; set; } = default!;
         public DbSet<Portion> Portion { get; set; } = default!;
@@ -64,12 +60,11 @@ namespace HealthWellbeing.Data
         public DbSet<Training> Training { get; set; } = default!;
 
         // -------------------------
-        // OUTROS (se existirem mesmo no teu projeto)
+        // OUTROS
         // -------------------------
         public DbSet<Receita> Receita { get; set; } = default!;
         public DbSet<RestricaoAlimentar> RestricaoAlimentar { get; set; } = default!;
         public DbSet<Alergia> Alergia { get; set; } = default!;
-
         public DbSet<Exercicio> Exercicio { get; set; } = default!;
         public DbSet<TipoExercicio> TipoExercicio { get; set; } = default!;
         public DbSet<Beneficio> Beneficio { get; set; } = default!;
@@ -84,7 +79,17 @@ namespace HealthWellbeing.Data
             base.OnModelCreating(modelBuilder);
 
             // -------------------------
-            // RELAÇÕES (FKs) IMPORTANTES
+            // REGRA GLOBAL: evitar Cascade
+            // -------------------------
+            foreach (var fk in modelBuilder.Model.GetEntityTypes()
+                         .SelectMany(e => e.GetForeignKeys())
+                         .Where(fk => !fk.IsOwnership))
+            {
+                fk.DeleteBehavior = DeleteBehavior.Restrict; // em SQL Server vira NO ACTION
+            }
+
+            // -------------------------
+            // RELAÇÕES IMPORTANTES
             // -------------------------
 
             modelBuilder.Entity<Event>()
@@ -111,49 +116,60 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(c => c.IdEspecialidade)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // ✅ CASCADE: apagar UtenteSaude apaga Consultas associadas
+            modelBuilder.Entity<Consulta>()
+                .HasOne(c => c.UtenteSaude)
+                .WithMany() // se quiseres, podes criar navigation ICollection<Consulta> em UtenteSaude e pôr .WithMany(u => u.Consultas)
+                .HasForeignKey(c => c.IdUtenteSaude)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<AgendaMedica>()
                 .HasOne(a => a.Medico)
                 .WithMany(d => d.AgendaMedica)
                 .HasForeignKey(a => a.IdMedico)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // -------------------------
+            // DoctorConsulta (many-to-many)
+            // -------------------------
             modelBuilder.Entity<DoctorConsulta>()
                 .HasKey(dc => new { dc.IdMedico, dc.IdConsulta });
 
             modelBuilder.Entity<DoctorConsulta>()
-               .HasOne(dc => dc.Medico)
-               .WithMany(d => d.DoctorConsultas)
-               .HasForeignKey(dc => dc.IdMedico)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(dc => dc.Medico)
+                .WithMany(d => d.DoctorConsultas)
+                .HasForeignKey(dc => dc.IdMedico)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            // ✅ CASCADE: apagar Consulta apaga linhas DoctorConsulta
             modelBuilder.Entity<DoctorConsulta>()
-               .HasOne(dc => dc.Consulta)
-               .WithMany(c => c.ConsultaDoctors)
-               .HasForeignKey(dc => dc.IdConsulta)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(dc => dc.Consulta)
+                .WithMany(c => c.ConsultaDoctors)
+                .HasForeignKey(dc => dc.IdConsulta)
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // -------------------------
+            // ConsultaUtente (many-to-many)
+            // -------------------------
             modelBuilder.Entity<ConsultaUtente>()
                 .HasKey(cu => new { cu.IdConsulta, cu.IdUtente });
 
+            // ✅ CASCADE: apagar Consulta apaga linhas ConsultaUtente
             modelBuilder.Entity<ConsultaUtente>()
-               .HasOne(cu => cu.Consulta)
-               .WithMany(u => u.ConsultaUtentes)
-               .HasForeignKey(cu => cu.IdConsulta)
-               .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(cu => cu.Consulta)
+                .WithMany(c => c.ConsultaUtentes)
+                .HasForeignKey(cu => cu.IdConsulta)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ConsultaUtente>()
-               .HasOne(cu => cu.Utente)
-               .WithMany(c => c.UtenteConsultas)
-               .HasForeignKey(cu => cu.IdUtente)
-               .OnDelete(DeleteBehavior.NoAction);
-
-
-
+                .HasOne(cu => cu.Utente)
+                .WithMany(u => u.UtenteConsultas)
+                .HasForeignKey(cu => cu.IdUtente)
+                .OnDelete(DeleteBehavior.NoAction);
 
             // -------------------------
             // ÍNDICES ÚNICOS
             // -------------------------
-
             modelBuilder.Entity<FoodPlanDay>()
                 .HasIndex(x => new { x.PlanId, x.Date, x.FoodId })
                 .IsUnique();
@@ -167,8 +183,7 @@ namespace HealthWellbeing.Data
                 .IsUnique();
 
             // -------------------------
-            // RELAÇÃO 1-para-1: Client <-> UtenteSaude
-            // (não pode haver mais utentes do que clientes)
+            // 1-para-1: Client <-> UtenteSaude
             // -------------------------
             modelBuilder.Entity<UtenteSaude>()
                 .HasOne(u => u.Client)
@@ -176,13 +191,12 @@ namespace HealthWellbeing.Data
                 .HasForeignKey<UtenteSaude>(u => u.ClientId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Reforço: 1 utente por client (garante unicidade do ClientId em UtenteSaude)
             modelBuilder.Entity<UtenteSaude>()
                 .HasIndex(u => u.ClientId)
                 .IsUnique();
 
             // -------------------------
-            // DECIMAIS DA RECEITA (se as props existirem mesmo)
+            // DECIMAIS (Receita)
             // -------------------------
             modelBuilder.Entity<Receita>(entity =>
             {
@@ -191,18 +205,6 @@ namespace HealthWellbeing.Data
                 entity.Property(e => e.HidratosCarbono).HasPrecision(10, 2);
                 entity.Property(e => e.Proteinas).HasPrecision(10, 2);
             });
-
-            // -------------------------
-            // Regra global: evitar Cascade (sem contrariar configurações explícitas)
-            // Só troca Cascade -> Restrict
-            // -------------------------
-            foreach (var fk in modelBuilder.Model.GetEntityTypes()
-                         .SelectMany(e => e.GetForeignKeys())
-                         .Where(fk => !fk.IsOwnership))
-            {
-                if (fk.DeleteBehavior == DeleteBehavior.Cascade)
-                    fk.DeleteBehavior = DeleteBehavior.Restrict;
-            }
         }
     }
 }
