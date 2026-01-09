@@ -306,7 +306,7 @@ internal class SeedData
                 {
                     var portionId = portions[rnd.Next(portions.Count)].PortionId;
 
-                    dbContext.FoodPlan.Add(new FoodPlan
+                    dbContext.FoodPlan.Add(new PlanFood
                     {
                         PlanId = plan.FoodHabitsPlanId,
                         FoodId = food.FoodId,
