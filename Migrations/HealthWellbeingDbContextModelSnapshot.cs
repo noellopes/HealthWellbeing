@@ -631,9 +631,6 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("ScoringStrategyId")
-                        .HasColumnType("int");
-
                     b.HasKey("EventTypeId");
 
                     b.ToTable("EventType");
