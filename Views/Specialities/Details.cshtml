@@ -190,6 +190,11 @@
                     </div>
                 </div>
             </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
 
             <!-- CORPO -->
             <div class="utente-body">
@@ -268,6 +273,23 @@
                                 </a>
                             </div>
                         </div>
+           
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h6 card-title">Consultas</h3>
+                    <p class="small text-muted">
+                        Veja as consultas relacionadas com esta especialidade
+                        e faça a sua marcação.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Consultas" asp-action="Index"
+                           class="btn btn-outline-primary btn-sm">
+                            Ver consultas
+                        </a>
+                       
+                    </div>
+                </div>
+            </div>
 
                         <!-- Card 2 -->
                         <div class="side-card mb-3">
@@ -296,6 +318,11 @@
                 </div>
 
             </div>
+    
+    <div class="mt-4 d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar à lista
+        </a>
 
             <div class="utente-footer-bar"></div>
         </div>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class MigracaoInicial : Migration
+    public partial class MigracaoAtual : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -931,6 +931,28 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ConsultaUtente",
+                columns: table => new
+                {
+                    IdConsulta = table.Column<int>(type: "int", nullable: false),
+                    IdUtente = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConsultaUtente", x => new { x.IdConsulta, x.IdUtente });
+                    table.ForeignKey(
+                        name: "FK_ConsultaUtente_Consulta_IdConsulta",
+                        column: x => x.IdConsulta,
+                        principalTable: "Consulta",
+                        principalColumn: "IdConsulta");
+                    table.ForeignKey(
+                        name: "FK_ConsultaUtente_UtenteSaude_IdUtente",
+                        column: x => x.IdUtente,
+                        principalTable: "UtenteSaude",
+                        principalColumn: "UtenteSaudeId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DoctorConsulta",
                 columns: table => new
                 {
@@ -991,6 +1013,11 @@ namespace HealthWellbeing.Migrations
                 name: "IX_Consulta_IdUtenteSaude",
                 table: "Consulta",
                 column: "IdUtenteSaude");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConsultaUtente_IdUtente",
+                table: "ConsultaUtente",
+                column: "IdUtente");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Doctor_IdEspecialidade",
@@ -1168,6 +1195,9 @@ namespace HealthWellbeing.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClientAlergy");
+
+            migrationBuilder.DropTable(
+                name: "ConsultaUtente");
 
             migrationBuilder.DropTable(
                 name: "DoctorConsulta");

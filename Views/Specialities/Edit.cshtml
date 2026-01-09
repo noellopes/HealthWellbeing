@@ -188,6 +188,11 @@
                                 <span asp-validation-for="Descricao" class="text-danger"></span>
                             </div>
                         </div>
+            <div class="mb-3">
+                <label asp-for="Descricao" class="form-label">Texto abaixo do nome (resumo)</label>
+                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
 
                         <div class="section-card mb-3">
                             <div class="section-head">
@@ -200,6 +205,11 @@
                                 <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
                             </div>
                         </div>
+            <div class="mb-3">
+                <label asp-for="OqueEDescricao" class="form-label">O que é a especialidade?</label>
+                <textarea asp-for="OqueEDescricao" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
+            </div>
 
                         <div class="d-flex gap-2 flex-wrap mt-3">
                             <button type="submit" class="btn btn-success">
