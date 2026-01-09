@@ -185,7 +185,7 @@
                     </div>
 
                     <div class="utente-actions">
-                        <span class="@badgeClass fs-6 px-3 py-2">@estado</span>
+                        
 
                         <a asp-action="Index" class="utente-btn">
                             <i class="bi bi-arrow-left"></i> Voltar
@@ -201,10 +201,17 @@
                         <h2 class="welcome-title">
                             <i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta
                         </h2>
+                        <div>
+                            <span class="@badgeClass fs-6 px-3 py-2">@estado</span>
+                            @if (User.IsInRole("Medico"))
+                            {
+                                <a asp-action="Observacoes" asp-route-id="@Model.IdConsulta" class="btn btn-secondary hb-btn">
+                                    <i class="bi bi-journal-text"></i> Editar Observações
+                                </a>
+                            }
+                        </div>
+                       
 
-                        <a asp-action="Observacoes" asp-route-id="@Model.IdConsulta" class="btn btn-secondary hb-btn">
-                            <i class="bi bi-journal-text"></i> Editar Observações
-                        </a>
                     </div>
 
                     <div class="row g-2">
