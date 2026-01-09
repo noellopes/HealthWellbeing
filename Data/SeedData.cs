@@ -20,10 +20,12 @@ namespace HealthWellbeing.Data
             PopulateGeneros(dbContext);
             PopulateGruposMusculares(dbContext);
             PopulateEquipamentos(dbContext);
-            PopulateProblemasSaude(dbContext);   // 🔥 TEM DE VIR ANTES
+            PopulateProblemasSaude(dbContext);
+            PopulateObjetivosFisicos(dbContext);
             PopulateBeneficios(dbContext);
             PopulateTiposExercicio(dbContext);
             PopulateExercicios(dbContext);
+
         }
 
         private static void PopulateGeneros(HealthWellbeingDbContext dbContext)
@@ -154,10 +156,15 @@ namespace HealthWellbeing.Data
         {
             if (dbContext.Equipamento.Any()) return;
 
-            var equipamentos = new[]
-            {
-            new Equipamento { NomeEquipamento = "Halteres" },
-            new Equipamento { NomeEquipamento = "Barra Olímpica" },
+            var equipamentos = new[]{
+            new Equipamento { NomeEquipamento = "Halteres", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Barra Olímpica", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Discos de Peso", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Caneleiras com Peso", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Coletes com Peso", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Kettlebell", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Medicine Ball", RequerPeso = true },
+            new Equipamento { NomeEquipamento = "Elásticos de Resistência", RequerPeso = true },
             new Equipamento { NomeEquipamento = "Banco de Musculação" },
             new Equipamento { NomeEquipamento = "Banco Inclinado" },
             new Equipamento { NomeEquipamento = "Banco Declinado" },
@@ -165,36 +172,22 @@ namespace HealthWellbeing.Data
             new Equipamento { NomeEquipamento = "Gaiola de Potência" },
             new Equipamento { NomeEquipamento = "Tapete de Yoga" },
             new Equipamento { NomeEquipamento = "Bola de Pilates" },
-            new Equipamento { NomeEquipamento = "Elásticos de Resistência" },
             new Equipamento { NomeEquipamento = "Passadeira" },
             new Equipamento { NomeEquipamento = "Bicicleta Estática" },
             new Equipamento { NomeEquipamento = "Bicicleta de Spinning" },
             new Equipamento { NomeEquipamento = "Elíptica" },
             new Equipamento { NomeEquipamento = "Remo Indoor" },
-            new Equipamento { NomeEquipamento = "Kettlebell" },
-            new Equipamento { NomeEquipamento = "Discos de Peso" },
-            new Equipamento { NomeEquipamento = "Corda de Saltar" },
             new Equipamento { NomeEquipamento = "TRX / Suspensão" },
-            new Equipamento { NomeEquipamento = "Máquina de Leg Press" },
-            new Equipamento { NomeEquipamento = "Máquina de Extensão de Pernas" },
-            new Equipamento { NomeEquipamento = "Máquina de Flexão de Pernas" },
-            new Equipamento { NomeEquipamento = "Máquina de Peitoral" },
-            new Equipamento { NomeEquipamento = "Máquina de Remada" },
-            new Equipamento { NomeEquipamento = "Máquina de Pulldown" },
-            new Equipamento { NomeEquipamento = "Smith Machine" },
-            new Equipamento { NomeEquipamento = "Plataforma Vibratória" },
             new Equipamento { NomeEquipamento = "Ab Wheel" },
-            new Equipamento { NomeEquipamento = "Medicine Ball" },
             new Equipamento { NomeEquipamento = "Step" },
-            new Equipamento { NomeEquipamento = "Caneleiras com Peso" },
-            new Equipamento { NomeEquipamento = "Coletes com Peso" },
             new Equipamento { NomeEquipamento = "Barra de Elevações" },
             new Equipamento { NomeEquipamento = "Paralelas" },
             new Equipamento { NomeEquipamento = "Bosu" },
             new Equipamento { NomeEquipamento = "Rolo de Espuma" },
             new Equipamento { NomeEquipamento = "Escada de Agilidade" },
             new Equipamento { NomeEquipamento = "Saco de Boxe" }
-            };
+        };
+
 
             dbContext.Equipamento.AddRange(equipamentos);
             dbContext.SaveChanges();
@@ -261,6 +254,31 @@ namespace HealthWellbeing.Data
             dbContext.ProblemaSaude.AddRange(problemas);
             dbContext.SaveChanges();
         }
+
+        private static void PopulateObjetivosFisicos(HealthWellbeingDbContext dbContext)
+        {
+            if (dbContext.ObjetivoFisico.Any()) return;
+
+            var objetivos = new[]
+            {
+            new ObjetivoFisico { NomeObjetivo = "Perda de Peso" },
+            new ObjetivoFisico { NomeObjetivo = "Ganho de Massa Muscular" },
+            new ObjetivoFisico { NomeObjetivo = "Melhoria da Condição Física" },
+            new ObjetivoFisico { NomeObjetivo = "Reabilitação Física" },
+            new ObjetivoFisico { NomeObjetivo = "Aumento da Resistência" },
+            new ObjetivoFisico { NomeObjetivo = "Definição Muscular" },
+            new ObjetivoFisico { NomeObjetivo = "Mobilidade e Flexibilidade" },
+            new ObjetivoFisico { NomeObjetivo = "Melhoria Postural" },
+            new ObjetivoFisico { NomeObjetivo = "Fortalecimento do Core"},
+            new ObjetivoFisico { NomeObjetivo = "Resistência Cardiovascular"},
+            new ObjetivoFisico { NomeObjetivo = "Saúde Geral" }
+
+        };
+
+            dbContext.ObjetivoFisico.AddRange(objetivos);
+            dbContext.SaveChanges();
+        }
+
 
         private static void PopulateBeneficios(HealthWellbeingDbContext dbContext)
         {
@@ -415,7 +433,7 @@ namespace HealthWellbeing.Data
                 },
                 new TipoExercicio
                 {
-                    NomeTipoExercicios = "HIIT",
+                    NomeTipoExercicios = "Resistência",
                     DescricaoTipoExercicios = "Alterna curtos períodos de exercício intenso com períodos de recuperação.",
                     CaracteristicasTipoExercicios = "Esforço máximo seguido de descanso, treino rápido e eficiente.",
                     TipoExercicioBeneficios = new List<TipoExercicioBeneficio>
@@ -615,12 +633,15 @@ namespace HealthWellbeing.Data
             var equipamentos = dbContext.Equipamento.ToDictionary(e => e.NomeEquipamento, e => e.EquipamentoId);
             var tipos = dbContext.TipoExercicio.ToDictionary(t => t.NomeTipoExercicios, t => t.TipoExercicioId);
             var problemas = dbContext.ProblemaSaude.ToDictionary(p => p.ProblemaNome, p => p.ProblemaSaudeId);
+            var objetivos = dbContext.ObjetivoFisico.ToDictionary(o => o.NomeObjetivo, o => o.ObjetivoFisicoId);
+
+
 
             // Helpers seguros (Fallback para o primeiro item se não encontrar)
             int GetGenId(string nome) => generos.TryGetValue(nome, out int id) ? id : generos.Values.First();
             int GetGrId(string nome) => grupos.TryGetValue(nome, out int id) ? id : grupos.Values.First();
             int GetEqId(string nome) => equipamentos.TryGetValue(nome, out int id) ? id : equipamentos.Values.First();
-            // Fallback para "Força" se não encontrar o tipo, ou o primeiro
+            int GetObjId(string nome) => objetivos.TryGetValue(nome, out int id) ? id : objetivos.Values.First();
             int GetTipoId(string nome) => tipos.TryGetValue(nome, out int id) ? id : (tipos.TryGetValue("Força", out int fId) ? fId : tipos.Values.First());
             int GetProbId(string nome) => problemas.TryGetValue(nome, out int id) ? id : 0;
 
@@ -637,11 +658,23 @@ namespace HealthWellbeing.Data
                     Repeticoes = 15,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioObjetivos = new List<ExercicioObjetivoFisico>
+                    {
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Ganho de Massa Muscular") },
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Saúde Geral") }
+                    },
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular>
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Tríceps") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Ombros") }
+                    },
+                    ExercicioTipoExercicios = new List<ExercicioTipoExercicio>
+                    {
+                        new ExercicioTipoExercicio
+                        {
+                            TipoExercicioId = GetTipoId("Força")
+                        }
                     },
                     ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
                     // Contraindicação: Quem tem tendinite no braço
@@ -682,6 +715,11 @@ namespace HealthWellbeing.Data
                     Repeticoes = 1,
                     Series = 3,
                     ExercicioGeneros = new List<ExercicioGenero> { new ExercicioGenero { GeneroId = GetGenId("Unisexo") } },
+                    ExercicioObjetivos = new List<ExercicioObjetivoFisico>
+                    {
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Fortalecimento do Core") },
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Melhoria Postural") }
+                    },
                     ExercicioGrupoMusculares = new List<ExercicioGrupoMuscular> { new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") } },
                     ExercicioEquipamentos = new List<ExercicioEquipamento> { new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") } },
                     Contraindicacoes = new List<ExercicioProblemaSaude>()
@@ -727,6 +765,18 @@ namespace HealthWellbeing.Data
                     {
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Pernas") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Panturrilhas") }
+                    },
+                    ExercicioObjetivos = new List<ExercicioObjetivoFisico>
+                    {
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Perda de Peso") },
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Resistência Cardiovascular") }
+                    },
+                    ExercicioTipoExercicios = new List<ExercicioTipoExercicio>
+                    {
+                        new ExercicioTipoExercicio
+                        {
+                            TipoExercicioId = GetTipoId("Cardiovascular")
+                        }
                     },
                     ExercicioEquipamentos = new List<ExercicioEquipamento>(),
                     // Contraindicação: Asma (se alta intensidade)
@@ -971,6 +1021,13 @@ namespace HealthWellbeing.Data
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Peito") },
                         new ExercicioGrupoMuscular { GrupoMuscularId = GetGrId("Abdómen") }
                     },
+                    ExercicioTipoExercicios = new List<ExercicioTipoExercicio>
+                    {
+                        new ExercicioTipoExercicio
+                        {
+                            TipoExercicioId = GetTipoId("Resistência")
+                        }
+                    },
                     ExercicioEquipamentos = new List<ExercicioEquipamento>(),
                     Contraindicacoes = (GetProbId("Hipertensão Arterial") > 0)
                         ? new List<ExercicioProblemaSaude> { new ExercicioProblemaSaude { ProblemaSaudeId = GetProbId("Hipertensão Arterial") } }
@@ -1018,6 +1075,17 @@ namespace HealthWellbeing.Data
                     ExercicioEquipamentos = new List<ExercicioEquipamento>
                     {
                         new ExercicioEquipamento { EquipamentoId = GetEqId("Tapete de Yoga") }
+                    },
+                    ExercicioObjetivos = new List<ExercicioObjetivoFisico>
+                    {
+                        new ExercicioObjetivoFisico { ObjetivoFisicoId = GetObjId("Mobilidade e Flexibilidade") }
+                    },
+                    ExercicioTipoExercicios = new List<ExercicioTipoExercicio>
+                    {
+                        new ExercicioTipoExercicio
+                        {
+                            TipoExercicioId = GetTipoId("Flexibilidade")
+                        }
                     },
                     Contraindicacoes = new List<ExercicioProblemaSaude>()
                 },
