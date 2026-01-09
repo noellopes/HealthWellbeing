@@ -209,12 +209,8 @@ internal class SeedData
 
     private static void PopulateAlimentos(HealthWellbeingDbContext context)
     {
-        if (context.Alimentos.Any())
+        var seedAlimentos = new List<Alimento>
         {
-            return;
-        }
-
-        context.Alimentos.AddRange(
             new Alimento { Name = "Maçã", Description = "Fruta doce e crocante.", CategoriaAlimentoId = 1, Calories = 52, KcalPor100g = 52, ProteinaGPor100g = 0.3m, HidratosGPor100g = 14m, GorduraGPor100g = 0.2m },
             new Alimento { Name = "Cenoura", Description = "Vegetal rico em vitamina A.", CategoriaAlimentoId = 2, Calories = 41, KcalPor100g = 41, ProteinaGPor100g = 0.9m, HidratosGPor100g = 10m, GorduraGPor100g = 0.2m },
             new Alimento { Name = "Arroz", Description = "Grão básico na alimentação.", CategoriaAlimentoId = 3, Calories = 130, KcalPor100g = 130, ProteinaGPor100g = 2.7m, HidratosGPor100g = 28m, GorduraGPor100g = 0.3m },
@@ -231,8 +227,24 @@ internal class SeedData
             new Alimento { Name = "Aveia", Description = "Cereal integral, boa fonte de fibras.", CategoriaAlimentoId = 3, Calories = 389, KcalPor100g = 389, ProteinaGPor100g = 17m, HidratosGPor100g = 66m, GorduraGPor100g = 7m },
             new Alimento { Name = "Queijo", Description = "Lácteo fermentado, fonte de cálcio.", CategoriaAlimentoId = 4, Calories = 402, KcalPor100g = 402, ProteinaGPor100g = 25m, HidratosGPor100g = 1.3m, GorduraGPor100g = 33m },
             new Alimento { Name = "Salmão", Description = "Peixe gordo, rico em ômega-3.", CategoriaAlimentoId = 5, Calories = 208, KcalPor100g = 208, ProteinaGPor100g = 20m, HidratosGPor100g = 0m, GorduraGPor100g = 13m },
-            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = 3, Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m }
-        );
+            new Alimento { Name = "Batata Doce", Description = "Tubérculo rico em betacaroteno e fibras.", CategoriaAlimentoId = 3, Calories = 86, KcalPor100g = 86, ProteinaGPor100g = 1.6m, HidratosGPor100g = 20m, GorduraGPor100g = 0.1m },
+
+            // Alimentos adicionais para suportar associações de alergias/restrições
+            new Alimento { Name = "Ovo", Description = "Ovo de galinha, fonte de proteína.", CategoriaAlimentoId = 5, Calories = 155, KcalPor100g = 155, ProteinaGPor100g = 13m, HidratosGPor100g = 1.1m, GorduraGPor100g = 11m },
+            new Alimento { Name = "Trigo", Description = "Cereal com glúten, base para farinhas e pães.", CategoriaAlimentoId = 3, Calories = 339, KcalPor100g = 339, ProteinaGPor100g = 13m, HidratosGPor100g = 72m, GorduraGPor100g = 2.5m },
+            new Alimento { Name = "Amendoim", Description = "Oleaginosa rica em gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 567, KcalPor100g = 567, ProteinaGPor100g = 25.8m, HidratosGPor100g = 16.1m, GorduraGPor100g = 49.2m },
+            new Alimento { Name = "Amêndoa", Description = "Oleaginosa rica em fibras e gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 579, KcalPor100g = 579, ProteinaGPor100g = 21.2m, HidratosGPor100g = 21.7m, GorduraGPor100g = 49.9m },
+            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = 5, Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m }
+        };
+
+        var existingNames = new HashSet<string>(
+            context.Alimentos.Select(a => a.Name),
+            StringComparer.OrdinalIgnoreCase);
+
+        var toAdd = seedAlimentos.Where(a => !existingNames.Contains(a.Name)).ToList();
+        if (toAdd.Count == 0) return;
+
+        context.Alimentos.AddRange(toAdd);
 
         context.SaveChanges();
     }
@@ -331,24 +343,40 @@ internal class SeedData
         // Associa os alimentos existentes às alergias
         var alimentos = context.Alimentos.ToList();
 
-        var alergiaAlimentos = new List<AlergiaAlimento>
-    {
-        new AlergiaAlimento { AlergiaId = alergias[0].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
-        new AlergiaAlimento { AlergiaId = alergias[1].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 },
-        new AlergiaAlimento { AlergiaId = alergias[2].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Ovo")?.AlimentoId ?? 2 },
-        new AlergiaAlimento { AlergiaId = alergias[3].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
-        new AlergiaAlimento { AlergiaId = alergias[4].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
+        int? TryGetAlimentoId(string nome)
+        {
+            return alimentos
+                .FirstOrDefault(a => string.Equals(a.Name, nome, StringComparison.OrdinalIgnoreCase))
+                ?.AlimentoId;
+        }
 
-        // Associações das novas alergias (usando alimentos existentes)
-        new AlergiaAlimento { AlergiaId = alergias[5].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Amendoim")?.AlimentoId ?? 1 },
-        new AlergiaAlimento { AlergiaId = alergias[6].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 }, // soja associada ao trigo (aproximação)
-        new AlergiaAlimento { AlergiaId = alergias[7].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frutos do Mar")?.AlimentoId ?? 5 },
-        new AlergiaAlimento { AlergiaId = alergias[8].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Frango")?.AlimentoId ?? 5 },
-        new AlergiaAlimento { AlergiaId = alergias[9].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Trigo")?.AlimentoId ?? 3 },
-        new AlergiaAlimento { AlergiaId = alergias[10].AlergiaId, AlimentoId = alimentos.FirstOrDefault(a => a.Name == "Leite")?.AlimentoId ?? 4 }
-    };
+        void AddAssociacao(int alergiaIndex, string alimentoNome)
+        {
+            var alimentoId = TryGetAlimentoId(alimentoNome);
+            if (alimentoId == null) return;
 
-        context.AlergiaAlimento.AddRange(alergiaAlimentos);
+            context.AlergiaAlimento.Add(new AlergiaAlimento
+            {
+                AlergiaId = alergias[alergiaIndex].AlergiaId,
+                AlimentoId = alimentoId.Value
+            });
+        }
+
+        // Mantém coerência: cada alergia liga a um (ou mais) alimentos reais seedados.
+        AddAssociacao(0, "Amendoim");          // Alergia ao Amendoim
+        AddAssociacao(1, "Leite");             // Alergia ao Leite
+        AddAssociacao(2, "Ovo");               // Alergia ao Ovo
+        AddAssociacao(3, "Trigo");             // Alergia ao Trigo
+        AddAssociacao(4, "Camarão");           // Alergia a Frutos do Mar
+        AddAssociacao(5, "Amêndoa");           // Alergia a Castanhas
+        AddAssociacao(6, "Tofu");              // Alergia à Soja
+        AddAssociacao(7, "Salmão");            // Alergia ao Peixe
+        AddAssociacao(8, "Frango");            // Alergia ao Frango
+        AddAssociacao(9, "Trigo");             // Alergia ao Glúten
+        AddAssociacao(9, "Pão");               // Glúten (derivados)
+        AddAssociacao(10, "Leite");            // Alergia a Lacticínios
+        AddAssociacao(10, "Queijo");           // Lacticínios
+
         context.SaveChanges();
     }
 
@@ -549,7 +577,7 @@ internal class SeedData
 
         // Alergia a Frutos do Mar
         var frutosMar = restricoes.First(r => r.Nome == "Alergia a Frutos do Mar");
-        var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Salmão")).Take(1);
+        var frutosMarAlimentos = alimentos.Where(a => a.Name.Contains("Camarão")).Take(1);
         foreach (var alimento in frutosMarAlimentos)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -559,9 +587,9 @@ internal class SeedData
             });
         }
 
-        // Alergia a Amendoim (simulada com alimentos existentes)
+        // Alergia a Amendoim
         var amendoim = restricoes.First(r => r.Nome == "Alergia a Amendoim");
-        var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Feijão") || a.Name.Contains("Aveia")).Take(2);
+        var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Amendoim")).Take(1);
         foreach (var alimento in amendoimAlimentos)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
@@ -571,9 +599,9 @@ internal class SeedData
             });
         }
 
-        // Alergia a Ovos (simulada com alimentos existentes)
+        // Alergia a Ovos
         var ovos = restricoes.First(r => r.Nome == "Alergia a Ovos");
-        var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Maçã") || a.Name.Contains("Banana")).Take(2);
+        var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Ovo")).Take(1);
         foreach (var alimento in ovosAlimentos)
         {
             associacoes.Add(new RestricaoAlimentarAlimento 
