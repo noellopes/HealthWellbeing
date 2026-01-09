@@ -119,9 +119,9 @@ namespace HealthWellbeing.Data
             // ✅ CASCADE: apagar UtenteSaude apaga Consultas associadas
             modelBuilder.Entity<Consulta>()
                 .HasOne(c => c.UtenteSaude)
-                .WithMany() // se quiseres, podes criar navigation ICollection<Consulta> em UtenteSaude e pôr .WithMany(u => u.Consultas)
+                .WithMany() 
                 .HasForeignKey(c => c.IdUtenteSaude)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<AgendaMedica>()
                 .HasOne(a => a.Medico)
@@ -146,7 +146,7 @@ namespace HealthWellbeing.Data
                 .HasOne(dc => dc.Consulta)
                 .WithMany(c => c.ConsultaDoctors)
                 .HasForeignKey(dc => dc.IdConsulta)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // -------------------------
             // ConsultaUtente (many-to-many)
@@ -159,7 +159,7 @@ namespace HealthWellbeing.Data
                 .HasOne(cu => cu.Consulta)
                 .WithMany(c => c.ConsultaUtentes)
                 .HasForeignKey(cu => cu.IdConsulta)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<ConsultaUtente>()
                 .HasOne(cu => cu.Utente)
