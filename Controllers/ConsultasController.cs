@@ -22,6 +22,21 @@ namespace HealthWellbeing.Controllers
         {
             _context = context;
         }
+
+        private const string SessUtenteId = "SelectedUtenteSaudeId";
+        private const string SessUtenteEmail = "SelectedUtenteEmail";
+        private const string SessUtenteNome = "SelectedUtenteNome";
+
+        private async Task<UtenteSaude?> GetUtenteSelecionadoRececionistaAsync()
+        {
+            var id = HttpContext.Session.GetInt32(SessUtenteId);
+            if (!id.HasValue) return null;
+
+            return await _context.UtenteSaude
+                .Include(u => u.Client)
+                .FirstOrDefaultAsync(u => u.UtenteSaudeId == id.Value);
+        }
+        //
         [HttpGet]
         public async Task<IActionResult> Observacoes(int id)
         {
@@ -62,7 +77,7 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction("Details", new { id = vm.IdConsulta });
         }
 
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Administrador")]
         [HttpGet]
         public async Task<IActionResult> Relatorio()
         {
@@ -184,6 +199,20 @@ namespace HealthWellbeing.Controllers
         [HttpGet]
         public async Task<IActionResult> Marcar(int? idEspecialidade, int? idMedico, bool naoSelecionarMedico = false)
         {
+            // ✅ Rececionista tem de ter utente selecionado
+            if (User.IsInRole("Rececionista"))
+            {
+                var utSel = await GetUtenteSelecionadoRececionistaAsync();
+                if (utSel == null)
+                {
+                    TempData["Erro"] = "Escolhe primeiro um utente (clica em Detalhes) antes de marcares a consulta.";
+                    return RedirectToAction("RecepcionistaView", "UtenteSaude");
+                }
+
+                ViewBag.SelectedUtenteNome = HttpContext.Session.GetString(SessUtenteNome) ?? utSel.Client?.Name ?? utSel.NomeCompleto ?? "—";
+                ViewBag.SelectedUtenteEmail = HttpContext.Session.GetString(SessUtenteEmail) ?? utSel.Client?.Email ?? "—";
+            }
+
             var vm = new MarcarConsultaGridVM
             {
                 IdEspecialidade = idEspecialidade,
@@ -194,6 +223,16 @@ namespace HealthWellbeing.Controllers
                     .Select(e => new SimpleOptionVM { Id = e.IdEspecialidade, Nome = e.Nome })
                     .ToListAsync()
             };
+            //var vm = new MarcarConsultaGridVM
+           /* {
+                IdEspecialidade = idEspecialidade,
+                IdMedico = idMedico,
+                NaoSelecionarMedico = naoSelecionarMedico,
+                Especialidades = await _context.Specialities
+                    .OrderBy(e => e.Nome)
+                    .Select(e => new SimpleOptionVM { Id = e.IdEspecialidade, Nome = e.Nome })
+                    .ToListAsync()
+            };*/
 
             if (idEspecialidade.HasValue)
             {
@@ -254,6 +293,40 @@ namespace HealthWellbeing.Controllers
             var hi = TimeOnly.ParseExact(partes[1], "HH:mm");
             var hf = TimeOnly.ParseExact(partes[2], "HH:mm");
 
+            var inicioConsultaGlobal = d.ToDateTime(hi);
+            if (inicioConsultaGlobal <= DateTime.Now)
+            {
+                TempData["Erro"] = "Não é possível marcar consultas no passado.";
+                return RedirectToAction(nameof(Marcar), new
+                {
+                    idEspecialidade = vm.IdEspecialidade,
+                    idMedico = vm.IdMedico,
+                    naoSelecionarMedico = vm.NaoSelecionarMedico
+                });
+            }
+            // 🔎 obter o utente (depende do role)
+            UtenteSaude? utente = null;
+
+            if (User.IsInRole("Utente"))
+            {
+                utente = await GetUtenteFromLoggedUser();
+                if (utente == null)
+                    return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
+            }
+            else if (User.IsInRole("Rececionista"))
+            {
+                utente = await GetUtenteSelecionadoRececionistaAsync();
+                if (utente == null)
+                {
+                    TempData["Erro"] = "Escolhe primeiro um utente (clica em Detalhes) antes de confirmares a marcação.";
+                    return RedirectToAction("RecepcionistaView", "UtenteSaude");
+                }
+            }
+            else
+            {
+                return Forbid();
+            }
+            /*
             // 🔎 obter o utente logado (ajusta ao teu projeto)
             var email = User.Identity?.Name?.Trim();
             if (string.IsNullOrWhiteSpace(email))
@@ -265,7 +338,7 @@ namespace HealthWellbeing.Controllers
 
             if (utente == null)
                 return Content("Não existe um utente associado ao teu utilizador (email não encontrado em UtenteSaude).");
-
+            */
             // limite 2 consultas/dia (igual ao teu)
             var totalNoDia = await _context.Consulta.CountAsync(c =>
                 c.IdUtenteSaude == utente.UtenteSaudeId &&
@@ -372,8 +445,33 @@ namespace HealthWellbeing.Controllers
             await _context.SaveChangesAsync();
             await tx.CommitAsync();
 
+            if (User.IsInRole("Rececionista"))
+            {
+                HttpContext.Session.Remove(SessUtenteId);
+                HttpContext.Session.Remove(SessUtenteEmail);
+                HttpContext.Session.Remove(SessUtenteNome);
+            }
+
+            //  TempData["Ok"] = "Consulta marcada com sucesso!";
+            // return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+            if (User.IsInRole("Rececionista"))
+            {
+                HttpContext.Session.Remove("SelectedUtenteSaudeId");
+                HttpContext.Session.Remove("SelectedUtenteEmail");
+                HttpContext.Session.Remove("SelectedUtenteNome");
+
+                TempData["Msg"] = "Consulta marcada com sucesso!";
+                return RedirectToAction("RecepcionistaView", "UtenteSaude");
+            }
+
             TempData["Ok"] = "Consulta marcada com sucesso!";
-            return RedirectToAction(nameof(Marcar), new { idEspecialidade = vm.IdEspecialidade, idMedico = vm.IdMedico });
+            return RedirectToAction(nameof(Marcar), new
+            {
+                idEspecialidade = vm.IdEspecialidade,
+                idMedico = vm.IdMedico,
+                naoSelecionarMedico = vm.NaoSelecionarMedico
+            });
+
         }
 
 

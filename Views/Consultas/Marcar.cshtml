@@ -308,7 +308,14 @@
                     {
                         <div class="alert alert-success mb-3">@TempData["Ok"]</div>
                     }
-
+                    @if (User.IsInRole("Rececionista"))
+                    {
+                        <div class="alert alert-info mb-3">
+                            <strong>Utente selecionado:</strong> @ViewBag.SelectedUtenteNome
+                            <span class="ms-2">(@ViewBag.SelectedUtenteEmail)</span>
+                            <a class="ms-3" asp-controller="UtenteSaude" asp-action="RecepcionistaView">Trocar utente</a>
+                        </div>
+                    }
                     <!-- FILTROS (card) -->
                     <div class="filter-card mb-3">
                         <form method="get" asp-action="Marcar" class="row g-3 align-items-end">
@@ -364,6 +371,14 @@
                         <div class="alert alert-warning">
                             Este médico não tem horários definidos para os próximos 15 dias úteis.
                         </div>
+                    }
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">@TempData["Erro"]</div>
+                    }
+                    @if (TempData["Ok"] != null)
+                    {
+                        <div class="alert alert-success mb-3">@TempData["Ok"]</div>
                     }
 
                     <!-- GRID -->

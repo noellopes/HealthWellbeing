@@ -37,7 +37,7 @@ namespace HealthWellbeing.Models
         public string Nif { get; set; } = default!;
 
         // Número de Segurança Social (NISS) — 11 dígitos
-        [Required(ErrorMessage = "O NISS é obrigatório.")]
+        //[Required(ErrorMessage = "O NISS é obrigatório.")]
         [Display(Name = "Número de Segurança Social")]
         [StringLength(11)]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O NISS deve ter 11 dígitos.")]
