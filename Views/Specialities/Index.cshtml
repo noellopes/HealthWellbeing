@@ -207,7 +207,6 @@
                     </div>
 
                     <div class="utente-actions">
-                        <!-- 3 botões ) -->
                         <a class="utente-btn alt" asp-controller="Doctor" asp-action="Index">
                             <i class="bi bi-heart-pulse"></i> Médicos
                         </a>
@@ -229,35 +228,27 @@
                 <div class="welcome-row">
                     <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
 
-                    <!-- Ajusta para o teu módulo de agendas -->
                     <a class="agenda-btn"
                        asp-controller="AgendaMedicas"
                        asp-action="Index">
                         <i class="bi bi-calendar2-week"></i> Agenda Médica
                     </a>
                 </div>
+
                 <div class="content-card">
-                    
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <div>
                             <h3 class="content-title">Especialidades</h3>
                             <p class="content-sub">Gere e consulta as especialidades médicas.</p>
                         </div>
 
-                        <a asp-action="Create" class="btn btn-success">
-                            <i class="bi bi-plus-circle me-1"></i> Nova Especialidade
-                        </a>
+                        @if (podeGerirEspecialidades)
+                        {
+                            <a asp-action="Create" class="btn btn-success">
+                                <i class="bi bi-plus-circle me-1"></i> Nova Especialidade
+                            </a>
+                        }
                     </div>
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-
-    @if (podeGerirEspecialidades)
-    {
-        <a asp-action="Create" class="btn btn-primary">
-            + Nova Especialidade
-        </a>
-    }
-</div>
 
                     <!-- Pesquisa -->
                     <div class="search-wrap mt-3">
@@ -318,20 +309,23 @@
                                             <div class="d-flex justify-content-between align-items-start gap-2">
                                                 <h5 class="spec-name">@item.Nome</h5>
 
-                                                <div class="spec-actions btn-group btn-group-sm">
-                                                    <a asp-action="Edit"
-                                                       asp-route-id="@item.IdEspecialidade"
-                                                       class="btn btn-outline-secondary"
-                                                       onclick="event.stopPropagation();">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </a>
-                                                    <a asp-action="Delete"
-                                                       asp-route-id="@item.IdEspecialidade"
-                                                       class="btn btn-outline-danger"
-                                                       onclick="event.stopPropagation();">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
-                                                </div>
+                                                @if (podeGerirEspecialidades)
+                                                {
+                                                    <div class="spec-actions btn-group btn-group-sm">
+                                                        <a asp-action="Edit"
+                                                           asp-route-id="@item.IdEspecialidade"
+                                                           class="btn btn-outline-secondary"
+                                                           onclick="event.stopPropagation();">
+                                                            Editar
+                                                        </a>
+                                                        <a asp-action="Delete"
+                                                           asp-route-id="@item.IdEspecialidade"
+                                                           class="btn btn-outline-danger"
+                                                           onclick="event.stopPropagation();">
+                                                            Eliminar
+                                                        </a>
+                                                    </div>
+                                                }
                                             </div>
 
                                             <div class="mt-2 text-muted" style="font-size:.92rem;">
@@ -341,40 +335,12 @@
                                     </div>
                                 }
                             </div>
-                                    @if (podeGerirEspecialidades)
-                                    {
-                                        <div class="btn-group btn-group-sm">
-                                            <a asp-action="Edit"
-                                               asp-route-id="@item.IdEspecialidade"
-                                               class="btn btn-outline-secondary"
-                                               onclick="event.stopPropagation();">
-                                                Editar
-                                            </a>
-                                            <a asp-action="Delete"
-                                               asp-route-id="@item.IdEspecialidade"
-                                               class="btn btn-outline-danger"
-                                               onclick="event.stopPropagation();">
-                                                Eliminar
-                                            </a>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
 
                             <!-- Paginação -->
                             @if (Model.TotalPages > 1)
                             {
                                 <nav aria-label="Navegação de páginas" class="mt-4">
                                     <ul class="pagination justify-content-center mb-0">
-            @if (Model.TotalPages > 1)
-            {
-                <nav aria-label="Navegação de páginas" class="mt-3">
-                    <ul class="pagination justify-content-center mb-0">
-
                                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                                             <a class="page-link"
                                                asp-action="Index"
@@ -404,13 +370,11 @@
                                                 Seguinte
                                             </a>
                                         </li>
-
                                     </ul>
                                 </nav>
                             }
                         }
                     </div>
-
                 </div>
             </div>
 
