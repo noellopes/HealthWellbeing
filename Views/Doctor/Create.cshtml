@@ -1,50 +1,187 @@
 ﻿@model HealthWellbeing.Models.Doctor
 
 @{
-    ViewData["Title"] = "Criar";
+    ViewData["Title"] = "Criar Médico";
 }
 
-<h1>Criar</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<h4>Médico</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nome" class="control-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telemovel" class="control-label"></label>
-                <input asp-for="Telemovel" class="form-control" />
-                <span asp-validation-for="Telemovel" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
- 
-            <div class="form-group mb-3">
-                <label asp-for="IdEspecialidade" class="control-label">Especialidade</label>
-                <select asp-for="IdEspecialidade"
-                        class="form-control"
-                        asp-items="ViewBag.IdEspecialidade">
-                    <option value="">-- Selecione uma Especialidade --</option>
-                </select>
-                <span asp-validation-for="IdEspecialidade" class="text-danger"></span>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    /* Header */
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .top-nav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .top-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .top-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    /* ---------- CORPO ---------- */
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .form-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+
+    .form-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+        font-weight: 600;
+    }
+
+    .btn-group .btn {
+        font-size: .9rem;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- Header -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="top-nav">
+                        <a class="top-btn"
+                           asp-action="Index">
+                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Criar" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
+            <!-- CORPO -->
+            <div class="utente-body">
+                <div class="form-card">
+                    <h2 class="form-title"><i class="bi bi-person-plus-fill me-2"></i> Criar Médico</h2>
+                    <p class="form-sub">Preencha os dados abaixo para criar um novo médico.</p>
+
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Nome" class="control-label"></label>
+                            <input asp-for="Nome" class="form-control" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Telemovel" class="control-label"></label>
+                            <input asp-for="Telemovel" class="form-control" />
+                            <span asp-validation-for="Telemovel" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="IdEspecialidade" class="control-label">Especialidade</label>
+                            <select asp-for="IdEspecialidade"
+                                    class="form-control"
+                                    asp-items="ViewBag.IdEspecialidade">
+                            </select>
+                            <span asp-validation-for="IdEspecialidade" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <input type="submit" value="Criar" class="btn btn-primary" />
+                            <a asp-action="Index" class="btn btn-secondary">Voltar à lista</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>
-
 

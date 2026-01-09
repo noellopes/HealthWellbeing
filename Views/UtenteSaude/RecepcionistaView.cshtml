@@ -1,0 +1,280 @@
+﻿@using HealthWellbeing.Models
+@model PaginationInfo<UtenteSaude>
+
+@{
+    ViewData["Title"] = "Área do Recepcionista";
+    string nomeRecepcionista = ViewBag.NomeRecepcionista as string ?? "Recepcionista";
+    string searchNome = ViewBag.SearchNome as string ?? "";
+    string searchNif = ViewBag.SearchNif as string ?? "";
+    bool isFirst = Model.CurrentPage <= 1;
+    bool isLast = Model.CurrentPage >= Model.TotalPages;
+}
+
+<style>
+    /* Mantém o teu tema */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+    }
+
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    /* Cabeçalho */
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn.alt {
+            background: #3f8fb7;
+        }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    /* Corpo */
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Pequenos ajustes visuais */
+    .title-welcome {
+        margin-top: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + Consultar Agendas Médicas -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                       
+                        <a asp-controller="AgendaMedicas" asp-action="Index" class="utente-btn">
+                            <i class="bi bi-calendar2-week"></i> Consultar Agendas Médicas
+                        </a>
+                        <a asp-controller ="Consultas" asp-action="Index" class="utente-btn">
+                            <i class="bi bi-file-earmark-medical-fill"></i>Consultas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CORPO -->
+            <div class="utente-body">
+
+                <!-- Bem-vindo -->
+                  <h2 class="title-welcome">Bem-vindo, @nomeRecepcionista</h2>
+              
+
+                <!-- Cabeçalho lista + botão pesquisar -->
+                <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+                    <h2 class="h4 m-0">Lista de Utentes</h2>
+
+                    <div class="d-flex justify-content-end">
+                        <a class="btn btn-secondary"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#utenteSearch"
+                           aria-expanded="false"
+                           aria-controls="utenteSearch">
+                            <i class="bi bi-search me-1"></i> Pesquisar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pesquisa -->
+                <div class="collapse mt-2 mb-2" id="utenteSearch">
+                    <div class="card card-body">
+                        <!-- ⚠️ Ajusta asp-action se esta view estiver numa action diferente -->
+                        <form asp-controller="UtenteSaude" asp-action="RecepcionistaView" method="get" class="row g-2 align-items-end">
+
+                            <div class="col-md-6">
+                                <label for="searchNome" class="form-label">Nome</label>
+                                <input id="searchNome" name="searchNome"
+                                       value="@searchNome"
+                                       class="form-control"
+                                       placeholder="Pesquisar por nome"
+                                       type="search" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="searchNif" class="form-label">NIF</label>
+                                <input id="searchNif" name="searchNif"
+                                       value="@searchNif"
+                                       class="form-control"
+                                       placeholder="Pesquisar por NIF"
+                                       type="search" />
+                            </div>
+
+                            <div class="col-12 mt-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-1"></i> Pesquisar
+                                </button>
+                                <a asp-controller="UtenteSaude" asp-action="RecepcionistaView" class="btn btn-secondary">Limpar</a>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mensagem -->
+                @if (TempData["Msg"] != null)
+                {
+                    <div class="alert alert-success mt-3">
+                        @TempData["Msg"]
+                    </div>
+                }
+
+                <!-- Tabela -->
+                <div class="table-responsive mt-3">
+                    <table class="table table-sm table-striped table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th style="width:120px;">Idade</th>
+                                <th style="width:190px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.Items == null || !Model.Items.Any())
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">
+                                        Não existem utentes para apresentar.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var u in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@u.NomeCompleto</td>
+                                        <td>@u.Idade</td>
+                                        <td>
+                                            <a class="btn btn-sm btn-primary"
+                                               asp-action="Details"
+                                               asp-route-id="@u.UtenteSaudeId">
+                                                <i class="bi bi-eye me-1"></i>Detalhes
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                
+
+                <nav aria-label="Paginação de utentes">
+                    <ul class="pagination justify-content-center">
+
+                        <li class="page-item @(isFirst ? "disabled" : "")">
+                            <a class="page-link"
+                               href="@(isFirst ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                  new { page = Model.CurrentPage - 1, searchNome, searchNif }))">
+                                «
+                            </a>
+                        </li>
+
+                        @for (int i = Model.FirstPageShow; i <= Model.LastPageShow; i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link"
+                                   href="@(i == Model.CurrentPage ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                          new { page = i, searchNome, searchNif }))">
+                                @i
+                            </a>
+                        </li>
+                                                }
+
+                        <li class="page-item @(isLast ? "disabled" : "")">
+                            <a class="page-link"
+                               href="@(isLast ? "#" : Url.Action("RecepcionistaView", "UtenteSaude",
+                                                  new { page = Model.CurrentPage + 1, searchNome, searchNif }))">
+                                »
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>

@@ -4,47 +4,180 @@
     ViewData["Title"] = "Nova Especialidade";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-    <a asp-action="Index" class="btn btn-outline-secondary">Voltar à lista</a>
-</div>
+<style>
+    /* Tema igual ao resto */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form asp-action="Create" method="post" autocomplete="off">
-            @Html.AntiForgeryToken()
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-            <div class="mb-3">
-                <label asp-for="Nome" class="form-label"></label>
-                <input asp-for="Nome" class="form-control" placeholder="Ex.: Cardiologia" />
-                <div class="form-text">Máx. 80 caracteres.</div>
-                <span asp-validation-for="Nome" class="text-danger"></span>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .form-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+
+    .form-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+        font-weight: 600;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- Header -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Descricao" class="form-label">Texto abaixo do nome (resumo)</label>
-                <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Pequeno resumo mostrado no topo da especialidade"></textarea>
-                <div class="form-text">Máx. 1500 caracteres.</div>
-                <span asp-validation-for="Descricao" class="text-danger"></span>
+            <!-- Body -->
+            <div class="utente-body">
+                <div class="form-card">
+                    <h2 class="form-title"><i class="bi bi-plus-circle me-2"></i>Nova Especialidade</h2>
+                    <p class="form-sub">Preenche as informações da especialidade que deseja registar.</p>
+
+                    <form asp-action="Create" method="post" autocomplete="off">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Nome" class="form-label fw-semibold"></label>
+                            <input asp-for="Nome" class="form-control" placeholder="Ex.: Cardiologia" />
+                            <div class="form-text">Máx. 80 caracteres.</div>
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Descricao" class="form-label">Texto abaixo do nome (resumo)</label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3" placeholder="Pequeno resumo mostrado no topo da especialidade"></textarea>
+                            <div class="form-text">Máx. 1500 caracteres.</div>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="mb-3">
+                            <label asp-for="OqueEDescricao" class="form-label">O que é a especialidade?</label>
+                            <textarea asp-for="OqueEDescricao" class="form-control" rows="4"
+                                      placeholder="Texto da secção 'O que é a especialidade de ...'"></textarea>
+                            <div class="form-text">Opcional (até 300 caracteres, se mantiveste o MaxLength(300)).</div>
+                            <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i> Guardar
+                            </button>
+                            <a asp-action="Index" class="btn btn-light border">
+                                <i class="bi bi-x-circle me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <hr class="my-4" />
-
-            <div class="mb-3">
-                <label asp-for="OqueEDescricao" class="form-label">O que é a especialidade?</label>
-                <textarea asp-for="OqueEDescricao" class="form-control" rows="4"
-                          placeholder="Texto da secção 'O que é a especialidade de ...'"></textarea>
-                <div class="form-text">Opcional (até 300 caracteres, se mantiveste o MaxLength(300)).</div>
-                <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
-            </div>
-
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <a asp-action="Index" class="btn btn-light border">Cancelar</a>
-            </div>
-        </form>
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>
 

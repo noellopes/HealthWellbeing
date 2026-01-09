@@ -3,93 +3,287 @@
 @{
     ViewData["Title"] = "Detalhes da Consulta";
 
-    // Usa o Estado já calculado na própria classe Consulta
-    var estado = Model.Estado;
+    var estado = Model?.Estado ?? "—";
 
-    // Escolhe a classe CSS para o badge com if/else clássico (compatível com C# antigos)
-    string badgeClass;
-    if (estado == "Cancelada")
-    {
-        badgeClass = "badge bg-danger";
-    }
-    else if (estado == "Expirada")
-    {
-        badgeClass = "badge bg-secondary";
-    }
-    else if (estado == "Hoje")
-    {
-        badgeClass = "badge bg-warning text-dark";
-    }
-    else
-    {
-        badgeClass = "badge bg-success";
-    }
+    string badgeClass =
+        estado == "Cancelada" ? "badge bg-danger" :
+        estado == "Expirada" ? "badge bg-secondary" :
+        estado == "Hoje" ? "badge bg-warning text-dark" :
+        "badge bg-success";
+
+    var dataMarcacao = Model?.DataMarcacao.ToString("dd/MM/yyyy HH:mm") ?? "—";
+    var dataConsulta = Model?.DataConsulta.ToString("dd/MM/yyyy HH:mm") ?? "—";
+    var horaInicio = Model?.HoraInicio.ToString(@"hh\:mm") ?? "—";
+    var horaFim = Model?.HoraFim.ToString(@"hh\:mm") ?? "—";
+    var dataCancelamento = Model?.DataCancelamento.HasValue == true ? Model.DataCancelamento!.Value.ToString("dd/MM/yyyy HH:mm") : "—";
+
+    var medico = Model?.Doctor?.Nome ?? "—";
+    var especialidade = Model?.Speciality?.Nome ?? "—";
+    var emailUtente = Model?.UtenteSaude?.Client?.Email ?? "—";
+
+    var obs = Model?.Observacoes;
+    var temObs = !string.IsNullOrWhiteSpace(obs);
 }
 
-<div class="container py-5">
-    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-            <h2 class="mb-0">
-                <i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta
-            </h2>
-            <span class="@badgeClass fs-6 px-3 py-2">@estado</span>
-        </div>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-        <div class="card-body bg-light px-5 py-4">
-            <dl class="row mb-0">
-                <dt class="col-sm-4 fw-semibold text-secondary">Data de Marcação</dt>
-                <dd class="col-sm-8">
-                    @Model.DataMarcacao.ToString("dd/MM/yyyy HH:mm")
-                </dd>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">Data da Consulta</dt>
-                <dd class="col-sm-8">
-                    @Model.DataConsulta.ToString("dd/MM/yyyy HH:mm")
-                </dd>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Início</dt>
-                <dd class="col-sm-8">
-                    @Model.HoraInicio.ToString("HH\\:mm")
-                </dd>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">Hora de Fim</dt>
-                <dd class="col-sm-8">
-                    @Model.HoraFim.ToString("HH\\:mm")
-                </dd>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">Data de Cancelamento</dt>
-                <dd class="col-sm-8">
-                    @(Model.DataCancelamento.HasValue
-                                        ? Model.DataCancelamento.Value.ToString("dd/MM/yyyy HH:mm")
-                                        : "—")
-                </dd>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">Estado da Consulta</dt>
-                <dd class="col-sm-8">
-                    @Model.Estado
-                </dd>
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+    }
 
-                <dt class="col-sm-4 fw-semibold text-secondary">ID da Consulta</dt>
-                <dd class="col-sm-8">
-                    @Model.IdConsulta
-                </dd>
-            </dl>
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
 
-            <hr class="my-4" />
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
 
-            <div class="d-flex justify-content-between">
-                <a asp-action="Index" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-arrow-left"></i> Voltar
-                </a>
-                <div class="d-flex gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.IdConsulta" class="btn btn-warning px-4">
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a asp-action="Delete" asp-route-id="@Model.IdConsulta" class="btn btn-danger px-4">
-                        <i class="bi bi-trash"></i> Apagar
-                    </a>
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-item {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #2b546c;
+            opacity: .85;
+            margin-bottom: 2px;
+            font-weight: 800;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #1f4f6a;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    .obs-box {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 14px;
+        white-space: pre-wrap;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <span class="@badgeClass fs-6 px-3 py-2">@estado</span>
+
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </div>
                 </div>
             </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">
+                            <i class="bi bi-file-earmark-text me-2"></i> Detalhes da Consulta
+                        </h2>
+
+                        <a asp-action="Observacoes" asp-route-id="@Model.IdConsulta" class="btn btn-secondary hb-btn">
+                            <i class="bi bi-journal-text"></i> Editar Observações
+                        </a>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Data de Marcação</span>
+                                <span class="val">@dataMarcacao</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Data da Consulta</span>
+                                <span class="val">@dataConsulta</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <div class="info-item">
+                                <span class="lbl">Hora de Início</span>
+                                <span class="val">@horaInicio</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <div class="info-item">
+                                <span class="lbl">Hora de Fim</span>
+                                <span class="val">@horaFim</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="info-item">
+                                <span class="lbl">Data de Cancelamento</span>
+                                <span class="val">@dataCancelamento</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">Médico</span>
+                                <span class="val">@medico</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">Especialidade</span>
+                                <span class="val">@especialidade</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <div class="info-item">
+                                <span class="lbl">Email do Utente</span>
+                                <span class="val">@emailUtente</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h4 class="m-0" style="color:#1f4f6a; font-weight:900;">Observações</h4>
+
+                    <div class="mt-2">
+                        @if (!temObs)
+                        {
+                            <p class="text-muted mb-0">Sem observações.</p>
+                        }
+                        else
+                        {
+                            <div class="obs-box">@obs</div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
         </div>
     </div>
 </div>

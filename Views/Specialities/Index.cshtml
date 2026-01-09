@@ -1,128 +1,381 @@
-﻿@model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.Specialities>
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.ViewModel.PaginationInfo<HealthWellbeing.Models.Specialities>
 
 @{
     ViewData["Title"] = "Especialidades";
     var q = ViewBag.SearchQuery as string ?? "";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0">@ViewData["Title"]</h1>
-    <a asp-action="Create" class="btn btn-primary">
-        + Nova Especialidade
-    </a>
-</div>
+<style>
+    /* Tema base (igual ao resto do teu projeto) */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="card shadow-sm">
-    <div class="card-header">
-        <form asp-action="Index" method="get" class="d-flex gap-2">
-            <input type="text"
-                   name="q"
-                   value="@q"
-                   class="form-control"
-                   placeholder="Procurar por nome..." />
-            <button type="submit" class="btn btn-outline-secondary">Pesquisar</button>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-            @if (!string.IsNullOrWhiteSpace(q))
-            {
-                <a asp-action="Index" class="btn btn-outline-light border">Limpar</a>
-            }
-        </form>
-    </div>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-    <div class="card-body">
-        @if (Model.Items == null || !Model.Items.Any())
-        {
-            <div class="text-muted">
-                @if (!string.IsNullOrWhiteSpace(q))
-                {
-                    <p class="mb-1">
-                        Não foram encontradas especialidades para
-                        <strong>"@q"</strong>.
-                    </p>
-                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-2">Ver todas</a>
-                }
-                else
-                {
-                    <p class="mb-0">De momento não existem especialidades registadas.</p>
-                }
-            </div>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn.alt {
+            background: #3f8fb7;
         }
-        else
-        {
-            <div class="row g-3">
-                @foreach (var item in Model.Items)
-                {
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card h-100 border-0 shadow-sm"
-                             role="button"
-                             style="cursor: pointer;"
-                             onclick="location.href='@Url.Action("Details", new { id = item.IdEspecialidade })'">
-                            <div class="card-body d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="card-title mb-0">@item.Nome</h5>
 
-                                    <div class="btn-group btn-group-sm">
-                                        <a asp-action="Edit"
-                                           asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-outline-secondary"
-                                           onclick="event.stopPropagation();">
-                                            Editar
-                                        </a>
-                                        <a asp-action="Delete"
-                                           asp-route-id="@item.IdEspecialidade"
-                                           class="btn btn-outline-danger"
-                                           onclick="event.stopPropagation();">
-                                            Eliminar
-                                        </a>
-                                    </div>
-                                </div>
+        .utente-btn.active-lock {
+            background: #245f80;
+            opacity: .92;
+            pointer-events: none;
+            cursor: default;
+        }
 
-                                
-                            </div>
-                        </div>
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Card branco interno */
+    .content-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .content-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+
+    .content-sub {
+        margin: 6px 0 0 0;
+        color: #2b546c;
+        font-weight: 600;
+    }
+
+    /* Cards de especialidade */
+    .spec-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 14px;
+        padding: 14px;
+        height: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        transition: transform .06s ease, filter .06s ease;
+    }
+
+        .spec-card:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.01);
+        }
+
+    .spec-name {
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 1.05rem;
+        margin: 0;
+    }
+
+    .spec-actions .btn {
+        border-radius: 999px;
+    }
+
+    /* Pesquisa */
+    .search-wrap {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .agenda-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .agenda-btn:hover {
+            filter: brightness(1.05);
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- TOPO: Logo + menu -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
                     </div>
-                }
+
+                    <div class="utente-actions">
+                        <!-- 3 botões ) -->
+                        <a class="utente-btn alt" asp-controller="Doctor" asp-action="Index">
+                            <i class="bi bi-heart-pulse"></i> Médicos
+                        </a>
+
+                        <a class="utente-btn active-lock" asp-controller="Specialities" asp-action="Index">
+                            <i class="bi bi-clipboard2-pulse"></i> Especialidades
+                        </a>
+
+                        <a class="utente-btn alt" asp-controller="UtenteSaude" asp-action="Index">
+                            <i class="bi bi-people-fill"></i> Utentes
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            @* PAGINAÇÃO *@
-            @if (Model.TotalPages > 1)
-            {
-                <nav aria-label="Navegação de páginas" class="mt-3">
-                    <ul class="pagination justify-content-center mb-0">
+            <!-- CORPO -->
+            <div class="utente-body">
+                <!-- Bem-vindo + Agenda Médica -->
+                <div class="welcome-row">
+                    <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
 
-                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                            <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@(Model.CurrentPage - 1)"
-                               asp-route-q="@q">
-                                Anterior
-                            </a>
-                        </li>
+                    <!-- Ajusta para o teu módulo de agendas -->
+                    <a class="agenda-btn"
+                       asp-controller="AgendaMedicas"
+                       asp-action="Index">
+                        <i class="bi bi-calendar2-week"></i> Agenda Médica
+                    </a>
+                </div>
+                <div class="content-card">
+                    
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <h3 class="content-title">Especialidades</h3>
+                            <p class="content-sub">Gere e consulta as especialidades médicas.</p>
+                        </div>
 
-                        @for (var p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i> Nova Especialidade
+                        </a>
+                    </div>
+
+                    <!-- Pesquisa -->
+                    <div class="search-wrap mt-3">
+                        <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                            <div class="col-12 col-md-8">
+                                <label class="form-label fw-semibold">Pesquisar</label>
+                                <input type="text"
+                                       name="q"
+                                       value="@q"
+                                       class="form-control"
+                                       placeholder="Procurar por nome..." />
+                            </div>
+
+                            <div class="col-12 col-md-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search me-1"></i> Pesquisar
+                                </button>
+
+                                @if (!string.IsNullOrWhiteSpace(q))
+                                {
+                                    <a asp-action="Index" class="btn btn-secondary w-100">
+                                        Limpar
+                                    </a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Conteúdo -->
+                    <div class="mt-3">
+                        @if (Model.Items == null || !Model.Items.Any())
                         {
-                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                                <a class="page-link"
-                                   asp-action="Index"
-                                   asp-route-page="@p"
-                                   asp-route-q="@q">
-                                    @p
-                                </a>
-                            </li>
+                            <div class="text-muted">
+                                @if (!string.IsNullOrWhiteSpace(q))
+                                {
+                                    <p class="mb-1">
+                                        Não foram encontradas especialidades para <strong>"@q"</strong>.
+                                    </p>
+                                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary mt-2">Ver todas</a>
+                                }
+                                else
+                                {
+                                    <p class="mb-0">De momento não existem especialidades registadas.</p>
+                                }
+                            </div>
                         }
+                        else
+                        {
+                            <div class="row g-3">
+                                @foreach (var item in Model.Items)
+                                {
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <div class="spec-card"
+                                             role="button"
+                                             style="cursor:pointer;"
+                                             onclick="location.href='@Url.Action("Details", new { id = item.IdEspecialidade })'">
 
-                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@(Model.CurrentPage + 1)"
-                               asp-route-q="@q">
-                                Seguinte
-                            </a>
-                        </li>
+                                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                                <h5 class="spec-name">@item.Nome</h5>
 
-                    </ul>
-                </nav>
-            }
-        }
+                                                <div class="spec-actions btn-group btn-group-sm">
+                                                    <a asp-action="Edit"
+                                                       asp-route-id="@item.IdEspecialidade"
+                                                       class="btn btn-outline-secondary"
+                                                       onclick="event.stopPropagation();">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a asp-action="Delete"
+                                                       asp-route-id="@item.IdEspecialidade"
+                                                       class="btn btn-outline-danger"
+                                                       onclick="event.stopPropagation();">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-2 text-muted" style="font-size:.92rem;">
+                                                Clique para ver detalhes.
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Paginação -->
+                            @if (Model.TotalPages > 1)
+                            {
+                                <nav aria-label="Navegação de páginas" class="mt-4">
+                                    <ul class="pagination justify-content-center mb-0">
+
+                                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                                            <a class="page-link"
+                                               asp-action="Index"
+                                               asp-route-page="@(Model.CurrentPage - 1)"
+                                               asp-route-q="@q">
+                                                Anterior
+                                            </a>
+                                        </li>
+
+                                        @for (var p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                                        {
+                                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                                <a class="page-link"
+                                                   asp-action="Index"
+                                                   asp-route-page="@p"
+                                                   asp-route-q="@q">
+                                                    @p
+                                                </a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                                            <a class="page-link"
+                                               asp-action="Index"
+                                               asp-route-page="@(Model.CurrentPage + 1)"
+                                               asp-route-q="@q">
+                                                Seguinte
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                </nav>
+                            }
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>

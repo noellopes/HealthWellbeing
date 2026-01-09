@@ -6,7 +6,10 @@
     <title>@ViewData["Title"] - HealthWellbeing</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/foodhabits-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
+    <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
 </head>
 <body>
     <header>
@@ -19,41 +22,71 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
 
+                        <!-- Dropdown FoodHabits -->
                         <li class="nav-item dropdown">
-
-                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Gestão de Ginásio
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navHealthDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Food Habits
                             </a>
-
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Client" asp-action="Index">Client</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Member" asp-action="Index">Member</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Plan" asp-action="Index">Plan</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="MemberPlan" asp-action="Index">MemberPlan</a></li>
-
-                                <li><hr class="dropdown-divider"></li>
-
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Trainer" asp-action="Index">Trainer</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Training" asp-action="Index">Training</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingPlan" asp-action="Index">TrainingPlan</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingType" asp-action="Index">TrainingType</a></li>
+                            <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
+                                <li><a class="dropdown-item" asp-controller="Plan" asp-action="Index">Food Plan</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodIntake" asp-action="Index">Food Intake</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Food" asp-action="Index">Foods</a></li>
+                                <li><a class="dropdown-item" asp-controller="FoodCategory" asp-action="Index">Food Categories</a></li>
+                                <li><a class="dropdown-item" asp-controller="Portion" asp-action="Index">Food Portions</a></li>
+                                <li><a class="dropdown-item" asp-controller="NutritionalComponent" asp-action="Index">Nutritional Components</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Nutritionist" asp-action="Index">Nutritionists</a></li>
+                                <li><a class="dropdown-item" asp-controller="Goal" asp-action="Index">Goals</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Consultas" asp-action="Marcar">Marcar Consulta</a>
+                        
+
+                        <!--MArcação de consulta Dropdown para desenvolvimento-->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navHealthDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gestão de Consultas
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navHealthDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="UtenteSaude"
+                                       asp-action="GestaoConsultas">Utentes</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Doctor" asp-action="Index">Médicos</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Specialities" asp-action="Index">Especialidadess</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Marcar">Marcar Consulta</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Relatorio"> Relatório Global</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Consultas" asp-action="Index"> Histórico consultas</a>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="AgendaMedicas" asp-action="Index"> Agenda médica</a>
+                                <li class="dropdown-item">
+                                    <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin</a>
+                                </li>
+                            </ul>
                         </li>
+                        <!--MArcação de consulta final nav-->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Doctor" asp-action="Index">Médicos</a>
+                            <a class="nav-link text-dark"
+                               asp-controller="UtenteSaude"
+                               asp-action="GestaoConsultas">
+                                Gestão de Consultas
+                            </a>
                         </li>
                     </ul>
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
