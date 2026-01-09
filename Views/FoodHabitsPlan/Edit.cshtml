@@ -1,0 +1,206 @@
+﻿@model HealthWellbeing.ViewModels.FoodHabitsPlanFormVM
+
+@{
+    ViewData["Title"] = "Edit Plan";
+    var isNutri = User.IsInRole("Nutricionista") || User.IsInRole("Nutritionist");
+}
+
+<div class="container my-4">
+    <div class="fi-wrapper">
+
+        <div class="fi-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-pencil-square" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                    <h1 class="h5 mb-0 fi-titlebar">Edit Plan</h1>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                        <i class="bi bi-arrow-left-circle me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="fi-panel">
+            <div class="fi-card p-3">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <form asp-action="Edit" asp-route-id="@Model.FoodHabitsPlanId" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="FoodHabitsPlanId" />
+
+                    <div class="row g-3">
+                        <!-- LEFT: Plan info -->
+                        <div class="col-lg-5">
+                            <div class="fi-card p-3 h-100">
+                                <div class="fw-bold mb-2">Plan information</div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ClientId" class="form-label">Client</label>
+                                    <select asp-for="ClientId" class="form-select" asp-items="ViewBag.ClientId" id="clientSelect"></select>
+                                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="GoalId" class="form-label">Goal</label>
+                                    <select asp-for="GoalId" class="form-select" id="goalSelect">
+                                        <option value="">-- select a goal --</option>
+                                    </select>
+                                    <span asp-validation-for="GoalId" class="text-danger"></span>
+                                    <div class="small mt-2" style="color: var(--fi-muted);">
+                                        Goals are filtered by the selected client.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="StartingDate" class="form-label">Start date</label>
+                                    <input asp-for="StartingDate" type="date" class="form-control fh-date" id="startDate" />
+                                    <span asp-validation-for="StartingDate" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="EndingDate" class="form-label">End date</label>
+                                    <input asp-for="EndingDate" type="date" class="form-control fh-date" id="endDate" />
+                                    <span asp-validation-for="EndingDate" class="text-danger"></span>
+                                </div>
+
+                                <div class="mt-2">
+                                    <button type="submit" class="btn fi-btn-primary w-100">
+                                        <i class="bi bi-check2-circle me-1"></i>Save changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Foods -->
+                        <div class="col-lg-7">
+                            <div class="fi-card p-3 h-100">
+                                <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                                    <div class="fw-bold">Foods in this plan</div>
+                                    <div class="small" style="color: var(--fi-muted);">
+                                        Select foods and portion size.
+                                    </div>
+                                </div>
+
+                                <hr />
+
+                                @if (Model.Foods == null || !Model.Foods.Any())
+                                {
+                                    <div class="small" style="color: var(--fi-muted);">No foods available.</div>
+                                }
+                                else
+                                {
+                                    <div class="table-responsive">
+                                        <table class="table align-middle fh-table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:56px;">Use</th>
+                                                    <th>Food</th>
+                                                    <th>Category</th>
+                                                    <th style="width:200px;">Portion</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (int i = 0; i < Model.Foods.Count; i++)
+                                                {
+                                                    <tr>
+                                                        <td class="text-center">
+                                                            <input asp-for="Foods[i].Selected" class="form-check-input" />
+                                                            <input type="hidden" asp-for="Foods[i].FoodId" />
+                                                            <input type="hidden" asp-for="Foods[i].FoodName" />
+                                                            <input type="hidden" asp-for="Foods[i].CategoryName" />
+                                                        </td>
+                                                        <td class="fw-semibold">@Model.Foods[i].FoodName</td>
+                                                        <td>@Model.Foods[i].CategoryName</td>
+                                                        <td>
+                                                            <select asp-for="Foods[i].PortionId" class="form-select" asp-items="ViewBag.PortionId"></select>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="small mt-2" style="color: var(--fi-muted);">
+                                        Tip: pick at least 1 food to save.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Dark calendar UI (where supported) is handled by CSS: color-scheme: dark
+
+        // Keep end >= start (UI-side)
+        const startEl = document.getElementById('startDate');
+        const endEl = document.getElementById('endDate');
+
+        function syncDateLimits() {
+            if (!startEl.value || !endEl.value) return;
+
+            endEl.min = startEl.value;
+            startEl.max = endEl.value;
+
+            if (endEl.value < startEl.value) endEl.value = startEl.value;
+        }
+
+        startEl?.addEventListener('change', syncDateLimits);
+        endEl?.addEventListener('change', syncDateLimits);
+        syncDateLimits();
+
+        // Load goals for selected client
+        const clientSelect = document.getElementById('clientSelect');
+        const goalSelect = document.getElementById('goalSelect');
+        const currentGoalId = '@(Model.GoalId.ToString() ?? "")';
+
+        async function loadGoals(clientId) {
+            goalSelect.innerHTML = '<option value="">-- select a goal --</option>';
+            if (!clientId) return;
+
+            const res = await fetch('@Url.Action("GetGoals", "FoodHabitsPlan")?clientId=' + clientId);
+            if (!res.ok) return;
+
+            const goals = await res.json();
+            for (const g of goals) {
+                const opt = document.createElement('option');
+                opt.value = g.goalId ?? g.GoalId;
+                opt.textContent = g.goalName ?? g.GoalName;
+                goalSelect.appendChild(opt);
+            }
+
+            if (currentGoalId) goalSelect.value = currentGoalId;
+        }
+
+        clientSelect?.addEventListener('change', () => loadGoals(clientSelect.value));
+        loadGoals(clientSelect?.value);
+    </script>
+
+    <style>
+        .fh-date {
+            background: #0b2230;
+            color: #e8f7ff;
+            border: 1px solid rgba(34,211,238,.25);
+            border-radius: 12px;
+            box-shadow: none;
+            color-scheme: dark;
+        }
+
+            .fh-date:focus {
+                border-color: rgba(34,211,238,.55);
+                box-shadow: 0 0 0 .2rem rgba(34,211,238,.12);
+            }
+    </style>
+}

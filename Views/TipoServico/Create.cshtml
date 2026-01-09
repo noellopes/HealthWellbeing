@@ -1,0 +1,52 @@
+﻿@model HealthWellbeing.Models.TipoServico
+
+@{
+    ViewData["Title"] = "Criar Tipo de Serviço";
+
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bg bi-plus-circle me-2"></i>Novo Tipo de Serviço
+        </h4>
+    </div>
+    <div class="card-body">
+   
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+
+        <div class="mb-3">
+            <label asp-for="Nome" class="control-label"></label>
+            <input asp-for="Nome" class="form-control" />
+            <span asp-validation-for="Nome" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Descricao" class="control-label"></label>
+            <textarea asp-for="Descricao" class="form-control"></textarea>
+            <span asp-validation-for="Descricao" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-start gap-2">
+            <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Criar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i>Voltar
+            </a>
+        </div>
+    </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+

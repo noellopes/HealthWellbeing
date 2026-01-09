@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Access denied";
+}
+
+<div class="container my-4">
+    <div class="fi-wrapper">
+
+        <div class="fi-header">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock-fill" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
+                        <h1 class="h5 mb-0 fi-titlebar">Access denied</h1>
+                    </div>
+
+                    <div class="mt-2 fi-badge">
+                        <i class="bi bi-exclamation-triangle" style="color: var(--fi-cyan);"></i>
+                        <span>You don’t have permission to access the data in this area.</span>
+                    </div>
+                </div>
+
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Back
+                </a>
+            </div>
+        </div>
+
+        <div class="fi-panel">
+            <div class="fi-card p-3">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="fi-icon">
+                        <i class="bi bi-info-circle" style="font-size:1.25rem; color: var(--fi-cyan);"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="color: var(--fi-text);">Administrator notice</div>
+                        <div style="color: var(--fi-muted);">
+                            This module’s data is restricted. Please switch to an authorized role to view plans.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

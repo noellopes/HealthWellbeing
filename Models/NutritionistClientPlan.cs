@@ -17,7 +17,7 @@ namespace HealthWellbeing.Models
         public int NutritionistId { get; set; }
 
         public Client? Client { get; set; }
-        public Plan? Plan { get; set; }
+        public FoodHabitsPlan? FoodHabitsPlan { get; set; }
         public Nutritionist? Nutritionist { get; set; }
     }
 }

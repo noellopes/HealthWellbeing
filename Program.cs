@@ -1,63 +1,80 @@
 ﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
+// Add services to the container.
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
+	options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(
+    options =>
+    {
+        // Sign in
+        options.SignIn.RequireConfirmedAccount = false;
+
+        // Password
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 8;
+        options.Password.RequiredUniqueChars = 6;
+        options.Password.RequireNonAlphanumeric = true;
+
+        // Lockout
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultUI();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-/*if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<ApplicationDbContext>();
-    context.Database.Migrate();
-}*/
-
 if (!app.Environment.IsDevelopment())
 {
-	app.UseExceptionHandler("/Home/Error");
-	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-	app.UseHsts();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 else
 {
-	using (var serviceScope = app.Services.CreateScope())
-	{
-		var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-		SeedData.Populate(dbContext);
-	}
+    using (var scope = app.Services.CreateScope())
+    {
+
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        SeedData.SeedRoles(roleManager);
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        SeedData.SeedDefaultAdmin(userManager);
+
+        SeedData.SeedUsers(userManager);
+
+        var context = scope.ServiceProvider.GetRequiredService<HealthWellbeingDbContext>();
+        SeedData.Populate(context);
+        SeedDataExercicio.Populate(context);
+        SeedDataTipoExercicio.Populate(context);
+        SeedDataProblemaSaude.Populate(context);
+    }
+
+	
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

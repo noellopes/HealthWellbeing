@@ -1,0 +1,83 @@
+﻿@model HealthWellbeing.Models.Event
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-calendar-event me-2"></i> Event Details
+        </h4>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventName)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventName)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventDescription)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventDescription)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventType)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventType.EventTypeName)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventStart)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventStart)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventEnd)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventEnd)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.MinLevel)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.MinLevel)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold text-muted">
+                @Html.DisplayNameFor(model => model.EventPoints)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.EventPoints)
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4 d-flex justify-content-end gap-2">
+    <a asp-action="Edit" asp-route-id="@Model?.EventId" class="btn btn-warning">
+        <i class="bi bi-pencil-square me-1"></i> Edit
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to List
+    </a>
+</div>

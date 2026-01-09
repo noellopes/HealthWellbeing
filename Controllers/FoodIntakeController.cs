@@ -64,14 +64,14 @@ namespace HealthWellbeing.Controllers
             }
 
             // 1) Plan Validation
-            await EnsureDayPlanAsync(plan.PlanId, selectedDate);
+            await EnsureDayPlanAsync(plan.FoodHabitsPlanId, selectedDate);
 
             // 1.5) Date validation
             var today = DateTime.Today;
 
             var range = await _context.FoodPlanDay
                 .AsNoTracking()
-                .Where(x => x.PlanId == plan.PlanId)
+                .Where(x => x.PlanId == plan.FoodHabitsPlanId)
                 .GroupBy(x => 1)
                 .Select(g => new { Min = g.Min(a => a.Date), Max = g.Max(a => a.Date) })
                 .FirstOrDefaultAsync();
@@ -113,14 +113,14 @@ namespace HealthWellbeing.Controllers
                 .AsNoTracking()
                 .Include(x => x.Food)
                 .Include(x => x.Portion)
-                .Where(x => x.PlanId == plan.PlanId && x.Date == selectedDate)
+                .Where(x => x.PlanId == plan.FoodHabitsPlanId && x.Date == selectedDate)
 
                 .OrderBy(x => x.ScheduledTime)
                 .ThenBy(x => x.Food != null ? x.Food.Name : "")
                 .ToListAsync();
 
             // 3) FoodIntake Validation
-            var intakesMap = await EnsureDayIntakesAsync(plan.PlanId, selectedDate, dayPlan);
+            var intakesMap = await EnsureDayIntakesAsync(plan.FoodHabitsPlanId, selectedDate, dayPlan);
 
             // 4) Portion list
             vm.Portions = await _context.Portion
@@ -153,7 +153,7 @@ namespace HealthWellbeing.Controllers
             }).ToList();
 
             // 6) dashboard 
-            var totals = await CalculateDayTotalsAsync(plan.PlanId, selectedDate);
+            var totals = await CalculateDayTotalsAsync(plan.FoodHabitsPlanId, selectedDate);
             vm.CaloriesConsumed = totals.cal;
             vm.ProteinConsumed = totals.prot;
             vm.FatConsumed = totals.fat;
@@ -179,19 +179,19 @@ namespace HealthWellbeing.Controllers
 
             // linha do plano do dia
             var line = await _context.FoodPlanDay
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
 
             if (line == null) return BadRequest("Food is not on the day plan.");
 
             // intake
             var fi = await _context.FoodIntake
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId && x.Date.Date == day.Date && x.FoodId == dto.FoodId);
 
             if (fi == null)
             {
                 fi = new FoodIntake
                 {
-                    PlanId = plan.PlanId,
+                    PlanId = plan.FoodHabitsPlanId,
                     FoodId = dto.FoodId,
                     PortionId = line.PortionId,
                     Date = day,
@@ -212,7 +212,7 @@ namespace HealthWellbeing.Controllers
             await _context.SaveChangesAsync();
 
             // recalcular dashboard
-            var totals = await CalculateDayTotalsAsync(plan.PlanId, day);
+            var totals = await CalculateDayTotalsAsync(plan.FoodHabitsPlanId, day);
 
             return Json(new
             {
@@ -254,14 +254,14 @@ namespace HealthWellbeing.Controllers
 
             // 1) FoodPlanDay (evitar duplicados)
             var line = await _context.FoodPlanDay
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.Date == day && x.FoodId == dto.FoodId);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId && x.Date == day && x.FoodId == dto.FoodId);
 
 
             if (line == null)
             {
                 line = new FoodPlanDay
                 {
-                    PlanId = plan.PlanId,
+                    PlanId = plan.FoodHabitsPlanId,
                     FoodId = dto.FoodId,
                     PortionId = dto.PortionId.Value,
                     Date = day,
@@ -282,13 +282,13 @@ namespace HealthWellbeing.Controllers
 
             // 2) FoodIntake do dia
             var fi = await _context.FoodIntake
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId && x.FoodId == dto.FoodId && x.Date == day);
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId && x.FoodId == dto.FoodId && x.Date == day);
 
             if (fi == null)
             {
                 fi = new FoodIntake
                 {
-                    PlanId = plan.PlanId,
+                    PlanId = plan.FoodHabitsPlanId,
                     FoodId = dto.FoodId,
                     PortionId = line.PortionId,
                     Date = day,
@@ -452,7 +452,7 @@ namespace HealthWellbeing.Controllers
 
             // Garantir que o alimento existe no plano do dia
             var line = await _context.FoodPlanDay
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId
                                       && x.FoodId == dto.FoodId
                                       && x.Date.Date == day);
 
@@ -461,7 +461,7 @@ namespace HealthWellbeing.Controllers
 
             // Buscar (ou criar) o FoodIntake do dia
             var fi = await _context.FoodIntake
-                .FirstOrDefaultAsync(x => x.PlanId == plan.PlanId
+                .FirstOrDefaultAsync(x => x.PlanId == plan.FoodHabitsPlanId
                                       && x.FoodId == dto.FoodId
                                       && x.Date.Date == day);
 
@@ -469,7 +469,7 @@ namespace HealthWellbeing.Controllers
             {
                 fi = new FoodIntake
                 {
-                    PlanId = plan.PlanId,
+                    PlanId = plan.FoodHabitsPlanId,
                     FoodId = dto.FoodId,
                     PortionId = line.PortionId,
                     Date = day,
@@ -550,9 +550,9 @@ namespace HealthWellbeing.Controllers
         // =========================
         // Helpers
         // =========================
-        private async Task<Plan?> GetClientPlanAsync(int clientId)
+        private async Task<FoodHabitsPlan?> GetClientPlanAsync(int clientId)
         {
-            return await _context.Plan.FirstOrDefaultAsync(p => p.ClientId == clientId);
+            return await _context.FoodHabitsPlan.FirstOrDefaultAsync(p => p.ClientId == clientId);
         }
 
         private async Task<List<SelectListItem>> LoadClientsAsync(int selectedClientId)

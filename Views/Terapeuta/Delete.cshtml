@@ -1,0 +1,78 @@
+﻿@model HealthWellbeing.Models.Terapeuta
+
+@{
+    ViewData["Title"] = "Eliminar Terapeuta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Eliminar Terapeuta</h1>
+
+<hr />
+
+@* Mensagem para confirmar a eliminação *@
+<h4>Dados do Terapeuta</h4>
+
+<div>
+<hr />
+
+    @* Lista dos campos do terapeuta*@
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Especialidade)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Especialidade)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Telefone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Telefone)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AnosExperiencia)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AnosExperiencia)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Ativo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ativo)
+        </dd>
+    </dl>
+
+    @* 
+        Formulário de confirmação de eliminação.
+        Quando o utilizador clica em "Eliminar", é feita uma requisição POST
+        para a Action "Delete" no TerapeutaController.
+    *@
+    <form asp-action="Delete">
+        @* Campo oculto que contém o ID do terapeuta a eliminar *@
+        <input type="hidden" asp-for="TerapeutaId" />
+
+        @* Botão de confirmação*@
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+
+        @* Link da lista de terapeutas*@
+        <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    </form>
+</div>

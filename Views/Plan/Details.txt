@@ -1,0 +1,54 @@
+@model HealthWellbeing.Models.Plan
+
+@{
+    ViewData["Title"] = "Plan Details";
+}
+
+<h1 class="display-4 text-primary mb-4">Plan Details</h1>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">@Model.Name</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-9">
+                $@Html.DisplayFor(model => model.Price)
+            </dd>
+
+            <dt class="col-sm-3 fw-bold">
+                @Html.DisplayNameFor(model => model.DurationDays)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.DurationDays) days
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.PlanId" class="btn btn-primary me-2 shadow-sm">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to List
+    </a>
+</div>

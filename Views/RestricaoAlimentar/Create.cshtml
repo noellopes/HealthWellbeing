@@ -1,0 +1,138 @@
+@model HealthWellbeing.Models.RestricaoAlimentar
+
+@{
+    ViewData["Title"] = "Criar Restrição Alimentar";
+}
+
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-@(TempData["AlertType"] ?? "info") alert-dismissible fade show" role="alert">
+        @TempData["AlertMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Cabeçalho padronizado -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Criar Restrição Alimentar</h1>
+    <a class="btn btn-secondary" asp-action="Index">Voltar</a>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+
+            <!-- Dropdown para Tipo -->
+            <div class="form-group mb-3">
+                <label asp-for="Tipo" class="control-label"></label>
+                <select asp-for="Tipo" class="form-control" asp-items="Html.GetEnumSelectList<TipoRestricao>()">
+                    <option value="">-- Selecione o Tipo de Restrição --</option>
+                </select>
+                <span asp-validation-for="Tipo" class="text-danger"></span>
+            </div>
+
+            <!-- Dropdown para Gravidade -->
+            <div class="form-group mb-3">
+                <label asp-for="Gravidade" class="control-label"></label>
+                <select asp-for="Gravidade" class="form-control" asp-items="Html.GetEnumSelectList<GravidadeRestricao>()">
+                    <option value="">-- Selecione a Gravidade --</option>
+                </select>
+                <span asp-validation-for="Gravidade" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Descricao" class="control-label"></label>
+                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+
+            <!-- SELEÇÃO MÚLTIPLA DE ALIMENTOS -->
+            <div class="form-group mb-3">
+                <label>Alimentos Relacionados</label>
+                <select id="alimentosSelect" class="form-control">
+                    <option value="">-- Selecione um alimento --</option>
+                    @foreach (var a in ViewBag.Alimentos)
+                    {
+                        <option value="@a.id">@a.nome</option>
+                    }
+                </select>
+            </div>
+
+            <div id="selectedAlimentos" class="mb-3 p-2 border rounded"></div>
+
+            <input type="hidden" id="selectedAlimentosInput" name="selectedAlimentosIds" />
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Criar</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const select = document.getElementById("alimentosSelect");
+        const selectedContainer = document.getElementById("selectedAlimentos");
+        const hiddenInput = document.getElementById("selectedAlimentosInput");
+
+        const selected = [];
+
+        select.addEventListener("change", () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const id = parseInt(selectedOption.value);
+            const nome = selectedOption.text;
+
+            if (id && !selected.some(a => a.id === id)) {
+                selected.push({ id, nome });
+                renderSelected();
+            }
+
+            select.selectedIndex = 0;
+        });
+
+        function removeAlimento(id) {
+            const index = selected.findIndex(a => a.id === id);
+            if (index > -1) {
+                selected.splice(index, 1);
+                renderSelected();
+            }
+        }
+
+        function renderSelected() {
+            selectedContainer.innerHTML = "";
+            
+            if (selected.length === 0) {
+                selectedContainer.innerHTML = '<span class="text-muted">Nenhum alimento selecionado</span>';
+                hiddenInput.value = "";
+                return;
+            }
+
+            selected.forEach(a => {
+                const badge = document.createElement("div");
+                badge.classList.add("badge", "bg-success", "me-2", "mb-2", "p-2");
+                badge.style.fontSize = "0.9em";
+                badge.innerHTML = `${a.nome} <span style="cursor:pointer; margin-left: 5px;" onclick="removeAlimento(${a.id})">❌</span>`;
+                selectedContainer.appendChild(badge);
+            });
+            
+            hiddenInput.value = selected.map(a => a.id).join(",");
+        }
+
+        // Inicializar com lista vazia
+        renderSelected();
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
