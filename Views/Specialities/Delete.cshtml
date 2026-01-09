@@ -1,10 +1,9 @@
-﻿@using HealthWellbeing.Models
-@model HealthWellbeing.Models.Specialities
+﻿@model HealthWellbeing.Models.Specialities
 
 @{
-    ViewData["Title"] = "Apagar Especialidade";
-    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
-    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model!.Descricao : "—";
+    ViewData["Title"] = "Eliminar Especialidade";
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model.Nome : "—";
+    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model.Descricao : "—";
 }
 
 <style>
@@ -115,8 +114,6 @@
         color: #7a2a33;
         font-weight: 600;
     }
-    ViewData["Title"] = "Eliminar Especialidade";
-}
 
     .info-item {
         background: rgba(255,255,255,.65);
@@ -156,13 +153,13 @@
     <div class="utente-card">
         <div class="utente-panel">
 
+            <!-- Cabeçalho -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
                         <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
                              alt="Logo HealthWellbeing" class="logo-img" />
                     </div>
-<h1 class="h4 mb-3 text-danger">Eliminar Especialidade</h1>
 
                     <div class="utente-actions">
                         <a asp-action="Index" class="utente-btn">
@@ -171,22 +168,22 @@
                     </div>
                 </div>
             </div>
-<div class="alert alert-warning">
-    Tem a certeza que pretende eliminar a especialidade
-    <strong>@Model.Nome</strong>?
-    <br />
-    Esta ação não poderá ser revertida.
-</div>
 
+            <!-- Corpo -->
             <div class="utente-body">
                 <div class="danger-card">
 
-                    <h2 class="danger-title">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Especialidade
-                    </h2>
-                    <p class="danger-sub">
-                        Tens a certeza que queres apagar esta especialidade? Esta ação não pode ser desfeita.
-                    </p>
+                    <h1 class="h4 mb-3 text-danger">Eliminar Especialidade</h1>
+
+                    <div class="alert alert-warning">
+                        Tem a certeza que pretende eliminar a especialidade
+                        <strong>@nome</strong>?
+                        <br />
+                        Esta ação não poderá ser revertida.
+                    </div>
+
+                    <!-- ❗ Aqui vão aparecer erros do ModelState (ex: “não pode apagar porque há médicos”) -->
+                    <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
                     <div class="danger-data">
                         <div class="row g-2">
@@ -205,12 +202,6 @@
                             </div>
                         </div>
                     </div>
-<div class="card shadow-sm mb-3">
-    <div class="card-body">
-        <p><strong>Nome:</strong> @Model.Nome</p>
-        <p><strong>Descrição:</strong> @Model.Descricao</p>
-    </div>
-</div>
 
                     <form asp-action="Delete" asp-route-id="@Model.IdEspecialidade" method="post" class="mt-3 d-flex gap-2 flex-wrap">
                         @Html.AntiForgeryToken()
@@ -232,8 +223,3 @@
         </div>
     </div>
 </div>
-<form asp-action="Delete">
-    <input type="hidden" asp-for="IdEspecialidade" />
-    <button type="submit" class="btn btn-danger">Eliminar</button>
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
-</form>
