@@ -18,10 +18,11 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // INDEX COM PAGINAÇÃO + PESQUISA
+        // INDEX: Sincroniza stock, gera avisos e lista os consumíveis
         public async Task<IActionResult> Index(string? searchNome, string? searchCategoria, int page = 1)
         {
             var todosConsumiveisIds = await _context.Consumivel.Select(c => c.ConsumivelId).ToListAsync();
+
             foreach (var id in todosConsumiveisIds)
             {
                
@@ -29,6 +30,8 @@ namespace HealthWellbeing.Controllers
                 await AtualizarQuantidadeAtualConsumivel(id);
 
 
+                // 2. Verifica se deve gerar o TempData para o alerta na View
+                await VerificarNecessidadeProposta(id);
             }
 
             var query = _context.Consumivel.Include(c => c.CategoriaConsumivel).AsQueryable();
@@ -54,10 +57,13 @@ namespace HealthWellbeing.Controllers
             return View(model);
         }
 
-        // DETAILS
-        public async Task<IActionResult> Details(int? id)
+        // AÇÃO PARA ACEITAR A PROPOSTA: Regista a compra e sinaliza para confirmação futura
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AceitarEncomenda(int id)
         {
-            if (id == null) return View("InvalidConsumivel");
+            var consumivel = await _context.Consumivel.FindAsync(id);
+            if (consumivel == null) return NotFound();
 
             var consumivel = await _context.Consumivel
                 .Include(c => c.CategoriaConsumivel)
@@ -65,12 +71,100 @@ namespace HealthWellbeing.Controllers
                     .ThenInclude(fc => fc.Fornecedor)
                 .FirstOrDefaultAsync(c => c.ConsumivelId == id);
 
-            if (consumivel == null) return View("InvalidConsumivel");
+            if (melhorFornecedor != null)
+            {
+                int qtdAEncomendar = consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
-            return View(consumivel);
+                if (qtdAEncomendar > 0)
+                {
+                    // 1. MODIFICADO: Cria o registo na tabela Compra, mas NÃO distribui o stock ainda
+                    var novaCompra = new Compra
+                    {
+                        ConsumivelId = id,
+                        FornecedorId = melhorFornecedor.FornecedorId,
+                        Quantidade = qtdAEncomendar,
+                        PrecoUnitario = melhorFornecedor.Preco,
+                        TempoEntrega = melhorFornecedor.TempoEntrega ?? 0
+                    };
+                    _context.Compra.Add(novaCompra);
+                    await _context.SaveChangesAsync();
+
+                    // 2. MODIFICADO: Sinaliza a pendência via TempData persistente
+                    // Este sinal será lido pelo ZonaArmazenamentoController para mostrar o segundo popup
+                    TempData[$"Pendente_{id}"] = true;
+
+                    // 3. MODIFICADO: Redireciona com mensagem de instrução
+                    TempData["SuccessMessage"] = $"✅ Encomenda de {consumivel.Nome} solicitada com sucesso! " +
+                                                $"Por favor, vá a 'Zonas de Armazenamento' para confirmar a receção e arrumar o stock.";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Não foi possível encontrar um fornecedor para este consumível.";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
-        // CREATE
+        // AÇÃO PARA NEGAR A PROPOSTA
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult NegarEncomenda(int id)
+        {
+            TempData.Remove($"Aviso_{id}");
+            return RedirectToAction(nameof(Index));
+        }
+
+        // --- MÉTODOS DE SUPORTE ---
+
+        private async Task VerificarNecessidadeProposta(int consumivelId)
+        {
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null && consumivel.QuantidadeAtual <= consumivel.QuantidadeMinima)
+            {
+                TempData[$"Aviso_{consumivelId}"] = $"Stock Crítico: {consumivel.Nome} ({consumivel.QuantidadeAtual} unidades). Deseja repor stock?";
+            }
+        }
+
+        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
+        {
+            var quantidadeTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.QuantidadeAtual);
+
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeAtual = quantidadeTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task AtualizarQuantidadeMaximaConsumivel(int consumivelId)
+        {
+            var quantidadeMaximaTotal = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == consumivelId)
+                .SumAsync(z => z.CapacidadeMaxima);
+
+            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
+            if (consumivel != null)
+            {
+                consumivel.QuantidadeMaxima = quantidadeMaximaTotal;
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // --- MÉTODOS PADRÃO ---
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return View("InvalidConsumivel");
+            var consumivel = await _context.Consumivel.Include(c => c.CategoriaConsumivel).FirstOrDefaultAsync(c => c.ConsumivelId == id);
+            return (consumivel == null) ? View("InvalidConsumivel") : View(consumivel);
+        }
+
         public IActionResult Create()
         {
             ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome");
@@ -85,68 +179,38 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(consumivel);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Consumível criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-
             ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
             return View(consumivel);
         }
 
-        // EDIT
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return View("InvalidConsumivel");
-
             var consumivel = await _context.Consumivel.FindAsync(id);
-            if (consumivel == null) return View("InvalidConsumivel");
-
-            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
+            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel?.CategoriaId);
             return View(consumivel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,
-            [Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeAtual,QuantidadeMinima")] Consumivel consumivel)
+        public async Task<IActionResult> Edit(int id, [Bind("ConsumivelId,Nome,Descricao,CategoriaId,QuantidadeAtual,QuantidadeMinima")] Consumivel consumivel)
         {
-            if (id != consumivel.ConsumivelId)
-                return View("InvalidConsumivel");
-
+            if (id != consumivel.ConsumivelId) return View("InvalidConsumivel");
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(consumivel);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Consumível atualizado com sucesso!";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Consumivel.Any(e => e.ConsumivelId == consumivel.ConsumivelId))
-                        return View("InvalidConsumivel");
-                    else
-                        throw;
-                }
+                _context.Update(consumivel);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            ViewData["CategoriaId"] = new SelectList(_context.CategoriaConsumivel, "CategoriaId", "Nome", consumivel.CategoriaId);
             return View(consumivel);
         }
 
-
-        // DELETE
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return View("InvalidConsumivel");
-
-            var consumivel = await _context.Consumivel
-                .Include(c => c.CategoriaConsumivel)
-                .FirstOrDefaultAsync(c => c.ConsumivelId == id);
-
-            if (consumivel == null) return View("InvalidConsumivel");
-
+            var consumivel = await _context.Consumivel.Include(c => c.CategoriaConsumivel).FirstOrDefaultAsync(c => c.ConsumivelId == id);
             return View(consumivel);
         }
 
@@ -154,66 +218,13 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var consumivel = await _context.Consumivel
-                .Include(c => c.CategoriaConsumivel)
-                .FirstOrDefaultAsync(c => c.ConsumivelId == id);
-
-            if (consumivel == null)
-                return View("InvalidConsumivel");
-
-            try
+            var consumivel = await _context.Consumivel.FindAsync(id);
+            if (consumivel != null)
             {
                 _context.Consumivel.Remove(consumivel);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Consumível eliminado com sucesso!";
             }
-            catch (DbUpdateException)
-            {
-                // conta quantas zonas existem
-                int numZonas = await _context.ZonaArmazenamento
-                    .Where(z => z.ConsumivelId == id)
-                    .CountAsync();
-
-                // Passa a mensagem de erro para a view
-                ViewBag.Error = $"Não é possível apagar este consumível. Existem {numZonas} zonas de armazenamento associadas.";
-                return View(consumivel);
-            }
-
             return RedirectToAction(nameof(Index));
         }
-        private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
-        {
-            // Obter todas as zonas que têm este consumível
-            var quantidadeTotal = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId)
-                .SumAsync(z => z.QuantidadeAtual);
-
-            // Atualizar o Consumível
-            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel != null)
-            {
-                consumivel.QuantidadeAtual = quantidadeTotal;
-                _context.Update(consumivel);
-                await _context.SaveChangesAsync();
-            }
-        }
-        private async Task AtualizarQuantidadeMaximaConsumivel(int consumivelId)
-        {
-            // Soma todas as capacidades máximas das zonas associadas
-            var quantidadeMaximaTotal = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId)
-                .SumAsync(z => z.CapacidadeMaxima);
-
-            // Atualiza o Consumível
-            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel != null)
-            {
-                consumivel.QuantidadeMaxima = quantidadeMaximaTotal;
-                _context.Update(consumivel);
-                await _context.SaveChangesAsync();
-            }
-        }
-
-
     }
 }
