@@ -266,12 +266,54 @@ namespace HealthWellbeing.Controllers
 
         // GET: Create (Manual)
         [Authorize(Roles = "Administrador,ProfissionalSaude")]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? utenteId)
         {
-            // Passamos o user para filtrar a lista de utentes
             var user = await _userManager.GetUserAsync(User);
-            await CarregarViewBagsManual(user);
+
+            await CarregarViewBagsManual(user, utenteId);
+
+            if (utenteId.HasValue)
+            {
+                if (!User.IsInRole("Administrador"))
+                {
+                    bool pertence = await _context.UtenteGrupo7
+                        .AnyAsync(u => u.UtenteGrupo7Id == utenteId && u.ProfissionalSaudeId == user.Id);
+
+                    if (!pertence) return Forbid();
+                }
+
+    
+                var utente = await _context.UtenteGrupo7
+                    .Include(u => u.UtenteProblemasSaude)
+                    .FirstOrDefaultAsync(u => u.UtenteGrupo7Id == utenteId);
+
+                var idsProblemas = utente?.UtenteProblemasSaude.Select(p => p.ProblemaSaudeId).ToList() ?? new List<int>();
+
+            
+                var todosExercicios = await _context.Exercicio
+                    .Include(e => e.Contraindicacoes)
+                    .ToListAsync();
+
+                var listaExerciciosProcessada = todosExercicios.Select(ex => new ExercicioViewModelManual
+                {
+                    Id = ex.ExercicioId,
+                    Nome = ex.ExercicioNome,
+                    IsPerigoso = ex.Contraindicacoes.Any(c => idsProblemas.Contains(c.ProblemaSaudeId))
+                }).ToList();
+
+                ViewBag.ListaExerciciosProcessada = listaExerciciosProcessada;
+                ViewBag.UtenteSelecionadoId = utenteId;
+            }
+
             return View();
+        }
+
+        
+        public class ExercicioViewModelManual
+        {
+            public int Id { get; set; }
+            public string Nome { get; set; }
+            public bool IsPerigoso { get; set; }
         }
 
         // POST: Create (Manual)

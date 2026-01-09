@@ -4,27 +4,52 @@
     ViewData["Title"] = "Detalhes";
 }
 
-<h1>Detalhes</h1>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-file-earmark-text me-2"></i>Detalhes
+            </h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model?.BeneficioId" class="btn btn-warning shadow-sm text-dark">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
-<div>
-    <h4>Benefício</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NomeBeneficio)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NomeBeneficio)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DescricaoBeneficio)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DescricaoBeneficio)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.BeneficioId" class="btn btn-warning">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+            <h5 class="mb-0 fw-bold text-dark">Informação do Benefício</h5>
+        </div>
+        <div class="card-body p-4">
+            <div class="row mb-3 border-bottom pb-3">
+                <div class="col-md-3 text-muted fw-bold">
+                    @Html.DisplayNameFor(model => model.NomeBeneficio)
+                </div>
+                <div class="col-md-9 text-dark">
+                    @Html.DisplayFor(model => model.NomeBeneficio)
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 text-muted fw-bold">
+                    @Html.DisplayNameFor(model => model.DescricaoBeneficio)
+                </div>
+                <div class="col-md-9 text-dark">
+                    @if (!string.IsNullOrEmpty(Model.DescricaoBeneficio))
+                    {
+                        @Html.DisplayFor(model => model.DescricaoBeneficio)
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Sem descrição disponível.</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

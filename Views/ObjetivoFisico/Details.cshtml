@@ -4,31 +4,39 @@
     ViewData["Title"] = "Detalhes";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0"><i class="bi bi-info-circle me-2"></i>Detalhes do Registo</h4>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4 text-muted">ID do Registo</dt>
-                        <dd class="col-sm-8">@Html.DisplayFor(model => model.ObjetivoFisicoId)</dd>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-file-earmark-text me-2"></i>Detalhes
+            </h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model?.ObjetivoFisicoId" class="btn btn-warning shadow-sm text-dark">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
-                        <div class="w-100 border-bottom mb-3"></div>
-
-                        <dt class="col-sm-4 fw-bold">Nome do Objetivo</dt>
-                        <dd class="col-sm-8 text-primary fw-bold">@Html.DisplayFor(model => model.NomeObjetivo)</dd>
-                    </dl>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+                    <h5 class="mb-0 fw-bold text-dark">Informação do Registo</h5>
                 </div>
-                <div class="card-footer bg-light text-end">
-                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-left"></i> Voltar à Lista
-                    </a>
-                    <a asp-action="Edit" asp-route-id="@Model?.ObjetivoFisicoId" class="btn btn-primary btn-sm">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
+                <div class="card-body p-4">
+                    <div class="mb-4 border-bottom pb-3">
+                        <label class="d-block text-muted small text-uppercase fw-bold mb-1">ID do Registo</label>
+                        <span class="text-dark">@Html.DisplayFor(model => model.ObjetivoFisicoId)</span>
+                    </div>
+
+                    <div>
+                        <label class="d-block text-muted small text-uppercase fw-bold mb-1">Nome do Objetivo</label>
+                        <span class="h5 text-primary fw-bold">@Html.DisplayFor(model => model.NomeObjetivo)</span>
+                    </div>
                 </div>
             </div>
         </div>

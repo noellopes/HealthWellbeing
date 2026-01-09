@@ -4,183 +4,164 @@
     ViewData["Title"] = "Objetivos Físicos";
 }
 
-<h1 class="mb-4 text-primary"><i class="bi bi-trophy"></i> Objetivos Físicos</h1>
-
-
-@if (TempData["StatusMessage"] is string statusMessage)
-{
-    string alertClass = "alert-info";
-
-    if (statusMessage.StartsWith("Sucesso:"))
-    {
-        alertClass = "alert-success";
-    }
-    else if (statusMessage.StartsWith("Aviso:"))
-    {
-        alertClass = "alert-warning";
-    }
-    else if (statusMessage.StartsWith("Erro:"))
-    {
-        alertClass = "alert-danger";
-    }
-
-    <div class="alert @alertClass alert-dismissible fade show" role="alert">
-        @statusMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-    </div>
-}
-
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4">Listagem</h2>
-    <div>
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-expanded="false" aria-controls="searchForm">
-            <i class="bi bi-search me-1"></i> Pesquisa
-        </a>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-1"></i> Criar Novo
-        </a>
-    </div>
-</div>
-
-
-<div class="collapse mb-3" id="searchForm">
-    <div class="card card-body bg-light">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-
-            <div class="col-md-9">
-                <label for="searchNome" class="form-label fw-bold">Nome do Objetivo</label>
-                <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Ex: Perda de Peso, Musculação..." />
-            </div>
-
-            <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-search me-1"></i> Filtrar
-                </button>
-                <a asp-action="Index" class="btn btn-outline-secondary w-100">Limpar</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning shadow-sm">
-        <i class="bi bi-exclamation-triangle me-2"></i> Nenhum objetivo físico encontrado.
-    </div>
-}
-else
-{
-    <div class="card shadow-sm border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nome do Objetivo</th>
-                        <th class="text-end" style="min-width: 200px;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Items)
-                    {
-                        <tr>
-                            <td class="fw-bold text-dark">@item.NomeObjetivo</td>
-                            <td class="text-end">
-                                <a asp-action="Edit" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-warning btn-sm me-1" title="Editar">
-                                    <i class="bi bi-pencil"></i>Editar
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-info btn-sm me-1 text-white" title="Detalhes">
-                                    <i class="bi bi-eye"></i>Detalhes
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-danger btn-sm" title="Apagar">
-                                    <i class="bi bi-trash"></i>Apagar
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-trophy-fill me-2"></i>@ViewData["Title"]
+            </h1>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#searchForm">
+                <i class="bi bi-search"></i> Pesquisa
+            </button>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-1"></i> Criar Novo
+            </a>
         </div>
     </div>
 
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-            @{
-                var routeData = new Dictionary<string, string>
-                {
-                { "searchUtente", ViewBag.SearchUtente },
-                { "dataInicio", ViewBag.DataInicio },
-                { "dataFim", ViewBag.DataFim }
-                };
-            }
+    @if (TempData["StatusMessage"] is string statusMessage)
+    {
+        string alertClass = "alert-info";
+        string icon = "bi-info-circle";
 
-            @if (Model.CurrentPage == 1)
+        if (statusMessage.StartsWith("Sucesso:")) { alertClass = "alert-success"; icon = "bi-check-circle"; }
+        else if (statusMessage.StartsWith("Aviso:")) { alertClass = "alert-warning"; icon = "bi-exclamation-triangle"; }
+        else if (statusMessage.StartsWith("Erro:")) { alertClass = "alert-danger"; icon = "bi-x-circle"; }
+
+        <div class="alert @alertClass alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi @icon me-2"></i> @statusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    <div class="collapse mb-4" id="searchForm">
+        <div class="card border-0 shadow-sm bg-light">
+            <div class="card-body">
+                <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                    <div class="col-md-9">
+                        <label for="searchNome" class="form-label fw-bold">Nome do Objetivo</label>
+                        <input id="searchNome" name="searchNome" value="@ViewBag.SearchNome" class="form-control" placeholder="Ex: Perda de Peso, Musculação..." />
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary w-100" title="Limpar">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            @if (!Model.Items.Any())
             {
-                <li class="page-item disabled">
-                    <span class="page-link"><i class="bi bi-chevron-double-left"></i> Primeira</span>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link"><i class="bi bi-chevron-left"></i> Anterior</span>
-                </li>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-trophy display-4 mb-3 d-block opacity-50"></i>
+                    <p class="mb-0">Nenhum objetivo físico encontrado.</p>
+                </div>
             }
             else
             {
-                routeData["page"] = "1";
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a primeira página">
-                        <i class="bi bi-chevron-double-left"></i> Primeira
-                    </a>
-                </li>
-
-                routeData["page"] = (Model.CurrentPage - 1).ToString();
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Página anterior">
-                        <i class="bi bi-chevron-left"></i> Anterior
-                    </a>
-                </li>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4 py-3">Nome do Objetivo</th>
+                                <th class="py-3 text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-dark">
+                                        @item.NomeObjetivo
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a asp-action="Details" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-sm btn-info text-white me-1" title="Detalhes">
+                                            <i class="bi bi-eye"></i>Detalhes
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-sm btn-warning me-1" title="Editar">
+                                            <i class="bi bi-pencil"></i>Editar
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.ObjetivoFisicoId" class="btn btn-sm btn-danger" title="Apagar">
+                                            <i class="bi bi-trash"></i>Apagar
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
+        </div>
 
-            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-            {
-                if (p == Model.CurrentPage)
-                {
-                    <li class="page-item active"><span class="page-link">@p</span></li>
-                }
-                else
-                {
-                    routeData["page"] = p.ToString();
-                    <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-all-route-data="routeData">@p</a>
-                    </li>
-                }
-            }
+        @if (Model.Items.Any())
+        {
+            <div class="card-footer bg-white py-3">
+                <nav>
+                    <ul class="pagination justify-content-center mb-0">
+                        @{
+                            var routeData = new Dictionary<string, string>
+                                        {
+                                        { "searchNome", ViewBag.SearchNome }
+                                        };
+                        }
 
-            @if (Model.CurrentPage == Model.TotalPages)
-            {
-                <li class="page-item disabled">
-                    <span class="page-link">Próxima <i class="bi bi-chevron-right"></i></span>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link">Última <i class="bi bi-chevron-double-right"></i></span>
-                </li>
-            }
-            else
-            {
-                routeData["page"] = (Model.CurrentPage + 1).ToString();
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Próxima página">
-                        Próxima <i class="bi bi-chevron-right"></i>
-                    </a>
-                </li>
+                        @if (Model.CurrentPage > 1)
+                        {
+                            routeData["page"] = (Model.CurrentPage - 1).ToString();
+                            <li class="page-item">
+                                <a class="page-link border-0" asp-action="Index" asp-all-route-data="routeData">Anterior</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link border-0">Anterior</span>
+                            </li>
+                        }
 
-                routeData["page"] = Model.TotalPages.ToString();
-                <li class="page-item">
-                    <a class="page-link" asp-action="Index" asp-all-route-data="routeData" title="Ir para a última página">
-                        Última <i class="bi bi-chevron-double-right"></i>
-                    </a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        {
+                            if (p == Model.CurrentPage)
+                            {
+                                <li class="page-item active"><span class="page-link">@p</span></li>
+                            }
+                            else
+                            {
+                                routeData["page"] = p.ToString();
+                                <li class="page-item">
+                                    <a class="page-link border-0 rounded-circle mx-1" asp-action="Index" asp-all-route-data="routeData">@p</a>
+                                </li>
+                            }
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            routeData["page"] = (Model.CurrentPage + 1).ToString();
+                            <li class="page-item">
+                                <a class="page-link border-0" asp-action="Index" asp-all-route-data="routeData">Próxima</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link border-0">Próxima</span>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

@@ -5,156 +5,176 @@
     bool isStaff = ViewBag.IsStaff ?? false;
 }
 
-<div class="container mt-4">
+<div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-success"><i class="bi bi-plus-circle"></i> Nova Avaliação Física</h2>
-        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+        <div>
+            <h1 class="h3 mb-0 text-success">
+                <i class="bi bi-plus-circle me-2"></i>Nova Avaliação
+            </h1>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
     </div>
 
     <form asp-action="Create">
-        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger shadow-sm mb-4"></div>
 
         <div class="row g-4">
-            <div class="col-md-12">
-                <div class="card shadow-sm border-success h-100">
-                    <div class="card-header bg-success text-white fw-bold">
-                        <i class="bi bi-person-lines-fill me-2"></i> Dados Gerais
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-success fw-bold mb-0">
+                            <i class="bi bi-person-lines-fill me-2"></i>Dados Gerais
+                        </h5>
                     </div>
-                    <div class="card-body row g-3">
-                        @if (isStaff)
-                        {
+                    <div class="card-body p-4 pt-2">
+                        <div class="row g-3">
+                            @if (isStaff)
+                            {
+                                <div class="col-12">
+                                    <label asp-for="UtenteGrupo7Id" class="form-label fw-bold text-muted small text-uppercase">Utente</label>
+                                    <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id">
+                                        <option value="">-- Selecione o Utente --</option>
+                                    </select>
+                                    <span asp-validation-for="UtenteGrupo7Id" class="text-danger small"></span>
+                                </div>
+                            }
+
+                            <div class="col-12">
+                                <label asp-for="DataMedicao" class="form-label fw-bold text-muted small text-uppercase">Data da Medição</label>
+                                <input asp-for="DataMedicao" class="form-control" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                                <span asp-validation-for="DataMedicao" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-success fw-bold mb-0">
+                            <i class="bi bi-speedometer2 me-2"></i>Composição Corporal
+                        </h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <label asp-for="UtenteGrupo7Id" class="form-label fw-bold">Utente</label>
-                                <select asp-for="UtenteGrupo7Id" class="form-select" asp-items="ViewBag.UtenteGrupo7Id">
-                                    <option value="">-- Selecione o Utente --</option>
-                                </select>
-                                <span asp-validation-for="UtenteGrupo7Id" class="text-danger"></span>
+                                <label asp-for="Peso" class="form-label fw-bold text-muted small text-uppercase">Peso</label>
+                                <div class="input-group">
+                                    <input asp-for="Peso" class="form-control" placeholder="0.0" />
+                                    <span class="input-group-text bg-light">kg</span>
+                                </div>
+                                <span asp-validation-for="Peso" class="text-danger small"></span>
                             </div>
-                        }
-
-                        <div class="col-md-6">
-                            <label asp-for="DataMedicao" class="form-label fw-bold">Data da Medição</label>
-                            <input asp-for="DataMedicao" class="form-control" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                            <span asp-validation-for="DataMedicao" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-light fw-bold">
-                        <i class="bi bi-speedometer2 me-2"></i> Composição Corporal
-                    </div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-6">
-                            <label asp-for="Peso" class="form-label">Peso (kg)</label>
-                            <div class="input-group">
-                                <input asp-for="Peso" class="form-control" placeholder="0.0" />
-                                <span class="input-group-text">kg</span>
+                            <div class="col-md-6">
+                                <label asp-for="Altura" class="form-label fw-bold text-muted small text-uppercase">Altura</label>
+                                <div class="input-group">
+                                    <input asp-for="Altura" class="form-control" placeholder="0" />
+                                    <span class="input-group-text bg-light">cm</span>
+                                </div>
+                                <span asp-validation-for="Altura" class="text-danger small"></span>
                             </div>
-                            <span asp-validation-for="Peso" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="Altura" class="form-label">Altura (cm)</label>
-                            <div class="input-group">
-                                <input asp-for="Altura" class="form-control" placeholder="0" />
-                                <span class="input-group-text">cm</span>
+                            <div class="col-md-6">
+                                <label asp-for="GorduraCorporal" class="form-label fw-bold text-muted small text-uppercase">Gordura Corporal</label>
+                                <div class="input-group">
+                                    <input asp-for="GorduraCorporal" class="form-control" placeholder="0.0" />
+                                    <span class="input-group-text bg-light">%</span>
+                                </div>
                             </div>
-                            <span asp-validation-for="Altura" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="GorduraCorporal" class="form-label">Gordura Corporal (%)</label>
-                            <div class="input-group">
-                                <input asp-for="GorduraCorporal" class="form-control" placeholder="0.0" />
-                                <span class="input-group-text">%</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="MassaMuscular" class="form-label">Massa Muscular (%)</label>
-                            <div class="input-group">
-                                <input asp-for="MassaMuscular" class="form-control" placeholder="0.0" />
-                                <span class="input-group-text">%</span>
+                            <div class="col-md-6">
+                                <label asp-for="MassaMuscular" class="form-label fw-bold text-muted small text-uppercase">Massa Muscular</label>
+                                <div class="input-group">
+                                    <input asp-for="MassaMuscular" class="form-control" placeholder="0.0" />
+                                    <span class="input-group-text bg-light">%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-light fw-bold">
-                        <i class="bi bi-arrows-expand me-2"></i> Medidas Tronco & Superiores
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-success fw-bold mb-0">
+                            <i class="bi bi-arrows-expand me-2"></i>Tronco & Superiores
+                        </h5>
                     </div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-4">
-                            <label asp-for="Pescoco" class="form-label">Pescoço</label>
-                            <input asp-for="Pescoco" class="form-control" />
+                    <div class="card-body p-4 pt-2">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="Pescoco" class="form-label text-muted small">Pescoço</label>
+                                <input asp-for="Pescoco" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Ombros" class="form-label text-muted small">Ombros</label>
+                                <input asp-for="Ombros" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Peitoral" class="form-label text-muted small">Peitoral</label>
+                                <input asp-for="Peitoral" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BracoDireito" class="form-label text-muted small">Braço Direito</label>
+                                <input asp-for="BracoDireito" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BracoEsquerdo" class="form-label text-muted small">Braço Esquerdo</label>
+                                <input asp-for="BracoEsquerdo" class="form-control" />
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label asp-for="Ombros" class="form-label">Ombros</label>
-                            <input asp-for="Ombros" class="form-control" />
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="Peitoral" class="form-label">Peitoral</label>
-                            <input asp-for="Peitoral" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="BracoDireito" class="form-label">Braço Direito</label>
-                            <input asp-for="BracoDireito" class="form-control" />
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="BracoEsquerdo" class="form-label">Braço Esquerdo</label>
-                            <input asp-for="BracoEsquerdo" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-4 ps-4">
+                        <h5 class="text-success fw-bold mb-0">
+                            <i class="bi bi-person-standing me-2"></i>Cintura & Inferiores
+                        </h5>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label asp-for="Cintura" class="form-label text-muted small">Cintura</label>
+                                <input asp-for="Cintura" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Abdomen" class="form-label text-muted small">Abdómen</label>
+                                <input asp-for="Abdomen" class="form-control" />
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Anca" class="form-label text-muted small">Anca</label>
+                                <input asp-for="Anca" class="form-control" />
+                            </div>
+
+                            <div class="col-12"><hr class="text-muted opacity-25"></div>
+
+                            <div class="col-md-3">
+                                <label asp-for="CoxaDireita" class="form-label text-muted small">Coxa Dir.</label>
+                                <input asp-for="CoxaDireita" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="CoxaEsquerda" class="form-label text-muted small">Coxa Esq.</label>
+                                <input asp-for="CoxaEsquerda" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="GemeoDireito" class="form-label text-muted small">Gémeo Dir.</label>
+                                <input asp-for="GemeoDireito" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label asp-for="GemeoEsquerdo" class="form-label text-muted small">Gémeo Esq.</label>
+                                <input asp-for="GemeoEsquerdo" class="form-control" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-12">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-light fw-bold">
-                        <i class="bi bi-person-standing me-2"></i> Cintura & Membros Inferiores
-                    </div>
-                    <div class="card-body row g-3">
-                        <div class="col-md-4">
-                            <label asp-for="Cintura" class="form-label">Cintura</label>
-                            <input asp-for="Cintura" class="form-control" />
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="Abdomen" class="form-label">Abdómen</label>
-                            <input asp-for="Abdomen" class="form-control" />
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="Anca" class="form-label">Anca</label>
-                            <input asp-for="Anca" class="form-control" />
-                        </div>
-
-                        <div class="col-12"><hr class="text-muted"></div>
-
-                        <div class="col-md-3">
-                            <label asp-for="CoxaDireita" class="form-label">Coxa Direita</label>
-                            <input asp-for="CoxaDireita" class="form-control" />
-                        </div>
-                        <div class="col-md-3">
-                            <label asp-for="CoxaEsquerda" class="form-label">Coxa Esquerda</label>
-                            <input asp-for="CoxaEsquerda" class="form-control" />
-                        </div>
-                        <div class="col-md-3">
-                            <label asp-for="GemeoDireito" class="form-label">Gémeo Direito</label>
-                            <input asp-for="GemeoDireito" class="form-control" />
-                        </div>
-                        <div class="col-md-3">
-                            <label asp-for="GemeoEsquerdo" class="form-label">Gémeo Esquerdo</label>
-                            <input asp-for="GemeoEsquerdo" class="form-control" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 text-end mt-4">
-                <button type="submit" class="btn btn-success btn-lg px-5">
-                    <i class="bi bi-save"></i> Guardar Avaliação
+            <div class="col-12 text-end mt-4 mb-5">
+                <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
+                    <i class="bi bi-check-lg me-2"></i>Guardar Avaliação
                 </button>
             </div>
         </div>

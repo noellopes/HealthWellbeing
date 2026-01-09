@@ -4,50 +4,63 @@
     ViewData["Title"] = "Editar";
 }
 
-<h1>Editar</h1>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-warning text-dark">
+                <i class="bi bi-pencil-square me-2"></i>Editar Benefício
+            </h1>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
-<h4>Benefício</h4>
-
-@if (ViewData["StatusMessage"] is string statusMessage)
-{
-    string alertClass = "alert-info";
-
-    
-    if (statusMessage.StartsWith("Erro:", StringComparison.OrdinalIgnoreCase))
+    @if (ViewData["StatusMessage"] is string statusMessage)
     {
-        alertClass = "alert-danger";
+        string alertClass = "alert-info";
+        if (statusMessage.StartsWith("Erro:", StringComparison.OrdinalIgnoreCase)) { alertClass = "alert-danger"; }
+
+        <div class="alert @alertClass alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            @statusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
     }
 
-    <div class="alert @alertClass alert-dismissible fade show" role="alert">
-        @statusMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-    </div>
-}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="text-warning text-dark fw-bold mb-0">Dados do Benefício</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+                        <input type="hidden" asp-for="BeneficioId" />
 
-<hr />
-<div class="row">
-    <div class="col-md-8">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BeneficioId" />
+                        <div class="mb-3">
+                            <label asp-for="NomeBeneficio" class="form-label fw-bold text-muted small text-uppercase">Nome do Benefício</label>
+                            <input asp-for="NomeBeneficio" class="form-control" />
+                            <span asp-validation-for="NomeBeneficio" class="text-danger small"></span>
+                        </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="NomeBeneficio" class="control-label">Nome do Benefício</label>
-                <input asp-for="NomeBeneficio" class="form-control" />
-                <span asp-validation-for="NomeBeneficio" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="DescricaoBeneficio" class="form-label fw-bold text-muted small text-uppercase">Descrição</label>
+                            <textarea asp-for="DescricaoBeneficio" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="DescricaoBeneficio" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning px-5 shadow-sm text-dark">
+                                <i class="bi bi-save me-2"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="DescricaoBeneficio" class="control-label">Descrição</label>
-                <textarea asp-for="DescricaoBeneficio" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="DescricaoBeneficio" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <input type="submit" value="Guardar" class="btn btn-success" />
-                <a asp-action="Index" class="btn btn-secondary">Voltar à Lista</a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 

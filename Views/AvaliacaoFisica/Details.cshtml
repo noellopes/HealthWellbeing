@@ -4,81 +4,116 @@
     ViewData["Title"] = "Detalhes da Avaliação";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-file-earmark-medical me-2"></i>Detalhes da Avaliação
+            </h1>
+            <p class="text-muted mb-0 small mt-1">
+                Realizada a @Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.AvaliacaoFisicaId" class="btn btn-warning shadow-sm text-dark">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="text-primary mb-0">Avaliação Física</h2>
-                    <p class="text-muted">Realizada a @Model.DataMedicao.ToString("dd/MM/yyyy HH:mm")</p>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="bi bi-person-circle me-2 text-primary"></i>
+                Utente: @Model.UtenteGrupo7.Nome
+            </h5>
+        </div>
+        <div class="card-body p-4">
+
+            <div class="row g-3 mb-5">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center border h-100">
+                        <span class="d-block text-muted small text-uppercase fw-bold mb-1">Peso</span>
+                        <h2 class="text-primary mb-0 fw-bold">@Model.Peso <small class="fs-6 text-muted">kg</small></h2>
+                    </div>
                 </div>
-                <div>
-                    <a asp-action="Edit" asp-route-id="@Model.AvaliacaoFisicaId" class="btn btn-warning me-2"><i class="bi bi-pencil"></i> Editar</a>
-                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center border h-100">
+                        <span class="d-block text-muted small text-uppercase fw-bold mb-1">Altura</span>
+                        <h2 class="text-primary mb-0 fw-bold">@Model.Altura <small class="fs-6 text-muted">cm</small></h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center border h-100">
+                        <span class="d-block text-muted small text-uppercase fw-bold mb-1">Gordura</span>
+                        <h2 class="text-success mb-0 fw-bold">@Model.GorduraCorporal <small class="fs-6 text-muted">%</small></h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-3 text-center border h-100">
+                        <span class="d-block text-muted small text-uppercase fw-bold mb-1">Massa Muscular</span>
+                        <h2 class="text-info mb-0 fw-bold">@Model.MassaMuscular <small class="fs-6 text-muted">%</small></h2>
+                    </div>
                 </div>
             </div>
 
-            <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i> Utente: @Model.UtenteGrupo7.Nome</h5>
+            <h6 class="text-muted fw-bold text-uppercase border-bottom pb-2 mb-3">
+                <i class="bi bi-rulers me-2"></i>Perímetros e Medidas
+            </h6>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Pescoço</span>
+                            <span class="fw-bold">@Model.Pescoco cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Ombros</span>
+                            <span class="fw-bold">@Model.Ombros cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Peitoral</span>
+                            <span class="fw-bold">@Model.Peitoral cm</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="card-body">
 
-                    <div class="row text-center mb-4">
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded border">
-                                <h3 class="text-primary">@Model.Peso <small class="fs-6 text-muted">kg</small></h3>
-                                <div class="small fw-bold text-uppercase">Peso</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded border">
-                                <h3 class="text-primary">@Model.Altura <small class="fs-6 text-muted">cm</small></h3>
-                                <div class="small fw-bold text-uppercase">Altura</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded border">
-                                <h3 class="text-success">@Model.GorduraCorporal <small class="fs-6 text-muted">%</small></h3>
-                                <div class="small fw-bold text-uppercase">Gordura</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded border">
-                                <h3 class="text-info">@Model.MassaMuscular <small class="fs-6 text-muted">%</small></h3>
-                                <div class="small fw-bold text-uppercase">Massa Muscular</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Braço Direito</span>
+                            <span class="fw-bold">@Model.BracoDireito cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Braço Esquerdo</span>
+                            <span class="fw-bold">@Model.BracoEsquerdo cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Cintura</span>
+                            <span class="fw-bold">@Model.Cintura cm</span>
+                        </li>
+                    </ul>
+                </div>
 
-                    <hr />
-
-                    <h5 class="mb-3 text-secondary"><i class="bi bi-rulers me-2"></i>Perímetros e Medidas (cm)</h5>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between"><span>Pescoço:</span> <strong>@Model.Pescoco</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Ombros:</span> <strong>@Model.Ombros</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Peitoral:</span> <strong>@Model.Peitoral</strong></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between"><span>Braço Dir:</span> <strong>@Model.BracoDireito</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Braço Esq:</span> <strong>@Model.BracoEsquerdo</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Cintura:</span> <strong>@Model.Cintura</strong></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between"><span>Anca:</span> <strong>@Model.Anca</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Coxa Dir:</span> <strong>@Model.CoxaDireita</strong></li>
-                                <li class="list-group-item d-flex justify-content-between"><span>Coxa Esq:</span> <strong>@Model.CoxaEsquerda</strong></li>
-                            </ul>
-                        </div>
-                    </div>
-
+                <div class="col-md-4">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Anca</span>
+                            <span class="fw-bold">@Model.Anca cm</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Coxa (Dir/Esq)</span>
+                            <span class="fw-bold">@Model.CoxaDireita / @Model.CoxaEsquerda</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center ps-0">
+                            <span class="text-muted">Gémeo (Dir/Esq)</span>
+                            <span class="fw-bold">@Model.GemeoDireito / @Model.GemeoEsquerdo</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 

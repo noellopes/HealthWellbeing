@@ -5,63 +5,73 @@
     var selectedBeneficios = ViewData["SelectedBeneficios"] as List<int> ?? new List<int>();
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-<div class="alert alert-warning d-flex align-items-center p-4 border border-warning rounded shadow-sm" role="alert">
-    <i class="bi bi-exclamation-triangle-fill flex-shrink-0 text-warning" style="font-size: 4rem;"></i>
-    <div class="ps-4">
-        <h4 class="alert-heading mb-2">O registo não existe</h4>
-        <p class="mb-0">
-            O tipo de exercício que tentou editar ou visualizar já não existe na base de dados.
-            Provavelmente foi eliminado por outro utilizador.
-        </p>
-    </div>
-</div>
+            <div class="card border-0 shadow-sm text-center p-5 mb-4">
+                <div class="mb-4 text-warning">
+                    <i class="bi bi-exclamation-triangle-fill display-1"></i>
+                </div>
+                <h2 class="h3 fw-bold text-warning mb-3">O registo não existe</h2>
+                <p class="text-muted mb-0">
+                    O tipo de exercício que tentou editar ou visualizar já não existe na base de dados.
+                    Provavelmente foi eliminado por outro utilizador.
+                </p>
+            </div>
 
+            @if (Model != null)
+            {
+                <div class="card border-0 shadow-sm border-start border-4 border-info">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-light text-info rounded-circle p-3 me-3">
+                                <i class="bi bi-arrow-repeat fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-0">Recuperação de Dados</h5>
+                                <small class="text-muted">Deseja salvar os dados como um novo registo?</small>
+                            </div>
+                        </div>
 
-@if (Model != null)
-{
-    <div class="card border-info mb-4 shadow-sm">
-        <div class="card-header bg-info text-white">
-            <i class="bi bi-arrow-repeat me-2"></i>Recuperação de Dados
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">Deseja salvar os dados como um novo registo?</h5>
-            <p class="card-text">
-                Apesar de o original ter sido apagado, ainda temos os dados que acabou de preencher.
-                Pode clicar abaixo para os adicionar novamente à base de dados como um novo Tipo de Exercício.
-            </p>
+                        <p class="text-muted mb-4">
+                            Apesar de o original ter sido apagado, ainda temos os dados que acabou de preencher.
+                            Pode clicar abaixo para os adicionar novamente à base de dados como um novo Tipo de Exercício.
+                        </p>
 
-            <form asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
+                        <form asp-action="Create" method="post">
+                            @Html.AntiForgeryToken()
 
-                <input type="hidden" asp-for="NomeTipoExercicios" />
-                <input type="hidden" asp-for="DescricaoTipoExercicios" />
-                <input type="hidden" asp-for="CaracteristicasTipoExercicios" />
+                            <input type="hidden" asp-for="NomeTipoExercicios" />
+                            <input type="hidden" asp-for="DescricaoTipoExercicios" />
+                            <input type="hidden" asp-for="CaracteristicasTipoExercicios" />
 
-                @foreach (var id in selectedBeneficios)
-                {
-                    <input type="hidden" name="selectedBeneficios" value="@id" />
-                }
+                            @foreach (var id in selectedBeneficios)
+                            {
+                                <input type="hidden" name="selectedBeneficios" value="@id" />
+                            }
 
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success">
-                        <i class="bi bi-plus-circle me-1"></i> Adicionar Novamente
-                    </button>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success flex-grow-1">
+                                    <i class="bi bi-plus-circle me-1"></i> Adicionar Novamente
+                                </button>
 
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        Cancelar e Voltar à Lista
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    Cancelar e Voltar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="text-center">
+                    <a asp-action="Index" class="btn btn-secondary px-5">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
                     </a>
                 </div>
-            </form>
+            }
         </div>
     </div>
-}
-else
-{
-    <div class="mt-4 text-end">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left-circle me-1"></i> Voltar à Lista
-        </a>
-    </div>
-}
+</div>
