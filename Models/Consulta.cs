@@ -53,7 +53,5 @@ namespace HealthWellbeing.Models
         //public int IdConsumivel { get; set; }
         //public ConsumablesExpenses? consumivel { get; set; }
         public ICollection<DoctorConsulta>? ConsultaDoctors { get; set; }
-
-        public ICollection<ConsultaUtente>? ConsultaUtentes { get; set; }
     }
 }

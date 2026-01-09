@@ -101,9 +101,6 @@ namespace HealthWellbeing.Models
                     new[] { nameof(ClientId) });
             }
         }
-
-        public ICollection<ConsultaUtente>? UtenteConsultas { get; set; }
-
     }
 
     // --------------------------
