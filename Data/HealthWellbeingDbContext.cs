@@ -22,7 +22,7 @@ namespace HealthWellbeing.Data
         public DbSet<Specialities> Specialities { get; set; } = default!;
         public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
         public DbSet<DoctorConsulta> DoctorConsulta { get; set; } = default!;
-        public DbSet<ConsultaDoctor> ConsultaDoctor { get; set; } = default!;
+        public DbSet<ConsultaUtente> ConsultaUtente { get; set; } = default!;
 
 
         // -------------------------
