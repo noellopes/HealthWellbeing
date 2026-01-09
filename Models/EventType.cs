@@ -16,10 +16,6 @@ namespace HealthWellbeing.Models {
         [StringLength(300, ErrorMessage = "The description cannot exceed {1} characters.")]
         public string? EventTypeDescription { get; set; }
 
-        [Display(Name = "Scoring Strategy")]
-        [Required(ErrorMessage = "Please select a scoring mode.")]
-        public int ScoringStrategyId { get; set; }
-
         public virtual ICollection<Event>? Events { get; set; }
 
         [Display(Name = "Multiplier")]
