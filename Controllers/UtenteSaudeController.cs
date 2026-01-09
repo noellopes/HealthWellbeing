@@ -514,15 +514,16 @@ namespace HealthWellbeing.Controllers
                 TempData["Msg"] = "Utente não encontrado.";
                 return RedirectToAction(nameof(Index));
             }
-
+            
             var hasConsultas = await _db.Consulta
                 .AnyAsync(c => c.IdUtenteSaude == u.UtenteSaudeId);
-
+            
             if (hasConsultas)
             {
                 TempData["Msg"] = "Não é possível apagar o utente porque existem consultas associadas.";
                 return RedirectToAction(nameof(Delete), new { id = u.UtenteSaudeId });
             }
+            
 
             _db.UtenteSaude.Remove(u);
             await _db.SaveChangesAsync();
