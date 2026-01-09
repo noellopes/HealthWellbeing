@@ -169,6 +169,10 @@
                     <p class="danger-sub">
                         Tem a certeza que pretende eliminar este médico? Esta ação não pode ser desfeita.
                     </p>
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
 
                     <div class="danger-data">
                         <div class="row g-2">

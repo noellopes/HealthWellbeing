@@ -1,12 +1,15 @@
-﻿@using HealthWellbeing.Models
+﻿```cshtml
+@using HealthWellbeing.Models
 @model HealthWellbeing.Models.Specialities
 
 @{
     ViewData["Title"] = Model?.Nome ?? "Especialidade";
 
-    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
-    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model!.Descricao : "—";
-    var oqueE = !string.IsNullOrWhiteSpace(Model?.OqueEDescricao) ? Model!.OqueEDescricao : null;
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model.Nome : "—";
+    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model.Descricao : "—";
+    var oqueE = !string.IsNullOrWhiteSpace(Model?.OqueEDescricao) ? Model.OqueEDescricao : null;
+
+    var podeEditar = User.IsInRole("Administrador") || User.IsInRole("DiretorClinico");
 }
 
 <style>
@@ -69,6 +72,7 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        white-space: nowrap;
     }
 
         .utente-btn:hover {
@@ -111,30 +115,32 @@
     }
 
     .details-title {
-        margin: 0 0 10px 0;
+        margin: 0 0 8px 0;
         color: #1f4f6a;
-        font-weight: 800;
+        font-weight: 900;
     }
 
     .details-sub {
         margin: 0 0 14px 0;
         color: #2b546c;
+        font-weight: 700;
+        opacity: .9;
     }
 
     .info-item {
         background: #f7fbfe;
         border: 1px solid rgba(97,166,199,.35);
-        border-radius: 10px;
-        padding: 10px 12px;
+        border-radius: 12px;
+        padding: 12px;
     }
 
         .info-item .lbl {
             display: block;
-            font-size: .85rem;
+            font-size: .9rem;
             color: #2b546c;
-            opacity: .85;
-            margin-bottom: 2px;
-            font-weight: 700;
+            opacity: .9;
+            margin-bottom: 6px;
+            font-weight: 900;
         }
 
         .info-item .val {
@@ -155,7 +161,7 @@
 
     .side-title {
         margin: 0 0 6px 0;
-        font-weight: 800;
+        font-weight: 900;
         color: #1f4f6a;
         font-size: 1rem;
     }
@@ -164,6 +170,8 @@
         margin: 0 0 12px 0;
         color: #2b546c;
         font-size: .9rem;
+        font-weight: 700;
+        opacity: .9;
     }
 </style>
 
@@ -171,7 +179,6 @@
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- TOPO: Logo + ações -->
             <div class="utente-header">
                 <div class="utente-header-content">
                     <div class="utente-logo">
@@ -184,23 +191,19 @@
                             <i class="bi bi-arrow-left"></i> Voltar
                         </a>
 
-                        <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade" class="utente-btn">
-                            <i class="bi bi-pencil-square"></i> Editar
-                        </a>
+                        @if (podeEditar)
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.IdEspecialidade" class="utente-btn">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
-                    
-                </div>
-            </div>
-        </div>
-    </section>
 
-            <!-- CORPO -->
             <div class="utente-body">
-
                 <div class="row g-3">
-                    <!-- ESQUERDA: detalhes -->
+
                     <div class="col-12 col-lg-8">
                         <div class="details-card">
                             <h2 class="details-title">@nome</h2>
@@ -250,13 +253,17 @@
                                 </div>
                             </div>
 
+                            <div class="mt-3 d-flex justify-content-between flex-wrap gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary hb-btn">
+                                    <i class="bi bi-arrow-left"></i> Voltar à lista
+                                </a>
+                            </div>
+
                         </div>
                     </div>
 
-                    <!-- DIREITA: 3 cards -->
                     <div class="col-12 col-lg-4">
 
-                        <!-- Card 1 -->
                         <div class="side-card mb-3">
                             <h3 class="side-title">Consultas</h3>
                             <p class="side-sub">
@@ -264,34 +271,13 @@
                             </p>
 
                             <div class="d-grid gap-2">
-                                <a asp-controller="Consultas" asp-action="Marcar" class="btn btn-primary hb-btn">
-                                    <i class="bi bi-calendar-check"></i> Marcar consulta
-                                </a>
-
+                                
                                 <a asp-controller="Consultas" asp-action="Index" class="btn btn-outline-primary hb-btn">
                                     <i class="bi bi-eye"></i> Ver consultas
                                 </a>
                             </div>
                         </div>
-           
-            <div class="card mb-3 shadow-sm">
-                <div class="card-body">
-                    <h3 class="h6 card-title">Consultas</h3>
-                    <p class="small text-muted">
-                        Veja as consultas relacionadas com esta especialidade
-                        e faça a sua marcação.
-                    </p>
-                    <div class="d-grid gap-2">
-                        <a asp-controller="Consultas" asp-action="Index"
-                           class="btn btn-outline-primary btn-sm">
-                            Ver consultas
-                        </a>
-                       
-                    </div>
-                </div>
-            </div>
 
-                        <!-- Card 2 -->
                         <div class="side-card mb-3">
                             <h3 class="side-title">Corpo clínico</h3>
                             <p class="side-sub">
@@ -303,7 +289,6 @@
                             </a>
                         </div>
 
-                        <!-- Card 3 -->
                         <div class="side-card">
                             <h3 class="side-title">Informação adicional</h3>
                             <p class="side-sub mb-2">
@@ -316,16 +301,10 @@
 
                     </div>
                 </div>
-
             </div>
-    
-    <div class="mt-4 d-flex justify-content-between">
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar à lista
-        </a>
 
             <div class="utente-footer-bar"></div>
         </div>
     </div>
 </div>
-
+```

@@ -224,7 +224,12 @@
                                <i class="bi bi-arrow-left"></i> Voltar
                            </a>
                         }
-                        
+                        else if (User.IsInRole("DiretorClinico"))
+                        {
+                            <a asp-action="Index" asp-controller="UtenteSaude" class="utente-btn">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
