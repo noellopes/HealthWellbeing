@@ -367,21 +367,27 @@ namespace HealthWellbeing.Controllers
         [HttpGet]
         [Authorize]
         //Consulta BTN ACESS
+        [HttpGet]
+        [Authorize]
         public IActionResult GestaoConsultas()
         {
-            if (User.IsInRole("Medico"))
-                return RedirectToAction("Index", "Consultas");
+            if (User.IsInRole("Administrador"))
+                return RedirectToAction("Index", "Admin");
 
-            if (User.IsInRole("Utente"))
-                return RedirectToAction(nameof(UtenteView), "UtenteSaude");
+            if (User.IsInRole("DiretorClinico"))
+                return RedirectToAction(nameof(Index), "UtenteSaude");
 
             if (User.IsInRole("Rececionista"))
                 return RedirectToAction(nameof(RecepcionistaView), "UtenteSaude");
 
-            if (User.IsInRole("DiretorClinico") || User.IsInRole("Administrador"))
-                return RedirectToAction(nameof(Index), "UtenteSaude");
+            if (User.IsInRole("Utente"))
+                return RedirectToAction(nameof(UtenteView), "UtenteSaude");
+
+            if (User.IsInRole("Medico"))
+                return RedirectToAction("Index", "Consultas");
 
             return Forbid();
         }
+
     }
 }
