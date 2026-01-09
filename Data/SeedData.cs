@@ -234,7 +234,32 @@ internal class SeedData
             new Alimento { Name = "Trigo", Description = "Cereal com glúten, base para farinhas e pães.", CategoriaAlimentoId = 3, Calories = 339, KcalPor100g = 339, ProteinaGPor100g = 13m, HidratosGPor100g = 72m, GorduraGPor100g = 2.5m },
             new Alimento { Name = "Amendoim", Description = "Oleaginosa rica em gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 567, KcalPor100g = 567, ProteinaGPor100g = 25.8m, HidratosGPor100g = 16.1m, GorduraGPor100g = 49.2m },
             new Alimento { Name = "Amêndoa", Description = "Oleaginosa rica em fibras e gorduras saudáveis.", CategoriaAlimentoId = 3, Calories = 579, KcalPor100g = 579, ProteinaGPor100g = 21.2m, HidratosGPor100g = 21.7m, GorduraGPor100g = 49.9m },
-            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = 5, Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m }
+            new Alimento { Name = "Camarão", Description = "Crustáceo (frutos do mar), fonte de proteína.", CategoriaAlimentoId = 5, Calories = 99, KcalPor100g = 99, ProteinaGPor100g = 24m, HidratosGPor100g = 0.2m, GorduraGPor100g = 0.3m },
+
+            // Ingredientes base para receitas (mantidos no fim para não afetar IDs esperados 1..15)
+            new Alimento { Name = "Cebola", Description = "Base aromática comum em muitas receitas.", CategoriaAlimentoId = 2, Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Alho", Description = "Aromático usado em temperos e refogados.", CategoriaAlimentoId = 2, Calories = 149, KcalPor100g = 149, ProteinaGPor100g = 6.4m, HidratosGPor100g = 33m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Tomate", Description = "Vegetal usado em molhos e saladas.", CategoriaAlimentoId = 2, Calories = 18, KcalPor100g = 18, ProteinaGPor100g = 0.9m, HidratosGPor100g = 3.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Alface", Description = "Folha verde para saladas e sanduíches.", CategoriaAlimentoId = 2, Calories = 15, KcalPor100g = 15, ProteinaGPor100g = 1.4m, HidratosGPor100g = 2.9m, GorduraGPor100g = 0.2m },
+            new Alimento { Name = "Azeite", Description = "Gordura vegetal usada em temperos e cozinhados.", CategoriaAlimentoId = 2, Calories = 884, KcalPor100g = 884, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 100m },
+            new Alimento { Name = "Limão", Description = "Fruta cítrica usada para temperar.", CategoriaAlimentoId = 1, Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.1m, HidratosGPor100g = 9.3m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Laranja", Description = "Fruta cítrica, usada como sobremesa/acompanhamento.", CategoriaAlimentoId = 1, Calories = 47, KcalPor100g = 47, ProteinaGPor100g = 0.9m, HidratosGPor100g = 12m, GorduraGPor100g = 0.1m },
+            new Alimento { Name = "Mel", Description = "Adoçante natural, usado em saladas e bebidas.", CategoriaAlimentoId = 1, Calories = 304, KcalPor100g = 304, ProteinaGPor100g = 0.3m, HidratosGPor100g = 82m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Azeitonas", Description = "Azeitonas (pretas/verdes), usadas como complemento.", CategoriaAlimentoId = 2, Calories = 115, KcalPor100g = 115, ProteinaGPor100g = 0.8m, HidratosGPor100g = 6.3m, GorduraGPor100g = 10.7m },
+            new Alimento { Name = "Couve", Description = "Folha verde muito usada em sopas.", CategoriaAlimentoId = 2, Calories = 25, KcalPor100g = 25, ProteinaGPor100g = 2.5m, HidratosGPor100g = 5.6m, GorduraGPor100g = 0.4m },
+            new Alimento { Name = "Bacalhau", Description = "Peixe (bacalhau) usado em pratos tradicionais.", CategoriaAlimentoId = 5, Calories = 105, KcalPor100g = 105, ProteinaGPor100g = 23m, HidratosGPor100g = 0m, GorduraGPor100g = 0.9m },
+            new Alimento { Name = "Batata Palha", Description = "Batata frita em palha, usada em pratos como bacalhau à brás.", CategoriaAlimentoId = 3, Calories = 550, KcalPor100g = 550, ProteinaGPor100g = 6m, HidratosGPor100g = 50m, GorduraGPor100g = 35m },
+            new Alimento { Name = "Chouriço", Description = "Enchido tradicional usado em sopas e feijoadas.", CategoriaAlimentoId = 5, Calories = 350, KcalPor100g = 350, ProteinaGPor100g = 17m, HidratosGPor100g = 2m, GorduraGPor100g = 30m },
+            new Alimento { Name = "Bacon", Description = "Carne curada, usada como ingrediente em feijoadas.", CategoriaAlimentoId = 5, Calories = 541, KcalPor100g = 541, ProteinaGPor100g = 37m, HidratosGPor100g = 1.4m, GorduraGPor100g = 42m },
+            new Alimento { Name = "Cogumelos", Description = "Cogumelos frescos, usados em risottos e molhos.", CategoriaAlimentoId = 2, Calories = 22, KcalPor100g = 22, ProteinaGPor100g = 3.1m, HidratosGPor100g = 3.3m, GorduraGPor100g = 0.3m },
+            new Alimento { Name = "Manteiga", Description = "Gordura láctea usada em confeitaria e risottos.", CategoriaAlimentoId = 4, Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0.9m, HidratosGPor100g = 0.1m, GorduraGPor100g = 81m },
+            new Alimento { Name = "Coentros", Description = "Erva aromática (coentro) usada para finalizar pratos.", CategoriaAlimentoId = 2, Calories = 23, KcalPor100g = 23, ProteinaGPor100g = 2.1m, HidratosGPor100g = 3.7m, GorduraGPor100g = 0.5m },
+            new Alimento { Name = "Massa de Lasanha", Description = "Massa para lasanha (seca).", CategoriaAlimentoId = 3, Calories = 371, KcalPor100g = 371, ProteinaGPor100g = 13m, HidratosGPor100g = 75m, GorduraGPor100g = 1.5m },
+            new Alimento { Name = "Queijo Parmesão", Description = "Queijo curado usado para finalizar pratos.", CategoriaAlimentoId = 4, Calories = 431, KcalPor100g = 431, ProteinaGPor100g = 38m, HidratosGPor100g = 4m, GorduraGPor100g = 29m },
+            new Alimento { Name = "Farinha de Trigo", Description = "Farinha usada em massas e empadões.", CategoriaAlimentoId = 3, Calories = 364, KcalPor100g = 364, ProteinaGPor100g = 10m, HidratosGPor100g = 76m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Leite Condensado", Description = "Produto lácteo adoçado para sobremesas.", CategoriaAlimentoId = 4, Calories = 321, KcalPor100g = 321, ProteinaGPor100g = 7.9m, HidratosGPor100g = 55m, GorduraGPor100g = 8.7m },
+            new Alimento { Name = "Açúcar", Description = "Açúcar branco para confeitaria.", CategoriaAlimentoId = 3, Calories = 387, KcalPor100g = 387, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Polvo", Description = "Molusco (polvo) usado em pratos tradicionais.", CategoriaAlimentoId = 5, Calories = 82, KcalPor100g = 82, ProteinaGPor100g = 15m, HidratosGPor100g = 2.2m, GorduraGPor100g = 1m },
         };
 
         var existingNames = new HashSet<string>(
@@ -732,62 +757,248 @@ internal class SeedData
 
     private static void PopulateComponentesReceita(HealthWellbeingDbContext context)
     {
-        if (context.ComponenteReceita.Any())
-        {
-            return;
-        }
-
-        var receitas = context.Receita.ToList();
+        var receitas = context.Receita
+            .AsNoTracking()
+            .ToList();
         if (!receitas.Any())
         {
             return;
         }
 
-        var receitaIds = receitas.Select(r => r.ReceitaId).ToArray();
-        var idx = 0;
-        Func<int> nextReceitaId = () =>
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+        if (!alimentos.Any())
         {
-            var id = receitaIds[idx % receitaIds.Length];
-            idx++;
-            return id;
+            return;
+        }
+
+        var receitasByNome = receitas
+            .GroupBy(r => r.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var alimentosByNome = alimentos
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        int GetReceitaId(string receitaNome)
+        {
+            if (!receitasByNome.TryGetValue(receitaNome, out var receita))
+                throw new InvalidOperationException($"Receita não encontrada para seed: '{receitaNome}'.");
+            return receita.ReceitaId;
+        }
+
+        int GetAlimentoId(string alimentoNome)
+        {
+            if (!alimentosByNome.TryGetValue(alimentoNome, out var alimento))
+                throw new InvalidOperationException($"Alimento não encontrado para seed: '{alimentoNome}'.");
+            return alimento.AlimentoId;
+        }
+
+        var receitaNomesSeed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Salada de Frutas Tropical",
+            "Vitamina de Banana com Aveia",
+            "Omelete de Legumes",
+            "Sanduíche Natural de Frango",
+            "Sopa de Legumes Caseira",
+            "Arroz Integral com Feijão",
+            "Frango Grelhado com Ervas",
+            "Bacalhau à Brás",
+            "Batata Doce Assada",
+            "Caldo Verde",
+            "Arroz de Frango",
+            "Lasanha de Legumes",
+            "Salmão Assado com Legumes",
+            "Feijoada Completa",
+            "Risotto de Cogumelos",
+            "Empadão de Frango",
+            "Açorda de Marisco",
+            "Pudim de Leite Condensado",
+            "Polvo à Lagareiro",
         };
 
-        context.ComponenteReceita.AddRange(
-            new ComponenteReceita { AlimentoId = 1, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 100, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 2, UnidadeMedida = UnidadeMedidaEnum.Mililitro, Quantidade = 200, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 3, UnidadeMedida = UnidadeMedidaEnum.Xicara, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 4, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 2, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 5, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
+        var novos = new List<ComponenteReceita>();
 
-            new ComponenteReceita { AlimentoId = 6, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 7, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 150, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 8, UnidadeMedida = UnidadeMedidaEnum.Fatia, Quantidade = 2, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 9, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 120, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 10, UnidadeMedida = UnidadeMedidaEnum.Mililitro, Quantidade = 200, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 11, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 100, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 12, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 3, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 13, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 50, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 14, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 120, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 15, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 150, IsOpcional = false, ReceitaId = nextReceitaId() },
+        void Add(string receitaNome, string alimentoNome, UnidadeMedidaEnum unidade, int quantidade, bool opcional = false)
+        {
+            if (!receitaNomesSeed.Contains(receitaNome))
+                return;
 
-            new ComponenteReceita { AlimentoId = 6, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 80, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 11, UnidadeMedida = UnidadeMedidaEnum.Xicara, Quantidade = 1, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 7, UnidadeMedida = UnidadeMedidaEnum.Unidade, Quantidade = 1, IsOpcional = true, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 10, UnidadeMedida = UnidadeMedidaEnum.ColherDeSopa, Quantidade = 4, IsOpcional = false, ReceitaId = nextReceitaId() },
-            new ComponenteReceita { AlimentoId = 12, UnidadeMedida = UnidadeMedidaEnum.Grama, Quantidade = 40, IsOpcional = true, ReceitaId = nextReceitaId() }
-        );
+            novos.Add(new ComponenteReceita
+            {
+                ReceitaId = GetReceitaId(receitaNome),
+                AlimentoId = GetAlimentoId(alimentoNome),
+                UnidadeMedida = unidade,
+                Quantidade = quantidade,
+                IsOpcional = opcional
+            });
+        }
 
+        // Salada de Frutas Tropical
+        Add("Salada de Frutas Tropical", "Maçã", UnidadeMedidaEnum.Grama, 150);
+        Add("Salada de Frutas Tropical", "Banana", UnidadeMedidaEnum.Unidade, 1);
+        Add("Salada de Frutas Tropical", "Laranja", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+        Add("Salada de Frutas Tropical", "Mel", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Vitamina de Banana com Aveia
+        Add("Vitamina de Banana com Aveia", "Banana", UnidadeMedidaEnum.Unidade, 1);
+        Add("Vitamina de Banana com Aveia", "Leite", UnidadeMedidaEnum.Mililitro, 250);
+        Add("Vitamina de Banana com Aveia", "Aveia", UnidadeMedidaEnum.ColherDeSopa, 3);
+        Add("Vitamina de Banana com Aveia", "Mel", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Omelete de Legumes
+        Add("Omelete de Legumes", "Ovo", UnidadeMedidaEnum.Unidade, 2);
+        Add("Omelete de Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 50);
+        Add("Omelete de Legumes", "Cebola", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Omelete de Legumes", "Azeite", UnidadeMedidaEnum.ColherDeCha, 1, opcional: true);
+
+        // Sanduíche Natural de Frango
+        Add("Sanduíche Natural de Frango", "Frango", UnidadeMedidaEnum.Grama, 120);
+        Add("Sanduíche Natural de Frango", "Pão", UnidadeMedidaEnum.Fatia, 2);
+        Add("Sanduíche Natural de Frango", "Alface", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Sanduíche Natural de Frango", "Tomate", UnidadeMedidaEnum.Grama, 60, opcional: true);
+
+        // Sopa de Legumes Caseira
+        Add("Sopa de Legumes Caseira", "Batata", UnidadeMedidaEnum.Grama, 200);
+        Add("Sopa de Legumes Caseira", "Cenoura", UnidadeMedidaEnum.Grama, 100);
+        Add("Sopa de Legumes Caseira", "Cebola", UnidadeMedidaEnum.Grama, 60);
+        Add("Sopa de Legumes Caseira", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Sopa de Legumes Caseira", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Arroz Integral com Feijão
+        Add("Arroz Integral com Feijão", "Arroz", UnidadeMedidaEnum.Xicara, 1);
+        Add("Arroz Integral com Feijão", "Feijão", UnidadeMedidaEnum.Xicara, 1);
+        Add("Arroz Integral com Feijão", "Cebola", UnidadeMedidaEnum.Grama, 50, opcional: true);
+        Add("Arroz Integral com Feijão", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Frango Grelhado com Ervas
+        Add("Frango Grelhado com Ervas", "Frango", UnidadeMedidaEnum.Grama, 200);
+        Add("Frango Grelhado com Ervas", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Frango Grelhado com Ervas", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+        Add("Frango Grelhado com Ervas", "Limão", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+
+        // Bacalhau à Brás
+        Add("Bacalhau à Brás", "Bacalhau", UnidadeMedidaEnum.Grama, 300);
+        Add("Bacalhau à Brás", "Batata Palha", UnidadeMedidaEnum.Grama, 200);
+        Add("Bacalhau à Brás", "Ovo", UnidadeMedidaEnum.Unidade, 4);
+        Add("Bacalhau à Brás", "Cebola", UnidadeMedidaEnum.Grama, 120);
+        Add("Bacalhau à Brás", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Bacalhau à Brás", "Azeitonas", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Bacalhau à Brás", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 2, opcional: true);
+
+        // Batata Doce Assada
+        Add("Batata Doce Assada", "Batata Doce", UnidadeMedidaEnum.Grama, 300);
+        Add("Batata Doce Assada", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Caldo Verde
+        Add("Caldo Verde", "Batata", UnidadeMedidaEnum.Grama, 400);
+        Add("Caldo Verde", "Couve", UnidadeMedidaEnum.Grama, 200);
+        Add("Caldo Verde", "Chouriço", UnidadeMedidaEnum.Grama, 80, opcional: true);
+        Add("Caldo Verde", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Arroz de Frango
+        Add("Arroz de Frango", "Arroz", UnidadeMedidaEnum.Xicara, 2);
+        Add("Arroz de Frango", "Frango", UnidadeMedidaEnum.Grama, 300);
+        Add("Arroz de Frango", "Tomate", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Arroz de Frango", "Cebola", UnidadeMedidaEnum.Grama, 100, opcional: true);
+        Add("Arroz de Frango", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Lasanha de Legumes
+        Add("Lasanha de Legumes", "Massa de Lasanha", UnidadeMedidaEnum.Grama, 250);
+        Add("Lasanha de Legumes", "Tomate", UnidadeMedidaEnum.Grama, 300);
+        Add("Lasanha de Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Lasanha de Legumes", "Cogumelos", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Lasanha de Legumes", "Queijo", UnidadeMedidaEnum.Grama, 200, opcional: true);
+
+        // Salmão Assado com Legumes
+        Add("Salmão Assado com Legumes", "Salmão", UnidadeMedidaEnum.Grama, 250);
+        Add("Salmão Assado com Legumes", "Batata", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Salmão Assado com Legumes", "Cenoura", UnidadeMedidaEnum.Grama, 100, opcional: true);
+        Add("Salmão Assado com Legumes", "Limão", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+        Add("Salmão Assado com Legumes", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 1, opcional: true);
+
+        // Feijoada Completa
+        Add("Feijoada Completa", "Feijão", UnidadeMedidaEnum.Xicara, 2);
+        Add("Feijoada Completa", "Arroz", UnidadeMedidaEnum.Xicara, 2, opcional: true);
+        Add("Feijoada Completa", "Bacon", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Feijoada Completa", "Chouriço", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Feijoada Completa", "Couve", UnidadeMedidaEnum.Grama, 200, opcional: true);
+        Add("Feijoada Completa", "Laranja", UnidadeMedidaEnum.Unidade, 1, opcional: true);
+
+        // Risotto de Cogumelos
+        Add("Risotto de Cogumelos", "Arroz", UnidadeMedidaEnum.Xicara, 2);
+        Add("Risotto de Cogumelos", "Cogumelos", UnidadeMedidaEnum.Grama, 300);
+        Add("Risotto de Cogumelos", "Cebola", UnidadeMedidaEnum.Grama, 80, opcional: true);
+        Add("Risotto de Cogumelos", "Manteiga", UnidadeMedidaEnum.Grama, 30, opcional: true);
+        Add("Risotto de Cogumelos", "Queijo Parmesão", UnidadeMedidaEnum.Grama, 50, opcional: true);
+
+        // Empadão de Frango
+        Add("Empadão de Frango", "Frango", UnidadeMedidaEnum.Grama, 300);
+        Add("Empadão de Frango", "Farinha de Trigo", UnidadeMedidaEnum.Grama, 300);
+        Add("Empadão de Frango", "Manteiga", UnidadeMedidaEnum.Grama, 150, opcional: true);
+        Add("Empadão de Frango", "Ovo", UnidadeMedidaEnum.Unidade, 2);
+        Add("Empadão de Frango", "Azeitonas", UnidadeMedidaEnum.Grama, 50, opcional: true);
+
+        // Açorda de Marisco
+        Add("Açorda de Marisco", "Pão", UnidadeMedidaEnum.Grama, 200);
+        Add("Açorda de Marisco", "Camarão", UnidadeMedidaEnum.Grama, 300);
+        Add("Açorda de Marisco", "Alho", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+        Add("Açorda de Marisco", "Coentros", UnidadeMedidaEnum.Grama, 10, opcional: true);
+        Add("Açorda de Marisco", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 2, opcional: true);
+        Add("Açorda de Marisco", "Ovo", UnidadeMedidaEnum.Unidade, 2, opcional: true);
+
+        // Pudim de Leite Condensado
+        Add("Pudim de Leite Condensado", "Leite Condensado", UnidadeMedidaEnum.Grama, 395);
+        Add("Pudim de Leite Condensado", "Leite", UnidadeMedidaEnum.Mililitro, 500);
+        Add("Pudim de Leite Condensado", "Ovo", UnidadeMedidaEnum.Unidade, 4);
+        Add("Pudim de Leite Condensado", "Açúcar", UnidadeMedidaEnum.Grama, 120, opcional: true);
+
+        // Polvo à Lagareiro
+        Add("Polvo à Lagareiro", "Polvo", UnidadeMedidaEnum.Grama, 800);
+        Add("Polvo à Lagareiro", "Batata", UnidadeMedidaEnum.Grama, 500);
+        Add("Polvo à Lagareiro", "Alho", UnidadeMedidaEnum.Unidade, 4, opcional: true);
+        Add("Polvo à Lagareiro", "Azeite", UnidadeMedidaEnum.ColherDeSopa, 4, opcional: true);
+
+        if (novos.Count == 0)
+        {
+            return;
+        }
+
+        var receitaIdsSeed = novos
+            .Select(c => c.ReceitaId)
+            .ToHashSet();
+
+        var existentes = context.ComponenteReceita
+            .Where(c => receitaIdsSeed.Contains(c.ReceitaId))
+            .ToList();
+
+        var desiredSet = novos
+            .Select(c => (c.ReceitaId, c.AlimentoId, c.UnidadeMedida, c.Quantidade, c.IsOpcional))
+            .ToHashSet();
+
+        var existingSet = existentes
+            .Select(c => (c.ReceitaId, c.AlimentoId, c.UnidadeMedida, c.Quantidade, c.IsOpcional))
+            .ToHashSet();
+
+        if (existingSet.SetEquals(desiredSet))
+        {
+            return;
+        }
+
+        if (existentes.Count > 0)
+        {
+            context.ComponenteReceita.RemoveRange(existentes);
+        }
+
+        context.ComponenteReceita.AddRange(novos);
         context.SaveChanges();
     }
 
     private static void PopulateReceitas(HealthWellbeingDbContext context)
     {
-        if (context.Receita.Any())
+        var receitasSeed = new List<Receita>
         {
-            return;
-        }
-
-        context.Receita.AddRange(
             // Receitas Rápidas (5-15 minutos)
             new Receita
             {
@@ -1023,8 +1234,22 @@ internal class SeedData
                 HidratosCarbono = 25,
                 Gorduras = 14
             }
-        );
+        };
 
+        var existentes = new HashSet<string>(
+            context.Receita.Select(r => r.Nome),
+            StringComparer.OrdinalIgnoreCase);
+
+        var paraAdicionar = receitasSeed
+            .Where(r => !existentes.Contains(r.Nome))
+            .ToList();
+
+        if (paraAdicionar.Count == 0)
+        {
+            return;
+        }
+
+        context.Receita.AddRange(paraAdicionar);
         context.SaveChanges();
     }
 
