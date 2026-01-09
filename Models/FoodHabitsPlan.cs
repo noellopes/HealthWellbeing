@@ -20,6 +20,6 @@ namespace HealthWellbeing.Models
         public Client? Client { get; set; }
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
-        public ICollection<FoodPlan>? FoodPlans { get; set; }
+        public ICollection<PlanFood>? FoodPlans { get; set; }
     }
 }
