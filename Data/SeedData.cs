@@ -308,6 +308,8 @@ internal class SeedData
             new Alimento { Name = "Vinagre de Maçã", Description = "Condimento ácido usado como alternativa ao limão em temperos.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 21, KcalPor100g = 21, ProteinaGPor100g = 0m, HidratosGPor100g = 0.9m, GorduraGPor100g = 0m },
             new Alimento { Name = "Mostarda", Description = "Condimento usado em molhos e sanduíches.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 66, KcalPor100g = 66, ProteinaGPor100g = 4.4m, HidratosGPor100g = 5.8m, GorduraGPor100g = 3.6m },
             new Alimento { Name = "Molho de Soja", Description = "Tempero líquido salgado (shoyu).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 53, KcalPor100g = 53, ProteinaGPor100g = 8.1m, HidratosGPor100g = 4.9m, GorduraGPor100g = 0.6m },
+            new Alimento { Name = "Tamari", Description = "Molho tipo shoyu (frequentemente sem glúten).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 10m, HidratosGPor100g = 5m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Aminos de Coco", Description = "Tempero líquido com perfil semelhante ao shoyu (sem soja).", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 40, KcalPor100g = 40, ProteinaGPor100g = 0.5m, HidratosGPor100g = 10m, GorduraGPor100g = 0m },
             new Alimento { Name = "Molho de Tomate", Description = "Base de tomate cozinhada para massas e guisados.", CategoriaAlimentoId = Cat("Condimentos e Molhos"), Calories = 29, KcalPor100g = 29, ProteinaGPor100g = 1.4m, HidratosGPor100g = 6.6m, GorduraGPor100g = 0.2m },
 
             // Óleos e Gorduras
@@ -398,6 +400,7 @@ internal class SeedData
             new Alimento { Name = "Avelã", Description = "Oleaginosa aromática, usada em snacks e sobremesas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 628, KcalPor100g = 628, ProteinaGPor100g = 15m, HidratosGPor100g = 16.7m, GorduraGPor100g = 60.8m },
             new Alimento { Name = "Sementes de Girassol", Description = "Sementes ricas em gorduras saudáveis; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 584, KcalPor100g = 584, ProteinaGPor100g = 20.8m, HidratosGPor100g = 20m, GorduraGPor100g = 51.5m },
             new Alimento { Name = "Sementes de Abóbora", Description = "Sementes ricas em magnésio; alternativa a oleaginosas.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 559, KcalPor100g = 559, ProteinaGPor100g = 30.2m, HidratosGPor100g = 10.7m, GorduraGPor100g = 49m },
+            new Alimento { Name = "Sementes de Sésamo", Description = "Sementes ricas em gorduras saudáveis, usadas em saladas e panificação.", CategoriaAlimentoId = Cat("Oleaginosas e Sementes"), Calories = 573, KcalPor100g = 573, ProteinaGPor100g = 17.7m, HidratosGPor100g = 23.4m, GorduraGPor100g = 49.7m },
 
             // Carnes (inclui aves e enchidos)
             new Alimento { Name = "Frango", Description = "Carne branca rica em proteínas.", CategoriaAlimentoId = Cat("Carnes"), Calories = 165, KcalPor100g = 165, ProteinaGPor100g = 31m, HidratosGPor100g = 0m, GorduraGPor100g = 3.6m },
@@ -474,97 +477,168 @@ internal class SeedData
 
     private static void PopulateAlergias(HealthWellbeingDbContext context)
     {
-        if (context.Alergia.Any())
+        var seedAlergias = new List<Alergia>
+        {
+            new Alergia
+            {
+                Nome = "Alergia ao Amendoim",
+                Descricao = "Reação alérgica a proteínas do amendoim.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Urticária, inchaço (face/garganta), dificuldade para respirar."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Leite",
+                Descricao = "Alergia às proteínas do leite .",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Urticária, vómitos, diarreia, congestão nasal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Ovo",
+                Descricao = "Reação imunológica às proteínas do ovo (clara e/ou gema).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Coceira, urticária, desconforto gastrointestinal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Trigo",
+                Descricao = "Reação às proteínas do trigo (pode envolver glúten).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Inchaço, urticária, dor abdominal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Frutos do Mar",
+                Descricao = "Reação a crustáceos e/ou moluscos.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Inchaço facial, vómitos, anafilaxia."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Castanhas",
+                Descricao = "Reação a oleaginosas (ex.: amêndoa, noz, caju, avelã).",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Prurido, inchaço, risco de anafilaxia."
+            },
+            new Alergia
+            {
+                Nome = "Alergia à Soja",
+                Descricao = "Reação às proteínas da soja e derivados.",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Erupções cutâneas, dor abdominal, tosse."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Peixe",
+                Descricao = "Reação imunológica a proteínas de peixes.",
+                Gravidade = GravidadeAlergia.Grave,
+                Sintomas = "Urticária, vómitos, dificuldade respiratória."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Frango",
+                Descricao = "Hipersensibilidade rara a proteínas da carne de frango.",
+                Gravidade = GravidadeAlergia.Leve,
+                Sintomas = "Vermelhidão, urticária, irritação cutânea."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Glúten",
+                Descricao = "Sensibilidade a proteínas com glúten (não é diagnóstico de celíaca).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Dores abdominais, náuseas, fadiga."
+            },
+            new Alergia
+            {
+                Nome = "Alergia a Lacticínios",
+                Descricao = "Reação a derivados do leite (ex.: queijos, iogurtes, manteiga).",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Inchaço, diarreia, congestão nasal."
+            },
+            new Alergia
+            {
+                Nome = "Alergia ao Sésamo",
+                Descricao = "Reação a proteínas do sésamo e produtos contendo sésamo.",
+                Gravidade = GravidadeAlergia.Moderada,
+                Sintomas = "Urticária, inchaço, dificuldade respiratória."
+            },
+            new Alergia
+            {
+                Nome = "Alergia à Mostarda",
+                Descricao = "Alergia a condimentos com mostarda (semente/derivados).",
+                Gravidade = GravidadeAlergia.Leve,
+                Sintomas = "Coceira, urticária, irritação oral."
+            }
+        };
+
+        var existentes = context.Alergia
+            .ToList()
+            .GroupBy(a => a.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var changed = false;
+        foreach (var seed in seedAlergias)
+        {
+            if (!existentes.TryGetValue(seed.Nome, out var atual))
+            {
+                context.Alergia.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (!string.Equals(atual.Descricao, seed.Descricao, StringComparison.Ordinal))
+            {
+                atual.Descricao = seed.Descricao;
+                changed = true;
+            }
+
+            if (atual.Gravidade != seed.Gravidade)
+            {
+                atual.Gravidade = seed.Gravidade;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Sintomas, seed.Sintomas, StringComparison.Ordinal))
+            {
+                atual.Sintomas = seed.Sintomas;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            context.SaveChanges();
+        }
+
+        // Associações N:N (additivas)
+        var alergiasByNome = context.Alergia
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(a => a.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        var alimentos = context.Alimentos
+            .AsNoTracking()
+            .ToList();
+
+        if (!alimentos.Any() || !alergiasByNome.Any())
         {
             return;
         }
 
-        var alergias = new List<Alergia>
-    {
-        new Alergia
+        var categoriasByNome = context.CategoriaAlimento
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().CategoriaAlimentoId, StringComparer.OrdinalIgnoreCase);
+
+        int? TryCatId(string nome)
         {
-            Nome = "Alergia ao Amendoim",
-            Descricao = "Reação alérgica grave a proteínas do amendoim.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Urticária, dificuldade para respirar, inchaço na garganta."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Leite",
-            Descricao = "Sensibilidade às proteínas do leite de vaca.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Cólicas, diarreia, erupções cutâneas."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Ovo",
-            Descricao = "Reação imunológica às proteínas da clara ou gema do ovo.",
-            Gravidade = GravidadeAlergia.Leve,
-            Sintomas = "Coceira, vermelhidão, desconforto gastrointestinal."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Trigo",
-            Descricao = "Reação às proteínas do trigo, incluindo o glúten.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Inchaço abdominal, erupções cutâneas, fadiga."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Frutos do Mar",
-            Descricao = "Reação a crustáceos e moluscos.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Inchaço facial, vômitos, anafilaxia."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Castanhas",
-            Descricao = "Reação a proteínas encontradas em castanhas, nozes e amêndoas.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Prurido, inchaço, risco de anafilaxia."
-        },
-        new Alergia
-        {
-            Nome = "Alergia à Soja",
-            Descricao = "Reação às proteínas encontradas nos grãos de soja.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Erupções, desconforto abdominal, tosse."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Peixe",
-            Descricao = "Reação imunológica a proteínas de peixes diversos.",
-            Gravidade = GravidadeAlergia.Grave,
-            Sintomas = "Inchaço facial, vômitos, dificuldade respiratória."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Frango",
-            Descricao = "Hipersensibilidade às proteínas da carne de frango.",
-            Gravidade = GravidadeAlergia.Leve,
-            Sintomas = "Vermelhidão, urticária, irritação na pele."
-        },
-        new Alergia
-        {
-            Nome = "Alergia ao Glúten",
-            Descricao = "Reação não-celíaca às proteínas do glúten.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Dores abdominais, náuseas, fadiga."
-        },
-        new Alergia
-        {
-            Nome = "Alergia a Lacticínios",
-            Descricao = "Reação a derivados do leite, mesmo quando sem lactose.",
-            Gravidade = GravidadeAlergia.Moderada,
-            Sintomas = "Inchaço, diarréia, irritação nasal."
+            if (!categoriasByNome.TryGetValue(nome, out var id))
+                return null;
+            return id;
         }
-    };
-
-        context.Alergia.AddRange(alergias);
-        context.SaveChanges();
-
-        // Associa os alimentos existentes às alergias
-        var alimentos = context.Alimentos.ToList();
 
         int? TryGetAlimentoId(string nome)
         {
@@ -573,45 +647,154 @@ internal class SeedData
                 ?.AlimentoId;
         }
 
-        void AddAssociacao(int alergiaIndex, string alimentoNome)
-        {
-            var alimentoId = TryGetAlimentoId(alimentoNome);
-            if (alimentoId == null) return;
+        var existingPairs = context.AlergiaAlimento
+            .AsNoTracking()
+            .Select(x => new { x.AlergiaId, x.AlimentoId })
+            .AsEnumerable()
+            .Select(x => (x.AlergiaId, x.AlimentoId))
+            .ToHashSet();
 
-            context.AlergiaAlimento.Add(new AlergiaAlimento
+        var novos = new List<AlergiaAlimento>();
+
+        void AddAssociacao(string alergiaNome, int alimentoId)
+        {
+            if (!alergiasByNome.TryGetValue(alergiaNome, out var alergia))
+                return;
+
+            var key = (alergia.AlergiaId, alimentoId);
+            if (!existingPairs.Add(key))
+                return;
+
+            novos.Add(new AlergiaAlimento
             {
-                AlergiaId = alergias[alergiaIndex].AlergiaId,
-                AlimentoId = alimentoId.Value
+                AlergiaId = alergia.AlergiaId,
+                AlimentoId = alimentoId
             });
         }
 
-        // Mantém coerência: cada alergia liga a um (ou mais) alimentos reais seedados.
-        AddAssociacao(0, "Amendoim");          // Alergia ao Amendoim
-        AddAssociacao(1, "Leite");             // Alergia ao Leite
-        AddAssociacao(2, "Ovo");               // Alergia ao Ovo
-        AddAssociacao(3, "Trigo");             // Alergia ao Trigo
-        AddAssociacao(4, "Camarão");           // Alergia a Frutos do Mar
-        AddAssociacao(5, "Amêndoa");           // Alergia a Castanhas
-        AddAssociacao(6, "Tofu");              // Alergia à Soja
-        AddAssociacao(7, "Salmão");            // Alergia ao Peixe
-        AddAssociacao(8, "Frango");            // Alergia ao Frango
-        AddAssociacao(9, "Trigo");             // Alergia ao Glúten
-        AddAssociacao(9, "Pão");               // Glúten (derivados)
-        AddAssociacao(10, "Leite");            // Alergia a Lacticínios
-        AddAssociacao(10, "Queijo");           // Lacticínios
+        void AddAssociacaoPorNome(string alergiaNome, string alimentoNome)
+        {
+            var alimentoId = TryGetAlimentoId(alimentoNome);
+            if (alimentoId == null) return;
+            AddAssociacao(alergiaNome, alimentoId.Value);
+        }
 
-        context.SaveChanges();
+        void AddAssociacaoPorFiltro(string alergiaNome, Func<Alimento, bool> filtro, int? take = null)
+        {
+            var query = alimentos.Where(filtro);
+            if (take != null)
+                query = query.Take(take.Value);
+
+            foreach (var alimento in query)
+            {
+                AddAssociacao(alergiaNome, alimento.AlimentoId);
+            }
+        }
+
+        // Amendoim
+        AddAssociacaoPorNome("Alergia ao Amendoim", "Amendoim");
+
+        // Castanhas/Oleaginosas
+        AddAssociacaoPorNome("Alergia a Castanhas", "Amêndoa");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Noz");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Caju");
+        AddAssociacaoPorNome("Alergia a Castanhas", "Avelã");
+        var oleaginosasId = TryCatId("Oleaginosas e Sementes");
+        if (oleaginosasId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia a Castanhas", a => a.CategoriaAlimentoId == oleaginosasId.Value, take: 12);
+        }
+
+        // Leite/Lacticínios
+        AddAssociacaoPorNome("Alergia ao Leite", "Leite");
+        AddAssociacaoPorFiltro("Alergia ao Leite", a =>
+            a.Name.Contains("Leite", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Manteiga", StringComparison.OrdinalIgnoreCase));
+
+        AddAssociacaoPorNome("Alergia a Lacticínios", "Leite");
+        AddAssociacaoPorNome("Alergia a Lacticínios", "Queijo");
+        AddAssociacaoPorFiltro("Alergia a Lacticínios", a =>
+            a.Name.Contains("Leite", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Queijo", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Iogurte", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Kefir", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Requeijão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Manteiga", StringComparison.OrdinalIgnoreCase));
+
+        // Ovo
+        AddAssociacaoPorNome("Alergia ao Ovo", "Ovo");
+        var ovosId = TryCatId("Ovos");
+        if (ovosId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia ao Ovo", a => a.CategoriaAlimentoId == ovosId.Value, take: 8);
+        }
+
+        // Soja
+        AddAssociacaoPorNome("Alergia à Soja", "Tofu");
+        AddAssociacaoPorNome("Alergia à Soja", "Tempeh");
+        AddAssociacaoPorNome("Alergia à Soja", "Edamame");
+        AddAssociacaoPorNome("Alergia à Soja", "Molho de Soja");
+        AddAssociacaoPorNome("Alergia à Soja", "Tamari");
+        AddAssociacaoPorNome("Alergia à Soja", "Bebida de Soja");
+        AddAssociacaoPorNome("Alergia à Soja", "Iogurte de Soja");
+        AddAssociacaoPorFiltro("Alergia à Soja", a => a.Name.Contains("Soja", StringComparison.OrdinalIgnoreCase));
+
+        // Trigo / Glúten
+        void AddTrigoGluten(string alergiaNome)
+        {
+            AddAssociacaoPorFiltro(alergiaNome, a =>
+                a.Name.Equals("Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Farinha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.StartsWith("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Tortilha de Trigo", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Esparguete", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Lasanha", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cuscuz", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Cevada", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Seitan", StringComparison.OrdinalIgnoreCase));
+        }
+
+        AddTrigoGluten("Alergia ao Trigo");
+        AddTrigoGluten("Alergia ao Glúten");
+
+        // Peixe
+        AddAssociacaoPorNome("Alergia ao Peixe", "Salmão");
+        AddAssociacaoPorFiltro("Alergia ao Peixe", a =>
+            a.Name.Contains("Salmão", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Atum", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Bacalhau", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Sardinha", StringComparison.OrdinalIgnoreCase));
+
+        // Frutos do mar
+        AddAssociacaoPorNome("Alergia a Frutos do Mar", "Camarão");
+        var peixeMariscoId = TryCatId("Peixes e Mariscos");
+        if (peixeMariscoId != null)
+        {
+            AddAssociacaoPorFiltro("Alergia a Frutos do Mar", a => a.CategoriaAlimentoId == peixeMariscoId.Value, take: 12);
+        }
+
+        // Frango
+        AddAssociacaoPorNome("Alergia ao Frango", "Frango");
+
+        // Sésamo / Mostarda
+        AddAssociacaoPorNome("Alergia ao Sésamo", "Sementes de Sésamo");
+        AddAssociacaoPorNome("Alergia à Mostarda", "Mostarda");
+
+        if (novos.Any())
+        {
+            context.AlergiaAlimento.AddRange(novos);
+            context.SaveChanges();
+        }
     }
 
 
     private static void PopulateRestricoesAlimentares(HealthWellbeingDbContext context)
     {
-        if (context.RestricaoAlimentar.Any())
-        {
-            return;
-        }
-
-        var restricoes = new List<RestricaoAlimentar>
+        var seedRestricoes = new List<RestricaoAlimentar>
         {
             new RestricaoAlimentar 
             { 
@@ -649,11 +832,11 @@ internal class SeedData
                 Descricao = "Restrição total de açúcares refinados e controle de carboidratos." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Vegetariana Estrita", 
-                Tipo = TipoRestricao.Vegetariana, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Dieta sem carne, mas pode incluir laticínios e ovos." 
+            {
+                Nome = "Vegetariana Estrita",
+                Tipo = TipoRestricao.Vegetariana,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Dieta sem carne e peixe; pode incluir laticínios e ovos."
             },
             new RestricaoAlimentar 
             { 
@@ -663,11 +846,11 @@ internal class SeedData
                 Descricao = "Alergia severa a crustáceos e moluscos." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Restrição Religiosa - Halal", 
-                Tipo = TipoRestricao.Religiosa, 
-                Gravidade = GravidadeRestricao.Moderada, 
-                Descricao = "Alimentação de acordo com preceitos islâmicos." 
+            {
+                Nome = "Restrição Religiosa - Halal",
+                Tipo = TipoRestricao.Religiosa,
+                Gravidade = GravidadeRestricao.Moderada,
+                Descricao = "Alimentação de acordo com preceitos islâmicos (ex.: sem carne de porco)."
             },
             new RestricaoAlimentar 
             { 
@@ -705,11 +888,11 @@ internal class SeedData
                 Descricao = "Dificuldade em digerir frutose presente em frutas e mel." 
             },
             new RestricaoAlimentar 
-            { 
-                Nome = "Dieta Paleolítica", 
-                Tipo = TipoRestricao.Outra, 
-                Gravidade = GravidadeRestricao.Leve, 
-                Descricao = "Baseada em alimentos supostamente disponíveis na era paleolítica." 
+            {
+                Nome = "Dieta Paleolítica",
+                Tipo = TipoRestricao.Outra,
+                Gravidade = GravidadeRestricao.Leve,
+                Descricao = "Evita processados, grãos, leguminosas e laticínios; foca em alimentos simples."
             },
             new RestricaoAlimentar 
             { 
@@ -720,11 +903,48 @@ internal class SeedData
             }
         };
 
-        context.RestricaoAlimentar.AddRange(restricoes);
-        context.SaveChanges();
+        var existentes = context.RestricaoAlimentar
+            .ToList()
+            .GroupBy(r => r.Nome, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-        // Agora cria as associações N:N com alimentos
-        PopulateRestricaoAlimentarAssociacoes(context, restricoes);
+        var changed = false;
+        foreach (var seed in seedRestricoes)
+        {
+            if (!existentes.TryGetValue(seed.Nome, out var atual))
+            {
+                context.RestricaoAlimentar.Add(seed);
+                changed = true;
+                continue;
+            }
+
+            if (atual.Tipo != seed.Tipo)
+            {
+                atual.Tipo = seed.Tipo;
+                changed = true;
+            }
+
+            if (atual.Gravidade != seed.Gravidade)
+            {
+                atual.Gravidade = seed.Gravidade;
+                changed = true;
+            }
+
+            if (!string.Equals(atual.Descricao, seed.Descricao, StringComparison.Ordinal))
+            {
+                atual.Descricao = seed.Descricao;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            context.SaveChanges();
+        }
+
+        // Agora cria/atualiza as associações N:N com alimentos (additivas)
+        var restricoesDb = context.RestricaoAlimentar.AsNoTracking().ToList();
+        PopulateRestricaoAlimentarAssociacoes(context, restricoesDb);
     }
 
 
@@ -751,6 +971,26 @@ internal class SeedData
             return id;
         }
 
+        var existingPairs = context.RestricaoAlimentarAlimento
+            .AsNoTracking()
+            .Select(x => new { x.RestricaoAlimentarId, x.AlimentoId })
+            .AsEnumerable()
+            .Select(x => (x.RestricaoAlimentarId, x.AlimentoId))
+            .ToHashSet();
+
+        void AddLink(int restricaoId, int alimentoId)
+        {
+            var key = (restricaoId, alimentoId);
+            if (!existingPairs.Add(key))
+                return;
+
+            associacoes.Add(new RestricaoAlimentarAlimento
+            {
+                RestricaoAlimentarId = restricaoId,
+                AlimentoId = alimentoId
+            });
+        }
+
         // Intolerância à Lactose - associa com laticínios
         var lactose = restricoes.First(r => r.Nome == "Intolerância à Lactose");
         var laticinios = alimentos
@@ -765,11 +1005,7 @@ internal class SeedData
             .Take(12);
         foreach (var alimento in laticinios)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = lactose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(lactose.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Vegana - associa com carnes, ovos, laticínios
@@ -792,11 +1028,7 @@ internal class SeedData
             .Take(25);
         foreach (var alimento in produtosAnimais)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = vegana.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(vegana.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Baixo Sódio - associa com alimentos processados
@@ -813,11 +1045,7 @@ internal class SeedData
             .Take(10);
         foreach (var alimento in alimentosProcessados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = baixoSodio.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(baixoSodio.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Doença Celíaca - associa com trigo, pão
@@ -836,11 +1064,7 @@ internal class SeedData
             .Take(15);
         foreach (var alimento in comGluten)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = celiaca.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(celiaca.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Diabetes - associa com açúcares e carboidratos
@@ -858,11 +1082,7 @@ internal class SeedData
             .Take(12);
         foreach (var alimento in acucarados)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = diabetes.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(diabetes.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Alergia a Frutos do Mar
@@ -872,11 +1092,7 @@ internal class SeedData
             .Take(10);
         foreach (var alimento in frutosMarAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutosMar.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(frutosMar.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Alergia a Amendoim
@@ -884,11 +1100,7 @@ internal class SeedData
         var amendoimAlimentos = alimentos.Where(a => a.Name.Contains("Amendoim")).Take(1);
         foreach (var alimento in amendoimAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = amendoim.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(amendoim.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Alergia a Ovos
@@ -896,11 +1108,7 @@ internal class SeedData
         var ovosAlimentos = alimentos.Where(a => a.Name.Contains("Ovo")).Take(1);
         foreach (var alimento in ovosAlimentos)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = ovos.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(ovos.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
         // Intolerância à Frutose - associa com frutas doces
@@ -913,32 +1121,91 @@ internal class SeedData
             .Take(15);
         foreach (var alimento in frutasDoces)
         {
-            associacoes.Add(new RestricaoAlimentarAlimento 
-            { 
-                RestricaoAlimentarId = frutose.RestricaoAlimentarId, 
-                AlimentoId = alimento.AlimentoId 
-            });
+            AddLink(frutose.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        // Adiciona algumas associações aleatórias para as restrições restantes
-        var random = new Random();
-        var restricoesSemAssociacao = restricoes.Except(new[] { lactose, vegana, baixoSodio, celiaca, diabetes, frutosMar, amendoim, ovos, frutose });
-
-        foreach (var restricao in restricoesSemAssociacao)
+        // Vegetariana: sem carnes e peixes (mantém laticínios/ovos)
+        var vegetariana = restricoes.First(r => r.Nome == "Vegetariana Estrita");
+        var carnesEPeixes = alimentos
+            .Where(a => a.CategoriaAlimentoId == catCarnes || a.CategoriaAlimentoId == catPeixes)
+            .Take(25);
+        foreach (var alimento in carnesEPeixes)
         {
-            var alimentosAleatorios = alimentos.OrderBy(x => random.Next()).Take(2);
-            foreach (var alimento in alimentosAleatorios)
-            {
-                associacoes.Add(new RestricaoAlimentarAlimento 
-                { 
-                    RestricaoAlimentarId = restricao.RestricaoAlimentarId, 
-                    AlimentoId = alimento.AlimentoId 
-                });
-            }
+            AddLink(vegetariana.RestricaoAlimentarId, alimento.AlimentoId);
         }
 
-        context.RestricaoAlimentarAlimento.AddRange(associacoes);
-        context.SaveChanges();
+        // Sensibilidade ao Glúten: semelhante à celíaca (mesmos marcadores principais)
+        var sensGluten = restricoes.First(r => r.Nome == "Sensibilidade ao Glúten");
+        foreach (var alimento in comGluten)
+        {
+            AddLink(sensGluten.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Low Carb: marca principais fontes de hidratos/açúcares
+        var lowCarb = restricoes.First(r => r.Nome == "Dieta Low Carb");
+        var alimentosHighCarb = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Açúcares e Adoçantes") ||
+                a.CategoriaAlimentoId == CatId("Grãos") ||
+                a.CategoriaAlimentoId == CatId("Massas") ||
+                a.CategoriaAlimentoId == CatId("Pães e Tortilhas") ||
+                a.CategoriaAlimentoId == CatId("Tubérculos") ||
+                a.Name.Contains("Farinha", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Pão", StringComparison.OrdinalIgnoreCase) ||
+                a.Name.Contains("Massa", StringComparison.OrdinalIgnoreCase))
+            .Take(25);
+        foreach (var alimento in alimentosHighCarb)
+        {
+            AddLink(lowCarb.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Halal: sem porco e derivados (simplificação)
+        var halal = restricoes.First(r => r.Nome == "Restrição Religiosa - Halal");
+        var porcoDerivados = alimentos.Where(a =>
+            a.Name.Contains("Bacon", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Chouriço", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Porco", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Presunto", StringComparison.OrdinalIgnoreCase) ||
+            a.Name.Contains("Fiambre", StringComparison.OrdinalIgnoreCase))
+            .Take(25);
+        foreach (var alimento in porcoDerivados)
+        {
+            AddLink(halal.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Kosher: sem porco e sem marisco (simplificação)
+        var kosher = restricoes.First(r => r.Nome == "Restrição Religiosa - Kosher");
+        foreach (var alimento in porcoDerivados)
+        {
+            AddLink(kosher.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+        foreach (var alimento in frutosMarAlimentos)
+        {
+            AddLink(kosher.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        // Paleolítica: evita processados, grãos, leguminosas e laticínios (simplificação)
+        var paleo = restricoes.First(r => r.Nome == "Dieta Paleolítica");
+        var paleoEvitar = alimentos
+            .Where(a =>
+                a.CategoriaAlimentoId == CatId("Grãos") ||
+                a.CategoriaAlimentoId == CatId("Massas") ||
+                a.CategoriaAlimentoId == CatId("Pães e Tortilhas") ||
+                a.CategoriaAlimentoId == CatId("Farinhas e Panificação") ||
+                a.CategoriaAlimentoId == CatId("Leguminosas") ||
+                a.CategoriaAlimentoId == CatId("Laticínios") ||
+                a.CategoriaAlimentoId == CatId("Açúcares e Adoçantes"))
+            .Take(60);
+        foreach (var alimento in paleoEvitar)
+        {
+            AddLink(paleo.RestricaoAlimentarId, alimento.AlimentoId);
+        }
+
+        if (associacoes.Any())
+        {
+            context.RestricaoAlimentarAlimento.AddRange(associacoes);
+            context.SaveChanges();
+        }
     }
 
 
@@ -1083,9 +1350,16 @@ internal class SeedData
         AddSub("Cogumelos", "Beringela", "Alternativa de textura em pratos com molho.", 1m, "Assar ou saltear para reduzir água.", 0.55);
         AddSub("Azeitonas", "Alcaparras", "Alternativa salgada para saladas e molhos.", 0.5m, "São mais intensas; usar menos.", 0.65);
         AddSub("Azeite", "Óleo de Girassol", "Alternativa de gordura para cozinhar.", 1m, "Sabor mais neutro; melhor em altas temperaturas.", 0.65);
+        AddSub("Molho de Soja", "Tamari", "Alternativa de tempero tipo shoyu.", 1m, "Boa opção quando se quer um perfil semelhante; verificar rótulo para 'sem glúten'.", 0.8);
+        AddSub("Molho de Soja", "Aminos de Coco", "Alternativa ao shoyu sem soja.", 1m, "Geralmente mais doce e menos salgado; ajustar quantidade.", 0.7);
+        AddSub("Tamari", "Molho de Soja", "Alternativa equivalente para temperar.", 1m, "Sabor próximo; pode ser mais intenso.", 0.75);
+        AddSub("Mostarda", "Vinagre de Maçã", "Alternativa ácida para molhos e temperos.", 0.5m, "Adicionar aos poucos e ajustar com especiarias.", 0.5);
 
         // Grãos / farináceos
         AddSub("Arroz", "Quinoa", "Alternativa sem glúten e rica em proteína.", 1m, "Lavar antes de cozinhar para reduzir amargor.", 0.7);
+        AddSub("Cuscuz", "Arroz", "Alternativa de acompanhamento (sem glúten quando o cuscuz é de trigo).");
+        AddSub("Cuscuz", "Quinoa", "Alternativa sem glúten para acompanhamento.", 1m, "Boa em saladas frias e bowls.", 0.65);
+        AddSub("Cevada", "Arroz", "Alternativa de cereal em sopas/acompanhamentos (sem glúten).");
         AddSub("Batata", "Batata Doce", "Alternativa de hidrato complexo.", 1m, "Mais doce; boa assada.", 0.75);
         AddSub("Batata Doce", "Batata", "Alternativa de tubérculo.", 1m, "Menos doce; ajustar temperos.", 0.7);
         AddSub("Batata Palha", "Batata", "Alternativa menos processada.", 1m, "Assar/cortar em palitos como substituição.", 0.5);
@@ -1098,6 +1372,11 @@ internal class SeedData
         AddSub("Farinha de Trigo", "Farinha de Arroz", "Alternativa para receitas sem glúten.", 1m, "Pode precisar de ajuste de líquidos.", 0.7);
         AddSub("Farinha de Arroz", "Farinha de Milho", "Alternativa sem glúten para panificação.", 1m, "Textura mais granulada; pode misturar com outras farinhas.", 0.6);
         AddSub("Massa de Lasanha", "Massa Integral", "Alternativa mais rica em fibra.", 1m, "Ajustar tempo de cozedura.", 0.7);
+        AddSub("Esparguete", "Esparguete Integral", "Alternativa com mais fibra.", 1m, "Ajustar tempo de cozedura.", 0.75);
+        AddSub("Esparguete", "Massa Integral", "Alternativa de massa com mais fibra.");
+        AddSub("Seitan", "Tofu", "Alternativa proteica vegetal (sem glúten).", 1m, "Textura diferente; marinar ajuda.", 0.55);
+        AddSub("Seitan", "Grão-de-bico", "Alternativa proteica vegetal sem glúten.", 1m, "Bom em caris e salteados.", 0.5);
+        AddSub("Tempeh", "Tofu", "Alternativa vegetal à base de soja.", 1m, "Textura mais macia.", 0.65);
 
         // Açúcares / adoçantes
         AddSub("Açúcar", "Adoçante (Stevia)", "Alternativa com baixo teor calórico.", 0.2m, "Ajustar ao paladar e à receita.", 0.55);
