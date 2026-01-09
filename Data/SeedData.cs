@@ -89,6 +89,7 @@ internal class SeedData
         EnsureUserIsCreatedAsync(userManager, "client2@health.com", "Secret123$", new[] { "Client" }).Wait();
         EnsureUserIsCreatedAsync(userManager, "client3@health.com", "Secret123$", new[] { "Client" }).Wait();
         EnsureUserIsCreatedAsync(userManager, "client4@health.com", "Secret123$", new[] { "Client" }).Wait();
+        EnsureUserIsCreatedAsync(userManager, "alice@health.com", "Secret123$", new[] { "Client" }).Wait();
     }
 
 
