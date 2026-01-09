@@ -75,7 +75,8 @@
                         @if (User.IsInRole("Utente"))
                         {
                             <li class="nav-item dropdown">
-                                <a class="nav-link text-dark dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @* Alterado de text-primary para text-dark (preto) *@
+                                <a class="nav-link text-dark fw-bold dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-workspace me-1"></i> Client Area
                                 </a>
                                 <ul class="dropdown-menu">
@@ -104,6 +105,12 @@
                                     <li>
                                         <a class="dropdown-item" asp-area="" asp-controller="CustomerLevel" asp-action="Index">
                                             <i class="bi bi-bar-chart-line me-2 text-muted"></i> My Progress (Level)
+                                        </a>
+                                    </li>
+                                    @* Alterado de Leaderboard para Ranking *@
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Leaderboard" asp-action="Index">
+                                            <i class="bi bi-trophy me-2 text-muted"></i> Ranking
                                         </a>
                                     </li>
                                 </ul>

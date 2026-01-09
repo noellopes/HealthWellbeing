@@ -1,0 +1,201 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.ViewModels.LeaderboardItemViewModel>
+
+@{
+    ViewData["Title"] = "Community Leaderboard";
+
+    // Ler o Top 3 do ViewBag para o Pódio
+    var top3 = ViewBag.Top3 as List<HealthWellbeing.ViewModels.LeaderboardItemViewModel>;
+
+    var first = top3?.FirstOrDefault(x => x.Rank == 1);
+    var second = top3?.FirstOrDefault(x => x.Rank == 2);
+    var third = top3?.FirstOrDefault(x => x.Rank == 3);
+}
+
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<div class="container py-5">
+
+    @* --- Cabeçalho --- *@
+    <div class="text-center mb-5">
+        <h6 class="text-uppercase text-primary fw-bold small ls-1">Competition</h6>
+        <h1 class="fw-bold text-dark display-5">Ranking</h1>
+        <p class="text-muted">See who is leading the fitness journey.</p>
+    </div>
+
+    @* --- PÓDIO (MOSTRA SEMPRE O TOP 3 GLOBAL) --- *@
+    @if (top3 != null && top3.Any())
+    {
+        <div class="row g-4 justify-content-center align-items-end mb-5">
+
+            @* 2º Lugar (Silver) *@
+            @if (second != null)
+            {
+                <div class="col-md-3 order-2 order-md-1">
+                    <div class="card border-0 shadow-sm rounded-4 text-center position-relative overflow-hidden hover-lift" style="border-bottom: 5px solid #C0C0C0 !important;">
+                        <div class="card-body p-4">
+                            <div class="mb-3 position-relative">
+                                <i class="bi bi-person-circle display-4 text-secondary opacity-50"></i>
+                                <span class="position-absolute top-100 start-50 translate-middle badge rounded-pill bg-secondary border border-white">2</span>
+                            </div>
+                            <h5 class="fw-bold text-dark text-truncate">@second.CustomerName</h5>
+                            <div class="text-primary fw-bold">@second.TotalPoints pts</div>
+                            <small class="text-muted">Lvl @second.LevelNumber</small>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* 1º Lugar (Gold) *@
+            @if (first != null)
+            {
+                <div class="col-md-4 order-1 order-md-2 mb-3 mb-md-0">
+                    <div class="card border-0 shadow rounded-4 text-center position-relative overflow-hidden hover-lift bg-warning bg-opacity-10" style="border-bottom: 5px solid #FFD700 !important;">
+                        <div class="position-absolute top-0 start-50 translate-middle-x mt-2 text-warning">
+                            <i class="bi bi-crown-fill fs-3"></i>
+                        </div>
+                        <div class="card-body p-5">
+                            <div class="mb-3 position-relative">
+                                <i class="bi bi-person-circle display-2 text-warning"></i>
+                                <span class="position-absolute top-100 start-50 translate-middle badge rounded-pill bg-warning text-dark border border-white px-3">#1</span>
+                            </div>
+                            <h3 class="fw-bold text-dark text-truncate mb-0">@first.CustomerName</h3>
+                            <div class="display-6 fw-bold text-dark mb-2">@first.TotalPoints <span class="fs-6 text-muted">pts</span></div>
+                            <span class="badge bg-white text-dark border shadow-sm rounded-pill px-3">Lvl @first.LevelNumber • @first.LevelName</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* 3º Lugar (Bronze) *@
+            @if (third != null)
+            {
+                <div class="col-md-3 order-3 order-md-3">
+                    <div class="card border-0 shadow-sm rounded-4 text-center position-relative overflow-hidden hover-lift" style="border-bottom: 5px solid #CD7F32 !important;">
+                        <div class="card-body p-4">
+                            <div class="mb-3 position-relative">
+                                <i class="bi bi-person-circle display-4 text-secondary opacity-50" style="color: #CD7F32 !important;"></i>
+                                <span class="position-absolute top-100 start-50 translate-middle badge rounded-pill border border-white" style="background-color: #CD7F32;">3</span>
+                            </div>
+                            <h5 class="fw-bold text-dark text-truncate">@third.CustomerName</h5>
+                            <div class="text-primary fw-bold">@third.TotalPoints pts</div>
+                            <small class="text-muted">Lvl @third.LevelNumber</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @* --- TABELA COM PAGINAÇÃO --- *@
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 border-0 text-muted small text-uppercase" style="width: 80px;">Rank</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase">Member</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase">Level</th>
+                        <th class="py-3 border-0 text-muted small text-uppercase text-center">Badges</th>
+                        <th class="pe-4 py-3 border-0 text-muted small text-uppercase text-end">Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        // Destacar se for o utilizador atual
+                        string rowClass = item.IsCurrentUser ? "bg-primary bg-opacity-10 border-start border-4 border-primary" : "";
+
+                        // Ícones para os Tops na tabela também
+                        string rankDisplay = "#" + item.Rank;
+                        if (item.Rank == 1) rankDisplay = "🥇";
+                        if (item.Rank == 2) rankDisplay = "🥈";
+                        if (item.Rank == 3) rankDisplay = "🥉";
+
+                        <tr class="@rowClass">
+                            <td class="ps-4 py-3 fw-bold text-secondary">@rankDisplay</td>
+                            <td class="py-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3 text-secondary fw-bold" style="width: 35px; height: 35px;">
+                                        @item.CustomerName.Substring(0, 1)
+                                    </div>
+                                    <div>
+                                        <span class="fw-bold text-dark">@item.CustomerName</span>
+                                        @if (item.IsCurrentUser)
+                                        {
+                                            <span class="badge bg-primary ms-2" style="font-size: 0.65rem;">YOU</span>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <span class="badge bg-light text-dark border">@item.LevelNumber</span>
+                            </td>
+                            <td class="py-3 text-center">
+                                @if (item.BadgesCount > 0)
+                                {
+                                    <span class="text-warning"><i class="bi bi-award-fill"></i> @item.BadgesCount</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td class="pe-4 py-3 text-end fw-bold text-primary">
+                                @item.TotalPoints
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* --- PAGINAÇÃO --- *@
+    <div class="d-flex justify-content-center mt-5">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm shadow-sm">
+                @* Previous *@
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link border-0 rounded-start" asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                </li>
+
+                @* Numbers *@
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link border-0" asp-action="Index" asp-route-page="@p">@p</a>
+                    </li>
+                }
+
+                @* Next *@
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link border-0 rounded-end" asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: white;
+    }
+
+    .page-link {
+        color: #333;
+    }
+</style>
