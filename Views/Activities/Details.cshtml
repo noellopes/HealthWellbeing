@@ -22,7 +22,7 @@
             @* --- CARD CONTAINER --- *@
             <div class="card border-0 shadow-lg rounded-4 animate__animated animate__fadeInUp">
 
-                @* --- HEADER (Info/Cyan to distinguish from Badges) --- *@
+                @* --- HEADER --- *@
                 <div class="card-header bg-info bg-gradient text-white p-4 rounded-top-4">
                     <div class="d-flex align-items-center gap-3">
                         <div class="bg-white bg-opacity-25 p-2 rounded-3">
@@ -75,10 +75,12 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold text-dark mb-1">Description</label>
                         <div class="p-3 border rounded-3 bg-light text-secondary" style="min-height: 80px;">
-                            @if (!string.IsNullOrEmpty(Model.ActivityDescription)) {
+                            @if (!string.IsNullOrEmpty(Model.ActivityDescription))
+                            {
                                 @Model.ActivityDescription
                             }
-                            else {
+                            else
+                            {
                                 <span class="fst-italic opacity-50">No description provided.</span>
                             }
                         </div>
@@ -126,21 +128,28 @@
                         <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
                             Back to List
                         </a>
-                        <a asp-action="Edit" asp-route-id="@Model.ActivityId" class="btn btn-warning px-4 shadow-sm">
-                            Edit
-                        </a>
-                        @{
-                            bool canDelete = (Model.EventActivities?.Count ?? 0) == 0 && (Model.CustomerActivities?.Count ?? 0) == 0;
-                        }
-                        @if (canDelete) {
-                            <a asp-action="Delete" asp-route-id="@Model.ActivityId" class="btn btn-danger px-4 shadow-sm">
-                                Delete
+
+                        @* ONLY SHOW EDIT/DELETE IF TREINADOR *@
+                        @if (User.IsInRole("Treinador"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.ActivityId" class="btn btn-warning px-4 shadow-sm">
+                                Edit
                             </a>
-                        }
-                        else {
-                            <button class="btn btn-outline-danger px-4 shadow-sm" disabled title="Cannot delete: Active usage detected">
-                                <i class="bi bi-lock-fill me-1"></i> In Use
-                            </button>
+
+                            bool canDelete = (Model.EventActivities?.Count ?? 0) == 0 && (Model.CustomerActivities?.Count ?? 0) == 0;
+
+                            @if (canDelete)
+                            {
+                                <a asp-action="Delete" asp-route-id="@Model.ActivityId" class="btn btn-danger px-4 shadow-sm">
+                                    Delete
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-danger px-4 shadow-sm" disabled title="Cannot delete: Active usage detected">
+                                    <i class="bi bi-lock-fill me-1"></i> In Use
+                                </button>
+                            }
                         }
                     </div>
 

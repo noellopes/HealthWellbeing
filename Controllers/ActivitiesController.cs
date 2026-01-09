@@ -10,17 +10,22 @@ using HealthWellbeing.Models;
 using Microsoft.AspNetCore.Authorization;
 using HealthWellbeing.ViewModels;
 
-namespace HealthWellbeing.Controllers {
-    [Authorize(Roles = "Gestor")]
-    public class ActivitiesController : Controller {
+namespace HealthWellbeing.Controllers
+{
+    // Both roles can access Index and Details
+    [Authorize(Roles = "Gestor, Treinador")]
+    public class ActivitiesController : Controller
+    {
         private readonly HealthWellbeingDbContext _context;
 
-        public ActivitiesController(HealthWellbeingDbContext context) {
+        public ActivitiesController(HealthWellbeingDbContext context)
+        {
             _context = context;
         }
 
         // GET: Activities
-        public async Task<IActionResult> Index(string searchName, int? searchTypeId, int? searchPoints, int page = 1) {
+        public async Task<IActionResult> Index(string searchName, int? searchTypeId, int? searchPoints, int page = 1)
+        {
             var query = _context.Activity
                 .Include(a => a.ActivityType)
                 .AsNoTracking()
@@ -54,8 +59,8 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: Activities/Details/5
-        public async Task<IActionResult> Details(int? id) {
-            // ALTERADO: Se id for nulo, mostra a view personalizada
+        public async Task<IActionResult> Details(int? id)
+        {
             if (id == null) return View("InvalidActivity");
 
             var activity = await _context.Activity
@@ -63,14 +68,17 @@ namespace HealthWellbeing.Controllers {
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ActivityId == id);
 
-            // ALTERADO: Se não encontrar a atividade
             if (activity == null) return View("InvalidActivity");
 
             return View(activity);
         }
 
+        // --- TRAINER ONLY ACTIONS ---
+
         // GET: Activities/Create
-        public IActionResult Create() {
+        [Authorize(Roles = "Treinador")]
+        public IActionResult Create()
+        {
             ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name");
             return View();
         }
@@ -78,8 +86,11 @@ namespace HealthWellbeing.Controllers {
         // POST: Activities/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity) {
-            if (ModelState.IsValid) {
+        [Authorize(Roles = "Treinador")]
+        public async Task<IActionResult> Create([Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity)
+        {
+            if (ModelState.IsValid)
+            {
                 _context.Add(activity);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -89,12 +100,12 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: Activities/Edit/5
-        public async Task<IActionResult> Edit(int? id) {
-            // ALTERADO
+        [Authorize(Roles = "Treinador")]
+        public async Task<IActionResult> Edit(int? id)
+        {
             if (id == null) return View("InvalidActivity");
 
             var activity = await _context.Activity.FindAsync(id);
-            // ALTERADO
             if (activity == null) return View("InvalidActivity");
 
             ViewData["ActivityTypeId"] = new SelectList(_context.ActivityType, "ActivityTypeId", "Name", activity.ActivityTypeId);
@@ -104,17 +115,21 @@ namespace HealthWellbeing.Controllers {
         // POST: Activities/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity) {
-            // ALTERADO: Proteção contra ID adulterado
+        [Authorize(Roles = "Treinador")]
+        public async Task<IActionResult> Edit(int id, [Bind("ActivityId,ActivityName,ActivityDescription,ActivityReward,ActivityTypeId")] Activity activity)
+        {
             if (id != activity.ActivityId) return View("InvalidActivity");
 
-            if (ModelState.IsValid) {
-                try {
+            if (ModelState.IsValid)
+            {
+                try
+                {
                     _context.Update(activity);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException) {
-                    if (!ActivityExists(activity.ActivityId)) return View("InvalidActivity"); // ALTERADO
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ActivityExists(activity.ActivityId)) return View("InvalidActivity");
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -124,8 +139,9 @@ namespace HealthWellbeing.Controllers {
         }
 
         // GET: Activities/Delete/5
-        public async Task<IActionResult> Delete(int? id) {
-            // ALTERADO
+        [Authorize(Roles = "Treinador")]
+        public async Task<IActionResult> Delete(int? id)
+        {
             if (id == null) return View("InvalidActivity");
 
             var activity = await _context.Activity
@@ -133,7 +149,6 @@ namespace HealthWellbeing.Controllers {
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ActivityId == id);
 
-            // ALTERADO
             if (activity == null) return View("InvalidActivity");
 
             return View(activity);
@@ -142,20 +157,21 @@ namespace HealthWellbeing.Controllers {
         // POST: Activities/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id) {
+        [Authorize(Roles = "Treinador")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
             var activity = await _context.Activity
                 .Include(a => a.CustomerActivities)
                 .Include(a => a.EventActivities)
                 .FirstOrDefaultAsync(a => a.ActivityId == id);
 
-            // ALTERADO: Caso alguém apague ao mesmo tempo que tu
             if (activity == null) return View("InvalidActivity");
 
-            // Validações de integridade
             bool hasUserHistory = activity.CustomerActivities != null && activity.CustomerActivities.Any();
             bool isLinkedToEvents = activity.EventActivities != null && activity.EventActivities.Any();
 
-            if (hasUserHistory || isLinkedToEvents) {
+            if (hasUserHistory || isLinkedToEvents)
+            {
                 ViewBag.ErrorTitle = "Cannot Delete Activity";
 
                 if (hasUserHistory)
@@ -163,16 +179,17 @@ namespace HealthWellbeing.Controllers {
                 else
                     ViewBag.ErrorMessage = "This activity is currently linked to one or more Events. Please remove it from the events first.";
 
-                // Reload Type to prevent view crash
                 await _context.Entry(activity).Reference(a => a.ActivityType).LoadAsync();
                 return View(activity);
             }
 
-            try {
+            try
+            {
                 _context.Activity.Remove(activity);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException) {
+            catch (DbUpdateException)
+            {
                 ViewBag.ErrorTitle = "Database Error";
                 ViewBag.ErrorMessage = "A technical dependency prevents deletion.";
                 return View(activity);
@@ -181,7 +198,8 @@ namespace HealthWellbeing.Controllers {
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ActivityExists(int id) {
+        private bool ActivityExists(int id)
+        {
             return _context.Activity.Any(e => e.ActivityId == id);
         }
     }

@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Gestor")]
+    // Both roles can access Index and Details
+    [Authorize(Roles = "Gestor, Treinador")]
     public class EventsController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -22,7 +23,6 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // ALTERADO: Recebe int em vez de string
         [HttpGet]
         public async Task<IActionResult> GetActivitiesByType(int typeId)
         {
@@ -38,6 +38,7 @@ namespace HealthWellbeing.Controllers
             return Json(activities);
         }
 
+        // GET: Index
         public async Task<IActionResult> Index(string searchName, int? searchType, string searchStatus, int? searchLevel, int page = 1)
         {
             ViewBag.SearchName = searchName;
@@ -92,6 +93,7 @@ namespace HealthWellbeing.Controllers
             return View(paginationInfo);
         }
 
+        // GET: Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return View("InvalidEvent");
@@ -114,14 +116,16 @@ namespace HealthWellbeing.Controllers
             ViewBag.EventTypeId = new SelectList(eventTypesQuery.AsNoTracking(), "EventTypeId", "EventTypeName", selectedEventType);
         }
 
-        // --- CORREÇÃO DO ERRO ---
-        // Recebe object? para aceitar int ou null. Configura ID como Valor e Name como Texto.
         private void PopulateActivityCategories(object? selectedTypeId = null)
         {
             var typesQuery = _context.ActivityType.OrderBy(t => t.Name);
             ViewBag.ActivityCategory = new SelectList(typesQuery.AsNoTracking(), "ActivityTypeId", "Name", selectedTypeId);
         }
 
+        // --- TRAINER ONLY ACTIONS ---
+
+        // GET: Create
+        [Authorize(Roles = "Treinador")]
         public IActionResult Create()
         {
             PopulateEventTypesDropDownList();
@@ -129,9 +133,10 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // ALTERADO: Bind ActivityTypeId
+        [Authorize(Roles = "Treinador")]
         public async Task<IActionResult> Create([Bind("EventId,EventName,EventDescription,EventTypeId,ActivityTypeId,EventStart,EventEnd,MinLevel")] Event @event, int[] selectedActivities)
         {
             if (selectedActivities != null && selectedActivities.Length > 0)
@@ -165,6 +170,8 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
+        // GET: Edit
+        [Authorize(Roles = "Treinador")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return View("InvalidEvent");
@@ -176,14 +183,16 @@ namespace HealthWellbeing.Controllers
             if (@event == null) return View("InvalidEvent");
 
             PopulateEventTypesDropDownList(@event.EventTypeId);
-            PopulateActivityCategories(@event.ActivityTypeId); // Passa o ID
+            PopulateActivityCategories(@event.ActivityTypeId);
 
             ViewBag.SelectedActivityIds = @event.EventActivities.Select(ea => ea.ActivityId).ToList();
             return View(@event);
         }
 
+        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Treinador")]
         public async Task<IActionResult> Edit(int id, [Bind("EventId,EventName,EventDescription,EventTypeId,ActivityTypeId,EventStart,EventEnd,MinLevel")] Event @event, int[] selectedActivities)
         {
             if (id != @event.EventId) return View("InvalidEvent");
@@ -228,6 +237,8 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
+        // GET: Delete
+        [Authorize(Roles = "Treinador")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return View("InvalidEvent");
@@ -238,8 +249,10 @@ namespace HealthWellbeing.Controllers
             return View(@event);
         }
 
+        // POST: Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Treinador")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var @event = await _context.Event.FindAsync(id);

@@ -20,7 +20,8 @@
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 @* --- FEEDBACK MESSAGES --- *@
-@if (successMessage != null) {
+@if (successMessage != null)
+{
     <div class="container py-4">
         <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> @successMessage
@@ -28,7 +29,8 @@
         </div>
     </div>
 }
-@if (errorMessage != null) {
+@if (errorMessage != null)
+{
     <div class="container py-4">
         <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
@@ -38,7 +40,8 @@
 }
 
 @* --- EMPTY STATE  --- *@
-@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && ViewBag.SearchTypeId == null && ViewBag.SearchPoints == null) {
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName) && ViewBag.SearchTypeId == null && ViewBag.SearchPoints == null)
+{
     <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
         <div class="ps-3">
@@ -47,11 +50,15 @@
         </div>
     </div>
 
-    <a asp-action="Create" class="btn btn-success shadow-sm">
-        <i class="bi bi-plus-circle me-1"></i> Create New Activity
-    </a>
+    @if (User.IsInRole("Treinador"))
+    {
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Create New Activity
+        </a>
+    }
 }
-else {
+else
+{
     @* --- HEADER & SEARCH TOGGLE --- *@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h4 text-secondary">Overview</h2>
@@ -59,9 +66,14 @@ else {
             <a class="btn btn-primary shadow-sm" data-bs-toggle="collapse" data-bs-target="#activitySearch" aria-expanded="false" aria-controls="activitySearch">
                 <i class="bi bi-search me-1"></i> Search
             </a>
-            <a asp-action="Create" class="btn btn-success shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Create New
-            </a>
+
+            @* ONLY SHOW CREATE BUTTON IF TREINADOR *@
+            @if (User.IsInRole("Treinador"))
+            {
+                <a asp-action="Create" class="btn btn-success shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Create New
+                </a>
+            }
         </div>
     </div>
 
@@ -109,7 +121,8 @@ else {
     </div>
 
     @* --- NO RESULTS (Filters) --- *@
-    @if (!Model.Items.Any()) {
+    @if (!Model.Items.Any())
+    {
         <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
             <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
             <div class="ps-3">
@@ -118,7 +131,8 @@ else {
             </div>
         </div>
     }
-    else {
+    else
+    {
         @* --- DATA TABLE --- *@
         <div class="table-responsive shadow-sm rounded-3">
             <table class="table table-striped table-hover align-middle mb-0">
@@ -131,37 +145,39 @@ else {
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Items) {
+                    @foreach (var item in Model.Items)
+                    {
                         <tr>
-                            @* 1. Name *@
                             <td>
                                 <div class="fw-bold text-dark">@item.ActivityName</div>
                             </td>
-
-                            @* 2. Type *@
                             <td>
                                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-1 fw-normal px-2 py-1">
                                     @item.ActivityType?.Name
                                 </span>
                             </td>
-
-                            @* 3. Points *@
                             <td class="text-center">
                                 <span class="fw-bold text-dark">@item.ActivityReward</span>
                                 <small class="text-muted ms-1">pts</small>
                             </td>
-
-                            @* 4. Actions *@
                             <td class="text-end text-nowrap">
-                                <a asp-action="Edit" asp-route-id="@item.ActivityId" class="btn btn-sm btn-warning me-1 shadow-sm">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
+                                @if (User.IsInRole("Treinador"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.ActivityId" class="btn btn-sm btn-warning me-1 shadow-sm">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                }
+
                                 <a asp-action="Details" asp-route-id="@item.ActivityId" class="btn btn-sm btn-info me-1 shadow-sm">
                                     <i class="bi bi-info-circle"></i> Details
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@item.ActivityId" class="btn btn-sm btn-danger shadow-sm">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
+
+                                @if (User.IsInRole("Treinador"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.ActivityId" class="btn btn-sm btn-danger shadow-sm">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }
@@ -176,7 +192,6 @@ else {
 
                 <nav aria-label="Activities page">
                     <ul class="pagination mb-0">
-                        @* First Page *@
                         <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                             <a class="page-link" asp-action="Index"
                                asp-route-page="1"
@@ -185,8 +200,8 @@ else {
                                asp-route-searchPoints="@ViewBag.SearchPoints">First</a>
                         </li>
 
-                        @* Page Numbers *@
-                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++) {
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        {
                             <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
                                 <a class="page-link" asp-action="Index"
                                    asp-route-page="@p"
@@ -196,7 +211,6 @@ else {
                             </li>
                         }
 
-                        @* Last Page *@
                         <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
                             <a class="page-link" asp-action="Index"
                                asp-route-page="@Model.TotalPages"

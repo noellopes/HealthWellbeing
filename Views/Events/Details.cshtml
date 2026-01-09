@@ -130,8 +130,13 @@
                     @* --- BUTTONS --- *@
                     <div class="d-flex justify-content-end gap-2 mt-5 pt-3 border-top">
                         <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">Back to List</a>
-                        <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-warning px-4 shadow-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@Model.EventId" class="btn btn-danger px-4 shadow-sm">Delete</a>
+
+                        @* ONLY SHOW EDIT/DELETE IF TREINADOR *@
+                        @if (User.IsInRole("Treinador"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.EventId" class="btn btn-warning px-4 shadow-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@Model.EventId" class="btn btn-danger px-4 shadow-sm">Delete</a>
+                        }
                     </div>
                 </div>
             </div>

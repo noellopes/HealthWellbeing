@@ -33,9 +33,12 @@
         </div>
     </div>
 
-    <a asp-action="Create" class="btn btn-success shadow-sm">
-        <i class="bi bi-plus-circle me-1"></i> Create New Event
-    </a>
+    @if (User.IsInRole("Treinador"))
+    {
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Create New Event
+        </a>
+    }
 }
 else
 {
@@ -46,9 +49,14 @@ else
             <a class="btn btn-primary shadow-sm" data-bs-toggle="collapse" data-bs-target="#eventSearch" aria-expanded="false" aria-controls="eventSearch">
                 <i class="bi bi-search me-1"></i> Search
             </a>
-            <a asp-action="Create" class="btn btn-success shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> Create New
-            </a>
+
+            @* ONLY SHOW CREATE BUTTON IF TREINADOR *@
+            @if (User.IsInRole("Treinador"))
+            {
+                <a asp-action="Create" class="btn btn-success shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Create New
+                </a>
+            }
         </div>
     </div>
 
@@ -132,19 +140,14 @@ else
                     @foreach (var item in Model.Items)
                     {
                         <tr>
-                            @* 1. Name *@
                             <td>
                                 <div class="fw-bold text-dark">@item.EventName</div>
                             </td>
-
-                            @* 2. Type *@
                             <td>
                                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-1 fw-normal px-2 py-1">
                                     @item.EventType?.EventTypeName
                                 </span>
                             </td>
-
-                            @* 3. Date *@
                             <td>
                                 <div class="d-flex flex-column small">
                                     <div class="mb-1 text-nowrap">
@@ -157,19 +160,13 @@ else
                                     </div>
                                 </div>
                             </td>
-
-                            @* 4. Level *@
                             <td class="text-center">
                                 <span class="fw-bold text-dark">@item.MinLevel</span>
                             </td>
-
-                            @* 5. Points *@
                             <td class="text-center">
                                 <span class="fw-bold text-dark">@item.EventPoints</span>
                                 <small class="text-muted ms-1">pts</small>
                             </td>
-
-                            @* 6. Status *@
                             <td class="text-center">
                                 @if (item.Status == HealthWellbeing.Models.EventStatus.Adecorrer)
                                 {
@@ -190,18 +187,24 @@ else
                                     </span>
                                 }
                             </td>
-
-                            @* 7. Actions *@
                             <td class="text-end text-nowrap">
-                                <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning me-1 shadow-sm">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
+                                @if (User.IsInRole("Treinador"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.EventId" class="btn btn-sm btn-warning me-1 shadow-sm">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                }
+
                                 <a asp-action="Details" asp-route-id="@item.EventId" class="btn btn-sm btn-info me-1 shadow-sm">
                                     <i class="bi bi-info-circle"></i> Details
                                 </a>
-                                <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger shadow-sm">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
+
+                                @if (User.IsInRole("Treinador"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.EventId" class="btn btn-sm btn-danger shadow-sm">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }

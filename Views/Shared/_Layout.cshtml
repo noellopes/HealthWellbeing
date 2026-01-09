@@ -119,6 +119,28 @@
                             </li>
                         }
 
+                        @* --- TRAINER MENU (Only if Treinador) --- *@
+                        @if (User.IsInRole("Treinador"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Trainer Area
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Activities" asp-action="Index">
+                                            <i class="bi bi-activity me-2"></i> Manage Activities
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Events" asp-action="Index">
+                                            <i class="bi bi-calendar-event me-2"></i> Manage Events
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
