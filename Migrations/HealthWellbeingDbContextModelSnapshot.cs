@@ -341,6 +341,21 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("Consulta");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ConsultaUtente", b =>
+                {
+                    b.Property<int>("IdConsulta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdUtente")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdConsulta", "IdUtente");
+
+                    b.HasIndex("IdUtente");
+
+                    b.ToTable("ConsultaUtente");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
                 {
                     b.Property<int>("IdMedico")
@@ -1425,6 +1440,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("UtenteSaude");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.ConsultaUtente", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Consulta", "Consulta")
+                        .WithMany("ConsultaUtentes")
+                        .HasForeignKey("IdConsulta")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.UtenteSaude", "Utente")
+                        .WithMany("UtenteConsultas")
+                        .HasForeignKey("IdUtente")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Consulta");
+
+                    b.Navigation("Utente");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Specialities", "Especialidade")
@@ -1714,6 +1748,8 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Consulta", b =>
                 {
                     b.Navigation("ConsultaDoctors");
+
+                    b.Navigation("ConsultaUtentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Doctor", b =>
@@ -1769,6 +1805,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Consultas");
 
                     b.Navigation("Medicos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
+                {
+                    b.Navigation("UtenteConsultas");
                 });
 #pragma warning restore 612, 618
         }
