@@ -25,9 +25,10 @@ namespace HealthWellbeing.Controllers
 
             foreach (var id in todosConsumiveisIds)
             {
-                // 1. Atualiza as quantidades reais baseadas na soma das zonas
-                await AtualizarQuantidadeAtualConsumivel(id);
+               
                 await AtualizarQuantidadeMaximaConsumivel(id);
+                await AtualizarQuantidadeAtualConsumivel(id);
+
 
                 // 2. Verifica se deve gerar o TempData para o alerta na View
                 await VerificarNecessidadeProposta(id);
@@ -64,11 +65,11 @@ namespace HealthWellbeing.Controllers
             var consumivel = await _context.Consumivel.FindAsync(id);
             if (consumivel == null) return NotFound();
 
-            var melhorFornecedor = await _context.Fornecedor_Consumivel
-                .Where(fc => fc.ConsumivelId == id)
-                .OrderBy(fc => fc.Preco)
-                .ThenBy(fc => fc.TempoEntrega)
-                .FirstOrDefaultAsync();
+            var consumivel = await _context.Consumivel
+                .Include(c => c.CategoriaConsumivel)
+                .Include(c => c.FornecedoresConsumiveis)
+                    .ThenInclude(fc => fc.Fornecedor)
+                .FirstOrDefaultAsync(c => c.ConsumivelId == id);
 
             if (melhorFornecedor != null)
             {

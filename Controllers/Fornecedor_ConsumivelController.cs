@@ -54,9 +54,6 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: Fornecedor_Consumivel/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FornecedorConsumivelId,FornecedorId,ConsumivelId,TempoEntrega,Preco")] Fornecedor_Consumivel fornecedor_Consumivel)
@@ -73,6 +70,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Fornecedor_Consumivel/Edit/5
+        
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,19 +78,20 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var fornecedor_Consumivel = await _context.Fornecedor_Consumivel.FindAsync(id);
+            var fornecedor_Consumivel = await _context.Fornecedor_Consumivel
+                .Include(fc => fc.Fornecedor)
+                .Include(fc => fc.Consumivel)
+                .FirstOrDefaultAsync(fc => fc.FornecedorConsumivelId == id);
+
             if (fornecedor_Consumivel == null)
             {
                 return NotFound();
             }
-            ViewData["ConsumivelId"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", fornecedor_Consumivel.ConsumivelId);
-            ViewData["FornecedorId"] = new SelectList(_context.Fornecedor, "FornecedorId", "NomeEmpresa", fornecedor_Consumivel.FornecedorId);
+
             return View(fornecedor_Consumivel);
         }
 
-        // POST: Fornecedor_Consumivel/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("FornecedorConsumivelId,FornecedorId,ConsumivelId,TempoEntrega,Preco")] Fornecedor_Consumivel fornecedor_Consumivel)
@@ -136,9 +135,10 @@ namespace HealthWellbeing.Controllers
             }
 
             var fornecedor_Consumivel = await _context.Fornecedor_Consumivel
-                .Include(f => f.Consumivel)
-                .Include(f => f.Fornecedor)
-                .FirstOrDefaultAsync(m => m.FornecedorConsumivelId == id);
+            .Include(fc => fc.Fornecedor)
+            .Include(fc => fc.Consumivel)
+            .FirstOrDefaultAsync(fc => fc.FornecedorConsumivelId == id);
+
             if (fornecedor_Consumivel == null)
             {
                 return NotFound();

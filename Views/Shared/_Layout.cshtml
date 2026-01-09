@@ -83,6 +83,65 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="ComponentesAlimento" asp-action="Index">ComponentesAlimento</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="consumivelDropdown"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Consumíveis
+                            </a>
+
+                            <ul class="dropdown-menu" aria-labelledby="consumivelDropdown">
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Consumíveis</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Consumivel" asp-action="Create">Criar Consumível</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Consumivel" asp-action="Index">Lista de Consumíveis</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Categorias</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="CategoriaConsumivel" asp-action="Create">Criar Categoria</a></li>
+                                        <li><a class="dropdown-item" asp-controller="CategoriaConsumivel" asp-action="Index">Lista de Categorias</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Fornecedores</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Fornecedor" asp-action="Create">Criar Fornecedor</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Fornecedor" asp-action="Index">Lista de Fornecedores</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Fornecedor × Consumível</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Fornecedor_Consumivel" asp-action="Create">Associar</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Fornecedor_Consumivel" asp-action="Index">Lista</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Uso de Consumíveis</a>
+                                    <ul class="dropdown-menu">
+@*                                         <li><a class="dropdown-item" asp-controller="UsoConsumivel" asp-action="Create">Registar Uso</a></li>
+ *@                                        <li><a class="dropdown-item" asp-controller="UsoConsumivel" asp-action="Index">Histórico</a></li>
+                                    </ul>
+                                </li>
+
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Zonas de Armazenamento</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="ZonaArmazenamento" asp-action="Create">Criar Zona</a></li>
+                                        <li><a class="dropdown-item" asp-controller="ZonaArmazenamento" asp-action="Index">Lista de Zonas</a></li>
+                                    </ul>
+                                </li>
+
+                            </ul>
+                        </li>
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

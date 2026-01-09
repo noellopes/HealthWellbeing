@@ -37,6 +37,7 @@
                             {
                                 <option value="@c.ConsumivelId"
                                         data-atual="@c.QuantidadeAtual"
+                                        data-min="@c.QuantidadeMinima"
                                         data-max="@c.QuantidadeMaxima">
                                     @c.Nome
                                 </option>
@@ -84,40 +85,46 @@
     }
 </div>
 
-@section Scripts {
-    <script>
-        const select = document.getElementById("consumivelSelect");
-        const qtdAtualInput = document.getElementById("qtdAtual");
-        const qtdMinInput = document.getElementById("qtdMin");
-        const qtdMaxInput = document.getElementById("qtdMax");
-        const qtdComprarInput = document.getElementById("qtdComprar");
-        const infoCompra = document.getElementById("infoCompra");
 
-        select?.addEventListener("change", () => {
-            const opt = select.selectedOptions[0];
-            if (!opt) return;
+    @section Scripts {
+<script>
+    const select = document.getElementById("consumivelSelect");
+    const qtdAtualInput = document.getElementById("qtdAtual");
+    const qtdMinInput = document.getElementById("qtdMin");
+    const qtdMaxInput = document.getElementById("qtdMax");
+    const qtdComprarInput = document.getElementById("qtdComprar");
+    const infoCompra = document.getElementById("infoCompra");
 
-            const atual = parseInt(opt.dataset.atual || 0);
-            const min = parseInt(opt.dataset.min || 0);
-            const max = parseInt(opt.dataset.max || 0);
+    select?.addEventListener("change", () => {
+        const opt = select.selectedOptions[0];
+        if (!opt) return;
 
-            qtdAtualInput.value = atual;
-            qtdMinInput.value = min;
-            qtdMaxInput.value = max;
+        const atual = parseInt(opt.dataset.atual || 0);
+        const min = parseInt(opt.dataset.min || 0);
+        const max = parseInt(opt.dataset.max || 0);
 
-            // sugestão principal
-            let sugestao = Math.max(0, max - atual);
-            qtdComprarInput.value = sugestao;
+        qtdAtualInput.value = atual;
+        qtdMinInput.value = min;
+        qtdMaxInput.value = max;
 
-            // mensagem informativa
-            if (atual < min) {
-                infoCompra.innerText =
-                    "⚠ O stock está abaixo do mínimo. Sugestão baseada no máximo.";
-            } else {
-                infoCompra.innerText =
-                    "Sugestão automática: diferença entre a quantidade máxima e a atual.";
-            }
-        });
-    </script>
+        const limitePermitido = Math.max(0, max - atual);
 
+        // definir limite real no input
+        qtdComprarInput.max = limitePermitido;
+
+        // sugestão automática
+        qtdComprarInput.value = limitePermitido;
+
+        // mensagem informativa
+        if (atual < min) {
+            infoCompra.innerText =
+                "⚠ O stock está abaixo do mínimo. Sugestão baseada no máximo permitido.";
+        } else {
+            infoCompra.innerText =
+                "Sugestão automática: quantidade máxima permitida para reposição.";
+        }
+    });
+</script>
 }
+
+

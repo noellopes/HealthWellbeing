@@ -10,7 +10,7 @@ namespace HealthWellbeing.Data
         {
             if (HealthWellbeingDbContext == null) throw new ArgumentNullException(nameof(HealthWellbeingDbContext));
 
-            HealthWellbeingDbContext.Database.EnsureCreated();
+          
 
             PopulatePathology(HealthWellbeingDbContext);
             PopulateTreatmentType(HealthWellbeingDbContext);

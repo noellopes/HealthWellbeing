@@ -1,42 +1,83 @@
 ﻿@model HealthWellbeing.Models.Fornecedor_Consumivel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Associação";
 }
 
-<h1>Details</h1>
+<style>
+    .details-container {
+        max-width: 650px;
+        margin: 40px auto;
+    }
 
-<div>
-    <h4>Fornecedor_Consumivel</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fornecedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fornecedor.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Consumivel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Consumivel.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TempoEntrega)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TempoEntrega)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Preco)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Preco)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.FornecedorConsumivelId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .details-label {
+        font-weight: 600;
+        color: #555;
+    }
+
+    .details-value {
+        color: #222;
+        font-size: 1.05rem;
+    }
+</style>
+
+<div class="details-container">
+    <div class="card">
+        <div class="card-header">
+            📄 Detalhes da Associação Fornecedor–Consumível
+        </div>
+
+        <div class="card-body">
+            <dl class="row mb-4">
+                <dt class="col-sm-4 details-label">Fornecedor</dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Fornecedor.Email)
+                </dd>
+
+                <dt class="col-sm-4 details-label">Consumível</dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Consumivel.Nome)
+                </dd>
+
+                <dt class="col-sm-4 details-label">
+                    @Html.DisplayNameFor(model => model.TempoEntrega)
+                </dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.TempoEntrega)
+                </dd>
+
+                <dt class="col-sm-4 details-label">
+                    @Html.DisplayNameFor(model => model.Preco)
+                </dt>
+                <dd class="col-sm-8 details-value">
+                    @Html.DisplayFor(model => model.Preco)
+                </dd>
+            </dl>
+
+            <div class="d-flex justify-content-end">
+                <a asp-action="Edit"
+                   asp-route-id="@Model.FornecedorConsumivelId"
+                   class="btn btn-warning text-white me-2">
+                    ✏️ Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    ⬅️ Voltar
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
