@@ -1,12 +1,16 @@
-﻿@model PaginationInfo<Consulta>
+﻿@using HealthWellbeing.Models
+@model PaginationInfo<Consulta>
 
 @{
     ViewData["Title"] = "Consultas";
     var successMessage = TempData["SuccessMessage"];
+    string searchTerm = ViewBag.SearchTerm as string ?? "";
+
+    bool isFirst = Model.CurrentPage <= 1;
+    bool isLast = Model.CurrentPage >= Model.TotalPages;
 }
 
 @functions {
-    // Mantém a função Badge compatível com qualquer versão de Razor/C#
     public static string Badge(string estado)
     {
         switch (estado)
@@ -19,159 +23,342 @@
     }
 }
 
-<h1 class="mb-4">@ViewData["Title"]</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-@if (successMessage != null)
-{
-    <div class="container py-4">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @successMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    </div>
-}
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
 
-<div class="collapse mt-2 mb-2" id="postSearch">
-    <div class="card card-body">
-        <form asp-action="Index" method="get" class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label for="searchTerm" class="form-label">Pesquisa</label>
-                <input id="searchTerm" name="searchTerm" value="@ViewBag.SearchTerm" class="form-control" placeholder="Pesquise uma data" type="search" />
-            </div>
-            
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
 
-            <div class="col-12 mt-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Procurar
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    Limpar
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
 
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
 
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning d-flex align-items-center border-2" role="alert">
-        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem;"></i>
-        <div class="ps-3">
-            <h4 class="alert-heading">Sem Consultas</h4>
-            <p>Ainda não existem consultas registadas.</p>
-        </div>
-    </div>
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle me-1"></i> Marcar Consulta
-    </a>
-}
-else
-{
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4">Lista de Consultas</h2>
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-primary"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#postSearch"
-                        aria-expanded="false"
-                        aria-controls="postSearch">
-                    <i class="bi bi-search me-1"></i> Pesquisar
-                </button>
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
 
-                <a asp-action="Create" class="btn btn-success">
-                    <i class="bi bi-plus-circle me-1"></i> Marcar Consulta
-                </a>
-            </div>
-        </div>
-    </div>
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
 
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Data Marcação</th>
-                    <th>Data Consulta</th>
-                    <th>Médico</th>
-                    <th>Especialidade</th>
-                    <th>Estado</th>
-                    <th class="text-end">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
 
-                @foreach (var consulta in Model.Items)
-                {
-                    <tr class="text-center">
-                        <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy")</td>
-                        <td>@consulta.DataConsulta.ToString("dd/MM/yyyy")</td>
-                        <td>@consulta.Doctor?.Nome</td>
-                        <td>@consulta.Speciality?.Nome</td>
-                        
-                    <td>
-                        <span class="@Badge(consulta.Estado) px-3 py-2 rounded-pill">
-                            @consulta.Estado
-                        </span>
-                    </td>
-                    <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-primary" >
-                                <i class="bi bi-info-circle"></i> Detalhes
-                        </a>
-                            <a asp-action="Edit" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-warning text-white">
-                            <i class="bi bi-pencil-square"></i> Editar
-							</a>
-                                <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Cancelar esta consulta? O horário ficará disponível.');">
-                                        <i class="bi bi-x-circle"></i> Cancelar
-                                    </button>
-                                </form>
-                    </td>
-                </tr>
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .hb-btn.btn-sm {
+            padding: 6px 12px !important;
+        }
+
+    .hw-input {
+        border-radius: 14px !important;
+        border: 2px solid rgba(45,121,160,.55) !important;
+        background: #eef7fd !important;
+        color: #1f4f6a !important;
+        font-weight: 700;
+    }
+
+        .hw-input:focus {
+            border-color: #2d79a0 !important;
+            box-shadow: 0 0 0 .2rem rgba(45,121,160,.25) !important;
+            background: #fff !important;
+        }
+
+    .table-wrap {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .tbl thead th {
+        background: #f1f7fb !important;
+        color: #1f4f6a;
+        font-weight: 900;
+        border-bottom: 1px solid rgba(97,166,199,.35);
+    }
+
+    .tbl tbody td {
+        vertical-align: middle;
+    }
+
+    .actions-cell {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pagination {
+        justify-content: center;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <button class="utente-btn"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#consultaSearch"
+                                aria-expanded="false"
+                                aria-controls="consultaSearch">
+                            <i class="bi bi-search"></i> Pesquisar
+                        </button>
+
+                        @if (User.IsInRole("Medico"))
+                        {
+                            <a class="utente-btn" asp-controller="AgendaMedicas" asp-action="Index"><i class="bi bi-file-earmark-medical-fill"></i> Agenda médica</a>
+                           
                         }
-            </tbody>
-        </table>
+                        else if (User.IsInRole("Utente"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
 
-        <nav aria-label="Consultas page">
-            <ul class="pagination">
-                @if (Model.CurrentPage == 1)
-                {
-                    <li class="page-item disabled"><a class="page-link">Primeira</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index">Primeira</a></li>
-                }
+            <div class="utente-body">
+                <div class="details-card">
 
-                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
-                {
-                    if (p == Model.CurrentPage)
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">@ViewData["Title"]</h2>
+                    </div>
+
+                    @if (successMessage != null)
                     {
-                        <li class="page-item active"><a class="page-link" href="#">@p</a></li>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            @successMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="collapse mt-2 mb-3" id="consultaSearch">
+                        <div class="table-wrap">
+                            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                                <div class="col-12 col-md-6">
+                                    <label for="searchTerm" class="form-label fw-bold" style="color:#1f4f6a;">Pesquisa</label>
+                                    <input id="searchTerm"
+                                           name="searchTerm"
+                                           value="@searchTerm"
+                                           class="form-control hw-input"
+                                           placeholder="Pesquise uma data"
+                                           type="search" />
+                                </div>
+
+                                <div class="col-12 d-flex gap-2 flex-wrap">
+                                    <button type="submit" class="btn btn-primary hb-btn">
+                                        <i class="bi bi-search"></i> Procurar
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-secondary hb-btn">
+                                        Limpar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if (Model.Items == null || !Model.Items.Any())
+                    {
+                        <div class="alert alert-warning d-flex align-items-center border-2 mb-0" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                            <div class="ps-3">
+                                <h4 class="alert-heading m-0">Sem Consultas</h4>
+                                <p class="mb-0">Ainda não existem consultas registadas.</p>
+                            </div>
+                        </div>
                     }
                     else
                     {
-                        <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@p">@p</a></li>
-                    }
-                }
+                        <div class="table-wrap mt-3">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle tbl mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Data Marcação</th>
+                                            <th>Data Consulta</th>
+                                            <th>Médico</th>
+                                            <th>Especialidade</th>
+                                            <th>Estado</th>
+                                            <th class="text-end">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var consulta in Model.Items)
+                                        {
+                                            <tr>
+                                                <td>@consulta.DataMarcacao.ToString("dd/MM/yyyy")</td>
+                                                <td>@consulta.DataConsulta.ToString("dd/MM/yyyy")</td>
+                                                <td>@(consulta.Doctor?.Nome ?? "—")</td>
+                                                <td>@(consulta.Speciality?.Nome ?? "—")</td>
+                                                <td>
+                                                    <span class="@Badge(consulta.Estado) px-3 py-2 rounded-pill">
+                                                        @consulta.Estado
+                                                    </span>
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="actions-cell">
+                                                        <a asp-action="Details" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-primary hb-btn">
+                                                            <i class="bi bi-info-circle"></i> Detalhes
+                                                        </a>
 
-                @if (Model.CurrentPage == Model.TotalPages)
-                {
-                    <li class="page-item disabled"><a class="page-link">Última</a></li>
-                }
-                else
-                {
-                    <li class="page-item"><a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages">Última</a></li>
-                }
-            </ul>
-        </nav>
+                                                        <a asp-action="Observacoes" asp-route-id="@consulta.IdConsulta" class="btn btn-sm btn-secondary hb-btn">
+                                                            <i class="bi bi-journal-text"></i> Observações
+                                                        </a>
+
+                                                        <form asp-action="Cancelar" asp-route-id="@consulta.IdConsulta" method="post" class="d-inline">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-sm btn-danger hb-btn"
+                                                                    onclick="return confirm('Cancelar esta consulta? O horário ficará disponível.');">
+                                                                <i class="bi bi-x-circle"></i> Cancelar
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <nav aria-label="Paginação de consultas" class="mt-3">
+                                <ul class="pagination">
+
+                                    <li class="page-item @(isFirst ? "disabled" : "")">
+                                        <a class="page-link"
+                                           href="@(isFirst ? "#" : Url.Action("Index", "Consultas", new { page = Model.CurrentPage - 1, searchTerm }))">
+                                            «
+                                        </a>
+                                    </li>
+
+                                    @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                                    {
+                                        <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                            <a class="page-link"
+                                               href="@(p == Model.CurrentPage ? "#" : Url.Action("Index", "Consultas", new { page = p, searchTerm }))">
+                                                @p
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item @(isLast ? "disabled" : "")">
+                                        <a class="page-link"
+                                           href="@(isLast ? "#" : Url.Action("Index", "Consultas", new { page = Model.CurrentPage + 1, searchTerm }))">
+                                            »
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
-}
+</div>

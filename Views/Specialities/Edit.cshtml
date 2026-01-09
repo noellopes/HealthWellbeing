@@ -4,36 +4,227 @@
     ViewData["Title"] = "Editar Especialidade";
 }
 
-<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <form asp-action="Edit" method="post">
-            <input type="hidden" asp-for="IdEspecialidade" />
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-            <div class="mb-3">
-                <label asp-for="Nome" class="form-label"></label>
-                <input asp-for="Nome" class="form-control" />
-                <span asp-validation-for="Nome" class="text-danger"></span>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .form-title {
+        margin: 0 0 10px 0;
+        color: #1f4f6a;
+        font-weight: 900;
+    }
+
+    .form-sub {
+        margin: 0 0 14px 0;
+        color: #2b546c;
+        font-weight: 600;
+    }
+
+    /* Mini-cards das secções do formulário */
+    .section-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .section-head {
+        margin-bottom: 8px;
+    }
+
+    .section-title {
+        color: #1f4f6a;
+        font-weight: 900;
+        font-size: 1.05rem;
+    }
+
+    .section-subtitle {
+        color: #2b546c;
+        font-size: .9rem;
+        opacity: .9;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <!-- Header -->
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing"
+                             class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar à lista
+                        </a>
+                    </div>
+                </div>
             </div>
 
+            <!-- CORPO -->
+            <div class="utente-body">
+                <div class="form-card">
+                    <h2 class="form-title"><i class="bi bi-pencil-square me-2"></i>Editar Especialidade</h2>
+                    <p class="form-sub">Atualize as informações da especialidade abaixo.</p>
+
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="IdEspecialidade" />
+
+                        <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+                        <div class="section-card mb-3">
+                            <div class="section-head">
+                                <div class="section-title">Nome</div>
+                                <div class="section-subtitle">Nome da especialidade</div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Nome" class="form-label fw-semibold"></label>
+                                <input asp-for="Nome" class="form-control" />
+                                <span asp-validation-for="Nome" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="section-card mb-3">
+                            <div class="section-head">
+                                <div class="section-title">Resumo</div>
+                                <div class="section-subtitle">Breve descrição da especialidade</div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Descricao" class="form-label fw-semibold"></label>
+                                <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Descricao" class="text-danger"></span>
+                            </div>
+                        </div>
             <div class="mb-3">
                 <label asp-for="Descricao" class="form-label">Texto abaixo do nome (resumo)</label>
                 <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Descricao" class="text-danger"></span>
             </div>
 
+                        <div class="section-card mb-3">
+                            <div class="section-head">
+                                <div class="section-title">Descrição detalhada</div>
+                                <div class="section-subtitle">O que é a especialidade?</div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="OqueEDescricao" class="form-label fw-semibold"></label>
+                                <textarea asp-for="OqueEDescricao" class="form-control" rows="4"></textarea>
+                                <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
+                            </div>
+                        </div>
             <div class="mb-3">
                 <label asp-for="OqueEDescricao" class="form-label">O que é a especialidade?</label>
                 <textarea asp-for="OqueEDescricao" class="form-control" rows="5"></textarea>
                 <span asp-validation-for="OqueEDescricao" class="text-danger"></span>
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Guardar</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <div class="d-flex gap-2 flex-wrap mt-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle me-1"></i> Guardar
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
 </div>
 

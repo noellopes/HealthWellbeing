@@ -4,109 +4,464 @@
     ViewData["Title"] = "Marcar Consulta";
 }
 
-<h2>@ViewData["Title"]</h2>
+<style>
+    /* --- Tema base (igual ao resto) --- */
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-@if (TempData["Erro"] != null)
-{
-    <div class="alert alert-danger">@TempData["Erro"]</div>
-}
-@if (TempData["Ok"] != null)
-{
-    <div class="alert alert-success">@TempData["Ok"]</div>
-}
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
 
-<form method="get" asp-action="Marcar" class="row g-3 mb-3">
-    <div class="col-md-6">
-        <label class="form-label">Especialidade</label>
-        <select class="form-select" name="idEspecialidade" onchange="this.form.submit()">
-            <option value="">-- escolher --</option>
-            @foreach (var e in Model.Especialidades)
-            {
-                <option value="@e.Id" selected="@(Model.IdEspecialidade == e.Id)">
-                    @e.Nome
-                </option>
-            }
-        </select>
-    </div>
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
 
-    <div class="col-md-6">
-        <label class="form-label">Médico</label>
-        <select class="form-select" name="idMedico" onchange="this.form.submit()" @(Model.IdEspecialidade == null ? "disabled" : "")>
-            <option value="">-- escolher --</option>
-            @foreach (var m in Model.Medicos)
-            {
-                <option value="@m.Id" selected="@(Model.IdMedico == m.Id)">
-                    @m.Nome
-                </option>
-            }
-        </select>
-    </div>
-</form>
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
 
-@if (Model.IdMedico == null)
-{
-    <div class="text-muted"><em>Escolhe uma especialidade e um médico para ver a agenda.</em></div>
-}
-else if (Model.Linhas.Count == 0)
-{
-    <div class="alert alert-warning">Este médico não tem horários definidos para os próximos 15 dias úteis.</div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-sm table-striped table-bordered align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th style="min-width:120px;">Hora</th>
-                    @foreach (var d in Model.Datas)
-                    {
-                        <th style="min-width:120px;">
-                            @d.ToString("dd/MM")<br />
-                            <small>@d.DayOfWeek</small>
-                        </th>
-                    }
-                </tr>
-            </thead>
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
 
-            <tbody>
-                @for (int i = 0; i < Model.Linhas.Count; i++)
-                {
-                    <tr>
-                        <td>@Model.Linhas[i].Label</td>
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
 
-                        @for (int j = 0; j < Model.Linhas[i].Cells.Count; j++)
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 360px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+        w
+    }
+
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .welcome-title {
+        margin: 0;
+        color: #1f4f6a;
+        font-weight: 800;
+    }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* --- Filtros em “card” + dropdown azul --- */
+    .filter-card {
+        background: #f7fbfe;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .filter-label {
+        font-weight: 800;
+        color: #1f4f6a;
+    }
+
+    .hw-select {
+        border-radius: 14px !important;
+        border: 2px solid rgba(45,121,160,.55) !important;
+        background: #eef7fd !important;
+        color: #1f4f6a !important;
+        font-weight: 700;
+        box-shadow: 0 1px 0 rgba(0,0,0,.03);
+    }
+
+        .hw-select:focus {
+            border-color: #2d79a0 !important;
+            box-shadow: 0 0 0 .2rem rgba(45,121,160,.25) !important;
+            background: #ffffff !important;
+        }
+
+    .hw-check {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: #eef7fd;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 14px;
+        padding: 10px 12px;
+    }
+
+        .hw-check input {
+            transform: scale(1.15);
+        }
+
+    /* --- Tabela (grid) com “cards” --- */
+    .agenda-table {
+        border-collapse: separate !important;
+        border-spacing: 10px !important;
+    }
+
+        .agenda-table thead th {
+            background: #f1f7fb !important;
+            border: 1px solid rgba(97,166,199,.35) !important;
+            border-radius: 12px;
+            color: #1f4f6a;
+            font-weight: 900;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px 12px !important;
+            white-space: nowrap;
+        }
+
+        .agenda-table tbody td {
+            border: none !important;
+            padding: 0 !important;
+            vertical-align: middle;
+        }
+
+    .row-label {
+        background: #ffffff;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-weight: 900;
+        color: #1f4f6a;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 58px;
+    }
+
+    .slot-option {
+        display: block;
+        margin: 0;
+    }
+
+        .slot-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    .slot-card {
+        background: #ffffff;
+        border: 1px solid rgba(97,166,199,.35);
+        border-radius: 12px;
+        padding: 10px 12px;
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 6px;
+        font-weight: 900;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+        user-select: none;
+    }
+
+    .slot-free {
+        background: #e9fff1;
+        border-color: rgba(25,135,84,.35);
+        color: #0f5132;
+        cursor: pointer;
+        transition: transform .05s ease, filter .1s ease, box-shadow .1s ease;
+    }
+
+        .slot-free:hover {
+            filter: brightness(1.02);
+            box-shadow: 0 4px 14px rgba(0,0,0,.10);
+        }
+
+    .slot-busy {
+        background: #fff3cd;
+        border-color: rgba(220,53,69,.35);
+        color: #8a1f2b;
+    }
+
+    .slot-out {
+        background: #f2f6fa;
+        border-color: rgba(31,79,106,.15);
+        color: #6c757d;
+        box-shadow: none;
+    }
+
+    /* quando seleciona um “Livre”, fica amarelo (aguarda confirmação) */
+    .slot-option input:checked + .slot-card {
+        background: #fff3cd !important;
+        border-color: rgba(255,193,7,.65) !important;
+        color: #664d03 !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,.14) !important;
+    }
+
+    .slot-time {
+        font-weight: 800;
+        opacity: .85;
+        display: block;
+        font-size: .82rem;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        @if (User.IsInRole("Rececionista"))
                         {
-                            var cell = Model.Linhas[i].Cells[j];
-
-                            <td>
-                                @if (cell.Estado == "fora")
-                                {
-                                    <span class="text-muted">—</span>
-                                }
-                                else if (cell.Estado == "ocupado")
-                                {
-                                    <span class="badge bg-danger">Ocupado</span>
-                                }
-                                else
-                                {
-                                    <form asp-action="MarcarSlot" method="post" class="m-0">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="idMedico" value="@Model.IdMedico" />
-                                        <input type="hidden" name="idEspecialidade" value="@Model.IdEspecialidade" />
-                                        <input type="hidden" name="data" value="@cell.Data.ToString("yyyy-MM-dd")" />
-                                        <input type="hidden" name="horaInicio" value="@cell.Inicio.ToString("HH:mm")" />
-                                        <input type="hidden" name="horaFim" value="@cell.Fim.ToString("HH:mm")" />
-
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            Livre
-                                        </button>
-                                    </form>
-                                }
-                            </td>
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
                         }
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        else if (User.IsInRole("Utente"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="details-card">
+
+                    <div class="welcome-row">
+                        <h2 class="welcome-title">@ViewData["Title"]</h2>
+                    </div>
+
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">@TempData["Erro"]</div>
+                    }
+                    @if (TempData["Ok"] != null)
+                    {
+                        <div class="alert alert-success mb-3">@TempData["Ok"]</div>
+                    }
+                    @if (User.IsInRole("Rececionista"))
+                    {
+                        <div class="alert alert-info mb-3">
+                            <strong>Utente selecionado:</strong> @ViewBag.SelectedUtenteNome
+                            <span class="ms-2">(@ViewBag.SelectedUtenteEmail)</span>
+                            <a class="ms-3" asp-controller="UtenteSaude" asp-action="RecepcionistaView">Trocar utente</a>
+                        </div>
+                    }
+                    <!-- FILTROS (card) -->
+                    <div class="filter-card mb-3">
+                        <form method="get" asp-action="Marcar" class="row g-3 align-items-end">
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label filter-label">Especialidade</label>
+                                <select class="form-select hw-select" name="idEspecialidade" onchange="this.form.submit()">
+                                    <option value="">-- escolher --</option>
+                                    @foreach (var e in Model.Especialidades)
+                                    {
+                                        <option value="@e.Id" selected="@(Model.IdEspecialidade == e.Id)">
+                                            @e.Nome
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-lg-6">
+                                <label class="form-label filter-label">Médico</label>
+                                <select class="form-select hw-select" name="idMedico" onchange="this.form.submit()" @(Model.IdEspecialidade == null ? "disabled" : "")>
+                                    <option value="">-- escolher --</option>
+                                    @foreach (var m in Model.Medicos)
+                                    {
+                                        <option value="@m.Id" selected="@(Model.IdMedico == m.Id)">
+                                            @m.Nome
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="hw-check">
+                                    <input type="checkbox"
+                                           name="naoSelecionarMedico"
+                                           value="true"
+                                           @(Model.NaoSelecionarMedico ? "checked" : "")
+                                           onchange="this.form.submit()" />
+                                    <span class="fw-bold text-dark">Não selecionar o médico</span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+
+                    @if (!Model.NaoSelecionarMedico && Model.IdMedico == null)
+                    {
+                        <div class="text-muted"><em>Escolhe uma especialidade e um médico para ver a agenda.</em></div>
+                    }
+                    else if (Model.NaoSelecionarMedico && Model.IdEspecialidade == null)
+                    {
+                        <div class="text-muted"><em>Escolhe uma especialidade para ver a agenda preferencial.</em></div>
+                    }
+                    else if (Model.Linhas.Count == 0)
+                    {
+                        <div class="alert alert-warning">
+                            Este médico não tem horários definidos para os próximos 15 dias úteis.
+                        </div>
+                    }
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger mb-3">@TempData["Erro"]</div>
+                    }
+                    @if (TempData["Ok"] != null)
+                    {
+                        <div class="alert alert-success mb-3">@TempData["Ok"]</div>
+                    }
+
+                    <!-- GRID -->
+                    <form asp-action="MarcarConsulta" method="post" class="mt-3">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="IdEspecialidade" />
+                        <input type="hidden" asp-for="IdMedico" />
+                        <input type="hidden" asp-for="NaoSelecionarMedico" />
+
+                        <div class="table-responsive">
+                            <table class="table agenda-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width:160px; text-align:left;">Horário</th>
+                                        @foreach (var d in Model.Datas)
+                                        {
+                                            <th style="min-width:150px;">
+                                                @d.ToString("dd/MM")<br />
+                                                <small class="text-muted">@d.DayOfWeek</small>
+                                            </th>
+                                        }
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @for (int i = 0; i < Model.Linhas.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="row-label">@Model.Linhas[i].Label</div>
+                                            </td>
+
+                                            @for (int j = 0; j < Model.Linhas[i].Cells.Count; j++)
+                                            {
+                                                var cell = Model.Linhas[i].Cells[j];
+
+                                                <td>
+                                                    @if (cell.Estado == "fora")
+                                                    {
+                                                        <div class="slot-card slot-out">—</div>
+                                                    }
+                                                    else if (cell.Estado == "ocupado")
+                                                    {
+                                                        <div class="slot-card slot-busy">
+                                                            Ocupado
+                                                            <span class="slot-time">@cell.Inicio.ToString(@"HH\:mm") - @cell.Fim.ToString(@"HH\:mm")</span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        var slotValue = $"{cell.Data:yyyy-MM-dd}|{cell.Inicio:HH\\:mm}|{cell.Fim:HH\\:mm}";
+
+                                                        <label class="slot-option">
+                                                            <input type="radio"
+                                                                   name="DataSelecionada"
+                                                                   value="@slotValue"
+                                                                   @(Model.DataSelecionada == slotValue ? "checked" : "") />
+                                                            <div class="slot-card slot-free">
+                                                                Livre
+                                                                <span class="slot-time">@cell.Inicio.ToString(@"HH\:mm") - @cell.Fim.ToString(@"HH\:mm")</span>
+                                                            </div>
+                                                        </label>
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3 d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary hb-btn">
+                                <i class="bi bi-check2-circle"></i> Marcar consulta
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
     </div>
-}
+</div>

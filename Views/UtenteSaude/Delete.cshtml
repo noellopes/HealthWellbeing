@@ -1,21 +1,217 @@
-﻿@model HealthWellbeing.Models.UtenteSaude
+﻿@using HealthWellbeing.Models
+@model UtenteSaude
+
 @{
     ViewData["Title"] = "Apagar Utente";
+    var nome = !string.IsNullOrWhiteSpace(Model?.Client?.Name) ? Model.Client!.Name : "—";
 }
-<h1>Apagar</h1>
 
-<h4>Tens a certeza que queres apagar este utente?</h4>
-<dl class="row">
-    <dt class="col-sm-3">Nome</dt>
-    <dd class="col-sm-9">@Model.NomeCompleto</dd>
-    <dt class="col-sm-3">NIF</dt>
-    <dd class="col-sm-9">@Model.Nif</dd>
-    <dt class="col-sm-3">NUS</dt>
-    <dd class="col-sm-9">@Model.Nus</dd>
-</dl>
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
 
-<form asp-action="Delete" method="post">
-    <input type="hidden" asp-for="UtenteSaudeId" />
-    <button type="submit" class="btn btn-danger">Apagar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .danger-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .danger-data {
+        background: #ffe8ea;
+        border: 1px solid rgba(220,53,69,.35);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
+    }
+
+    .danger-title {
+        margin: 0;
+        color: #8a1f2b;
+        font-weight: 900;
+    }
+
+    .danger-sub {
+        margin: 8px 0 0 0;
+        color: #7a2a33;
+        font-weight: 600;
+    }
+
+    .info-item {
+        background: rgba(255,255,255,.65);
+        border: 1px solid rgba(220,53,69,.20);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #7a2a33;
+            opacity: .9;
+            margin-bottom: 2px;
+            font-weight: 800;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #8a1f2b;
+            font-weight: 800;
+            word-break: break-word;
+        }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
+
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="utente-body">
+                <div class="danger-card">
+
+                    <h2 class="danger-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Utente
+                    </h2>
+                    <p class="danger-sub">
+                        Tens a certeza que queres apagar este utente? Esta ação não pode ser desfeita.
+                    </p>
+
+                    <div class="danger-data">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-6">
+                                <div class="info-item">
+                                    <span class="lbl">Nome</span>
+                                    <span class="val">@nome</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <div class="info-item">
+                                    <span class="lbl">NIF</span>
+                                    <span class="val">@Model.Nif</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <div class="info-item">
+                                    <span class="lbl">NUS</span>
+                                    <span class="val">@Model.Nus</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ✅ FIX: asp-route-id para o POST receber o "id" -->
+                    <form asp-action="Delete" asp-route-id="@Model.UtenteSaudeId" method="post" class="mt-3 d-flex gap-2 flex-wrap">
+                        @Html.AntiForgeryToken()
+
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Apagar
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>

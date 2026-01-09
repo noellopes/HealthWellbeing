@@ -1,11 +1,176 @@
-﻿@model HealthWellbeing.Models.Specialities
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.Specialities
 
 @{
+    ViewData["Title"] = "Apagar Especialidade";
+    var nome = !string.IsNullOrWhiteSpace(Model?.Nome) ? Model!.Nome : "—";
+    var descricao = !string.IsNullOrWhiteSpace(Model?.Descricao) ? Model!.Descricao : "—";
+}
+
+<style>
+    .utente-wrapper {
+        background: #1f4f6a;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.2);
+        color: #1f4f6a;
+    }
+
+    .utente-card {
+        background: #2d79a0;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+
+    .utente-panel {
+        background: #a8d6ea;
+        border-radius: 12px;
+        padding: 10px;
+    }
+
+    .utente-header {
+        background: #a8d6ea;
+        border-radius: 10px 10px 0 0;
+        padding: 12px 16px;
+    }
+
+    .utente-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .utente-logo .logo-img {
+        max-height: 80px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px rgba(0,0,0,.2);
+    }
+
+    .utente-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .utente-btn {
+        padding: 8px 14px;
+        border-radius: 18px;
+        border: none;
+        background: #2d79a0;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .utente-btn:hover {
+            filter: brightness(1.05);
+        }
+
+    .utente-body {
+        background: #e6f3fb;
+        min-height: 260px;
+        margin: 8px;
+        border-radius: 8px;
+        padding: 18px;
+    }
+
+    .utente-footer-bar {
+        height: 10px;
+        background: #61a6c7;
+        margin: 0 8px 8px 8px;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .danger-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(97,166,199,.45);
+        box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .danger-data {
+        background: #ffe8ea;
+        border: 1px solid rgba(220,53,69,.35);
+        border-radius: 12px;
+        padding: 14px;
+        margin-top: 12px;
+    }
+
+    .danger-title {
+        margin: 0;
+        color: #8a1f2b;
+        font-weight: 900;
+    }
+
+    .danger-sub {
+        margin: 8px 0 0 0;
+        color: #7a2a33;
+        font-weight: 600;
+    }
     ViewData["Title"] = "Eliminar Especialidade";
 }
 
+    .info-item {
+        background: rgba(255,255,255,.65);
+        border: 1px solid rgba(220,53,69,.20);
+        border-radius: 10px;
+        padding: 10px 12px;
+        height: 100%;
+    }
+
+        .info-item .lbl {
+            display: block;
+            font-size: .85rem;
+            color: #7a2a33;
+            opacity: .9;
+            margin-bottom: 2px;
+            font-weight: 800;
+        }
+
+        .info-item .val {
+            display: block;
+            font-size: 1rem;
+            color: #8a1f2b;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    .hb-btn {
+        border-radius: 18px !important;
+        font-weight: 700 !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+
+<div class="utente-wrapper">
+    <div class="utente-card">
+        <div class="utente-panel">
+
+            <div class="utente-header">
+                <div class="utente-header-content">
+                    <div class="utente-logo">
+                        <img src="https://ipgpt-my.sharepoint.com/:u:/g/personal/1707765_sal_ipg_pt/EXQ_SdGCX0ZAhcsexkX0g5UBYcJ60VvKhiARCgmRiKBTIw?e=A4dVIr&download=1"
+                             alt="Logo HealthWellbeing" class="logo-img" />
+                    </div>
 <h1 class="h4 mb-3 text-danger">Eliminar Especialidade</h1>
 
+                    <div class="utente-actions">
+                        <a asp-action="Index" class="utente-btn">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
 <div class="alert alert-warning">
     Tem a certeza que pretende eliminar a especialidade
     <strong>@Model.Nome</strong>?
@@ -13,6 +178,33 @@
     Esta ação não poderá ser revertida.
 </div>
 
+            <div class="utente-body">
+                <div class="danger-card">
+
+                    <h2 class="danger-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Especialidade
+                    </h2>
+                    <p class="danger-sub">
+                        Tens a certeza que queres apagar esta especialidade? Esta ação não pode ser desfeita.
+                    </p>
+
+                    <div class="danger-data">
+                        <div class="row g-2">
+                            <div class="col-12 col-md-5">
+                                <div class="info-item">
+                                    <span class="lbl">Nome</span>
+                                    <span class="val">@nome</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-7">
+                                <div class="info-item">
+                                    <span class="lbl">Descrição</span>
+                                    <span class="val">@descricao</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 <div class="card shadow-sm mb-3">
     <div class="card-body">
         <p><strong>Nome:</strong> @Model.Nome</p>
@@ -20,6 +212,26 @@
     </div>
 </div>
 
+                    <form asp-action="Delete" asp-route-id="@Model.IdEspecialidade" method="post" class="mt-3 d-flex gap-2 flex-wrap">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="IdEspecialidade" />
+
+                        <button type="submit" class="btn btn-danger hb-btn">
+                            <i class="bi bi-trash"></i> Apagar
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary hb-btn">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="utente-footer-bar"></div>
+        </div>
+    </div>
+</div>
 <form asp-action="Delete">
     <input type="hidden" asp-for="IdEspecialidade" />
     <button type="submit" class="btn btn-danger">Eliminar</button>
