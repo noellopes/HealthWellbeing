@@ -24,10 +24,6 @@ namespace HealthWellbeing.Models
         [Display(Name = "Duração Estimada")]
         public required int EstimatedDuration { get; set; }
 
-        [Required(ErrorMessage = "A prioridade é obrigatória!")]
-        [Display(Name = "Prioridade")]
-        public string? Priority { get; set; }         //Se é Urgente, Normal, Rotina
-
     }
 
 }

@@ -6,8 +6,6 @@ using HealthWellbeing.Utils.Group1.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Controllers
 {
@@ -33,7 +31,7 @@ namespace HealthWellbeing.Controllers
             var MAX_ITEMS_PER_PAGE = Constants.MAX_ITEMS_PER_PAGE<TreatmentType>();
 
             // Define as propriadades visiveis do modelo
-            IReadOnlyList<string> baseProperties = ["Name", "Description", "EstimatedDuration", "Priority"];
+            IReadOnlyList<string> baseProperties = ["Name", "Description", "EstimatedDuration"];
 
             // Query Base para otimizar as consultas
             IQueryable<TreatmentType> treatment_types = _context.TreatmentType.AsNoTracking();
@@ -86,7 +84,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,EstimatedDuration")] TreatmentType treatmentType)
         {
             if (ModelState.IsValid)
             {
@@ -119,7 +117,7 @@ namespace HealthWellbeing.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,EstimatedDuration,Priority")] TreatmentType treatmentType)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,EstimatedDuration")] TreatmentType treatmentType)
         {
             if (id != treatmentType.Id)
             {
