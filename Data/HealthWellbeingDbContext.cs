@@ -23,6 +23,7 @@ namespace HealthWellbeing.Data
         public DbSet<AgendaMedica> AgendaMedica { get; set; } = default!;
         public DbSet<DoctorConsulta> DoctorConsulta { get; set; } = default!;
         public DbSet<ConsultaUtente> ConsultaUtente { get; set; } = default!;
+        public DbSet<SpecialitiesDoctor> SpecialitiesDoctor { get; set; } = default!;
 
 
         // -------------------------
@@ -146,7 +147,21 @@ namespace HealthWellbeing.Data
                .WithMany(c => c.UtenteConsultas)
                .HasForeignKey(cu => cu.IdUtente)
                .OnDelete(DeleteBehavior.NoAction);
+            
+            modelBuilder.Entity<SpecialitiesDoctor>()
+                .HasKey(sd => new { sd.IdEspecialidade, sd.IdMedico });
 
+            modelBuilder.Entity<SpecialitiesDoctor>()
+                .HasOne(sd => sd.Especialidade)
+                .WithMany(s => s.SpecialitiesDoctors)
+                .HasForeignKey(sd => sd.IdEspecialidade)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SpecialitiesDoctor>()
+                .HasOne(sd => sd.Medico)
+                .WithMany(d => d.DoctorSpecialities)
+                .HasForeignKey(sd => sd.IdMedico)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
 

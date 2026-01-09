@@ -21,6 +21,7 @@ namespace HealthWellbeing.Models
         [MaxLength(5000)]
         public string? OqueEDescricao { get; set; }
 
-        
+        public ICollection<SpecialitiesDoctor>? SpecialitiesDoctors { get; set; }
+
     }
 }
