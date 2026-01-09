@@ -39,6 +39,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(
     .AddDefaultUI();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<HealthWellbeing.Services.IReceitaAjusteService, HealthWellbeing.Services.ReceitaAjusteService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

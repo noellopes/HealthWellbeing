@@ -280,6 +280,14 @@ internal class SeedData
             new Alimento { Name = "Leite Condensado", Description = "Produto lácteo adoçado para sobremesas.", CategoriaAlimentoId = 4, Calories = 321, KcalPor100g = 321, ProteinaGPor100g = 7.9m, HidratosGPor100g = 55m, GorduraGPor100g = 8.7m },
             new Alimento { Name = "Açúcar", Description = "Açúcar branco para confeitaria.", CategoriaAlimentoId = 3, Calories = 387, KcalPor100g = 387, ProteinaGPor100g = 0m, HidratosGPor100g = 100m, GorduraGPor100g = 0m },
             new Alimento { Name = "Polvo", Description = "Molusco (polvo) usado em pratos tradicionais.", CategoriaAlimentoId = 5, Calories = 82, KcalPor100g = 82, ProteinaGPor100g = 15m, HidratosGPor100g = 2.2m, GorduraGPor100g = 1m },
+
+            // Alimentos adicionais para substituições realistas
+            new Alimento { Name = "Bebida de Soja", Description = "Bebida vegetal usada como alternativa ao leite.", CategoriaAlimentoId = 4, Calories = 33, KcalPor100g = 33, ProteinaGPor100g = 3m, HidratosGPor100g = 1.7m, GorduraGPor100g = 1.9m },
+            new Alimento { Name = "Iogurte Sem Lactose", Description = "Iogurte sem lactose (alternativa a laticínios).", CategoriaAlimentoId = 4, Calories = 60, KcalPor100g = 60, ProteinaGPor100g = 4m, HidratosGPor100g = 6m, GorduraGPor100g = 2m },
+            new Alimento { Name = "Pão Sem Glúten", Description = "Pão preparado sem glúten.", CategoriaAlimentoId = 3, Calories = 250, KcalPor100g = 250, ProteinaGPor100g = 5m, HidratosGPor100g = 50m, GorduraGPor100g = 3m },
+            new Alimento { Name = "Farinha de Arroz", Description = "Farinha alternativa, naturalmente sem glúten.", CategoriaAlimentoId = 3, Calories = 366, KcalPor100g = 366, ProteinaGPor100g = 6m, HidratosGPor100g = 80m, GorduraGPor100g = 1m },
+            new Alimento { Name = "Adoçante (Stevia)", Description = "Adoçante com baixo teor calórico.", CategoriaAlimentoId = 3, Calories = 0, KcalPor100g = 0, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 0m },
+            new Alimento { Name = "Margarina Vegetal", Description = "Gordura vegetal usada como alternativa à manteiga.", CategoriaAlimentoId = 4, Calories = 717, KcalPor100g = 717, ProteinaGPor100g = 0m, HidratosGPor100g = 0m, GorduraGPor100g = 80m },
         };
 
         var existingNames = new HashSet<string>(
@@ -698,80 +706,41 @@ internal class SeedData
             return;
         }
 
-        context.AlimentoSubstitutos.AddRange(
+        var alimentosByNome = context.Alimentos
+            .AsNoTracking()
+            .ToList()
+            .GroupBy(a => a.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 2, Motivo = "Alternativa para alergia.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.8 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 4, Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.9 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 1, Motivo = "Alternativa para dieta vegana.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 3, Motivo = "Alternativa para restrição alimentar.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.85 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 5, Motivo = "Alternativa para alergia ao leite.", ProporcaoEquivalente = 1, Observacoes = "Substituição recomendada.", FatorSimilaridade = 0.75 },
+        int GetAlimentoId(string nome)
+        {
+            if (!alimentosByNome.TryGetValue(nome, out var alimento))
+                throw new InvalidOperationException($"Alimento não encontrado para seed de substitutos: '{nome}'.");
+            return alimento.AlimentoId;
+        }
 
+        var subs = new List<AlimentoSubstituto>
+        {
+            // Lactose / laticínios
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Leite"), AlimentoSubstitutoRefId = GetAlimentoId("Leite de Amêndoa"), Motivo = "Alternativa sem lactose.", ProporcaoEquivalente = 1m, Observacoes = "Boa para bebidas, cereais e algumas receitas.", FatorSimilaridade = 0.75 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Leite"), AlimentoSubstitutoRefId = GetAlimentoId("Bebida de Soja"), Motivo = "Alternativa vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Boa para molhos e smoothies.", FatorSimilaridade = 0.7 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Queijo"), AlimentoSubstitutoRefId = GetAlimentoId("Tofu"), Motivo = "Alternativa para dietas sem lactose/veganas.", ProporcaoEquivalente = 1m, Observacoes = "Textura diferente; ajustar temperos.", FatorSimilaridade = 0.45 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Manteiga"), AlimentoSubstitutoRefId = GetAlimentoId("Azeite"), Motivo = "Alternativa sem lactose para cozinhar.", ProporcaoEquivalente = 0.75m, Observacoes = "Usar menos quantidade e ajustar ao gosto.", FatorSimilaridade = 0.6 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Manteiga"), AlimentoSubstitutoRefId = GetAlimentoId("Margarina Vegetal"), Motivo = "Alternativa vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Boa para barrar e algumas receitas.", FatorSimilaridade = 0.65 },
 
-            // Substitutos para Maçã (1)
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 6, Motivo = "Opção doce e similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Boa troca em vitaminas e bolos.", FatorSimilaridade = 0.78 },
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 8, Motivo = "Substituto em pratos assados.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, sabor complementar.", FatorSimilaridade = 0.55 },
-            new AlimentoSubstituto { AlimentoOriginalId = 1, AlimentoSubstitutoRefId = 15, Motivo = "Alternativa energética e rica em fibras.", ProporcaoEquivalente = 1, Observacoes = "Usar em purês ou assados.", FatorSimilaridade = 0.6 },
+            // Glúten
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Pão"), AlimentoSubstitutoRefId = GetAlimentoId("Pão Sem Glúten"), Motivo = "Alternativa para intolerância ao glúten.", ProporcaoEquivalente = 1m, Observacoes = "Sabor/textura podem variar.", FatorSimilaridade = 0.8 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Farinha de Trigo"), AlimentoSubstitutoRefId = GetAlimentoId("Farinha de Arroz"), Motivo = "Alternativa para receitas sem glúten.", ProporcaoEquivalente = 1m, Observacoes = "Pode precisar de ajuste de líquidos.", FatorSimilaridade = 0.7 },
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Trigo"), AlimentoSubstitutoRefId = GetAlimentoId("Arroz"), Motivo = "Alternativa de grão sem glúten.", ProporcaoEquivalente = 1m, Observacoes = "Perfil nutricional diferente.", FatorSimilaridade = 0.5 },
 
-            // Substitutos para Cenoura (2)
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 12, Motivo = "Boa fonte de fibras para sopas.", ProporcaoEquivalente = 1, Observacoes = "Textura semelhante ao cozinhar.", FatorSimilaridade = 0.62 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 7, Motivo = "Substituto em purês e assados.", ProporcaoEquivalente = 1, Observacoes = "Ajustar temperos.", FatorSimilaridade = 0.58 },
-            new AlimentoSubstituto { AlimentoOriginalId = 2, AlimentoSubstitutoRefId = 6, Motivo = "Alternativa em saladas e snacks.", ProporcaoEquivalente = 1, Observacoes = "Sabor mais doce.", FatorSimilaridade = 0.45 },
+            // Açúcar
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Açúcar"), AlimentoSubstitutoRefId = GetAlimentoId("Adoçante (Stevia)"), Motivo = "Alternativa com baixo teor calórico.", ProporcaoEquivalente = 0.2m, Observacoes = "Ajustar ao paladar e à receita.", FatorSimilaridade = 0.55 },
 
-            // Substitutos para Arroz (3)
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 11, Motivo = "Fonte de proteína e fibras.", ProporcaoEquivalente = 0.9m, Observacoes = "Excelente em pratos orientais.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 8, Motivo = "Carboidrato alternativo em acompanhamentos.", ProporcaoEquivalente = 1, Observacoes = "Usar pão torrado para saladas.", FatorSimilaridade = 0.4 },
-            new AlimentoSubstituto { AlimentoOriginalId = 3, AlimentoSubstitutoRefId = 12, Motivo = "Alternativa integral rica em fibras.", ProporcaoEquivalente = 0.9m, Observacoes = "Bom para versões mais saudáveis.", FatorSimilaridade = 0.6 },
+            // Proteína animal ↔ vegetal (útil para vegetariano/vegano)
+            new AlimentoSubstituto { AlimentoOriginalId = GetAlimentoId("Frango"), AlimentoSubstitutoRefId = GetAlimentoId("Tofu"), Motivo = "Alternativa proteica vegetal.", ProporcaoEquivalente = 1m, Observacoes = "Ideal em salteados e pratos com molho.", FatorSimilaridade = 0.55 },
+        };
 
-            // Substitutos para Leite (4)
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 10, Motivo = "Alternativa vegetal para intolerantes.", ProporcaoEquivalente = 1, Observacoes = "Usar em bebidas e cereais.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 13, Motivo = "Alternativa em receitas que pedem cremosidade.", ProporcaoEquivalente = 0.8m, Observacoes = "Ajustar sal e fermento.", FatorSimilaridade = 0.65 },
-            new AlimentoSubstituto { AlimentoOriginalId = 4, AlimentoSubstitutoRefId = 9, Motivo = "Alternativa proteica e sem lactose.", ProporcaoEquivalente = 0.9m, Observacoes = "Usar em molhos e smoothies.", FatorSimilaridade = 0.55 },
-
-            // Substitutos para Frango (5)
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 9, Motivo = "Opção vegetal rica em proteína.", ProporcaoEquivalente = 1, Observacoes = "Boa para dietas vegetarianas.", FatorSimilaridade = 0.6 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 14, Motivo = "Peixe rico em ômega-3 como alternativa.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente, alto valor nutritivo.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 5, AlimentoSubstitutoRefId = 11, Motivo = "Fonte proteica vegetal.", ProporcaoEquivalente = 1, Observacoes = "Ótimo em ensopados e saladas.", FatorSimilaridade = 0.5 },
-            // 6 - Banana
-            new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 1, Motivo = "Fruta similar em sobremesas.", ProporcaoEquivalente = 1, Observacoes = "Troca comum em vitaminas.", FatorSimilaridade = 0.7 },
-            new AlimentoSubstituto { AlimentoOriginalId = 6, AlimentoSubstitutoRefId = 15, Motivo = "Alternativa energética.", ProporcaoEquivalente = 1, Observacoes = "Boa para bolos e purês.", FatorSimilaridade = 0.6 },
-
-            // 7 - Batata
-            new AlimentoSubstituto { AlimentoOriginalId = 7, AlimentoSubstitutoRefId = 15, Motivo = "Batata doce substitui em assados.", ProporcaoEquivalente = 1, Observacoes = "Mais doce e rica em fibras.", FatorSimilaridade = 0.65 },
-            new AlimentoSubstituto { AlimentoOriginalId = 7, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento alternativo.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente.", FatorSimilaridade = 0.4 },
-
-            // 8 - Pão
-            new AlimentoSubstituto { AlimentoOriginalId = 8, AlimentoSubstitutoRefId = 3, Motivo = "Arroz pra saladas frias/companhias.", ProporcaoEquivalente = 1, Observacoes = "Usar torrado para textura.", FatorSimilaridade = 0.35 },
-            new AlimentoSubstituto { AlimentoOriginalId = 8, AlimentoSubstitutoRefId = 11, Motivo = "Feijão em preparos rústicos.", ProporcaoEquivalente = 1, Observacoes = "Troca incomum mas possível.", FatorSimilaridade = 0.25 },
-
-            // 9 - Tofu
-            new AlimentoSubstituto { AlimentoOriginalId = 9, AlimentoSubstitutoRefId = 5, Motivo = "Peito de frango como alternativa proteica.", ProporcaoEquivalente = 1, Observacoes = "Não vegano.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 9, AlimentoSubstitutoRefId = 11, Motivo = "Feijão para proteína vegetal.", ProporcaoEquivalente = 1, Observacoes = "Bom para ensopados.", FatorSimilaridade = 0.55 },
-
-            // 10 - Leite de Amêndoa
-            new AlimentoSubstituto { AlimentoOriginalId = 10, AlimentoSubstitutoRefId = 4, Motivo = "Leite de vaca quando tolerado.", ProporcaoEquivalente = 1, Observacoes = "Não indicado para intolerantes.", FatorSimilaridade = 0.45 },
-            new AlimentoSubstituto { AlimentoOriginalId = 10, AlimentoSubstitutoRefId = 13, Motivo = "Queijo para cremosidade em receitas.", ProporcaoEquivalente = 0.8m, Observacoes = "Requer ajustes.", FatorSimilaridade = 0.4 },
-
-            // 11 - Feijão
-            new AlimentoSubstituto { AlimentoOriginalId = 11, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento proteico em conjunto.", ProporcaoEquivalente = 1, Observacoes = "Combina em pratos principais.", FatorSimilaridade = 0.3 },
-            new AlimentoSubstituto { AlimentoOriginalId = 11, AlimentoSubstitutoRefId = 12, Motivo = "Aveia em preparos calóricos.", ProporcaoEquivalente = 0.9m, Observacoes = "Uso técnico em receitas.", FatorSimilaridade = 0.25 },
-
-            // 12 - Aveia
-            new AlimentoSubstituto { AlimentoOriginalId = 12, AlimentoSubstitutoRefId = 8, Motivo = "Pão integral em substituições de café da manhã.", ProporcaoEquivalente = 1, Observacoes = "Textura diferente.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 12, AlimentoSubstitutoRefId = 6, Motivo = "Banana em vitaminas/purês.", ProporcaoEquivalente = 0.8m, Observacoes = "Ajustar quantidade.", FatorSimilaridade = 0.45 },
-
-            // 13 - Queijo
-            new AlimentoSubstituto { AlimentoOriginalId = 13, AlimentoSubstitutoRefId = 4, Motivo = "Leite para cremosidade.", ProporcaoEquivalente = 0.9m, Observacoes = "Alterar consistência.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 13, AlimentoSubstitutoRefId = 10, Motivo = "Leite vegetal em receitas veganas.", ProporcaoEquivalente = 1, Observacoes = "Ajustar sabor.", FatorSimilaridade = 0.35 },
-
-            // 14 - Salmão
-            new AlimentoSubstituto { AlimentoOriginalId = 14, AlimentoSubstitutoRefId = 5, Motivo = "Frango como alternativa de proteína.", ProporcaoEquivalente = 1, Observacoes = "Menos ômega-3.", FatorSimilaridade = 0.5 },
-            new AlimentoSubstituto { AlimentoOriginalId = 14, AlimentoSubstitutoRefId = 11, Motivo = "Feijão como fonte proteica vegetal.", ProporcaoEquivalente = 1, Observacoes = "Mudança de perfil nutricional.", FatorSimilaridade = 0.3 },
-
-            // 15 - Batata Doce
-            new AlimentoSubstituto { AlimentoOriginalId = 15, AlimentoSubstitutoRefId = 7, Motivo = "Batata comum como substituto em receitas.", ProporcaoEquivalente = 1, Observacoes = "Menos beta-caroteno.", FatorSimilaridade = 0.6 },
-            new AlimentoSubstituto { AlimentoOriginalId = 15, AlimentoSubstitutoRefId = 3, Motivo = "Arroz como acompanhamento alternativo.", ProporcaoEquivalente = 1, Observacoes = "Uso em guarnições.", FatorSimilaridade = 0.25 }
-        );
-
+        context.AlimentoSubstitutos.AddRange(subs);
         context.SaveChanges();
     }
 

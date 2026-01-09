@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using HealthWellbeing.ViewModels;
+using HealthWellbeing.Services;
 
 namespace HealthWellbeing.Controllers
 {
@@ -13,10 +14,12 @@ namespace HealthWellbeing.Controllers
     public class ReceitasParaPlanosAlimentaresController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private readonly IReceitaAjusteService _ajusteService;
 
-        public ReceitasParaPlanosAlimentaresController(HealthWellbeingDbContext context)
+        public ReceitasParaPlanosAlimentaresController(HealthWellbeingDbContext context, IReceitaAjusteService ajusteService)
         {
             _context = context;
+            _ajusteService = ajusteService;
         }
 
         public IActionResult Index()
@@ -185,32 +188,48 @@ namespace HealthWellbeing.Controllers
                 return View(noPlanVm);
             }
 
-            var receitas = await _context.ReceitasParaPlanosAlimentares
-                .AsNoTracking()
-                .Where(x => x.PlanoAlimentarId == plano.PlanoAlimentarId)
-                .Include(x => x.Receita)
-                .Select(x => x.Receita!)
-                .OrderBy(r => r.Nome)
-                .Select(r => new ReceitaResumo
-                {
-                    ReceitaId = r.ReceitaId,
-                    Nome = r.Nome,
-                    Descricao = r.Descricao,
-                    TempoPreparo = r.TempoPreparo,
-                    Porcoes = r.Porcoes,
-                    Calorias = r.Calorias,
-                    Proteinas = r.Proteinas,
-                    HidratosCarbono = r.HidratosCarbono,
-                    Gorduras = r.Gorduras
-                })
-                .ToListAsync();
+            // Ajustes automáticos (apenas para apresentação; não persiste alterações)
+            var ajustado = await _ajusteService.GerarAjustesAsync(client.ClientId, plano.PlanoAlimentarId);
 
             var vm = new MinhasReceitasPlanoViewModel
             {
                 ClientNome = client.Name,
                 PlanoAlimentarId = plano.PlanoAlimentarId,
-                Receitas = receitas,
-                Aviso = receitas.Count == 0 ? "Ainda não existem receitas associadas ao seu plano alimentar." : null
+                ReceitasAjustadas = ajustado.Receitas
+                    .Select(r => new ReceitaAjustadaVm
+                    {
+                        ReceitaId = r.ReceitaId,
+                        Nome = r.Nome,
+                        Descricao = r.Descricao,
+                        TempoPreparo = r.TempoPreparo,
+                        PorcoesOriginal = r.PorcoesOriginal,
+                        MultiplicadorPorcao = r.MultiplicadorPorcao,
+                        CaloriasPorPorcaoOriginal = r.CaloriasPorPorcaoOriginal,
+                        ProteinasPorPorcaoOriginal = r.ProteinasPorPorcaoOriginal,
+                        HidratosPorPorcaoOriginal = r.HidratosPorPorcaoOriginal,
+                        GordurasPorPorcaoOriginal = r.GordurasPorPorcaoOriginal,
+                        CaloriasPorPorcaoFinal = r.CaloriasPorPorcaoFinal,
+                        ProteinasPorPorcaoFinal = r.ProteinasPorPorcaoFinal,
+                        HidratosPorPorcaoFinal = r.HidratosPorPorcaoFinal,
+                        GordurasPorPorcaoFinal = r.GordurasPorPorcaoFinal,
+                        Ingredientes = r.Ingredientes.Select(i => new IngredienteAjustadoVm
+                        {
+                            AlimentoOriginalNome = i.AlimentoOriginalNome,
+                            AlimentoFinalNome = i.AlimentoFinalNome,
+                            UnidadeMedida = i.UnidadeMedida.ToString(),
+                            QuantidadeOriginal = i.QuantidadeOriginal,
+                            QuantidadeFinal = i.QuantidadeFinal,
+                            TipoAjuste = i.TipoAjuste.ToString(),
+                            IncluidoNoResultado = i.IncluidoNoResultado
+                        }).ToList(),
+                        Notas = r.Notas.Select(n => new AjusteNotaVm
+                        {
+                            Tipo = n.Tipo.ToString(),
+                            Mensagem = n.Mensagem
+                        }).ToList()
+                    })
+                    .ToList(),
+                Aviso = ajustado.Aviso
             };
 
             return View(vm);
