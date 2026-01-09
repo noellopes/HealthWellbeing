@@ -160,7 +160,8 @@ namespace HealthWellbeing.Controllers
         // =====================================================
         public IActionResult Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email");
+            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name");
+
             return View();
         }
 
@@ -172,7 +173,8 @@ namespace HealthWellbeing.Controllers
             if (client == null)
             {
                 ModelState.AddModelError("", "Client not found.");
-                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", goal.ClientId);
+
                 return View(goal);
             }
 
