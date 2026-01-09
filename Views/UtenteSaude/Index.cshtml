@@ -1,11 +1,13 @@
-﻿@using HealthWellbeing.Models
-@model PaginationInfo<UtenteSaude>
+﻿```cshtml
+@using HealthWellbeing.Models
+@model PaginationInfo<Client>
 
 @{
-    ViewData["Title"] = "Diretor Clínico - Utentes";
+    ViewData["Title"] = "Diretor Clínico - Clientes/Utentes";
 
     string searchNome = ViewBag.SearchNome as string ?? "";
     string searchNif = ViewBag.SearchNif as string ?? "";
+    bool onlyUtentes = ViewBag.OnlyUtentes is bool b && b;
 
     bool isFirst = Model.CurrentPage <= 1;
     bool isLast = Model.CurrentPage >= Model.TotalPages;
@@ -79,11 +81,10 @@
             filter: brightness(1.05);
         }
 
-        /* Ativo (Utentes) */
         .top-btn.active {
-            background: #256b8f; /* ligeiramente diferente */
+            background: #256b8f;
             cursor: default;
-            pointer-events: none; /* “trancada” */
+            pointer-events: none;
             opacity: .95;
             box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
         }
@@ -142,7 +143,7 @@
     <div class="utente-card">
         <div class="utente-panel">
 
-            <!-- ---------- TOPO: LOGO + NAV (Médicos / Especialidades / Utentes ativo) ---------- -->
+            <!-- ---------- TOPO ---------- -->
             <div class="utente-header">
                 <div class="utente-header-content">
 
@@ -153,22 +154,15 @@
                     </div>
 
                     <div class="top-nav">
-                       
-                        <a class="top-btn"
-                           asp-controller="Doctor" asp-action="Index">
+                        <a class="top-btn" asp-controller="Doctor" asp-action="Index">
                             <i class="bi bi-heart-pulse"></i> Médicos
                         </a>
 
-                        <a class="top-btn"
-                           asp-controller="Specialities" asp-action="Index">
+                        <a class="top-btn" asp-controller="Specialities" asp-action="Index">
                             <i class="bi bi-diagram-3"></i> Especialidades
                         </a>
 
-                        <!-- UTENTES (ATIVO / TRANCADO) -->
-                        <a class="top-btn active"
-                           href="#"
-                           aria-disabled="true"
-                           tabindex="-1">
+                        <a class="top-btn active" href="#" aria-disabled="true" tabindex="-1">
                             <i class="bi bi-people"></i> Utentes
                         </a>
                     </div>
@@ -176,26 +170,44 @@
                 </div>
             </div>
 
-            <!-- ---------- CORPO PRINCIPAL ---------- -->
+            <!-- ---------- CORPO ---------- -->
             <div class="utente-body">
 
-                <!-- Bem-vindo + Agenda Médica -->
+                <!-- Bem-vindo + Agenda -->
                 <div class="welcome-row">
                     <h2 class="welcome-title">Bem-vindo, Diretor Clínico</h2>
 
-                    <!-- Ajusta para o teu módulo de agendas -->
-                    <a class="agenda-btn"
-                       asp-controller="AgendaMedicas"
-                       asp-action="Index">
+                    <a class="agenda-btn" asp-controller="AgendaMedicas" asp-action="Index">
                         <i class="bi bi-calendar2-week"></i> Agenda Médica
                     </a>
                 </div>
 
-                <!-- Lista de utentes + Pesquisar + Criar Novo -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h4 m-0">Lista de Utentes</h2>
-                    <div class="d-flex justify-content-end">
-                        <a class="btn btn-secondary me-2"
+                <!-- Cabeçalho lista + botões -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h2 class="h4 m-0">Lista de Clientes</h2>
+
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                        <a class="btn @(onlyUtentes ? "btn-outline-primary" : "btn-primary")"
+                           asp-controller="UtenteSaude"
+                           asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchNome="@searchNome"
+                           asp-route-searchNif="@searchNif"
+                           asp-route-onlyUtentes="false">
+                            Mostrar todos
+                        </a>
+
+                        <a class="btn @(onlyUtentes ? "btn-primary" : "btn-outline-primary")"
+                           asp-controller="UtenteSaude"
+                           asp-action="Index"
+                           asp-route-page="1"
+                           asp-route-searchNome="@searchNome"
+                           asp-route-searchNif="@searchNif"
+                           asp-route-onlyUtentes="true">
+                            Só utentes
+                        </a>
+
+                        <a class="btn btn-secondary"
                            data-bs-toggle="collapse"
                            data-bs-target="#utenteSearch"
                            aria-expanded="false"
@@ -213,7 +225,9 @@
                 <div class="collapse mt-2 mb-2" id="utenteSearch">
                     <div class="card card-body">
                         <form asp-controller="UtenteSaude" asp-action="Index" method="get" class="row g-2 align-items-end">
-                            <div class="col-md-6">
+                            <input type="hidden" name="onlyUtentes" value="@onlyUtentes.ToString().ToLower()" />
+
+                            <div >
                                 <label for="searchNome" class="form-label">Nome</label>
                                 <input id="searchNome" name="searchNome"
                                        value="@searchNome"
@@ -222,20 +236,18 @@
                                        type="search" />
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="searchNif" class="form-label">NIF</label>
-                                <input id="searchNif" name="searchNif"
-                                       value="@searchNif"
-                                       class="form-control"
-                                       placeholder="Pesquisar por NIF"
-                                       type="search" />
-                            </div>
+                          
 
                             <div class="col-12 mt-2 d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-search me-1"></i> Pesquisar
                                 </button>
-                                <a asp-controller="UtenteSaude" asp-action="Index" class="btn btn-secondary">Limpar</a>
+
+                                <a asp-controller="UtenteSaude" asp-action="Index"
+                                   asp-route-onlyUtentes="@onlyUtentes.ToString().ToLower()"
+                                   class="btn btn-secondary">
+                                    Limpar
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -249,42 +261,75 @@
                     </div>
                 }
 
-                <!-- Tabela -->
+                <!-- Tabela (sem coluna NIF) -->
                 <div class="table-responsive mt-4">
                     <table class="table table-striped table-bordered align-middle">
                         <thead class="table-light">
                             <tr>
                                 <th>Nome</th>
-                                <th style="width:120px;">Idade</th>
-                                <th style="width:320px;">Ações</th>
+                                <th style="width:260px;">Email</th>
+                                <th style="width:110px;">Estado</th>
+                                <th style="width:360px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (Model.Items == null || !Model.Items.Any())
                             {
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        Ainda não existem utentes. Clique em <strong>Criar Novo</strong> para adicionar
+                                    <td colspan="4" class="text-center text-muted">
+                                        Não existem registos para apresentar.
                                     </td>
                                 </tr>
                             }
                             else
                             {
-                                foreach (var u in Model.Items)
+                                foreach (var c in Model.Items)
                                 {
+                                    var isUtente = c.UtenteSaude != null;
+                                    var email = string.IsNullOrWhiteSpace(c.Email) ? "—" : c.Email;
+
                                     <tr>
-                                        <td>@u.NomeCompleto</td>
-                                        <td>@u.Idade</td>
+                                        <td>@c.Name</td>
+                                        <td>@email</td>
                                         <td>
-                                            <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-eye me-1"></i> Detalhes
-                                            </a>
-                                            <a class="btn btn-sm btn-warning text-white" asp-action="Edit" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-pencil-square me-1"></i> Editar
-                                            </a>
-                                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@u.UtenteSaudeId">
-                                                <i class="bi bi-trash me-1"></i> Apagar
-                                            </a>
+                                            @if (isUtente)
+                                            {
+                                                <span class="badge bg-success">Utente</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Cliente</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (isUtente)
+                                            {
+                                                <a class="btn btn-sm btn-primary"
+                                                   asp-action="Details"
+                                                   asp-route-id="@c.UtenteSaude!.UtenteSaudeId">
+                                                    <i class="bi bi-eye me-1"></i> Detalhes
+                                                </a>
+
+                                                <a class="btn btn-sm btn-warning text-white"
+                                                   asp-action="Edit"
+                                                   asp-route-id="@c.UtenteSaude!.UtenteSaudeId">
+                                                    <i class="bi bi-pencil-square me-1"></i> Editar
+                                                </a>
+
+                                                <a class="btn btn-sm btn-danger"
+                                                   asp-action="Delete"
+                                                   asp-route-id="@c.UtenteSaude!.UtenteSaudeId">
+                                                    <i class="bi bi-trash me-1"></i> Apagar
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a class="btn btn-sm btn-success"
+                                                   asp-action="Create"
+                                                   asp-route-clientId="@c.ClientId">
+                                                    <i class="bi bi-person-plus me-1"></i> Adicionar
+                                                </a>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -293,14 +338,14 @@
                     </table>
                 </div>
 
-                <!-- Paginação (igual à tua, só com « e » no protótipo se quiseres) -->
-                <nav aria-label="Paginação de utentes">
+                <!-- Paginação (mantém pesquisa + filtro) -->
+                <nav aria-label="Paginação de clientes">
                     <ul class="pagination justify-content-center">
 
                         <li class="page-item @(isFirst ? "disabled" : "")">
                             <a class="page-link"
                                href="@(isFirst ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                  new { page = Model.CurrentPage - 1, searchNome, searchNif }))">
+                                                                  new { page = Model.CurrentPage - 1, searchNome, searchNif, onlyUtentes }))">
                                 «
                             </a>
                         </li>
@@ -310,7 +355,7 @@
                             <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
                                 <a class="page-link"
                                    href="@(i == Model.CurrentPage ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                          new { page = i, searchNome, searchNif }))">
+                                                                          new { page = i, searchNome, searchNif, onlyUtentes }))">
                                 @i
                             </a>
                         </li>
@@ -319,19 +364,18 @@
                         <li class="page-item @(isLast ? "disabled" : "")">
                             <a class="page-link"
                                href="@(isLast ? "#" : Url.Action("Index", "UtenteSaude",
-                                                                  new { page = Model.CurrentPage + 1, searchNome, searchNif }))">
+                                                                  new { page = Model.CurrentPage + 1, searchNome, searchNif, onlyUtentes }))">
                                 »
                             </a>
                         </li>
 
                     </ul>
-                   
                 </nav>
 
             </div>
 
             <div class="utente-footer-bar"></div>
-
         </div>
     </div>
 </div>
+```

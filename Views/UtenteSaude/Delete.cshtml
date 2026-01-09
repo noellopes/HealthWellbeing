@@ -162,6 +162,10 @@
 
             <div class="utente-body">
                 <div class="danger-card">
+                    @if (TempData["Msg"] != null)
+                    {
+                        <div class="alert alert-danger mt-3">@TempData["Msg"]</div>
+                    }
 
                     <h2 class="danger-title">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i> Apagar Utente

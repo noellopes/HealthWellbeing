@@ -449,7 +449,7 @@ namespace HealthWellbeing.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     Nif = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    Niss = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    Niss = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: true),
                     Nus = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false)
                 },
                 constraints: table =>
@@ -1141,7 +1141,8 @@ namespace HealthWellbeing.Migrations
                 name: "IX_UtenteSaude_Niss",
                 table: "UtenteSaude",
                 column: "Niss",
-                unique: true);
+                unique: true,
+                filter: "[Niss] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UtenteSaude_Nus",

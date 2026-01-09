@@ -116,37 +116,110 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpGet]
         [Authorize(Roles = "DiretorClinico")]
+        /*  public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "")
+          {
+              if (page < 1) page = 1;
+
+              var utentesQuery = _db.UtenteSaude
+                  .Include(u => u.Client)
+                  .AsQueryable();
+
+              if (!string.IsNullOrWhiteSpace(searchNome))
+                  utentesQuery = utentesQuery.Where(u => u.Client != null && u.Client.Name.Contains(searchNome));
+
+              if (!string.IsNullOrWhiteSpace(searchNif))
+                  utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
+
+              ViewBag.SearchNome = searchNome;
+              ViewBag.SearchNif = searchNif;
+
+              int numberUtentes = await utentesQuery.CountAsync();
+              if (numberUtentes == 0) page = 1;
+
+              var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+
+              utentesInfo.Items = await utentesQuery
+                  .AsNoTracking()
+                  .OrderBy(u => u.Client!.Name)
+                  .Skip(utentesInfo.ItemsToSkip)
+                  .Take(utentesInfo.ItemsPerPage)
+                  .ToListAsync();
+
+              return View(utentesInfo);
+          }*/
+        /*
+        [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "")
         {
             if (page < 1) page = 1;
 
-            var utentesQuery = _db.UtenteSaude
-                .Include(u => u.Client)
+            var clientsQuery = _db.Client
+                .Include(c => c.UtenteSaude)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchNome))
-                utentesQuery = utentesQuery.Where(u => u.Client != null && u.Client.Name.Contains(searchNome));
+                clientsQuery = clientsQuery.Where(c => c.Name.Contains(searchNome));
 
             if (!string.IsNullOrWhiteSpace(searchNif))
-                utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
+                clientsQuery = clientsQuery.Where(c => c.UtenteSaude != null && c.UtenteSaude.Nif.Contains(searchNif));
 
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchNif = searchNif;
 
-            int numberUtentes = await utentesQuery.CountAsync();
-            if (numberUtentes == 0) page = 1;
+            int numberClients = await clientsQuery.CountAsync();
+            if (numberClients == 0) page = 1;
 
-            var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
+            var info = new PaginationInfo<Client>(page, numberClients);
 
-            utentesInfo.Items = await utentesQuery
+            info.Items = await clientsQuery
                 .AsNoTracking()
-                .OrderBy(u => u.Client!.Name)
-                .Skip(utentesInfo.ItemsToSkip)
-                .Take(utentesInfo.ItemsPerPage)
+                .OrderBy(c => c.Name)
+                .Skip(info.ItemsToSkip)
+                .Take(info.ItemsPerPage)
                 .ToListAsync();
 
-            return View(utentesInfo);
+            return View(info);
+        }*/
+        [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "", bool onlyUtentes = false)
+        {
+            if (page < 1) page = 1;
+
+            var clientsQuery = _db.Client
+                .Include(c => c.UtenteSaude)
+                .AsQueryable();
+
+            // ✅ filtro do botão
+            if (onlyUtentes)
+                clientsQuery = clientsQuery.Where(c => c.UtenteSaude != null);
+
+            if (!string.IsNullOrWhiteSpace(searchNome))
+                clientsQuery = clientsQuery.Where(c => c.Name.Contains(searchNome));
+
+            if (!string.IsNullOrWhiteSpace(searchNif))
+                clientsQuery = clientsQuery.Where(c => c.UtenteSaude != null && c.UtenteSaude.Nif.Contains(searchNif));
+
+            ViewBag.SearchNome = searchNome;
+            ViewBag.SearchNif = searchNif;
+            ViewBag.OnlyUtentes = onlyUtentes;
+
+            int numberClients = await clientsQuery.CountAsync();
+            if (numberClients == 0) page = 1;
+
+            var info = new PaginationInfo<Client>(page, numberClients);
+
+            info.Items = await clientsQuery
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Skip(info.ItemsToSkip)
+                .Take(info.ItemsPerPage)
+                .ToListAsync();
+
+            return View(info);
         }
+
 
         // ================================
         // DETAILS (DiretorClinico e Rececionista)
@@ -185,6 +258,7 @@ namespace HealthWellbeing.Controllers
         // ================================
         [HttpGet]
         [Authorize(Roles = "DiretorClinico")]
+        /*
         public IActionResult Create()
         {
             LoadClientsJsonAvailable();
@@ -195,7 +269,43 @@ namespace HealthWellbeing.Controllers
             };
 
             return View(vm);
+        }*/
+        [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
+        public async Task<IActionResult> Create(int? clientId)
+        {
+            LoadClientsJsonAvailable();
+
+            var vm = new UtenteSaudeFormVM { IsEdit = false };
+
+            if (clientId.HasValue && clientId.Value > 0)
+            {
+                var c = await _db.Client.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == clientId.Value);
+                if (c == null)
+                {
+                    TempData["Msg"] = "Cliente não encontrado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                bool jaTemUtente = await _db.UtenteSaude.AnyAsync(u => u.ClientId == c.ClientId);
+                if (jaTemUtente)
+                {
+                    TempData["Msg"] = "Este cliente já tem um Utente de Saúde associado.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                vm.ClientId = c.ClientId;
+                vm.Name = c.Name;
+                vm.Email = c.Email;
+                vm.Phone = c.Phone;
+                vm.Address = c.Address;
+                vm.BirthDate = c.BirthDate;
+                vm.Gender = c.Gender;
+            }
+
+            return View(vm);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -372,6 +482,7 @@ namespace HealthWellbeing.Controllers
         // ================================
         // DELETE (DiretorClinico)
         // ================================
+      
         [HttpGet]
         [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Delete(int id)
@@ -382,6 +493,11 @@ namespace HealthWellbeing.Controllers
                 .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
 
             if (u == null) return NotFound();
+
+            ViewBag.HasConsultas = await _db.Consulta
+                .AsNoTracking()
+                .AnyAsync(c => c.IdUtenteSaude == u.UtenteSaudeId);
+
             return View(u);
         }
 
@@ -390,16 +506,31 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var u = await _db.UtenteSaude.FindAsync(id);
-            if (u != null)
+            var u = await _db.UtenteSaude
+                .FirstOrDefaultAsync(x => x.UtenteSaudeId == id);
+
+            if (u == null)
             {
-                _db.UtenteSaude.Remove(u);
-                await _db.SaveChangesAsync();
-                TempData["Msg"] = "Utente removido.";
+                TempData["Msg"] = "Utente não encontrado.";
+                return RedirectToAction(nameof(Index));
             }
 
+            var hasConsultas = await _db.Consulta
+                .AnyAsync(c => c.IdUtenteSaude == u.UtenteSaudeId);
+
+            if (hasConsultas)
+            {
+                TempData["Msg"] = "Não é possível apagar o utente porque existem consultas associadas.";
+                return RedirectToAction(nameof(Delete), new { id = u.UtenteSaudeId });
+            }
+
+            _db.UtenteSaude.Remove(u);
+            await _db.SaveChangesAsync();
+
+            TempData["Msg"] = "Utente removido.";
             return RedirectToAction(nameof(Index));
         }
+
 
         // ================================
         // REDIRECT por Role (Gestão Consultas)

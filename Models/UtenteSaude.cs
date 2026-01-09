@@ -41,7 +41,7 @@ namespace HealthWellbeing.Models
         [Display(Name = "Número de Segurança Social")]
         [StringLength(11)]
         [RegularExpression(@"^\d{11}$", ErrorMessage = "O NISS deve ter 11 dígitos.")]
-        public string Niss { get; set; } = default!;
+        public string? Niss { get; set; }
 
         // Número de Utente de Saúde (SNS/NUS) — 9 dígitos
         [Required(ErrorMessage = "O número de utente de saúde é obrigatório.")]
