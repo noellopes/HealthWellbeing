@@ -119,9 +119,12 @@
                     </div>
 
                     <div class="utente-actions">
-                        <!-- ⚠️ Ajusta controller/action para o teu módulo de agendas -->
-                        <a asp-controller="AgendasMedicas" asp-action="Index" class="utente-btn">
+                       
+                        <a asp-controller="AgendaMedicas" asp-action="Index" class="utente-btn">
                             <i class="bi bi-calendar2-week"></i> Consultar Agendas Médicas
+                        </a>
+                        <a asp-controller ="Consultas" asp-action="Index" class="utente-btn">
+                            <i class="bi bi-file-earmark-medical-fill"></i>Consultas
                         </a>
                     </div>
                 </div>

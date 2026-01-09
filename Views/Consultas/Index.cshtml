@@ -205,9 +205,16 @@
                             <i class="bi bi-search"></i> Pesquisar
                         </button>
 
-                        <a asp-action="Create" class="utente-btn">
-                            <i class="bi bi-plus-circle"></i> Marcar Consulta
-                        </a>
+                        @if (User.IsInRole("Medico"))
+                        {
+                            <a class="utente-btn" asp-controller="AgendaMedicas" asp-action="Index"><i class="bi bi-file-earmark-medical-fill"></i> Agenda médica</a>
+                           
+                        }
+                        else if (User.IsInRole("Utente"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        
                     </div>
                 </div>
             </div>

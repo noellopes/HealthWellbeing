@@ -280,9 +280,15 @@
                     </div>
 
                     <div class="utente-actions">
-                        <a asp-action="Index" asp-controller="Home" class="utente-btn">
-                            <i class="bi bi-house"></i> Início
-                        </a>
+                        @if (User.IsInRole("Rececionista"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="RecepcionistaView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        else if (User.IsInRole("Utente"))
+                        {
+                            <a class="utente-btn" asp-controller="UtenteSaude" asp-action="UtenteView"><i class="bi bi-arrow-left"></i> Voltar</a>
+                        }
+                        
                     </div>
                 </div>
             </div>

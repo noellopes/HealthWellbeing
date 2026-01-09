@@ -166,15 +166,35 @@
                              class="logo-img" />
                     </div>
 
-                    <div class="utente-actions">
-                        <a asp-action="Index" class="utente-btn">
-                            <i class="bi bi-arrow-left"></i> Voltar
-                        </a>
 
-                        <a asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" class="utente-btn">
-                            <i class="bi bi-pencil-square"></i> Editar
-                        </a>
-                    </div>
+                    @if (User.IsInRole("Rececionista"))
+                    {
+                        <div class="utente-actions">
+                            <a asp-controller="Consultas" asp-action="Marcar" class="utente-btn">
+                                <i class="bi bi-journal-medical me-1"></i> Marcar Consultas
+                            </a>
+                            <a asp-action="RecepcionistaView" class="utente-btn">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    }
+                    else if (User.IsInRole("DiretorClinico"))
+                    {
+                        <div class="utente-actions">
+                            <a asp-action="Index" class="utente-btn">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+
+                            <a asp-action="Edit" asp-route-id="@Model.UtenteSaudeId" class="utente-btn">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                        </div>
+                    }
+
+
+
+
+                    
                 </div>
             </div>
 

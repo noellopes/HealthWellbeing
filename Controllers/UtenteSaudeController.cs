@@ -2,23 +2,25 @@
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class UtenteSaudeController : Controller
     {
         private readonly HealthWellbeingDbContext _db;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UtenteSaudeController(HealthWellbeingDbContext db)
+        public UtenteSaudeController(HealthWellbeingDbContext db, UserManager<IdentityUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
-        // ================================
-        // Helper: JSON de clients disponíveis (para autocomplete no Create)
-        // ================================
         private void LoadClientsJsonAvailable()
         {
             var available = _db.Client.AsNoTracking()
@@ -38,55 +40,49 @@ namespace HealthWellbeing.Controllers
 
             ViewBag.ClientsJson = JsonSerializer.Serialize(available);
         }
+
         // ================================
-        // TESTE UI (UtenteView)
+        // UTENTE VIEW (só Utente) - dados pelo email logado
         // ================================
         [HttpGet]
-        public IActionResult UtenteView()
+        [Authorize(Roles = "Utente")]
+        public async Task<IActionResult> UtenteView()
         {
-            var utenteFixe = new UtenteSaude
-            {
-                UtenteSaudeId = 1,
-                ClientId = 1,
-                Nif = "245123987",
-                Niss = "12345678901",
-                Nus = "123456789",
-                Client = new Client
-                {
-                    ClientId = 1,
-                    Name = "Maria Correia",
-                    Email = "maria.correia@email.pt",
-                    Phone = "912345678",
-                    Address = "Rua Exemplo, 10, 3500-000 Viseu",
-                    BirthDate = new DateTime(1999, 5, 12),
-                    Gender = "Female"
-                }
-            };
+            var identityUser = await _userManager.GetUserAsync(User);
+            if (identityUser == null) return Challenge();
 
-            return View(utenteFixe);
+            var email = await _userManager.GetEmailAsync(identityUser) ?? identityUser.UserName;
+            if (string.IsNullOrWhiteSpace(email)) return Forbid();
+
+            var utente = await _db.UtenteSaude
+                .Include(u => u.Client)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Client != null && u.Client.Email == email);
+
+            if (utente == null)
+            {
+                TempData["Msg"] = "Não existe um Utente de Saúde associado ao seu email.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(utente);
         }
 
         // ================================
-        // RECEPCIONISTA VIEW (Paginação + Pesquisa)
+        // RECECIONISTA VIEW (só Rececionista)
         // ================================
         [HttpGet]
-        public async Task<IActionResult> RecepcionistaView(
-            int page = 1,
-            string searchNome = "",
-            string searchNif = ""
-        )
+        [Authorize(Roles = "Rececionista")]
+        public async Task<IActionResult> RecepcionistaView(int page = 1, string searchNome = "", string searchNif = "")
         {
-            if (page < 1)
-                page = 1;
+            if (page < 1) page = 1;
 
             var utentesQuery = _db.UtenteSaude
                 .Include(u => u.Client)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchNome))
-                utentesQuery = utentesQuery.Where(u =>
-                    u.Client != null && u.Client.Name.Contains(searchNome)
-                );
+                utentesQuery = utentesQuery.Where(u => u.Client != null && u.Client.Name.Contains(searchNome));
 
             if (!string.IsNullOrWhiteSpace(searchNif))
                 utentesQuery = utentesQuery.Where(u => u.Nif.Contains(searchNif));
@@ -95,9 +91,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchNif = searchNif;
 
             int numberUtentes = await utentesQuery.CountAsync();
-
-            if (numberUtentes == 0)
-                page = 1;
+            if (numberUtentes == 0) page = 1;
 
             var utentesInfo = new PaginationInfo<UtenteSaude>(page, numberUtentes);
 
@@ -108,14 +102,14 @@ namespace HealthWellbeing.Controllers
                 .Take(utentesInfo.ItemsPerPage)
                 .ToListAsync();
 
-            ViewBag.NomeRecepcionista = "Recepcionista";
-
+            ViewBag.NomeRecepcionista = "Rececionista";
             return View(utentesInfo);
         }
 
         // ================================
-        // LISTAR (Index) - igual ao teu
+        // GERIR UTENTES (DiretorClinico)
         // ================================
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "")
         {
             if (page < 1) page = 1;
@@ -148,9 +142,8 @@ namespace HealthWellbeing.Controllers
             return View(utentesInfo);
         }
 
-        // ================================
-        // DETALHES - igual ao teu
-        // ================================
+        [Authorize(Roles = "DiretorClinico,Rececionista")]
+       
         public async Task<IActionResult> Details(int id)
         {
             var u = await _db.UtenteSaude
@@ -162,10 +155,8 @@ namespace HealthWellbeing.Controllers
             return View(u);
         }
 
-        // ================================
-        // CREATE (GET) - com autocomplete
-        // ================================
         [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
         public IActionResult Create()
         {
             LoadClientsJsonAvailable();
@@ -178,18 +169,13 @@ namespace HealthWellbeing.Controllers
             return View(vm);
         }
 
-        // ================================
-        // CREATE (POST)
-        // - Se ClientId vem preenchido => cria só UtenteSaude e associa a cliente existente
-        // - Se ClientId vem vazio => cria Client + UtenteSaude associados
-        // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Create(UtenteSaudeFormVM vm)
         {
             vm.IsEdit = false;
 
-            // Unicidades do Utente
             if (!string.IsNullOrWhiteSpace(vm.Nif) && await _db.UtenteSaude.AnyAsync(x => x.Nif == vm.Nif))
                 ModelState.AddModelError(nameof(vm.Nif), "Já existe um utente com este NIF.");
 
@@ -199,9 +185,6 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrWhiteSpace(vm.Niss) && await _db.UtenteSaude.AnyAsync(x => x.Niss == vm.Niss))
                 ModelState.AddModelError(nameof(vm.Niss), "Já existe um utente com este NISS.");
 
-            // ===============================
-            // CASO A) escolheu cliente existente
-            // ===============================
             if (vm.ClientId.HasValue && vm.ClientId.Value > 0)
             {
                 bool clientExists = await _db.Client.AnyAsync(c => c.ClientId == vm.ClientId.Value);
@@ -213,7 +196,6 @@ namespace HealthWellbeing.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    // repõe dados do cliente (para não depender do JS no postback)
                     var c = await _db.Client.AsNoTracking().FirstOrDefaultAsync(x => x.ClientId == vm.ClientId.Value);
                     if (c != null)
                     {
@@ -245,9 +227,6 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Details), new { id = u.UtenteSaudeId });
             }
 
-            // ===============================
-            // CASO B) não escolheu cliente => criar Client + Utente
-            // ===============================
             if (!ModelState.IsValid)
             {
                 LoadClientsJsonAvailable();
@@ -279,10 +258,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Details), new { id = newUtente.UtenteSaudeId });
         }
 
-        // ================================
-        // EDIT (GET) - devolve VM para editar Client + Utente
-        // ================================
         [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Edit(int id)
         {
             var u = await _db.UtenteSaude
@@ -297,16 +274,12 @@ namespace HealthWellbeing.Controllers
                 IsEdit = true,
                 UtenteSaudeId = u.UtenteSaudeId,
                 ClientId = u.ClientId,
-
-                // Client
                 Name = u.Client.Name,
                 Email = u.Client.Email,
                 Phone = u.Client.Phone,
                 Address = u.Client.Address,
                 BirthDate = u.Client.BirthDate,
                 Gender = u.Client.Gender,
-
-                // Utente
                 Nif = u.Nif,
                 Niss = u.Niss,
                 Nus = u.Nus
@@ -315,11 +288,9 @@ namespace HealthWellbeing.Controllers
             return View(vm);
         }
 
-        // ================================
-        // EDIT (POST) - atualiza Client + Utente
-        // ================================
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Edit(int id, UtenteSaudeFormVM vm)
         {
             vm.IsEdit = true;
@@ -333,11 +304,9 @@ namespace HealthWellbeing.Controllers
             if (existing == null) return NotFound();
             if (existing.Client == null) return NotFound();
 
-            // proteção: não permitir trocar o ClientId
             if (!vm.ClientId.HasValue || vm.ClientId.Value != existing.ClientId)
                 ModelState.AddModelError(nameof(vm.ClientId), "Não é permitido alterar o cliente associado.");
 
-            // unicidade (ignora o próprio)
             if (await _db.UtenteSaude.AnyAsync(x => x.UtenteSaudeId != id && x.Nif == vm.Nif))
                 ModelState.AddModelError(nameof(vm.Nif), "Já existe um utente com este NIF.");
 
@@ -350,12 +319,10 @@ namespace HealthWellbeing.Controllers
             if (!ModelState.IsValid)
                 return View(vm);
 
-            // Utente
             existing.Nif = vm.Nif;
             existing.Niss = vm.Niss;
             existing.Nus = vm.Nus;
 
-            // Client
             existing.Client.Name = vm.Name ?? "";
             existing.Client.Email = vm.Email ?? "";
             existing.Client.Phone = vm.Phone ?? "";
@@ -369,10 +336,8 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Details), new { id = existing.UtenteSaudeId });
         }
 
-        // ================================
-        // DELETE (GET)
-        // ================================
         [HttpGet]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> Delete(int id)
         {
             var u = await _db.UtenteSaude
@@ -384,11 +349,9 @@ namespace HealthWellbeing.Controllers
             return View(u);
         }
 
-        // ================================
-        // DELETE (POST) - remove só Utente (Client fica)
-        // ================================
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DiretorClinico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var u = await _db.UtenteSaude.FindAsync(id);
@@ -400,6 +363,25 @@ namespace HealthWellbeing.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+        [Authorize]
+        //Consulta BTN ACESS
+        public IActionResult GestaoConsultas()
+        {
+            if (User.IsInRole("Medico"))
+                return RedirectToAction("Index", "Consultas");
+
+            if (User.IsInRole("Utente"))
+                return RedirectToAction(nameof(UtenteView), "UtenteSaude");
+
+            if (User.IsInRole("Rececionista"))
+                return RedirectToAction(nameof(RecepcionistaView), "UtenteSaude");
+
+            if (User.IsInRole("DiretorClinico") || User.IsInRole("Administrador"))
+                return RedirectToAction(nameof(Index), "UtenteSaude");
+
+            return Forbid();
         }
     }
 }
