@@ -111,50 +111,53 @@
                 </div>
             }
 
-            <!-- Restrições -->
-            @if (ViewBag.RestricoesDetalhadas != null && ((List<dynamic>)ViewBag.RestricoesDetalhadas).Any())
+            @if (User.IsInRole("Nutricionista"))
             {
-                <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
-                    </div>
-                    <div class="card-body">
-                        @foreach (var rest in (List<dynamic>)ViewBag.RestricoesDetalhadas)
-                        {
-                            var badgeClass = rest.Gravidade == "Grave" ? "bg-danger" : 
-                                           rest.Gravidade == "Moderada" ? "bg-warning" : "bg-info";
-                            
-                            <div class="alert alert-warning mb-3" role="alert">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h6 class="alert-heading">
-                                            <i class="bi bi-shield-exclamation"></i> @rest.Nome
-                                        </h6>
-                                        @if (!string.IsNullOrEmpty(rest.Descricao))
-                                        {
-                                            <p class="mb-2"><small>@rest.Descricao</small></p>
-                                        }
-                                        <div class="mb-0">
-                                            <span class="badge bg-secondary">@rest.Tipo</span>
-                                            <span class="badge @badgeClass">@rest.Gravidade</span>
+                <!-- Restrições -->
+                @if (ViewBag.RestricoesDetalhadas != null && ((List<dynamic>)ViewBag.RestricoesDetalhadas).Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var rest in (List<dynamic>)ViewBag.RestricoesDetalhadas)
+                            {
+                                var badgeClass = rest.Gravidade == "Grave" ? "bg-danger" :
+                                rest.Gravidade == "Moderada" ? "bg-warning" : "bg-info";
+
+                                <div class="alert alert-warning mb-3" role="alert">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="alert-heading">
+                                                <i class="bi bi-shield-exclamation"></i> @rest.Nome
+                                            </h6>
+                                            @if (!string.IsNullOrEmpty(rest.Descricao))
+                                            {
+                                                <p class="mb-2"><small>@rest.Descricao</small></p>
+                                            }
+                                            <div class="mb-0">
+                                                <span class="badge bg-secondary">@rest.Tipo</span>
+                                                <span class="badge @badgeClass">@rest.Gravidade</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
-                </div>
-            }
-            else if (Model.RestricoesAlimentarId != null && Model.RestricoesAlimentarId.Any())
-            {
-                <div class="card mb-4">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                }
+                else if (Model.RestricoesAlimentarId != null && Model.RestricoesAlimentarId.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Restrições Alimentares</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Restrições (IDs): @string.Join(", ", Model.RestricoesAlimentarId)</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="text-muted">Restrições (IDs): @string.Join(", ", Model.RestricoesAlimentarId)</p>
-                    </div>
-                </div>
+                }
             }
         </div>
 

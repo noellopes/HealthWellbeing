@@ -10,9 +10,14 @@
             <h1 class="h3 mb-1">As Minhas Receitas</h1>
             <p class="text-muted mb-0">Receitas associadas ao seu plano alimentar.</p>
         </div>
-        <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Voltar
-        </a>
+        <div class="d-flex gap-2">
+            <a asp-action="MeuPerfilAlimentar" class="btn btn-outline-success">
+                <i class="bi bi-person-badge"></i> O Meu Perfil Alimentar
+            </a>
+            <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(Model.Aviso))

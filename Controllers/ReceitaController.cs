@@ -108,13 +108,13 @@ namespace HealthWellbeing.Controllers
             
             ViewBag.ComponentesDetalhados = componentesDetalhados;
 
-            // Carregar restrições relacionadas
-            var restricoesDetalhadas = new List<dynamic>();
-            if (receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
+            // Carregar restrições relacionadas (apenas para Nutricionista)
+            if (User.IsInRole("Nutricionista") && receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
             {
-                restricoesDetalhadas = await _context.RestricaoAlimentar
+                var restricoesDetalhadas = await _context.RestricaoAlimentar
                     .Where(r => receita.RestricoesAlimentarId.Contains(r.RestricaoAlimentarId))
-                    .Select(r => new {
+                    .Select(r => new
+                    {
                         r.RestricaoAlimentarId,
                         r.Nome,
                         Tipo = r.Tipo.ToString(),
@@ -122,8 +122,13 @@ namespace HealthWellbeing.Controllers
                         r.Descricao
                     })
                     .ToListAsync<dynamic>();
+
+                ViewBag.RestricoesDetalhadas = restricoesDetalhadas;
             }
-            ViewBag.RestricoesDetalhadas = restricoesDetalhadas;
+            else
+            {
+                ViewBag.RestricoesDetalhadas = null;
+            }
 
             return View(receita);
         }

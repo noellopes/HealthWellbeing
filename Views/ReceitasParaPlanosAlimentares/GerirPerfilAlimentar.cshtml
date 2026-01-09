@@ -1,0 +1,234 @@
+@model HealthWellbeing.ViewModels.GerirPerfilAlimentarViewModel
+
+@{
+    ViewData["Title"] = "Perfil Alimentar — Gestão";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Perfil Alimentar — Gestão</h1>
+            <p class="text-muted mb-0">Cliente: <strong>@Model.ClientNome</strong> <span class="text-muted">(@Model.ClientEmail)</span></p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="ClientesPerfilAlimentar" class="btn btn-outline-secondary">
+                <i class="bi bi-people"></i> Clientes
+            </a>
+            <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["AlertMessage"] != null)
+    {
+        var alertType = TempData["AlertType"]?.ToString() ?? "info";
+        <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+            @TempData["AlertMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-diamond"></i> Alergias</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AdicionarAlergia" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                        <label class="form-label">Adicionar alergia</label>
+                        <div class="input-group">
+                            <select name="ItemId" class="form-select" required>
+                                <option value="">-- Selecionar --</option>
+                                @foreach (var opt in Model.OpcoesAlergias)
+                                {
+                                    <option value="@opt.Value">@opt.Text</option>
+                                }
+                            </select>
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg"></i> Adicionar</button>
+                        </div>
+                    </form>
+
+                    @if (Model.Alergias.Count == 0)
+                    {
+                        <div class="text-muted">Sem alergias associadas.</div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var a in Model.Alergias)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="fw-semibold">@a.Nome</div>
+                                            @if (!string.IsNullOrWhiteSpace(a.Descricao))
+                                            {
+                                                <div class="small text-muted">@a.Descricao</div>
+                                            }
+                                        </div>
+                                        <form asp-action="RemoverAlergia" method="post" class="ms-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                                            <input type="hidden" name="ItemId" value="@a.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <form asp-action="EditarAlergia" method="post" class="mt-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                                        <input type="hidden" name="OldItemId" value="@a.Id" />
+                                        <div class="input-group input-group-sm">
+                                            <select name="NewItemId" class="form-select" required>
+                                                @foreach (var opt in Model.OpcoesAlergias)
+                                                {
+                                                    <option value="@opt.Value" selected="@(opt.Value == a.Id ? "selected" : null)">@opt.Text</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-save"></i> Atualizar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> Restrições Alimentares</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AdicionarRestricao" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                        <label class="form-label">Adicionar restrição</label>
+                        <div class="input-group">
+                            <select name="ItemId" class="form-select" required>
+                                <option value="">-- Selecionar --</option>
+                                @foreach (var opt in Model.OpcoesRestricoes)
+                                {
+                                    <option value="@opt.Value">@opt.Text</option>
+                                }
+                            </select>
+                            <button class="btn btn-danger" type="submit"><i class="bi bi-plus-lg"></i> Adicionar</button>
+                        </div>
+                    </form>
+
+                    @if (Model.Restricoes.Count == 0)
+                    {
+                        <div class="text-muted">Sem restrições associadas.</div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var r in Model.Restricoes)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="fw-semibold">@r.Nome</div>
+                                            @if (!string.IsNullOrWhiteSpace(r.Descricao))
+                                            {
+                                                <div class="small text-muted">@r.Descricao</div>
+                                            }
+                                        </div>
+                                        <form asp-action="RemoverRestricao" method="post" class="ms-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                                            <input type="hidden" name="ItemId" value="@r.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                    <form asp-action="EditarRestricao" method="post" class="mt-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ClientId" value="@Model.ClientId" />
+                                        <input type="hidden" name="OldItemId" value="@r.Id" />
+                                        <div class="input-group input-group-sm">
+                                            <select name="NewItemId" class="form-select" required>
+                                                @foreach (var opt in Model.OpcoesRestricoes)
+                                                {
+                                                    <option value="@opt.Value" selected="@(opt.Value == r.Id ? "selected" : null)">@opt.Text</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-save"></i> Atualizar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bullseye"></i> Metas</h5>
+                    <a asp-action="CriarMeta" asp-route-clientId="@Model.ClientId" class="btn btn-light btn-sm">
+                        <i class="bi bi-plus-lg"></i> Nova meta
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (Model.Metas.Count == 0)
+                    {
+                        <div class="text-muted">Sem metas registadas.</div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Calorias</th>
+                                        <th>Proteína</th>
+                                        <th>Gordura</th>
+                                        <th>Hidratos</th>
+                                        <th>Vitaminas</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in Model.Metas)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold">@m.MetaDescription</td>
+                                            <td>@m.DailyCalories</td>
+                                            <td>@m.DailyProtein</td>
+                                            <td>@m.DailyFat</td>
+                                            <td>@m.DailyHydrates</td>
+                                            <td>@m.DailyVitamins</td>
+                                            <td class="text-end">
+                                                <a asp-action="EditarMeta" asp-route-id="@m.MetaId" class="btn btn-sm btn-outline-warning">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a asp-action="ApagarMeta" asp-route-id="@m.MetaId" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
