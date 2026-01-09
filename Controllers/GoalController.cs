@@ -187,7 +187,6 @@ namespace HealthWellbeing.Controllers
             ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
             return View(goal);
         }
-
         // =====================================================
         // EDIT
         // =====================================================
@@ -198,7 +197,19 @@ namespace HealthWellbeing.Controllers
             var goal = await _context.Goal.FindAsync(id);
             if (goal == null) return NotFound();
 
+            // Dropdown de clientes
             ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+
+            // Dropdown de GoalName
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+            new { Value = "gain", Text = "Gain" },
+            new { Value = "lose", Text = "Lose" },
+            new { Value = "maintain", Text = "Maintain" }
+                }, "Value", "Text", goal.GoalName
+            );
+
             return View(goal);
         }
 
@@ -213,9 +224,21 @@ namespace HealthWellbeing.Controllers
             {
                 ModelState.AddModelError("", "Client not found.");
                 ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+
+                
+                ViewBag.GoalOptions = new SelectList(
+                    new[]
+                    {
+                 new { Value = "lose", Text = "Weight Loss" },
+                 new { Value = "maintain", Text = "Maintenance" },
+                 new { Value = "gain", Text = "Muscle Gain" }
+                    }, "Value", "Text", goal.GoalName
+                );
+
                 return View(goal);
             }
 
+            // Calcula macros automaticamente
             CalculateAndFillMacros(client, goal);
 
             if (ModelState.IsValid)
@@ -225,10 +248,19 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            
             ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+            new { Value = "gain", Text = "Gain" },
+            new { Value = "lose", Text = "Lose" },
+            new { Value = "maintain", Text = "Maintain" }
+                }, "Value", "Text", goal.GoalName
+            );
+
             return View(goal);
         }
-
         // =====================================================
         // DELETE
         // =====================================================

@@ -6,6 +6,8 @@
 
 <div class="container my-4">
     <div class="fh-wrapper">
+
+        <!-- Header -->
         <div class="fh-header">
             <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                 <div class="d-flex align-items-center gap-2">
@@ -18,6 +20,7 @@
             </div>
         </div>
 
+        <!-- Panel -->
         <div class="fh-panel">
             <div class="fh-card p-3">
                 <form asp-action="Edit" class="fh-form">
@@ -25,49 +28,34 @@
 
                     <input type="hidden" asp-for="GoalId" />
 
+                    <!-- Cliente -->
                     <div class="mb-3">
                         <label asp-for="ClientId" class="form-label">Client</label>
-                        <select asp-for="ClientId" class="form-select" asp-items="ViewBag.ClientId">
+                        <select asp-for="ClientId" class="form-select" asp-items="@(ViewData["ClientId"] as SelectList)">
                             <option value="">— Select —</option>
                         </select>
                         <span asp-validation-for="ClientId" class="text-danger"></span>
                     </div>
 
+                 
                     <div class="mb-3">
-                        <label asp-for="GoalName" class="form-label">Goal name</label>
-                        <input asp-for="GoalName" class="form-control" />
+                        <label asp-for="GoalName" class="form-label">Goal</label>
+                        @Html.DropDownListFor(
+                        model => model.GoalName,
+                          new List<SelectListItem>
+                           {
+                             new SelectListItem { Text = "— Select —", Value = "" },
+                             new SelectListItem { Text = "Weight Loss", Value = "lose" },
+                             new SelectListItem { Text = "Maintenance", Value = "maintain" },
+                             new SelectListItem { Text = "Muscle Gain", Value = "gain" },
+                                                },new { @class = "form-select" })
                         <span asp-validation-for="GoalName" class="text-danger"></span>
                     </div>
 
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <label asp-for="DailyCalories" class="form-label">Daily calories</label>
-                            <input asp-for="DailyCalories" class="form-control" />
-                            <span asp-validation-for="DailyCalories" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="DailyProtein" class="form-label">Daily protein</label>
-                            <input asp-for="DailyProtein" class="form-control" />
-                            <span asp-validation-for="DailyProtein" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="DailyFat" class="form-label">Daily fat</label>
-                            <input asp-for="DailyFat" class="form-control" />
-                            <span asp-validation-for="DailyFat" class="text-danger"></span>
-                        </div>
 
-                        <div class="col-md-6">
-                            <label asp-for="DailyHydrates" class="form-label">Daily hydrates</label>
-                            <input asp-for="DailyHydrates" class="form-control" />
-                            <span asp-validation-for="DailyHydrates" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="DailyVitamins" class="form-label">Daily vitamins</label>
-                            <input asp-for="DailyVitamins" class="form-control" />
-                            <span asp-validation-for="DailyVitamins" class="text-danger"></span>
-                        </div>
-                    </div>
+                   
 
+                    <!-- Botões -->
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
                         <button type="submit" class="btn fh-btn-primary">
@@ -80,4 +68,8 @@
     </div>
 </div>
 
-@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

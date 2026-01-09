@@ -23,6 +23,7 @@
                 <form asp-action="Create" class="fh-form">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                    <!-- Cliente -->
                     <div class="mb-3">
                         <label asp-for="ClientId" class="form-label">Client</label>
                         <select asp-for="ClientId" class="form-select" asp-items="ViewBag.ClientId">
@@ -31,41 +32,19 @@
                         <span asp-validation-for="ClientId" class="text-danger"></span>
                     </div>
 
+                    <!-- Goal Name (seleção fixa) -->
                     <div class="mb-3">
-                        <label asp-for="GoalName" class="form-label">Goal name</label>
-                        <input asp-for="GoalName" class="form-control" />
+                        <label asp-for="GoalName" class="form-label">Goal</label>
+                        <select asp-for="GoalName" class="form-select">
+                            <option value="">— Select —</option>
+                            <option value="lose">Weight Loss</option>
+                            <option value="maintain">Maintenance</option>
+                            <option value="gain">Muscle Gain</option>
+                        </select>
                         <span asp-validation-for="GoalName" class="text-danger"></span>
                     </div>
 
-                    <div class="row g-2">
-                        <div class="col-md-4">
-                            <label asp-for="DailyCalories" class="form-label">Daily calories</label>
-                            <input asp-for="DailyCalories" class="form-control" />
-                            <span asp-validation-for="DailyCalories" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="DailyProtein" class="form-label">Daily protein</label>
-                            <input asp-for="DailyProtein" class="form-control" />
-                            <span asp-validation-for="DailyProtein" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-4">
-                            <label asp-for="DailyFat" class="form-label">Daily fat</label>
-                            <input asp-for="DailyFat" class="form-control" />
-                            <span asp-validation-for="DailyFat" class="text-danger"></span>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label asp-for="DailyHydrates" class="form-label">Daily hydrates</label>
-                            <input asp-for="DailyHydrates" class="form-control" />
-                            <span asp-validation-for="DailyHydrates" class="text-danger"></span>
-                        </div>
-                        <div class="col-md-6">
-                            <label asp-for="DailyVitamins" class="form-label">Daily vitamins</label>
-                            <input asp-for="DailyVitamins" class="form-control" />
-                            <span asp-validation-for="DailyVitamins" class="text-danger"></span>
-                        </div>
-                    </div>
-
+                    <!-- Botões -->
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
                         <button type="submit" class="btn fh-btn-primary">
@@ -78,4 +57,8 @@
     </div>
 </div>
 
-@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

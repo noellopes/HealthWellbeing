@@ -6,6 +6,7 @@
 
 <div class="container my-4">
     <div class="fh-wrapper">
+        <!-- Header -->
         <div class="fh-header">
             <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                 <div class="d-flex align-items-center gap-2">
@@ -18,17 +19,31 @@
             </div>
         </div>
 
+        <!-- Alert -->
         <div class="fh-panel">
             <div class="alert alert-danger fh-alert">
                 <i class="bi bi-exclamation-triangle me-1"></i>This action cannot be undone.
             </div>
 
+            <!-- Details -->
             <div class="fh-card p-3">
                 <dl class="row mb-3">
+                    <dt class="col-sm-3" style="color: var(--fi-muted);">Client</dt>
+                    <dd class="col-sm-9 fw-bold">@((Model.Client?.Name) ?? $"Client #{Model.ClientId}")</dd>
+
                     <dt class="col-sm-3" style="color: var(--fi-muted);">Goal</dt>
-                    <dd class="col-sm-9 fw-bold">@Model.GoalName</dd>
+                    <dd class="col-sm-9 fw-bold">
+                        @(Model.GoalName switch
+                        {
+                            "lose" => "Weight Loss",
+                            "maintain" => "Maintenance",
+                            "gain" => "Muscle Gain",
+                            _ => Model.GoalName
+                        })
+                    </dd>
                 </dl>
 
+                <!-- Delete Form -->
                 <form asp-action="Delete">
                     <input type="hidden" asp-for="GoalId" />
                     <div class="d-flex justify-content-end gap-2">
