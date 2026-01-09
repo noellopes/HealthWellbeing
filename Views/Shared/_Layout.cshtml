@@ -62,6 +62,10 @@
 
                                     <li><hr class="dropdown-divider"></li>
 
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="RankingManager" asp-action="Index">Global Ranking</a></li>
+
+                                    <li><hr class="dropdown-divider"></li>
+
                                     <li><h6 class="dropdown-header">Rewards</h6></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Badges" asp-action="Index">Badges</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="BadgeTypes" asp-action="Index">Badge Types</a></li>
@@ -75,7 +79,6 @@
                         @if (User.IsInRole("Utente"))
                         {
                             <li class="nav-item dropdown">
-                                @* Alterado de text-primary para text-dark (preto) *@
                                 <a class="nav-link text-dark fw-bold dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-person-workspace me-1"></i> Client Area
                                 </a>
@@ -107,7 +110,6 @@
                                             <i class="bi bi-bar-chart-line me-2 text-muted"></i> My Progress (Level)
                                         </a>
                                     </li>
-                                    @* Alterado de Leaderboard para Ranking *@
                                     <li>
                                         <a class="dropdown-item" asp-area="" asp-controller="Leaderboard" asp-action="Index">
                                             <i class="bi bi-trophy me-2 text-muted"></i> Ranking

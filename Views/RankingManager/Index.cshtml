@@ -1,0 +1,197 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.Customer>
+
+@{
+    ViewData["Title"] = "Global User Ranking";
+    int currentRank = ViewBag.StartRank;
+}
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@* --- EMPTY STATE (Sem dados e sem pesquisa) --- *@
+@if (!Model.Items.Any() && string.IsNullOrEmpty(ViewBag.SearchName))
+{
+    <div class="alert alert-warning d-flex align-items-center border-2 p-3 rounded" role="alert">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+        <div class="ps-3">
+            <h4 class="alert-heading">No Users Found</h4>
+            <p>There are no customers registered or ranked yet.</p>
+        </div>
+    </div>
+}
+else
+{
+    @* --- HEADER & SEARCH TOGGLE --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 text-secondary">Overview</h2>
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-primary shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#rankingSearch" aria-expanded="false" aria-controls="rankingSearch">
+                <i class="bi bi-search me-1"></i> Search
+            </button>
+        </div>
+    </div>
+
+    @* --- SEARCH FORM (Expansível) --- *@
+    <div class="collapse mt-2 mb-4" id="rankingSearch">
+        <div class="card card-body border-0 shadow-sm rounded-4 bg-light">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+
+                @* 1. Name/Email Search *@
+                <div class="col-md-9 col-lg-10">
+                    <label for="searchName" class="form-label fw-bold small text-muted text-uppercase">Customer Name or Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person"></i></span>
+                        <input id="searchName" name="searchName" value="@ViewBag.SearchName" class="form-control border-start-0 ps-0" placeholder="Search by name..." type="search" />
+                    </div>
+                </div>
+
+                @* 2. Buttons *@
+                <div class="col-md-3 col-lg-2">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100 shadow-sm">Apply</button>
+                        <a asp-action="Index" class="btn btn-secondary w-100 shadow-sm text-decoration-none">Clear</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* --- NO RESULTS (Com filtros ativos) --- *@
+    @if (!Model.Items.Any())
+    {
+        <div class="alert alert-info d-flex align-items-center p-3 rounded" role="alert">
+            <i class="bi bi-info-circle-fill" style="font-size: 2rem;"></i>
+            <div class="ps-3">
+                <h5 class="alert-heading">No results found.</h5>
+                <p class="mb-0">Try adjusting your search filters.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        @* --- DATA TABLE --- *@
+        <div class="table-responsive shadow-sm rounded-3 bg-white">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 10%;" class="ps-4">Rank</th>
+                        <th style="width: 30%;">Customer</th>
+                        <th style="width: 25%;">Email</th>
+                        <th style="width: 15%;" class="text-center">Level</th>
+                        <th style="width: 10%;" class="text-center">Badges</th>
+                        <th style="width: 10%;" class="text-end pe-4">Total Points</th>
+                        @* Coluna Actions REMOVIDA *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            @* 1. Rank *@
+                            <td class="ps-4">
+                                <span class="fw-bold text-secondary">#@currentRank</span>
+                            </td>
+
+                            @* 2. Customer Name *@
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center me-2 text-primary fw-bold" style="width: 35px; height: 35px;">
+                                        @(item.Name?.Substring(0, 1).ToUpper() ?? "?")
+                                    </div>
+                                    <span class="fw-bold text-dark">@item.Name</span>
+                                </div>
+                            </td>
+
+                            @* 3. Email *@
+                            <td class="text-muted small">
+                                <i class="bi bi-envelope me-1"></i> @item.Email
+                            </td>
+
+                            @* 4. Level *@
+                            <td class="text-center">
+                                @if (item.Level != null)
+                                {
+                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-1">
+                                        Lvl @item.Level.LevelNumber
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-muted border rounded-pill px-3 py-1">No Level</span>
+                                }
+                            </td>
+
+                            @* 5. Badges *@
+                            <td class="text-center">
+                                <span class="badge bg-warning bg-opacity-10 text-dark border border-warning border-opacity-25 rounded-pill px-3 py-1">
+                                    <i class="bi bi-award-fill text-warning me-1"></i> @item.CustomerBadges.Count()
+                                </span>
+                            </td>
+
+                            @* 6. Points *@
+                            <td class="text-end pe-4">
+                                <span class="fw-bold text-primary fs-5">@item.TotalPoints</span>
+                                <small class="text-muted">pts</small>
+                            </td>
+
+                            @* Coluna Actions (Botões) REMOVIDA *@
+                        </tr>
+                        currentRank++;
+                    }
+                </tbody>
+            </table>
+
+            @* --- PAGINATION FOOTER --- *@
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 border-top">
+                <div class="small text-muted">
+                    Showing @Model.FirstItemOnPage - @Model.LastItemOnPage of @Model.TotalItems
+                </div>
+
+                <nav aria-label="Ranking page">
+                    <ul class="pagination mb-0">
+                        @* First Page *@
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="1"
+                               asp-route-searchName="@ViewBag.SearchName">First</a>
+                        </li>
+
+                        @* Previous Page *@
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage - 1)"
+                               asp-route-searchName="@ViewBag.SearchName"><i class="bi bi-chevron-left"></i></a>
+                        </li>
+
+                        @* Page Numbers *@
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@p"
+                                   asp-route-searchName="@ViewBag.SearchName">@p</a>
+                            </li>
+                        }
+
+                        @* Next Page *@
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(Model.CurrentPage + 1)"
+                               asp-route-searchName="@ViewBag.SearchName"><i class="bi bi-chevron-right"></i></a>
+                        </li>
+
+                        @* Last Page *@
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchName="@ViewBag.SearchName">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    }
+}
