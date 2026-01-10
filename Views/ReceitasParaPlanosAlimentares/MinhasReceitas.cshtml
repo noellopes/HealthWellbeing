@@ -57,7 +57,7 @@
                                 <div class="d-flex flex-wrap gap-2 mt-1">
                                     <span class="badge bg-success">@r.Calorias kcal</span>
                                     <span class="badge bg-secondary">Proteínas: @r.Proteinas g</span>
-                                    <span class="badge bg-secondary">Hidratos: @r.HidratosCarbono g</span>
+                                    <span class="badge bg-secondary">Carboidratos: @r.HidratosCarbono g</span>
                                     <span class="badge bg-secondary">Gorduras: @r.Gorduras g</span>
                                 </div>
                                 <div class="small text-muted mt-2">Porções: <strong>@r.Porcoes</strong></div>
@@ -110,26 +110,20 @@
                                     {
                                         <span class="badge bg-success">@r.CaloriasPorPorcaoFinal kcal</span>
                                         <span class="badge bg-secondary">Proteínas: @r.ProteinasPorPorcaoFinal g</span>
-                                        <span class="badge bg-secondary">Hidratos: @r.HidratosPorPorcaoFinal g</span>
+                                        <span class="badge bg-secondary">Carboidratos: @r.HidratosPorPorcaoFinal g</span>
                                         <span class="badge bg-secondary">Gorduras: @r.GordurasPorPorcaoFinal g</span>
                                     }
                                     else
                                     {
                                         <span class="badge bg-success">@r.CaloriasPorPorcaoOriginal kcal</span>
                                         <span class="badge bg-secondary">Proteínas: @r.ProteinasPorPorcaoOriginal g</span>
-                                        <span class="badge bg-secondary">Hidratos: @r.HidratosPorPorcaoOriginal g</span>
+                                        <span class="badge bg-secondary">Carboidratos: @r.HidratosPorPorcaoOriginal g</span>
                                         <span class="badge bg-secondary">Gorduras: @r.GordurasPorPorcaoOriginal g</span>
                                     }
                                 </div>
 
                                 <div class="small text-muted mt-2">
                                     Porções: <strong>@r.PorcoesOriginal</strong>
-                                    @if (r.TemAjustes && System.Math.Abs(r.MultiplicadorPorcao - 1m) > 0.001m)
-                                    {
-                                        <span class="ms-2 badge bg-info text-dark">
-                                            Porção ajustada: @(multiplicadorPct >= 0 ? "+" : "")@multiplicadorPct.ToString("0")%
-                                        </span>
-                                    }
                                 </div>
                             </div>
 

@@ -214,11 +214,6 @@ namespace HealthWellbeing.Services
                         ? $" para atender à meta: {meta!.MetaDescription}"
                         : " para alinhar com a sua meta diária";
 
-                    notas.Add(new AjusteNota
-                    {
-                        Tipo = AjusteMotivoTipo.Meta,
-                        Mensagem = $"Porção ajustada{metaTxt}." 
-                    });
                 }
 
                 foreach (var comp in receita.Componentes.OrderBy(c => c.ComponenteReceitaId))

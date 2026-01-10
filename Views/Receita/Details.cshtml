@@ -188,14 +188,7 @@
                                         <div class="border rounded p-3 bg-light h-100">
                                             <div class="text-muted small">Porções</div>
                                             <div class="fs-5 fw-semibold">@adaptada.PorcoesOriginal</div>
-                                            @if (System.Math.Abs(adaptada.MultiplicadorPorcao - 1m) > 0.001m)
-                                            {
-                                                var multiplicadorPct = (adaptada.MultiplicadorPorcao - 1m) * 100m;
-                                                <div class="small">
-                                                    <span class="badge bg-info text-dark">Porção ajustada: @(multiplicadorPct >= 0 ?
-                                                                                                    "+" : "")@multiplicadorPct.ToString("0")%</span>
-                                                </div>
-                                            }
+
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-6">
@@ -205,7 +198,7 @@
                                                 <span class="badge bg-success">@adaptada.CaloriasPorPorcaoFinal kcal</span>
                                                 <span class="badge bg-secondary">Proteínas: @adaptada.ProteinasPorPorcaoFinal
                                                     g</span>
-                                                <span class="badge bg-secondary">Hidratos: @adaptada.HidratosPorPorcaoFinal
+                                                <span class="badge bg-secondary">Carboidratos: @adaptada.HidratosPorPorcaoFinal
                                                     g</span>
                                                 <span class="badge bg-secondary">Gorduras: @adaptada.GordurasPorPorcaoFinal
                                                     g</span>
