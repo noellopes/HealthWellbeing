@@ -1,0 +1,93 @@
+@model HealthWellbeing.Models.ProgressRecord
+
+@{
+    ViewData["Title"] = "Editar Registo";
+}
+
+<h1>Editar Registo de Progresso</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="ProgressRecordId" />
+            <input type="hidden" asp-for="NutritionistId" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="CreatedBy" />
+
+            <div class="form-group mb-3">
+                <label asp-for="ClientId" class="control-label">Cliente</label>
+                <select asp-for="ClientId" class="form-control" asp-items="ViewBag.ClientId">
+                </select>
+                <span asp-validation-for="ClientId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="RecordDate" class="control-label"></label>
+                <input asp-for="RecordDate" class="form-control" type="date" />
+                <span asp-validation-for="RecordDate" class="text-danger"></span>
+            </div>
+
+            <hr />
+            <h5>Métricas de Saúde</h5>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="Weight" class="control-label"></label>
+                        <input asp-for="Weight" class="form-control" />
+                        <span asp-validation-for="Weight" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="BodyFatPercentage" class="control-label"></label>
+                        <input asp-for="BodyFatPercentage" class="form-control" />
+                        <span asp-validation-for="BodyFatPercentage" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="Cholesterol" class="control-label"></label>
+                        <input asp-for="Cholesterol" class="form-control" />
+                        <span asp-validation-for="Cholesterol" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="BMI" class="control-label"></label>
+                        <input asp-for="BMI" class="form-control" />
+                        <span asp-validation-for="BMI" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label asp-for="MuscleMass" class="control-label"></label>
+                        <input asp-for="MuscleMass" class="form-control" />
+                        <span asp-validation-for="MuscleMass" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+            <div class="form-group mb-3">
+                <label asp-for="Notes" class="control-label"></label>
+                <textarea asp-for="Notes" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

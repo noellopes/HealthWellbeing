@@ -87,6 +87,21 @@ else
                         }
 
                     }
+                    <div class="col-md-4">
+                        <a href="@Url.Action("Index", "RegistroProgresso")"
+                            class="btn btn-outline-secondary w-100 p-4 shadow-sm rounded-3">
+                            <h4>Registos de Progresso</h4>
+                            <p>Acompanhar evolução de saúde dos clientes</p>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <a href="@Url.Action("Index", "MetaCorporal")"
+                            class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                            <h4>Metas Corporais</h4>
+                            <p>@(User.IsInRole("Cliente") ? "Ver as minhas metas de saúde" : "Gerir objetivos corporais dos clientes")</p>
+                        </a>
+                    </div>
 
                 </div>
             </div>
