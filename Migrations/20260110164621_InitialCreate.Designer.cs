@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260106145026_InitialCreate")]
+    [Migration("20260110164621_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -1102,7 +1102,7 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Fornecedor_Consumivel", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Consumivel", "Consumivel")
-                        .WithMany()
+                        .WithMany("FornecedoresConsumiveis")
                         .HasForeignKey("ConsumivelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1330,6 +1330,11 @@ namespace HealthWellbeingRoom.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Alimento", b =>
                 {
                     b.Navigation("AlergiasRelacionadas");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
+                {
+                    b.Navigation("FornecedoresConsumiveis");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Room", b =>
