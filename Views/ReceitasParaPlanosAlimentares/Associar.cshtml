@@ -8,7 +8,8 @@
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
         <div>
             <h1 class="h3 mb-1">Associar Receitas ao Plano Alimentar</h1>
-            <p class="text-muted mb-0">Selecione um cliente e marque as receitas que devem ficar associadas ao plano.</p>
+            <p class="text-muted mb-0">Selecione um cliente e marque as receitas que devem ficar associadas ao plano.
+            </p>
         </div>
         <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Voltar
@@ -37,7 +38,8 @@
                             <option value="">-- Selecione --</option>
                             @foreach (var c in Model.Clientes)
                             {
-                                <option value="@c.ClientId" selected="@(Model.ClientId == c.ClientId ? "selected" : null)">@c.Display</option>
+                                <option value="@c.ClientId" selected="@(Model.ClientId == c.ClientId ? "selected" : null)">
+                                    @c.Display</option>
                             }
                         </select>
                         <div class="d-grid mt-3">
@@ -87,7 +89,62 @@
                                 Marque/desmarque receitas e clique em <strong>Guardar</strong>.
                             </p>
 
-                            <div style="max-height: 420px; overflow-y: auto; border: 1px solid #ddd; padding: 12px; border-radius: 6px;">
+                            <style>
+                                /* container do scroll */
+                                .receitas-scroll {
+                                    max-height: 420px;
+                                    overflow-y: auto;
+                                    border: 1px solid #ddd;
+                                    border-radius: 8px;
+                                    padding: 0;
+                                    /* importante: o list-group já tem espaçamento */
+                                    background: #fff;
+                                }
+
+                                /* item clicável/alinhado */
+                                .receita-item {
+                                    display: flex;
+                                    align-items: flex-start;
+                                    gap: .75rem;
+                                    padding: .75rem 1rem;
+                                    border-bottom: 1px solid #eee;
+                                }
+
+                                .receita-item:last-child {
+                                    border-bottom: 0;
+                                }
+
+                                .receita-item:hover {
+                                    background: #f8f9fa;
+                                }
+
+                                .receita-item.is-selected {
+                                    background: #f4fff7;
+                                    outline: 1px solid rgba(25, 135, 84, .35);
+                                    outline-offset: -1px;
+                                }
+
+                                /* checkbox sempre alinhado */
+                                .receita-item .form-check-input {
+                                    margin-top: .25rem;
+                                    flex: 0 0 auto;
+                                }
+
+                                /* texto + badge sem quebrar layout */
+                                .receita-item .receita-content {
+                                    flex: 1 1 auto;
+                                    min-width: 0;
+                                }
+
+                                .receita-item .receita-title {
+                                    font-weight: 600;
+                                    display: block;
+                                    line-height: 1.2;
+                                    word-break: break-word;
+                                }
+                            </style>
+
+                            <div class="receitas-scroll">
                                 @{
                                     var selected = (Model.ReceitaIdsSelecionadas ?? new List<int>()).ToHashSet();
                                 }
@@ -95,25 +152,27 @@
                                 @foreach (var r in Model.Receitas)
                                 {
                                     var isChecked = selected.Contains(r.ReceitaId);
-                                    <div class="form-check mb-2 p-2 @(isChecked ? "bg-light border border-success rounded" : "")">
-                                        <input class="form-check-input" type="checkbox"
-                                               name="ReceitaIdsSelecionadas"
-                                               value="@r.ReceitaId"
-                                               id="rec_@r.ReceitaId"
-                                               @(isChecked ? "checked" : "") />
-                                        <label class="form-check-label w-100" for="rec_@r.ReceitaId">
-                                            <strong>@r.Display</strong>
+
+                                    <label class="receita-item @(isChecked ? "is-selected" : "")" for="rec_@r.ReceitaId">
+                                        <input class="form-check-input" type="checkbox" name="ReceitaIdsSelecionadas"
+                                            value="@r.ReceitaId" id="rec_@r.ReceitaId" @(isChecked ? "checked" : "") />
+
+                                        <div class="receita-content">
+                                            <span class="receita-title">@r.Display</span>
+
                                             @if (isChecked)
                                             {
-                                                <span class="badge bg-success float-end">Selecionada</span>
+                                                <span class="badge bg-success mt-2">Selecionada</span>
                                             }
-                                        </label>
-                                    </div>
+                                        </div>
+                                    </label>
                                 }
                             </div>
 
+
                             <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                                <a asp-action="Associar" asp-route-clientId="@Model.ClientId" class="btn btn-outline-secondary">
+                                <a asp-action="Associar" asp-route-clientId="@Model.ClientId"
+                                    class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-repeat"></i> Recarregar
                                 </a>
                                 <button type="submit" class="btn btn-success btn-lg">
