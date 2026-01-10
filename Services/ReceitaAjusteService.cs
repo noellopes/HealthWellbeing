@@ -206,6 +206,7 @@ namespace HealthWellbeing.Services
             {
                 var notas = new List<AjusteNota>();
                 var ingredientes = new List<IngredienteAjustado>();
+                var substitutosJaUsadosNaReceita = new HashSet<int>();
 
                 if (Math.Abs(multiplicadorPorcao - 1m) > 0.001m)
                 {
@@ -257,12 +258,15 @@ namespace HealthWellbeing.Services
                     var escolhido = EscolherMelhorSubstituto(
                         substitutosPorOriginal,
                         comp.AlimentoId,
-                        IsConflitante);
+                        IsConflitante,
+                        substitutosJaUsadosNaReceita);
 
                     if (escolhido != null)
                     {
                         var subsId = escolhido.AlimentoSubstitutoRefId;
                         var subsNome = escolhido.AlimentoSubstitutoRef?.Name ?? $"Alimento #{subsId}";
+
+                        substitutosJaUsadosNaReceita.Add(subsId);
 
                         var proporcao = escolhido.ProporcaoEquivalente ?? 1m;
                         var quantidadeFinal = AjustarQuantidade((decimal)comp.Quantidade * proporcao, multiplicadorPorcao);
@@ -347,7 +351,8 @@ namespace HealthWellbeing.Services
         private static AlimentoSubstituto? EscolherMelhorSubstituto(
             Dictionary<int, List<AlimentoSubstituto>> substitutosPorOriginal,
             int alimentoOriginalId,
-            Func<int, bool> isConflitante)
+            Func<int, bool> isConflitante,
+            IReadOnlySet<int> substitutosJaUsadosNaReceita)
         {
             if (!substitutosPorOriginal.TryGetValue(alimentoOriginalId, out var lista) || lista.Count == 0)
                 return null;
@@ -355,6 +360,7 @@ namespace HealthWellbeing.Services
             return lista
                 .Where(s => s.AlimentoSubstitutoRefId != alimentoOriginalId)
                 .Where(s => !isConflitante(s.AlimentoSubstitutoRefId))
+                .Where(s => !substitutosJaUsadosNaReceita.Contains(s.AlimentoSubstitutoRefId))
                 .OrderByDescending(s => s.FatorSimilaridade ?? 0d)
                 .ThenByDescending(s => s.ProporcaoEquivalente ?? 1m)
                 .FirstOrDefault();
