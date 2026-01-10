@@ -8,6 +8,6 @@ namespace HealthWellbeing.Models
         [Key]
         public int PortionId { get; set; }
         public string PortionName { get; set; } = string.Empty;
-        public ICollection<FoodPlan>? FoodPlans { get; set; }
+        public ICollection<PlanFood>? FoodPlans { get; set; }
     }
 }

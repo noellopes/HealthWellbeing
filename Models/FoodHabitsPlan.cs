@@ -26,7 +26,7 @@ namespace HealthWellbeing.Models
         public Goal? Goal { get; set; }
 
         public ICollection<NutritionistClientPlan>? NutritionistClientPlans { get; set; }
-        public ICollection<FoodPlan>? FoodPlans { get; set; }
+        public ICollection<PlanFood>? PlanFoods { get; set; }
 
         [NotMapped]
         public string StatusText

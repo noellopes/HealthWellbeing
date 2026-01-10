@@ -349,7 +349,7 @@ namespace HealthWellbeing.Controllers
             _context.FoodHabitsPlan.Add(plan);
             await _context.SaveChangesAsync();
 
-            _context.FoodPlan.AddRange(selectedFoods.Select(f => new FoodPlan
+            _context.FoodPlan.AddRange(selectedFoods.Select(f => new PlanFood
             {
                 PlanId = plan.FoodHabitsPlanId,
                 FoodId = f.FoodId,
@@ -373,7 +373,7 @@ namespace HealthWellbeing.Controllers
             if (id == null) return NotFound();
 
             var plan = await _context.FoodHabitsPlan
-                .Include(p => p.FoodPlans)
+                .Include(p => p.PlanFoods)
                 .FirstOrDefaultAsync(p => p.FoodHabitsPlanId == id);
 
             if (plan == null) return NotFound();
@@ -389,7 +389,7 @@ namespace HealthWellbeing.Controllers
 
             await LoadFormListsAsync(vm.ClientId);
 
-            var selectedFoods = plan.FoodPlans?.Select(fp => new FoodHabitsPlanFormVM.FoodLineVM
+            var selectedFoods = plan.PlanFoods?.Select(fp => new FoodHabitsPlanFormVM.FoodLineVM
             {
                 Selected = true,
                 FoodId = fp.FoodId,
@@ -430,7 +430,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var plan = await _context.FoodHabitsPlan
-                .Include(p => p.FoodPlans)
+                .Include(p => p.PlanFoods)
                 .FirstOrDefaultAsync(p => p.FoodHabitsPlanId == id);
 
             if (plan == null) return NotFound();
@@ -440,10 +440,10 @@ namespace HealthWellbeing.Controllers
             plan.StartingDate = vm.StartingDate.Date;
             plan.EndingDate = vm.EndingDate.Date;
 
-            if (plan.FoodPlans != null && plan.FoodPlans.Count > 0)
-                _context.FoodPlan.RemoveRange(plan.FoodPlans);
+            if (plan.PlanFoods != null && plan.PlanFoods.Count > 0)
+                _context.FoodPlan.RemoveRange(plan.PlanFoods);
 
-            _context.FoodPlan.AddRange(selectedFoods.Select(f => new FoodPlan
+            _context.FoodPlan.AddRange(selectedFoods.Select(f => new PlanFood
             {
                 PlanId = plan.FoodHabitsPlanId,
                 FoodId = f.FoodId,
