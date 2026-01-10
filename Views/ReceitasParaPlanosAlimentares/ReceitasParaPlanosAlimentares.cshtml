@@ -28,7 +28,7 @@ else
                         </div>
 
                         <div class="col-md-4">
-                            <a href="@Url.Action("Calculate", "Nutrition", new { id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value })"
+                            <a href="@Url.Action("Calculate", "Nutrition")"
                                class="btn btn-outline-info w-100 p-4 shadow-sm rounded-3">
                                 <h4>Minhas Necessidades Nutricionais</h4>
                                 <p>Ver calorias e macronutrientes recomendados</p>
@@ -36,7 +36,7 @@ else
                         </div>
 
                         <div class="col-md-4">
-                            <a href="@Url.Action("CompareWithGoal", "Nutrition", new { id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value })"
+                            <a href="@Url.Action("CompareWithGoal", "Nutrition")"
                                class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
                                 <h4>Comparar com Minha Meta</h4>
                                 <p>Ver o quanto estou próximo dos meus objetivos</p>

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
@@ -24,10 +26,34 @@ namespace HealthWellbeing.Controllers
             return View(clients);
         }
 
-        // GET: Nutrition/Calculate/ClientId-String
-        public IActionResult Calculate(string id)
+        // GET: Nutrition/Calculate/ClientId-String (optional)
+        [Authorize]
+        public async Task<IActionResult> Calculate(string? id)
         {
-            var client = _context.Client.Find(id);
+            Client? client = null;
+
+            // If no ID is provided, get the current user's client record
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Forbid();
+                }
+                client = await _context.Client.FirstOrDefaultAsync(c => c.IdentityUserId == userId);
+            }
+            else
+            {
+                // Try to find by ClientId first
+                client = await _context.Client.FindAsync(id);
+                
+                // If not found, try to find by IdentityUserId
+                if (client == null)
+                {
+                    client = await _context.Client.FirstOrDefaultAsync(c => c.IdentityUserId == id);
+                }
+            }
+
             if (client == null)
             {
                 return NotFound();
@@ -37,10 +63,34 @@ namespace HealthWellbeing.Controllers
             return View(needs);
         }
 
-        // GET: Nutrition/CompareWithGoal/ClientId-String
-        public IActionResult CompareWithGoal(string id)
+        // GET: Nutrition/CompareWithGoal/ClientId-String (optional)
+        [Authorize]
+        public async Task<IActionResult> CompareWithGoal(string? id)
         {
-            var client = _context.Client.Find(id);
+            Client? client = null;
+
+            // If no ID is provided, get the current user's client record
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Forbid();
+                }
+                client = await _context.Client.FirstOrDefaultAsync(c => c.IdentityUserId == userId);
+            }
+            else
+            {
+                // Try to find by ClientId first
+                client = await _context.Client.FindAsync(id);
+                
+                // If not found, try to find by IdentityUserId
+                if (client == null)
+                {
+                    client = await _context.Client.FirstOrDefaultAsync(c => c.IdentityUserId == id);
+                }
+            }
+
             if (client == null)
             {
                 return NotFound();
@@ -48,7 +98,7 @@ namespace HealthWellbeing.Controllers
 
             // Buscar meta do cliente
             var meta = _context.Meta
-                .FirstOrDefault(m => m.ClientId == id);
+                .FirstOrDefault(m => m.ClientId == client.ClientId);
 
             if (meta == null)
             {
