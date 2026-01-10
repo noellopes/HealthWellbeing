@@ -36,55 +36,17 @@
                            placeholder="Digite o email..." value="@Model.SearchEmail" />
                 </div>
 
-                <!-- Género -->
-                <div class="col-md-3">
-                    <label for="searchGender" class="form-label">Género</label>
-                    <select class="form-select" id="searchGender" name="searchGender">
-                        <option value="">-- Selecione --</option>
-                        <option value="M" @(Model.SearchGender == "M" ? "selected" : "")>Masculino</option>
-                        <option value="F" @(Model.SearchGender == "F" ? "selected" : "")>Feminino</option>
-                        <option value="Masculino" @(Model.SearchGender == "Masculino" ? "selected" : "")>Masculino (PT)</option>
-                        <option value="Feminino" @(Model.SearchGender == "Feminino" ? "selected" : "")>Feminino (PT)</option>
-                    </select>
-                </div>
+                
 
                 <!-- Tamanho da Página -->
                 <div class="col-md-3">
                     <label for="pageSize" class="form-label">Itens por página</label>
                     <select class="form-select" id="pageSize" name="pageSize">
-                        <option value="5" @(Model.PageSize == 5 ? "selected" : "")>5</option>
-                        <option value="10" @(Model.PageSize == 10 ? "selected" : "")>10</option>
-                        <option value="20" @(Model.PageSize == 20 ? "selected" : "")>20</option>
-                        <option value="50" @(Model.PageSize == 50 ? "selected" : "")>50</option>
+                        <option value="5" selected="@(Model.PageSize == 5)">5</option>
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                        <option value="50" selected="@(Model.PageSize == 50)">50</option>
                     </select>
-                </div>
-
-                <!-- Data de Nascimento - De -->
-                <div class="col-md-3">
-                    <label for="searchBirthDateFrom" class="form-label">Data Nascimento (De)</label>
-                    <input type="date" class="form-control" id="searchBirthDateFrom" name="searchBirthDateFrom" 
-                           value="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")" />
-                </div>
-
-                <!-- Data de Nascimento - Até -->
-                <div class="col-md-3">
-                    <label for="searchBirthDateTo" class="form-label">Data Nascimento (Até)</label>
-                    <input type="date" class="form-control" id="searchBirthDateTo" name="searchBirthDateTo" 
-                           value="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")" />
-                </div>
-
-                <!-- Data de Registo - De -->
-                <div class="col-md-3">
-                    <label for="searchRegistrationDateFrom" class="form-label">Data Registo (De)</label>
-                    <input type="date" class="form-control" id="searchRegistrationDateFrom" name="searchRegistrationDateFrom" 
-                           value="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")" />
-                </div>
-
-                <!-- Data de Registo - Até -->
-                <div class="col-md-3">
-                    <label for="searchRegistrationDateTo" class="form-label">Data Registo (Até)</label>
-                    <input type="date" class="form-control" id="searchRegistrationDateTo" name="searchRegistrationDateTo" 
-                           value="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")" />
                 </div>
 
                 <!-- Botões -->
@@ -216,7 +178,7 @@
                         {
                             <li class="page-item active" aria-current="page">
                                 <span class="page-link">
-                                    @page <span class="visually-hidden">(página atual)</span>
+                                    @(page) <span class="visually-hidden">(página atual)</span>
                                 </span>
                             </li>
                         }
@@ -225,7 +187,7 @@
                             <li class="page-item">
                                 <a class="page-link" 
                                    asp-action="ListAll"
-                                   asp-route-page="@page"
+                                   asp-route-page="@(page)"
                                    asp-route-pageSize="@Model.PageSize"
                                    asp-route-searchName="@Model.SearchName"
                                    asp-route-searchEmail="@Model.SearchEmail"
@@ -234,7 +196,7 @@
                                    asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
                                    asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
                                    asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
-                                    @page
+                                    @(page)
                                 </a>
                             </li>
                         }
