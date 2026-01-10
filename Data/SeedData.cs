@@ -52,6 +52,11 @@ internal class SeedData
         Initialize(dbContext);
     }
 
+    internal static void SeedProgressRecords(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        SeedDataProgressRecord.Populate(dbContext, userManager);
+    }
+
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
     {
         EnsureRoleIsCreatedAsync(roleManager, "Administrator").Wait();
