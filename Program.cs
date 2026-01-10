@@ -67,6 +67,9 @@ else
         SeedDataExercicio.Populate(context);
         SeedDataTipoExercicio.Populate(context);
         SeedDataProblemaSaude.Populate(context);
+        
+        // Seed ProgressRecord after users and clients are created
+        SeedData.SeedProgressRecords(userManager, context);
     }
 }
 

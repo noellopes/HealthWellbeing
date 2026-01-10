@@ -53,6 +53,8 @@ namespace HealthWellbeing.Data
 
 
 
+        public DbSet<ProgressRecord> ProgressRecord { get; set; } = default!;
+        public DbSet<MetaCorporal> MetaCorporal { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -187,6 +189,25 @@ namespace HealthWellbeing.Data
                         j.ToTable("ReceitasParaPlanosAlimentares");
                     });
 
+            // ProgressRecord relationships
+            modelBuilder.Entity<ProgressRecord>()
+                .HasOne(p => p.Client)
+                .WithMany()
+                .HasForeignKey(p => p.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProgressRecord>()
+                .HasOne(p => p.Nutritionist)
+                .WithMany()
+                .HasForeignKey(p => p.NutritionistId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // MetaCorporal relationships
+            modelBuilder.Entity<MetaCorporal>()
+                .HasOne(m => m.Client)
+                .WithMany()
+                .HasForeignKey(m => m.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

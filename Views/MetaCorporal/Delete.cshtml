@@ -1,0 +1,68 @@
+@model HealthWellbeing.Models.MetaCorporal
+
+@{
+    ViewData["Title"] = "Eliminar Meta Corporal";
+}
+
+<h1>Eliminar Meta Corporal</h1>
+
+<div class="alert alert-warning">
+    <h4>Tem a certeza que deseja eliminar esta meta?</h4>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4>@Model.Client?.Name</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-4">Peso Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.PesoObjetivo?.ToString("F1") ?? "-") kg</dd>
+
+            <dt class="col-sm-4">Gordura Corporal Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.GorduraCorporalObjetivo?.ToString("F1") ?? "-") %</dd>
+
+            <dt class="col-sm-4">IMC Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.IMCObjetivo?.ToString("F1") ?? "-")</dd>
+
+            <dt class="col-sm-4">Colesterol Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.ColesterolObjetivo?.ToString("F0") ?? "-") mg/dL</dd>
+
+            <dt class="col-sm-4">Massa Muscular Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.MassaMuscularObjetivo?.ToString("F1") ?? "-") kg</dd>
+
+            <dt class="col-sm-4">Data de Início:</dt>
+            <dd class="col-sm-8">@Model.DataInicio.ToShortDateString()</dd>
+
+            <dt class="col-sm-4">Data Objetivo:</dt>
+            <dd class="col-sm-8">@(Model.DataObjetivo?.ToShortDateString() ?? "-")</dd>
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8">
+                @if (Model.Ativo)
+                {
+                    <span class="badge bg-success">Ativa</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inativa</span>
+                }
+            </dd>
+        </dl>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Notas))
+        {
+            <hr />
+            <div>
+                <strong>Notas:</strong>
+                <p class="border rounded p-2 bg-light">@Model.Notas</p>
+            </div>
+        }
+    </div>
+</div>
+
+<form asp-action="Delete" class="mt-3">
+    <input type="hidden" asp-for="MetaCorporalId" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>

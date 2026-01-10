@@ -1,0 +1,65 @@
+@model HealthWellbeing.Models.ProgressRecord
+
+@{
+    ViewData["Title"] = "Detalhes do Registo";
+}
+
+<h1>Detalhes do Registo de Progresso</h1>
+
+<div class="card">
+    <div class="card-header">
+        <h4>@Model.Client?.Name - @Model.RecordDate.ToShortDateString()</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Métricas de Saúde</h5>
+                <dl class="row">
+                    <dt class="col-sm-5">Peso</dt>
+                    <dd class="col-sm-7">@(Model.Weight?.ToString("F1") ?? "-") kg</dd>
+
+                    <dt class="col-sm-5">Gordura Corporal</dt>
+                    <dd class="col-sm-7">@(Model.BodyFatPercentage?.ToString("F1") ?? "-") %</dd>
+
+                    <dt class="col-sm-5">Colesterol</dt>
+                    <dd class="col-sm-7">@(Model.Cholesterol?.ToString("F0") ?? "-") mg/dL</dd>
+
+                    <dt class="col-sm-5">IMC</dt>
+                    <dd class="col-sm-7">@(Model.BMI?.ToString("F1") ?? "-")</dd>
+
+                    <dt class="col-sm-5">Massa Muscular</dt>
+                    <dd class="col-sm-7">@(Model.MuscleMass?.ToString("F1") ?? "-") kg</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h5>Informações do Registo</h5>
+                <dl class="row">
+                    <dt class="col-sm-5">Data do Registo</dt>
+                    <dd class="col-sm-7">@Model.RecordDate.ToShortDateString()</dd>
+
+                    <dt class="col-sm-5">Nutricionista</dt>
+                    <dd class="col-sm-7">@Model.Nutritionist?.Email</dd>
+
+                    <dt class="col-sm-5">Criado em</dt>
+                    <dd class="col-sm-7">@Model.CreatedAt.ToString("g")</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Notes))
+        {
+            <hr />
+            <h5>Notas</h5>
+            <p>@Model.Notes</p>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="History" asp-route-id="@Model.ClientId" class="btn btn-secondary">Ver Histórico</a>
+    @if (User.IsInRole("Nutricionista"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.ProgressRecordId" class="btn btn-warning">Editar</a>
+    }
+    <a asp-action="Index" class="btn btn-outline-secondary">Voltar</a>
+</div>

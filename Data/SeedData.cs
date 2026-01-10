@@ -46,7 +46,15 @@ internal class SeedData
         PopulateEvents(dbContext);
         PopulateLevels(dbContext);
 
+        // Seed MetaCorporal (body goals)
+        SeedDataMetaCorporal.Populate(dbContext);
+
         Initialize(dbContext);
+    }
+
+    internal static void SeedProgressRecords(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
+    {
+        SeedDataProgressRecord.Populate(dbContext, userManager);
     }
 
     internal static void SeedRoles(RoleManager<IdentityRole> roleManager)
@@ -68,13 +76,6 @@ internal class SeedData
     {
         EnsureUserIsCreatedAsync(userManager, "cliente@health.com", "Secret123$", new[] { "Cliente" }, dbContext).Wait();
         EnsureUserIsCreatedAsync(userManager, "nutri@health.com", "Secret123$", new[] { "Nutricionista" }, dbContext).Wait();
-
-        // In case a new Client profile was created here, ensure the dependent food-plan seed data exists too.
-        PopulateMetas(dbContext);
-        PopulatePlanosAlimentares(dbContext);
-        PopulateClientAlergias(dbContext);
-        PopulateClientRestricoes(dbContext);
-        PopulateReceitasParaPlanosAlimentares(dbContext);
     }
 
     internal static void SeedPopulateClientsAsUsers(UserManager<IdentityUser> userManager, HealthWellbeingDbContext dbContext)
