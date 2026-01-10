@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class GoalController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -19,9 +21,30 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // =====================================================
-        // Calcular idade
-        // =====================================================
+        private bool IsNutritionist()
+            => User.IsInRole("Nutricionista") || User.IsInRole("Nutritionist");
+
+        private bool IsAdmin()
+            => User.IsInRole("Administrador") || User.IsInRole("Administrator");
+
+        private bool IsClient()
+            => User.IsInRole("Cliente") || User.IsInRole("Client");
+
+        private IActionResult NoDataPermission()
+            => View("~/Views/Shared/NoDataPermission.cshtml");
+
+        private async Task<int?> GetCurrentClientIdAsync()
+        {
+            var email = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email)) return null;
+
+            return await _context.Client
+                .AsNoTracking()
+                .Where(c => c.Email == email)
+                .Select(c => (int?)c.ClientId)
+                .FirstOrDefaultAsync();
+        }
+
         private int CalculateAge(DateTime? birthDate)
         {
             if (birthDate == null) return 0;
@@ -35,28 +58,19 @@ namespace HealthWellbeing.Controllers
             return age;
         }
 
-        // =====================================================
-        //  CÁLCULOS NUTRICIONAIS
-        // =====================================================
         private double CalculateBMR(Client c)
         {
-            var sex = (c.Gender ?? "m").ToLower();
+            var sex = (c.Gender ?? "m").ToLowerInvariant();
             int age = CalculateAge(c.BirthDate);
 
             if (sex.StartsWith("m"))
-            {
                 return 10 * c.WeightKg + 6.25 * c.HeightCm - 5 * age + 5;
-            }
-            else
-            {
-                return 10 * c.WeightKg + 6.25 * c.HeightCm - 5 * age - 161;
-            }
+
+            return 10 * c.WeightKg + 6.25 * c.HeightCm - 5 * age - 161;
         }
 
         private double CalculateMaintenanceCalories(Client c)
-        {
-            return CalculateBMR(c) * c.ActivityFactor;
-        }
+            => CalculateBMR(c) * c.ActivityFactor;
 
         private double CalculateGoalCalories(Client c, string goalName)
         {
@@ -66,21 +80,19 @@ namespace HealthWellbeing.Controllers
             {
                 "gain" => maintenance + 500,
                 "lose" => maintenance - 500,
-                _ => maintenance // maintain
+                _ => maintenance
             };
         }
 
         private void CalculateAndFillMacros(Client client, Goal goal)
         {
-            goal.DailyCalories = (int)Math.Round(
-                CalculateGoalCalories(client, goal.GoalName)
-            );
+            goal.DailyCalories = (int)Math.Round(CalculateGoalCalories(client, goal.GoalName));
 
             double proteinFactor = goal.GoalName switch
             {
                 "gain" => 1.6,
                 "lose" => 1.8,
-                _ => 1.2 // maintain
+                _ => 1.2
             };
 
             double proteinGrams = client.WeightKg * proteinFactor;
@@ -97,120 +109,174 @@ namespace HealthWellbeing.Controllers
             goal.DailyHydrates = (int)Math.Round(carbsKcal / 4);
         }
 
-        // =====================================================
-        //  INDEX (PaginationInfo + search)
-        // =====================================================
-        public async Task<IActionResult> Index(int page = 1, string? search = "")
+        // LISTA: Nutricionista vê tudo; Cliente vê só os dele; Admin NÃO pode ver
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist,Cliente,Client")]
+        public async Task<IActionResult> Index(int page = 1, int itemsPerPage = 10, string? search = "")
         {
-            const int pageSize = 10;
+            if (IsAdmin()) return NoDataPermission();
 
             if (page < 1) page = 1;
+            if (itemsPerPage < 1) itemsPerPage = 10;
 
             var query = _context.Goal
+                .AsNoTracking()
                 .Include(g => g.Client)
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(search))
+            if (IsClient())
             {
-                search = search.Trim().ToLower();
+                var myId = await GetCurrentClientIdAsync();
+                if (myId == null) return NoDataPermission();
+                query = query.Where(g => g.ClientId == myId.Value);
+            }
+
+            var s = (search ?? "").Trim();
+            if (!string.IsNullOrWhiteSpace(s))
+            {
+                var sl = s.ToLowerInvariant();
                 query = query.Where(g =>
-                    g.GoalName.ToLower().Contains(search) ||
-                    (g.Client != null && g.Client.Name.ToLower().Contains(search))
+                    (g.GoalName != null && g.GoalName.ToLower().Contains(sl)) ||
+                    (g.Client != null && g.Client.Name != null && g.Client.Name.ToLower().Contains(sl))
                 );
             }
 
-            ViewBag.Search = search ?? "";
-
             int totalItems = await query.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-            if (totalPages < 1) totalPages = 1;
-
-            if (page > totalPages) page = totalPages;
 
             var items = await query
-                .OrderBy(g => g.Client!.Name)
+                .OrderBy(g => g.Client != null ? g.Client.Name : "")
                 .ThenBy(g => g.GoalName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((page - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfoFoodHabits<Goal>(items, totalItems, page, pageSize);
+            ViewBag.Search = s;
 
-            return View(model);
+            return View(new PaginationInfoFoodHabits<Goal>(items, totalItems, page, itemsPerPage));
         }
 
-        // =====================================================
-        // DETAILS
-        // =====================================================
+        // DETAILS: Nutricionista vê; Cliente só vê o dele; Admin NÃO pode ver
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist,Cliente,Client")]
         public async Task<IActionResult> Details(int? id)
         {
+            if (IsAdmin()) return NoDataPermission();
             if (id == null) return NotFound();
 
             var goal = await _context.Goal
+                .AsNoTracking()
                 .Include(g => g.Client)
-                .FirstOrDefaultAsync(m => m.GoalId == id);
+                .FirstOrDefaultAsync(g => g.GoalId == id);
 
             if (goal == null) return NotFound();
+
+            if (IsClient())
+            {
+                var myId = await GetCurrentClientIdAsync();
+                if (myId == null) return NoDataPermission();
+                if (goal.ClientId != myId.Value) return NoDataPermission();
+            }
 
             return View(goal);
         }
 
-        // =====================================================
-        // CREATE
-        // =====================================================
-        public IActionResult Create()
+        // CREATE/EDIT/DELETE: só Nutricionista; Admin NÃO pode ver; Cliente NÃO pode
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
+        public async Task<IActionResult> Create()
         {
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name");
+            if (IsAdmin()) return NoDataPermission();
+
+            var clients = await _context.Client
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new { c.ClientId, c.Name })
+                .ToListAsync();
+
+            ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name");
+
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+                    new { Value = "lose", Text = "Weight Loss" },
+                    new { Value = "maintain", Text = "Maintenance" },
+                    new { Value = "gain", Text = "Muscle Gain" }
+                },
+                "Value", "Text"
+            );
 
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
         public async Task<IActionResult> Create([Bind("ClientId,GoalName")] Goal goal)
         {
+            if (IsAdmin()) return NoDataPermission();
+
             var client = await _context.Client.FindAsync(goal.ClientId);
             if (client == null)
+                ModelState.AddModelError(nameof(goal.ClientId), "Client not found.");
+
+            if (!new[] { "lose", "maintain", "gain" }.Contains(goal.GoalName ?? ""))
+                ModelState.AddModelError(nameof(goal.GoalName), "Invalid goal.");
+
+            if (ModelState.IsValid && client != null)
             {
-                ModelState.AddModelError("", "Client not found.");
-                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", goal.ClientId);
+                CalculateAndFillMacros(client, goal);
 
-                return View(goal);
-            }
-
-            CalculateAndFillMacros(client, goal);
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(goal);
+                _context.Goal.Add(goal);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
-            return View(goal);
-        }
-        // =====================================================
-        // EDIT
-        // =====================================================
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
+            var clients = await _context.Client
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new { c.ClientId, c.Name })
+                .ToListAsync();
 
-            var goal = await _context.Goal.FindAsync(id);
-            if (goal == null) return NotFound();
+            ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", goal.ClientId);
 
-            // Dropdown de clientes
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
-
-            // Dropdown de GoalName
             ViewBag.GoalOptions = new SelectList(
                 new[]
                 {
-            new { Value = "gain", Text = "Gain" },
-            new { Value = "lose", Text = "Lose" },
-            new { Value = "maintain", Text = "Maintain" }
-                }, "Value", "Text", goal.GoalName
+                    new { Value = "lose", Text = "Weight Loss" },
+                    new { Value = "maintain", Text = "Maintenance" },
+                    new { Value = "gain", Text = "Muscle Gain" }
+                },
+                "Value", "Text", goal.GoalName
+            );
+
+            return View(goal);
+        }
+
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (IsAdmin()) return NoDataPermission();
+            if (id == null) return NotFound();
+
+            var goal = await _context.Goal
+                .Include(g => g.Client)
+                .FirstOrDefaultAsync(g => g.GoalId == id);
+
+            if (goal == null) return NotFound();
+
+            var clients = await _context.Client
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new { c.ClientId, c.Name })
+                .ToListAsync();
+
+            ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", goal.ClientId);
+
+            ViewBag.GoalOptions = new SelectList(
+                new[]
+                {
+                    new { Value = "lose", Text = "Weight Loss" },
+                    new { Value = "maintain", Text = "Maintenance" },
+                    new { Value = "gain", Text = "Muscle Gain" }
+                },
+                "Value", "Text", goal.GoalName
             );
 
             return View(goal);
@@ -218,62 +284,59 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
         public async Task<IActionResult> Edit(int id, [Bind("GoalId,ClientId,GoalName")] Goal goal)
         {
+            if (IsAdmin()) return NoDataPermission();
             if (id != goal.GoalId) return NotFound();
 
             var client = await _context.Client.FindAsync(goal.ClientId);
             if (client == null)
+                ModelState.AddModelError(nameof(goal.ClientId), "Client not found.");
+
+            if (!new[] { "lose", "maintain", "gain" }.Contains(goal.GoalName ?? ""))
+                ModelState.AddModelError(nameof(goal.GoalName), "Invalid goal.");
+
+            if (ModelState.IsValid && client != null)
             {
-                ModelState.AddModelError("", "Client not found.");
-                ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+                CalculateAndFillMacros(client, goal);
 
-                
-                ViewBag.GoalOptions = new SelectList(
-                    new[]
-                    {
-                 new { Value = "lose", Text = "Weight Loss" },
-                 new { Value = "maintain", Text = "Maintenance" },
-                 new { Value = "gain", Text = "Muscle Gain" }
-                    }, "Value", "Text", goal.GoalName
-                );
-
-                return View(goal);
-            }
-
-            // Calcula macros automaticamente
-            CalculateAndFillMacros(client, goal);
-
-            if (ModelState.IsValid)
-            {
                 _context.Update(goal);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Email", goal.ClientId);
+            var clients = await _context.Client
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new { c.ClientId, c.Name })
+                .ToListAsync();
+
+            ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", goal.ClientId);
+
             ViewBag.GoalOptions = new SelectList(
                 new[]
                 {
-            new { Value = "gain", Text = "Gain" },
-            new { Value = "lose", Text = "Lose" },
-            new { Value = "maintain", Text = "Maintain" }
-                }, "Value", "Text", goal.GoalName
+                    new { Value = "lose", Text = "Weight Loss" },
+                    new { Value = "maintain", Text = "Maintenance" },
+                    new { Value = "gain", Text = "Muscle Gain" }
+                },
+                "Value", "Text", goal.GoalName
             );
 
             return View(goal);
         }
-        // =====================================================
-        // DELETE
-        // =====================================================
+
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
         public async Task<IActionResult> Delete(int? id)
         {
+            if (IsAdmin()) return NoDataPermission();
             if (id == null) return NotFound();
 
             var goal = await _context.Goal
+                .AsNoTracking()
                 .Include(g => g.Client)
-                .FirstOrDefaultAsync(m => m.GoalId == id);
+                .FirstOrDefaultAsync(g => g.GoalId == id);
 
             if (goal == null) return NotFound();
 
@@ -282,14 +345,18 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (IsAdmin()) return NoDataPermission();
+
             var goal = await _context.Goal.FindAsync(id);
             if (goal != null)
             {
                 _context.Goal.Remove(goal);
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToAction(nameof(Index));
         }
     }

@@ -344,12 +344,44 @@ select.form-select {
     .fh-table tbody tr:hover {
         background: rgba(34,211,238,.06);
     }
+.fh-input[readonly],
+.fh-input:disabled {
+    background: rgba(17,24,39,.92) !important;
+    color: rgba(255,255,255,.9) !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: rgba(255,255,255,.9) !important;
+}
 
 .fh-form label {
     font-weight: 700;
     color: var(--fi-text);
     margin-bottom: 4px;
 }
+<style >
+.pagination .page-link {
+    background: rgba(17,24,39,.92);
+    border: 1px solid rgba(255,255,255,.14);
+    color: rgba(255,255,255,.85);
+}
+
+.pagination .page-link:hover {
+    border-color: rgba(34,211,238,.45);
+    color: rgba(255,255,255,.95);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--fi-cyan), var(--fi-cyan2));
+    border-color: transparent;
+    color: #001018;
+    font-weight: 900;
+}
+
+.pagination .page-item.disabled .page-link {
+    opacity: .45;
+}
+
+</style >
 
 .fh-form .form-control,
 .fh-form .form-select {

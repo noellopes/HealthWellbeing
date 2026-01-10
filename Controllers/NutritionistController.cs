@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -11,6 +11,7 @@ using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class NutritionistController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -20,19 +21,35 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Nutritionists
+        private bool IsAdmin()
+            => User.IsInRole("Administrador") || User.IsInRole("Administrator");
+
+        private IActionResult NoDataPermission()
+            => View("~/Views/Shared/NoDataPermission.cshtml");
+
+        private async Task<List<Tuple<int, string, string>>> LoadClientsAsync()
+        {
+            return await _context.Client
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => Tuple.Create(c.ClientId, c.Name, c.Email ?? ""))
+                .ToListAsync();
+        }
+
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist,Cliente,Client")]
         public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
-            var query = _context.Nutritionist.AsQueryable();
+            var query = _context.Nutritionist.AsNoTracking().AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(search))
+            var s = (search ?? "").Trim();
+            if (!string.IsNullOrWhiteSpace(s))
             {
-                search = search.Trim().ToLower();
+                var sl = s.ToLowerInvariant();
 
                 query = query.Where(n =>
-                    n.Name.ToLower().Contains(search) ||
-                    (!string.IsNullOrEmpty(n.Email) && n.Email.ToLower().Contains(search)) ||
-                    (!string.IsNullOrEmpty(n.Gender) && n.Gender.ToLower().Contains(search)));
+                    (n.Name != null && n.Name.ToLower().Contains(sl)) ||
+                    (!string.IsNullOrEmpty(n.Email) && n.Email.ToLower().Contains(sl)) ||
+                    (!string.IsNullOrEmpty(n.Gender) && n.Gender.ToLower().Contains(sl)));
             }
 
             int totalItems = await query.CountAsync();
@@ -43,141 +60,180 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfoFoodHabits<Nutritionist>(items, totalItems, page, itemsPerPage);
+            ViewBag.Search = s;
+            ViewBag.IsAdmin = IsAdmin();
 
-            ViewBag.Search = search;
-
-            return View(model);
+            return View(new PaginationInfoFoodHabits<Nutritionist>(items, totalItems, page, itemsPerPage));
         }
 
-
-        // GET: Nutritionists/Details/5
+        [Authorize(Roles = "Administrador,Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var nutritionist = await _context.Nutritionist
-                .FirstOrDefaultAsync(m => m.NutritionistId == id);
-            if (nutritionist == null)
-            {
-                return NotFound();
-            }
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.NutritionistId == id);
 
+            if (nutritionist == null) return NotFound();
             return View(nutritionist);
         }
 
-        // GET: Nutritionists/Create
-        public IActionResult Create()
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Create()
         {
-            return View();
+            ViewBag.Clients = await LoadClientsAsync();
+            return View(new Nutritionist());
         }
 
-        // POST: Nutritionists/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NutritionistId,Name,Gender,Email")] Nutritionist nutritionist)
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Create(int clientId, string gender)
         {
-            if (ModelState.IsValid)
+            ViewBag.Clients = await LoadClientsAsync();
+
+            if (clientId <= 0)
+                ModelState.AddModelError("ClientId", "Seleciona um cliente.");
+
+            if (string.IsNullOrWhiteSpace(gender))
+                ModelState.AddModelError("Gender", "Seleciona um género.");
+
+            var client = await _context.Client
+                .AsNoTracking()
+                .Where(c => c.ClientId == clientId)
+                .Select(c => new { c.Name, c.Email })
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+                ModelState.AddModelError("ClientId", "Cliente inválido.");
+
+            if (client != null)
             {
-                _context.Add(nutritionist);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var email = (client.Email ?? "").Trim();
+
+                var exists = await _context.Nutritionist
+                    .AsNoTracking()
+                    .AnyAsync(n => n.Email == email);
+
+                if (exists)
+                    ModelState.AddModelError("ClientId", "Este cliente já está registado como nutricionista.");
             }
-            return View(nutritionist);
+
+            if (!ModelState.IsValid)
+                return View(new Nutritionist());
+
+            var n = new Nutritionist
+            {
+                Name = client!.Name,
+                Email = client.Email,
+                Gender = gender
+            };
+
+            _context.Nutritionist.Add(n);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Nutritionists/Edit/5
+        [Authorize(Roles = "Administrador,Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var nutritionist = await _context.Nutritionist.FindAsync(id);
-            if (nutritionist == null)
+            if (nutritionist == null) return NotFound();
+
+            ViewBag.Clients = await LoadClientsAsync();
+
+            int selectedClientId = 0;
+            if (!string.IsNullOrWhiteSpace(nutritionist.Email))
             {
-                return NotFound();
+                selectedClientId = await _context.Client
+                    .AsNoTracking()
+                    .Where(c => c.Email == nutritionist.Email)
+                    .Select(c => c.ClientId)
+                    .FirstOrDefaultAsync();
             }
+
+            ViewBag.SelectedClientId = selectedClientId;
+
             return View(nutritionist);
         }
 
-        // POST: Nutritionists/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NutritionistId,Name,Gender,Email")] Nutritionist nutritionist)
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Edit(int id, int clientId, string gender)
         {
-            if (id != nutritionist.NutritionistId)
+            var nutritionist = await _context.Nutritionist.FindAsync(id);
+            if (nutritionist == null) return NotFound();
+
+            ViewBag.Clients = await LoadClientsAsync();
+            ViewBag.SelectedClientId = clientId;
+
+            if (clientId <= 0)
+                ModelState.AddModelError("ClientId", "Seleciona um cliente.");
+
+            if (string.IsNullOrWhiteSpace(gender))
+                ModelState.AddModelError("Gender", "Seleciona um género.");
+
+            var client = await _context.Client
+                .AsNoTracking()
+                .Where(c => c.ClientId == clientId)
+                .Select(c => new { c.Name, c.Email })
+                .FirstOrDefaultAsync();
+
+            if (client == null)
+                ModelState.AddModelError("ClientId", "Cliente inválido.");
+
+            if (client != null)
             {
-                return NotFound();
+                var email = (client.Email ?? "").Trim();
+
+                var conflict = await _context.Nutritionist
+                    .AsNoTracking()
+                    .AnyAsync(n => n.Email == email && n.NutritionistId != id);
+
+                if (conflict)
+                    ModelState.AddModelError("ClientId", "Já existe outro nutricionista com este email.");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(nutritionist);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NutritionistExists(nutritionist.NutritionistId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(nutritionist);
+            if (!ModelState.IsValid)
+                return View(nutritionist);
+
+            nutritionist.Name = client!.Name;
+            nutritionist.Email = client.Email;
+            nutritionist.Gender = gender;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Nutritionists/Delete/5
+        [Authorize(Roles = "Administrador,Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var nutritionist = await _context.Nutritionist
-                .FirstOrDefaultAsync(m => m.NutritionistId == id);
-            if (nutritionist == null)
-            {
-                return NotFound();
-            }
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.NutritionistId == id);
 
+            if (nutritionist == null) return NotFound();
             return View(nutritionist);
         }
 
-        // POST: Nutritionists/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var nutritionist = await _context.Nutritionist.FindAsync(id);
             if (nutritionist != null)
             {
                 _context.Nutritionist.Remove(nutritionist);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool NutritionistExists(int id)
-        {
-            return _context.Nutritionist.Any(e => e.NutritionistId == id);
         }
     }
 }

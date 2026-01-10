@@ -140,6 +140,23 @@ internal class SeedData
             dbContext.SaveChanges();
         }
     }
+    private static void PopulateNutritionists(HealthWellbeingDbContext context)
+    {
+        if (context.Nutritionist != null && !context.Nutritionist.Any())
+        {
+            context.Nutritionist.AddRange(new[]
+            {
+            new Nutritionist { Name = "Inês Almeida", Gender = "F", Email = "ines.almeida@health.com" },
+            new Nutritionist { Name = "Tiago Carvalho", Gender = "M", Email = "tiago.carvalho@health.com" },
+            new Nutritionist { Name = "Marta Sousa", Gender = "F", Email = "marta.sousa@health.com" },
+            new Nutritionist { Name = "Rui Fernandes", Gender = "M", Email = "rui.fernandes@health.com" },
+            new Nutritionist { Name = "Beatriz Costa", Gender = "F", Email = "beatriz.costa@health.com" },
+            new Nutritionist { Name = "João Ribeiro", Gender = "M", Email = "joao.ribeiro@health.com" }
+        });
+
+            context.SaveChanges();
+        }
+    }
 
     private static void PopulatePortions(HealthWellbeingDbContext dbContext)
     {

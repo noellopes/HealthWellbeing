@@ -8,44 +8,50 @@
     <div class="fh-wrapper">
 
         <div class="fh-header">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <div class="d-flex align-items-center gap-2">
                     <i class="bi bi-pencil-square" style="color: var(--fi-cyan); font-size:1.15rem;"></i>
                     <h1 class="h5 fh-title mb-0">Edit Food</h1>
                 </div>
 
-                <a asp-action="Index" class="btn btn-outline-light" style="border-radius:12px;">
-                    <i class="bi bi-arrow-left me-1"></i>Back
+                <a asp-action="Index" class="btn btn-secondary" style="border-radius:12px;">
+                    <i class="bi bi-arrow-left-circle me-1"></i>Back
                 </a>
+            </div>
+
+            <div class="mt-2 fh-badge">
+                <i class="bi bi-basket3-fill" style="color: var(--fi-cyan);"></i>
+                <span>@Model.Name</span>
             </div>
         </div>
 
         <div class="fh-panel">
             <div class="fh-card p-3">
-                <form asp-action="Edit" class="fh-form">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="FoodId" />
 
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label"></label>
+                        <label asp-for="Name" class="form-label">Name</label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="CategoryId" class="form-label">Category</label>
-                        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="FoodCategoryId" asp-for="CategoryId" asp-items="ViewBag.FoodCategoryId">
                             <option value="">— Select —</option>
                         </select>
                         <span asp-validation-for="CategoryId" class="text-danger"></span>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a asp-action="Index" class="btn btn-outline-secondary" style="border-radius:12px;">Cancel</a>
-                        <button type="submit" class="btn fh-btn-primary">
-                            <i class="bi bi-save2 me-1"></i>Save
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning text-white" style="border-radius:12px; font-weight:800;">
+                            <i class="bi bi-check2-circle me-1"></i>Save
                         </button>
+                        <a asp-action="Index" class="btn btn-outline-light">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -55,7 +61,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

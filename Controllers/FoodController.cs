@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +11,7 @@ using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class FoodController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -20,18 +21,31 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Food
+        private bool IsAdmin()
+            => User.IsInRole("Administrador") || User.IsInRole("Administrator");
+
+        private IActionResult NoDataPermission()
+            => View("~/Views/Shared/NoDataPermission.cshtml");
+
+        // TODOS podem ver
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist,Cliente,Client")]
         public async Task<IActionResult> Index(string? search, int page = 1, int itemsPerPage = 10)
         {
-            var query = _context.Food
-                                .Include(f => f.Category)
-                                .AsQueryable();
+            if (page < 1) page = 1;
+            if (itemsPerPage < 1) itemsPerPage = 10;
 
-            if (!string.IsNullOrWhiteSpace(search))
+            var query = _context.Food
+                .AsNoTracking()
+                .Include(f => f.Category)
+                .AsQueryable();
+
+            var s = (search ?? "").Trim();
+            if (!string.IsNullOrWhiteSpace(s))
             {
+                var sl = s.ToLower();
                 query = query.Where(f =>
-                    f.Name.Contains(search) ||
-                    f.Category.Category.Contains(search));
+                    (f.Name != null && f.Name.ToLower().Contains(sl)) ||
+                    (f.Category != null && f.Category.Category != null && f.Category.Category.ToLower().Contains(sl)));
             }
 
             int totalItems = await query.CountAsync();
@@ -42,146 +56,139 @@ namespace HealthWellbeing.Controllers
                 .Take(itemsPerPage)
                 .ToListAsync();
 
-            var model = new PaginationInfoFoodHabits<Food>(items, totalItems, page, itemsPerPage);
+            ViewBag.Search = s;
 
-            ViewBag.Search = search;
-
-            return View(model);
+            return View(new PaginationInfoFoodHabits<Food>(items, totalItems, page, itemsPerPage));
         }
 
-        // GET: Food/Details/5
+        // TODOS podem ver
+        [Authorize(Roles = "Administrador,Administrator,Nutricionista,Nutritionist,Cliente,Client")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var food = await _context.Food
+                .AsNoTracking()
                 .Include(f => f.Category)
-                .FirstOrDefaultAsync(m => m.FoodId == id);
-            if (food == null)
-            {
-                return NotFound();
-            }
+                .FirstOrDefaultAsync(f => f.FoodId == id);
+
+            if (food == null) return NotFound();
 
             return View(food);
         }
 
-        // GET: Food/Create
-        public IActionResult Create()
+        // SÓ ADMIN
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category");
+            await LoadCategoriesAsync();
             return View();
         }
 
-        // POST: Food/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FoodId,CategoryId,Name")] Food food)
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Create(Food food)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(food);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
-            return View(food);
-        }
-
-        // GET: Food/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
+                await LoadCategoriesAsync(food.CategoryId);
+                return View(food);
             }
 
-            var food = await _context.Food.FindAsync(id);
-            if (food == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
-            return View(food);
-        }
-
-        // POST: Food/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("FoodId,CategoryId,Name")] Food food)
-        {
-            if (id != food.FoodId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(food);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FoodExists(food.FoodId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.FoodCategory, "CategoryId", "Category", food.CategoryId);
-            return View(food);
-        }
-
-        // GET: Food/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var food = await _context.Food
-                .Include(f => f.Category)
-                .FirstOrDefaultAsync(m => m.FoodId == id);
-            if (food == null)
-            {
-                return NotFound();
-            }
-
-            return View(food);
-        }
-
-        // POST: Food/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var food = await _context.Food.FindAsync(id);
-            if (food != null)
-            {
-                _context.Food.Remove(food);
-            }
-
+            _context.Food.Add(food);
             await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Food created successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool FoodExists(int id)
+        // SÓ ADMIN
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Edit(int? id)
         {
-            return _context.Food.Any(e => e.FoodId == id);
+            if (id == null) return NotFound();
+
+            var food = await _context.Food.FindAsync(id);
+            if (food == null) return NotFound();
+
+            await LoadCategoriesAsync(food.CategoryId);
+            return View(food);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Edit(int id, Food food)
+        {
+            if (id != food.FoodId) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                await LoadCategoriesAsync(food.CategoryId);
+                return View(food);
+            }
+
+            try
+            {
+                _context.Update(food);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Food updated successfully.";
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                var exists = await _context.Food.AnyAsync(f => f.FoodId == food.FoodId);
+                if (!exists) return NotFound();
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // SÓ ADMIN
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var food = await _context.Food
+                .AsNoTracking()
+                .Include(f => f.Category)
+                .FirstOrDefaultAsync(f => f.FoodId == id);
+
+            if (food == null) return NotFound();
+
+            return View(food);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Administrator")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var food = await _context.Food.FindAsync(id);
+            if (food == null)
+            {
+                TempData["Error"] = "Food not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Food.Remove(food);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Food deleted successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task LoadCategoriesAsync(int? selectedId = null)
+        {
+            var cats = await _context.FoodCategory
+                .AsNoTracking()
+                .OrderBy(c => c.Category)
+                .Select(c => new { c.CategoryId, c.Category })
+                .ToListAsync();
+
+            ViewBag.FoodCategoryId = new SelectList(cats, "FoodCategoryId", "Category", selectedId);
         }
     }
 }
