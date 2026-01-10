@@ -147,19 +147,19 @@ namespace HealthWellbeing.Data
                .WithMany(c => c.UtenteConsultas)
                .HasForeignKey(cu => cu.IdUtente)
                .OnDelete(DeleteBehavior.NoAction);
-            
-            modelBuilder.Entity<SpecialitiesDoctor>()
-                .HasKey(sd => new { sd.IdEspecialidade, sd.IdMedico });
 
             modelBuilder.Entity<SpecialitiesDoctor>()
-                .HasOne(sd => sd.Especialidade)
+    .HasKey(sd => new { sd.IdEspecialidade, sd.IdMedico });
+
+            modelBuilder.Entity<SpecialitiesDoctor>()
+                .HasOne(sd => sd.Speciality)
                 .WithMany(s => s.SpecialitiesDoctors)
                 .HasForeignKey(sd => sd.IdEspecialidade)
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<SpecialitiesDoctor>()
-                .HasOne(sd => sd.Medico)
-                .WithMany(d => d.DoctorSpecialities)
+                .HasOne(sd => sd.Doctor)
+                .WithMany(d => d.SpecialitiesDoctors)
                 .HasForeignKey(sd => sd.IdMedico)
                 .OnDelete(DeleteBehavior.NoAction);
 

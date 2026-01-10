@@ -15,13 +15,16 @@ namespace HealthWellbeing.Models
         [StringLength(1500, ErrorMessage = "Máximo 1500 caracteres.")]
         public string Descricao { get; set; } = "";
 
+        
         public ICollection<Consulta>? Consultas { get; set; }
+
+        
         public ICollection<Doctor>? Medicos { get; set; }
 
         [MaxLength(5000)]
         public string? OqueEDescricao { get; set; }
 
         public ICollection<SpecialitiesDoctor>? SpecialitiesDoctors { get; set; }
-
+        public bool IsDeleted { get; set; } = false;
     }
 }

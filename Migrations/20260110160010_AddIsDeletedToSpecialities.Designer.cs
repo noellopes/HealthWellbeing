@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260110160010_AddIsDeletedToSpecialities")]
+    partial class AddIsDeletedToSpecialities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1143,12 +1146,7 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("IdMedico")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DoctorIdMedico")
-                        .HasColumnType("int");
-
                     b.HasKey("IdEspecialidade", "IdMedico");
-
-                    b.HasIndex("DoctorIdMedico");
 
                     b.HasIndex("IdMedico");
 
@@ -1707,25 +1705,21 @@ namespace HealthWellbeing.Migrations
 
             modelBuilder.Entity("HealthWellbeing.Models.SpecialitiesDoctor", b =>
                 {
-                    b.HasOne("HealthWellbeing.Models.Doctor", null)
-                        .WithMany("DoctorSpecialities")
-                        .HasForeignKey("DoctorIdMedico");
-
-                    b.HasOne("HealthWellbeing.Models.Specialities", "Speciality")
+                    b.HasOne("HealthWellbeing.Models.Specialities", "Especialidade")
                         .WithMany("SpecialitiesDoctors")
                         .HasForeignKey("IdEspecialidade")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.Doctor", "Doctor")
-                        .WithMany("SpecialitiesDoctors")
+                    b.HasOne("HealthWellbeing.Models.Doctor", "Medico")
+                        .WithMany("DoctorSpecialities")
                         .HasForeignKey("IdMedico")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Doctor");
+                    b.Navigation("Especialidade");
 
-                    b.Navigation("Speciality");
+                    b.Navigation("Medico");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Training", b =>
@@ -1807,8 +1801,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("DoctorConsultas");
 
                     b.Navigation("DoctorSpecialities");
-
-                    b.Navigation("SpecialitiesDoctors");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Food", b =>

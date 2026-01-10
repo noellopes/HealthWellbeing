@@ -30,5 +30,6 @@ namespace HealthWellbeing.Models{
         public ICollection<AgendaMedica>? AgendaMedica { get; set; }
         public ICollection<DoctorConsulta>? DoctorConsultas { get; set; }
         public ICollection<SpecialitiesDoctor>? DoctorSpecialities { get; set; }
+        public ICollection<SpecialitiesDoctor>? SpecialitiesDoctors { get; set; }
     }
 }

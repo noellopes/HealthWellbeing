@@ -1,4 +1,5 @@
-﻿@model HealthWellbeing.Models.Specialities
+﻿@using HealthWellbeing.Models
+@model HealthWellbeing.Models.Specialities
 
 @{
     ViewData["Title"] = "Eliminar Especialidade";
@@ -182,12 +183,10 @@
                         Esta ação não poderá ser revertida.
                     </div>
 
-                    <!-- ❗ Aqui vão aparecer erros do ModelState (ex: “não pode apagar porque há médicos”) -->
+                    <!-- Aqui aparecem mensagens do ModelState (ex: “não pode apagar porque há médicos”) -->
                     <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
 
                     <div class="danger-data">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-2"></div>
-
                         <div class="row g-2">
                             <div class="col-12 col-md-5">
                                 <div class="info-item">
@@ -205,7 +204,10 @@
                         </div>
                     </div>
 
-                    <form asp-action="Delete" asp-route-id="@Model.IdEspecialidade" method="post" class="mt-3 d-flex gap-2 flex-wrap">
+                    <form asp-action="Delete"
+                          asp-route-id="@Model.IdEspecialidade"
+                          method="post"
+                          class="mt-3 d-flex gap-2 flex-wrap">
                         @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="IdEspecialidade" />
 
