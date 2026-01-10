@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; // Necessário para o SelectList
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
@@ -20,71 +20,56 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: TrainingType
-        public async Task<IActionResult> Index(int page = 1, int? searchTrainingTypeId = null, string searchActive = "", int? searchDuration = null)
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchActive = "",
+            int? searchDuration = null)
         {
             var trainingTypesQuery = _context.TrainingType.AsQueryable();
 
-            // 1. Filtro por Tipo de Treino (Dropdown)
-            if (searchTrainingTypeId.HasValue)
-            {
-                trainingTypesQuery = trainingTypesQuery.Where(tt => tt.TrainingTypeId == searchTrainingTypeId.Value);
-            }
-
-            // 2. Filtro por Status
+            // Filtro por estado ativo
             if (!string.IsNullOrEmpty(searchActive))
             {
                 if (searchActive == "Yes")
-                {
-                    trainingTypesQuery = trainingTypesQuery.Where(tt => tt.IsActive);
-                }
+                    trainingTypesQuery = trainingTypesQuery.Where(t => t.IsActive);
                 else if (searchActive == "No")
-                {
-                    trainingTypesQuery = trainingTypesQuery.Where(tt => !tt.IsActive);
-                }
+                    trainingTypesQuery = trainingTypesQuery.Where(t => !t.IsActive);
             }
 
-            // 3. Novo Filtro por Duração
+            // Filtro por duração
             if (searchDuration.HasValue)
             {
-                trainingTypesQuery = trainingTypesQuery.Where(tt => tt.DurationMinutes == searchDuration.Value);
+                trainingTypesQuery = trainingTypesQuery
+                    .Where(t => t.DurationMinutes == searchDuration.Value);
             }
 
-            // Guardar valores para a View
-            ViewBag.SearchTrainingTypeId = searchTrainingTypeId;
             ViewBag.SearchActive = searchActive;
             ViewBag.SearchDuration = searchDuration;
 
-            // Criar a lista para o Dropdown (ordenada por nome)
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType.OrderBy(t => t.Name), "TrainingTypeId", "Name", searchTrainingTypeId);
+            int totalItems = await trainingTypesQuery.CountAsync();
 
-            int totalTrainingTypes = await trainingTypesQuery.CountAsync();
+            var pagination = new PaginationInfo<TrainingType>(page, totalItems, 8);
 
-            var trainingTypesInfo = new PaginationInfo<TrainingType>(page, totalTrainingTypes, 8);
-
-            trainingTypesInfo.Items = await trainingTypesQuery
-                .OrderBy(tt => tt.Name)
-                .Skip(trainingTypesInfo.ItemsToSkip)
-                .Take(trainingTypesInfo.ItemsPerPage)
+            pagination.Items = await trainingTypesQuery
+                .OrderBy(t => t.Name)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            return View(trainingTypesInfo);
+            return View(pagination);
         }
 
         // GET: TrainingType/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trainingType = await _context.TrainingType
-                .FirstOrDefaultAsync(m => m.TrainingTypeId == id);
+                .FirstOrDefaultAsync(t => t.TrainingTypeId == id);
 
             if (trainingType == null)
-            {
-                return View("InvalidTrainingType");
-            }
+                return NotFound();
 
             return View(trainingType);
         }
@@ -98,7 +83,8 @@ namespace HealthWellbeing.Controllers
         // POST: TrainingType/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,DurationMinutes,Intensity,IsActive")] TrainingType trainingType)
+        public async Task<IActionResult> Create(
+            [Bind("Name,Description,DurationMinutes,IsActive")] TrainingType trainingType)
         {
             if (ModelState.IsValid)
             {
@@ -106,6 +92,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(trainingType);
         }
 
@@ -113,27 +100,25 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trainingType = await _context.TrainingType.FindAsync(id);
+
             if (trainingType == null)
-            {
                 return NotFound();
-            }
+
             return View(trainingType);
         }
 
         // POST: TrainingType/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainingTypeId,Name,Description,DurationMinutes,Intensity,IsActive")] TrainingType trainingType)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("TrainingTypeId,Name,Description,DurationMinutes,IsActive")] TrainingType trainingType)
         {
             if (id != trainingType.TrainingTypeId)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -145,16 +130,14 @@ namespace HealthWellbeing.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!TrainingTypeExists(trainingType.TrainingTypeId))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(trainingType);
         }
 
@@ -162,17 +145,13 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var trainingType = await _context.TrainingType
-                .FirstOrDefaultAsync(m => m.TrainingTypeId == id);
+                .FirstOrDefaultAsync(t => t.TrainingTypeId == id);
 
             if (trainingType == null)
-            {
                 return NotFound();
-            }
 
             return View(trainingType);
         }
@@ -183,6 +162,7 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var trainingType = await _context.TrainingType.FindAsync(id);
+
             if (trainingType != null)
             {
                 _context.TrainingType.Remove(trainingType);

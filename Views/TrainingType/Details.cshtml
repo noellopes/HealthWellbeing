@@ -1,58 +1,69 @@
 ﻿@model HealthWellbeing.Models.TrainingType
 
 @{
-    ViewData["Title"] = "Training Details";
+    ViewData["Title"] = "Training Type Details";
 }
 
-<h1 class="display-4 text-primary mb-4">Training Details</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary">
+        <i class="bi bi-tag-fill me-2"></i>Training Type Details
+    </h1>
 
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">@Model.Name</h4>
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>Training Type Information
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <dl class="row mb-0">
+
+                        <dt class="col-sm-4 text-muted fw-bold">Name</dt>
+                        <dd class="col-sm-8">@Model.Name</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Description</dt>
+                        <dd class="col-sm-8 mt-2">
+                            @(string.IsNullOrWhiteSpace(Model.Description) ? "—" : Model.Description)
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Default Duration</dt>
+                        <dd class="col-sm-8 mt-2">@Model.DurationMinutes minutes</dd>
+
+                        <dt class="col-sm-4 text-muted fw-bold mt-2">Status</dt>
+                        <dd class="col-sm-8 mt-2">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>Active
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle me-1"></i>Inactive
+                                </span>
+                            }
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
+    <div class="mt-2 d-flex justify-content-end gap-2">
+        <a asp-action="Edit"
+           asp-route-id="@Model.TrainingTypeId"
+           class="btn btn-warning shadow-sm">
+            <i class="bi bi-pencil-square me-1"></i>Edit
+        </a>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.DurationMinutes) minutes
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.IsActive)
-            </dt>
-            <dd class="col-sm-9">
-                @{
-                    string badgeClass = Model.IsActive ? "bg-success" : "bg-danger";
-                    string badgeText = Model.IsActive ? "Active" : "Inactive";
-                }
-                <span class="badge @badgeClass fs-6">@badgeText</span>
-            </dd>
-        </dl>
+        <a asp-action="Index"
+           class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left-circle me-1"></i>Back to List
+        </a>
     </div>
-</div>
-
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.TrainingTypeId" class="btn btn-primary me-2 shadow-sm">
-        <i class="bi bi-pencil-square"></i> Edit
-    </a>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Back to List
-    </a>
 </div>

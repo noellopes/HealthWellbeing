@@ -1,65 +1,70 @@
 ﻿@model HealthWellbeing.Models.TrainingType
 
 @{
-    ViewData["Title"] = "Delete Training";
+    ViewData["Title"] = "Delete Training Type";
 }
 
-<h1 class="display-4 text-danger mb-3">Delete Training</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
 
-<h3 class="alert alert-warning border-0 shadow-sm p-3" role="alert">
-    ⚠️ Are you sure you want to delete the training: <strong class="text-danger">@Model.Name</strong>?
-</h3>
-<hr class="mb-4" />
+            <div class="alert alert-danger p-4 shadow-sm border-0 mb-4 rounded-4" role="alert">
+                <i class="bi bi-exclamation-octagon-fill fs-1 text-danger d-block mb-3"></i>
+                <h2 class="alert-heading">Are you sure?</h2>
+                <p class="mb-0">
+                    You are about to delete the training type
+                    <strong>@Model.Name</strong>.
+                    This action may affect associated training sessions.
+                </p>
+            </div>
 
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Training Information to be Deleted</h5>
-    </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4 text-start">
+                    <div class="row">
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
+                        <div class="col-sm-4 text-muted fw-bold small">Training Type:</div>
+                        <div class="col-sm-8 mb-2">@Model.Name</div>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.DurationMinutes)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.DurationMinutes) minutes
-            </dd>
+                        <div class="col-sm-4 text-muted fw-bold small">Description:</div>
+                        <div class="col-sm-8 mb-2">@Model.Description</div>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.IsActive)
-            </dt>
-            <dd class="col-sm-9">
-                @{
-                    string badgeClass = Model.IsActive ? "bg-success" : "bg-danger";
-                    string badgeText = Model.IsActive ? "Active" : "Inactive";
-                }
-                <span class="badge @badgeClass fs-6">@badgeText</span>
-            </dd>
-        </dl>
+                        <div class="col-sm-4 text-muted fw-bold small">Default Duration:</div>
+                        <div class="col-sm-8 mb-2">@Model.DurationMinutes minutes</div>
+
+                        <div class="col-sm-4 text-muted fw-bold small">Status:</div>
+                        <div class="col-sm-8 mb-2">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TrainingTypeId" />
+
+                <div class="d-grid gap-2 d-md-block">
+                    <button type="submit"
+                            class="btn btn-danger btn-lg px-5 shadow-sm me-md-2">
+                        <i class="bi bi-trash-fill me-2"></i>Delete Forever
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary btn-lg px-5 shadow-sm">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+
+        </div>
     </div>
 </div>
 
-<form asp-action="Delete" class="d-flex align-items-center mt-4">
-    <input type="hidden" asp-for="TrainingTypeId" />
-
-    <button type="submit" class="btn btn-danger btn-lg shadow-sm me-3">
-        <i class="bi bi-trash"></i> Confirm Delete
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary btn-lg">
-        <i class="bi bi-x-circle"></i> Cancel
-    </a>
-</form>

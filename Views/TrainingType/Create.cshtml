@@ -1,49 +1,82 @@
 ﻿@model HealthWellbeing.Models.TrainingType
 
 @{
-    ViewData["Title"] = "Create Training Type";
+    ViewData["Title"] = "New Training Type";
 }
 
-<h1 class="display-4 text-primary mb-4">Create New Training Type</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary">
+        <i class="bi bi-tags-fill me-2"></i>Create Training Type
+    </h1>
 
-<h4 class="mb-3">Enter Training Type Details</h4>
-<hr class="mb-4" />
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="card-title mb-0 fw-bold">
+                Training Type Details
+            </h5>
+        </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-6 col-md-8">
-        <div class="card shadow-lg p-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="card-body p-4">
+            <p class="text-muted small mb-4">
+                Define a new type of training available in the gym.
+            </p>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+            <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger mb-4 shadow-sm"></div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name"
+                               class="form-control shadow-sm"
+                               placeholder="e.g. HIIT, Yoga, Pilates" />
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control shadow-sm"
+                                  rows="3"
+                                  placeholder="Short description of the training type"></textarea>
+                        <span asp-validation-for="Description" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DurationMinutes" class="form-label fw-bold"></label>
+                        <input asp-for="DurationMinutes"
+                               class="form-control shadow-sm"
+                               type="number"
+                               min="45"
+                               max="120" />
+                        <span asp-validation-for="DurationMinutes" class="invalid-feedback"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3 d-flex align-items-center">
+                        <div class="form-check mt-4">
+                            <input asp-for="IsActive"
+                                   class="form-check-input"
+                                   type="checkbox" />
+                            <label asp-for="IsActive"
+                                   class="form-check-label fw-bold ms-1"></label>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold"></label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit"
+                            class="btn btn-success px-5 shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i>Create
+                    </button>
 
-                <div class="mb-3">
-                    <label asp-for="DurationMinutes" class="form-label fw-bold"></label>
-                    <input asp-for="DurationMinutes" class="form-control" type="number" min="10" max="300" />
-                    <span asp-validation-for="DurationMinutes" class="text-danger"></span>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
-                    <label asp-for="IsActive" class="form-check-label fw-bold"></label>
-                    <span asp-validation-for="IsActive" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Create Training Type" class="btn btn-primary btn-lg shadow" />
-
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary px-4 shadow-sm">
+                        Back to List
                     </a>
                 </div>
             </form>

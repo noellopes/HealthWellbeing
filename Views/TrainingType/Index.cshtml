@@ -1,134 +1,139 @@
 ﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.TrainingType>
 
 @{
-    ViewData["Title"] = "Training Type Management";
-
-    var searchTrainingTypeId = ViewBag.SearchTrainingTypeId;
+    ViewData["Title"] = "Training Types";
     var searchActive = ViewBag.SearchActive ?? "";
     var searchDuration = ViewBag.SearchDuration;
-
-    var trainingTypeList = ViewData["TrainingTypeId"] as SelectList;
 }
 
-<h1 class="display-4 text-primary mb-4">@ViewData["Title"]</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary fw-bold">
+        <i class="bi bi-tags-fill me-2"></i>@ViewData["Title"]
+    </h1>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="h4 mb-0">Training Types List</h2>
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="bi bi-list-ul me-2"></i>Training Type Directory
+            </h5>
+            <a asp-action="Create" class="btn btn-success px-3 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i>Add Training Type
+            </a>
+        </div>
 
-    <div class="d-flex justify-content-end">
-        <a class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#trainingTypeSearch">
-            <i class="bi bi-search me-1"></i> Search
-        </a>
+        <div class="card-body bg-light">
 
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Training Type
-        </a>
-    </div>
-</div>
+            <!-- SEARCH -->
+            <form asp-action="Index" method="get" class="row g-2 mb-4">
+                <div class="col-md-4">
+                    <input type="number"
+                           name="searchDuration"
+                           value="@searchDuration"
+                           class="form-control shadow-sm"
+                           placeholder="Search by duration (min)" />
+                </div>
 
-<div class="collapse mt-2 mb-2 @(searchTrainingTypeId != null || !string.IsNullOrEmpty(searchActive) || searchDuration != null ? "show" : "")" id="trainingTypeSearch">
-    <div class="card card-body shadow-sm">
-        <form asp-action="Index" method="get" class="row g-2">
+                <div class="col-md-4">
+                    <select name="searchActive" class="form-select shadow-sm">
+                        <option value="">All Status</option>
+                        <option value="Yes" selected="@(searchActive == "Yes")">Active</option>
+                        <option value="No" selected="@(searchActive == "No")">Inactive</option>
+                    </select>
+                </div>
 
-            <div class="col-md-4">
-                <label class="form-label">Training Type Name</label>
-                <select name="searchTrainingTypeId" class="form-select" asp-items="trainingTypeList">
-                    <option value="">All Types</option>
-                </select>
-            </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
+                        <i class="bi bi-search me-1"></i>Search
+                    </button>
+                </div>
+            </form>
 
-            <div class="col-md-4">
-                <label class="form-label">Duration (min)</label>
-                <input name="searchDuration" value="@searchDuration" class="form-control" placeholder="e.g. 45" type="number" />
-            </div>
-
-            @* 3. Status Dropdown (col-md-4) *@
-            <div class="col-md-4">
-                <label for="searchActive" class="form-label">Status</label>
-                <select id="searchActive" name="searchActive" class="form-select">
-                    <option value="" selected="@(searchActive == "")">All</option>
-                    <option value="Yes" selected="@(searchActive == "Yes")">Active</option>
-                    <option value="No" selected="@(searchActive == "No")">Inactive</option>
-                </select>
-            </div>
-
-            <div class="col-12 d-flex gap-2 mt-2">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Search
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">Clear</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if (!Model.Items.Any())
-{
-    <div class="alert alert-warning mt-4 shadow-sm" role="alert">
-        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> No Training Types Found</h4>
-        <p>There are no training types matching your criteria. Try adjusting your search or create a new type.</p>
-    </div>
-}
-else
-{
-    <div class="table-responsive shadow-sm rounded">
-        <table class="table table-striped table-hover align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th>@Html.DisplayNameFor(model => model.Items.First().Name)</th>
-                    <th>@Html.DisplayNameFor(model => model.Items.First().DurationMinutes)</th>
-                    <th>@Html.DisplayNameFor(model => model.Items.First().IsActive)</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
-                    <tr>
-                        <td class="fw-bold">@item.Name</td>
-                        <td>@item.DurationMinutes min</td>
-                        <td>
-                            @{
-                                string badgeClass = item.IsActive ? "bg-success" : "bg-danger";
-                                string badgeText = item.IsActive ? "Active" : "Inactive";
-                            }
-                            <span class="badge @badgeClass">@badgeText</span>
-                        </td>
-                        <td class="text-end">
-                            <div class="btn-group" role="group">
-                                <a asp-action="Edit" asp-route-id="@item.TrainingTypeId" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.TrainingTypeId" class="btn btn-sm btn-info">
-                                    <i class="bi bi-info-circle"></i> Details
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.TrainingTypeId" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Delete
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <nav aria-label="TrainingType pages" class="mt-3">
-        <ul class="pagination">
-            <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-searchTrainingTypeId="@searchTrainingTypeId" asp-route-searchDuration="@searchDuration" asp-route-searchActive="@searchActive">First</a>
-            </li>
-
-            @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+            @if (Model.Items == null || !Model.Items.Any())
             {
-                <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@p" asp-route-searchTrainingTypeId="@searchTrainingTypeId" asp-route-searchDuration="@searchDuration" asp-route-searchActive="@searchActive">@p</a>
-                </li>
+                <div class="alert alert-warning shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    No training types found with the selected criteria.
+                </div>
             }
+            else
+            {
+                <div class="table-responsive bg-white rounded shadow-sm">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light border-bottom">
+                            <tr>
+                                <th class="ps-3">Name</th>
+                                <th>Default Duration</th>
+                                <th>Status</th>
+                                <th class="text-end pe-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td class="fw-bold ps-3">@item.Name</td>
+                                    <td>@item.DurationMinutes min</td>
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Inactive</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <div class="btn-group shadow-sm" role="group">
+                                            <a asp-action="Edit" asp-route-id="@item.TrainingTypeId"
+                                               class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@item.TrainingTypeId"
+                                               class="btn btn-sm btn-info">
+                                                <i class="bi bi-info-circle"></i> Details
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.TrainingTypeId"
+                                               class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
-            <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchTrainingTypeId="@searchTrainingTypeId" asp-route-searchDuration="@searchDuration" asp-route-searchActive="@searchActive">Last</a>
-            </li>
-        </ul>
-    </nav>
-}
+                <!-- PAGINATION -->
+                <nav aria-label="Training type navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link shadow-sm"
+                               asp-route-page="1"
+                               asp-route-searchDuration="@searchDuration"
+                               asp-route-searchActive="@searchActive">First</a>
+                        </li>
+
+                        @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                        {
+                            <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link shadow-sm"
+                                   asp-route-page="@p"
+                                   asp-route-searchDuration="@searchDuration"
+                                   asp-route-searchActive="@searchActive">@p</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link shadow-sm"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-searchDuration="@searchDuration"
+                               asp-route-searchActive="@searchActive">Last</a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
