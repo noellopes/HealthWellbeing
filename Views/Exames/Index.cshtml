@@ -61,7 +61,7 @@
         </div>
 
         @* Apenas Admin ou Rececionista (se existisse) criariam novos exames *@
-        @if (!isTecnico)
+        @if (User.IsInRole("Admin") || User.IsInRole("Medico"))
         {
             <a asp-action="Create" class="btn btn-success shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Nova Marcação
@@ -153,22 +153,46 @@
                                     }
                                     <span class="badge @badgeClass rounded-pill px-3">@exame.Estado</span>
                                 </td>
-                                <td class="text-end pe-4 text-nowrap">
-                                    @* Se for técnico e o exame estiver pendente/marcado, o botão Edit serve como "Executar" *@
-                                    <a asp-action="Edit" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                                        <i class="bi bi-pencil-square"></i> @(isTecnico ? "Executar" : "Editar")
-                                    </a>
-
-                                    <a asp-action="Details" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-info me-1" title="Detalhes">
-                                        <i class="bi bi-eye"></i> Detalhes
-                                    </a>
-
-                                    @if (User.IsInRole("Admin"))
-                                    {
-                                        <a asp-action="Delete" asp-route-id="@exame.ExameId" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                            <i class="bi bi-trash"></i> Eliminar
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        @* DETALHES - Todos podem ver *@
+                                        <a asp-action="Details"
+                                           asp-route-id="@exame.ExameId"
+                                           class="btn btn-outline-primary"
+                                           title="Ver Detalhes">
+                                            Detalhes
+                                            <i class="bi bi-eye"></i>
                                         </a>
-                                    }
+
+                                        @* EDITAR - Admin, Gestor, Rececionista, Médico, Técnico, Supervisor Técnico *@
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Rececionista") || User.IsInRole("Medico") ||
+                                                                        User.IsInRole("Tecnico") || User.IsInRole("Supervisor Tecnico"))
+                                        {
+                                            @* Se for Técnico, só mostra botão se for o seu exame *@
+                                            @if (!User.IsInRole("Tecnico") || User.IsInRole("Admin") || User.IsInRole("Supervisor Tecnico") ||
+                                                                            exame.ProfissionalExecutante?.Email == User.Identity.Name)
+                                            {
+                                                <a asp-action="Edit"
+                                                   asp-route-id="@exame.ExameId"
+                                                   class="btn btn-outline-warning" x
+                                                   title="Editar">
+                                                    Editar
+                                                </a>
+                                            }
+                                        }
+
+                                        @* APAGAR - Apenas Admin e Médico *@
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Medico"))
+                                        {
+                                            <a asp-action="Delete"
+                                               asp-route-id="@exame.ExameId"
+                                               class="btn btn-outline-danger"
+                                               title="Apagar">
+                                                Apagar
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }

@@ -261,14 +261,21 @@ namespace HealthWellbeing.Data
         // --- Identity Helpers (Mantidos iguais) ---
         internal static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            string[] roles = { "Admin", "Gestor", "Medico", "Utente", "Rececionista", "Tecnico" };
+            string[] roles = {
+                "Rececionista",
+                "Utente",
+                "Tecnico",
+                "Supervisor Tecnico",
+                "Gestor",
+                "Medico",
+                "Admin",
+            };
             foreach (var role in roles)
                 if (!await roleManager.RoleExistsAsync(role)) await roleManager.CreateAsync(new IdentityRole(role));
         }
 
         internal static async Task SeedProfissionalLogin(UserManager<IdentityUser> userManager)
         {
-            // Usando o email que já existe no teu Seed de Dados Clínicos (rui@h.pt)
             await CriarUser(userManager, "Kandonga123@gmail.com", "Tecnico");
         }
         internal static async Task SeedDefaultAdmin(UserManager<IdentityUser> userManager)
@@ -285,7 +292,9 @@ namespace HealthWellbeing.Data
         // Novo método para o João Martins
         internal static async Task SeedRecepcionistaLogin(UserManager<IdentityUser> userManager)
         {
-            await CriarUser(userManager, "JoaoMartinsRec@gmail.com", "Recepcionista");
+            await CriarUser(userManager, "JoaoMartinsRec@gmail.com", "Rececionista");
+            await CriarUser(userManager, "pedro.costa@hospital.pt", "Medico");
+            await CriarUser(userManager, "DiogoRodrigues04@gmail.com", "Supervisor Tecnico");
         }
         
 

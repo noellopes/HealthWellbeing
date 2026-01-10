@@ -13,8 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace HealthWellbeing.Controllers
 {
-    // Permite que Admin e Tecnicos acedam ao Controller
-    [Authorize(Roles = "Admin,Tecnico")]
+    [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico,Utente")]
     public class ExamesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -25,9 +24,9 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exames
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Index(int pagina = 1, string pesquisaUtente = "", DateTime? pesquisaData = null)
         {
-            // Lógica do filtro "Hoje na primeira vez"
             string sessaoKey = "FiltroInicialRealizado";
             if (string.IsNullOrEmpty(HttpContext.Session.GetString(sessaoKey)) && !pesquisaData.HasValue && !Request.Query.ContainsKey("pesquisaData"))
             {
@@ -38,7 +37,6 @@ namespace HealthWellbeing.Controllers
             ViewBag.PesquisaUtente = pesquisaUtente;
             ViewBag.PesquisaData = pesquisaData;
 
-            // Inicia a query com todos os Includes necessários
             var examesQuery = _context.Exames
                 .Include(e => e.ExameTipo)
                 .Include(e => e.MaterialEquipamentoAssociado)
@@ -48,17 +46,19 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.Utente)
                 .AsQueryable();
 
-            // ============================================================
-            // FILTRO POR TÉCNICO LOGADO
-            // Se não for Admin, filtra apenas os exames do técnico atual
-            // ============================================================
-            if (!User.IsInRole("Admin") && User.IsInRole("Tecnico"))
+            // Filtros por Role
+            var userEmail = User.Identity?.Name;
+
+            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && !User.IsInRole("Gestor"))
             {
-                var userEmail = User.Identity.Name;
                 examesQuery = examesQuery.Where(e => e.ProfissionalExecutante.Email == userEmail);
             }
 
-            // Filtros de pesquisa existentes
+            if (User.IsInRole("Utente") && !User.IsInRole("Admin") && !User.IsInRole("Gestor"))
+            {
+                examesQuery = examesQuery.Where(e => e.Utente.Email == userEmail);
+            }
+
             if (!string.IsNullOrEmpty(pesquisaUtente))
             {
                 examesQuery = examesQuery.Where(e => e.Utente.Nome.Contains(pesquisaUtente));
@@ -69,7 +69,6 @@ namespace HealthWellbeing.Controllers
                 examesQuery = examesQuery.Where(e => e.DataHoraMarcacao.Date == pesquisaData.Value.Date);
             }
 
-            // Paginação
             int totalExames = await examesQuery.CountAsync();
             var paginationInfo = new PaginationInfo<Exame>(pagina, totalExames, itemsPerPage: 10);
 
@@ -98,16 +97,18 @@ namespace HealthWellbeing.Controllers
 
             if (exame == null) return NotFound();
 
-            // Segurança: Se for técnico, não pode ver detalhes de exames de outros
-            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && exame.ProfissionalExecutante.Email != User.Identity.Name)
-            {
+            var userEmail = User.Identity?.Name;
+            if (User.IsInRole("Tecnico") && !User.IsInRole("Admin") && !User.IsInRole("Gestor") && exame.ProfissionalExecutante?.Email != userEmail)
                 return Forbid();
-            }
+
+            if (User.IsInRole("Utente") && !User.IsInRole("Admin") && !User.IsInRole("Gestor") && exame.Utente?.Email != userEmail)
+                return Forbid();
 
             return View(exame);
         }
 
         // GET: Exames/Create
+        [Authorize(Roles = "Admin,Gestor,Medico")]
         public IActionResult Create()
         {
             CarregarViewBagDropdowns();
@@ -117,6 +118,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exames/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Gestor,Medico")]
         public async Task<IActionResult> Create([Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
             bool salaOcupada = await _context.Exames.AnyAsync(e =>
@@ -124,9 +126,7 @@ namespace HealthWellbeing.Controllers
                 e.DataHoraMarcacao == exame.DataHoraMarcacao);
 
             if (salaOcupada)
-            {
                 ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
-            }
 
             if (ModelState.IsValid)
             {
@@ -141,11 +141,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exames/Edit/5
+        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
+
             var exame = await _context.Exames.FindAsync(id);
             if (exame == null) return NotFound();
+
             CarregarViewBagDropdowns(exame);
             return View(exame);
         }
@@ -153,6 +156,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exames/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
         public async Task<IActionResult> Edit(int id, [Bind("ExameId,DataHoraMarcacao,Estado,Notas,UtenteId,ExameTipoId,MedicoSolicitanteId,ProfissionalExecutanteId,SalaDeExameId,MaterialEquipamentoAssociadoId")] Exame exame)
         {
             if (id != exame.ExameId) return NotFound();
@@ -163,16 +167,22 @@ namespace HealthWellbeing.Controllers
                 e.ExameId != id);
 
             if (salaOcupadaOutro)
-            {
                 ModelState.AddModelError("DataHoraMarcacao", "A sala selecionada já está ocupada neste horário.");
-            }
 
             if (ModelState.IsValid)
             {
-                _context.Update(exame);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Update(exame);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Exame atualizado com sucesso!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Exames.Any(e => e.ExameId == exame.ExameId)) return NotFound();
+                    else throw;
+                }
             }
 
             CarregarViewBagDropdowns(exame);
@@ -180,14 +190,18 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Exames/Delete/5
-        // Apenas Admin pode apagar exames
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
+
             var exame = await _context.Exames
-                .Include(e => e.ExameTipo).Include(e => e.Utente)
+                .Include(e => e.ExameTipo)
+                .Include(e => e.Utente)
+                .Include(e => e.MedicoSolicitante)
+                .Include(e => e.SalaDeExame)
                 .FirstOrDefaultAsync(m => m.ExameId == id);
+
             if (exame == null) return NotFound();
             return View(exame);
         }
@@ -195,7 +209,7 @@ namespace HealthWellbeing.Controllers
         // POST: Exames/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exame = await _context.Exames.FindAsync(id);
@@ -214,35 +228,20 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // --- MÉTODO AJAX ---
-        [HttpGet]
+        [Authorize(Roles = "Admin,Gestor,Rececionista,Medico,Tecnico,Supervisor Tecnico")]
         public async Task<JsonResult> GetMateriaisPorTipo(int id)
         {
-            try
-            {
-                var materiaisEspecificos = await _context.ExameTipoRecursos
-                    .Where(x => x.ExameTipoId == id)
-                    .Include(x => x.Recurso)
-                    .Select(x => new
-                    {
-                        value = x.MaterialEquipamentoAssociadoId,
-                        text = x.Recurso.NomeEquipamento
-                    })
-                    .ToListAsync();
+            var materiaisEspecificos = await _context.ExameTipoRecursos
+                .Where(x => x.ExameTipoId == id)
+                .Include(x => x.Recurso)
+                .Select(x => new { value = x.MaterialEquipamentoAssociadoId, text = x.Recurso.NomeEquipamento })
+                .ToListAsync();
 
-                if (materiaisEspecificos.Any())
-                {
-                    return Json(new { isFallback = false, data = materiaisEspecificos });
-                }
-            }
-            catch { }
+            if (materiaisEspecificos.Any())
+                return Json(new { isFallback = false, data = materiaisEspecificos });
 
             var todosMateriais = await _context.MaterialEquipamentoAssociado
-                .Select(x => new
-                {
-                    value = x.MaterialEquipamentoAssociadoId,
-                    text = x.NomeEquipamento
-                })
+                .Select(x => new { value = x.MaterialEquipamentoAssociadoId, text = x.NomeEquipamento })
                 .ToListAsync();
 
             return Json(new { isFallback = true, data = todosMateriais });

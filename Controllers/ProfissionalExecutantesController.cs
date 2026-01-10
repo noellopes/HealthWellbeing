@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace HealthWellbeing.Controllers
 {
     // Acesso básico à lista (Index) e Detalhes permitido a Admin, Gestor e Tecnico
-    [Authorize(Roles = "Admin, Gestor, Tecnico")]
+    [Authorize(Roles = "Admin, Supervisor Tecnico, Tecnico")]
     public class ProfissionalExecutantesController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

@@ -15,13 +15,17 @@
         {
             <span class="badge bg-danger">Administrador</span>
         }
-        @if (User.IsInRole("Gestor"))
-        {
-            <span class="badge bg-warning text-dark">Gestor</span>
-        }
         @if (User.IsInRole("Medico"))
         {
             <span class="badge bg-primary">Médico</span>
+        }
+        @if (User.IsInRole("Tecnico"))
+        {
+            <span class="badge bg-secondary">Técnico</span>
+        }
+        @if (User.IsInRole("Supervisor Tecnico"))
+        {
+            <span class="badge bg-dark">Supervisor Técnico</span>
         }
         @if (User.IsInRole("Rececionista"))
         {
@@ -46,16 +50,17 @@
                     <div class="card-body">
                         <p class="card-text text-muted">Gerir funcionários, criar logins e acessos de segurança.</p>
                         <div class="d-grid gap-2">
-                            <a asp-controller="ProfissionalExecutantes" asp-action="Index" class="btn btn-outline-danger">Gerir Profissionais</a>
-                            <a asp-controller="Roles" asp-action="Index" class="btn btn-outline-danger">Gerir Permissões</a>
+                            <a asp-controller="Roles" asp-action="Index" class="btn btn-outline-danger">Gerir Contas</a>
                         </div>
                     </div>
                 </div>
             </div>
         }
 
-        @* --- NOVO: ÁREA DE GESTÃO DE EXAMES (AZUL) --- *@
-        @if (User.IsInRole("Admin") || User.IsInRole("Gestor"))
+        @* --- ÁREA DE GESTÃO DE EXAMES (AZUL) --- *@
+        @if (User.IsInRole("Admin") || User.IsInRole("Rececionista") ||
+            User.IsInRole("Utente") || User.IsInRole("Tecnico") || User.IsInRole("Supervisor Tecnico") ||
+            User.IsInRole("Medico"))
         {
             <div class="col-md-4 mb-4">
                 <div class="card border-primary h-100 shadow-sm">
@@ -65,7 +70,6 @@
                     <div class="card-body">
                         <p class="card-text text-muted">Consultar agenda diária, filtrar marcações e gerir estados.</p>
                         <div class="d-grid gap-2 mt-4">
-                            @* Botão Outline para ficar igual aos outros *@
                             <a asp-controller="Exames" asp-action="Index" class="btn btn-outline-primary">
                                 Aceder aos Exames
                             </a>
@@ -76,7 +80,7 @@
         }
 
         @* --- ÁREA DE GESTÃO CLÍNICA (AMARELO) --- *@
-        @if (User.IsInRole("Gestor") || User.IsInRole("Admin"))
+        @if (User.IsInRole("Admin") || User.IsInRole("Supervisor Tecnico"))
         {
             <div class="col-md-4 mb-4">
                 <div class="card border-warning h-100 shadow-sm">
@@ -84,43 +88,51 @@
                         <i class="bi bi-clipboard-pulse me-2"></i>Gestão Clínica
                     </div>
                     <div class="card-body">
-                        <p class="card-text text-muted">Configurar tipos de exames, especialidades e materiais.</p>
+                        <p class="card-text text-muted">Configurar tipos de exames, especialidades e dados clínicos.</p>
                         <div class="d-grid gap-2 mt-4">
                             <a asp-controller="ExameTipo" asp-action="Index" class="btn btn-outline-dark">Gerir Tipos de Exame</a>
+                            <a asp-controller="Especialidades" asp-action="Index" class="btn btn-outline-dark">Gerir Especialidades</a>
                         </div>
                     </div>
                 </div>
             </div>
         }
 
-        @* --- ÁREA MÉDICA --- *@
-        @if (User.IsInRole("Medico"))
+        @* --- ÁREA DE PROFISSIONAIS EXECUTANTES (ROXO) --- *@
+        @if (User.IsInRole("Admin") || User.IsInRole("Gestor") || User.IsInRole("Supervisor Tecnico"))
         {
             <div class="col-md-4 mb-4">
-                <div class="card border-primary h-100 shadow-sm">
-                    <div class="card-header bg-primary text-white">Área Médica</div>
+                <div class="card border-secondary h-100 shadow-sm" style="border-color: #6f42c1 !important;">
+                    <div class="card-header text-white fw-bold" style="background-color: #6f42c1;">
+                        <i class="bi bi-people me-2"></i>Profissionais Executantes
+                    </div>
                     <div class="card-body">
-                        <p class="card-text">Consultar agenda e realizar exames.</p>
-                        <div class="d-grid gap-2">
-                            <a asp-controller="Consultas" asp-action="Index" class="btn btn-outline-primary">As Minhas Consultas</a>
-                            <a asp-controller="Exames" asp-action="Index" class="btn btn-outline-primary">Registar Resultados</a>
+                        <p class="card-text text-muted">Consultar e gerir profissionais que executam exames.</p>
+                        <div class="d-grid gap-2 mt-4">
+                            <a asp-controller="ProfissionalExecutantes" asp-action="Index" class="btn btn-outline-secondary" style="color: #6f42c1; border-color: #6f42c1;">
+                                Aceder aos Profissionais
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         }
 
-        @* --- ÁREA DE RECEÇÃO --- *@
-        @if (User.IsInRole("Rececionista") || User.IsInRole("Gestor"))
+        @* --- ÁREA DE MATERIAL E EQUIPAMENTO (VERDE-ESCURO) --- *@
+        @if (User.IsInRole("Admin") || User.IsInRole("Gestor") || User.IsInRole("Medico") ||
+            User.IsInRole("Tecnico") || User.IsInRole("Supervisor Tecnico"))
         {
             <div class="col-md-4 mb-4">
-                <div class="card border-info h-100 shadow-sm">
-                    <div class="card-header bg-info text-dark">Receção</div>
+                <div class="card border-success h-100 shadow-sm" style="border-color: #198754 !important;">
+                    <div class="card-header text-white fw-bold" style="background-color: #198754;">
+                        <i class="bi bi-box-seam me-2"></i>Material e Equipamento
+                    </div>
                     <div class="card-body">
-                        <p class="card-text">Fazer marcações e check-in de utentes.</p>
-                        <div class="d-grid gap-2">
-                            <a asp-controller="Marcacoes" asp-action="Create" class="btn btn-outline-info">Nova Marcação</a>
-                            <a asp-controller="Utentes" asp-action="Index" class="btn btn-outline-info">Listar Utentes</a>
+                        <p class="card-text text-muted">Consultar materiais e equipamentos associados aos exames.</p>
+                        <div class="d-grid gap-2 mt-4">
+                            <a asp-controller="MaterialEquipamentoAssociados" asp-action="Index" class="btn btn-outline-success">
+                                Aceder aos Materiais
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -132,9 +144,11 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card border-success h-100 shadow-sm">
-                    <div class="card-header bg-success text-white">O Meu Espaço</div>
+                    <div class="card-header bg-success text-white fw-bold">
+                        <i class="bi bi-person-circle me-2"></i>O Meu Espaço
+                    </div>
                     <div class="card-body">
-                        <p class="card-text">Veja o seu histórico e exames marcados.</p>
+                        <p class="card-text text-muted">Veja o seu histórico e exames marcados.</p>
                         <div class="d-grid gap-2">
                             <a asp-controller="Historico" asp-action="Index" class="btn btn-outline-success">Meus Exames</a>
                         </div>
