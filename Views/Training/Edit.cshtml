@@ -4,78 +4,125 @@
     ViewData["Title"] = "Edit Training Session";
 }
 
-<h1 class="display-4 text-primary mb-4">Edit Training Session</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary">
+        <i class="bi bi-pencil-square me-2"></i>Edit Training Session
+    </h1>
 
-<h4 class="mb-3">Training Session Details</h4>
-<hr class="mb-4" />
+    @if (ViewBag.TrainingWasDeleted != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center p-4 border border-danger rounded shadow-sm mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill flex-shrink-0 me-3" style="font-size: 2rem;"></i>
+            <div>
+                <h4 class="alert-heading">Concurrent Change Detected</h4>
+                <p class="mb-0">
+                    The training session you were editing was removed by another user.
+                    You can still use this form to recreate it.
+                </p>
+            </div>
+        </div>
+    }
 
-<div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-        <div class="card shadow-lg p-4">
-            <form asp-action="Edit">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="card-title mb-0 fw-bold">Update Training Information</h5>
+        </div>
+
+        <div class="card-body p-4">
+            <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger mb-4 shadow-sm">
+                </div>
 
                 <input type="hidden" asp-for="TrainingId" />
 
-                <div class="row">
-
+                <div class="row g-3">
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainerId" class="form-label fw-bold"></label>
-                        <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.TrainerId"></select>
-                        <span asp-validation-for="TrainerId" class="text-danger"></span>
+                        <select asp-for="TrainerId"
+                                class="form-select shadow-sm"
+                                asp-items="ViewBag.TrainerId">
+                            <option value="">Choose trainer...</option>
+                        </select>
+                        <span asp-validation-for="TrainerId" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainingTypeId" class="form-label fw-bold"></label>
-                        <select asp-for="TrainingTypeId" class="form-control" asp-items="ViewBag.TrainingTypeId"></select>
-                        <span asp-validation-for="TrainingTypeId" class="text-danger"></span>
+                        <select asp-for="TrainingTypeId"
+                                class="form-select shadow-sm"
+                                asp-items="ViewBag.TrainingTypeId">
+                            <option value="">Choose training type...</option>
+                        </select>
+                        <span asp-validation-for="TrainingTypeId" class="invalid-feedback"></span>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name"
+                               class="form-control shadow-sm"
+                               placeholder="Training session name" />
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                    </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold"></label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control shadow-sm"
+                                  rows="3"></textarea>
+                        <span asp-validation-for="Description" class="invalid-feedback"></span>
+                    </div>
 
-                <div class="row">
                     <div class="col-md-4 mb-3">
                         <label asp-for="DayOfWeek" class="form-label fw-bold"></label>
-                        <input asp-for="DayOfWeek" class="form-control" />
-                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                        <select asp-for="DayOfWeek"
+                                class="form-select shadow-sm"
+                                asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.WeekDay>()">
+                            <option value="">Choose day...</option>
+                        </select>
+                        <span asp-validation-for="DayOfWeek" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label asp-for="StartTime" class="form-label fw-bold"></label>
-                        <input asp-for="StartTime" class="form-control" type="time" />
-                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                        <input asp-for="StartTime"
+                               type="time"
+                               class="form-control shadow-sm" />
+                        <span asp-validation-for="StartTime" class="invalid-feedback"></span>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label asp-for="Duration" class="form-label fw-bold"></label>
-                        <input asp-for="Duration" class="form-control" type="number" min="45" max="120" />
-                        <span asp-validation-for="Duration" class="text-danger"></span>
+                        <input asp-for="Duration"
+                               type="number"
+                               min="45"
+                               max="120"
+                               class="form-control shadow-sm" />
+                        <span asp-validation-for="Duration" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
-                        <input asp-for="MaxParticipants" class="form-control" type="number" min="1" max="50" />
-                        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+                        <input asp-for="MaxParticipants"
+                               type="number"
+                               min="1"
+                               max="50"
+                               class="form-control shadow-sm" />
+                        <span asp-validation-for="MaxParticipants" class="invalid-feedback"></span>
                     </div>
                 </div>
 
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Save Changes" class="btn btn-primary btn-lg shadow" />
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit"
+                            class="btn btn-primary px-4 shadow-sm">
+                        <i class="bi bi-save me-1"></i> Save Changes
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary px-4 shadow-sm">
+                        Cancel
                     </a>
                 </div>
             </form>
@@ -87,4 +134,19 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Add Bootstrap 'is-invalid' class to inputs with server-side errors
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                var errorSpans = document.querySelectorAll('.field-validation-error, .invalid-feedback');
+                errorSpans.forEach(function (span) {
+                    var name = span.getAttribute('data-valmsg-for');
+                    if (!name) return;
+                    var input = document.querySelector('[name="' + name + '"]');
+                    if (input) input.classList.add('is-invalid');
+                });
+            });
+        })();
+    </script>
 }

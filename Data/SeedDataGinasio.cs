@@ -175,49 +175,308 @@ internal class SeedDataGinasio
         return trainers;
     }
 
-    private static List<Training> PopulateTraining(HealthWellbeingDbContext dbContext, List<Trainer> trainers)
+    private static List<Training> PopulateTraining(
+    HealthWellbeingDbContext dbContext,
+    List<Trainer> trainers)
     {
-        if (dbContext.Training.Any()) return dbContext.Training.ToList();
+        if (dbContext.Training.Any())
+            return dbContext.Training.ToList();
 
         var trainings = new List<Training>();
-
-        // Precisamos dos tipos de treino para criar os treinos. Vamos buscá-los à BD.
         var trainingTypes = dbContext.TrainingType.ToList();
 
-        // Helper local para encontrar IDs
-        int GetTrainerId(string namePart) => trainers.First(t => t.Name.Contains(namePart)).TrainerId;
-        int GetTypeId(string namePart) => trainingTypes.First(t => t.Name.Contains(namePart)).TrainingTypeId;
+        int GetTrainerId(string namePart) =>
+            trainers.First(t => t.Name.Contains(namePart)).TrainerId;
 
-        // --- CRIAÇÃO DE TREINOS (Mínimo 20 para TrainingPlan usar) ---
+        int GetTypeId(string namePart) =>
+            trainingTypes.First(t => t.Name.Contains(namePart)).TrainingTypeId;
 
-        trainings.Add(new Training { Name = "Morning Yoga Flow", Description = "Start the day right", DayOfWeek = "Monday", Duration = 60, MaxParticipants = 15, TrainerId = GetTrainerId("Carlos"), TrainingTypeId = GetTypeId("Yoga") });
-        trainings.Add(new Training { Name = "Intense Cardio HIT", Description = "Quick burn", DayOfWeek = "Wednesday", Duration = 45, MaxParticipants = 20, TrainerId = GetTrainerId("John"), TrainingTypeId = GetTypeId("HIIT") });
-        trainings.Add(new Training { Name = "Heavy Lifting Focus", Description = "Build muscle", DayOfWeek = "Friday", Duration = 90, MaxParticipants = 10, TrainerId = GetTrainerId("Emma"), TrainingTypeId = GetTypeId("Strength") });
-        trainings.Add(new Training { Name = "Pilates Core Stability", Description = "Abs focus", DayOfWeek = "Tuesday", Duration = 50, MaxParticipants = 12, TrainerId = GetTrainerId("Sophie"), TrainingTypeId = GetTypeId("Pilates") });
-        trainings.Add(new Training { Name = "Zumba Latin Fiesta", Description = "Dance workout", DayOfWeek = "Thursday", Duration = 55, MaxParticipants = 30, TrainerId = GetTrainerId("Maria"), TrainingTypeId = GetTypeId("Zumba") });
-        trainings.Add(new Training { Name = "Power Yoga: Midday", Description = "Vigorous flow", DayOfWeek = "Monday", Duration = 75, MaxParticipants = 12, TrainerId = GetTrainerId("Laura"), TrainingTypeId = GetTypeId("Power Yoga") });
-        trainings.Add(new Training { Name = "Morning Endurance Spin", Description = "Cycle hard", DayOfWeek = "Wednesday", Duration = 45, MaxParticipants = 18, TrainerId = GetTrainerId("David"), TrainingTypeId = GetTypeId("Cycling") });
-        trainings.Add(new Training { Name = "Deep Water Toning", Description = "Pool workout", DayOfWeek = "Saturday", Duration = 45, MaxParticipants = 25, TrainerId = GetTrainerId("Maria"), TrainingTypeId = GetTypeId("Aqua") });
-        trainings.Add(new Training { Name = "TRX Suspension Full Body", Description = "Bodyweight", DayOfWeek = "Tuesday", Duration = 50, MaxParticipants = 10, TrainerId = GetTrainerId("André"), TrainingTypeId = GetTypeId("TRX") });
-        trainings.Add(new Training { Name = "Express Lunch HIIT", Description = "Fast workout", DayOfWeek = "Friday", Duration = 30, MaxParticipants = 20, TrainerId = GetTrainerId("John"), TrainingTypeId = GetTypeId("HIIT") });
-        trainings.Add(new Training { Name = "Barre Sculpt and Tone", Description = "Ballet style", DayOfWeek = "Monday", Duration = 55, MaxParticipants = 15, TrainerId = GetTrainerId("Laura"), TrainingTypeId = GetTypeId("Barre") });
-        trainings.Add(new Training { Name = "Boxing Technique Workshop", Description = "Punching basics", DayOfWeek = "Thursday", Duration = 60, MaxParticipants = 16, TrainerId = GetTrainerId("David"), TrainingTypeId = GetTypeId("Boxing") });
-        trainings.Add(new Training { Name = "Sunday Morning Calm", Description = "Meditation", DayOfWeek = "Sunday", Duration = 30, MaxParticipants = 40, TrainerId = GetTrainerId("Carlos"), TrainingTypeId = GetTypeId("Meditation") });
-        trainings.Add(new Training { Name = "Kettlebell Power Flow", Description = "Dynamic strength", DayOfWeek = "Wednesday", Duration = 45, MaxParticipants = 14, TrainerId = GetTrainerId("André"), TrainingTypeId = GetTypeId("Kettlebell") });
-        trainings.Add(new Training { Name = "Full Body Circuit", Description = "Strength circuit", DayOfWeek = "Tuesday", Duration = 60, MaxParticipants = 12, TrainerId = GetTrainerId("Emma"), TrainingTypeId = GetTypeId("Strength") });
-        trainings.Add(new Training { Name = "Lower Body Endurance", Description = "Leg day", DayOfWeek = "Thursday", Duration = 60, MaxParticipants = 12, TrainerId = GetTrainerId("John"), TrainingTypeId = GetTypeId("Strength") });
-        trainings.Add(new Training { Name = "Gentle Hatha Evening", Description = "Relaxing yoga", DayOfWeek = "Wednesday", Duration = 60, MaxParticipants = 15, TrainerId = GetTrainerId("Carlos"), TrainingTypeId = GetTypeId("Yoga") });
-        trainings.Add(new Training { Name = "Zumba Gold", Description = "Low impact", DayOfWeek = "Friday", Duration = 55, MaxParticipants = 25, TrainerId = GetTrainerId("Maria"), TrainingTypeId = GetTypeId("Zumba") });
-        trainings.Add(new Training { Name = "Power Hour Max", Description = "Intense cycle", DayOfWeek = "Saturday", Duration = 60, MaxParticipants = 18, TrainerId = GetTrainerId("David"), TrainingTypeId = GetTypeId("Cycling") });
-        trainings.Add(new Training { Name = "Reformer Intro", Description = "Machine pilates", DayOfWeek = "Thursday", Duration = 50, MaxParticipants = 8, TrainerId = GetTrainerId("Sophie"), TrainingTypeId = GetTypeId("Pilates") });
-        trainings.Add(new Training { Name = "Weekend Metabolic", Description = "Burn calories", DayOfWeek = "Saturday", Duration = 45, MaxParticipants = 20, TrainerId = GetTrainerId("André"), TrainingTypeId = GetTypeId("HIIT") });
-        trainings.Add(new Training { Name = "Water Circuit", Description = "Pool circuit", DayOfWeek = "Monday", Duration = 45, MaxParticipants = 25, TrainerId = GetTrainerId("Maria"), TrainingTypeId = GetTypeId("Aqua") });
-        trainings.Add(new Training { Name = "Deep Stretch", Description = "Recovery", DayOfWeek = "Sunday", Duration = 55, MaxParticipants = 15, TrainerId = GetTrainerId("Laura"), TrainingTypeId = GetTypeId("Barre") });
+        // -------- BASIC WELLNESS --------
+        trainings.Add(new Training
+        {
+            Name = "Morning Yoga",
+            Description = "Start the day right",
+            DayOfWeek = WeekDay.Monday,
+            StartTime = new TimeSpan(9, 0, 0),
+            Duration = 60,
+            MaxParticipants = 15,
+            TrainerId = GetTrainerId("Carlos"),
+            TrainingTypeId = GetTypeId("Yoga")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Zumba Latin",
+            Description = "Dance workout",
+            DayOfWeek = WeekDay.Thursday,
+            StartTime = new TimeSpan(18, 0, 0),
+            Duration = 55,
+            MaxParticipants = 30,
+            TrainerId = GetTrainerId("Maria"),
+            TrainingTypeId = GetTypeId("Zumba")
+        });
+        trainings.Add(new Training
+        {
+            Name = "Zumba Gold",
+            Description = "Low impact dance workout",
+            DayOfWeek = WeekDay.Friday,
+            StartTime = new TimeSpan(17, 0, 0),
+            Duration = 55,
+            MaxParticipants = 25,
+            TrainerId = GetTrainerId("Maria"),
+            TrainingTypeId = GetTypeId("Zumba")
+        });
+
+
+        trainings.Add(new Training
+        {
+            Name = "Gentle Hatha",
+            Description = "Relaxing yoga",
+            DayOfWeek = WeekDay.Wednesday,
+            StartTime = new TimeSpan(19, 0, 0),
+            Duration = 60,
+            MaxParticipants = 15,
+            TrainerId = GetTrainerId("Carlos"),
+            TrainingTypeId = GetTypeId("Yoga")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Water Circuit",
+            Description = "Pool circuit",
+            DayOfWeek = WeekDay.Monday,
+            StartTime = new TimeSpan(10, 0, 0),
+            Duration = 45,
+            MaxParticipants = 25,
+            TrainerId = GetTrainerId("Maria"),
+            TrainingTypeId = GetTypeId("Aqua")
+        });
+
+        // -------- ADVANCED FITNESS --------
+        trainings.Add(new Training
+        {
+            Name = "Intense Cardio",
+            Description = "High intensity cardio",
+            DayOfWeek = WeekDay.Wednesday,
+            StartTime = new TimeSpan(7, 30, 0),
+            Duration = 45,
+            MaxParticipants = 20,
+            TrainerId = GetTrainerId("John"),
+            TrainingTypeId = GetTypeId("HIIT")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Heavy Lifting",
+            Description = "Strength training",
+            DayOfWeek = WeekDay.Friday,
+            StartTime = new TimeSpan(17, 0, 0),
+            Duration = 90,
+            MaxParticipants = 10,
+            TrainerId = GetTrainerId("Emma"),
+            TrainingTypeId = GetTypeId("Strength")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Endurance Spin",
+            Description = "Cycling endurance",
+            DayOfWeek = WeekDay.Wednesday,
+            StartTime = new TimeSpan(18, 30, 0),
+            Duration = 45,
+            MaxParticipants = 18,
+            TrainerId = GetTrainerId("David"),
+            TrainingTypeId = GetTypeId("Cycling")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Express Lunch",
+            Description = "Quick lunch workout",
+            DayOfWeek = WeekDay.Friday,
+            StartTime = new TimeSpan(12, 30, 0),
+            Duration = 30,
+            MaxParticipants = 20,
+            TrainerId = GetTrainerId("John"),
+            TrainingTypeId = GetTypeId("HIIT")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Full Body Circuit",
+            Description = "Strength circuit",
+            DayOfWeek = WeekDay.Tuesday,
+            StartTime = new TimeSpan(18, 0, 0),
+            Duration = 60,
+            MaxParticipants = 12,
+            TrainerId = GetTrainerId("Emma"),
+            TrainingTypeId = GetTypeId("Strength")
+        });
+
+        // -------- MIND & BODY --------
+        trainings.Add(new Training
+        {
+            Name = "Pilates Core",
+            Description = "Core strength",
+            DayOfWeek = WeekDay.Tuesday,
+            StartTime = new TimeSpan(17, 0, 0),
+            Duration = 50,
+            MaxParticipants = 12,
+            TrainerId = GetTrainerId("Sophie"),
+            TrainingTypeId = GetTypeId("Pilates")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Power Yoga",
+            Description = "Vigorous yoga",
+            DayOfWeek = WeekDay.Monday,
+            StartTime = new TimeSpan(13, 0, 0),
+            Duration = 75,
+            MaxParticipants = 12,
+            TrainerId = GetTrainerId("Laura"),
+            TrainingTypeId = GetTypeId("Yoga")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Barre Sculpt",
+            Description = "Ballet inspired",
+            DayOfWeek = WeekDay.Monday,
+            StartTime = new TimeSpan(18, 0, 0),
+            Duration = 55,
+            MaxParticipants = 15,
+            TrainerId = GetTrainerId("Laura"),
+            TrainingTypeId = GetTypeId("Barre")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Sunday Morning",
+            Description = "Meditation session",
+            DayOfWeek = WeekDay.Sunday,
+            StartTime = new TimeSpan(9, 0, 0),
+            Duration = 30,
+            MaxParticipants = 40,
+            TrainerId = GetTrainerId("Carlos"),
+            TrainingTypeId = GetTypeId("Meditation")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Reformer Intro",
+            Description = "Machine pilates",
+            DayOfWeek = WeekDay.Thursday,
+            StartTime = new TimeSpan(16, 0, 0),
+            Duration = 50,
+            MaxParticipants = 8,
+            TrainerId = GetTrainerId("Sophie"),
+            TrainingTypeId = GetTypeId("Pilates")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Deep Stretch",
+            Description = "Recovery session",
+            DayOfWeek = WeekDay.Sunday,
+            StartTime = new TimeSpan(18, 0, 0),
+            Duration = 55,
+            MaxParticipants = 15,
+            TrainerId = GetTrainerId("Laura"),
+            TrainingTypeId = GetTypeId("Barre")
+        });
+
+        // -------- ULTIMATE --------
+        trainings.Add(new Training
+        {
+            Name = "Lower Body Endurance",
+            Description = "Leg focus",
+            DayOfWeek = WeekDay.Thursday,
+            StartTime = new TimeSpan(19, 0, 0),
+            Duration = 60,
+            MaxParticipants = 12,
+            TrainerId = GetTrainerId("John"),
+            TrainingTypeId = GetTypeId("Strength")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Boxing Technique",
+            Description = "Boxing basics",
+            DayOfWeek = WeekDay.Thursday,
+            StartTime = new TimeSpan(20, 0, 0),
+            Duration = 60,
+            MaxParticipants = 16,
+            TrainerId = GetTrainerId("David"),
+            TrainingTypeId = GetTypeId("Boxing")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Kettlebell Power",
+            Description = "Dynamic strength",
+            DayOfWeek = WeekDay.Wednesday,
+            StartTime = new TimeSpan(19, 0, 0),
+            Duration = 45,
+            MaxParticipants = 14,
+            TrainerId = GetTrainerId("André"),
+            TrainingTypeId = GetTypeId("Kettlebell")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "TRX Suspension",
+            Description = "Bodyweight training",
+            DayOfWeek = WeekDay.Tuesday,
+            StartTime = new TimeSpan(20, 0, 0),
+            Duration = 50,
+            MaxParticipants = 10,
+            TrainerId = GetTrainerId("André"),
+            TrainingTypeId = GetTypeId("TRX")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Power Hour Max",
+            Description = "High intensity cycling",
+            DayOfWeek = WeekDay.Saturday,
+            StartTime = new TimeSpan(10, 0, 0),
+            Duration = 60,
+            MaxParticipants = 18,
+            TrainerId = GetTrainerId("David"),
+            TrainingTypeId = GetTypeId("Cycling")
+        });
+
+        trainings.Add(new Training
+        {
+            Name = "Weekend Metabolic",
+            Description = "Calorie burn",
+            DayOfWeek = WeekDay.Saturday,
+            StartTime = new TimeSpan(11, 30, 0),
+            Duration = 45,
+            MaxParticipants = 20,
+            TrainerId = GetTrainerId("André"),
+            TrainingTypeId = GetTypeId("HIIT")
+        });
+
+        // -------- EXTRA (CORRIGE O ERRO ATUAL) --------
+        trainings.Add(new Training
+        {
+            Name = "Deep Water Toning",
+            Description = "Pool toning session",
+            DayOfWeek = WeekDay.Saturday,
+            StartTime = new TimeSpan(12, 0, 0),
+            Duration = 45,
+            MaxParticipants = 25,
+            TrainerId = GetTrainerId("Maria"),
+            TrainingTypeId = GetTypeId("Aqua")
+        });
 
         dbContext.Training.AddRange(trainings);
         dbContext.SaveChanges();
         return trainings;
     }
+
 
     private static void PopulateMemberPlan(HealthWellbeingDbContext dbContext, List<Member> members, List<Plan> plans)
     {
@@ -225,8 +484,6 @@ internal class SeedDataGinasio
 
         var memberPlans = new List<MemberPlan>();
 
-        // Helper
-        int GetPlanId(string namePart) => plans.First(p => p.Name.Contains(namePart)).PlanId;
 
         if (members.Count == 0 || plans.Count == 0) return;
 
@@ -266,7 +523,15 @@ internal class SeedDataGinasio
 
         // Helper para encontrar IDs
         int GetPlanId(string namePart) => plans.First(p => p.Name.Contains(namePart)).PlanId;
-        int GetTrainingId(string namePart) => trainings.First(t => t.Name.Contains(namePart)).TrainingId;
+        int GetTrainingId(string namePart)
+        {
+            var training = trainings.FirstOrDefault(t => t.Name.Contains(namePart));
+            if (training == null)
+                throw new Exception($"Training not found in SeedData: {namePart}");
+
+            return training.TrainingId;
+        }
+
 
         // --- CRIAÇÃO DE TRAINING PLANS (Associar Planos a Treinos - Mínimo 20) ---
 

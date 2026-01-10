@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels; // Adicionar este using
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
+    [AllowAnonymous]
     public class TrainingController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -21,124 +19,185 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Training
-        public async Task<IActionResult> Index(int page = 1, string searchName = "", int? searchTrainerId = null, int? searchTrainingTypeId = null, int? searchDuration = null)
+        public async Task<IActionResult> Index(
+            int page = 1,
+            string searchName = "",
+            int? searchTrainerId = null,
+            int? searchTrainingTypesId = null,
+            int? searchDuration = null)
         {
             var trainingsQuery = _context.Training
                 .Include(t => t.Trainer)
                 .Include(t => t.TrainingType)
                 .AsQueryable();
 
-            // Filtragem
-            if (!string.IsNullOrEmpty(searchName))
+            if (!string.IsNullOrWhiteSpace(searchName))
             {
-                trainingsQuery = trainingsQuery.Where(t => t.Name.Contains(searchName));
+                trainingsQuery = trainingsQuery.Where(t =>
+                    t.Name.Contains(searchName));
             }
 
             if (searchTrainerId.HasValue)
             {
-                trainingsQuery = trainingsQuery.Where(t => t.TrainerId == searchTrainerId.Value);
+                trainingsQuery = trainingsQuery.Where(t =>
+                    t.TrainerId == searchTrainerId.Value);
             }
 
-            if (searchTrainingTypeId.HasValue)
+            if (searchTrainingTypesId.HasValue)
             {
-                trainingsQuery = trainingsQuery.Where(t => t.TrainingTypeId == searchTrainingTypeId.Value);
+                trainingsQuery = trainingsQuery.Where(t =>
+                    t.TrainingTypeId == searchTrainingTypesId.Value);
             }
 
-            // Nova lógica para Duração
             if (searchDuration.HasValue)
             {
-                trainingsQuery = trainingsQuery.Where(t => t.Duration == searchDuration.Value);
+                trainingsQuery = trainingsQuery.Where(t =>
+                    t.Duration == searchDuration.Value);
             }
 
-            // Guardar valores de pesquisa para o View
             ViewBag.SearchName = searchName;
             ViewBag.SearchTrainerId = searchTrainerId;
-            ViewBag.SearchTrainingTypeId = searchTrainingTypeId;
-            ViewBag.SearchDuration = searchDuration; // Guardar duração na ViewBag
+            ViewBag.SearchTrainingTypeId = searchTrainingTypesId;
+            ViewBag.SearchDuration = searchDuration;
 
-            // Para os dropdowns de filtro
-            ViewData["TrainerId"] = new SelectList(_context.Trainer.OrderBy(t => t.Name), "TrainerId", "Name", searchTrainerId);
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType.OrderBy(tt => tt.Name), "TrainingTypeId", "Name", searchTrainingTypeId);
+            ViewData["TrainerId"] = new SelectList(
+                _context.Trainer.OrderBy(t => t.Name),
+                "TrainerId",
+                "Name",
+                searchTrainerId);
+
+            ViewData["TrainingTypeId"] = new SelectList(
+                _context.TrainingType.OrderBy(tt => tt.Name),
+                "TrainingTypeId",
+                "Name",
+                searchTrainingTypesId);
 
             int totalTrainings = await trainingsQuery.CountAsync();
 
-            var trainingsInfo = new PaginationInfo<Training>(page, totalTrainings, 8);
+            var pagination = new PaginationInfo<Training>(page, totalTrainings);
 
-            trainingsInfo.Items = await trainingsQuery
+            pagination.Items = await trainingsQuery
                 .OrderBy(t => t.DayOfWeek)
                 .ThenBy(t => t.StartTime)
-                .Skip(trainingsInfo.ItemsToSkip)
-                .Take(trainingsInfo.ItemsPerPage)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            return View(trainingsInfo);
+            return View(pagination);
         }
 
+        // GET: Training/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var training = await _context.Training
                 .Include(t => t.Trainer)
                 .Include(t => t.TrainingType)
-                .FirstOrDefaultAsync(m => m.TrainingId == id);
-            if (training == null)
-            {
-                return NotFound();
-            }
+                .FirstOrDefaultAsync(t => t.TrainingId == id);
+
+            if (training == null) return NotFound();
 
             return View(training);
         }
 
+        // GET: Training/Create
         public IActionResult Create()
         {
-            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Email");
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name");
+            ViewData["TrainerId"] = new SelectList(
+                _context.Trainer.OrderBy(t => t.Name),
+                "TrainerId",
+                "Name");
+
+            ViewData["TrainingTypeId"] = new SelectList(
+                _context.TrainingType.OrderBy(tt => tt.Name),
+                "TrainingTypeId",
+                "Name");
+
             return View();
         }
 
+        // POST: Training/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")] Training training)
+        public async Task<IActionResult> Create(
+            [Bind("TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")]
+            Training training)
         {
+            // 🔐 Validações de negócio (como o professor exige)
+            if (training.Duration <= 0)
+            {
+                ModelState.AddModelError(nameof(training.Duration),
+                    "A duração do treino deve ser superior a 0 minutos.");
+            }
+
+            if (training.MaxParticipants <= 0)
+            {
+                ModelState.AddModelError(nameof(training.MaxParticipants),
+                    "O número máximo de participantes deve ser superior a 0.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(training);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Treino criado com sucesso.";
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Email", training.TrainerId);
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name", training.TrainingTypeId);
+
+            ViewData["TrainerId"] = new SelectList(
+                _context.Trainer.OrderBy(t => t.Name),
+                "TrainerId",
+                "Name",
+                training.TrainerId);
+
+            ViewData["TrainingTypeId"] = new SelectList(
+                _context.TrainingType.OrderBy(tt => tt.Name),
+                "TrainingTypeId",
+                "Name",
+                training.TrainingTypeId);
+
             return View(training);
         }
 
+        // GET: Training/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var training = await _context.Training.FindAsync(id);
-            if (training == null)
-            {
-                return NotFound();
-            }
-            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Email", training.TrainerId);
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name", training.TrainingTypeId);
+            if (training == null) return NotFound();
+
+            ViewData["TrainerId"] = new SelectList(
+                _context.Trainer.OrderBy(t => t.Name),
+                "TrainerId",
+                "Name",
+                training.TrainerId);
+
+            ViewData["TrainingTypeId"] = new SelectList(
+                _context.TrainingType.OrderBy(tt => tt.Name),
+                "TrainingTypeId",
+                "Name",
+                training.TrainingTypeId);
+
             return View(training);
         }
 
+        // POST: Training/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")] Training training)
+        public async Task<IActionResult> Edit(
+            int id,
+            [Bind("TrainingId,TrainerId,TrainingTypeId,Name,Description,Duration,DayOfWeek,StartTime,MaxParticipants")]
+            Training training)
         {
-            if (id != training.TrainingId)
+            if (id != training.TrainingId) return NotFound();
+
+            if (training.Duration <= 0)
             {
-                return NotFound();
+                ModelState.AddModelError(nameof(training.Duration),
+                    "A duração do treino deve ser superior a 0 minutos.");
             }
 
             if (ModelState.IsValid)
@@ -147,44 +206,49 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(training);
                     await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Treino atualizado com sucesso.";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TrainingExists(training.TrainingId))
-                    {
+                    if (!_context.Training.Any(t => t.TrainingId == training.TrainingId))
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Email", training.TrainerId);
-            ViewData["TrainingTypeId"] = new SelectList(_context.TrainingType, "TrainingTypeId", "Name", training.TrainingTypeId);
+
+            ViewData["TrainerId"] = new SelectList(
+                _context.Trainer.OrderBy(t => t.Name),
+                "TrainerId",
+                "Name",
+                training.TrainerId);
+
+            ViewData["TrainingTypeId"] = new SelectList(
+                _context.TrainingType.OrderBy(tt => tt.Name),
+                "TrainingTypeId",
+                "Name",
+                training.TrainingTypeId);
+
             return View(training);
         }
 
+        // GET: Training/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var training = await _context.Training
                 .Include(t => t.Trainer)
                 .Include(t => t.TrainingType)
-                .FirstOrDefaultAsync(m => m.TrainingId == id);
-            if (training == null)
-            {
-                return NotFound();
-            }
+                .FirstOrDefaultAsync(t => t.TrainingId == id);
+
+            if (training == null) return NotFound();
 
             return View(training);
         }
 
+        // POST: Training/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -193,15 +257,11 @@ namespace HealthWellbeing.Controllers
             if (training != null)
             {
                 _context.Training.Remove(training);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Treino eliminado com sucesso.";
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TrainingExists(int id)
-        {
-            return _context.Training.Any(e => e.TrainingId == id);
         }
     }
 }

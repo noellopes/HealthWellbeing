@@ -4,77 +4,115 @@
     ViewData["Title"] = "Create Training Session";
 }
 
-<h1 class="display-4 text-primary mb-4">Create New Training Session</h1>
+<div class="container-fluid px-4">
+    <h1 class="mt-4 text-primary">
+        <i class="bi bi-calendar-plus-fill me-2"></i>Create Training Session
+    </h1>
 
-<h4 class="mb-3">Enter Training Session Details</h4>
-<hr class="mb-4" />
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="card-title mb-0 fw-bold">Training Session Form</h5>
+        </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-        <div class="card shadow-lg p-4">
-            <form asp-action="Create">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <div class="card-body p-4">
+            <p class="text-muted small mb-4">
+                Fill in the details below to schedule a new training session.
+            </p>
 
-                <div class="row">
+            <form asp-action="Create" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
 
+                <div asp-validation-summary="ModelOnly"
+                     class="alert alert-danger mb-4 shadow-sm">
+                </div>
+
+                <div class="row g-3">
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainerId" class="form-label fw-bold"></label>
-                        <select asp-for="TrainerId" class="form-control" asp-items="ViewBag.TrainerId"></select>
-                        <span asp-validation-for="TrainerId" class="text-danger"></span>
+                        <select asp-for="TrainerId"
+                                class="form-select shadow-sm"
+                                asp-items="ViewBag.TrainerId">
+                            <option value="">Choose trainer...</option>
+                        </select>
+                        <span asp-validation-for="TrainerId" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label asp-for="TrainingTypeId" class="form-label fw-bold"></label>
-                        <select asp-for="TrainingTypeId" class="form-control" asp-items="ViewBag.TrainingTypeId"></select>
-                        <span asp-validation-for="TrainingTypeId" class="text-danger"></span>
+                        <select asp-for="TrainingTypeId"
+                                class="form-select shadow-sm"
+                                asp-items="ViewBag.TrainingTypeId">
+                            <option value="">Choose training type...</option>
+                        </select>
+                        <span asp-validation-for="TrainingTypeId" class="invalid-feedback"></span>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name"
+                               class="form-control shadow-sm"
+                               placeholder="Training session name" />
+                        <span asp-validation-for="Name" class="invalid-feedback"></span>
+                    </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold"></label>
-                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
+                    <div class="col-md-12 mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <textarea asp-for="Description"
+                                  class="form-control shadow-sm"
+                                  rows="3"
+                                  placeholder="Optional description"></textarea>
+                        <span asp-validation-for="Description" class="invalid-feedback"></span>
+                    </div>
 
-                <div class="row">
                     <div class="col-md-4 mb-3">
                         <label asp-for="DayOfWeek" class="form-label fw-bold"></label>
-                        <input asp-for="DayOfWeek" class="form-control" />
-                        <span asp-validation-for="DayOfWeek" class="text-danger"></span>
+                        <select asp-for="DayOfWeek"
+                                class="form-select shadow-sm"
+                                asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.WeekDay>()">
+                            <option value="">Choose day...</option>
+                        </select>
+                        <span asp-validation-for="DayOfWeek" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label asp-for="StartTime" class="form-label fw-bold"></label>
-                        <input asp-for="StartTime" class="form-control" type="time" />
-                        <span asp-validation-for="StartTime" class="text-danger"></span>
+                        <input asp-for="StartTime"
+                               type="time"
+                               class="form-control shadow-sm" />
+                        <span asp-validation-for="StartTime" class="invalid-feedback"></span>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label asp-for="Duration" class="form-label fw-bold"></label>
-                        <input asp-for="Duration" class="form-control" type="number" min="45" max="120" />
-                        <span asp-validation-for="Duration" class="text-danger"></span>
+                        <input asp-for="Duration"
+                               type="number"
+                               min="45"
+                               max="120"
+                               class="form-control shadow-sm"
+                               placeholder="Minutes" />
+                        <span asp-validation-for="Duration" class="invalid-feedback"></span>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label asp-for="MaxParticipants" class="form-label fw-bold"></label>
-                        <input asp-for="MaxParticipants" class="form-control" type="number" min="1" max="50" />
-                        <span asp-validation-for="MaxParticipants" class="text-danger"></span>
+                        <input asp-for="MaxParticipants"
+                               type="number"
+                               min="1"
+                               max="50"
+                               class="form-control shadow-sm" />
+                        <span asp-validation-for="MaxParticipants" class="invalid-feedback"></span>
                     </div>
                 </div>
 
-                <div class="mb-3 d-flex justify-content-between pt-2">
-                    <input type="submit" value="Create Training Session" class="btn btn-primary btn-lg shadow" />
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <button type="submit"
+                            class="btn btn-success px-5 shadow-sm">
+                        <i class="bi bi-check-circle me-1"></i>Create Training
+                    </button>
 
-                    <a asp-action="Index" class="btn btn-secondary btn-lg">
-                        <i class="bi bi-arrow-left"></i> Back to List
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary px-4 shadow-sm">
+                        Back to List
                     </a>
                 </div>
             </form>
@@ -87,3 +125,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
