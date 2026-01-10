@@ -195,40 +195,7 @@ namespace HealthWellbeing.Controllers
             {
                 ClientNome = client.Name,
                 PlanoAlimentarId = plano.PlanoAlimentarId,
-                ReceitasAjustadas = ajustado.Receitas
-                    .Select(r => new ReceitaAjustadaVm
-                    {
-                        ReceitaId = r.ReceitaId,
-                        Nome = r.Nome,
-                        Descricao = r.Descricao,
-                        TempoPreparo = r.TempoPreparo,
-                        PorcoesOriginal = r.PorcoesOriginal,
-                        MultiplicadorPorcao = r.MultiplicadorPorcao,
-                        CaloriasPorPorcaoOriginal = r.CaloriasPorPorcaoOriginal,
-                        ProteinasPorPorcaoOriginal = r.ProteinasPorPorcaoOriginal,
-                        HidratosPorPorcaoOriginal = r.HidratosPorPorcaoOriginal,
-                        GordurasPorPorcaoOriginal = r.GordurasPorPorcaoOriginal,
-                        CaloriasPorPorcaoFinal = r.CaloriasPorPorcaoFinal,
-                        ProteinasPorPorcaoFinal = r.ProteinasPorPorcaoFinal,
-                        HidratosPorPorcaoFinal = r.HidratosPorPorcaoFinal,
-                        GordurasPorPorcaoFinal = r.GordurasPorPorcaoFinal,
-                        Ingredientes = r.Ingredientes.Select(i => new IngredienteAjustadoVm
-                        {
-                            AlimentoOriginalNome = i.AlimentoOriginalNome,
-                            AlimentoFinalNome = i.AlimentoFinalNome,
-                            UnidadeMedida = i.UnidadeMedida.ToString(),
-                            QuantidadeOriginal = i.QuantidadeOriginal,
-                            QuantidadeFinal = i.QuantidadeFinal,
-                            TipoAjuste = i.TipoAjuste.ToString(),
-                            IncluidoNoResultado = i.IncluidoNoResultado
-                        }).ToList(),
-                        Notas = r.Notas.Select(n => new AjusteNotaVm
-                        {
-                            Tipo = n.Tipo.ToString(),
-                            Mensagem = n.Mensagem
-                        }).ToList()
-                    })
-                    .ToList(),
+                ReceitasAjustadas = ajustado.Receitas.Select(r => r.ToVm()).ToList(),
                 Aviso = ajustado.Aviso
             };
 
