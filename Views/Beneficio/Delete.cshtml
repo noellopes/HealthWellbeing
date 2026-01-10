@@ -1,17 +1,18 @@
 ﻿@model HealthWellbeing.Models.Beneficio
 
 @{
-    ViewData["Title"] = "Eliminar";
+    ViewData["Title"] = "Eliminar Benefício";
+    bool podeEliminar = ViewBag.PodeEliminar ?? true;
 }
 
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
 
-            @if (ViewData["ErrorMessage"] != null)
+            @if (TempData["StatusMessage"] != null && TempData["StatusMessage"].ToString().StartsWith("Erro"))
             {
                 <div class="alert alert-danger shadow-sm mb-4" role="alert">
-                    <i class="bi bi-exclamation-circle me-2"></i> @ViewData["ErrorMessage"]
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["StatusMessage"]
                 </div>
             }
 
@@ -22,38 +23,55 @@
                         <i class="bi bi-trash3 display-1"></i>
                     </div>
 
-                    <h2 class="h3 mb-3 fw-bold text-danger">Eliminar Benefício?</h2>
-                    <p class="text-muted mb-4">
-                        Tem a certeza que deseja eliminar o benefício
-                        <strong class="text-dark">@Model.NomeBeneficio</strong>?
-                        <br>Esta ação pode ser irreversível.
-                    </p>
+                    <h2 class="h3 mb-3 fw-bold text-danger">Eliminar Benefício</h2>
+
+                    @if (!podeEliminar)
+                    {
+                        <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-start small mb-4">
+                            <h6 class="alert-heading fw-bold text-danger"><i class="bi bi-lock-fill me-1"></i> Ação Bloqueada</h6>
+                            <p class="mb-0 text-dark">
+                                @ViewBag.MensagemErro
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-4">
+                            Tem a certeza que deseja eliminar o benefício
+                            <strong class="text-dark">@Model.NomeBeneficio</strong>?
+                            <br>Esta ação é irreversível.
+                        </p>
+                    }
 
                     <div class="bg-light p-3 rounded mb-4 text-start small border">
-                        <div class="row">
-                            <div class="col-4 text-muted">Descrição:</div>
-                            <div class="col-8 text-dark">
-                                @(string.IsNullOrEmpty(Model.DescricaoBeneficio) ? "-" : Model.DescricaoBeneficio)
-                            </div>
-                        </div>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted">Nome:</dt>
+                            <dd class="col-sm-8 fw-bold text-dark">@Model.NomeBeneficio</dd>
+
+                            <dt class="col-sm-4 text-muted">Descrição:</dt>
+                            <dd class="col-sm-8 text-secondary">
+                                @(string.IsNullOrEmpty(Model.DescricaoBeneficio) ? "Sem descrição" : Model.DescricaoBeneficio)
+                            </dd>
+                        </dl>
                     </div>
 
-                    <form asp-action="Delete" class="d-flex justify-content-center gap-2">
+                    <form asp-action="Delete" method="post" class="d-flex justify-content-center gap-2">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="BeneficioId" />
 
                         <a asp-action="Index" class="btn btn-outline-secondary px-4">
                             Cancelar
                         </a>
 
-                        @if (ViewData["DisableDelete"] == null)
+                        @if (podeEliminar)
                         {
                             <button type="submit" class="btn btn-danger px-4">
-                                <i class="bi bi-trash-fill me-1"></i> Eliminar
+                                <i class="bi bi-trash-fill me-1"></i> Confirmar Eliminação
                             </button>
                         }
                         else
                         {
-                            <button type="submit" class="btn btn-danger px-4 opacity-50" disabled title="Não é possível apagar pois está associado a Tipos de Exercício.">
+                            <button type="button" class="btn btn-danger px-4 opacity-50" disabled title="Remova as dependências primeiro">
                                 <i class="bi bi-lock-fill me-1"></i> Bloqueado
                             </button>
                         }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels; // Necessário para PaginationInfo
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -20,36 +20,27 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        
+        // GET: ObjetivoFisico
         public async Task<IActionResult> Index(int page = 1, string searchNome = "")
         {
             var query = _context.ObjetivoFisico.AsQueryable();
 
-            
             if (!string.IsNullOrEmpty(searchNome))
             {
                 query = query.Where(o => o.NomeObjetivo.Contains(searchNome));
             }
 
-            
             ViewBag.SearchNome = searchNome;
 
-            
             int total = await query.CountAsync();
             var pagination = new PaginationInfo<ObjetivoFisico>(page, total);
 
             if (total > 0)
             {
-                pagination.Items = await query
-                    .OrderBy(o => o.NomeObjetivo)
-                    .Skip(pagination.ItemsToSkip)
-                    .Take(pagination.ItemsPerPage)
-                    .ToListAsync();
+                pagination.Items = await query.OrderBy(o => o.NomeObjetivo)
+                    .Skip(pagination.ItemsToSkip).Take(pagination.ItemsPerPage).ToListAsync();
             }
-            else
-            {
-                pagination.Items = new List<ObjetivoFisico>();
-            }
+            else pagination.Items = new List<ObjetivoFisico>();
 
             return View(pagination);
         }
@@ -58,12 +49,8 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
-            var objetivoFisico = await _context.ObjetivoFisico
-                .FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
-
+            var objetivoFisico = await _context.ObjetivoFisico.FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
             if (objetivoFisico == null) return NotFound();
-
             return View(objetivoFisico);
         }
 
@@ -92,14 +79,12 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var objetivoFisico = await _context.ObjetivoFisico.FindAsync(id);
             if (objetivoFisico == null) return NotFound();
-
             return View(objetivoFisico);
         }
 
-        
+        // POST: ObjetivoFisico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ObjetivoFisicoId,NomeObjetivo")] ObjetivoFisico objetivoFisico)
@@ -116,15 +101,8 @@ namespace HealthWellbeing.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ObjetivoFisicoExists(objetivoFisico.ObjetivoFisicoId))
-                    {
-                        
-                        return View("InvalidObjetivoFisico", objetivoFisico);
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!ObjetivoFisicoExists(objetivoFisico.ObjetivoFisicoId)) return View("InvalidObjetivoFisico", objetivoFisico);
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -138,6 +116,7 @@ namespace HealthWellbeing.Controllers
 
             var objetivoFisico = await _context.ObjetivoFisico
                 .Include(o => o.ExercicioObjetivos)
+                .Include(o => o.Utentes)
                 .FirstOrDefaultAsync(m => m.ObjetivoFisicoId == id);
 
             if (objetivoFisico == null)
@@ -147,9 +126,25 @@ namespace HealthWellbeing.Controllers
             }
 
             int numExercicios = objetivoFisico.ExercicioObjetivos?.Count ?? 0;
+            int numUtentes = objetivoFisico.Utentes?.Count ?? 0;
+
+            if (numUtentes > 0)
+            {
+                ViewBag.PodeEliminar = false;
+                ViewBag.MensagemErro = $"Não é possível eliminar '{objetivoFisico.NomeObjetivo}' porque está atribuído a {numUtentes} Utente(s).";
+            }
+            else if (numExercicios > 0)
+            {
+                ViewBag.PodeEliminar = false;
+                ViewBag.MensagemErro = $"Não é possível eliminar '{objetivoFisico.NomeObjetivo}' porque está associado a {numExercicios} Exercício(s).";
+            }
+            else
+            {
+                ViewBag.PodeEliminar = true;
+            }
 
             ViewBag.NumExercicios = numExercicios;
-            ViewBag.PodeEliminar = numExercicios == 0;
+            ViewBag.NumUtentes = numUtentes;
 
             return View(objetivoFisico);
         }
@@ -157,30 +152,32 @@ namespace HealthWellbeing.Controllers
         // POST: ObjetivoFisico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int ObjetivoFisicoId) 
+        public async Task<IActionResult> DeleteConfirmed(int ObjetivoFisicoId)
         {
             var objetivoFisico = await _context.ObjetivoFisico.FindAsync(ObjetivoFisicoId);
-
             if (objetivoFisico == null) return RedirectToAction(nameof(Index));
 
             try
             {
                 _context.ObjetivoFisico.Remove(objetivoFisico);
                 await _context.SaveChangesAsync();
-
                 TempData["StatusMessage"] = "Sucesso: Objetivo eliminado.";
-                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ObjetivoFisicoExists(ObjetivoFisicoId)) return RedirectToAction(nameof(Index));
+                else throw;
             }
             catch (DbUpdateException)
             {
-                TempData["ErrorMessage"] = "Não é possível eliminar este objetivo porque está associado a um ou mais exercícios.";
-                return RedirectToAction(nameof(Delete), new { id = ObjetivoFisicoId });
+                TempData["StatusMessage"] = "Erro: Existem dependências que impedem a eliminação.";
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocorreu um erro inesperado ao tentar eliminar o objetivo.";
-                return RedirectToAction(nameof(Delete), new { id = ObjetivoFisicoId });
+                TempData["StatusMessage"] = "Erro: Ocorreu um erro inesperado.";
             }
+
+            return RedirectToAction(nameof(Index));
         }
 
         private bool ObjetivoFisicoExists(int id)

@@ -72,13 +72,21 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(up => up.UtenteGrupo7Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // 5. Utente -> Histórico de Atividade (NOVO)
-            // Assumindo que HistoricoAtividade tem uma propriedade 'UtenteGrupo7Id' e 'UtenteGrupo7'
+            // 5. Utente -> Histórico de Atividade
             modelBuilder.Entity<HistoricoAtividade>()
                 .HasOne(h => h.UtenteGrupo7)
                 .WithMany(u => u.HistoricoAtividades)
                 .HasForeignKey(h => h.UtenteGrupo7Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            //  6. UTENTE -> OBJETIVO FISICO
+
+            modelBuilder.Entity<UtenteGrupo7>()
+                .HasOne(u => u.ObjetivoFisico)
+                .WithMany(o => o.Utentes) 
+                .HasForeignKey(u => u.ObjetivoFisicoId)
+                .OnDelete(DeleteBehavior.NoAction);
+
 
             // =================================================================================
             // RESTANTES RELAÇÕES
@@ -92,7 +100,7 @@ namespace HealthWellbeing.Data
                 .HasOne(up => up.ProblemaSaude)
                 .WithMany(p => p.UtenteProblemasSaude)
                 .HasForeignKey(up => up.ProblemaSaudeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); 
 
             // Exercicio <-> Genero
             modelBuilder.Entity<ExercicioGenero>()
@@ -172,7 +180,7 @@ namespace HealthWellbeing.Data
                 .HasOne(et => et.TipoExercicio)
                 .WithMany(t => t.ExercicioTipoExercicios)
                 .HasForeignKey(et => et.TipoExercicioId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Exercicio <-> Objetivo Fisico
             modelBuilder.Entity<ExercicioObjetivoFisico>()
@@ -224,12 +232,14 @@ namespace HealthWellbeing.Data
             modelBuilder.Entity<TipoExercicioBeneficio>()
                 .HasOne(tb => tb.TipoExercicio)
                 .WithMany(t => t.TipoExercicioBeneficios)
-                .HasForeignKey(tb => tb.TipoExercicioId);
+                .HasForeignKey(tb => tb.TipoExercicioId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TipoExercicioBeneficio>()
                 .HasOne(tb => tb.Beneficio)
                 .WithMany(b => b.TipoExercicioBeneficios)
-                .HasForeignKey(tb => tb.BeneficioId);
+                .HasForeignKey(tb => tb.BeneficioId)
+                .OnDelete(DeleteBehavior.NoAction);
 
         }
     }

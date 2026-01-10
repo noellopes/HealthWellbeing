@@ -4,15 +4,12 @@ using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using static HealthWellbeing.Data.SeedData;
 
 namespace HealthWellbeing.Controllers
 {
     [Authorize(Roles = SeedData.Roles.Administrador + "," + SeedData.Roles.Profissional)]
-
     public class BeneficioController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -27,24 +24,15 @@ namespace HealthWellbeing.Controllers
         {
             var query = _context.Beneficio.AsQueryable();
 
-            // --- 1. Filtros de Pesquisa ---
             if (!string.IsNullOrEmpty(searchNome))
-            {
                 query = query.Where(b => b.NomeBeneficio.Contains(searchNome));
-            }
 
             if (!string.IsNullOrEmpty(searchDescricao))
-            {
                 query.Where(b => b.DescricaoBeneficio.Contains(searchDescricao));
-            }
 
-            // --- 2. Paginação ---
             int totalItems = await query.CountAsync();
-            int pageSize = 5;
+            var pagination = new PaginationInfo<Beneficio>(page, totalItems, 5);
 
-            var pagination = new PaginationInfo<Beneficio>(page, totalItems, pageSize);
-
-            // --- 3. Obter Dados ---
             var items = await query
                 .OrderBy(b => b.NomeBeneficio)
                 .Skip(pagination.ItemsToSkip)
@@ -52,8 +40,6 @@ namespace HealthWellbeing.Controllers
                 .ToListAsync();
 
             pagination.Items = items;
-
-            // --- 4. Manter o estado da pesquisa ---
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchDescricao = searchDescricao;
 
@@ -64,12 +50,8 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
-            var beneficio = await _context.Beneficio
-                .FirstOrDefaultAsync(m => m.BeneficioId == id);
-
+            var beneficio = await _context.Beneficio.FirstOrDefaultAsync(m => m.BeneficioId == id);
             if (beneficio == null) return NotFound();
-
             return View(beneficio);
         }
 
@@ -84,22 +66,20 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BeneficioId,NomeBeneficio,DescricaoBeneficio")] Beneficio beneficio)
         {
-
             var existingBeneficio = await _context.Beneficio
                 .FirstOrDefaultAsync(b => b.NomeBeneficio.ToLower() == beneficio.NomeBeneficio.ToLower());
 
             if (existingBeneficio != null)
             {
-                TempData["StatusMessage"] = $"Erro: O Benefício '{beneficio.NomeBeneficio}' já existe no sistema.";
+                TempData["StatusMessage"] = $"Erro: O Benefício '{beneficio.NomeBeneficio}' já existe.";
                 return View(beneficio);
             }
-
 
             if (ModelState.IsValid)
             {
                 _context.Add(beneficio);
                 await _context.SaveChangesAsync();
-                TempData["StatusMessage"] = $"Sucesso: O Benefício '{beneficio.NomeBeneficio}' foi criado com sucesso!";
+                TempData["StatusMessage"] = $"Sucesso: Benefício '{beneficio.NomeBeneficio}' criado.";
                 return RedirectToAction(nameof(Index));
             }
             return View(beneficio);
@@ -109,10 +89,8 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var beneficio = await _context.Beneficio.FindAsync(id);
             if (beneficio == null) return NotFound();
-
             return View(beneficio);
         }
 
@@ -123,19 +101,14 @@ namespace HealthWellbeing.Controllers
         {
             if (id != beneficio.BeneficioId) return NotFound();
 
-
             var existingBeneficioWithSameName = await _context.Beneficio
-                .FirstOrDefaultAsync(b =>
-                    b.NomeBeneficio.ToLower() == beneficio.NomeBeneficio.ToLower() &&
-                    b.BeneficioId != id);
+                .FirstOrDefaultAsync(b => b.NomeBeneficio.ToLower() == beneficio.NomeBeneficio.ToLower() && b.BeneficioId != id);
 
             if (existingBeneficioWithSameName != null)
             {
-                
-                ViewData["StatusMessage"] = $"Erro: O Benefício '{beneficio.NomeBeneficio}' já existe para outro registo.";
+                ViewData["StatusMessage"] = $"Erro: Já existe um benefício com o nome '{beneficio.NomeBeneficio}'.";
                 return View(beneficio);
             }
-
 
             if (ModelState.IsValid)
             {
@@ -143,15 +116,11 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(beneficio);
                     await _context.SaveChangesAsync();
-                    TempData["StatusMessage"] = "Sucesso: Benefício atualizado com sucesso!";
+                    TempData["StatusMessage"] = "Sucesso: Benefício atualizado.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BeneficioExists(beneficio.BeneficioId))
-                    {
-
-                        return RedirectToAction(nameof(Invalido), beneficio);
-                    }
+                    if (!BeneficioExists(beneficio.BeneficioId)) return View("InvalidBeneficio", beneficio);
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -159,43 +128,25 @@ namespace HealthWellbeing.Controllers
             return View(beneficio);
         }
 
-
-        // GET: Beneficio/Invalido
-        public IActionResult Invalido(Beneficio beneficio)
-        {
-            return View("InvalidBeneficio", beneficio);
-        }
-
-
         // GET: Beneficio/Delete/5
-        public async Task<IActionResult> Delete(int? id, bool concurrencyError = false)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var beneficio = await _context.Beneficio
-                .FirstOrDefaultAsync(m => m.BeneficioId == id);
+            var beneficio = await _context.Beneficio.FirstOrDefaultAsync(m => m.BeneficioId == id);
+            if (beneficio == null) return NotFound();
 
-            if (beneficio == null)
+            // Contar quantas vezes é usado
+            int numAssociacoes = await _context.TipoExercicioBeneficio.CountAsync(tb => tb.BeneficioId == id);
+
+            if (numAssociacoes > 0)
             {
-                if (!concurrencyError) return NotFound();
-                return RedirectToAction(nameof(Index));
+                ViewBag.PodeEliminar = false;
+                ViewBag.MensagemErro = $"Não é possível eliminar o benefício '{beneficio.NomeBeneficio}' porque ele está associado a {numAssociacoes} Tipo(s) de Exercício.";
             }
-
-
-            var hasAssociations = await _context.TipoExercicioBeneficio
-                .AnyAsync(tb => tb.BeneficioId == id);
-
-            if (hasAssociations)
+            else
             {
-                ViewData["ErrorMessage"] = $"Não é possível excluir o benefício '{beneficio.NomeBeneficio}', pois está associado a um ou mais Tipos de Exercício.";
-                ViewData["DisableDelete"] = true;
-            }
-
-            if (concurrencyError)
-            {
-                ViewData["ErrorMessage"] = ViewData["ErrorMessage"] != null
-                    ? ViewData["ErrorMessage"]
-                    : "O benefício foi modificado por outro utilizador. Por favor, reveja e tente novamente.";
+                ViewBag.PodeEliminar = true;
             }
 
             return View(beneficio);
@@ -209,28 +160,28 @@ namespace HealthWellbeing.Controllers
             var beneficio = await _context.Beneficio.FindAsync(id);
             if (beneficio == null) return RedirectToAction(nameof(Index));
 
-
-            var hasAssociations = await _context.TipoExercicioBeneficio
-                .AnyAsync(tb => tb.BeneficioId == id);
-
-            if (hasAssociations)
-            {
-                return RedirectToAction(nameof(Delete), new { id = id });
-            }
-
             try
             {
                 _context.Beneficio.Remove(beneficio);
                 await _context.SaveChangesAsync();
-                TempData["StatusMessage"] = "Sucesso: Benefício eliminado com sucesso!";
+                TempData["StatusMessage"] = "Sucesso: Benefício eliminado.";
             }
             catch (DbUpdateConcurrencyException)
             {
                 if (!BeneficioExists(id)) return RedirectToAction(nameof(Index));
-                else return RedirectToAction(nameof(Delete), new { id = id, concurrencyError = true });
+                else throw;
+            }
+            catch (DbUpdateException)
+            {
+                TempData["StatusMessage"] = "Erro: Não é possível eliminar devido a dependências.";
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Invalido(Beneficio beneficio)
+        {
+            return View("InvalidBeneficio", beneficio);
         }
 
         private bool BeneficioExists(int id)
