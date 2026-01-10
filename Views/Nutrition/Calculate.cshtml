@@ -1,0 +1,165 @@
+﻿@model HealthWellbeing.Models.NutritionalNeeds
+
+@{
+    ViewData["Title"] = "Necessidades Nutricionais Calculadas";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Necessidades Nutricionais - @Model.ClientName</h2>
+            <p class="text-muted">Calculado em: @Model.CalculatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+    </div>
+
+    <!-- Calorias -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>Calorias Diárias Recomendadas</h3>
+                    <h1 class="display-3">@Model.DailyCalories <small>kcal</small></h1>
+                    <p class="mb-0">
+                        <strong>TMB:</strong> @Model.TMB kcal |
+                        <strong>TDEE:</strong> @Model.TDEE kcal
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Macronutrientes -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Proteínas</h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="text-success">@Model.ProteinGrams g</h2>
+                    <p class="mb-0">@Model.ProteinPercentage% das calorias</p>
+                    <small class="text-muted">@((Model.ProteinGrams * 4).ToString("F0")) kcal</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Carboidratos</h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="text-warning">@Model.CarbohydratesGrams g</h2>
+                    <p class="mb-0">@Model.CarbsPercentage% das calorias</p>
+                    <small class="text-muted">@((Model.CarbohydratesGrams * 4).ToString("F0")) kcal</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Gorduras</h5>
+                </div>
+                <div class="card-body">
+                    <h2 class="text-info">@Model.FatsGrams g</h2>
+                    <p class="mb-0">@Model.FatsPercentage% das calorias</p>
+                    <small class="text-muted">@((Model.FatsGrams * 9).ToString("F0")) kcal</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico -->
+    <div class="row mt-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Distribuição de Macronutrientes</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="macroChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Micronutrientes -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Micronutrientes Recomendados (Diários)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center p-3 border rounded">
+                                <h6>Fibras</h6>
+                                <h4>@Model.FiberGrams g</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 border rounded">
+                                <h6>Sódio (máx)</h6>
+                                <h4>@Model.SodiumMg mg</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 border rounded">
+                                <h6>Cálcio</h6>
+                                <h4>@Model.CalciumMg mg</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 border rounded">
+                                <h6>Ferro</h6>
+                                <h4>@Model.IronMg mg</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="row mt-4 mb-5">
+        <div class="col-md-12 text-center">
+            <a asp-action="ListAll" class="btn btn-secondary">Voltar à Lista</a>
+            <a asp-action="CompareWithGoal" asp-route-id="@Model.ClientId" class="btn btn-success">Comparar com Meta</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('macroChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Proteínas (@Model.ProteinPercentage%)',
+                         'Carboidratos (@Model.CarbsPercentage%)',
+                         'Gorduras (@Model.FatsPercentage%)'],
+                datasets: [{
+                    data: [@Model.ProteinPercentage, @Model.CarbsPercentage, @Model.FatsPercentage],
+                    backgroundColor: ['#28a745', '#ffc107', '#17a2b8'],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: {
+                        display: true,
+                        text: 'Distribuição Percentual',
+                        font: { size: 16 }
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,52 @@
+﻿@model IEnumerable<HealthWellbeing.Models.Client>
+
+@{
+    ViewData["Title"] = "Lista de Clientes";
+}
+
+<div class="container mt-4">
+    <h2>Lista de Clientes - Análise Nutricional</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Género</th>
+                <th>Data Nascimento</th>
+                <th>Data Registo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in Model)
+            {
+                <tr>
+                    <td>@client.Name</td>
+                    <td>@client.Email</td>
+                    <td>@client.Gender</td>
+                    <td>@(client.BirthDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                    <td>@client.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="Calculate" asp-route-id="@client.ClientId"
+                           class="btn btn-primary btn-sm" title="Calcular Necessidades">
+                            <i class="bi bi-calculator"></i> Calcular
+                        </a>
+                        <a asp-action="CompareWithGoal" asp-route-id="@client.ClientId"
+                           class="btn btn-success btn-sm" title="Comparar com Meta">
+                            <i class="bi bi-graph-up"></i> Comparar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
