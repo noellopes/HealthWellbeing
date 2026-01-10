@@ -1,6 +1,7 @@
 ﻿// Controllers/NutritionController.cs
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,10 +21,85 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Nutrition/ListAll
-        public IActionResult ListAll()
+        public IActionResult ListAll(
+            string searchName = "",
+            string searchEmail = "",
+            string searchGender = "",
+            DateTime? searchBirthDateFrom = null,
+            DateTime? searchBirthDateTo = null,
+            DateTime? searchRegistrationDateFrom = null,
+            DateTime? searchRegistrationDateTo = null,
+            int page = 1,
+            int pageSize = 10)
         {
-            var clients = _context.Client.ToList();
-            return View(clients);
+            // Iniciar a query
+            IQueryable<Client> query = _context.Client;
+
+            // Aplicar filtros
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(c => c.Name.Contains(searchName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchEmail))
+            {
+                query = query.Where(c => c.Email.Contains(searchEmail));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchGender))
+            {
+                query = query.Where(c => c.Gender == searchGender);
+            }
+
+            if (searchBirthDateFrom.HasValue)
+            {
+                query = query.Where(c => c.BirthDate >= searchBirthDateFrom.Value);
+            }
+
+            if (searchBirthDateTo.HasValue)
+            {
+                var endOfDay = searchBirthDateTo.Value.AddDays(1);
+                query = query.Where(c => c.BirthDate < endOfDay);
+            }
+
+            if (searchRegistrationDateFrom.HasValue)
+            {
+                query = query.Where(c => c.RegistrationDate >= searchRegistrationDateFrom.Value);
+            }
+
+            if (searchRegistrationDateTo.HasValue)
+            {
+                var endOfDay = searchRegistrationDateTo.Value.AddDays(1);
+                query = query.Where(c => c.RegistrationDate < endOfDay);
+            }
+
+            // Contar total antes de paginar
+            int totalCount = query.Count();
+
+            // Aplicar paginação
+            var clients = query
+                .OrderByDescending(c => c.RegistrationDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Criar ViewModel
+            var viewModel = new ClientSearchViewModel
+            {
+                Clients = clients,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                SearchName = searchName,
+                SearchEmail = searchEmail,
+                SearchGender = searchGender,
+                SearchBirthDateFrom = searchBirthDateFrom,
+                SearchBirthDateTo = searchBirthDateTo,
+                SearchRegistrationDateFrom = searchRegistrationDateFrom,
+                SearchRegistrationDateTo = searchRegistrationDateTo
+            };
+
+            return View(viewModel);
         }
 
         // GET: Nutrition/Calculate/ClientId-String (optional)

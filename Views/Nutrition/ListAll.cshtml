@@ -1,4 +1,4 @@
-﻿@model IEnumerable<HealthWellbeing.Models.Client>
+﻿@model HealthWellbeing.ViewModels.ClientSearchViewModel
 
 @{
     ViewData["Title"] = "Lista de Clientes";
@@ -15,6 +15,98 @@
         </div>
     }
 
+    <!-- Formulário de Pesquisa -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Filtros de Pesquisa</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="ListAll" class="row g-3">
+                <!-- Nome -->
+                <div class="col-md-3">
+                    <label for="searchName" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="searchName" name="searchName" 
+                           placeholder="Digite o nome..." value="@Model.SearchName" />
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-3">
+                    <label for="searchEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="searchEmail" name="searchEmail" 
+                           placeholder="Digite o email..." value="@Model.SearchEmail" />
+                </div>
+
+                <!-- Género -->
+                <div class="col-md-3">
+                    <label for="searchGender" class="form-label">Género</label>
+                    <select class="form-select" id="searchGender" name="searchGender">
+                        <option value="">-- Selecione --</option>
+                        <option value="M" @(Model.SearchGender == "M" ? "selected" : "")>Masculino</option>
+                        <option value="F" @(Model.SearchGender == "F" ? "selected" : "")>Feminino</option>
+                        <option value="Masculino" @(Model.SearchGender == "Masculino" ? "selected" : "")>Masculino (PT)</option>
+                        <option value="Feminino" @(Model.SearchGender == "Feminino" ? "selected" : "")>Feminino (PT)</option>
+                    </select>
+                </div>
+
+                <!-- Tamanho da Página -->
+                <div class="col-md-3">
+                    <label for="pageSize" class="form-label">Itens por página</label>
+                    <select class="form-select" id="pageSize" name="pageSize">
+                        <option value="5" @(Model.PageSize == 5 ? "selected" : "")>5</option>
+                        <option value="10" @(Model.PageSize == 10 ? "selected" : "")>10</option>
+                        <option value="20" @(Model.PageSize == 20 ? "selected" : "")>20</option>
+                        <option value="50" @(Model.PageSize == 50 ? "selected" : "")>50</option>
+                    </select>
+                </div>
+
+                <!-- Data de Nascimento - De -->
+                <div class="col-md-3">
+                    <label for="searchBirthDateFrom" class="form-label">Data Nascimento (De)</label>
+                    <input type="date" class="form-control" id="searchBirthDateFrom" name="searchBirthDateFrom" 
+                           value="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Data de Nascimento - Até -->
+                <div class="col-md-3">
+                    <label for="searchBirthDateTo" class="form-label">Data Nascimento (Até)</label>
+                    <input type="date" class="form-control" id="searchBirthDateTo" name="searchBirthDateTo" 
+                           value="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Data de Registo - De -->
+                <div class="col-md-3">
+                    <label for="searchRegistrationDateFrom" class="form-label">Data Registo (De)</label>
+                    <input type="date" class="form-control" id="searchRegistrationDateFrom" name="searchRegistrationDateFrom" 
+                           value="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Data de Registo - Até -->
+                <div class="col-md-3">
+                    <label for="searchRegistrationDateTo" class="form-label">Data Registo (Até)</label>
+                    <input type="date" class="form-control" id="searchRegistrationDateTo" name="searchRegistrationDateTo" 
+                           value="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Botões -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Pesquisar
+                    </button>
+                    <a asp-action="ListAll" class="btn btn-secondary">
+                        <i class="bi bi-arrow-clockwise"></i> Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Informações de Resultados -->
+    <div class="alert alert-info mb-3">
+        <strong>Resultados:</strong> @Model.Clients.Count de @Model.TotalCount cliente(s) 
+        <span class="float-end">Página @Model.CurrentPage de @Model.TotalPages</span>
+    </div>
+
+    <!-- Tabela de Clientes -->
     <table class="table table-hover">
         <thead class="table-dark">
             <tr>
@@ -27,26 +119,175 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var client in Model)
+            @if (Model.Clients.Count == 0)
             {
                 <tr>
-                    <td>@client.Name</td>
-                    <td>@client.Email</td>
-                    <td>@client.Gender</td>
-                    <td>@(client.BirthDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                    <td>@client.RegistrationDate.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a asp-action="Calculate" asp-route-id="@client.ClientId"
-                           class="btn btn-primary btn-sm" title="Calcular Necessidades">
-                            <i class="bi bi-calculator"></i> Calcular
-                        </a>
-                        <a asp-action="CompareWithGoal" asp-route-id="@client.ClientId"
-                           class="btn btn-success btn-sm" title="Comparar com Meta">
-                            <i class="bi bi-graph-up"></i> Comparar
-                        </a>
+                    <td colspan="6" class="text-center text-muted">
+                        Nenhum cliente encontrado com os critérios de pesquisa.
                     </td>
                 </tr>
             }
+            else
+            {
+                @foreach (var client in Model.Clients)
+                {
+                    <tr>
+                        <td>@client.Name</td>
+                        <td>@client.Email</td>
+                        <td>@client.Gender</td>
+                        <td>@(client.BirthDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                        <td>@client.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a asp-action="Calculate" asp-route-id="@client.ClientId"
+                               class="btn btn-primary btn-sm" title="Calcular Necessidades">
+                                <i class="bi bi-calculator"></i> Calcular
+                            </a>
+                            <a asp-action="CompareWithGoal" asp-route-id="@client.ClientId"
+                               class="btn btn-success btn-sm" title="Comparar com Meta">
+                                <i class="bi bi-graph-up"></i> Comparar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
         </tbody>
     </table>
+
+    <!-- Paginação -->
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Navegação de páginas">
+            <ul class="pagination justify-content-center">
+                <!-- Botão Anterior -->
+                <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a class="page-link" 
+                           asp-action="ListAll"
+                           asp-route-page="@(Model.CurrentPage - 1)"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-searchName="@Model.SearchName"
+                           asp-route-searchEmail="@Model.SearchEmail"
+                           asp-route-searchGender="@Model.SearchGender"
+                           asp-route-searchBirthDateFrom="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
+                           asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
+                            &laquo; Anterior
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link">&laquo; Anterior</span>
+                    }
+                </li>
+
+                <!-- Números de Páginas -->
+                @{
+                    int startPage = Math.Max(1, Model.CurrentPage - 2);
+                    int endPage = Math.Min(Model.TotalPages, Model.CurrentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" 
+                               asp-action="ListAll"
+                               asp-route-page="1"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-searchName="@Model.SearchName"
+                               asp-route-searchEmail="@Model.SearchEmail"
+                               asp-route-searchGender="@Model.SearchGender"
+                               asp-route-searchBirthDateFrom="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")"
+                               asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
+                               asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
+                               asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
+                                1
+                            </a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+
+                    for (int page = startPage; page <= endPage; page++)
+                    {
+                        if (page == Model.CurrentPage)
+                        {
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">
+                                    @page <span class="visually-hidden">(página atual)</span>
+                                </span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item">
+                                <a class="page-link" 
+                                   asp-action="ListAll"
+                                   asp-route-page="@page"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchName="@Model.SearchName"
+                                   asp-route-searchEmail="@Model.SearchEmail"
+                                   asp-route-searchGender="@Model.SearchGender"
+                                   asp-route-searchBirthDateFrom="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")"
+                                   asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
+                                   asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
+                                   asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
+                                    @page
+                                </a>
+                            </li>
+                        }
+                    }
+
+                    if (endPage < Model.TotalPages)
+                    {
+                        if (endPage < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" 
+                               asp-action="ListAll"
+                               asp-route-page="@Model.TotalPages"
+                               asp-route-pageSize="@Model.PageSize"
+                               asp-route-searchName="@Model.SearchName"
+                               asp-route-searchEmail="@Model.SearchEmail"
+                               asp-route-searchGender="@Model.SearchGender"
+                               asp-route-searchBirthDateFrom="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")"
+                               asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
+                               asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
+                               asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
+                                @Model.TotalPages
+                            </a>
+                        </li>
+                    }
+                }
+
+                <!-- Botão Próxima -->
+                <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                    @if (Model.HasNextPage)
+                    {
+                        <a class="page-link" 
+                           asp-action="ListAll"
+                           asp-route-page="@(Model.CurrentPage + 1)"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-searchName="@Model.SearchName"
+                           asp-route-searchEmail="@Model.SearchEmail"
+                           asp-route-searchGender="@Model.SearchGender"
+                           asp-route-searchBirthDateFrom="@Model.SearchBirthDateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-searchBirthDateTo="@Model.SearchBirthDateTo?.ToString("yyyy-MM-dd")"
+                           asp-route-searchRegistrationDateFrom="@Model.SearchRegistrationDateFrom?.ToString("yyyy-MM-dd")"
+                           asp-route-searchRegistrationDateTo="@Model.SearchRegistrationDateTo?.ToString("yyyy-MM-dd")">
+                            Próxima &raquo;
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="page-link">Próxima &raquo;</span>
+                    }
+                </li>
+            </ul>
+        </nav>
+    }
 </div>
