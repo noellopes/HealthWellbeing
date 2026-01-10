@@ -5,12 +5,13 @@
 @{
     ViewData["Title"] = "Foods";
     string search = ViewBag.Search as string ?? "";
+    bool isAdmin = User.IsInRole("Administrador") || User.IsInRole("Administrator");
+
 }
 
 <div class="container my-4">
     <div class="fh-wrapper">
 
-        <!-- HEADER -->
         <div class="fh-header">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                 <div>
@@ -25,7 +26,6 @@
                 </div>
 
                 <div class="d-flex flex-wrap align-items-center gap-2">
-                    <!-- SEARCH -->
                     <form asp-action="Index" method="get" class="fh-form d-flex align-items-center gap-2">
                         <input type="search"
                                name="search"
@@ -34,21 +34,37 @@
                                style="min-width: 260px;"
                                placeholder="Search by name or category" />
 
-                        <button type="submit" class="btn fh-btn-primary">
+                        <button type="submit" class="btn d-flex fh-btn-primary">
                             <i class="bi bi-search me-1"></i>Search
                         </button>
                     </form>
 
-                    <!-- CREATE -->
-                    <a asp-action="Create" class="btn btn-success" style="border-radius:12px; font-weight:800;">
-                        <i class="bi bi-plus-circle me-1"></i>Add Food
-                    </a>
+                    @if (isAdmin)
+                    {
+                        <a asp-action="Create" class="btn btn-success" style="border-radius:12px; font-weight:800;">
+                            <i class="bi bi-plus-circle me-1"></i>Add Food
+                        </a>
+                    }
                 </div>
             </div>
         </div>
 
-        <!-- CONTENT -->
         <div class="fh-panel">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success fh-alert d-flex align-items-center gap-2" role="alert">
+                    <i class="bi bi-check2-circle-fill" style="font-size:1.2rem;"></i>
+                    <div>@TempData["Success"]</div>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger fh-alert d-flex align-items-center gap-2" role="alert">
+                    <i class="bi bi-x-circle-fill" style="font-size:1.2rem;"></i>
+                    <div>@TempData["Error"]</div>
+                </div>
+            }
 
             @if (!Model.Items.Any())
             {
@@ -84,16 +100,20 @@
                                                style="border-radius:10px;">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a asp-action="Edit" asp-route-id="@item.FoodId"
-                                               class="btn btn-sm btn-outline-warning me-1"
-                                               style="border-radius:10px;">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@item.FoodId"
-                                               class="btn btn-sm btn-outline-danger"
-                                               style="border-radius:10px;">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </a>
+
+                                            @if (isAdmin)
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.FoodId"
+                                                   class="btn btn-sm btn-outline-warning me-1"
+                                                   style="border-radius:10px;">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.FoodId"
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   style="border-radius:10px;">
+                                                    <i class="bi bi-trash-fill"></i>
+                                                </a>
+                                            }
                                         </td>
                                     </tr>
                                 }
@@ -165,7 +185,6 @@
                     </style>
                 }
             }
-
         </div>
     </div>
 </div>
