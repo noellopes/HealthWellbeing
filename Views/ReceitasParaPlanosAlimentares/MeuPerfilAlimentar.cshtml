@@ -1,0 +1,222 @@
+@model HealthWellbeing.ViewModels.MeuPerfilAlimentarViewModel
+
+@{
+    ViewData["Title"] = "O Meu Perfil Alimentar";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">O Meu Perfil Alimentar</h1>
+            <p class="text-muted mb-0">Olá, <strong>@Model.ClientNome</strong>. Gere as suas alergias, restrições e metas.</p>
+        </div>
+        <a asp-action="MinhasReceitas" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar às minhas receitas
+        </a>
+    </div>
+
+    @if (TempData["AlertMessage"] != null)
+    {
+        var alertType = TempData["AlertType"]?.ToString() ?? "info";
+        <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+            @TempData["AlertMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Aviso))
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> @Model.Aviso
+        </div>
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-diamond"></i> As minhas alergias</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AdicionarAlergia" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ClientId" value="" />
+                        <label class="form-label">Adicionar alergia</label>
+                        <div class="input-group">
+                            <select name="ItemId" class="form-select" required>
+                                <option value="">-- Selecionar --</option>
+                                @foreach (var opt in Model.OpcoesAlergias)
+                                {
+                                    <option value="@opt.Value">@opt.Text</option>
+                                }
+                            </select>
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-plus-lg"></i></button>
+                        </div>
+                    </form>
+
+                    @if (Model.Alergias.Count == 0)
+                    {
+                        <div class="text-muted">Ainda não registou alergias.</div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var a in Model.Alergias)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="fw-semibold">@a.Nome</div>
+                                            @if (!string.IsNullOrWhiteSpace(a.Descricao))
+                                            {
+                                                <div class="small text-muted">@a.Descricao</div>
+                                            }
+                                        </div>
+                                        <form asp-action="RemoverAlergia" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="ClientId" value="" />
+                                            <input type="hidden" name="ItemId" value="@a.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+
+                                    <form asp-action="EditarAlergia" method="post" class="mt-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ClientId" value="" />
+                                        <input type="hidden" name="OldItemId" value="@a.Id" />
+                                        <div class="input-group input-group-sm">
+                                            <select name="NewItemId" class="form-select" required>
+                                                @foreach (var opt in Model.OpcoesAlergias)
+                                                {
+                                                    <option value="@opt.Value" selected="@(opt.Value == a.Id ? "selected" : null)">@opt.Text</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-save"></i> Atualizar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> As minhas restrições alimentares</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AdicionarRestricao" method="post" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ClientId" value="" />
+                        <label class="form-label">Adicionar restrição</label>
+                        <div class="input-group">
+                            <select name="ItemId" class="form-select" required>
+                                <option value="">-- Selecionar --</option>
+                                @foreach (var opt in Model.OpcoesRestricoes)
+                                {
+                                    <option value="@opt.Value">@opt.Text</option>
+                                }
+                            </select>
+                            <button class="btn btn-danger" type="submit"><i class="bi bi-plus-lg"></i></button>
+                        </div>
+                    </form>
+
+                    @if (Model.Restricoes.Count == 0)
+                    {
+                        <div class="text-muted">Ainda não registou restrições.</div>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var r in Model.Restricoes)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <div class="fw-semibold">@r.Nome</div>
+                                            @if (!string.IsNullOrWhiteSpace(r.Descricao))
+                                            {
+                                                <div class="small text-muted">@r.Descricao</div>
+                                            }
+                                        </div>
+                                        <form asp-action="RemoverRestricao" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="ClientId" value="" />
+                                            <input type="hidden" name="ItemId" value="@r.Id" />
+                                            <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+
+                                    <form asp-action="EditarRestricao" method="post" class="mt-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="ClientId" value="" />
+                                        <input type="hidden" name="OldItemId" value="@r.Id" />
+                                        <div class="input-group input-group-sm">
+                                            <select name="NewItemId" class="form-select" required>
+                                                @foreach (var opt in Model.OpcoesRestricoes)
+                                                {
+                                                    <option value="@opt.Value" selected="@(opt.Value == r.Id ? "selected" : null)">@opt.Text</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-save"></i> Atualizar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bullseye"></i> As minhas metas</h5>
+                    <a asp-action="CriarMeta" class="btn btn-light btn-sm"><i class="bi bi-plus-lg"></i> Nova meta</a>
+                </div>
+                <div class="card-body">
+                    @if (Model.Metas.Count == 0)
+                    {
+                        <div class="text-muted">Ainda não registou metas.</div>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            @foreach (var m in Model.Metas)
+                            {
+                                <div class="col-12 col-md-6 col-xl-4">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="fw-semibold mb-1">@m.MetaDescription</div>
+                                            <div class="small text-muted">Valores diários</div>
+                                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                                <span class="badge bg-success">@m.DailyCalories kcal</span>
+                                                <span class="badge bg-secondary">Proteína: @m.DailyProtein</span>
+                                                <span class="badge bg-secondary">Gordura: @m.DailyFat</span>
+                                                <span class="badge bg-secondary">Carboidratos: @m.DailyHydrates</span>
+                                                <span class="badge bg-secondary">Vitaminas: @m.DailyVitamins</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-white d-flex justify-content-end gap-2">
+                                            <a asp-action="EditarMeta" asp-route-id="@m.MetaId" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </a>
+                                            <a asp-action="ApagarMeta" asp-route-id="@m.MetaId" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i> Apagar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using System.Text.Json;
+using System.Security.Claims;
+using HealthWellbeing.Services;
+using HealthWellbeing.ViewModels;
 
 namespace HealthWellbeing.Controllers
 {
@@ -16,10 +19,12 @@ namespace HealthWellbeing.Controllers
     public class ReceitaController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
+        private readonly IReceitaAjusteService _ajusteService;
 
-        public ReceitaController(HealthWellbeingDbContext context)
+        public ReceitaController(HealthWellbeingDbContext context, IReceitaAjusteService ajusteService)
         {
             _context = context;
+            _ajusteService = ajusteService;
         }
 
         // GET: Receita
@@ -78,7 +83,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Receita/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, string? clientId)
         {
             if (id == null)
             {
@@ -108,13 +113,13 @@ namespace HealthWellbeing.Controllers
             
             ViewBag.ComponentesDetalhados = componentesDetalhados;
 
-            // Carregar restrições relacionadas
-            var restricoesDetalhadas = new List<dynamic>();
-            if (receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
+            // Carregar restrições relacionadas (apenas para Nutricionista)
+            if (User.IsInRole("Nutricionista") && receita.RestricoesAlimentarId != null && receita.RestricoesAlimentarId.Any())
             {
-                restricoesDetalhadas = await _context.RestricaoAlimentar
+                var restricoesDetalhadas = await _context.RestricaoAlimentar
                     .Where(r => receita.RestricoesAlimentarId.Contains(r.RestricaoAlimentarId))
-                    .Select(r => new {
+                    .Select(r => new
+                    {
                         r.RestricaoAlimentarId,
                         r.Nome,
                         Tipo = r.Tipo.ToString(),
@@ -122,10 +127,122 @@ namespace HealthWellbeing.Controllers
                         r.Descricao
                     })
                     .ToListAsync<dynamic>();
-            }
-            ViewBag.RestricoesDetalhadas = restricoesDetalhadas;
 
-            return View(receita);
+                ViewBag.RestricoesDetalhadas = restricoesDetalhadas;
+            }
+            else
+            {
+                ViewBag.RestricoesDetalhadas = null;
+            }
+
+            ReceitaAjustadaVm? adaptadaVm = null;
+            string? avisoAdaptacao = null;
+
+            // Cliente: versão adaptada do próprio utilizador, se a receita estiver no seu plano.
+            if (User.IsInRole("Cliente"))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!string.IsNullOrWhiteSpace(userId))
+                {
+                    var client = await _context.Client
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(c => c.IdentityUserId == userId);
+
+                    if (client == null)
+                    {
+                        avisoAdaptacao = "Não foi possível localizar o seu perfil de cliente.";
+                    }
+                    else
+                    {
+                        var plano = await _context.PlanoAlimentar
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(p => p.ClientId == client.ClientId);
+
+                        if (plano == null)
+                        {
+                            avisoAdaptacao = "Ainda não existe um plano alimentar associado ao seu perfil.";
+                        }
+                        else
+                        {
+                            var estaNoPlano = await _context.ReceitasParaPlanosAlimentares
+                                .AsNoTracking()
+                                .AnyAsync(x => x.PlanoAlimentarId == plano.PlanoAlimentarId && x.ReceitaId == receita.ReceitaId);
+
+                            if (!estaNoPlano)
+                            {
+                                avisoAdaptacao = "A versão adaptada está disponível apenas para receitas associadas ao seu plano alimentar.";
+                            }
+                            else
+                            {
+                                var ajustado = await _ajusteService.GerarAjustesAsync(client.ClientId, plano.PlanoAlimentarId);
+                                var receitaAjustada = ajustado.Receitas.FirstOrDefault(r => r.ReceitaId == receita.ReceitaId);
+                                adaptadaVm = receitaAjustada?.ToVm();
+                                avisoAdaptacao ??= ajustado.Aviso;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Nutricionista: permite escolher um cliente que tenha esta receita atribuída.
+            var clientesDisponiveis = new List<ClienteOptionVm>();
+            string? clientIdSelecionado = null;
+
+            if (User.IsInRole("Nutricionista"))
+            {
+                var planosComReceita = await _context.PlanoAlimentar
+                    .AsNoTracking()
+                    .Include(p => p.Client)
+                    .Where(p => p.ClientId != null)
+                    .Where(p => _context.ReceitasParaPlanosAlimentares
+                        .AsNoTracking()
+                        .Any(rp => rp.PlanoAlimentarId == p.PlanoAlimentarId && rp.ReceitaId == receita.ReceitaId))
+                    .OrderBy(p => p.Client!.Name)
+                    .ToListAsync();
+
+                clientesDisponiveis = planosComReceita
+                    .Select(p => new ClienteOptionVm
+                    {
+                        ClientId = p.ClientId!,
+                        PlanoAlimentarId = p.PlanoAlimentarId,
+                        Display = !string.IsNullOrWhiteSpace(p.Client!.Email)
+                            ? $"{p.Client.Name} ({p.Client.Email})"
+                            : p.Client.Name
+                    })
+                    .ToList();
+
+                if (!string.IsNullOrWhiteSpace(clientId))
+                {
+                    var escolhido = clientesDisponiveis.FirstOrDefault(c => c.ClientId == clientId);
+                    if (escolhido == null)
+                    {
+                        avisoAdaptacao = "O cliente selecionado não tem esta receita atribuída.";
+                    }
+                    else
+                    {
+                        clientIdSelecionado = clientId;
+                        var ajustado = await _ajusteService.GerarAjustesAsync(escolhido.ClientId, escolhido.PlanoAlimentarId);
+                        var receitaAjustada = ajustado.Receitas.FirstOrDefault(r => r.ReceitaId == receita.ReceitaId);
+                        adaptadaVm = receitaAjustada?.ToVm();
+                        avisoAdaptacao ??= ajustado.Aviso;
+                    }
+                }
+                else if (clientesDisponiveis.Count == 0)
+                {
+                    avisoAdaptacao = "Não existem clientes com esta receita atribuída.";
+                }
+            }
+
+            var vm = new ReceitaComparacaoDetailsViewModel
+            {
+                Receita = receita,
+                ReceitaAdaptada = adaptadaVm,
+                AvisoAdaptacao = avisoAdaptacao,
+                ClientIdSelecionado = clientIdSelecionado,
+                ClientesDisponiveis = clientesDisponiveis
+            };
+
+            return View(vm);
         }
 
         // GET: Receita/Create

@@ -17,6 +17,19 @@ else
             <div class="col-md-10">
                 <div class="row g-4 text-center">
 
+                    @if (User.IsInRole("Cliente"))
+                    {
+                        <div class="col-md-4">
+                            <a href="@Url.Action("MinhasReceitas", "ReceitasParaPlanosAlimentares")"
+                                class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
+                                <h4>As Minhas Receitas</h4>
+                                <p>Ver receitas associadas ao meu plano alimentar</p>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+
                     <div class="col-md-4">
                         <a href="@Url.Action("Index", "Alergias")" class="btn btn-outline-primary w-100 p-4 shadow-sm rounded-3">
                             <h4>Alergias</h4>
@@ -53,6 +66,27 @@ else
                             <p>Gerenciar ingredientes e proporções das receitas</p>
                         </a>
                     </div>
+
+                        @if (User.IsInRole("Nutricionista"))
+                        {
+                            <div class="col-md-4">
+                                <a href="@Url.Action("Associar", "ReceitasParaPlanosAlimentares")"
+                                    class="btn btn-outline-secondary w-100 p-4 shadow-sm rounded-3">
+                                    <h4>Associar Receitas ao Plano Alimentar dos Clientes</h4>
+                                    <p>Definir receitas que pertencem ao plano alimentar</p>
+                                </a>
+                            </div>
+
+                            <div class="col-md-4">
+                                <a href="@Url.Action("ClientesPerfilAlimentar", "ReceitasParaPlanosAlimentares")"
+                                    class="btn btn-outline-success w-100 p-4 shadow-sm rounded-3">
+                                    <h4>Perfil Alimentar — Clientes</h4>
+                                    <p>Gerir alergias, restrições e metas por cliente</p>
+                                </a>
+                            </div>
+                        }
+
+                    }
 
                 </div>
             </div>

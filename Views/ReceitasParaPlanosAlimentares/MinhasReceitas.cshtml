@@ -1,0 +1,203 @@
+@model HealthWellbeing.ViewModels.MinhasReceitasPlanoViewModel
+
+@using System.Linq
+
+@{
+    ViewData["Title"] = "As Minhas Receitas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">As Minhas Receitas</h1>
+            <p class="text-muted mb-0">Receitas associadas ao seu plano alimentar.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="MeuPerfilAlimentar" class="btn btn-outline-success">
+                <i class="bi bi-person-badge"></i> O Meu Perfil Alimentar
+            </a>
+            <a asp-action="ReceitasParaPlanosAlimentares" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Aviso))
+    {
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> @Model.Aviso
+        </div>
+    }
+
+    @if ((Model.ReceitasAjustadas == null || Model.ReceitasAjustadas.Count == 0) && Model.Receitas != null &&
+        Model.Receitas.Count > 0)
+    {
+        <div class="row g-4">
+            @foreach (var r in Model.Receitas)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <h5 class="card-title mb-1">@r.Nome</h5>
+                                <span class="badge bg-primary">@r.TempoPreparo min</span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.Descricao))
+                            {
+                                <p class="text-muted small mb-2">@r.Descricao</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-2">Sem descrição.</p>
+                            }
+
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Resumo nutricional (por porção)</div>
+                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                    <span class="badge bg-success">@r.Calorias kcal</span>
+                                    <span class="badge bg-secondary">Proteínas: @r.Proteinas g</span>
+                                    <span class="badge bg-secondary">Carboidratos: @r.HidratosCarbono g</span>
+                                    <span class="badge bg-secondary">Gorduras: @r.Gorduras g</span>
+                                </div>
+                                <div class="small text-muted mt-2">Porções: <strong>@r.Porcoes</strong></div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white d-flex justify-content-end">
+                            <a asp-controller="Receita" asp-action="Details" asp-route-id="@r.ReceitaId" class="btn btn-outline-primary">
+                                <i class="bi bi-eye"></i> Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (Model.ReceitasAjustadas != null && Model.ReceitasAjustadas.Count > 0)
+    {
+        <div class="row g-4">
+            @foreach (var r in Model.ReceitasAjustadas)
+            {
+                var multiplicadorPct = (r.MultiplicadorPorcao - 1m) * 100m;
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card h-100 shadow-sm @(r.TemAjustes ? "border border-warning" : "")">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <h5 class="card-title mb-1">@r.Nome</h5>
+                                    @if (r.TemAjustes)
+                                    {
+                                        <span class="badge bg-warning text-dark">Ajustada automaticamente</span>
+                                    }
+                                </div>
+                                <span class="badge bg-primary">@r.TempoPreparo min</span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.Descricao))
+                            {
+                                <p class="text-muted small mb-2">@r.Descricao</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-2">Sem descrição.</p>
+                            }
+
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Resumo nutricional (por porção)</div>
+                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                    @if (r.TemAjustes)
+                                    {
+                                        <span class="badge bg-success">@r.CaloriasPorPorcaoFinal kcal</span>
+                                        <span class="badge bg-secondary">Proteínas: @r.ProteinasPorPorcaoFinal g</span>
+                                        <span class="badge bg-secondary">Carboidratos: @r.HidratosPorPorcaoFinal g</span>
+                                        <span class="badge bg-secondary">Gorduras: @r.GordurasPorPorcaoFinal g</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@r.CaloriasPorPorcaoOriginal kcal</span>
+                                        <span class="badge bg-secondary">Proteínas: @r.ProteinasPorPorcaoOriginal g</span>
+                                        <span class="badge bg-secondary">Carboidratos: @r.HidratosPorPorcaoOriginal g</span>
+                                        <span class="badge bg-secondary">Gorduras: @r.GordurasPorPorcaoOriginal g</span>
+                                    }
+                                </div>
+
+                                <div class="small text-muted mt-2">
+                                    Porções: <strong>@r.PorcoesOriginal</strong>
+                                </div>
+                            </div>
+
+                            @if (r.Notas != null && r.Notas.Count > 0)
+                            {
+                                <div class="mt-3">
+                                    <div class="fw-semibold mb-2">Ajustes automáticos</div>
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var n in r.Notas)
+                                        {
+                                            <li class="list-group-item px-0 py-2">
+                                                <span class="badge bg-warning text-dark me-2">@n.Tipo</span>
+                                                <span>@n.Mensagem</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            @if (r.Ingredientes != null && r.Ingredientes.Count > 0)
+                            {
+                                var removidos = r.Ingredientes.Where(i => !i.IncluidoNoResultado).ToList();
+                                var finais = r.Ingredientes.Where(i => i.IncluidoNoResultado).ToList();
+
+                                <div class="mt-3">
+                                    <div class="fw-semibold mb-2">Ingredientes (ajustados)</div>
+                                    <div class="border rounded p-2 bg-white overflow-auto" style="max-height: 180px;">
+                                        <ul class="list-unstyled mb-0">
+                                            @foreach (var i in finais)
+                                            {
+                                                var foiSubstituido = string.Equals(i.TipoAjuste, "Substituido",
+                                                System.StringComparison.OrdinalIgnoreCase);
+                                                <li
+                                                    class="d-flex justify-content-between gap-2 py-1 @(foiSubstituido ? "border-start border-3 border-warning ps-2" : "")">
+                                                    <div class="small">
+                                                        @if (foiSubstituido)
+                                                        {
+                                                            <div><strong>@i.AlimentoFinalNome</strong> <span class="text-muted">(substituiu
+                                                                    @i.AlimentoOriginalNome)</span></div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div>@i.AlimentoFinalNome</div>
+                                                        }
+                                                    </div>
+                                                    <div class="small text-nowrap">
+                                                        <span class="badge bg-light text-dark border">@i.QuantidadeFinal
+                                                            @i.UnidadeMedida</span>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+
+                                    @if (removidos.Count > 0)
+                                    {
+                                        <div class="alert alert-warning mt-2 mb-0">
+                                            <div class="fw-semibold mb-1">Sem substituto disponível</div>
+                                            <div class="small">@string.Join(", ", removidos.Select(x => x.AlimentoOriginalNome))</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-footer bg-white d-flex justify-content-end">
+                            <a asp-controller="Receita" asp-action="Details" asp-route-id="@r.ReceitaId"
+                                class="btn btn-outline-primary">
+                                <i class="bi bi-eye"></i> Ver detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
