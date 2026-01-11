@@ -1,5 +1,9 @@
 ﻿@model HealthWellbeing.Models.PhysicalAssessment
 
+@{
+    ViewData["Title"] = "Edit Assessment";
+}
+
 <div class="container py-4">
     <h1 class="text-primary fw-bold mb-4">Edit Assessment</h1>
 
@@ -7,15 +11,77 @@
         <div class="card-header bg-warning text-dark py-3">
             <h5 class="mb-0 fw-bold">Update Evaluation Records</h5>
         </div>
+
         <div class="card-body p-4">
             <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <input type="hidden" asp-for="PhysicalAssessmentId" />
-                @* Use a mesma estrutura do Create aqui *@
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MemberId" class="form-label fw-bold">Member</label>
+                        <select asp-for="MemberId" class="form-select shadow-sm" asp-items="ViewBag.MemberId">
+                            <option value="">-- Select Member --</option>
+                        </select>
+                        <span asp-validation-for="MemberId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TrainerId" class="form-label fw-bold">Trainer</label>
+                        <select asp-for="TrainerId" class="form-select shadow-sm" asp-items="ViewBag.TrainerId">
+                            <option value="">-- Select Trainer --</option>
+                        </select>
+                        <span asp-validation-for="TrainerId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="AssessmentDate" class="form-label fw-bold">Assessment Date</label>
+                        <input asp-for="AssessmentDate" class="form-control" type="date" />
+                        <span asp-validation-for="AssessmentDate" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Weight" class="form-label fw-bold">Weight (kg)</label>
+                        <input asp-for="Weight" class="form-control" placeholder="00.00" />
+                        <span asp-validation-for="Weight" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Height" class="form-label fw-bold">Height (m)</label>
+                        <input asp-for="Height" class="form-control" placeholder="1.75" />
+                        <span asp-validation-for="Height" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BodyFatPercentage" class="form-label fw-bold">Body Fat (%)</label>
+                        <input asp-for="BodyFatPercentage" class="form-control" placeholder="Optional" />
+                        <span asp-validation-for="BodyFatPercentage" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MuscleMass" class="form-label fw-bold">Muscle Mass (kg)</label>
+                        <input asp-for="MuscleMass" class="form-control" placeholder="Optional" />
+                        <span asp-validation-for="MuscleMass" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Notes" class="form-label fw-bold">Assessment Notes</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Add observations here..."></textarea>
+                    <span asp-validation-for="Notes" class="text-danger small"></span>
+                </div>
+
                 <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Back</a>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm bg-white">Back to List</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
