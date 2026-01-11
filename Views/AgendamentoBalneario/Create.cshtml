@@ -14,17 +14,19 @@
     </div>
 
     <div class="card-body">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
 
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <!-- ERROS GERAIS -->
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
             <div class="row">
 
-                <!-- COLUNA ESQUERDA -->
+                <!-- ================= COLUNA ESQUERDA ================= -->
                 <div class="col-md-6">
 
+                    <!-- UTENTE -->
                     <div class="mb-3">
-                        <label asp-for="UtenteBalnearioId">Utente</label>
+                        <label asp-for="UtenteBalnearioId" class="form-label"></label>
                         <select asp-for="UtenteBalnearioId"
                                 class="form-control"
                                 asp-items="ViewBag.UtenteBalnearioId">
@@ -33,42 +35,47 @@
                         <span asp-validation-for="UtenteBalnearioId" class="text-danger"></span>
                     </div>
 
+                    <!-- TERAPEUTA -->
                     <div class="mb-3">
-                        <label asp-for="TerapeutaId"></label>
+                        <label asp-for="TerapeutaId" class="form-label"></label>
                         <select asp-for="TerapeutaId"
                                 class="form-control"
                                 asp-items="ViewBag.TerapeutaId">
-                            <option value="">-- selecione um terapeuta --</option>
+                            <option value="">-- Selecione o Terapeuta --</option>
                         </select>
+                        <span asp-validation-for="TerapeutaId" class="text-danger"></span>
                     </div>
 
+                    <!-- SERVIÇO -->
                     <div class="mb-3">
-                        <label asp-for="ServicoId"></label>
+                        <label asp-for="ServicoId" class="form-label"></label>
                         <select asp-for="ServicoId"
                                 class="form-control"
                                 asp-items="ViewBag.ServicoId">
-                            <option value="">-- selecione um serviço --</option>
+                            <option value="">-- Selecione o Serviço --</option>
                         </select>
+                        <span asp-validation-for="ServicoId" class="text-danger"></span>
                     </div>
 
+                    <!-- TIPO DE SERVIÇO -->
                     <div class="mb-3">
-                        <label asp-for="TipoServicosId"></label>
+                        <label asp-for="TipoServicosId" class="form-label"></label>
                         <select asp-for="TipoServicosId"
                                 class="form-control"
                                 asp-items="ViewBag.TipoServicosId">
-                            <option value="">-- selecione o tipo de serviço --</option>
+                            <option value="">-- Selecione o Tipo de Serviço --</option>
                         </select>
+                        <span asp-validation-for="TipoServicosId" class="text-danger"></span>
                     </div>
 
+                    <!-- DESCRIÇÃO -->
                     <div class="mb-3">
-                        <label asp-for="Descricao"></label>
-                        <textarea asp-for="Descricao"
-                                  class="form-control"
-                                  rows="3"></textarea>
+                        <label asp-for="Descricao" class="form-label"></label>
+                        <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
                         <span asp-validation-for="Descricao" class="text-danger"></span>
                     </div>
 
-                   
+                    <!-- BOTÕES -->
                     <div class="mt-4 d-flex gap-2">
                         <button type="submit" class="btn btn-success px-4">
                             <i class="bi bi-check-circle me-1"></i>
@@ -80,31 +87,35 @@
                             Voltar
                         </a>
                     </div>
+                </div>
 
-                </div> 
-                <!-- COLUNA DIREITA -->
+                <!-- ================= COLUNA DIREITA ================= -->
                 <div class="col-md-6">
 
+                    <!-- DATA / HORA -->
                     <div class="mb-3">
-                        <label asp-for="HoraInicio"></label>
-                        <input asp-for="HoraInicio"
-                               class="form-control"
-                               type="datetime-local" />
+                        <label asp-for="HoraInicio" class="form-label"></label>
+                        <input asp-for="HoraInicio" type="datetime-local" class="form-control" />
                         <span asp-validation-for="HoraInicio" class="text-danger"></span>
                     </div>
 
+                    <!-- DURAÇÃO -->
                     <div class="mb-3">
-                        <label asp-for="DuracaoMinutos"></label>
+                        <label asp-for="DuracaoMinutos" class="form-label"></label>
                         <input asp-for="DuracaoMinutos" class="form-control" />
+                        <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
                     </div>
 
+                    <!-- PREÇO -->
                     <div class="mb-3">
-                        <label asp-for="Preco"></label>
+                        <label asp-for="Preco" class="form-label"></label>
                         <input asp-for="Preco" class="form-control" />
+                        <span asp-validation-for="Preco" class="text-danger"></span>
                     </div>
 
+                    <!-- ESTADO -->
                     <div class="mb-3">
-                        <label asp-for="Estado"></label>
+                        <label asp-for="Estado" class="form-label"></label>
                         <select asp-for="Estado"
                                 class="form-control"
                                 asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.EstadoAgendamento>()">
@@ -112,14 +123,14 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-                </div> 
-
-            </div> 
-
+                </div>
+            </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
