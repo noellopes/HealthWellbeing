@@ -12,7 +12,6 @@
             <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
         </h4>
     </div>
-    <div class="card-body">
 
         <form asp-action="Create">
             <div asp-validation-summary="All" class="text-danger"></div>
@@ -48,7 +47,6 @@
                         </select>
                         <span asp-validation-for="TipoServicoId" class="text-danger"></span>
                     </div>
-                </div>
 
                 <div class="col-md-6">
                     <div class="mb-3">
@@ -68,8 +66,6 @@
                         <input asp-for="Preco" class="form-control" />
                         <span asp-validation-for="Preco" class="text-danger"></span>
                     </div>
-                </div>
-            </div>
 
             <div class="mb-3">
                 <label asp-for="Descricao" class="control-label"></label>
@@ -92,15 +88,6 @@
                             // Garante que um Serviço foi realmente selecionado (ID > 0)
                             if (servicoId) {
 
-                                $.ajax({
-                                    url: '@Url.Action("ObterDetalhesServico", "Servico")', // Chamada ao método criado acima
-                                    type: 'GET',
-                                    data: { id: servicoId },
-                                    success: function (data) {
-                                        if (data) {
-                                            // 1. Preenche a Duração e o Preço (campos de input)
-                                            $('#DuracaoMinutos').val(data.duracao);
-                                            $('#Preco').val(data.preco);
 
                                             // 2. Preenche o Tipo de Serviço (dropdown)
                                             $('#TipoServicoId').val(data.tipoServicoId);

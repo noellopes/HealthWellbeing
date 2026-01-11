@@ -35,7 +35,6 @@ namespace HealthWellbeing.Models
         [ForeignKey("TerapeutaId")]
         public Terapeuta Terapeuta { get; set; }
 
-        // Serviços (Obrigatórios)
 
         [Required(ErrorMessage = "O Serviço é obrigatório.")]
         [Display(Name = "Serviço")]
