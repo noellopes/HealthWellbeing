@@ -84,7 +84,7 @@
                         <th>Nome da Empresa</th>
                         <th>Telefone</th>
                         <th>Email</th>
-                        <th class="text-center" style="width: 230px;">Ações</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,10 +94,10 @@
                             <td class="fw-semibold">@item.NomeEmpresa</td>
                             <td>@item.Telefone</td>
                             <td>@item.Email</td>
-                            <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-info text-white me-1 btn-acao">Ver</a>
-                                <a asp-action="Edit" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-warning text-white me-1 btn-acao">Editar</a>
-                                <a asp-action="Delete" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-danger btn-acao">Eliminar</a>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-info text-white me-1 btn-acao">📄 Detalhes</a>
+                                <a asp-action="Edit" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-warning text-white me-1 btn-acao">✏️ Editar</a>
+                                <a asp-action="Delete" asp-route-id="@item.FornecedorId" class="btn btn-sm btn-danger text-white me-1 btn-acao">🗑️ Eliminar</a>
                             </td>
                         </tr>
                     }

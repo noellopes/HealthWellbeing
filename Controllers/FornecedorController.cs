@@ -47,6 +47,8 @@ namespace HealthWellbeing.Controllers
             if (id == null) return View("InvalidFornecedor");
 
             var fornecedor = await _context.Fornecedor
+                    .Include(c => c.FornecedoresConsumiveis)
+                    .ThenInclude(fc => fc.Consumivel)
                 .FirstOrDefaultAsync(f => f.FornecedorId == id);
 
             if (fornecedor == null) return View("InvalidFornecedor");
@@ -115,12 +117,22 @@ namespace HealthWellbeing.Controllers
         // DELETE
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return View("InvalidFornecedor");
+            if (id == null)
+                return View("InvalidFornecedor");
 
             var fornecedor = await _context.Fornecedor
+                .Include(f => f.FornecedoresConsumiveis)
                 .FirstOrDefaultAsync(f => f.FornecedorId == id);
 
-            if (fornecedor == null) return View("InvalidFornecedor");
+            if (fornecedor == null)
+                return View("InvalidFornecedor");
+
+            if (fornecedor.FornecedoresConsumiveis.Any())
+            {
+                TempData["ErrorMessage"] =
+                    "Não é possível eliminar este fornecedor porque está associado a um ou mais consumíveis.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(fornecedor);
         }
@@ -129,13 +141,25 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var fornecedor = await _context.Fornecedor.FindAsync(id);
-            if (fornecedor != null)
+            var fornecedor = await _context.Fornecedor
+                .Include(f => f.FornecedoresConsumiveis)
+                .FirstOrDefaultAsync(f => f.FornecedorId == id);
+
+            if (fornecedor == null)
+                return RedirectToAction(nameof(Index));
+
+            // BLOQUEIO REAL
+            if (fornecedor.FornecedoresConsumiveis.Any())
             {
-                _context.Fornecedor.Remove(fornecedor);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Fornecedor eliminado com sucesso!";
+                TempData["ErrorMessage"] =
+                    "Não é possível eliminar o fornecedor porque está associado a um ou mais consumíveis.";
+                return RedirectToAction(nameof(Index));
             }
+
+            _context.Fornecedor.Remove(fornecedor);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Fornecedor eliminado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
     }

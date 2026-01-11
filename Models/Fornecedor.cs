@@ -27,5 +27,7 @@ namespace HealthWellbeing.Models
         [EmailAddress(ErrorMessage = "O Email deve conter um formato válido.")]
         public string Email { get; set; }
 
+
+        public ICollection<Fornecedor_Consumivel> FornecedoresConsumiveis { get; set; } = new List<Fornecedor_Consumivel>();
     }
 }

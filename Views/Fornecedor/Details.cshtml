@@ -63,7 +63,46 @@
                 <dd class="col-sm-8 details-value">@Html.DisplayFor(model => model.Email)</dd>
             </dl>
 
+            <h5 class="mb-3">Consumíveis associados</h5>
+
+            @if (Model.FornecedoresConsumiveis != null && Model.FornecedoresConsumiveis.Any())
+            {
+                <table class="table table-sm table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Preço</th>
+                            <th>Tempo de Entrega</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var fc in Model.FornecedoresConsumiveis)
+                        {
+                            <tr>
+                                <td>@fc.Consumivel?.Nome</td>
+                                <td>@fc.Preco.ToString("0.00") €</td>
+                                <td>
+                                    @(fc.TempoEntrega.HasValue
+                                                                ? fc.TempoEntrega + " dias"
+                                                                : "—")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">
+					Este fornecedor ainda não tem consumíveis associados.
+                </p>
+            }
+
+
             <div class="d-flex justify-content-end">
+                <a asp-action="Delete" asp-route-id="@Model.FornecedorId" class="btn btn-danger text-white me-2">
+                   🗑️ Eliminar
+                </a>
                 <a asp-action="Edit" asp-route-id="@Model.FornecedorId" class="btn btn-warning text-white me-2">
                     ✏️ Editar
                 </a>
