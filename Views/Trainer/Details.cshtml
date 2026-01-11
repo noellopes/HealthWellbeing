@@ -1,35 +1,70 @@
 ﻿@model HealthWellbeing.Models.Trainer
 
 @{
-    ViewData["Title"] = "Trainer Info";
+    ViewData["Title"] = "Trainer Details";
 }
 
 <div class="container py-4">
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0">Trainer Profile: @Model.Name</h2>
+    <h1 class="text-primary fw-bold mb-4">Trainer Details</h1>
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3 border-bottom pb-2">
+                        <div class="col-sm-4 fw-bold text-muted">Full Name</div>
+                        <div class="col-sm-8">@Model.Name</div>
+                    </div>
+                    <div class="row mb-3 border-bottom pb-2">
+                        <div class="col-sm-4 fw-bold text-muted">Email Address</div>
+                        <div class="col-sm-8">@Model.Email</div>
+                    </div>
+                    <div class="row mb-3 border-bottom pb-2">
+                        <div class="col-sm-4 fw-bold text-muted">Phone</div>
+                        <div class="col-sm-8">@Model.Phone</div>
+                    </div>
+                    <div class="row mb-3 border-bottom pb-2">
+                        <div class="col-sm-4 fw-bold text-muted">Birth Date</div>
+                        <div class="col-sm-8">@Model.BirthDate.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="row mb-3 border-bottom pb-2">
+                        <div class="col-sm-4 fw-bold text-muted">Address</div>
+                        <div class="col-sm-8">@Model.Address</div>
+                    </div>
+                    <div class="row mb-0">
+                        <div class="col-sm-4 fw-bold text-muted">Gender</div>
+                        <div class="col-sm-8">@Model.Gender</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3 text-muted">Email</dt>
-                <dd class="col-sm-9">@Model.Email</dd>
 
-                <dt class="col-sm-3 text-muted">Phone</dt>
-                <dd class="col-sm-9">@Model.Phone</dd>
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">Professional Status & Assignments</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h2 class="text-success fw-bold mt-3">Active Trainer</h2>
+                    <p class="text-muted">Registered since: @DateTime.Now.Year</p>
 
-                <dt class="col-sm-3 text-muted">Address</dt>
-                <dd class="col-sm-9">@Model.Address</dd>
+                    <hr class="my-4" />
 
-                <dt class="col-sm-3 text-muted">Birth Date</dt>
-                <dd class="col-sm-9">@Model.BirthDate.ToShortDateString()</dd>
-
-                <dt class="col-sm-3 text-muted">Gender</dt>
-                <dd class="col-sm-9">@Model.Gender</dd>
-            </dl>
+                    <p class="fw-bold text-uppercase small text-muted mb-3">Staff Role:</p>
+                    <div class="bg-light p-4 rounded border">
+                        <h4 class="text-primary mb-0">Professional Instructor</h4>
+                        <p class="small text-muted mt-2 mb-0">Authorized for Physical Assessments</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-footer bg-light d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.TrainerId" class="btn btn-warning">Edit</a>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.TrainerId" class="btn btn-warning px-4 fw-bold">Edit Trainer</a>
+        <a asp-action="Index" class="btn btn-secondary px-4">Back to List</a>
     </div>
 </div>
