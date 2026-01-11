@@ -11,10 +11,6 @@ namespace HealthWellbeing.Data
         {
         }
 
-        public DbSet<Terapeuta> Terapeutas { get; set; }
-        public DbSet<Servico> Servicos { get; set; }
-        public DbSet<AgendamentoModel> Agendamentos { get; set; }
-        public DbSet<TipoServico> TipoServicos{ get; set; }
     }
 }
 
