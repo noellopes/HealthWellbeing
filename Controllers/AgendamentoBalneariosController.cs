@@ -119,7 +119,8 @@ namespace HealthWellbeing.Controllers
             {
                 _context.Add(agendamentoBalneario);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index),
+                      new { id = agendamentoBalneario.AgendamentoId, successMessage = "Agendamento criado com sucesso!" });
             }
 
             // Recarregar listas se houver erro
@@ -190,7 +191,11 @@ public async Task<IActionResult> Edit(int? id)
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new
+                {
+                    id = agendamentoBalneario.AgendamentoId,
+                    successMessage = "Dados do Agendamento alterado com sucesso!"
+                });
             }
             ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
             ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
@@ -233,7 +238,7 @@ public async Task<IActionResult> Edit(int? id)
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { successMessage = "Agendamento eliminado com sucesso!" });
         }
 
         private bool AgendamentoBalnearioExists(int id)
