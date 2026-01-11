@@ -1,32 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
+
 
 namespace HealthWellbeing.Controllers
 {
     public class TipoServicoController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        
+        private readonly HealthWellbeingDbContext _context;
 
-        public TipoServicoController(ApplicationDbContext context)
+        public TipoServicoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
         // GET: TipoServico
-        public async Task<IActionResult> Index(string? successMessage = null)
+        public async Task<IActionResult> Index(string pesquisarNome, int pagina = 1)
         {
-            ViewBag.SuccessMessage = successMessage;
-            return View(await _context.TipoServicos.ToListAsync());
+            
+            var consulta = _context.TipoServicos.AsQueryable();
+
+            if (!string.IsNullOrEmpty(pesquisarNome))
+            {
+                consulta = consulta.Where(x => x.Nome.Contains(pesquisarNome));
+            }
+
+
+            int pageSize = 6;
+            int totalRegistos = await consulta.CountAsync();
+
+            var model = new TipoServicoViewModel
+            {
+                PesquisarNome = pesquisarNome,
+                paginacao = new Paginacao(totalRegistos, pagina, pageSize),
+                ListaServicos = await consulta
+                    .OrderBy(x => x.Nome)
+                    .Skip((pagina - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync()
+            };
+
+
+            return View(model);
         }
 
+
+
         // GET: TipoServico/Details/5
+        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Details(int? id, string? successMessage = null)
         {
             if (id == null)
@@ -35,7 +61,7 @@ namespace HealthWellbeing.Controllers
             }
 
             var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
 
             if (tipoServico == null)
             {
@@ -55,7 +81,7 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Create([Bind("TipoServicoId,Nome,Descricao")] TipoServicos tipoServico)
         {
             if (ModelState.IsValid)
             {
@@ -63,12 +89,7 @@ namespace HealthWellbeing.Controllers
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Details),
-                    new
-                    {
-                        id = tipoServico.TipoServicoId,
-                        successMessage = "Tipo de Serviço criado com sucesso!"
-                    }
-                );
+                    new { id = tipoServico.TipoServicosId, successMessage = "Tipo de Serviço criado com sucesso!" });
             }
             return View(tipoServico);
         }
@@ -88,13 +109,12 @@ namespace HealthWellbeing.Controllers
             }
             return View(tipoServico);
         }
-
         // POST: TipoServico/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TipoServicoId,Nome,Descricao")] TipoServico tipoServico)
+        public async Task<IActionResult> Edit(int id, [Bind("TipoServicosId,Nome,Descricao")] TipoServicos tipoServico)
         {
-            if (id != tipoServico.TipoServicoId)
+            if (id != tipoServico.TipoServicosId)
             {
                 return NotFound();
             }
@@ -105,26 +125,22 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(tipoServico);
                     await _context.SaveChangesAsync();
+
+                    
+                    return RedirectToAction(nameof(Details), new
+                    {
+                        id = tipoServico.TipoServicosId,
+                        successMessage = "Dados do Tipo de Serviço alterado com sucesso!"
+                    });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipoServicoExists(tipoServico.TipoServicoId))
+                    if (!TipoServicoExists(tipoServico.TipoServicosId))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    else { throw; }
                 }
-
-                return RedirectToAction(nameof(Details),
-                    new
-                    {
-                        id = tipoServico.TipoServicoId,
-                        successMessage = "Tipo de Serviço alterado com sucesso!"
-                    }
-                );
             }
             return View(tipoServico);
         }
@@ -137,8 +153,10 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
+           
             var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicoId == id);
+                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
+
             if (tipoServico == null)
             {
                 return NotFound();
@@ -150,26 +168,25 @@ namespace HealthWellbeing.Controllers
         // POST: TipoServico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var tipoServico = await _context.TipoServicos.FindAsync(id);
+
             if (tipoServico != null)
             {
                 _context.TipoServicos.Remove(tipoServico);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index),
-                new
-                {
-                    successMessage = "Tipo de Serviço eliminado com sucesso!"
-                }
-            );
+            
+            return RedirectToAction(nameof(Index), new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
         }
 
+        
         private bool TipoServicoExists(int id)
         {
-            return _context.TipoServicos.Any(e => e.TipoServicoId == id);
+            return _context.TipoServicos.Any(e => e.TipoServicosId == id);
+        }
+        
         }
     }
-}

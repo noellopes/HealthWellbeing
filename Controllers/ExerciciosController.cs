@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
-using HealthWellbeing.ViewModels;
+using HealthWellbeing.ViewModel;
 
 namespace HealthWellbeing.Controllers
 {
@@ -28,7 +28,7 @@ namespace HealthWellbeing.Controllers
         string searchGenero = "",
         string searchGrupoMuscular = "")
         {
-            var query = _context.Exercicio
+            var query = _context.Exercicios
                 .Include(e => e.Genero)        // coleção de Genero
                 .Include(e => e.GrupoMuscular) // coleção de GrupoMuscular
                 .AsQueryable();
@@ -75,7 +75,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exercicio = await _context.Exercicio
+            var exercicio = await _context.Exercicios
                 .Include(e => e.Genero)
                 .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
@@ -160,7 +160,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exercicio = await _context.Exercicio
+            var exercicio = await _context.Exercicios
                 .Include(e => e.Genero)
                 .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(e => e.ExercicioId == id);
@@ -199,7 +199,7 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                var exercicioExistente = await _context.Exercicio
+                var exercicioExistente = await _context.Exercicios
                     .Include(e => e.Genero)
                     .Include(e => e.GrupoMuscular)
                     .FirstOrDefaultAsync(e => e.ExercicioId == id);
@@ -252,7 +252,7 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var exercicio = await _context.Exercicio
+            var exercicio = await _context.Exercicios
                 .Include(e => e.Genero)
                 .Include(e => e.GrupoMuscular)
                 .FirstOrDefaultAsync(m => m.ExercicioId == id);
@@ -271,7 +271,7 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var exercicio = await _context.Exercicio
+            var exercicio = await _context.Exercicios
                 .Include(e => e.Genero)
                 .FirstOrDefaultAsync(e => e.ExercicioId == id);
 
@@ -280,7 +280,7 @@ namespace HealthWellbeing.Controllers
                 // Remove as relações muitos-para-muitos primeiro
                 exercicio.Genero?.Clear();
 
-                _context.Exercicio.Remove(exercicio);
+                _context.Exercicios.Remove(exercicio);
             }
 
             await _context.SaveChangesAsync();
@@ -289,7 +289,7 @@ namespace HealthWellbeing.Controllers
 
         private bool ExercicioExists(int id)
         {
-            return _context.Exercicio.Any(e => e.ExercicioId == id);
+            return _context.Exercicios.Any(e => e.ExercicioId == id);
         }
     }
 }

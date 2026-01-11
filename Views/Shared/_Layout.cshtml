@@ -26,11 +26,7 @@
                             <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
 
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Gestão de Ginásio
-                            </a>
+                      
 
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Client" asp-action="Index">Client</a></li>
@@ -46,25 +42,39 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="TrainingType" asp-action="Index">TrainingType</a></li>
                             </ul>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Client" asp-action="Index">Clientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-controller="Utentes" asp-action="Index">Utentes</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Servico" asp-action="Index">Serviços</a>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Doctor" asp-action="Index">Médicos</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="TipoServico" asp-action="Index">Tipo de Seviços</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Agendamento" asp-action="Index">Agendamentos</a>
+                            <a class="nav-link text-white" asp-controller="AgendamentoBalneario" asp-action="Index">Agendamentos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Doctor" asp-action="Index">Médicos</a>
+                        </li>                      
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-controller="Terapeuta" asp-action="Index">Terapeutas</a>
                         </li>
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gestão de Ginásio
+                            </a>
 
                     </ul>
 
@@ -90,6 +100,9 @@
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
         <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
         @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

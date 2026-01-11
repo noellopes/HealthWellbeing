@@ -46,17 +46,17 @@
                         @foreach (var prof in allProfissionais)
                         {
                             // Lógica para pré-selecionar a checkbox
-                            var isChecked = selectedProfissionais.Contains(prof.ProfissionalExecutanteId);
+                            var isChecked = selectedProfissionais.Contains(prof.Id);
 
                             <div class="form-check">
                                 <input class="form-check-input"
                                        type="checkbox"
                                        name="selectedProfissionais"
-                                       value="@prof.ProfissionalExecutanteId"
-                                       id="prof_@prof.ProfissionalExecutanteId"
+                                       value="@prof.Id"
+                                       id="prof_@prof.Id"
                                        @(isChecked ? "checked" : "") />
 
-                                <label class="form-check-label" for="prof_@prof.ProfissionalExecutanteId">
+                                <label class="form-check-label" for="prof_@prof.Id">
                                     @prof.Nome (@prof.Funcao)
                                 </label>
                             </div>

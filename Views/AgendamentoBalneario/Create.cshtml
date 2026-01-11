@@ -1,0 +1,131 @@
+﻿@model HealthWellbeing.Models.AgendamentoBalneario
+
+@{
+    ViewData["Title"] = "Criar Novo Agendamento";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Novo Agendamento
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="Create">
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="row">
+
+                <!-- COLUNA ESQUERDA -->
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="UtenteBalnearioId">Utente</label>
+                        <select asp-for="UtenteBalnearioId"
+                                class="form-control"
+                                asp-items="ViewBag.UtenteBalnearioId">
+                            <option value="">-- Selecione o Utente --</option>
+                        </select>
+                        <span asp-validation-for="UtenteBalnearioId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TerapeutaId"></label>
+                        <select asp-for="TerapeutaId"
+                                class="form-control"
+                                asp-items="ViewBag.TerapeutaId">
+                            <option value="">-- selecione um terapeuta --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ServicoId"></label>
+                        <select asp-for="ServicoId"
+                                class="form-control"
+                                asp-items="ViewBag.ServicoId">
+                            <option value="">-- selecione um serviço --</option>
+                        </select>
+                        <span asp-validation-for="ServicoId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="TipoServicosId"></label>
+                        <select asp-for="TipoServicosId"
+                                class="form-control"
+                                asp-items="ViewBag.TipoServicosId">
+                            <option value="">-- selecione o tipo de serviço --</option>
+                        </select>
+                        <span asp-validation-for="TipoServicosId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descricao"></label>
+                        <textarea asp-for="Descricao"
+                                  class="form-control"
+                                  rows="3"></textarea>
+                        <span asp-validation-for="Descricao" class="text-danger"></span>
+                    </div>
+
+                   
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Criar Agendamento
+                        </button>
+
+                        <a asp-action="Index" class="btn btn-secondary px-4">
+                            <i class="bi bi-arrow-left-circle me-1"></i>
+                            Voltar
+                        </a>
+                    </div>
+
+                </div> 
+                <!-- COLUNA DIREITA -->
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+                        <label asp-for="HoraInicio"></label>
+                        <input asp-for="HoraInicio"
+                               class="form-control"
+                               type="datetime-local" />
+                        <span asp-validation-for="HoraInicio" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DuracaoMinutos"></label>
+                        <input asp-for="DuracaoMinutos" class="form-control" />
+                        <span asp-validation-for="DuracaoMinutos" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Preco"></label>
+                        <input asp-for="Preco" class="form-control" />
+                        <span asp-validation-for="Preco" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Estado"></label>
+                        <select asp-for="Estado"
+                                class="form-control"
+                                asp-items="Html.GetEnumSelectList<HealthWellbeing.Models.EstadoAgendamento>()">
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+
+                </div> 
+
+            </div> 
+
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

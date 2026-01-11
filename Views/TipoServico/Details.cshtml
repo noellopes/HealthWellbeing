@@ -1,4 +1,4 @@
-﻿@model HealthWellbeing.Models.TipoServico
+﻿@model HealthWellbeing.Models.TipoServicos
 
 @{
     ViewData["Title"] = "Details";
@@ -21,7 +21,7 @@
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
         <h4 class="mb-0">
-            <i class="bi bi-book me-2"></i>Detalhes do Tipo de Serviço
+            <i class="bi bi-info-circle-fill me-2"></i>Detalhes do Tipo de Serviço
         </h4>
     </div>
     <div class="card-body">
@@ -43,11 +43,11 @@
     </dl>
 
     <div class="mt-4 d-flex justify-content-start gap-2">
-    <a asp-action="Edit" asp-route-id="@Model.TipoServicoId" class="btn btn-primary">
+    <a asp-action="Edit" asp-route-id="@Model.TipoServicosId" class="btn btn-primary">
         <i class="bi bi-pencil-square me-1"></i>Editar
         </a> 
     <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left-circle me-1"></i>Cancelar
+        <i class="bi bi-arrow-left-circle me-1"></i>Voltar
         </a>
 </div>
 

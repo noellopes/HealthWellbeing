@@ -10,6 +10,7 @@ namespace HealthWellbeing.Data
             : base(options)
         {
         }
+
     }
 }
 

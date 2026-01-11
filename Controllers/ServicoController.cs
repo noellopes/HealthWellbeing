@@ -1,111 +1,136 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
 
 namespace HealthWellbeing.Controllers
 {
     public class ServicoController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly HealthWellbeingDbContext _context;
 
-        public ServicoController(ApplicationDbContext context)
+        public ServicoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
         // GET: Servico
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string? pesquisarNome, int pagina = 1)
         {
-            var servicosContext = await _context.Servicos
-                .Include(s => s.TipoServico)
-                .ToListAsync();
-            return View(await _context.Servicos.ToListAsync());
+            int pageSize = 5;
+
+            var query = _context.Servicos
+                                .Include(s => s.TipoServico)
+                                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(pesquisarNome))
+            {
+                query = query.Where(s => s.Nome.Contains(pesquisarNome));
+            }
+
+            int totalRegistos = query.Count();
+
+            var servicos = query
+                .OrderBy(s => s.Nome)
+                .Skip((pagina - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var viewModel = new ServicoViewModel
+            {
+                ListaServicos = servicos,
+                PesquisarNome = pesquisarNome,
+                paginacao = new Paginacao(totalRegistos, pagina, pageSize)
+            };
+
+            return View(viewModel);
         }
+
 
         // GET: Servico/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var servico = await _context.Servicos
                 .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
+
             if (servico == null)
             {
+                // Certifique-se que esta View existe ou use NotFound()
                 return View("InvalidServico");
             }
 
             return View(servico);
         }
-
         // GET: Servico/Create
         public IActionResult Create()
         {
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome");
+            // Alterado para TipoServicoId (singular) para bater com a View
+            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
             return View();
         }
 
-        // POST: Servico/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicoId")] Servico servico)
-
+        public async Task<IActionResult> Create(
+     [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServicosId")] Servico servico)
         {
             ModelState.Remove("TipoServico");
+
             if (ModelState.IsValid)
             {
                 _context.Add(servico);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index),
-                    new
-                    {
-                        id = servico.ServicoId,
-                        SuccessMessage = "Serviço criado com sucesso!"
-                    }
-                    );
+                TempData["SuccessMessage"] = "Serviço criado com sucesso!";
+                return RedirectToAction(nameof(Index));
             }
 
-            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicoId", "Nome", servico.TipoServicoId);
+            ViewBag.TipoServicosId = new SelectList(
+                _context.TipoServicos,
+                "TipoServicosId",
+                "Nome",
+                servico.TipoServicosId
+            );
+
             return View(servico);
         }
 
         // GET: Servico/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var servico = await _context.Servicos.FindAsync(id);
-            if (servico == null)
-            {
-                return NotFound();
-            }
+            var servico = await _context.Servicos
+        .Include(s => s.TipoServico)
+        .FirstOrDefaultAsync(s => s.ServicoId == id);
+            if (servico == null) return NotFound();
+
+            ViewBag.TipoServicosId = new SelectList(
+        _context.TipoServicos,
+        "TipoServicosId",
+        "Nome",
+        servico.TipoServicosId 
+    );
             return View(servico);
         }
 
         // POST: Servico/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ServicoId,Nome,Descricao,Preco,DuracaoMinutos,TipoServico")] Servico servico)
+        public async Task<IActionResult> Edit(int id, Servico servico)
         {
             if (id != servico.ServicoId)
-            {
                 return NotFound();
+
+            ModelState.Remove("TipoServico");
+
+            if (servico.TipoServicosId == 0)
+            {
+                ModelState.AddModelError("TipoServicosId", "Selecione um tipo de serviço válido.");
             }
 
             if (ModelState.IsValid)
@@ -114,37 +139,39 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(servico);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Serviço atualizado com sucesso!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ServicoExists(servico.ServicoId))
-                    {
+                    if (!_context.Servicos.Any(e => e.ServicoId == servico.ServicoId))
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
-                return RedirectToAction(nameof(Index));
             }
+
+            
+            ViewBag.TipoServicosId = new SelectList(
+                _context.TipoServicos,
+                "TipoServicosId",
+                "Nome",
+                servico.TipoServicosId
+            );
+
             return View(servico);
         }
 
         // GET: Servico/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var servico = await _context.Servicos
+                .Include(s => s.TipoServico)
                 .FirstOrDefaultAsync(m => m.ServicoId == id);
-            if (servico == null)
-            {
-                return NotFound();
-            }
+
+            if (servico == null) return NotFound();
 
             return View(servico);
         }
@@ -158,9 +185,11 @@ namespace HealthWellbeing.Controllers
             if (servico != null)
             {
                 _context.Servicos.Remove(servico);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Serviço eliminado com sucesso!";
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
