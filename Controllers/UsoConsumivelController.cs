@@ -30,7 +30,9 @@ namespace HealthWellbeing.Controllers
         {
             var healthWellbeingDbContext = _context.UsoConsumivel
                 .Include(u => u.Consumivel)
-                .Include(u => u.TreatmentRecord);
+                .Include(u => u.TreatmentRecord)
+                .Include(u => u.ZonaArmazenamento);
+
             return View(await healthWellbeingDbContext.ToListAsync());
         }
 
@@ -76,7 +78,7 @@ namespace HealthWellbeing.Controllers
                                     z.ZonaId,
                                     z.NomeZona,
                                     z.ConsumivelId,
-                                    z.QuantidadeAtual // Importante para saber o stock no JS
+                                    z.QuantidadeAtual 
                                 })
                                 .ToList();
 
@@ -103,14 +105,14 @@ namespace HealthWellbeing.Controllers
                     .Where(z => z.ConsumivelId == usoConsumivel.ConsumivelId
                              && z.Ativa
                              && z.QuantidadeAtual >= usoConsumivel.QuantidadeUsada)
-                    .OrderByDescending(z => z.QuantidadeAtual) // Prioriza a que tem mais stock
+                    .OrderByDescending(z => z.QuantidadeAtual) 
                     .FirstOrDefaultAsync();
 
                 if (zona == null)
                 {
                     ModelState.AddModelError("", "❌ Erro: Não existe stock suficiente em nenhuma zona ativa para realizar este consumo.");
 
-                    // Recarregar as listas para não dar erro na View
+                    
                     ViewData["ConsumivelID"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", usoConsumivel.ConsumivelId);
                     ViewData["TreatmentRecordId"] = new SelectList(_context.TreatmentRecord, "Id", "Id", usoConsumivel.TreatmentRecordId);
                     return View(usoConsumivel);
@@ -118,7 +120,7 @@ namespace HealthWellbeing.Controllers
 
                 // 2. Configurar o Registo
                 usoConsumivel.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                usoConsumivel.ZonaArmazenamentoID = zona.ZonaId; // Associa à zona encontrada
+                usoConsumivel.ZonaArmazenamentoID = zona.ZonaId; 
 
                 if (usoConsumivel.DataConsumo == DateTime.MinValue)
                     usoConsumivel.DataConsumo = DateTime.Now;
@@ -151,32 +153,46 @@ namespace HealthWellbeing.Controllers
         // ==========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMultiple(int treatmentRecordId, int[] ConsumivelID, int[] QuantidadeUsada, DateTime[] DataConsumo)
+        public async Task<IActionResult> CreateMultiple(
+            int treatmentRecordId,
+            int[] ConsumivelID,
+            int[] QuantidadeUsada,
+            DateTime[] DataConsumo,
+            int[] ZonaArmazenamentoID) 
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<string> erros = new List<string>(); // Para guardar erros de stock
+            // 1. VERIFICAÇÃO DE SEGURANÇA
+            // Garante que os dados vieram alinhados (o mesmo nº de consumíveis, quantidades e zonas)
+            if (ConsumivelID.Length != ZonaArmazenamentoID.Length || ConsumivelID.Length != QuantidadeUsada.Length)
+            {
+                TempData["ErrorMessage"] = "Erro no envio: Os dados estão desalinhados. Tente novamente.";
+                return RedirectToAction("Details", "TreatmentRecords", new { id = treatmentRecordId });
+            }
 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<string> erros = new List<string>();
             for (int i = 0; i < ConsumivelID.Length; i++)
             {
                 int qtd = QuantidadeUsada[i];
                 int consumivelId = ConsumivelID[i];
-
-                // 1. Encontrar Zona Ativa com Stock Suficiente
+                int zonaId = ZonaArmazenamentoID[i]; 
+                // 2. BUSCAR A ZONA ESPECÍFICA              
                 var zona = await _context.ZonaArmazenamento
-                                         .Where(z => z.ConsumivelId == consumivelId
-                                                  && z.Ativa
-                                                  && z.QuantidadeAtual >= qtd)
-                                         .OrderByDescending(z => z.QuantidadeAtual)
-                                         .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(z => z.ZonaId == zonaId);
+                // --- VALIDAÇÕES ---
 
-                if (zona == null)
+                // Se a zona não existe ou não corresponde ao consumível (segurança contra manipulação de HTML)
+                if (zona == null || zona.ConsumivelId != consumivelId)
                 {
-                    // Regista o erro mas continua para os próximos itens
-                    erros.Add($"Consumível ID {consumivelId}: Stock insuficiente.");
+                    erros.Add($"Linha {i + 1}: Zona inválida para o consumível selecionado.");
                     continue;
                 }
-
-                // 2. Criar Registo
+                // Se a zona não tem stock suficiente
+                if (qtd > zona.QuantidadeAtual)
+                {
+                    erros.Add($"Linha {i + 1} ({zona.NomeZona}): Tentou retirar {qtd}, mas só existem {zona.QuantidadeAtual}.");
+                    continue;
+                }
+                // 3. CRIAR O REGISTO
                 var uso = new UsoConsumivel
                 {
                     TreatmentRecordId = treatmentRecordId,
@@ -184,16 +200,13 @@ namespace HealthWellbeing.Controllers
                     QuantidadeUsada = qtd,
                     DataConsumo = DataConsumo[i],
                     UserId = userId,
-                    ZonaArmazenamentoID = zona.ZonaId
+                    ZonaArmazenamentoID = zonaId 
                 };
-
                 _context.UsoConsumivel.Add(uso);
-
-                // 3.  SUBTRAIR STOCK DA ZONA
+                // 4. ATUALIZAR STOCKS
                 zona.QuantidadeAtual -= qtd;
                 _context.Update(zona);
 
-                // 4.  SUBTRAIR STOCK TOTAL DO CONSUMÍVEL
                 var consumivelPai = await _context.Consumivel.FindAsync(consumivelId);
                 if (consumivelPai != null)
                 {
@@ -201,17 +214,18 @@ namespace HealthWellbeing.Controllers
                     _context.Update(consumivelPai);
                 }
             }
-
-            // Gravar tudo o que foi possível
             await _context.SaveChangesAsync();
-
-            // Se houve erros, passa para o TempData (opcional: podes tratar isto na View de destino)
+            // Feedback ao utilizador
             if (erros.Count > 0)
             {
-                TempData["ErrorMessage"] = "Atenção: Alguns itens não foram registados por falta de stock. Verifique o inventário.";
+                TempData["ErrorMessage"] = "Atenção: " + string.Join(" | ", erros);
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Consumos registados com sucesso!";
             }
 
-            return RedirectToAction("Details", "TreatmentRecords", new { id = treatmentRecordId });
+            return RedirectToAction(nameof(Index));
         }
 
         // ==========================================
@@ -241,10 +255,7 @@ namespace HealthWellbeing.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
-                    // NOTA: A edição simples não repõe nem retira stock extra automaticamente
-                    // para evitar complexidade e erros de cálculo. 
-                    // Se for crítico, terias de comparar com o valor antigo (AsNoTracking).
+                {                  
 
                     _context.Update(usoConsumivel);
                     await _context.SaveChangesAsync();
@@ -290,8 +301,7 @@ namespace HealthWellbeing.Controllers
             var usoConsumivel = await _context.UsoConsumivel.FindAsync(id);
             if (usoConsumivel != null)
             {
-                // NOTA: Se apagares o registo de uso, idealmente devias repor o stock.
-                // Vou adicionar essa lógica para ficar perfeito:
+
 
                 // 1. Repor na Zona (se ainda existir)
                 if (usoConsumivel.ZonaArmazenamentoID != 0)

@@ -6,23 +6,39 @@
 
 <h2>Adicionar Consumo(s)</h2>
 
-<form asp-action="CreateMultiple" method="post">
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<form asp-action="CreateMultiple" method="post">
     <input type="hidden" name="treatmentRecordId" value="@ViewBag.TreatmentRecordId" />
 
-    <table class="table">
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Consumível</th>
                 <th>Quantidade</th>
                 <th>Data</th>
-                <th>Zona</th>
+                <th>Zona de Retirada (Obrigatório)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody id="rows">
             <tr>
                 <td>
-                    <select name="ConsumivelID" class="form-control consumivel-select" onchange="updateZona(this)">
+                    <select name="ConsumivelID" class="form-control consumivel-select" required onchange="updateZona(this)">
+                        <option value="">-- Selecione --</option>
                         @foreach (var item in (SelectList)ViewData["ConsumivelID"])
                         {
                             <option value="@item.Value">@item.Text</option>
@@ -30,71 +46,117 @@
                     </select>
                 </td>
                 <td>
-                    <input name="QuantidadeUsada" class="form-control" />
+                    <input name="QuantidadeUsada" type="number" min="1" class="form-control" required placeholder="Qtd" />
                 </td>
                 <td>
-                    <input name="DataConsumo" type="date" class="form-control" />
+                    <input name="DataConsumo" type="date" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
                 </td>
                 <td>
-                    <select name="ZonaArmazenamentoID" class="form-control zona-select"></select>
+                    <select name="ZonaArmazenamentoID" class="form-control zona-select" required>
+                        <option value="">Selecione Consumível primeiro</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-secondary" onclick="addRow()">+ Adicionar Linha</button>
-    <button type="submit" class="btn btn-success">Guardar</button>
+    <div class="mt-3">
+        <button type="button" class="btn btn-secondary" onclick="addRow()">+ Adicionar Linha</button>
+        <button type="submit" class="btn btn-success">Guardar Tudo</button>
+    </div>
 </form>
 
 <script>
-    // Pega as zonas do ViewBag
+    // Ler o JSON das zonas enviado pelo Controller
     const zonas = @Html.Raw(ViewBag.Zonas);
 
-    // Atualiza o dropdown de zona de armazenamento quando o consumível muda
     function updateZona(selectElement) {
         const row = selectElement.closest("tr");
         const zonaSelect = row.querySelector(".zona-select");
+        const qtdInput = row.querySelector("input[name='QuantidadeUsada']");
         const consumivelId = parseInt(selectElement.value);
 
-        // Limpa as opções existentes
+        // Limpa opções antigas
         zonaSelect.innerHTML = "";
+        qtdInput.removeAttribute("max");
 
-        // Filtra zonas ativas do consumível
+        if (!consumivelId) {
+             let opt = document.createElement("option");
+             opt.text = "Selecione Consumível primeiro";
+             zonaSelect.add(opt);
+             return;
+        }
+
+        // Filtra as zonas que têm este consumível
         const zonasFiltradas = zonas.filter(z => z.ConsumivelId === consumivelId);
 
-        // Adiciona opções
-        zonasFiltradas.forEach(z => {
-            const opt = document.createElement("option");
-            opt.value = z.ZonaId;
-            opt.text = z.NomeZona;
-            zonaSelect.appendChild(opt);
-        });
+        if (zonasFiltradas.length === 0) {
+            let opt = document.createElement("option");
+            opt.text = "Sem Stock / Indisponível";
+            zonaSelect.add(opt);
+        } else {
+            zonasFiltradas.forEach(z => {
+                let opt = document.createElement("option");
+                opt.value = z.ZonaId;
+                // Mostra ao user quanto stock existe naquela gaveta
+                opt.text = `${z.NomeZona} (Disp: ${z.QuantidadeAtual})`;
+                opt.setAttribute("data-stock", z.QuantidadeAtual);
+                zonaSelect.add(opt);
+            });
 
-        // Seleciona a primeira zona automaticamente
-        if (zonasFiltradas.length > 0) zonaSelect.value = zonasFiltradas[0].ZonaId;
+            // Seleciona a primeira automaticamente e define o limite
+            zonaSelect.selectedIndex = 0;
+            atualizarLimiteMaximo(zonaSelect);
+        }
+
+        // Se mudar a zona manualmente, atualiza o limite de quantidade
+        zonaSelect.onchange = function() { atualizarLimiteMaximo(this); };
     }
 
-    // Adiciona nova linha à tabela
+    function atualizarLimiteMaximo(zonaSelect) {
+        const row = zonaSelect.closest("tr");
+        const qtdInput = row.querySelector("input[name='QuantidadeUsada']");
+
+        const option = zonaSelect.options[zonaSelect.selectedIndex];
+        const stock = option.getAttribute("data-stock");
+
+        if (stock) {
+            qtdInput.max = stock;
+            qtdInput.placeholder = `Máx: ${stock}`;
+            // Se o user já escreveu mais do que o permitido, corrige
+            if (parseInt(qtdInput.value) > parseInt(stock)) {
+                qtdInput.value = stock;
+            }
+        }
+    }
+
     function addRow() {
-        const template = document.querySelector("#rows tr");
-        const newRow = template.cloneNode(true);
+        const tableBody = document.getElementById("rows");
+        const firstRow = tableBody.querySelector("tr");
+        const newRow = firstRow.cloneNode(true);
 
-        // Reseta inputs da nova linha
-        newRow.querySelector(".consumivel-select").selectedIndex = 0;
-        newRow.querySelector(".zona-select").innerHTML = "";
+        // Limpa valores da nova linha
+        newRow.querySelector(".consumivel-select").value = "";
         newRow.querySelector("input[name='QuantidadeUsada']").value = "";
-        newRow.querySelector("input[name='DataConsumo']").value = "";
+        newRow.querySelector("input[name='QuantidadeUsada']").removeAttribute("max");
+        newRow.querySelector("input[name='QuantidadeUsada']").placeholder = "Qtd";
 
-        // Adiciona a linha
-        document.querySelector("#rows").appendChild(newRow);
+        const zonaSelect = newRow.querySelector(".zona-select");
+        zonaSelect.innerHTML = '<option value="">Selecione Consumível primeiro</option>';
+        zonaSelect.onchange = null; 
 
-        // Atualiza zona da nova linha
-        updateZona(newRow.querySelector(".consumivel-select"));
+        tableBody.appendChild(newRow);
     }
 
-    // Inicializa a primeira linha ao carregar a página
-    document.addEventListener("DOMContentLoaded", () => {
-        const firstSelect = document.querySelector(".consumivel-select");
-        if (firstSelect) updateZona(firstSelect);
-    });
+    function removeRow(btn) {
+        const rows = document.querySelectorAll("#rows tr");
+        if(rows.length > 1) {
+            btn.closest("tr").remove();
+        } else {
+            alert("É necessário pelo menos um registo.");
+        }
+    }
 </script>

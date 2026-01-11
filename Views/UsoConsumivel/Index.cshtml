@@ -1,15 +1,31 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.UsoConsumivel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Histórico de Consumos";
 }
 
-<h1>Index</h1>
+<h1>Histórico de Consumos</h1>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Adicionar Novo Consumo</a>
 </p>
-<table class="table">
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>
@@ -24,30 +40,42 @@
             <th>
                 @Html.DisplayNameFor(model => model.DataConsumo)
             </th>
-            <th></th>
+            <th>
+                Zona
+            </th>
+            <th>Acções</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TreatmentRecord.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Consumivel.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.QuantidadeUsada)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataConsumo)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UsoConsumivelId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.UsoConsumivelId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UsoConsumivelId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (item.TreatmentRecord != null)
+                    {
+                        <span>#@item.TreatmentRecord.Id</span>
+                    }
+                    else
+                    {
+                        <span>Avulso</span>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Consumivel.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuantidadeUsada)
+                </td>
+                <td>
+                    @item.DataConsumo.ToString("dd/MM/yyyy HH:mm")
+                </td>
+                <td>
+                    @(item.ZonaArmazenamento != null ? item.ZonaArmazenamento.NomeZona : "N/A")
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.UsoConsumivelId" class="btn btn-info btn-sm">Detalhes</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
