@@ -1,0 +1,40 @@
+﻿@model HealthWellbeing.Models.PhysicalAssessment
+
+<div class="container py-4">
+    <h1 class="text-primary fw-bold mb-4">Assessment Report</h1>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">Physical Metrics</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p><strong>Member:</strong> @Model.Member?.Client?.Name</p>
+                    <hr />
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="small text-muted">Weight</div>
+                            <h4 class="fw-bold">@Model.Weight kg</h4>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="small text-muted">Height</div>
+                            <h4 class="fw-bold">@Model.Height m</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">BMI Status</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h1 class="display-4 fw-bold text-primary">@Model.BMI.ToString("F1")</h1>
+                    <p class="badge bg-success rounded-pill px-3 py-2">Healthy Range</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

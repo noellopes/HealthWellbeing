@@ -1,0 +1,25 @@
+﻿@model HealthWellbeing.Models.PhysicalAssessment
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="alert alert-danger border-0 shadow-sm p-4 text-center mb-4" style="background-color: #f8d7da; color: #842029;">
+                <h2 class="fw-bold mb-2">Delete Record?</h2>
+                <p class="mb-0">You are about to remove the assessment for <strong>@Model.Member?.Client?.Name</strong>.</p>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4 p-4 text-center">
+                <p class="text-muted mb-1">Assessment Date:</p>
+                <h5 class="fw-bold">@Model.AssessmentDate.ToShortDateString()</h5>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="PhysicalAssessmentId" />
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-danger px-5 fw-bold">Delete Forever</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-5 bg-white">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

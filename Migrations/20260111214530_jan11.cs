@@ -162,6 +162,38 @@ namespace HealthWellbeing.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PhysicalAssessment",
+                columns: table => new
+                {
+                    PhysicalAssessmentId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AssessmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Weight = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    Height = table.Column<decimal>(type: "decimal(3,2)", nullable: false),
+                    BodyFatPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    MuscleMass = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    MemberId = table.Column<int>(type: "int", nullable: false),
+                    TrainerId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhysicalAssessment", x => x.PhysicalAssessmentId);
+                    table.ForeignKey(
+                        name: "FK_PhysicalAssessment_Member_MemberId",
+                        column: x => x.MemberId,
+                        principalTable: "Member",
+                        principalColumn: "MemberId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PhysicalAssessment_Trainer_TrainerId",
+                        column: x => x.TrainerId,
+                        principalTable: "Trainer",
+                        principalColumn: "TrainerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrainingPlan",
                 columns: table => new
                 {
@@ -211,6 +243,16 @@ namespace HealthWellbeing.Migrations
                 column: "PlanId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PhysicalAssessment_MemberId",
+                table: "PhysicalAssessment",
+                column: "MemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhysicalAssessment_TrainerId",
+                table: "PhysicalAssessment",
+                column: "TrainerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Training_TrainerId",
                 table: "Training",
                 column: "TrainerId");
@@ -236,6 +278,9 @@ namespace HealthWellbeing.Migrations
         {
             migrationBuilder.DropTable(
                 name: "MemberPlan");
+
+            migrationBuilder.DropTable(
+                name: "PhysicalAssessment");
 
             migrationBuilder.DropTable(
                 name: "TrainingPlan");
