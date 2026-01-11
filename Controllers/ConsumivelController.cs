@@ -51,6 +51,23 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchCategoria = searchCategoria;
 
+            //identificar consumíveis em stock crítico (SÓ DA PÁGINA ATUAL)
+
+            var consumiveisCriticos = _context.Consumivel
+        .Where(c => c.QuantidadeAtual < c.QuantidadeMinima)
+        .Select(c => new {
+            c.ConsumivelId,
+            c.Nome,
+            c.QuantidadeAtual,
+            c.QuantidadeMinima
+        })
+        .ToList()
+        .Select(c => (dynamic)c) 
+        .ToList();
+
+            //enviar para a View
+            ViewBag.ConsumiveisCriticos = consumiveisCriticos;
+
             return View(model);
         }
 

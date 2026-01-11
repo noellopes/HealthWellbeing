@@ -20,6 +20,25 @@
         </div>
     </div>
 }
+@if (ViewBag.ConsumiveisCriticos != null && ((List<dynamic>)ViewBag.ConsumiveisCriticos).Any())
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>⚠ Consumíveis abaixo do mínimo:</strong>
+        <ul class="mb-0">
+            @foreach (var c in (List<dynamic>)ViewBag.ConsumiveisCriticos)
+            {
+                <li>
+                    @c.Nome (Atual: @c.QuantidadeAtual / Mínimo: @c.QuantidadeMinima)
+                    <a asp-controller="Compra" asp-action="Index" asp-route-consumivelId="@c.ConsumivelId"
+                       class="btn btn-sm btn-primary ms-2">
+                        Encomendar
+                    </a>
+                </li>
+            }
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 @if (!Model.Items.Any())
 {
@@ -76,6 +95,7 @@ else
             </form>
         </div>
     </div>
+
 
     <div class="table-responsive">
         <table class="table table-striped table-hover align-middle">

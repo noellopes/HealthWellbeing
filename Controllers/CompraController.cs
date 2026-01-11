@@ -41,6 +41,8 @@ namespace HealthWellbeing.Controllers
             ViewBag.QuantidadeSugerida =
                 consumivel.QuantidadeMaxima - consumivel.QuantidadeAtual;
 
+            ViewBag.ConsumivelSelecionadoId = consumivelId;
+
             return View();
         }
 

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Nova Compra";
     var consumiveis = ViewBag.Consumiveis as List<Consumivel> ?? new();
+    int selectedConsumivelId = ViewBag.ConsumivelSelecionadoId != null ? (int)ViewBag.ConsumivelSelecionadoId : 0;
 }
 
 <div class="container mt-4">
@@ -38,7 +39,8 @@
                                 <option value="@c.ConsumivelId"
                                         data-atual="@c.QuantidadeAtual"
                                         data-min="@c.QuantidadeMinima"
-                                        data-max="@c.QuantidadeMaxima">
+                                        data-max="@c.QuantidadeMaxima"
+                                        selected="@(c.ConsumivelId == selectedConsumivelId)">
                                     @c.Nome
                                 </option>
                             }
@@ -88,42 +90,49 @@
 
     @section Scripts {
 <script>
-    const select = document.getElementById("consumivelSelect");
-    const qtdAtualInput = document.getElementById("qtdAtual");
-    const qtdMinInput = document.getElementById("qtdMin");
-    const qtdMaxInput = document.getElementById("qtdMax");
-    const qtdComprarInput = document.getElementById("qtdComprar");
-    const infoCompra = document.getElementById("infoCompra");
+           const select = document.getElementById("consumivelSelect");
+        const qtdAtualInput = document.getElementById("qtdAtual");
+        const qtdMinInput = document.getElementById("qtdMin");
+        const qtdMaxInput = document.getElementById("qtdMax");
+        const qtdComprarInput = document.getElementById("qtdComprar");
+        const infoCompra = document.getElementById("infoCompra");
 
-    select?.addEventListener("change", () => {
-        const opt = select.selectedOptions[0];
-        if (!opt) return;
+        function atualizarCampos() {
+            const opt = select.selectedOptions[0];
+            if (!opt) {
+                qtdAtualInput.value = "";
+                qtdMinInput.value = "";
+                qtdMaxInput.value = "";
+                qtdComprarInput.value = "";
+                infoCompra.innerText = "";
+                return;
+            }
 
-        const atual = parseInt(opt.dataset.atual || 0);
-        const min = parseInt(opt.dataset.min || 0);
-        const max = parseInt(opt.dataset.max || 0);
+            const atual = parseInt(opt.dataset.atual || 0);
+            const min = parseInt(opt.dataset.min || 0);
+            const max = parseInt(opt.dataset.max || 0);
 
-        qtdAtualInput.value = atual;
-        qtdMinInput.value = min;
-        qtdMaxInput.value = max;
+            qtdAtualInput.value = atual;
+            qtdMinInput.value = min;
+            qtdMaxInput.value = max;
 
-        const limitePermitido = Math.max(0, max - atual);
+            const limitePermitido = Math.max(0, max - atual);
+            qtdComprarInput.max = limitePermitido;
+            qtdComprarInput.value = limitePermitido;
 
-        // definir limite real no input
-        qtdComprarInput.max = limitePermitido;
-
-        // sugestão automática
-        qtdComprarInput.value = limitePermitido;
-
-        // mensagem informativa
-        if (atual < min) {
-            infoCompra.innerText =
-                "⚠ O stock está abaixo do mínimo. Sugestão baseada no máximo permitido.";
-        } else {
-            infoCompra.innerText =
-                "Sugestão automática: quantidade máxima permitida para reposição.";
+            if (atual < min) {
+                infoCompra.innerText =
+                    "⚠ O stock está abaixo do mínimo. Sugestão baseada no máximo permitido.";
+            } else {
+                infoCompra.innerText =
+                    "Sugestão automática: quantidade máxima permitida para reposição.";
+            }
         }
-    });
+
+        select?.addEventListener("change", atualizarCampos);
+
+        // Atualiza os campos ao carregar a página caso já exista consumível selecionado
+        window.addEventListener("DOMContentLoaded", atualizarCampos);
 </script>
 }
 
