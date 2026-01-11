@@ -5,108 +5,176 @@
 }
 
 <div class="container mt-4">
-
-    <h1 class="display-6 mb-3">Editar Tipo de Exame</h1>
-    <p class="text-muted">ID: @Model.ExameTipoId</p>
-
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="display-6">Editar Protocolo</h1>
+            <p class="text-muted">Altere os dados ou ajuste as quantidades da receita padrão.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
     <hr />
 
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg p-3">
-                <div class="card-body">
+        <div class="col-lg-10">
 
-                    <form asp-action="Edit">
-                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+            <form asp-action="Edit" method="post">
 
-                        <input type="hidden" asp-for="ExameTipoId" />
+                @* --- CAMPO CRÍTICO: ID DO EXAME --- *@
+                <input type="hidden" asp-for="ExameTipoId" />
 
-                        @* --- Campos Normais --- *@
-                        <div class="mb-3">
-                            <label asp-for="NomeExame" class="form-label">Nome</label>
-                            <input asp-for="NomeExame" class="form-control" />
-                            <span asp-validation-for="NomeExame" class="text-danger"></span>
-                        </div>
+                @* Feedback de Sucesso ao adicionar material *@
+                @if (ViewData["FeedbackMaterial"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle me-2"></i> @ViewData["FeedbackMaterial"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
 
-                        <div class="mb-3">
-                            <label asp-for="Descricao" class="form-label">Descrição</label>
-                            <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
-                            <span asp-validation-for="Descricao" class="text-danger"></span>
-                        </div>
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                        <div class="mb-3">
-                            <label asp-for="EspecialidadeId" class="form-label">Especialidade</label>
-                            <select asp-for="EspecialidadeId" class="form-select" asp-items="@(ViewData["EspecialidadeId"] as SelectList)">
-                                <option value="">-- Selecione a Especialidade --</option>
-                            </select>
-                            <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
-                        </div>
-
-                        @* --- BLOCO DE RECURSOS M:N (CHECKBOXES) --- *@
-                        <div class="card mt-4 border-secondary">
-                            <div class="card-header bg-secondary text-white">
-                                <h5 class="mb-0 fs-6"><i class="bi bi-tools me-2"></i>Recursos e Equipamentos Necessários</h5>
+                @* --- DADOS GERAIS --- *@
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0 fs-6"><i class="bi bi-pencil-square me-2"></i>Dados Gerais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="NomeExame" class="form-label fw-bold">Nome do Exame</label>
+                                <input asp-for="NomeExame" class="form-control" />
+                                <span asp-validation-for="NomeExame" class="text-danger"></span>
                             </div>
-                            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                                @if (Model.Recursos.Any())
-                                {
-                                    @for (int i = 0; i < Model.Recursos.Count; i++)
-                                    {
-                                        <div class="d-flex align-items-center border-bottom py-2">
-                                            @* Checkbox e Nome *@
-                                            <div class="form-check flex-grow-1">
-                                                <input type="hidden" asp-for="@Model.Recursos[i].Id" />
-                                                <input type="hidden" asp-for="@Model.Recursos[i].Nome" />
 
-                                                <input class="form-check-input" type="checkbox" asp-for="@Model.Recursos[i].IsSelected" />
-                                                <label class="form-check-label" asp-for="@Model.Recursos[i].IsSelected">
-                                                    @Model.Recursos[i].Nome
-                                                </label>
-                                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="EspecialidadeId" class="form-label fw-bold">Especialidade Médica</label>
+                                <select asp-for="EspecialidadeId" class="form-select" asp-items="@(ViewData["EspecialidadeId"] as SelectList)">
+                                    <option value="">-- Selecione --</option>
+                                </select>
+                                <span asp-validation-for="EspecialidadeId" class="text-danger"></span>
+                            </div>
 
-                                            @* Input de Quantidade *@
-                                            <div class="d-flex align-items-center" style="width: 130px;">
-                                                <span class="small text-muted me-2">Qtd:</span>
-
-                                                @* Adicionado atributo max e mensagem de ajuda *@
-                                                <input type="number" class="form-control form-control-sm"
-                                                       asp-for="@Model.Recursos[i].Quantidade"
-                                                       min="1"
-                                                       max="@Model.Recursos[i].StockAtual" />
-                                            </div>
-
-                                            @* Mostrar o limite visualmente *@
-                                            <div class="ms-2">
-                                                <small class="text-muted" style="font-size: 0.75rem;">
-                                                    (Máx: @Model.Recursos[i].StockAtual)
-                                                </small>
-                                            </div>
-                                        </div>
-                                        @* Mensagem de erro de validação para a quantidade *@
-                                        <span asp-validation-for="@Model.Recursos[i].Quantidade" class="text-danger small"></span>
-                                    }
-                                }
-                                else
-                                {
-                                    <p class="text-muted mb-0">Não existem recursos registados no sistema.</p>
-                                }
+                            <div class="col-12">
+                                <label asp-for="Descricao" class="form-label">Descrição / Instruções</label>
+                                <textarea asp-for="Descricao" class="form-control" rows="2"></textarea>
+                                <span asp-validation-for="Descricao" class="text-danger"></span>
                             </div>
                         </div>
-                        @* --- FIM BLOCO M:N --- *@
-
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="submit" value="Save" class="btn btn-primary shadow-sm">
-                                <i class="bi bi-save"></i> Guardar Alterações
-                            </button>
-
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left-short"></i> Voltar
-                            </a>
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
-            </div>
+
+                @* --- SECÇÃO DE MATERIAIS --- *@
+                <div class="card shadow-sm border-secondary">
+                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fs-6"><i class="bi bi-box-seam me-2"></i>Recursos Necessários (Receita)</h5>
+                        <small>Catálogo Total: @Model.Recursos.Count</small>
+                    </div>
+
+                    <div class="card-body bg-light">
+
+                        @* --- BARRA DE ADIÇÃO DE NOVO MATERIAL --- *@
+                        <div class="mb-3 pb-3 border-bottom">
+                            <label class="form-label small text-muted fw-bold mb-2">Material em falta? Adicionar ao Dicionário:</label>
+
+                            <div class="row g-2">
+                                <div class="col-md-5">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white"><i class="bi bi-tag"></i></span>
+                                        <input type="text" name="novoMaterialNome" class="form-control"
+                                               placeholder="Nome (ex: Ligadura)"
+                                               value="@ViewData["NovoMaterialNome"]">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" name="novoMaterialTamanho" class="form-control form-control-sm"
+                                           placeholder="Tam. (ex: 10cm, S, 5ml)"
+                                           value="@ViewData["NovoMaterialTamanho"]">
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="novoMaterialQuantidade" class="form-control form-control-sm"
+                                           placeholder="Stock Inicial" min="0"
+                                           value="@ViewData["NovoMaterialQtd"]">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" name="submitAction" value="add_material" class="btn btn-success btn-sm w-100" formnovalidate>
+                                        <i class="bi bi-plus-lg"></i> Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-text small text-muted">Preencha os dados e clique em 'Adicionar' para criar o material antes de gravar o exame.</div>
+                        </div>
+
+                        @* --- LISTA DE CHECKBOXES (Com Badge de Tamanho) --- *@
+                        <div class="bg-white border rounded" style="max-height: 400px; overflow-y: auto;">
+                            @if (Model.Recursos.Any())
+                            {
+                                @for (int i = 0; i < Model.Recursos.Count; i++)
+                                {
+                                    // Destaque visual se o item estiver selecionado
+                                    var bgClass = Model.Recursos[i].IsSelected ? "bg-info bg-opacity-10" : "";
+
+                                    <div class="d-flex align-items-center border-bottom p-2 hover-bg @bgClass">
+
+                                        @* Hidden Inputs *@
+                                        <input type="hidden" asp-for="@Model.Recursos[i].Id" />
+                                        <input type="hidden" asp-for="@Model.Recursos[i].Nome" />
+                                        <input type="hidden" asp-for="@Model.Recursos[i].Tamanho" /> <input type="hidden" asp-for="@Model.Recursos[i].Tamanho" />
+
+                                        @* Checkbox *@
+                                        <div class="me-2">
+                                            <input class="form-check-input" type="checkbox" asp-for="@Model.Recursos[i].IsSelected" id="chk_@i" />
+                                        </div>
+
+                                        @* Label com Estilo Badge *@
+                                        <label class="form-check-label d-flex align-items-center flex-grow-1 cursor-pointer" for="chk_@i" style="cursor: pointer;">
+
+                                            <span class="fw-bold me-2">@Model.Recursos[i].Nome</span>
+
+                                            @* CAIXA DO TAMANHO *@
+                                            @if (!string.IsNullOrEmpty(Model.Recursos[i].Tamanho) && Model.Recursos[i].Tamanho != "N.A.")
+                                            {
+                                                <span class="badge bg-light text-dark border border-secondary fw-normal">
+                                                    @Model.Recursos[i].Tamanho
+                                                </span>
+                                            }
+
+                                        </label>
+
+                                        @* Input Qtd *@
+                                        <div class="d-flex align-items-center me-3 bg-light rounded px-2 py-1 border">
+                                            <span class="small text-muted me-2 fw-bold">Qtd:</span>
+                                            <input type="number" asp-for="@Model.Recursos[i].Quantidade"
+                                                   class="form-control form-control-sm text-center border-0 bg-transparent p-0"
+                                                   style="width: 50px;" min="1" />
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1"></i>
+                                    <p>Nenhum material registado no sistema.</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-text mt-2 text-end text-muted small">
+                            Marque os itens que fazem parte deste protocolo e ajuste a quantidade padrão.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 mb-5">
+                    <a asp-action="Index" class="btn btn-lg btn-secondary px-4">Cancelar</a>
+
+                    <button type="submit" name="submitAction" value="save" class="btn btn-lg btn-primary px-4 shadow">
+                        <i class="bi bi-check-lg me-2"></i> Atualizar Protocolo
+                    </button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
@@ -115,4 +183,9 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <style>
+        .hover-bg:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
 }

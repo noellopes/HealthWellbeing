@@ -6,80 +6,88 @@
 
 <div class="container mt-4">
 
-    <h1 class="display-6 mb-3">Detalhes do Tipo de Exame</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="display-6">Detalhes do Tipo de Exame</h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Voltar à Lista
+        </a>
+    </div>
     <hr />
 
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
 
-            <div class="card shadow-lg">
+            @* --- CARTÃO 1: DADOS GERAIS --- *@
+            <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-info-circle"></i>
-                        Informações: @Model.Nome
+                    <h5 class="mb-0 fs-5">
+                        <i class="bi bi-file-medical me-2"></i> @Model.Nome
                     </h5>
                 </div>
                 <div class="card-body">
-
                     <dl class="row mb-0">
-
-                        <dt class="col-sm-3 text-muted">
-                            @Html.DisplayNameFor(model => model.Nome)
-                        </dt>
-                        <dd class="col-sm-9 fw-bold">
-                            @Html.DisplayFor(model => model.Nome)
-                        </dd>
-
-                        <dt class="col-sm-3 text-muted">
-                            @Html.DisplayNameFor(model => model.Especialidade)
-                        </dt>
-                        <dd class="col-sm-9">
+                        <dt class="col-sm-4 text-muted">Especialidade</dt>
+                        <dd class="col-sm-8">
                             <span class="badge bg-info text-dark">
                                 @Html.DisplayFor(model => model.Especialidade!.Nome)
                             </span>
                         </dd>
 
-                        <dt class="col-sm-3 text-muted mt-3">
-                            @Html.DisplayNameFor(model => model.Descricao)
-                        </dt>
-                        <dd class="col-sm-9 mt-3">
-                            <p class="text-break">
-                                @Html.DisplayFor(model => model.Descricao)
+                        <dt class="col-sm-4 text-muted mt-2">Descrição / Instruções</dt>
+                        <dd class="col-sm-8 mt-2">
+                            <p class="text-break mb-0">
+                                @(string.IsNullOrEmpty(Model.Descricao) ? "Sem descrição disponível." : Model.Descricao)
                             </p>
                         </dd>
-                        <dt class="col-sm-3 text-muted mt-3">
-                            <i class="bi bi-tools me-1"></i> Recursos Necessários
-                        </dt>
-                        <dd class="col-sm-9 mt-3">
-                            @if (Model.ExameTipoRecursos != null && Model.ExameTipoRecursos.Any())
-                            {
-                                <ul class="list-group list-group-flush">
-                                    @foreach (var item in Model.ExameTipoRecursos)
-                                    {
-                                        <li class="list-group-item px-0 py-1">
-                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
-                                            @item.Recurso!.NomeEquipamento
-                                            <span class="badge bg-secondary ms-2">Qtd: @item.QuantidadeNecessaria</span>
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">Nenhum equipamento ou material associado a este exame.</span>
-                            }
-                        </dd>
-
                     </dl>
                 </div>
             </div>
 
-            <div class="mt-4 d-flex justify-content-start">
-                <a asp-action="Edit" asp-route-id="@Model?.ExameTipoId" class="btn btn-warning me-2">
-                    <i class="bi bi-pencil"></i> Editar
-                </a>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left-short"></i> Voltar para a Lista
+            @* --- CARTÃO 2: RECURSOS (DICIONÁRIO) --- *@
+            <div class="card shadow-sm border-secondary">
+                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fs-6"><i class="bi bi-box-seam me-2"></i>Recursos Necessários (Receita Padrão)</h5>
+                </div>
+
+                <div class="card-body bg-light">
+                    @if (Model.ExameTipoRecursos != null && Model.ExameTipoRecursos.Any())
+                    {
+                        <ul class="list-group shadow-sm">
+                            @foreach (var item in Model.ExameTipoRecursos)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-check2-circle text-success me-3 fs-5"></i>
+                                        <span class="fw-bold text-dark">
+                                            @item.Recurso?.NomeEquipamento
+                                        </span>
+                                    </div>
+
+                                    @* Mostra apenas a quantidade necessária para o protocolo, sem stock *@
+                                    <span class="badge bg-primary rounded-pill px-3 py-2" title="Quantidade Necessária por Exame">
+                                        @item.QuantidadeNecessaria un.
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                        <div class="text-end mt-2">
+                            <small class="text-muted fst-italic">Total de itens distintos: @Model.ExameTipoRecursos.Count</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                            <span>Este tipo de exame não exige materiais específicos do dicionário.</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* --- AÇÕES --- *@
+            <div class="mt-4 d-flex justify-content-end gap-2 mb-5">
+                <a asp-action="Edit" asp-route-id="@Model?.ExameTipoId" class="btn btn-warning shadow-sm px-4">
+                    <i class="bi bi-pencil-square me-2"></i> Editar Tipo de Exame
                 </a>
             </div>
 

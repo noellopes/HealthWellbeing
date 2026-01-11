@@ -2,26 +2,22 @@
 
 @{
     ViewData["Title"] = "Tipos de Exame";
-    // Variáveis da ViewBag para serem usadas nos links de paginação
     var searchNome = ViewBag.SearchNome;
     var searchEspecialidade = ViewBag.SearchEspecialidade;
 }
 
 <div class="container mt-4">
-    @* Bloco de Exibição de Mensagens de Sucesso *@
     @if (TempData["SuccessMessage"] != null)
-
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>Sucesso!</strong> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    @* Bloco de Exibição de Mensagens de Erro *@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>Erro de Exclusão!</strong> @TempData["ErrorMessage"]
+            <strong>Erro!</strong> @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
@@ -39,9 +35,10 @@
             </a>
         </div>
     </div>
-    @* --- DASHBOARD DE ESTATÍSTICAS --- *@
+
+    @* --- DASHBOARD DE ESTATÍSTICAS (Sem Stock em Alerta) --- *@
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card text-white bg-primary shadow-sm h-100">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
@@ -54,7 +51,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="card text-white bg-success shadow-sm h-100">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div>
@@ -66,37 +63,22 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card text-white bg-warning shadow-sm h-100">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div>
-                        <h6 class="card-title mb-0 text-dark">Stock em Alerta</h6>
-                        <h2 class="my-1 fw-bold text-dark">@ViewBag.MateriaisBaixoStock</h2>
-                        <small class="text-dark-50">Materiais < 10 un.</small>
-                    </div>
-                    <i class="bi bi-exclamation-triangle fs-1 text-dark-50"></i>
-                </div>
-            </div>
-        </div>
     </div>
     @* --- FIM DO DASHBOARD --- *@
+
     <div class="collapse mt-2 mb-4" id="postSearch">
         <div class="card card-body">
             <form asp-action="Index" method="get" class="row g-2 align-items-end">
-
                 <div class="col-md-4">
                     <label for="searchNome" class="form-label">Nome</label>
                     <input id="searchNome" name="searchNome" value="@searchNome"
                            class="form-control" placeholder="Pesquisar por nome" type="search" />
                 </div>
-
                 <div class="col-md-4">
                     <label for="searchEspecialidade" class="form-label">Especialidade</label>
                     <input id="searchEspecialidade" name="searchEspecialidade" value="@searchEspecialidade"
                            class="form-control" placeholder="Pesquisar por especialidade" type="search" />
                 </div>
-
                 <div class="col-12 mt-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i> Pesquisar</button>
                     <a asp-action="Index" class="btn btn-secondary">Limpar Filtros</a>
@@ -110,10 +92,10 @@
             <thead class="table-dark">
                 <tr>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Nome)</th>
-                    <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>   
+                    <th class="d-none d-sm-table-cell">@Html.DisplayNameFor(model => model.Items.First().Descricao)</th>
                     <th>@Html.DisplayNameFor(model => model.Items.First().Especialidade!.Nome)</th>
                     <th class="text-center" style="width: 250px;">Ações</th>
-                    <th>Recursos Necessários</th>
+                    @* Removida a coluna de Recursos Necessários *@
                 </tr>
             </thead>
             <tbody>
@@ -128,27 +110,7 @@
                             <a asp-action="Details" asp-route-id="@item.ExameTipoId" class="btn btn-info btn-sm mx-1"><i class="bi bi-eye me-1"></i> Detalhes</a>
                             <a asp-action="Delete" asp-route-id="@item.ExameTipoId" class="btn btn-danger btn-sm"><i class="bi bi-trash me-1"></i> Apagar</a>
                         </td>
-                        @* Na secção <tbody>, antes da coluna das Ações *@
-
-                        <td>
-                            @if (item.ExameTipoRecursos != null && item.ExameTipoRecursos.Any())
-                            {
-                                <div class="d-flex flex-wrap gap-1">
-                                    @foreach (var rec in item.ExameTipoRecursos)
-                                    {
-                                        <span class="badge bg-light text-dark border border-secondary"
-                                              title="Qtd Necessária: @rec.QuantidadeNecessaria">
-                                            @rec.Recurso!.NomeEquipamento
-                                            <span class="text-muted ms-1" style="font-size: 0.7em;">(@rec.QuantidadeNecessaria)</span>
-                                        </span>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <span class="text-muted small">-</span>
-                            }
-                        </td>
+                        @* Removida a célula com a lista de Recursos *@
                     </tr>
                 }
             </tbody>
@@ -159,45 +121,28 @@
     {
         <nav aria-label="Navegação dos Tipos de Exame" class="mt-4">
             <ul class="pagination justify-content-center">
-
-                @* Link "Primeiro" (First) *@
                 <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                     <a class="page-link" asp-action="Index"
                        asp-route-page="1"
                        asp-route-searchNome="@searchNome"
                        asp-route-searchEspecialidade="@searchEspecialidade">Primeiro</a>
                 </li>
-
-                @* Links Numéricos *@
                 @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
                 {
                     <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                        @if (p == Model.CurrentPage)
-                        {
-                            <a class="page-link" href="#">@p</a>
-                        }
-                        else
-                        {
-                            <a class="page-link"
-                               asp-action="Index"
-                               asp-route-page="@p"
-                               asp-route-searchNome="@searchNome"
-                               asp-route-searchEspecialidade="@searchEspecialidade">@p</a>
-                        }
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@p"
+                           asp-route-searchNome="@searchNome"
+                           asp-route-searchEspecialidade="@searchEspecialidade">@p</a>
                     </li>
                 }
-
-                @* Link "Último" (Last) *@
                 <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                    <a class="page-link"
-                       asp-action="Index"
+                    <a class="page-link" asp-action="Index"
                        asp-route-page="@Model.TotalPages"
                        asp-route-searchNome="@searchNome"
                        asp-route-searchEspecialidade="@searchEspecialidade">Último</a>
                 </li>
-
             </ul>
         </nav>
     }
-
 </div>
