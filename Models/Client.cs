@@ -44,5 +44,6 @@ namespace HealthWellbeing.Models
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
 
         public Member? Membership { get; set; }
+        public string? IdentityUserId { get; set; }
     }
 }
