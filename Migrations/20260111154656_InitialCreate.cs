@@ -496,7 +496,7 @@ namespace HealthWellbeingRoom.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FornecedorId = table.Column<int>(type: "int", nullable: false),
                     ConsumivelId = table.Column<int>(type: "int", nullable: false),
-                    TempoEntrega = table.Column<int>(type: "int", nullable: true),
+                    TempoEntrega = table.Column<int>(type: "int", nullable: false),
                     Preco = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>

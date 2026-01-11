@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeingRoom.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260110164621_InitialCreate")]
+    [Migration("20260111154656_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -279,6 +279,7 @@ namespace HealthWellbeingRoom.Migrations
                         .HasColumnType("real");
 
                     b.Property<int?>("TempoEntrega")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.HasKey("FornecedorConsumivelId");
@@ -1108,7 +1109,7 @@ namespace HealthWellbeingRoom.Migrations
                         .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.Fornecedor", "Fornecedor")
-                        .WithMany()
+                        .WithMany("FornecedoresConsumiveis")
                         .HasForeignKey("FornecedorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1333,6 +1334,11 @@ namespace HealthWellbeingRoom.Migrations
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Consumivel", b =>
+                {
+                    b.Navigation("FornecedoresConsumiveis");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Fornecedor", b =>
                 {
                     b.Navigation("FornecedoresConsumiveis");
                 });

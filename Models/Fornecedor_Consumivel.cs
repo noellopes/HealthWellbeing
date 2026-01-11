@@ -22,10 +22,12 @@ namespace HealthWellbeing.Models
         [ForeignKey(nameof(ConsumivelId))]
         public Consumivel? Consumivel { get; set; }
 
-        public int? TempoEntrega { get; set; } // em dias
+        [Required(ErrorMessage = "O tempo de entrega é obrigatório.")]
+        [Range(0, int.MaxValue, ErrorMessage = "O tempo de entrega deve ser um valor positivo.")]
+        public int? TempoEntrega { get; set; }
 
         [Required(ErrorMessage = "O preço é obrigatório.")]
-        [Range(0, double.MaxValue, ErrorMessage = "O preço deve ser um valor positivo.")]
+        [Range(0, float.MaxValue, ErrorMessage = "O preço deve ser um valor positivo.")]
         public float Preco { get; set; }
     }
 }

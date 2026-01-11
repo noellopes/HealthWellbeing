@@ -40,6 +40,15 @@
         </div>
 
         <div class="card-body">
+
+            @if (TempData["ErrorMessageLigaçaoExistente"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    @TempData["ErrorMessageLigaçaoExistente"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -87,9 +96,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
