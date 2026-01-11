@@ -166,7 +166,7 @@ public async Task<IActionResult> Edit(int? id)
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicoId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")] AgendamentoBalneario agendamentoBalneario)
+        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicosId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")] AgendamentoBalneario agendamentoBalneario)
         {
             if (id != agendamentoBalneario.AgendamentoId)
             {

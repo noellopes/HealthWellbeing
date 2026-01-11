@@ -75,14 +75,19 @@ namespace HealthWellbeing.Data
                 .HasForeignKey(a => a.TipoServicosId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<UtenteBalneario>(entity =>
-            {
-                entity.ToTable("Utentes"); 
-                entity.HasKey(u => u.UtenteBalnearioId);
-            });
+         
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<AgendamentoBalneario>()
+                .HasOne(a => a.Utentes)
+                .WithMany()
+                .HasForeignKey(a => a.UtenteBalnearioId)
+                .IsRequired(false); 
+        
 
 
-            modelBuilder.Entity<Event>()
+
+        modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)
                 .WithMany()
                 .HasForeignKey(e => e.EventTypeId)

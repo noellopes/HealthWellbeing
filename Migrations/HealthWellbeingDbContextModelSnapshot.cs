@@ -1136,7 +1136,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("SeguroSaudeId");
 
-                    b.ToTable("Utentes", (string)null);
+                    b.ToTable("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>

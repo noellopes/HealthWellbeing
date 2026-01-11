@@ -5,16 +5,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 // Add services to the container.
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
-	options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection") ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
+// DbContext da aplicação (Agendamentos, Serviços, Utentes, etc.)
+builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("HealthWellbeingConnection")));
+
+// DbContext do Identity (Login, Users, Roles)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
 
 
