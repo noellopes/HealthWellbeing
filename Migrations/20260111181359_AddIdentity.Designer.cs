@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
+<<<<<<<< HEAD:Migrations/20260111181359_AddIdentity.Designer.cs
+    [Migration("20260111181359_AddIdentity")]
+    partial class AddIdentity
+========
     [Migration("20260111192753_jan11")]
     partial class jan11
+>>>>>>>> ac9014f94f6fff41fb1c801d451db75915410741:Migrations/20260111192753_jan11.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +55,9 @@ namespace HealthWellbeing.Migrations
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("IdentityUserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()

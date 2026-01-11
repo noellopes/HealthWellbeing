@@ -4,48 +4,88 @@
     ViewData["Title"] = "Membership Details";
 }
 
-<div class="container py-4">
-    <h1 class="mb-4 text-primary">Membership Record</h1>
-
+<div class="container py-5">
     <div class="row">
-        <div class="col-md-4 text-center mb-4">
-            <div class="card shadow-sm border-0 p-4">
-                <i class="bi bi-person-circle text-secondary mb-3" style="font-size: 5rem;"></i>
-                <h4>@Model.Client?.Name</h4>
-                <p class="text-muted">Member ID: #@Model.MemberId</p>
-                <hr />
-                <div class="d-grid gap-2">
-                    <a asp-controller="Client" asp-action="Details" asp-route-id="@Model.ClientId" class="btn btn-outline-primary btn-sm">View Full Client Profile</a>
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm text-center h-100">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-person-circle display-1 text-secondary"></i>
+                    </div>
+                    <h3 class="card-title fw-bold">@Model.Client.Name</h3>
+                    <p class="text-muted mb-4">Member ID: #@Model.MemberId</p>
+
+                    <a asp-controller="Client" asp-action="Details" asp-route-id="@Model.ClientId" class="btn btn-primary w-100 rounded-pill">
+                        View Full Client Profile
+                    </a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-8">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Contract & Activity Information</h5>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-card-checklist me-2"></i>Contract & Activity Information</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @Html.Raw(TempData["Message"])
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
                     <dl class="row mb-0">
                         <dt class="col-sm-4 text-muted">Registration Email</dt>
-                        <dd class="col-sm-8">@Model.Client?.Email</dd>
+                        <dd class="col-sm-8 fw-bold">@Model.Client.Email</dd>
 
-                        <dt class="col-sm-4 text-muted mt-2">Registration Date</dt>
-                        <dd class="col-sm-8 mt-2">@Model.Client?.RegistrationDate.ToLongDateString()</dd>
+                        <dt class="col-sm-4 text-muted mt-3">Phone</dt>
+                        <dd class="col-sm-8 mt-3">@Model.Client.Phone</dd>
 
-                        <dt class="col-sm-4 text-muted mt-2">Active Plans</dt>
-                        <dd class="col-sm-8 mt-2">
-                            @* Aqui poderíamos listar os planos ativos deste membro *@
-                            <span class="badge bg-success">Standard Monthly</span>
+                        <hr class="my-4">
+
+                        <dt class="col-sm-4 text-muted">Active Plan</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.MemberPlans != null && Model.MemberPlans.Any(mp => mp.Status == "Active"))
+                            {
+                                var activePlan = Model.MemberPlans.First(mp => mp.Status == "Active");
+                                <span class="badge bg-success fs-6">@activePlan.Plan.Name</span>
+                                <div class="small text-muted mt-1">Expires: @activePlan.EndDate.ToShortDateString()</div>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No active plan</span>
+                                <div class="mt-2">
+                                    <a asp-controller="Plan" asp-action="PublicIndex" class="btn btn-sm btn-outline-primary">Subscribe Now</a>
+                                </div>
+                            }
                         </dd>
                     </dl>
                 </div>
+
+                <div class="card-footer bg-white border-0 p-4 text-end">
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Trainer"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-warning me-2">Edit Membership</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-warning me-2">Change Plan</a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Home</a>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="mt-4 d-flex justify-content-end gap-2">
-        <a asp-action="Edit" asp-route-id="@Model.MemberId" class="btn btn-warning">Edit Membership</a>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 </div>
