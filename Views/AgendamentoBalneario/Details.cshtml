@@ -7,40 +7,62 @@
 <h1>Details</h1>
 
 <div>
-    <h4>AgendamentoModel</h4>
+    <h4>AgendamentoBalneario</h4>
     <hr />
     <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Utentes)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Utentes.NomeCompleto)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Terapeuta)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Terapeuta.Email)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Servico)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Servico.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.TipoServico)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.TipoServico.Nome)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.HoraInicio)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.HoraInicio)
         </dd>
-       
-        
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DuracaoMinutos)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DuracaoMinutos)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Preco)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Preco)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Descricao)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Descricao)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Estado)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UtenteBalneario)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UtenteBalneario.UtenteBalnearioId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Terapeuta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Terapeuta.TerapeutaId)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Servico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Servico.ServicoId)
         </dd>
     </dl>
 </div>

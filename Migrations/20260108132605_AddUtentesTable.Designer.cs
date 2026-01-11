@@ -4,6 +4,7 @@ using HealthWellbeing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    partial class HealthWellbeingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260108132605_AddUtentesTable")]
+    partial class AddUtentesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,7 +112,11 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgendamentoId"));
 
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Descricao")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -128,10 +135,10 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TerapeutaId")
+                    b.Property<int?>("TerapeutaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoServicosId")
+                    b.Property<int>("TipoServicoId")
                         .HasColumnType("int");
 
                     b.Property<int>("UtenteBalnearioId")
@@ -143,7 +150,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("TerapeutaId");
 
-                    b.HasIndex("TipoServicosId");
+                    b.HasIndex("TipoServicoId");
 
                     b.HasIndex("UtenteBalnearioId");
 
@@ -1266,13 +1273,11 @@ namespace HealthWellbeing.Migrations
 
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
-                        .HasForeignKey("TerapeutaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TerapeutaId");
 
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
                         .WithMany()
-                        .HasForeignKey("TipoServicosId")
+                        .HasForeignKey("TipoServicoId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

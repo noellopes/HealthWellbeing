@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Models;
+using System.Collections;
 
 namespace HealthWellbeing.Data
 {
@@ -16,6 +17,7 @@ namespace HealthWellbeing.Data
 
         public DbSet<HealthWellbeing.Models.AgendamentoBalneario> Agendamentos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Servico> Servicos { get; set; } = default!;
+        public DbSet<HealthWellbeing.Models.UtenteBalneario> Utentes { get; set; }
         public DbSet<HealthWellbeing.Models.TipoServicos> TipoServicos { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.Terapeuta> Terapeuta { get; set; } = default!;
         public DbSet<HealthWellbeing.Models.EventType> EventType { get; set; } = default!;
@@ -70,8 +72,15 @@ namespace HealthWellbeing.Data
             modelBuilder.Entity<AgendamentoBalneario>()
                 .HasOne(a => a.TipoServico)
                 .WithMany()
-                .HasForeignKey(a => a.TipoServicoId)
+                .HasForeignKey(a => a.TipoServicosId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<UtenteBalneario>(entity =>
+            {
+                entity.ToTable("Utentes"); 
+                entity.HasKey(u => u.UtenteBalnearioId);
+            });
+
 
             modelBuilder.Entity<Event>()
                 .HasOne(e => e.EventType)

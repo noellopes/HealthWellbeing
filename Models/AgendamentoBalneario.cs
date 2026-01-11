@@ -24,29 +24,32 @@ namespace HealthWellbeing.Models
         [Key]
         public int AgendamentoId { get; set; }
 
+        [Required(ErrorMessage = "O Utente é obrigatório.")]
+        [Display(Name = "Utente")]
+        public int? UtenteBalnearioId { get; set; }
 
-        [Display(Name = "Cliente")]
-        public int? UtenteBalnearioId { get; set; } 
-        [ForeignKey("UtenteBalnearioId")]
-        public UtenteBalneario UtenteBalneario { get; set; }
+        [ForeignKey(nameof(UtenteBalnearioId))]
+        public UtenteBalneario? Utentes { get; set; }
 
+
+        [Required(ErrorMessage = "O Terapeuta é obrigatório.")]
         [Display(Name = "Terapeuta")]
-        public int? TerapeutaId { get; set; } // Opcional (Nullable)
+        public int? TerapeutaId { get; set; } 
         [ForeignKey("TerapeutaId")]
-        public Terapeuta Terapeuta { get; set; }
+        public Terapeuta? Terapeuta { get; set; }
 
 
         [Required(ErrorMessage = "O Serviço é obrigatório.")]
         [Display(Name = "Serviço")]
         public int ServicoId { get; set; }
         [ForeignKey("ServicoId")]
-        public Servico Servico { get; set; }
+        public Servico? Servico { get; set; }
 
         [Required(ErrorMessage = "O tipo de serviço é obrigatório.")]
         [DisplayName("Tipo de Serviço")]
-        public int TipoServicoId { get; set; }
-        [ForeignKey("TipoServicoId")]
-        public TipoServicos TipoServico { get; set; }
+        public int TipoServicosId { get; set; }
+        [ForeignKey("TipoServicosId")]
+        public TipoServicos? TipoServico { get; set; }
 
         [Required(ErrorMessage = "A data e hora de início são obrigatórias.")]
         [Display(Name = "Hora de Início")]
@@ -79,7 +82,7 @@ namespace HealthWellbeing.Models
 
         [Display(Name = "Descrição")]
         [StringLength(500)]
-        public string Descricao { get; set; } = string.Empty;
+        public string? Descricao { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "O estado da reserva é obrigatório.")]
         [Display(Name = "Estado")]

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace HealthWellbeing.Controllers
 {
     public class AgendamentoBalnearioController : Controller
@@ -21,13 +20,13 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Agendamento
+        // GET: AgendamentoBalnearios
         public async Task<IActionResult> Index(string pesquisarNomeUtente, int pagina = 1)
         {
             int itensPorPagina = 5;
 
             var query = _context.Agendamentos
-                .Include(a => a.UtenteBalneario)
+                .Include(a => a.Utentes)
                 .Include(a => a.Terapeuta)
                 .Include(a => a.Servico)
                 .Include(a => a.TipoServico)
@@ -37,8 +36,8 @@ namespace HealthWellbeing.Controllers
             if (!string.IsNullOrEmpty(pesquisarNomeUtente))
             {
                 query = query.Where(a =>
-                    a.UtenteBalneario != null &&
-                    a.UtenteBalneario.NomeCompleto.Contains(pesquisarNomeUtente));
+                    a.Utentes != null &&
+                    a.Utentes.NomeCompleto.Contains(pesquisarNomeUtente));
             }
 
             int totalItens = await query.CountAsync();
@@ -63,7 +62,7 @@ namespace HealthWellbeing.Controllers
             return View(viewModel);
         }
 
-        // GET: Agendamento/Details/5
+        // GET: AgendamentoBalnearios/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -71,48 +70,52 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamentos = await _context.Agendamentos
+            var agendamentoBalneario = await _context.Agendamentos
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
-                .Include(a => a.UtenteBalneario)
+                .Include(a => a.TipoServico)
+                .Include(a => a.Utentes)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
-            if (agendamentos == null)
+            if (agendamentoBalneario == null)
             {
                 return NotFound();
             }
 
-            return View(agendamentos);
+            return View(agendamentoBalneario);
         }
 
-        // GET: Agendamento/Create
+        // GET: AgendamentoBalnearios/Create
         public IActionResult Create()
         {
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId");
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId");
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId");
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes,"UtenteBalnearioId","NomeCompleto");
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email");
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome");        
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
             return View();
         }
 
-        // POST: Agendamento/Create
+        // POST: AgendamentoBalnearios/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] Models.AgendamentoBalneario agendamentobalneario)
+        public async Task<IActionResult> Create([Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicosId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")] AgendamentoBalneario agendamentoBalneario)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(agendamentobalneario);
+                _context.Add(agendamentoBalneario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamentobalneario.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId", agendamentobalneario.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamentobalneario.UtenteBalnearioId);
-            return View(agendamentobalneario);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+            return View(agendamentoBalneario);
         }
 
-        // GET: Agendamento/Edit/5
+
+        // GET: AgendamentoBalnearios/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -120,25 +123,26 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamento = await _context.Agendamentos.FindAsync(id);
-            if (agendamento == null)
+            var agendamentoBalneario = await _context.Agendamentos.FindAsync(id);
+            if (agendamentoBalneario == null)
             {
                 return NotFound();
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamento.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId", agendamento.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamento.UtenteBalnearioId);
-            return View(agendamento);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
+            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+            return View(agendamentoBalneario);
         }
 
-        // POST: Agendamento/Edit/5
+        // POST: AgendamentoBalnearios/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,DataHoraInicio,DataHoraFim,Estado,UtenteBalnearioId,TerapeutaId,ServicoId")] AgendamentoBalneario agendamento)
+        public async Task<IActionResult> Edit(int id, [Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicoId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")] AgendamentoBalneario agendamentoBalneario)
         {
-            if (id != agendamento.AgendamentoId)
+            if (id != agendamentoBalneario.AgendamentoId)
             {
                 return NotFound();
             }
@@ -147,12 +151,12 @@ namespace HealthWellbeing.Controllers
             {
                 try
                 {
-                    _context.Update(agendamento);
+                    _context.Update(agendamentoBalneario);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AgendamentoModelExists(agendamento.AgendamentoId))
+                    if (!AgendamentoBalnearioExists(agendamentoBalneario.AgendamentoId))
                     {
                         return NotFound();
                     }
@@ -163,13 +167,14 @@ namespace HealthWellbeing.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "ServicoId", agendamento.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "TerapeutaId", agendamento.TerapeutaId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Set<UtenteBalneario>(), "UtenteBalnearioId", "UtenteBalnearioId", agendamento.UtenteBalnearioId);
-            return View(agendamento);
+            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
+            ViewData["TipoServicoId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
+            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+            return View(agendamentoBalneario);
         }
 
-        // GET: Agendamento/Delete/5
+        // GET: AgendamentoBalnearios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -177,35 +182,36 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            var agendamentos = await _context.Agendamentos
+            var agendamentoBalneario = await _context.Agendamentos
                 .Include(a => a.Servico)
                 .Include(a => a.Terapeuta)
-                .Include(a => a.UtenteBalneario)
+                .Include(a => a.TipoServico)
+                .Include(a => a.Utentes)
                 .FirstOrDefaultAsync(m => m.AgendamentoId == id);
-            if (agendamentos == null)
+            if (agendamentoBalneario == null)
             {
                 return NotFound();
             }
 
-            return View(agendamentos);
+            return View(agendamentoBalneario);
         }
 
-        // POST: Agendamento/Delete/5
+        // POST: AgendamentoBalnearios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var agendamento = await _context.Agendamentos.FindAsync(id);
-            if (agendamento != null)
+            var agendamentoBalneario = await _context.Agendamentos.FindAsync(id);
+            if (agendamentoBalneario != null)
             {
-                _context.Agendamentos.Remove(agendamento);
+                _context.Agendamentos.Remove(agendamentoBalneario);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AgendamentoModelExists(int id)
+        private bool AgendamentoBalnearioExists(int id)
         {
             return _context.Agendamentos.Any(e => e.AgendamentoId == id);
         }

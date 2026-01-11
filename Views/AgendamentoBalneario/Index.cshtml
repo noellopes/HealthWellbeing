@@ -62,7 +62,7 @@
     <table class="table table-hover table-striped align-middle mb-0">
         <thead class="table-dark text-white">
             <tr>
-                <th>Cliente</th>
+                <th>Utente</th>
                 <th>Terapeuta</th>
                 <th>Serviço</th>
                 <th>Tipo de Serviço</th>
@@ -76,7 +76,7 @@
             {
                 <tr>
                     <td class="fw-semibold">
-                        @(item.UtenteBalneario != null ? item.UtenteBalneario.NomeCompleto : "---")
+                        @(item.Utentes != null ? item.Utentes.NomeCompleto : "---")
                     </td>
 
                     <td>
@@ -178,3 +178,4 @@
 
     </ul>
 </nav>
+
