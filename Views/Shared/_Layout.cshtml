@@ -55,6 +55,32 @@
                                 </ul>
                             </li>
                         }
+
+                        @* --- MENU DE DESENVOLVIMENTO (Remover antes da entrega final) --- *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-danger dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bug-fill me-1"></i> Model Check (Dev)
+                            </a>
+                            <ul class="dropdown-menu shadow border-danger">
+                                <li class="dropdown-header text-uppercase small">Entidades Principais</li>
+                                <li><a class="dropdown-item" asp-controller="Client" asp-action="Index">Clients</a></li>
+                                <li><a class="dropdown-item" asp-controller="Member" asp-action="Index">Members</a></li>
+                                <li><a class="dropdown-item" asp-controller="Trainer" asp-action="Index">Trainers</a></li>
+                                <li><a class="dropdown-item" asp-controller="Plan" asp-action="Index">Plans</a></li>
+
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-header text-uppercase small">Avaliações e Treino</li>
+                                <li><a class="dropdown-item" asp-controller="PhysicalAssessments" asp-action="Index">Physical Assessments</a></li>
+                                <li><a class="dropdown-item" asp-controller="TrainingType" asp-action="Index">Training Types</a></li>
+                                <li><a class="dropdown-item" asp-controller="Training" asp-action="Index">Trainings</a></li>
+
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-header text-uppercase small text-muted">Tabelas Intermédias</li>
+                                <li><a class="dropdown-item text-muted" asp-controller="MemberPlan" asp-action="Index">Member-Plan Links</a></li>
+                                <li><a class="dropdown-item text-muted" asp-controller="TrainingPlan" asp-action="Index">Training-Plan Links</a></li>
+                            </ul>
+                        </li>
+
                     </ul>
 
                     <ul class="navbar-nav ms-auto">
