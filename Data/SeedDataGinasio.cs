@@ -157,10 +157,12 @@ internal class SeedDataGinasio
 
     private static List<Trainer> PopulateTrainer(HealthWellbeingDbContext dbContext)
     {
-        if (dbContext.Trainer.Any()) return dbContext.Trainer.ToList();
+        // ALTERADO: Verifica se o "John Smith" existe. Se existir, assume que esta lista já foi carregada.
+        if (dbContext.Trainer.Any(t => t.Name == "John Smith"))
+            return dbContext.Trainer.ToList();
 
         var trainers = new List<Trainer>
-        {
+    {
             new Trainer { Name = "John Smith", Address = "123 HIIT St, New York", Email = "john@gym.com", Phone = "555-111", BirthDate = new DateTime(1988, 7, 10), Gender = "Male" },
             new Trainer { Name = "Emma Johnson", Address = "45 Strength Blvd, London", Email = "emma@gym.com", Phone = "555-222", BirthDate = new DateTime(1992, 11, 25), Gender = "Female" },
             new Trainer { Name = "Carlos Mendes", Address = "8 Yoga Lane, Lisbon", Email = "carlos@gym.com", Phone = "555-333", BirthDate = new DateTime(1975, 4, 1), Gender = "Male" },
@@ -173,7 +175,9 @@ internal class SeedDataGinasio
 
         dbContext.Trainer.AddRange(trainers);
         dbContext.SaveChanges();
-        return trainers;
+
+        // Recarrega tudo para incluir também o Admin e o Treinador criado no SeedAccount
+        return dbContext.Trainer.ToList();
     }
 
     private static List<Training> PopulateTraining(
