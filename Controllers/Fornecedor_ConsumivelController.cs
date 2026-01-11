@@ -84,27 +84,24 @@ namespace HealthWellbeing.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Verificar se já existe a ligação
+
                 var existing = await _context.Fornecedor_Consumivel
                     .FirstOrDefaultAsync(fc => fc.FornecedorId == fornecedor_Consumivel.FornecedorId
                                             && fc.ConsumivelId == fornecedor_Consumivel.ConsumivelId);
 
                 if (existing != null)
                 {
-                    // Coloca mensagem de erro
+
                     TempData["ErrorMessageLigaçaoExistente"] = "Ligação já existente! Por favor edite a ligação existente.";
-                    // Redireciona diretamente para Edit
                     return RedirectToAction("Edit", new { id = existing.FornecedorConsumivelId });
                 }
 
-                // Se não existir, adiciona normalmente
                 _context.Add(fornecedor_Consumivel);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Ligação criada com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Se houver erros de validação, recarrega os select lists
             ViewData["ConsumivelId"] = new SelectList(_context.Consumivel, "ConsumivelId", "Nome", fornecedor_Consumivel.ConsumivelId);
             ViewData["FornecedorId"] = new SelectList(_context.Fornecedor, "FornecedorId", "NomeEmpresa", fornecedor_Consumivel.FornecedorId);
             return View(fornecedor_Consumivel);
@@ -130,19 +127,18 @@ namespace HealthWellbeing.Controllers
                 return NotFound();
             }
 
-            // Aqui adicionamos os SelectLists para a View
             ViewData["FornecedorId"] = new SelectList(
                 _context.Fornecedor.OrderBy(f => f.NomeEmpresa),
                 "FornecedorId",
                 "NomeEmpresa",
-                fornecedor_Consumivel.FornecedorId // seleciona o fornecedor atual
+                fornecedor_Consumivel.FornecedorId 
             );
 
             ViewData["ConsumivelId"] = new SelectList(
                 _context.Consumivel.OrderBy(c => c.Nome),
                 "ConsumivelId",
                 "Nome",
-                fornecedor_Consumivel.ConsumivelId // seleciona o consumível atual
+                fornecedor_Consumivel.ConsumivelId
             );
 
             return View(fornecedor_Consumivel);

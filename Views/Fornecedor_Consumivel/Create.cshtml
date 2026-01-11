@@ -62,13 +62,13 @@
 
                 <div class="mb-3">
                     <label asp-for="TempoEntrega" class="form-label"></label>
-                    <input asp-for="TempoEntrega" class="form-control" />
+                    <input asp-for="TempoEntrega" class="form-control" type="number" min="0" />
                     <span asp-validation-for="TempoEntrega" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
                     <label asp-for="Preco" class="form-label"></label>
-                    <input asp-for="Preco" class="form-control" />
+                    <input asp-for="Preco" class="form-control " type="number" step="0.01" min="0" />
                     <span asp-validation-for="Preco" class="text-danger"></span>
                 </div>
 

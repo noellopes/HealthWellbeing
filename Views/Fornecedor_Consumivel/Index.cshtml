@@ -84,7 +84,8 @@
                 <thead class="table-primary">
                     <tr>
 						<th>Consumível</th>
-                        <th class="text-end">Ações</th>
+                        <th>Fornecedor</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +94,9 @@
                         <tr>
                             <td class="fw-semibold">
                                 @item.Consumivel.Nome
+                            </td>
+                            <td class="fw-semibold">
+                                @item.Fornecedor.NomeEmpresa
                             </td>
                             <td class="text-end">
                                 <a asp-action="Details"
