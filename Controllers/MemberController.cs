@@ -27,6 +27,8 @@ namespace HealthWellbeing.Controllers
         {
             var membersQuery = _context.Member
                 .Include(m => m.Client)
+                .Include(m => m.MemberPlans) // Incluir planos para mostrar "Active" na lista se necessário
+                    .ThenInclude(mp => mp.Plan)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchName))
@@ -152,6 +154,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator,Trainer")] // Só Staff pode editar
         public async Task<IActionResult> Edit(int id, [Bind("MemberId,ClientId")] Member member)
         {
             if (id != member.MemberId) return NotFound();
