@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize] // Exige que o utilizador esteja logado para qualquer ação
+    [Authorize] // Segurança Base: Exige login para tudo
     public class MemberController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -22,13 +22,15 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
+        // =============================================================
+        // INDEX: Lista de Membros (APENAS STAFF)
+        // =============================================================
         [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
             var membersQuery = _context.Member
                 .Include(m => m.Client)
-                .Include(m => m.MemberPlans) // Incluir planos para mostrar "Active" na lista se necessário
-                    .ThenInclude(mp => mp.Plan)
+                .Include(m => m.MemberPlans).ThenInclude(mp => mp.Plan)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchName))
@@ -56,6 +58,9 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
+        // =============================================================
+        // DETAILS: Ver Detalhes (STAFF OU O PRÓPRIO)
+        // =============================================================
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -68,15 +73,18 @@ namespace HealthWellbeing.Controllers
 
             if (member == null) return NotFound();
 
-            // SEGURANÇA: Se não for Staff, tem de ser o dono da conta (Email igual ao Login)
+            // SEGURANÇA: Se não for Staff, tem de ser o dono da conta
             if (!IsStaff() && member.Client.Email != User.Identity.Name)
             {
-                return Forbid(); // Acesso Negado
+                return Forbid();
             }
 
             return View(member);
         }
 
+        // =============================================================
+        // CREATE: Inscrever Novo Membro (APENAS STAFF)
+        // =============================================================
         [Authorize(Roles = "Administrator,Trainer")]
         public IActionResult Create(int? clientId)
         {
@@ -101,10 +109,12 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
+                // 1. Criar o Member
                 var member = new Member { ClientId = ClientId };
                 _context.Add(member);
                 await _context.SaveChangesAsync();
 
+                // 2. Criar a Subscrição
                 var plan = await _context.Plan.FindAsync(PlanId);
                 if (plan != null)
                 {
@@ -130,73 +140,88 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // =============================================================
+        // EDIT: Mudar Plano (STAFF OU O PRÓPRIO)
+        // =============================================================
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
             var member = await _context.Member
-                .Include(m => m.Client) // Necessário para validar o Email
+                .Include(m => m.Client)
+                .Include(m => m.MemberPlans).ThenInclude(mp => mp.Plan)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null) return NotFound();
 
-            // SEGURANÇA: Só Staff ou o próprio dono podem editar
+            // SEGURANÇA
             if (!IsStaff() && member.Client.Email != User.Identity.Name)
             {
                 return Forbid();
             }
 
-            // Nota: Se for o cliente a editar, o dropdown de ClientId devia estar desativado na View, 
-            // mas aqui carregamos a lista na mesma para o Admin poder mudar se quiser.
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
+            // Descobrir plano ativo para pré-selecionar no dropdown
+            var activePlan = member.MemberPlans.FirstOrDefault(mp => mp.Status == "Active");
+            int currentPlanId = activePlan?.PlanId ?? 0;
+
+            ViewData["PlanId"] = new SelectList(_context.Plan, "PlanId", "Name", currentPlanId);
             return View(member);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator,Trainer")] // Só Staff pode editar
-        public async Task<IActionResult> Edit(int id, [Bind("MemberId,ClientId")] Member member)
+        public async Task<IActionResult> Edit(int id, int NewPlanId)
         {
-            if (id != member.MemberId) return NotFound();
-
-            // SEGURANÇA NO POST: Verificar permissões novamente antes de gravar
-            // Buscamos o membro original (sem tracking) para conferir quem é o dono
-            var originalMember = await _context.Member
+            var member = await _context.Member
                 .Include(m => m.Client)
-                .AsNoTracking()
+                .Include(m => m.MemberPlans)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
-            if (originalMember == null) return NotFound();
+            if (member == null) return NotFound();
 
-            if (!IsStaff() && originalMember.Client.Email != User.Identity.Name)
+            // SEGURANÇA
+            if (!IsStaff() && member.Client.Email != User.Identity.Name)
             {
                 return Forbid();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(member);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Membership updated successfully.";
+            // Lógica de Atualização do Plano (Reinício de Ciclo)
+            var activeMemberPlan = member.MemberPlans.FirstOrDefault(mp => mp.Status == "Active");
 
-                    if (!IsStaff())
-                    {
-                        return RedirectToAction(nameof(Details), new { id = member.MemberId });
-                    }
-                }
-                catch (DbUpdateConcurrencyException)
+            if (activeMemberPlan != null && NewPlanId != 0 && activeMemberPlan.PlanId != NewPlanId)
+            {
+                var newPlanInfo = await _context.Plan.FindAsync(NewPlanId);
+
+                if (newPlanInfo != null)
                 {
-                    if (!MemberExists(member.MemberId)) return NotFound();
-                    else throw;
+                    // 1. Atualizar o ID do Plano
+                    activeMemberPlan.PlanId = NewPlanId;
+
+                    // 2. REINICIAR O CICLO DE FATURAÇÃO
+                    // A data de início passa a ser hoje
+                    activeMemberPlan.StartDate = DateTime.Now;
+                    // A data de fim é recalculada (Hoje + Duração do Novo Plano)
+                    activeMemberPlan.EndDate = DateTime.Now.AddDays(newPlanInfo.DurationDays);
+
+                    _context.Update(activeMemberPlan);
+                    await _context.SaveChangesAsync();
+
+                    // Mensagem de Feedback explicativa
+                    TempData["SuccessMessage"] = $"Plan updated to {newPlanInfo.Name}. A new billing cycle has started today.";
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
-            return View(member);
+
+            // Redirecionamento Inteligente
+            if (!IsStaff())
+            {
+                return RedirectToAction(nameof(Details), new { id = member.MemberId });
+            }
+            return RedirectToAction(nameof(Index));
         }
 
+        // =============================================================
+        // DELETE: Cancelar Membro (APENAS STAFF)
+        // =============================================================
         [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -204,8 +229,7 @@ namespace HealthWellbeing.Controllers
 
             var member = await _context.Member
                 .Include(m => m.Client)
-                .Include(m => m.MemberPlans)
-                    .ThenInclude(mp => mp.Plan)
+                .Include(m => m.MemberPlans).ThenInclude(mp => mp.Plan)
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null) return RedirectToAction(nameof(Index));
@@ -234,7 +258,7 @@ namespace HealthWellbeing.Controllers
             return _context.Member.Any(e => e.MemberId == id);
         }
 
-        // Função auxiliar para verificar se é Admin ou Trainer
+        // Helper para verificar permissões de Staff
         private bool IsStaff()
         {
             return User.IsInRole("Administrator") || User.IsInRole("Trainer");
