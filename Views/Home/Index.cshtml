@@ -1,8 +1,122 @@
-﻿@{
+﻿@model IEnumerable<HealthWellbeing.Models.Plan>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="bg-light p-5 rounded-3 mb-5 text-center shadow-sm">
+    <h1 class="display-4 fw-bold text-primary">Welcome to HealthWellbeing</h1>
+    <p class="lead text-muted">Achieve your fitness goals with our personalized training plans and expert guidance.</p>
+    <hr class="my-4">
+    <p>Choose a plan below to start your journey today.</p>
+
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <a class="btn btn-primary btn-lg px-4 gap-3 shadow-sm" asp-controller="Account" asp-action="Register" role="button">
+            Join Now <i class="bi bi-person-plus-fill ms-2"></i>
+        </a>
+    }
+    else
+    {
+        @if (ViewBag.MemberId != null)
+        {
+            <a class="btn btn-success btn-lg px-4 gap-3 shadow-sm"
+               asp-controller="Member" asp-action="Details" asp-route-id="@ViewBag.MemberId" role="button">
+                Go to My Dashboard <i class="bi bi-speedometer2 ms-2"></i>
+            </a>
+        }
+        else
+        {
+            <a class="btn btn-warning btn-lg px-4 gap-3 shadow-sm text-dark"
+               asp-controller="Plan" asp-action="PublicIndex" role="button">
+                Subscribe to a Plan <i class="bi bi-arrow-right-circle ms-2"></i>
+            </a>
+        }
+    }
 </div>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0 text-dark"><i class="bi bi-star-fill text-warning me-2"></i>Featured Plans</h2>
+            <p class="text-muted mb-0">Our top picks for you</p>
+        </div>
+
+        <a asp-controller="Plan" asp-action="PublicIndex" class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm">
+            View All Plans <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-info text-center py-4">
+                    <i class="bi bi-info-circle fs-4 d-block mb-2"></i>
+                    No plans available at the moment. Please ask an administrator to create plans.
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 hover-effect">
+                        <div class="card-header bg-white py-4 border-0 text-center">
+                            <h4 class="my-0 fw-bold text-uppercase text-secondary">@item.Name</h4>
+                        </div>
+
+                        <div class="card-body d-flex flex-column text-center">
+                            <h1 class="card-title pricing-card-title text-primary fw-bold">
+                                €@item.Price
+                                <small class="text-muted fw-light fs-4">/ @item.DurationDays days</small>
+                            </h1>
+
+                            <ul class="list-unstyled mt-3 mb-4 flex-grow-1 text-muted">
+                                <li class="mb-2">@item.Description</li>
+                                <li class="small"><i class="bi bi-check2 text-success me-1"></i> Full Gym Access</li>
+                                <li class="small"><i class="bi bi-check2 text-success me-1"></i> Trainer Support</li>
+                            </ul>
+
+                            <div class="mt-auto">
+                                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-controller="Plan" asp-action="Subscribe" asp-route-id="@item.PlanId"
+                                       class="w-100 btn btn-lg btn-outline-primary rounded-pill">
+                                        Subscribe Now
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Login"
+                                       class="w-100 btn btn-lg btn-primary rounded-pill shadow-sm">
+                                        Get Started
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="text-center mt-5">
+        <p class="text-muted mb-2">Not finding what you're looking for?</p>
+        <a asp-controller="Plan" asp-action="PublicIndex" class="text-decoration-none fw-bold text-primary">
+            Browse full catalog &rarr;
+        </a>
+    </div>
+</div>
+
+<style>
+    .hover-effect {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .hover-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important;
+        }
+</style>

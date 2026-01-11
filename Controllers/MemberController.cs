@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize] // Exige que o utilizador esteja logado para qualquer ação
     public class MemberController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -20,31 +22,22 @@ namespace HealthWellbeing.Controllers
             _context = context;
         }
 
-        // GET: Member
-        // Implementa a paginação e pesquisa filtrando através da entidade Client
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Index(int page = 1, string searchName = "", string searchPhone = "", string searchEmail = "")
         {
             var membersQuery = _context.Member
                 .Include(m => m.Client)
                 .AsQueryable();
 
-            // Filtros de Pesquisa (Lógica de navegação entre Member -> Client)
             if (!string.IsNullOrEmpty(searchName))
-            {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Name.Contains(searchName));
-            }
 
             if (!string.IsNullOrEmpty(searchPhone))
-            {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Phone.Contains(searchPhone));
-            }
 
             if (!string.IsNullOrEmpty(searchEmail))
-            {
                 membersQuery = membersQuery.Where(m => m.Client != null && m.Client.Email.Contains(searchEmail));
-            }
 
-            // Lógica de Paginação usando o ViewModel genérico
             int totalMembers = await membersQuery.CountAsync();
             var pagination = new PaginationInfo<Member>(page, totalMembers);
 
@@ -54,7 +47,6 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
-            // ViewBag para manter os filtros nos links de paginação
             ViewBag.SearchName = searchName;
             ViewBag.SearchPhone = searchPhone;
             ViewBag.SearchEmail = searchEmail;
@@ -62,7 +54,6 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // GET: Member/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -75,14 +66,20 @@ namespace HealthWellbeing.Controllers
 
             if (member == null) return NotFound();
 
+            // SEGURANÇA: Se não for Staff, tem de ser o dono da conta (Email igual ao Login)
+            if (!IsStaff() && member.Client.Email != User.Identity.Name)
+            {
+                return Forbid(); // Acesso Negado
+            }
+
             return View(member);
         }
 
-        // GET: Member/Create
+        [Authorize(Roles = "Administrator,Trainer")]
         public IActionResult Create(int? clientId)
         {
             var clients = _context.Client.Where(c => c.Membership == null).OrderBy(c => c.Name).ToList();
-            var plans = _context.Plan.OrderBy(p => p.Price).ToList(); // Lista de planos para o dropdown
+            var plans = _context.Plan.OrderBy(p => p.Price).ToList();
 
             ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", clientId);
             ViewData["PlanId"] = new SelectList(plans, "PlanId", "Name");
@@ -90,9 +87,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // POST: Member/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Create(int ClientId, int PlanId)
         {
             if (ClientId == 0 || PlanId == 0)
@@ -102,12 +99,10 @@ namespace HealthWellbeing.Controllers
 
             if (ModelState.IsValid)
             {
-                // 1. Criar o Member
                 var member = new Member { ClientId = ClientId };
                 _context.Add(member);
-                await _context.SaveChangesAsync(); // Grava para obter o MemberId
+                await _context.SaveChangesAsync();
 
-                // 2. Criar a Inscrição (MemberPlan)
                 var plan = await _context.Plan.FindAsync(PlanId);
                 if (plan != null)
                 {
@@ -123,7 +118,7 @@ namespace HealthWellbeing.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                TempData["Message"] = "Membership and Plan subscription completed successfully.";
+                TempData["Message"] = "Membership created successfully.";
                 TempData["MessageType"] = "success";
                 return RedirectToAction(nameof(Index));
             }
@@ -133,28 +128,47 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
-        // GET: Member/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
             var member = await _context.Member
-                .Include(m => m.Client)
+                .Include(m => m.Client) // Necessário para validar o Email
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null) return NotFound();
 
-            // Na edição permitimos trocar o cliente, se necessário
+            // SEGURANÇA: Só Staff ou o próprio dono podem editar
+            if (!IsStaff() && member.Client.Email != User.Identity.Name)
+            {
+                return Forbid();
+            }
+
+            // Nota: Se for o cliente a editar, o dropdown de ClientId devia estar desativado na View, 
+            // mas aqui carregamos a lista na mesma para o Admin poder mudar se quiser.
             ViewData["ClientId"] = new SelectList(_context.Client, "ClientId", "Name", member.ClientId);
             return View(member);
         }
 
-        // POST: Member/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MemberId,ClientId")] Member member)
         {
             if (id != member.MemberId) return NotFound();
+
+            // SEGURANÇA NO POST: Verificar permissões novamente antes de gravar
+            // Buscamos o membro original (sem tracking) para conferir quem é o dono
+            var originalMember = await _context.Member
+                .Include(m => m.Client)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.MemberId == id);
+
+            if (originalMember == null) return NotFound();
+
+            if (!IsStaff() && originalMember.Client.Email != User.Identity.Name)
+            {
+                return Forbid();
+            }
 
             if (ModelState.IsValid)
             {
@@ -162,7 +176,12 @@ namespace HealthWellbeing.Controllers
                 {
                     _context.Update(member);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Membership information updated.";
+                    TempData["SuccessMessage"] = "Membership updated successfully.";
+
+                    if (!IsStaff())
+                    {
+                        return RedirectToAction(nameof(Details), new { id = member.MemberId });
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -175,12 +194,11 @@ namespace HealthWellbeing.Controllers
             return View(member);
         }
 
-        // GET: Member/Delete/5
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            // Importante carregar os planos para o aviso de segurança na vista de remoção
             var member = await _context.Member
                 .Include(m => m.Client)
                 .Include(m => m.MemberPlans)
@@ -192,9 +210,9 @@ namespace HealthWellbeing.Controllers
             return View(member);
         }
 
-        // POST: Member/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var member = await _context.Member.FindAsync(id);
@@ -211,6 +229,12 @@ namespace HealthWellbeing.Controllers
         private bool MemberExists(int id)
         {
             return _context.Member.Any(e => e.MemberId == id);
+        }
+
+        // Função auxiliar para verificar se é Admin ou Trainer
+        private bool IsStaff()
+        {
+            return User.IsInRole("Administrator") || User.IsInRole("Trainer");
         }
     }
 }
