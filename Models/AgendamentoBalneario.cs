@@ -24,7 +24,7 @@ namespace HealthWellbeing.Models
         [Key]
         public int AgendamentoId { get; set; }
 
-        [Required(ErrorMessage = "O Utente é obrigatório.")]
+        //[Required(ErrorMessage = "O Utente é obrigatório.")]
         [Display(Name = "Utente")]
         public int? UtenteBalnearioId { get; set; }
 

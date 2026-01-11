@@ -1,75 +1,72 @@
 ﻿@model HealthWellbeing.Models.AgendamentoBalneario
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar Agendamento";
 }
 
-<h1>Delete</h1>
+<h1 class="mb-3">@ViewData["Title"]</h1>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>AgendamentoBalneario</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Utentes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Utentes.NomeCompleto)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Terapeuta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Terapeuta.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Servico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Servico.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoServico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoServico.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoraInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoraInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DuracaoMinutos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DuracaoMinutos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Preco)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Preco)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="AgendamentoId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<h5 class="mb-3">
+    Tem a certeza de que deseja eliminar este agendamento?
+</h5>
+
+<hr />
+
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-trash3-fill me-2"></i>Eliminar Agendamento
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <dl class="row mb-0">
+
+            <dt class="col-sm-4 fw-bold text-muted">Utente</dt>
+            <dd class="col-sm-8">
+                @(Model.Utentes != null ? Model.Utentes.NomeCompleto : "---")
+            </dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Terapeuta</dt>
+            <dd class="col-sm-8">@Model.Terapeuta?.Email</dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Serviço</dt>
+            <dd class="col-sm-8">@Model.Servico?.Nome</dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Tipo de Serviço</dt>
+            <dd class="col-sm-8">@Model.TipoServico?.Nome</dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Hora de Início</dt>
+            <dd class="col-sm-8">
+                @Model.HoraInicio.ToString("dd/MM/yyyy HH:mm")
+            </dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Duração (min)</dt>
+            <dd class="col-sm-8">@Model.DuracaoMinutos</dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Preço (€)</dt>
+            <dd class="col-sm-8">@Model.Preco.ToString("0.00")</dd>
+
+            <dt class="col-sm-4 fw-bold text-muted">Estado</dt>
+            <dd class="col-sm-8">
+                <span class="badge bg-secondary">@Model.Estado</span>
+            </dd>
+
+        </dl>
+
+        <form asp-action="Delete" method="post" class="mt-4">
+            <input type="hidden" asp-for="AgendamentoId" />
+
+            <div class="d-flex justify-content-start gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
