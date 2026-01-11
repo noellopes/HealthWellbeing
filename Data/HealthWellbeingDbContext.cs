@@ -23,9 +23,25 @@ namespace HealthWellbeing.Data
         // Entidades de Treino e Exercício
         public DbSet<Training> Training { get; set; } = default!;
         public DbSet<TrainingType> TrainingType { get; set; } = default!;
+        public DbSet<PhysicalAssessment> PhysicalAssessment { get; set; } = default!;
 
         // Tabelas Intermédias e Auxiliares
         public DbSet<MemberPlan> MemberPlan { get; set; } = default!;
         public DbSet<TrainingPlan> TrainingPlan { get; set; } = default!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Configuração para Peso, Altura, percentagem de gordura e massa muscular
+            modelBuilder.Entity<PhysicalAssessment>()
+                .Property(p => p.Weight).HasColumnType("decimal(5,2)");
+            modelBuilder.Entity<PhysicalAssessment>()
+                .Property(p => p.Height).HasColumnType("decimal(3,2)");
+            modelBuilder.Entity<PhysicalAssessment>()
+                .Property(p => p.BodyFatPercentage).HasColumnType("decimal(5,2)");
+            modelBuilder.Entity<PhysicalAssessment>()
+                .Property(p => p.MuscleMass).HasColumnType("decimal(5,2)");
+        }
     }
 }

@@ -125,6 +125,48 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("MemberPlan");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.PhysicalAssessment", b =>
+                {
+                    b.Property<int>("PhysicalAssessmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PhysicalAssessmentId"));
+
+                    b.Property<DateTime>("AssessmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("BodyFatPercentage")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("Height")
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("MuscleMass")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("TrainerId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("PhysicalAssessmentId");
+
+                    b.HasIndex("MemberId");
+
+                    b.HasIndex("TrainerId");
+
+                    b.ToTable("PhysicalAssessment");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Plan", b =>
                 {
                     b.Property<int>("PlanId")
@@ -318,6 +360,25 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Member");
 
                     b.Navigation("Plan");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.PhysicalAssessment", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Member", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.Trainer", "Trainer")
+                        .WithMany()
+                        .HasForeignKey("TrainerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Member");
+
+                    b.Navigation("Trainer");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Training", b =>
