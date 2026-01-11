@@ -1,79 +1,96 @@
 ﻿@model HealthWellbeing.Models.Member
 
 @{
-    ViewData["Title"] = "Edit Membership";
+    ViewData["Title"] = "Manage Subscription";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4 text-primary"><i class="bi bi-pencil-square me-2"></i>Edit Membership</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="text-primary mb-4"><i class="bi bi-pencil-square me-2"></i>Manage Subscription</h1>
 
-    <div class="card shadow-sm border-0 mt-4">
-        <div class="card-header bg-warning text-dark py-3">
-            <h5 class="card-title mb-0 fw-bold">Update Membership Details</h5>
-        </div>
-        <div class="card-body p-4">
-            <form asp-action="Edit" method="post" class="needs-validation" novalidate>
-                @Html.AntiForgeryToken()
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 shadow-sm"></div>
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0 fw-bold">Change Plan / Update</h5>
+                </div>
+                <div class="card-body p-4">
 
-                <input type="hidden" asp-for="MemberId" />
+                    <form asp-action="Edit" id="editForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="MemberId" />
 
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <label asp-for="ClientId" class="form-label fw-bold">Associated Client</label>
-                        <select asp-for="ClientId" class="form-select shadow-sm" asp-items="ViewBag.ClientId">
-                            <option value="">-- Change associated client --</option>
-                        </select>
-                        <span asp-validation-for="ClientId" class="invalid-feedback"></span>
-                        <div class="form-text mt-2">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Changing the client will transfer all gym history to the new profile.
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Member Name</label>
+                            <input type="text" class="form-control bg-light" value="@Model.Client.Name" readonly />
                         </div>
-                    </div>
-                </div>
 
-                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        <i class="bi bi-save me-1"></i> Save Changes
-                    </button>
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4 shadow-sm">
-                        Cancel
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
+                        <div class="mb-4">
+                            <label for="NewPlanId" class="form-label fw-bold">Active Plan</label>
+                            <select name="NewPlanId" id="NewPlanId" class="form-select form-select-lg" asp-items="ViewBag.PlanId" onchange="showWarning()">
+                            </select>
 
-    <div class="mt-4">
-        <div class="alert alert-light border shadow-sm">
-            <h6 class="fw-bold"><i class="bi bi-person-lines-fill me-2"></i>Current Client Details:</h6>
-            <hr />
-            <div class="row">
-                <div class="col-sm-4"><strong>Name:</strong> @Model.Client?.Name</div>
-                <div class="col-sm-4"><strong>Email:</strong> @Model.Client?.Email</div>
-                <div class="col-sm-4"><strong>Member Since:</strong> @Model.Client?.RegistrationDate.Year</div>
+                            <div id="planChangeWarning" class="alert alert-warning mt-3 d-none">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <strong>Warning:</strong> Changing your plan will <u>cancel the current period</u> and start a new subscription cycle effectively immediately.
+                                <br><small>Your new renewal date will be calculated from today.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            @if (User.IsInRole("Administrator") || User.IsInRole("Trainer"))
+                            {
+                                <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+                            }
+                            else
+                            {
+                                <a asp-action="Details" asp-route-id="@Model.MemberId" class="btn btn-outline-secondary">Cancel</a>
+                            }
+
+                            <button type="button" class="btn btn-primary px-4 fw-bold" onclick="confirmSubmission()">
+                                <i class="bi bi-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    // Guarda o valor original do plano quando a página carrega
+    const originalPlanId = document.getElementById('NewPlanId').value;
+
+    function showWarning() {
+        const select = document.getElementById('NewPlanId');
+        const warningDiv = document.getElementById('planChangeWarning');
+
+        // Se o plano selecionado for diferente do original, mostra o aviso
+        if (select.value !== originalPlanId) {
+            warningDiv.classList.remove('d-none');
+        } else {
+            warningDiv.classList.add('d-none');
+        }
+    }
+
+    function confirmSubmission() {
+        const select = document.getElementById('NewPlanId');
+
+        if (select.value !== originalPlanId) {
+            // Se mudou o plano, pede confirmação
+            if (confirm("Are you sure you want to change your plan? This will start a new billing cycle today.")) {
+                document.getElementById('editForm').submit();
+            }
+        } else {
+            // Se não mudou nada, apenas submete
+            document.getElementById('editForm').submit();
+        }
+    }
+</script>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-    <script>
-        // Script do professor para integrar erros do C# com o CSS do Bootstrap
-        (function () {
-            document.addEventListener('DOMContentLoaded', function () {
-                var errorSpans = document.querySelectorAll('.field-validation-error, .invalid-feedback');
-                errorSpans.forEach(function (span) {
-                    var name = span.getAttribute('data-valmsg-for') || span.getAttribute('asp-for');
-                    if (!name) return;
-                    var input = document.querySelector('[name=\"' + name + '\"]');
-                    if (input) input.classList.add('is-invalid');
-                });
-            });
-        })();
-    </script>
 }

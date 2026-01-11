@@ -35,18 +35,23 @@ namespace HealthWellbeing.Controllers
             return View(pagination);
         }
 
-        // GET: Client/Details/5 -> STAFF ou O PRÓPRIO
+        // GET: Client/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var client = await _context.Client.Include(c => c.Membership).FirstOrDefaultAsync(m => m.ClientId == id);
+            var client = await _context.Client
+                .Include(c => c.Membership)
+                    .ThenInclude(m => m.MemberPlans) // <--- FALTAVA ISTO
+                        .ThenInclude(mp => mp.Plan)  // <--- E ISTO (para saber o nome do plano)
+                .FirstOrDefaultAsync(m => m.ClientId == id);
+
             if (client == null) return NotFound();
 
             // SEGURANÇA: Se não for Staff, tem de ser o dono do email
             if (!IsStaff() && client.Email != User.Identity.Name)
             {
-                return Forbid(); // Acesso Negado
+                return Forbid();
             }
 
             return View(client);
