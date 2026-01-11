@@ -1,10 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HealthWellbeing.Controllers
 {
     public class UtentesController : Controller
     {
+        private readonly HealthWellbeingDbContext _context;
+
+        public UtentesController(HealthWellbeingDbContext context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
             var lista = UtenteService.GetAll();
@@ -24,9 +31,13 @@ namespace HealthWellbeing.Controllers
         public IActionResult Create(UtenteBalneario utente)
         {
             if (!ModelState.IsValid) return View(utente);
-            UtenteService.Add(utente);
+
+            _context.Utentes.Add(utente);
+            _context.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
+
 
         public IActionResult Edit(int id)
         {

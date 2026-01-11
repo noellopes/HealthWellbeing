@@ -87,34 +87,61 @@ namespace HealthWellbeing.Controllers
         // GET: AgendamentoBalnearios/Create
         public IActionResult Create()
         {
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes,"UtenteBalnearioId","NomeCompleto");
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email");
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome");        
-            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+            ViewBag.UtenteBalnearioId =
+                new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto");
+
+            ViewBag.TerapeutaId =
+                new SelectList(_context.Terapeuta, "TerapeutaId", "Email");
+
+            ViewBag.ServicoId =
+                new SelectList(_context.Servicos, "ServicoId", "Nome");
+
+            ViewBag.TipoServicosId =
+                new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+
             return View();
         }
 
         // POST: AgendamentoBalnearios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicosId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")] AgendamentoBalneario agendamentoBalneario)
+        public async Task<IActionResult> Create(
+            [Bind("AgendamentoId,UtenteBalnearioId,TerapeutaId,ServicoId,TipoServicosId,HoraInicio,DuracaoMinutos,Preco,Descricao,Estado")]
+            AgendamentoBalneario agendamentoBalneario)
         {
+            // Remove navigation properties (igual ao Servico)
+            ModelState.Remove("Utentes");
+            ModelState.Remove("Servico");
+            ModelState.Remove("Terapeuta");
+            ModelState.Remove("TipoServico");
+
             if (ModelState.IsValid)
             {
                 _context.Add(agendamentoBalneario);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ServicoId"] = new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
-            ViewData["TerapeutaId"] = new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
-            ViewData["TipoServicosId"] = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
-            ViewData["UtenteBalnearioId"] = new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+
+            // Recarregar listas se houver erro
+            ViewBag.UtenteBalnearioId =
+                new SelectList(_context.Utentes, "UtenteBalnearioId", "NomeCompleto", agendamentoBalneario.UtenteBalnearioId);
+
+            ViewBag.TerapeutaId =
+                new SelectList(_context.Terapeuta, "TerapeutaId", "Email", agendamentoBalneario.TerapeutaId);
+
+            ViewBag.ServicoId =
+                new SelectList(_context.Servicos, "ServicoId", "Nome", agendamentoBalneario.ServicoId);
+
+            ViewBag.TipoServicosId =
+                new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", agendamentoBalneario.TipoServicosId);
+
             return View(agendamentoBalneario);
         }
+    
 
 
-        // GET: AgendamentoBalnearios/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+// GET: AgendamentoBalnearios/Edit/5
+public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
