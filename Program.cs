@@ -5,12 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configuração da Base de Dados Principal (Negócio: Clientes, Membros, Planos)
+// 1. Base de Dados de Negócio (Ginásio)
 builder.Services.AddDbContext<HealthWellbeingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("HealthWellbeingConnection")
     ?? throw new InvalidOperationException("Connection string 'HealthWellbeingConnection' not found.")));
 
-// 2. Configuração da Base de Dados de Identidade (Login: Users, Roles)
+// 2. Base de Dados de Login (Identity)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -19,8 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// 3. Configuração do Identity (Login)
-// IMPORTANTE: .AddRoles<IdentityRole>() é obrigatório para ter Admin e Trainer
+// 3. Configuração do Identity (Roles são obrigatórios)
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -29,21 +28,11 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuração do Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
-}
-else
-{
-    // Seeding de Dados de Teste (Planos, etc.) - O seu código existente
-    using (var serviceScope = app.Services.CreateScope())
-    {
-        var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        // Verifique se a classe SeedDataGinasio existe mesmo, senão comente esta linha
-        // SeedDataGinasio.Populate(dbContext); 
-    }
 }
 
 app.UseHttpsRedirection();
@@ -51,6 +40,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication(); // Obrigatório antes do Authorization
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -58,21 +48,28 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Este bloco corre sempre que a aplicação inicia para garantir que o Admin existe.
+// =========================================================
+// BLOCO DE SEEDING (CRIAÇÃO DE DADOS AUTOMÁTICA)
+// =========================================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
-        
-        // Vai criar as Roles (Admin, Trainer, Client) e os utilizadores admin@ginasio.com e treinador@ginasio.com
-        await SeedData.SeedRolesAndAdminAsync(services);
+        // 1. Criar Roles e Admin (Usa o SeedDataAccount.cs)
+        // Nota: O método tem de ser aguardado (.Wait() ou await num contexto async, aqui usamos .Wait() para garantir)
+        HealthWellbeing.Data.SeedData.SeedRolesAndAdminAsync(services).Wait();
+
+        // 2. Criar Planos e Clientes (Usa o SeedDataGinasio.cs)
+        var context = services.GetRequiredService<HealthWellbeingDbContext>();
+        SeedDataGinasio.Populate(context);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database (Admin/Roles).");
+        logger.LogError(ex, "ERRO CRÍTICO: Falha ao criar dados iniciais (Seed).");
     }
 }
+// =========================================================
 
 app.Run();
