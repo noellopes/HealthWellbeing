@@ -97,23 +97,16 @@
             <button class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-    @if (ViewBag.PossuiEncomendas != null && (bool)ViewBag.PossuiEncomendas)
+    @if (ViewBag.PossuiEncomendaParaAceitar != null && (bool)ViewBag.PossuiEncomendaParaAceitar)
     {
-        <div class="mb-3">
-            <form asp-action="ReceberEncomenda" method="post" class="d-flex align-items-center">
-                <input type="hidden" name="consumivelId" value="@ViewBag.PrimeiroConsumivelComEncomenda" />
-                <div class="me-2">
-                    <label class="form-label fw-bold small mb-0">Quantidade a receber:</label>
-                    <input type="number" name="quantidadeTotal" min="1" max="@ViewBag.QuantidadeTotalPendentes"
-                           value="@ViewBag.QuantidadeTotalPendentes"
-                           class="form-control shadow-sm"
-                           style="width: 120px;" />
-                </div>
-                <button type="submit" class="btn btn-success shadow-sm" title="Receber nova encomenda">
-                    <i class="bi bi-box-seam me-1"></i> Receber Encomenda
-                </button>
+        <div class="alert alert-warning shadow-sm">
+            <strong>Encomenda pendente: @ViewBag.ConsumivelEncomendado</strong>
+            <form asp-action="ReceberEncomenda" method="post" class="d-flex align-items-center mt-2">
+                <input type="hidden" name="consumivelId" value="@ViewBag.ConsumivelEncomendado" />
+                <input type="number" name="quantidadeTotal" value="@ViewBag.QuantidadeEncomendada" min="@ViewBag.QuantidadeEncomendada"
+                       class="form-control me-2" style="width:120px;" />
+                <button type="submit" class="btn btn-success">Aceitar Encomenda</button>
             </form>
-            <small class="text-muted">Somente novas encomendas disponíveis serão exibidas.</small>
         </div>
     }
 

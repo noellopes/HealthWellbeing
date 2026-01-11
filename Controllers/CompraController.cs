@@ -167,6 +167,10 @@ namespace HealthWellbeing.Controllers
 
             _context.HistoricoCompras.Add(historico);
             _context.SaveChanges();
+
+            TempData["EncomendaRealizada"] = true;
+            TempData["ConsumivelIdEncomendado"] = model.ConsumivelId;
+            TempData["QuantidadeEncomendada"] = model.Quantidade;
             TempData["SuccessMessage"] = "✅ Encomenda registada com sucesso!";
 
             return RedirectToAction("Index", "HistoricoCompras");

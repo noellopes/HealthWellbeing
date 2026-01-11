@@ -74,17 +74,12 @@ namespace HealthWellbeing.Controllers
             await AtualizarQuantidadeAtualConsumivel(consumivelId);
 
             if (restante > 0)
-            {
-                TempData["ErrorMessage"] = $"⚠️ A encomenda excedeu a capacidade total das zonas. {restante} unidades não foram alocadas.";
-            }
+                TempData["ErrorMessage"] = $"⚠️ A encomenda excedeu a capacidade das zonas. {restante} unidades não foram alocadas.";
             else
-            {
                 TempData["SuccessMessage"] = "✅ Encomenda recebida e distribuída com sucesso!";
-            }
 
             return RedirectToAction(nameof(Index));
         }
-
         private void PreencherDropDowns(int? consumivelId = null, int? roomId = null)
         {
             ViewBag.Consumiveis = new SelectList(
@@ -144,64 +139,42 @@ namespace HealthWellbeing.Controllers
                     break;
             }
 
-            var consumiveisComEncomenda = await _context.Consumivel
-               .Where(c => c.QuantidadeAtual < c.QuantidadeMaxima) // somente futuras encomendas
-               .OrderBy(c => c.Nome)
-               .ToListAsync();
+            int? consumivelEncomendado = null;
+            int quantidadeEncomendada = 0;
 
-            if (consumiveisComEncomenda.Any())
+            if (TempData.ContainsKey("EncomendaRealizada"))
             {
-                ViewBag.PossuiEncomendas = true;
-                var primeiro = consumiveisComEncomenda.First();
-                ViewBag.PrimeiroConsumivelComEncomenda = primeiro.ConsumivelId;
-                ViewBag.QuantidadeTotalPendentes = primeiro.QuantidadeMaxima - primeiro.QuantidadeAtual;
+                consumivelEncomendado = TempData["ConsumivelIdEncomendado"] as int?;
+                quantidadeEncomendada = (int)(TempData["QuantidadeEncomendada"] ?? 0);
+
+                ViewBag.PossuiEncomendaParaAceitar = true;
+                ViewBag.ConsumivelEncomendado = consumivelEncomendado;
+                ViewBag.QuantidadeEncomendada = quantidadeEncomendada;
             }
             else
             {
-                ViewBag.PossuiEncomendas = false;
+                ViewBag.PossuiEncomendaParaAceitar = false;
             }
 
 
-            // --- Carregar a lista para a Dropdown de Pesquisa na View ---
+            // -----------------------------
+            // Dropdowns para pesquisa
+            // -----------------------------
             ViewBag.ConsumiveisList = new SelectList(
                 _context.Consumivel.OrderBy(c => c.Nome),
                 "ConsumivelId",
                 "Nome",
-                searchConsumivel // Mantém selecionado o que o user escolheu
+                searchConsumivel
             );
 
-            // Manter valores na View
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
             ViewBag.Estado = estado;
             ViewBag.SearchConsumivel = searchConsumivel;
 
-            if (consumiveisComEncomenda.Any())
-            {
-                ViewBag.PossuiEncomendas = true;
-                var primeiro = consumiveisComEncomenda.First();
-                ViewBag.PrimeiroConsumivelComEncomenda = primeiro.ConsumivelId;
-                ViewBag.QuantidadeTotalPendentes = primeiro.QuantidadeMaxima - primeiro.QuantidadeAtual;
-            }
-            else
-            {
-                ViewBag.PossuiEncomendas = false;
-            }
-
+            // -----------------------------
             // Paginação
-            int total = await zonasQuery.CountAsync();
-            var pag = new PaginationInfo<ZonaArmazenamento>(page, total, 10);
-
-            pag.Items = await zonasQuery
-                .OrderBy(z => z.NomeZona)
-                .Skip(pag.ItemsToSkip)
-                .Take(pag.ItemsPerPage)
-                .ToListAsync();
-
-            return View(pag);
-
-
-            // Paginação
+            // -----------------------------
             int totalZonas = await zonasQuery.CountAsync();
             var pagination = new PaginationInfo<ZonaArmazenamento>(page, totalZonas, 10);
 
@@ -211,6 +184,7 @@ namespace HealthWellbeing.Controllers
                 .Take(pagination.ItemsPerPage)
                 .ToListAsync();
 
+            // ✅ Retorna o model correto para a View
             return View(pagination);
         }
 
