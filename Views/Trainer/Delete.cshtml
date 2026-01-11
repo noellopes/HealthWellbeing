@@ -1,25 +1,51 @@
 ﻿@model HealthWellbeing.Models.Trainer
 
 @{
-    ViewData["Title"] = "Delete Confirmation";
+    ViewData["Title"] = "Delete Trainer";
 }
 
-<div class="container py-4">
-    <div class="alert alert-danger shadow-sm border-0" role="alert">
-        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Delete Trainer</h4>
-        <p>Are you sure you want to remove <strong>@Model.Name</strong> from the system? This action cannot be undone.</p>
-    </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body">
-            <p class="mb-1 text-muted">Email: @Model.Email</p>
-            <p class="mb-0 text-muted">Phone: @Model.Phone</p>
+            <div class="alert alert-danger border-0 shadow-sm p-4 text-center mb-4" style="background-color: #f8d7da; color: #842029;">
+                <h2 class="fw-bold mb-3" style="color: #842029;">Are you sure?</h2>
+                <p class="mb-0">
+                    You are about to delete <strong>@Model.Name</strong> from the system.
+                    This action cannot be undone and will affect their gym history.
+                </p>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-sm-5 fw-bold text-muted">Trainer ID:</div>
+                        <div class="col-sm-7">#@Model.TrainerId</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-5 fw-bold text-muted">Email:</div>
+                        <div class="col-sm-7">@Model.Email</div>
+                    </div>
+
+                    <p class="text-danger fw-bold mt-4 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        This trainer may have active training sessions assigned!
+                    </p>
+                </div>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="TrainerId" />
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-danger px-5 py-2 fw-bold shadow-sm">
+                        Delete Forever
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-5 py-2 shadow-sm bg-white">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
         </div>
     </div>
-
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="TrainerId" />
-        <button type="submit" class="btn btn-danger px-4">Confirm Delete</button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
 </div>

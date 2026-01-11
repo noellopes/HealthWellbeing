@@ -1,0 +1,55 @@
+﻿@model HealthWellbeing.Models.Client
+
+@{
+    ViewData["Title"] = "Confirm Subscription";
+    var plan = ViewBag.Plan as HealthWellbeing.Models.Plan;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0"><i class="bi bi-cart-check me-2"></i>Confirm Subscription</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        You are about to subscribe to a new gym plan.
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6 border-end">
+                            <h5 class="text-primary fw-bold">Your Details</h5>
+                            <hr>
+                            <p><strong>Name:</strong> @Model.Name</p>
+                            <p><strong>Email:</strong> @Model.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-success fw-bold">Plan Summary</h5>
+                            <hr>
+                            @if (plan != null)
+                            {
+                                <p><strong>Plan:</strong> @plan.Name</p>
+                                <p><strong>Duration:</strong> @plan.DurationDays days</p>
+                                <h3 class="text-dark mt-3">Total: €@plan.Price</h3>
+                            }
+                        </div>
+                    </div>
+
+                    <form asp-action="ConfirmSubscription" method="post">
+                        <input type="hidden" name="planId" value="@plan?.PlanId" />
+                        <input type="hidden" name="clientId" value="@Model.ClientId" />
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-action="PublicIndex" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success fw-bold shadow-sm">
+                                Confirm & Pay
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

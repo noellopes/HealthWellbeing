@@ -1,0 +1,45 @@
+﻿@model HealthWellbeing.Models.Exercise
+
+<div class="container py-4">
+    <h1 class="text-primary fw-bold mb-4">Edit Exercise</h1>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark py-3">
+            <h5 class="mb-0 fw-bold">Update Exercise Details</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="ExerciseId" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <input asp-for="Name" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MuscleGroup" class="form-label fw-bold"></label>
+                        <select asp-for="MuscleGroup" class="form-select">
+                            <option value="Chest">Chest</option>
+                            <option value="Back">Back</option>
+                            <option value="Legs">Legs</option>
+                            <option value="Shoulders">Shoulders</option>
+                            <option value="Arms">Arms</option>
+                            <option value="Core">Core</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Equipment" class="form-label fw-bold"></label>
+                    <input asp-for="Equipment" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

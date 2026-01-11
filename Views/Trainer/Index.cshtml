@@ -1,50 +1,65 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.Trainer>
 
 @{
-    ViewData["Title"] = "Trainers List";
+    ViewData["Title"] = "Trainers";
 }
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-primary">@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add New Trainer
-        </a>
-    </div>
+    <h1 class="text-primary fw-bold mb-4">Trainers</h1>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info shadow-sm">
-            <i class="bi bi-info-circle me-2"></i> No trainers registered yet.
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Trainer Directory</h5>
+            <a asp-action="Create" class="btn btn-success px-4">Add New Trainer</a>
         </div>
-    }
-    else
-    {
-        <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+            <div class="row g-2 mb-4">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Search by name...">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Search by email...">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Search by phone...">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100 fw-bold">Search</button>
+                </div>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Gender</th>
-                            <th class="text-end pe-4">Actions</th>
+                            <th style="width: 25%">Name</th>
+                            <th style="width: 25%">Contact Info</th>
+                            <th style="width: 15%">Gender</th>
+                            <th style="width: 15%">Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td class="ps-4 fw-bold">@item.Name</td>
-                                <td>@item.Email</td>
-                                <td>@item.Phone</td>
-                                <td>@item.Gender</td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group">
-                                        <a asp-action="Edit" asp-route-id="@item.TrainerId" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                                        <a asp-action="Details" asp-route-id="@item.TrainerId" class="btn btn-sm btn-outline-info"><i class="bi bi-info-circle"></i></a>
-                                        <a asp-action="Delete" asp-route-id="@item.TrainerId" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                <td class="fw-bold">@item.Name</td>
+                                <td>
+                                    <div class="text-muted small">@item.Email</div>
+                                    <div class="text-muted small">@item.Phone</div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill bg-light text-dark border">@item.Gender</span>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill bg-success">Active Trainer</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group gap-1">
+                                        <a asp-action="Edit" asp-route-id="@item.TrainerId" class="btn btn-warning btn-sm px-3">Edit</a>
+                                        <a asp-action="Details" asp-route-id="@item.TrainerId" class="btn btn-info btn-sm px-2 text-white">Details</a>
+                                        <a asp-action="Delete" asp-route-id="@item.TrainerId" class="btn btn-danger btn-sm px-2">Delete</a>
                                     </div>
                                 </td>
                             </tr>
@@ -52,6 +67,15 @@
                     </tbody>
                 </table>
             </div>
+
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled"><a class="page-item page-link">First</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                </ul>
+            </nav>
         </div>
-    }
+    </div>
 </div>
