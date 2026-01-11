@@ -1,6 +1,7 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
 using HealthWellbeing.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -188,7 +189,100 @@ namespace HealthWellbeing.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		private bool PlanExists(int id)
+        // GET: Plan/PublicIndex
+        [AllowAnonymous]
+        public async Task<IActionResult> PublicIndex(int page = 1)
+        {
+            var plansQuery = _context.Plan.AsQueryable();
+
+            // 1. Contar o total de planos
+            int totalPlans = await plansQuery.CountAsync();
+
+            // 2. Configurar a paginação
+            var pagination = new PaginationInfo<Plan>(page, totalPlans, 6);
+
+            // 3. Obter apenas os planos da página atual
+            pagination.Items = await plansQuery
+                .OrderBy(p => p.Price)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            // 4. Enviar o objeto de paginação para a vista
+            return View(pagination);
+        }
+
+        // GET: Plan/Subscribe/5
+        // Chamado quando clica em "Subscribe Now" na lista pública
+        [Authorize] // Só funciona se estiver logado
+        public async Task<IActionResult> Subscribe(int id)
+        {
+            // 1. Verificar se o plano existe
+            var plan = await _context.Plan.FindAsync(id);
+            if (plan == null) return NotFound();
+
+            // 2. Encontrar o Cliente ligado ao utilizador atual
+            var userEmail = User.Identity?.Name;
+            var client = await _context.Client
+                .Include(c => c.Membership)
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+
+            // Se por acaso o user não tiver perfil de cliente (erro de dados), manda criar
+            if (client == null)
+            {
+                TempData["Message"] = "Please complete your client profile before subscribing.";
+                return RedirectToAction("Create", "Client");
+            }
+
+            // 3. Passar dados para a vista de confirmação
+            ViewBag.Plan = plan; // Passamos o plano no ViewBag
+            return View(client); // Passamos o cliente como Model principal
+        }
+
+        // POST: Plan/ConfirmSubscription
+        // Chamado quando clica em "Confirm & Pay"
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> ConfirmSubscription(int planId, int clientId)
+        {
+            var plan = await _context.Plan.FindAsync(planId);
+            var client = await _context.Client
+                .Include(c => c.Membership)
+                .FirstOrDefaultAsync(c => c.ClientId == clientId);
+
+            if (plan == null || client == null) return NotFound();
+
+            // 1. Criar o registo de Membro se ainda não existir
+            if (client.Membership == null)
+            {
+                client.Membership = new Member { ClientId = client.ClientId };
+                _context.Member.Add(client.Membership);
+                await _context.SaveChangesAsync(); // Gravar para gerar o MemberId
+            }
+
+            // 2. Criar a Inscrição (MemberPlan) com estado "Active"
+            var memberPlan = new MemberPlan
+            {
+                MemberId = client.Membership.MemberId,
+                PlanId = plan.PlanId,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(plan.DurationDays),
+                Status = "Active"
+            };
+
+            _context.MemberPlan.Add(memberPlan);
+            await _context.SaveChangesAsync();
+
+            // 3. Sucesso! Redirecionar para o Dashboard do Membro
+            TempData["Message"] = $"Success! You subscribed to <strong>{plan.Name}</strong>.";
+            TempData["MessageType"] = "success";
+
+            // Redireciona para os detalhes do membro (o Dashboard do utilizador)
+            return RedirectToAction("Details", "Member", new { id = client.Membership.MemberId });
+        }
+
+        private bool PlanExists(int id)
 		{
 			return _context.Plan.Any(e => e.PlanId == id);
 		}
