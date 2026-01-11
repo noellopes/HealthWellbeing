@@ -18,7 +18,10 @@ namespace HealthWellbeing.Data
         private static void PopulateExercicios(HealthWellbeingDbContext dbContext)
         {
             // Se já houver exercícios, não faz nada
-            if (dbContext.Exercicio.Any()) return;
+           if (dbContext.Exercicios.Any())
+            {
+                return;
+            }
 
             var exercicios = new[]
             {
@@ -155,7 +158,7 @@ namespace HealthWellbeing.Data
             };
 
             // Adiciona todos os exercícios ao DbContext
-            dbContext.Exercicio.AddRange(exercicios);
+            dbContext.Exercicios.AddRange(exercicios);
             dbContext.SaveChanges();
         }
     }

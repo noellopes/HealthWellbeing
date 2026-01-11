@@ -28,7 +28,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    SeedData.Initialize(services.GetRequiredService<ApplicationDbContext>());
+    var context = services.GetRequiredService<HealthWellbeingDbContext>();
+    // object SeedData = null;
+    //SeedData.Initialize(services.GetRequiredService<HealthWellbeingDbContext>());
 }
 
 // Configure the HTTP request pipeline.
@@ -42,7 +44,7 @@ else
 	using (var serviceScope = app.Services.CreateScope())
 	{
         var dbContext = serviceScope.ServiceProvider.GetService<HealthWellbeingDbContext>();
-        SeedData.Populate(dbContext);
+        var context = dbContext;
         SeedDataExercicio.Populate(dbContext);
         SeedDataTipoExercicio.Populate(dbContext);
         SeedDataProblemaSaude.Populate(dbContext);

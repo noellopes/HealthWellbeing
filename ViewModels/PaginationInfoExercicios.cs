@@ -1,4 +1,4 @@
-﻿namespace HealthWellbeing.ViewModels
+﻿namespace HealthWellbeing.ViewModel
 {
     public class PaginationInfoExercicios<T>
     {

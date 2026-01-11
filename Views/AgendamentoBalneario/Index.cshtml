@@ -1,0 +1,181 @@
+﻿@model HealthWellbeing.ViewModel.AgendamentoBalnearioViewModel
+
+@{
+    ViewData["Title"] = "Agendamentos";
+}
+
+<h1 class="mb-4 fw-bold">Agendamento Balneário</h1>
+
+<!-- BOTÕES -->
+<div class="d-flex align-items-center mb-3">
+    <a asp-action="Create" class="btn btn-success me-2">
+        <i class="bi bi-plus-circle me-1"></i> Criar Novo Agendamento
+    </a>
+
+    <button class="btn btn-secondary me-2"
+            data-bs-toggle="modal"
+            data-bs-target="#searchModal">
+        <i class="bi bi-search me-1"></i> Pesquisar
+    </button>
+
+    @if (!string.IsNullOrEmpty(Model.PesquisarNomeUtente))
+    {
+        <a asp-action="Index" class="btn btn-outline-danger">
+            Limpar pesquisa
+        </a>
+    }
+</div>
+
+<!-- MODAL DE PESQUISA -->
+<div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-action="Index" method="get">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pesquisar Agendamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label class="form-label">Nome do Cliente</label>
+                    <input type="text"
+                           name="pesquisarNomeUtente"
+                           class="form-control"
+                           value="@Model.PesquisarNomeUtente"
+                           placeholder="Digite o nome do cliente..." />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Pesquisar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- TABELA -->
+<div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover table-striped align-middle mb-0">
+        <thead class="table-dark text-white">
+            <tr>
+                <th>Utente</th>
+                <th>Terapeuta</th>
+                <th>Serviço</th>
+                <th>Tipo de Serviço</th>
+                <th>Hora de Início</th>
+                <th>Estado</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ListaAgendamentos)
+            {
+                <tr>
+                    <td class="fw-semibold">
+                        @(item.Utentes != null ? item.Utentes.NomeCompleto : "---")
+                    </td>
+
+                    <td>
+                        @(item.Terapeuta != null ? item.Terapeuta.Nome : "---")
+                    </td>
+
+                    <td>@item.Servico?.Nome</td>
+                    <td>@item.TipoServico?.Nome</td>
+
+                    <td class="text-nowrap">
+                        @item.HoraInicio.ToString("dd/MM/yyyy HH:mm")
+                    </td>
+
+                    <td>
+                        @{
+                            var estadoClass = item.Estado.ToString() switch
+                            {
+                                "Confirmado" => "bg-success",
+                                "Pendente" => "bg-warning text-dark",
+                                "Cancelado" => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+                        }
+                        <span class="badge @estadoClass">@item.Estado</span>
+                    </td>
+
+                    <td class="text-center text-nowrap">
+                        <div class="btn-group btn-group-sm shadow-sm">
+                            <a asp-action="Edit"
+                               asp-route-id="@item.AgendamentoId"
+                               class="btn btn-primary text-white"
+                               title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.AgendamentoId"
+                               class="btn btn-warning text-dark"
+                               title="Detalhes">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.AgendamentoId"
+                               class="btn btn-danger text-white"
+                               title="Apagar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- ALERTA -->
+@if (!Model.ListaAgendamentos.Any())
+{
+    <div class="alert alert-info mt-4 shadow-sm">
+        <i class="bi bi-info-circle me-2"></i>
+        Não existem agendamentos registados.
+    </div>
+}
+
+<!-- PAGINAÇÃO -->
+<nav class="mt-4">
+    <ul class="pagination">
+
+        <li class="page-item @(Model.paginacao.PaginaCorrente == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pagina="1"
+               asp-route-pesquisarNomeUtente="@Model.PesquisarNomeUtente">
+                Primeira
+            </a>
+        </li>
+
+        @for (int p = Model.paginacao.PrimeiraPaginaVer; p <= Model.paginacao.UltimaPaginaVer; p++)
+        {
+            <li class="page-item @(p == Model.paginacao.PaginaCorrente ? "active" : "")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-pagina="@p"
+                   asp-route-pesquisarNomeUtente="@Model.PesquisarNomeUtente">
+                    @p
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(Model.paginacao.PaginaCorrente == Model.paginacao.PaginaTotal ? "disabled" : "")">
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pagina="@Model.paginacao.PaginaTotal"
+               asp-route-pesquisarNomeUtente="@Model.PesquisarNomeUtente">
+                Última
+            </a>
+        </li>
+
+    </ul>
+</nav>
+

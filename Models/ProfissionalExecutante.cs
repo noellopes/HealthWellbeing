@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
     public class ProfissionalExecutante
     {
-        public int Id { get; set; } //Id do Profissional
+        [Key]
+        public int Id { get; set; }
 
         [Required(ErrorMessage = "O nome do profissional é obrigatório")]
         [StringLength(100)]
@@ -12,12 +14,15 @@ namespace HealthWellbeing.Models
 
         [Required(ErrorMessage = "A função/cargo é obrigatória")]
         [StringLength(100)]
-        public string Funcao { get; set; } //Funcao que o mesmo tem ex tipo "Técnico de Radiologia"
+        public string Funcao { get; set; }
 
         [Phone(ErrorMessage = "Número de telefone inválido")]
         public string Telefone { get; set; }
 
         [EmailAddress(ErrorMessage = "Email inválido")]
         public string Email { get; set; }
+
+       
+        public virtual ICollection<ProblemaSaude> ProblemaSaudes { get; set; } = new List<ProblemaSaude>();
     }
 }
