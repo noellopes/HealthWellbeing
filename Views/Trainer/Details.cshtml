@@ -1,54 +1,35 @@
 ﻿@model HealthWellbeing.Models.Trainer
 
 @{
-    ViewData["Title"] = "Trainer Details";
+    ViewData["Title"] = "Trainer Info";
 }
 
-<h1 class="display-4 text-primary mb-4">Trainer Details</h1>
+<div class="container py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Trainer Profile: @Model.Name</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-muted">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
 
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">@Model.Name</h4>
+                <dt class="col-sm-3 text-muted">Phone</dt>
+                <dd class="col-sm-9">@Model.Phone</dd>
+
+                <dt class="col-sm-3 text-muted">Address</dt>
+                <dd class="col-sm-9">@Model.Address</dd>
+
+                <dt class="col-sm-3 text-muted">Birth Date</dt>
+                <dd class="col-sm-9">@Model.BirthDate.ToShortDateString()</dd>
+
+                <dt class="col-sm-3 text-muted">Gender</dt>
+                <dd class="col-sm-9">@Model.Gender</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-light d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.TrainerId" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
     </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Speciality)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Speciality)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Email)
-            </dt>
-            <dd class="col-sm-9">
-                <a href="mailto:@Model.Email" class="text-decoration-none">@Html.DisplayFor(model => model.Email)</a>
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Phone)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Phone)
-            </dd>
-        </dl>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TrainerId" class="btn btn-primary me-2 shadow-sm">
-        <i class="bi bi-pencil-square"></i> Edit
-    </a>
-
-    <a asp-action="Index" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Back to List
-    </a>
 </div>

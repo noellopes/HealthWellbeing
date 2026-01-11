@@ -53,12 +53,13 @@ namespace HealthWellbeing.Controllers
         // POST: Trainer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Speciality,Email,Phone")] Trainer trainer)
+        public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer")] Trainer trainer)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(trainer);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Trainer successfully created!";
                 return RedirectToAction(nameof(Index));
             }
             return View(trainer);
@@ -83,7 +84,7 @@ namespace HealthWellbeing.Controllers
         // POST: Trainer/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,Name,Speciality,Email,Phone")] Trainer trainer)
+        public async Task<IActionResult> Edit(int id, [Bind("TrainerId,Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer")] Trainer trainer)
         {
             if (id != trainer.TrainerId)
             {
@@ -108,6 +109,7 @@ namespace HealthWellbeing.Controllers
                         throw;
                     }
                 }
+                TempData["SuccessMessage"] = "Trainer information updated.";
                 return RedirectToAction(nameof(Index));
             }
             return View(trainer);
@@ -140,9 +142,9 @@ namespace HealthWellbeing.Controllers
             if (trainer != null)
             {
                 _context.Trainer.Remove(trainer);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
