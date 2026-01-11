@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260111214530_jan11")]
+<<<<<<<< HEAD:Migrations/20260111211459_jan11.Designer.cs
+    [Migration("20260111211459_jan11")]
     partial class jan11
+========
+    [Migration("20260111212910_physicalUI")]
+    partial class physicalUI
+>>>>>>>> PhysicalAssessment:Migrations/20260111212910_physicalUI.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
