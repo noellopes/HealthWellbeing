@@ -15,8 +15,9 @@
     {
         switch (estado)
         {
-            case "Cancelada": return "badge bg-danger";
-            case "Expirada": return "badge bg-secondary";
+            case "Cancelada": return "badge bg-warning";
+            case "Faltada": return "badge bg-danger";
+            case "Realizada": return "badge bg-primary";
             case "Hoje": return "badge bg-warning text-dark";
             default: return "badge bg-success";
         }

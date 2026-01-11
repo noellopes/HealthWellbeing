@@ -22,10 +22,28 @@ namespace HealthWellbeing.Models
         [Required(ErrorMessage = "Por favor introduza a hora de fim da consulta")]
         public TimeOnly HoraFim { get; set; }
 
-        public string Estado =>
-            DataCancelamento.HasValue ? "Cancelada" :
-            (DataConsulta.Date < DateTime.Now) ? "Expirada" :
-            (DataConsulta.Date == DateTime.Today) ? "Hoje" : "Agendada";
+        public string Estado
+        {
+            get
+            {
+                if (DataCancelamento.HasValue)
+                    return "Cancelada";
+
+                var agora = DateTime.Now;
+
+                // futura
+                if (DataConsulta > agora)
+                    return "Agendada";
+
+                // hoje
+                if (DataConsulta.Date == agora.Date && HoraInicio > TimeOnly.FromDateTime(agora))
+                    return "Hoje";
+
+                // já passou
+                // se tiver observação ⇒ realizada, senão ⇒ faltada
+                return string.IsNullOrWhiteSpace(Observacoes) ? "Faltada" : "Realizada";
+            }
+        }
 
         public string? SearchTerm { get; set; }
 
