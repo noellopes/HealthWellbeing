@@ -1,32 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace HealthWellbeing.Models
 {
     public class MaterialEquipamentoAssociado
     {
+        [Key]
         public int MaterialEquipamentoAssociadoId { get; set; }
 
-        [Required(ErrorMessage = "O nome do equipamento é obrigatório.")]
+        [Required(ErrorMessage = "O nome do material é obrigatório.")]
         [StringLength(100)]
         public string NomeEquipamento { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A quantidade é obrigatória.")]
-        [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser um número positivo.")]
+
+        [Required(ErrorMessage = "A quantidade em stock é obrigatória.")]
+        [StringLength(20)]
+        public string? Tamanho { get; set; }
+
+        [Required(ErrorMessage = "A quantidade em stock é obrigatória.")]
+        [Range(0, int.MaxValue)]
         public int Quantidade { get; set; }
 
-        // 1. Foreign Key Property (FK)
-        // This holds the actual ID of the EstadoMaterial (e.g., 1, 2, 3)
-        [Required(ErrorMessage = "O estado do componente é obrigatório.")]
-        // Make sure this name matches the primary key type (int) in EstadoMaterial
-        public int MaterialStatusId { get; set; }
-
-        // 2. Navigation Property
-        // This allows you to load the actual EstadoMaterial object (e.g., its Nome, Descricao)
-        public EstadoMaterial? EstadoMaterial { get; set; }
-
-        // NOVO: Propriedade de Navegação para M:N
-        public ICollection<ExameTipoRecurso>? ExameTipoRecursos { get; set; }
-
-
+        // Navegação: Permite ver em que "Protocolos" este material aparece
+        public virtual ICollection<ExameTipoRecurso> ExameTipoRecursos { get; set; } = new List<ExameTipoRecurso>();
     }
 }

@@ -88,10 +88,38 @@ namespace HealthWellbeing.Data
                 await db.SaveChangesAsync();
             }
 
+            // MaterialEquipamentoAssociado
             if (!db.MaterialEquipamentoAssociado.Any())
             {
-                var st = await db.EstadosMaterial.FirstOrDefaultAsync();
-                db.MaterialEquipamentoAssociado.Add(new MaterialEquipamentoAssociado { NomeEquipamento = "Kit Standard", Quantidade = 100, MaterialStatusId = st.MaterialStatusId });
+                db.MaterialEquipamentoAssociado.AddRange(
+                    // --- LUVAS E PROTEÇÃO ---
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Luvas de Látex", Quantidade = 200, Tamanho = "S" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Luvas de Látex", Quantidade = 350, Tamanho = "M" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Luvas de Látex", Quantidade = 200, Tamanho = "L" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Máscara Cirúrgica Descartável", Quantidade = 500, Tamanho = "Único" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Bata Cirúrgica Estéril", Quantidade = 50, Tamanho = "L" },
+
+                    // --- CONSUMÍVEIS DE INJEÇÃO ---
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Seringa", Quantidade = 150, Tamanho = "5ml" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Seringa", Quantidade = 100, Tamanho = "10ml" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Agulha Hipodérmica", Quantidade = 200, Tamanho = "21G" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Agulha Hipodérmica", Quantidade = 180, Tamanho = "23G" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Algodão Hidrófilo (Pacote)", Quantidade = 40, Tamanho = "500g" },
+
+                    // --- CURATIVOS E LIGADURAS ---
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Compressas de Gaze Estéril", Quantidade = 300, Tamanho = "10x10cm" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Ligadura Elástica", Quantidade = 60, Tamanho = "5cm" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Ligadura Elástica", Quantidade = 50, Tamanho = "10cm" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Adesivo Micropore", Quantidade = 80, Tamanho = "2.5cm" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Solução Betadine (Frasco)", Quantidade = 30, Tamanho = "100ml" },
+
+                    // --- EQUIPAMENTO DE DIAGNÓSTICO/OUTROS ---
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Espátula de Madeira (Abaixa-língua)", Quantidade = 400, Tamanho = "Único" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Copo de Recolha de Urina", Quantidade = 100, Tamanho = "100ml" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Gel para Ecografia (Frasco)", Quantidade = 25, Tamanho = "250ml" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Papel para marquesa (Rolo)", Quantidade = 40, Tamanho = "Standard" },
+                    new MaterialEquipamentoAssociado { NomeEquipamento = "Cateter Intravenoso", Quantidade = 75, Tamanho = "20G" }
+                );
                 await db.SaveChangesAsync();
             }
 

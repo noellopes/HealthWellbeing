@@ -196,214 +196,33 @@ namespace HealthWellbeing.Data
             );
 
             modelBuilder.Entity<MaterialEquipamentoAssociado>().HasData(
-                // 1
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 1, // PK
-                    NomeEquipamento = "Seringa Descartável 5ml",
-                    Quantidade = 500,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 2
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 2, // PK
-                    NomeEquipamento = "Compressa de Gaze Esterilizada",
-                    Quantidade = 1200,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 3
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 3, // PK
-                    NomeEquipamento = "Monitor de Sinais Vitais",
-                    Quantidade = 15,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 4
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 4, // PK
-                    NomeEquipamento = "Eletrocardiógrafo Portátil",
-                    Quantidade = 5,
-                    MaterialStatusId = 4 // Em Manutenção
-                },
-                // 5
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 5, // PK
-                    NomeEquipamento = "Luvas de Nitrilo (Caixa)",
-                    Quantidade = 80,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 6
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 6, // PK
-                    NomeEquipamento = "Cadeira de Rodas Standard",
-                    Quantidade = 25,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 7
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 7, // PK
-                    NomeEquipamento = "Bomba de Infusão Volumétrica",
-                    Quantidade = 40,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 8
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 8, // PK
-                    NomeEquipamento = "Termómetro Digital de Testa",
-                    Quantidade = 95,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 9
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 9, // PK
-                    NomeEquipamento = "Aspirador Cirúrgico",
-                    Quantidade = 8,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 10
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 10, // PK
-                    NomeEquipamento = "Mesa de Cirurgia Multiusos",
-                    Quantidade = 3,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 11
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 11, // PK
-                    NomeEquipamento = "Kit de Sutura Estéril",
-                    Quantidade = 300,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 12
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 12, // PK
-                    NomeEquipamento = "Bisturi Descartável (Unidade)",
-                    Quantidade = 1500,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 13
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 13, // PK
-                    NomeEquipamento = "Ventilador Pulmonar",
-                    Quantidade = 12,
-                    MaterialStatusId = 4 // Em Manutenção
-                },
-                // 14
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 14, // PK
-                    NomeEquipamento = "Carro de Emergência (Completo)",
-                    Quantidade = 6,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 15
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 15, // PK
-                    NomeEquipamento = "Agulha Hipodérmica 21G",
-                    Quantidade = 2000,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 16
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 16, // PK
-                    NomeEquipamento = "Otoscópio/Oftalmoscópio",
-                    Quantidade = 18,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 17
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 17, // PK
-                    NomeEquipamento = "Tala Imobilizadora (Vários Tamanhos)",
-                    Quantidade = 75,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 18
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 18, // PK
-                    NomeEquipamento = "Esfigmomanómetro Digital",
-                    Quantidade = 35,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 19
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 19, // PK
-                    NomeEquipamento = "Mascára Cirúrgica N95",
-                    Quantidade = 1000,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 20
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 20, // PK
-                    NomeEquipamento = "Laringoscópio Completo",
-                    Quantidade = 7,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 21
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 21, // PK
-                    NomeEquipamento = "Fato de Proteção Biológica",
-                    Quantidade = 150,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 22
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 22, // PK
-                    NomeEquipamento = "Desfibrilhador Externo Automático (DEA)",
-                    Quantidade = 10,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 23
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 23, // PK
-                    NomeEquipamento = "Pilha Alcalina AA (Pack de 10)",
-                    Quantidade = 20,
-                    MaterialStatusId = 1 // Disponível
-                },
-                // 24
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 24, // PK
-                    NomeEquipamento = "Estetoscópio Littmann",
-                    Quantidade = 55,
-                    MaterialStatusId = 2 // Em Uso
-                },
-                // 25
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 25, // PK
-                    NomeEquipamento = "Balança Hospitalar Digital",
-                    Quantidade = 4,
-                    MaterialStatusId = 4 // Em Manutenção
-                },
-                // 26
-                new MaterialEquipamentoAssociado
-                {
-                    MaterialEquipamentoAssociadoId = 26, // PK
-                    NomeEquipamento = "Gesso Ortopédico (Rolo)",
-                    Quantidade = 90,
-                    MaterialStatusId = 1 // Disponível
-                }
+                // --- LUVAS E PROTEÇÃO ---
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 1, NomeEquipamento = "Luvas de Látex", Quantidade = 2, Tamanho = "S" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 2, NomeEquipamento = "Luvas de Látex", Quantidade = 3, Tamanho = "M" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 3, NomeEquipamento = "Luvas de Látex", Quantidade = 1, Tamanho = "L" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 4, NomeEquipamento = "Máscara Cirúrgica Descartável", Quantidade = 2, Tamanho = "Único" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 5, NomeEquipamento = "Bata Cirúrgica Estéril", Quantidade = 1, Tamanho = "L" },
+
+                // --- CONSUMÍVEIS DE INJEÇÃO ---
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 6, NomeEquipamento = "Seringa", Quantidade = 2, Tamanho = "5ml" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 7, NomeEquipamento = "Seringa", Quantidade = 1, Tamanho = "10ml" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 8, NomeEquipamento = "Agulha Hipodérmica", Quantidade = 2, Tamanho = "21G" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 9, NomeEquipamento = "Agulha Hipodérmica", Quantidade = 2, Tamanho = "23G" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 10, NomeEquipamento = "Algodão Hidrófilo (Pacote)", Quantidade = 1, Tamanho = "500g" },
+
+                // --- CURATIVOS E LIGADURAS ---
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 11, NomeEquipamento = "Compressas de Gaze Estéril", Quantidade = 2, Tamanho = "10x10cm" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 12, NomeEquipamento = "Ligadura Elástica", Quantidade = 1, Tamanho = "5cm" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 13, NomeEquipamento = "Ligadura Elástica", Quantidade = 2, Tamanho = "10cm" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 14, NomeEquipamento = "Adesivo Micropore", Quantidade = 2, Tamanho = "2.5cm" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 15, NomeEquipamento = "Solução Betadine (Frasco)", Quantidade = 1, Tamanho = "100ml" },
+
+                // --- EQUIPAMENTO DE DIAGNÓSTICO/OUTROS ---
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 16, NomeEquipamento = "Espátula de Madeira (Abaixa-língua)", Quantidade = 2, Tamanho = "Único" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 17, NomeEquipamento = "Copo de Recolha de Urina", Quantidade = 3, Tamanho = "100ml" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 18, NomeEquipamento = "Gel para Ecografia (Frasco)", Quantidade = 2, Tamanho = "250ml" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 19, NomeEquipamento = "Papel para marquesa (Rolo)", Quantidade = 2, Tamanho = "Standard" },
+                new MaterialEquipamentoAssociado { MaterialEquipamentoAssociadoId = 20, NomeEquipamento = "Cateter Intravenoso", Quantidade = 4, Tamanho = "20G" }
             );
         }
     }

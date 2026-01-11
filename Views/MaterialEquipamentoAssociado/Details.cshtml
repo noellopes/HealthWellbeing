@@ -1,0 +1,83 @@
+﻿@model HealthWellbeing.Models.MaterialEquipamentoAssociado
+
+@{
+    ViewData["Title"] = "Detalhes do Material/Equipamento";
+}
+
+<div class="container mt-4">
+
+    <h1 class="display-6 mb-3">Detalhes do Material/Equipamento</h1>
+    <hr />
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+
+            <div class="card shadow-lg">
+                @* Cabeçalho do Card *@
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Informações do Item
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    <dl class="row mb-0 align-items-center">
+
+                        @* --- NOME --- *@
+                        <dt class="col-sm-3 text-muted">
+                            @Html.DisplayNameFor(model => model.NomeEquipamento)
+                        </dt>
+                        <dd class="col-sm-9 fw-bold fs-5 text-primary">
+                            @Html.DisplayFor(model => model.NomeEquipamento)
+                        </dd>
+
+                        @* --- QUANTIDADE --- *@
+                        <dt class="col-sm-3 text-muted mt-2">
+                            @Html.DisplayNameFor(model => model.Quantidade)
+                        </dt>
+                        <dd class="col-sm-9 mt-2">
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-box-seam me-1"></i>
+                                @Html.DisplayFor(model => model.Quantidade) un.
+                            </span>
+                        </dd>
+
+
+
+                    </dl>
+                </div>
+            </div>
+
+            @* --- TABELA DE ONDE É USADO (Opcional, mas útil) --- *@
+            @if (Model.ExameTipoRecursos != null && Model.ExameTipoRecursos.Any())
+            {
+                <div class="card mt-4 border-light shadow-sm">
+                    <div class="card-header bg-light">
+                        <small class="fw-bold text-muted">Usado nos seguintes protocolos:</small>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var uso in Model.ExameTipoRecursos)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@uso.ExameTipo?.Nome</span>
+                                <span class="badge bg-secondary rounded-pill">Qtd p/ exame: @uso.QuantidadeNecessaria</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @* Botões de Ação *@
+            <div class="mt-4 d-flex justify-content-start mb-5">
+                <a asp-action="Edit" asp-route-id="@Model?.MaterialEquipamentoAssociadoId" class="btn btn-warning me-2 shadow-sm px-4">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-secondary shadow-sm px-4">
+                    <i class="bi bi-arrow-left-short"></i> Voltar à Lista
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

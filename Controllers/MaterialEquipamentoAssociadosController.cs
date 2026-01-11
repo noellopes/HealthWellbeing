@@ -1,219 +1,167 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HealthWellbeing.Data;
+using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels; // Necessário para PaginationInfo
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using HealthWellbeing.Data;
-using HealthWellbeing.Models;
-using HealthWellBeing.Models; // Ensure all necessary namespaces are present
-using HealthWellbeing.ViewModels; // Assuming this contains PaginationInfo
-using Microsoft.AspNetCore.Mvc.Rendering; // Needed for SelectList
+using System.Linq; // Necessário para .Where e .OrderBy
+using System.Threading.Tasks;
 
-namespace HealthWellBeing.Controllers
+namespace HealthWellbeing.Controllers
 {
-    public class MaterialEquipamentoAssociadosController : Controller
+    [Authorize(Roles = "Admin, Gestor")]
+    public class MaterialEquipamentoAssociadoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
-        private const int ITEMS_PER_PAGE = 5; // Configuração do tamanho da página
 
-        public MaterialEquipamentoAssociadosController(HealthWellbeingDbContext context)
+        public MaterialEquipamentoAssociadoController(HealthWellbeingDbContext context)
         {
             _context = context;
         }
 
-        // Helper method to load status options for dropdowns (Select Lists)
-        private void LoadEstadoMaterialOptions(object selectedId = null)
+        // GET: MaterialEquipamentoAssociado
+        // Adicionados parâmetros para paginação e pesquisa
+        public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchEstado = "")
         {
-            var estados = _context.EstadosMaterial.OrderBy(e => e.Nome).AsNoTracking().ToList();
-            ViewData["MaterialStatusId"] = new SelectList(estados, "MaterialStatusId", "Nome", selectedId);
-        }
-
-        // GET: MaterialEquipamentoAssociados
-        public async Task<IActionResult> Index(
-            int page = 1,
-            string searchNome = "",
-            string searchEstado = "") // searchEstado is now the Status Name
-        {
+            // 1. Guardar os termos de pesquisa na ViewBag para a View não os perder
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchEstado = searchEstado;
 
-            // 1. Eager Load the Material Status (EstadoMaterial)
-            var materialQuery = _context.MaterialEquipamentoAssociado
-                .Include(m => m.EstadoMaterial) // MUST include to access the status name
-                .AsQueryable();
+            // 2. Preparar a Query
+            var query = _context.MaterialEquipamentoAssociado.AsQueryable();
 
+            // 3. Aplicar Filtros (Pesquisa)
             if (!string.IsNullOrEmpty(searchNome))
             {
-                materialQuery = materialQuery.Where(m => m.NomeEquipamento.Contains(searchNome));
+                query = query.Where(m => m.NomeEquipamento.Contains(searchNome));
             }
+            // Nota: O filtro de estado foi removido da BD, mas mantemos o parametro para não quebrar a View se ela o enviar
 
-            // 2. Filter by Status Name (EstadoMaterial.Nome)
-            if (!string.IsNullOrEmpty(searchEstado))
-            {
-                // We use the navigation property to filter by the related entity's name
-                materialQuery = materialQuery.Where(m =>
-                    m.EstadoMaterial != null &&
-                    m.EstadoMaterial.Nome.Contains(searchEstado)
-                );
-            }
+            // 4. Calcular Totais para a Paginação
+            int pageSize = 10; // Define quantos itens queres por página
+            int totalItems = await query.CountAsync();
 
-            int totalMateriais = await materialQuery.CountAsync();
+            // 5. Criar o objeto que a View está à espera (PaginationInfo)
+            var paginationInfo = new PaginationInfo<MaterialEquipamentoAssociado>(page, totalItems, pageSize);
 
-            var materialInfo = new PaginationInfo<MaterialEquipamentoAssociado>(page, totalMateriais, itemsPerPage: ITEMS_PER_PAGE);
-
-            materialInfo.Items = await materialQuery
+            // 6. Carregar apenas os itens da página atual
+            paginationInfo.Items = await query
                 .OrderBy(m => m.NomeEquipamento)
-                .Skip(materialInfo.ItemsToSkip) // Pula os itens das páginas anteriores
-                .Take(materialInfo.ItemsPerPage) // Pega apenas os 5 itens da página atual
+                .Skip(paginationInfo.ItemsToSkip)
+                .Take(paginationInfo.ItemsPerPage)
                 .ToListAsync();
 
-            return View(materialInfo);
+            // 7. Retornar o PaginationInfo (Isto resolve o erro de InvalidOperationException)
+            return View(paginationInfo);
         }
 
-        // GET: MaterialEquipamentoAssociados/Details/5
+        // GET: MaterialEquipamentoAssociado/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // Eager Load the Material Status
-            var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado
-                .Include(m => m.EstadoMaterial) // Include the status for display
+            var material = await _context.MaterialEquipamentoAssociado
+                .Include(m => m.ExameTipoRecursos)
+                    .ThenInclude(etr => etr.ExameTipo)
                 .FirstOrDefaultAsync(m => m.MaterialEquipamentoAssociadoId == id);
 
-            if (materialEquipamentoAssociado == null)
-            {
-                return NotFound();
-            }
+            if (material == null) return NotFound();
 
-            return View(materialEquipamentoAssociado);
+            return View(material);
         }
 
-        // GET: MaterialEquipamentoAssociados/Create
+        // GET: MaterialEquipamentoAssociado/Create
         public IActionResult Create()
         {
-            LoadEstadoMaterialOptions(); // Load options for the dropdown
             return View();
         }
 
-        // POST: MaterialEquipamentoAssociados/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // BIND: Removed 'EstadoComponente' and added the Foreign Key 'MaterialStatusId'
-        public async Task<IActionResult> Create([Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,MaterialStatusId")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
+        public async Task<IActionResult> Create(MaterialEquipamentoAssociado material)
         {
-            // Note: Since MaterialStatusId is a simple integer, ModelState.IsValid should be true 
-            // if the user selected a valid ID (which comes from the ViewData SelectList).
             if (ModelState.IsValid)
             {
-                _context.Add(materialEquipamentoAssociado);
+                _context.Add(material);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi criado com sucesso!";
                 return RedirectToAction(nameof(Index));
             }
-
-            // If model is invalid, reload the dropdown options before returning to the view
-            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
-            return View(materialEquipamentoAssociado);
+            return View(material);
         }
 
-        // GET: MaterialEquipamentoAssociados/Edit/5
+        // GET: MaterialEquipamentoAssociado/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado.FindAsync(id);
-            if (materialEquipamentoAssociado == null)
-            {
-                return NotFound();
-            }
+            var material = await _context.MaterialEquipamentoAssociado.FindAsync(id);
+            if (material == null) return NotFound();
 
-            // Load the options for the dropdown, selecting the current status ID
-            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
-            return View(materialEquipamentoAssociado);
+            return View(material);
         }
 
-        // POST: MaterialEquipamentoAssociados/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // BIND: Removed 'EstadoComponente' and added the Foreign Key 'MaterialStatusId'
-        public async Task<IActionResult> Edit(int id, [Bind("MaterialEquipamentoAssociadoId,NomeEquipamento,Quantidade,MaterialStatusId")] MaterialEquipamentoAssociado materialEquipamentoAssociado)
+        public async Task<IActionResult> Edit(int id, MaterialEquipamentoAssociado material)
         {
-            if (id != materialEquipamentoAssociado.MaterialEquipamentoAssociadoId)
-            {
-                return NotFound();
-            }
+            if (id != material.MaterialEquipamentoAssociadoId) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(materialEquipamentoAssociado);
+                    _context.Update(material);
                     await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi atualizado com sucesso!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MaterialEquipamentoAssociadoExists(materialEquipamentoAssociado.MaterialEquipamentoAssociadoId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!MaterialExists(material.MaterialEquipamentoAssociadoId)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-
-            // If model is invalid, reload the dropdown options before returning to the view
-            LoadEstadoMaterialOptions(materialEquipamentoAssociado.MaterialStatusId);
-            return View(materialEquipamentoAssociado);
+            return View(material);
         }
 
-        // GET: MaterialEquipamentoAssociados/Delete/5
+        // GET: MaterialEquipamentoAssociado/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            // Eager Load the Material Status for display on the Delete confirmation page
-            var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado
-                .Include(m => m.EstadoMaterial)
+            var material = await _context.MaterialEquipamentoAssociado
                 .FirstOrDefaultAsync(m => m.MaterialEquipamentoAssociadoId == id);
 
-            if (materialEquipamentoAssociado == null)
-            {
-                return NotFound();
-            }
+            if (material == null) return NotFound();
 
-            return View(materialEquipamentoAssociado);
+            return View(material);
         }
 
-        // POST: MaterialEquipamentoAssociados/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var materialEquipamentoAssociado = await _context.MaterialEquipamentoAssociado.FindAsync(id);
-            if (materialEquipamentoAssociado != null)
+            var material = await _context.MaterialEquipamentoAssociado.FindAsync(id);
+
+            // Verifica se está a ser usado nalgum protocolo
+            bool estaEmUsoNoProtocolo = await _context.ExameTipoRecursos
+                .AnyAsync(etr => etr.MaterialEquipamentoAssociadoId == id);
+
+            if (estaEmUsoNoProtocolo)
             {
-                _context.MaterialEquipamentoAssociado.Remove(materialEquipamentoAssociado);
-                TempData["SuccessMessage"] = $"O material '{materialEquipamentoAssociado.NomeEquipamento}' foi apagado com sucesso!";
+                TempData["ErrorMessage"] = "Não pode apagar este material porque ele faz parte da receita padrão de um Tipo de Exame.";
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            if (material != null)
+            {
+                _context.MaterialEquipamentoAssociado.Remove(material);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Material removido do dicionário.";
+            }
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MaterialEquipamentoAssociadoExists(int id)
+        private bool MaterialExists(int id)
         {
             return _context.MaterialEquipamentoAssociado.Any(e => e.MaterialEquipamentoAssociadoId == id);
         }

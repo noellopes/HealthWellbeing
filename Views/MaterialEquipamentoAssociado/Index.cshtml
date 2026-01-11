@@ -1,0 +1,163 @@
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.MaterialEquipamentoAssociado>
+
+@{
+    ViewData["Title"] = "Dicionário de Materiais";
+    var searchNome = ViewBag.SearchNome;
+}
+
+<div class="container mt-4">
+
+    @* Mensagens de Feedback *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Sucesso!</strong> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Erro!</strong> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6">Dicionário de Materiais</h1>
+            <p class="text-muted">Catálogo de referência para criação de Tipos de Exame.</p>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            @* Botão de Pesquisa *@
+            <a class="btn btn-secondary me-2" data-bs-toggle="collapse"
+               data-bs-target="#stockSearch" aria-expanded="false"
+               aria-controls="stockSearch">
+                <i class="bi bi-search me-1"></i> Pesquisar
+            </a>
+
+            @* Botão Criar Novo *@
+            <a asp-action="Create" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-circle"></i> Adicionar Novo
+            </a>
+        </div>
+    </div>
+
+    @* Área de Pesquisa *@
+    <div class="collapse mt-2 mb-4" id="stockSearch">
+        <div class="card card-body shadow-sm">
+            <form asp-action="Index" method="get" class="row g-2 align-items-end">
+                <div class="col-md-8">
+                    <label for="searchNome" class="form-label fw-bold">Nome do Material</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-tag"></i></span>
+                        <input id="searchNome" name="searchNome" value="@searchNome"
+                               class="form-control" placeholder="Ex: Seringa, Luvas..." type="search" />
+                    </div>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Filtrar</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-50">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* Tabela *@
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4" style="width: 55%;">Nome Equipamento</th>
+                            <th style="width: 25%;">Tamanho</th>
+                            <th class="text-center" style="width: 20%;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items != null && Model.Items.Any())
+                        {
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    @* Nome *@
+                                    <td class="ps-4">
+                                        @Html.DisplayFor(modelItem => item.NomeEquipamento)
+                                    </td>
+
+                                    @* Tamanho (Texto Normal) *@
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Tamanho) && item.Tamanho != "N.A.")
+                                        {
+                                            @Html.DisplayFor(modelItem => item.Tamanho)
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">N.A.</span>
+                                        }
+                                    </td>
+
+                                    @* Ações *@
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Edit" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-warning" title="Editar">Editar<i class="bi bi-pencil"></i></a>
+                                            <a asp-action="Details" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-info" title="Detalhes">Detalhes<i class="bi bi-eye"></i></a>
+                                            <a asp-action="Delete" asp-route-id="@item.MaterialEquipamentoAssociadoId" class="btn btn-danger" title="Apagar">Apagar<i class="bi bi-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Nenhum material encontrado.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @* Paginação *@
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Navegação" class="mt-4">
+            <ul class="pagination justify-content-center">
+
+                @* Primeiro *@
+                <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="1"
+                       asp-route-searchNome="@searchNome">Primeiro</a>
+                </li>
+
+                @* Loop Numérico *@
+                @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
+                {
+                    <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-page="@p"
+                           asp-route-searchNome="@searchNome">@p</a>
+                    </li>
+                }
+
+                @* Último *@
+                <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-page="@Model.TotalPages"
+                       asp-route-searchNome="@searchNome">Último</a>
+                </li>
+
+            </ul>
+        </nav>
+    }
+
+</div>

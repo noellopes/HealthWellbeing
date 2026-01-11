@@ -12,7 +12,7 @@ namespace HealthWellbeing.ViewModels
 
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade deve ser no mínimo 1.")]
         public int Quantidade { get; set; }
-        public int StockAtual { get; set; }
+        public String Tamanho { get; set; }
     }
 
     // O ViewModel principal para a View de Edição
@@ -27,3 +27,4 @@ namespace HealthWellbeing.ViewModels
         public List<RecursoCheckBoxItem> Recursos { get; set; } = new List<RecursoCheckBoxItem>();
     }
 }
+

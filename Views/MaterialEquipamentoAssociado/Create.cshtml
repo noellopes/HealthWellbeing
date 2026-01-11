@@ -30,14 +30,6 @@
                             <span asp-validation-for="Quantidade" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="MaterialStatusId" class="form-label">Estado e Condição</label>
-                            <select asp-for="MaterialStatusId" class="form-select"
-                                    asp-items="@(ViewData["MaterialStatusId"] as SelectList)"> @* <-- CORRIGIDO AQUI *@
-                                <option value="">-- Selecione o Estado --</option>
-                            </select>
-                            <span asp-validation-for="MaterialStatusId" class="text-danger"></span>
-                        </div>
 
                         <div class="d-flex justify-content-between mt-4">
                             <button type="submit" value="Create" class="btn btn-success shadow-sm">

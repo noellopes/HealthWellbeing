@@ -37,13 +37,11 @@
                             <span asp-validation-for="Quantidade" class="text-danger"></span>
                         </div>
 
+
                         <div class="mb-3">
-                            <label asp-for="MaterialStatusId" class="form-label">Estado e Condição</label>
-                            <select asp-for="MaterialStatusId" class="form-select"
-                                    asp-items="@(ViewData["MaterialStatusId"] as SelectList)">
-                                <option value="">-- Selecione o Estado --</option>
-                            </select>
-                            <span asp-validation-for="MaterialStatusId" class="text-danger"></span>
+                            <label asp-for="Tamanho" class="form-label"></label>
+                            <input asp-for="Tamanho" class="form-control" />
+                            <span asp-validation-for="Tamanho" class="text-danger"></span>
                         </div>
 
                         @* Área de Botões (alinhamento justificado) *@
