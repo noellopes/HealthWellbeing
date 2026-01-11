@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
+    [Authorize]
     public class TrainerController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
@@ -19,12 +20,14 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Trainer
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Trainer.ToListAsync());
         }
 
         // GET: Trainer/Details/5
+        [Authorize(Roles = "Administrator,Trainer")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,6 +47,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Trainer/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -52,6 +56,7 @@ namespace HealthWellbeing.Controllers
         // POST: Trainer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer")] Trainer trainer)
         {
             if (ModelState.IsValid)
@@ -65,6 +70,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Trainer/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -83,6 +89,7 @@ namespace HealthWellbeing.Controllers
         // POST: Trainer/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("TrainerId,Name,Email,Phone,Address,BirthDate,Gender,IsAdministrator,IsTrainer")] Trainer trainer)
         {
             if (id != trainer.TrainerId)
@@ -115,6 +122,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: Trainer/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,6 +141,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // POST: Trainer/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
