@@ -1,0 +1,27 @@
+﻿@model HealthWellbeing.Models.Exercise
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="alert alert-danger border-0 shadow-sm p-4 text-center mb-4" style="background-color: #f8d7da; color: #842029;">
+                <h2 class="fw-bold mb-2">Remove Exercise?</h2>
+                <p class="mb-0">You are about to delete <strong>@Model.Name</strong>. This may affect existing training plans.</p>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4 p-4 text-center">
+                <p class="text-muted mb-1">Muscle Group:</p>
+                <h5 class="fw-bold text-primary">@Model.MuscleGroup</h5>
+                <p class="text-muted mb-1 mt-3">Equipment:</p>
+                <h5 class="fw-bold">@Model.Equipment</h5>
+            </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="ExerciseId" />
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-danger px-5 fw-bold shadow-sm">Confirm Delete</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-5 bg-white shadow-sm">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

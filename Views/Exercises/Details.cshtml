@@ -1,0 +1,37 @@
+﻿@model HealthWellbeing.Models.Exercise
+
+<div class="container py-4">
+    <h1 class="text-primary fw-bold mb-4">Exercise Specification</h1>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">Technical Info</h5>
+                </div>
+                <div class="card-body p-4">
+                    <h3 class="fw-bold text-dark">@Model.Name</h3>
+                    <p class="text-muted">Targeting: <span class="badge bg-primary">@Model.MuscleGroup</span></p>
+                    <hr />
+                    <h6 class="fw-bold">Description:</h6>
+                    <p>@Model.Description</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">Requirements</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-tools text-primary display-4 mb-3"></i>
+                    <h5 class="text-muted">Equipment Needed:</h5>
+                    <h4 class="fw-bold">@(Model.Equipment ?? "No equipment")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a asp-action="Edit" asp-route-id="@Model.ExerciseId" class="btn btn-warning px-4 fw-bold">Edit Exercise</a>
+        <a asp-action="Index" class="btn btn-secondary px-4">Back to Library</a>
+    </div>
+</div>

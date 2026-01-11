@@ -22,6 +22,7 @@ internal class SeedDataGinasio
         PopulateMemberPlan(dbContext, members, plans);
         PopulateTrainingPlan(dbContext, plans, trainings);
         PopulatePhysicalAssessment(dbContext, members, trainers);
+        PopulateExercises(dbContext);
     }
 
     private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
@@ -635,6 +636,31 @@ internal class SeedDataGinasio
     };
 
         dbContext.PhysicalAssessment.AddRange(assessments);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulateExercises(HealthWellbeingDbContext dbContext)
+    {
+        // 1. Só insere se a tabela estiver vazia
+        if (dbContext.Exercise.Any()) return;
+
+        var exercises = new List<Exercise>
+    {
+        new Exercise { Name = "Bench Press", MuscleGroup = "Chest", Equipment = "Barbell", Description = "Lie on back, press bar up from chest." },
+        new Exercise { Name = "Dumbbell Flyes", MuscleGroup = "Chest", Equipment = "Dumbbells", Description = "Opening arms like wings with weights." },
+        new Exercise { Name = "Pull-Ups", MuscleGroup = "Back", Equipment = "Pull-up Bar", Description = "Pull body up until chin is over bar." },
+        new Exercise { Name = "Seated Row", MuscleGroup = "Back", Equipment = "Cable Machine", Description = "Pull handle towards abdomen while seated." },
+        new Exercise { Name = "Back Squat", MuscleGroup = "Legs", Equipment = "Barbell", Description = "Squat with bar on upper back." },
+        new Exercise { Name = "Leg Press", MuscleGroup = "Legs", Equipment = "Leg Press Machine", Description = "Push platform away with legs." },
+        new Exercise { Name = "Shoulder Press", MuscleGroup = "Shoulders", Equipment = "Dumbbells", Description = "Press weights overhead while seated." },
+        new Exercise { Name = "Lateral Raises", MuscleGroup = "Shoulders", Equipment = "Dumbbells", Description = "Lift arms out to the sides." },
+        new Exercise { Name = "Bicep Curls", MuscleGroup = "Arms", Equipment = "Dumbbells", Description = "Curl weight towards shoulder." },
+        new Exercise { Name = "Tricep Dips", MuscleGroup = "Arms", Equipment = "Parallel Bars", Description = "Lower and raise body using arms." },
+        new Exercise { Name = "Plank", MuscleGroup = "Core", Equipment = "None", Description = "Hold push-up position on elbows." },
+        new Exercise { Name = "Russian Twist", MuscleGroup = "Core", Equipment = "Medicine Ball", Description = "Rotate torso side to side." }
+    };
+
+        dbContext.Exercise.AddRange(exercises);
         dbContext.SaveChanges();
     }
 }
