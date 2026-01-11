@@ -167,27 +167,22 @@ namespace HealthWellbeing.Controllers
                 .Where(z => z.ConsumivelId == consumivel.ConsumivelId)
                 .Sum(z => z.QuantidadeAtual);
 
-            // Sincronizar stock automaticamente
-            SincronizaCompra.AtualizarStockAposCompra(
-                _context,
-                consumivel.ConsumivelId
-            );
 
             // 🔹 Histórico
             _context.HistoricoCompras.Add(new HistoricoCompras
             {
                 StockId = _context.Stock
-                    .Where(s => s.ConsumivelID == consumivel.ConsumivelId)
-                    .Select(s => s.StockId)
-                    .First(),
+        .Where(s => s.ConsumivelID == consumivel.ConsumivelId)
+        .Select(s => s.StockId)
+        .First(),
 
                 Quantidade = model.Quantidade,
                 FornecedorId = fornecedor.FornecedorId,
                 Tipo = "Entrada",
                 Data = DateTime.Now
             });
+            _context.SaveChanges();
 
-            
 
             return RedirectToAction("Index", "HistoricoCompras");
         }
