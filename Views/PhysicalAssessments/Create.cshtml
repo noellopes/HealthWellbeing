@@ -1,0 +1,50 @@
+﻿@model HealthWellbeing.Models.PhysicalAssessment
+
+<div class="container py-4">
+    <h1 class="text-primary fw-bold mb-4">New Assessment</h1>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0">Physical Evaluation Form</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="MemberId" class="form-label fw-bold">Select Member</label>
+                        <select asp-for="MemberId" class="form-select" asp-items="ViewBag.MemberId"></select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="TrainerId" class="form-label fw-bold">Assigned Trainer</label>
+                        <select asp-for="TrainerId" class="form-select" asp-items="ViewBag.TrainerId"></select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="AssessmentDate" class="form-label fw-bold">Date</label>
+                        <input asp-for="AssessmentDate" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Weight" class="form-label fw-bold">Weight (kg)</label>
+                        <input asp-for="Weight" class="form-control" placeholder="00.00" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Height" class="form-label fw-bold">Height (m)</label>
+                        <input asp-for="Height" class="form-control" placeholder="1.75" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label fw-bold">Notes</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-success px-4">Save Assessment</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
