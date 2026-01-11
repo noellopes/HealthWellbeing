@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Administrator")]
     public class TrainerController : Controller
     {
         private readonly HealthWellbeingDbContext _context;
