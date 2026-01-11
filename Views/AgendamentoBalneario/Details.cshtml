@@ -4,69 +4,119 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1 class="mb-4">@ViewData["Title"]</h1>
 
-<div>
-    <h4>AgendamentoBalneario</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Utentes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Utentes.NomeCompleto)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Terapeuta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Terapeuta.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Servico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Servico.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipoServico)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipoServico.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoraInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoraInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DuracaoMinutos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DuracaoMinutos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Preco)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Preco)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AgendamentoId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="card shadow-sm">
+
+    <!-- HEADER -->
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Detalhes do Agendamento
+        </h4>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+
+        <dl class="row mb-0">
+
+            <!-- UTENTE -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Utente
+            </dt>
+            <dd class="col-sm-9">
+                @(Model.Utentes != null ? Model.Utentes.NomeCompleto : "---")
+            </dd>
+
+            <!-- TERAPEUTA -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Terapeuta
+            </dt>
+            <dd class="col-sm-9">
+                @(Model.Terapeuta != null ? Model.Terapeuta.Nome : "---")
+            </dd>
+
+            <!-- SERVIÇO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Serviço
+            </dt>
+            <dd class="col-sm-9">
+                @Model.Servico?.Nome
+            </dd>
+
+            <!-- TIPO DE SERVIÇO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Tipo de Serviço
+            </dt>
+            <dd class="col-sm-9">
+                @Model.TipoServico?.Nome
+            </dd>
+
+            <!-- DATA / HORA -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Hora de Início
+            </dt>
+            <dd class="col-sm-9">
+                @Model.HoraInicio.ToString("dd/MM/yyyy HH:mm")
+            </dd>
+
+            <!-- DURAÇÃO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Duração (minutos)
+            </dt>
+            <dd class="col-sm-9">
+                @Model.DuracaoMinutos
+            </dd>
+
+            <!-- PREÇO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Preço (€)
+            </dt>
+            <dd class="col-sm-9">
+                @Model.Preco.ToString("0.00 €")
+            </dd>
+
+            <!-- DESCRIÇÃO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Descrição
+            </dt>
+            <dd class="col-sm-9">
+                @(!string.IsNullOrWhiteSpace(Model.Descricao) ? Model.Descricao : "---")
+            </dd>
+
+            <!-- ESTADO -->
+            <dt class="col-sm-3 fw-bold text-muted">
+                Estado
+            </dt>
+            <dd class="col-sm-9">
+                @{
+                    var estadoClass = Model.Estado switch
+                    {
+                        EstadoAgendamento.Confirmado => "badge bg-success",
+                        EstadoAgendamento.Pendente => "badge bg-warning text-dark",
+                        EstadoAgendamento.Cancelado => "badge bg-danger",
+                        EstadoAgendamento.Realizado => "badge bg-info",
+                        _ => "badge bg-secondary"
+                    };
+                }
+                <span class="@estadoClass">@Model.Estado</span>
+            </dd>
+
+        </dl>
+
+        <!-- BOTÕES -->
+        <div class="mt-4 d-flex justify-content-start gap-2">
+            <a asp-action="Edit"
+               asp-route-id="@Model.AgendamentoId"
+               class="btn btn-primary">
+                <i class="bi bi-pencil-square me-1"></i> Editar
+            </a>
+
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle me-1"></i> Voltar
+            </a>
+        </div>
+
+    </div>
 </div>
