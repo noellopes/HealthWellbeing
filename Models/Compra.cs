@@ -17,6 +17,7 @@
         public float PrecoUnitario { get; set; }
         public int TempoEntrega { get; set; }
 
+
         public DateTime DataCompra { get; set; } = DateTime.Now;
     }
 

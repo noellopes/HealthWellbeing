@@ -24,13 +24,14 @@ namespace HealthWellbeing.Controllers
         // -----------------------------
         // HELPERS
         // -----------------------------
+
+
         [HttpPost]
         public async Task<IActionResult> ReceberEncomenda(int consumivelId, int quantidadeTotal)
         {
             if (quantidadeTotal <= 0)
                 return RedirectToAction(nameof(Index));
 
-            // Obter o consumível
             var consumivel = await _context.Consumivel.FindAsync(consumivelId);
             if (consumivel == null)
             {
@@ -38,7 +39,6 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Obter todas as zonas ativas do consumível, ordenadas por nome
             var zonas = await _context.ZonaArmazenamento
                 .Where(z => z.ConsumivelId == consumivelId && z.Ativa)
                 .OrderBy(z => z.NomeZona)
@@ -57,14 +57,10 @@ namespace HealthWellbeing.Controllers
                 if (restante <= 0)
                     break;
 
-                // Espaço livre real na zona
                 int espacoLivre = zona.CapacidadeMaxima - zona.QuantidadeAtual;
-
-                // Garantir que não adicionamos mais que o espaço disponível
                 if (espacoLivre <= 0)
                     continue;
 
-                // Quanto podemos adicionar nesta zona
                 int aAdicionar = Math.Min(espacoLivre, restante);
 
                 zona.QuantidadeAtual += aAdicionar;
@@ -75,7 +71,6 @@ namespace HealthWellbeing.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Atualiza quantidade total no consumível
             await AtualizarQuantidadeAtualConsumivel(consumivelId);
 
             if (restante > 0)
@@ -89,19 +84,7 @@ namespace HealthWellbeing.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        private async Task<bool> ExcedeCapacidadeGlobal(int consumivelId, int novaQuantidadeZona, int? zonaId = null)
-        {
-            var consumivel = await _context.Consumivel.FindAsync(consumivelId);
-            if (consumivel == null) return false;
 
-            // Soma o stock de todas as OUTRAS zonas (exclui a zona atual se for uma edição)
-            var stockNasOutrasZonas = await _context.ZonaArmazenamento
-                .Where(z => z.ConsumivelId == consumivelId && z.ZonaId != zonaId)
-                .SumAsync(z => z.QuantidadeAtual);
-
-            // Verifica se (Stock existente + Nova quantidade) ultrapassa o teto do Consumível
-            return (stockNasOutrasZonas + novaQuantidadeZona) > consumivel.QuantidadeMaxima;
-        }
         private void PreencherDropDowns(int? consumivelId = null, int? roomId = null)
         {
             ViewBag.Consumiveis = new SelectList(
@@ -111,7 +94,6 @@ namespace HealthWellbeing.Controllers
                 consumivelId
             );
 
-            
             ViewBag.Rooms = new SelectList(
                 _context.Set<Room>().OrderBy(r => r.Name),
                 "RoomId",
@@ -120,7 +102,8 @@ namespace HealthWellbeing.Controllers
             );
         }
 
-        
+
+
         // -----------------------------
         // GET: ZonaArmazenamento (Index)
         // -----------------------------
@@ -161,6 +144,24 @@ namespace HealthWellbeing.Controllers
                     break;
             }
 
+            var consumiveisComEncomenda = await _context.Consumivel
+               .Where(c => c.QuantidadeAtual < c.QuantidadeMaxima) // somente futuras encomendas
+               .OrderBy(c => c.Nome)
+               .ToListAsync();
+
+            if (consumiveisComEncomenda.Any())
+            {
+                ViewBag.PossuiEncomendas = true;
+                var primeiro = consumiveisComEncomenda.First();
+                ViewBag.PrimeiroConsumivelComEncomenda = primeiro.ConsumivelId;
+                ViewBag.QuantidadeTotalPendentes = primeiro.QuantidadeMaxima - primeiro.QuantidadeAtual;
+            }
+            else
+            {
+                ViewBag.PossuiEncomendas = false;
+            }
+
+
             // --- Carregar a lista para a Dropdown de Pesquisa na View ---
             ViewBag.ConsumiveisList = new SelectList(
                 _context.Consumivel.OrderBy(c => c.Nome),
@@ -173,7 +174,32 @@ namespace HealthWellbeing.Controllers
             ViewBag.SearchNome = searchNome;
             ViewBag.SearchLocalizacao = searchLocalizacao;
             ViewBag.Estado = estado;
-            ViewBag.SearchConsumivel = searchConsumivel; 
+            ViewBag.SearchConsumivel = searchConsumivel;
+
+            if (consumiveisComEncomenda.Any())
+            {
+                ViewBag.PossuiEncomendas = true;
+                var primeiro = consumiveisComEncomenda.First();
+                ViewBag.PrimeiroConsumivelComEncomenda = primeiro.ConsumivelId;
+                ViewBag.QuantidadeTotalPendentes = primeiro.QuantidadeMaxima - primeiro.QuantidadeAtual;
+            }
+            else
+            {
+                ViewBag.PossuiEncomendas = false;
+            }
+
+            // Paginação
+            int total = await zonasQuery.CountAsync();
+            var pag = new PaginationInfo<ZonaArmazenamento>(page, total, 10);
+
+            pag.Items = await zonasQuery
+                .OrderBy(z => z.NomeZona)
+                .Skip(pag.ItemsToSkip)
+                .Take(pag.ItemsPerPage)
+                .ToListAsync();
+
+            return View(pag);
+
 
             // Paginação
             int totalZonas = await zonasQuery.CountAsync();
@@ -238,10 +264,6 @@ namespace HealthWellbeing.Controllers
             {
                 ModelState.AddModelError("Ativa", "Não é possível ter stock numa zona inativa. Para inativar a zona, a quantidade deve ser 0.");
             }
-            if (await ExcedeCapacidadeGlobal(zona.ConsumivelId, zona.QuantidadeAtual))
-            {
-                ModelState.AddModelError("QuantidadeAtual", "A soma do stock em todas as zonas excede o limite máximo definido para este consumível.");
-            }
 
             if (ModelState.IsValid)
             {
@@ -295,10 +317,6 @@ namespace HealthWellbeing.Controllers
             if (zona.Ativa == false && zona.QuantidadeAtual > 0)
             {
                 ModelState.AddModelError("Ativa", "Conflito: Uma zona inativa não pode ter consumíveis (Quantidade tem de ser 0).");
-            }
-            if (await ExcedeCapacidadeGlobal(zona.ConsumivelId, zona.QuantidadeAtual, id))
-            {
-                ModelState.AddModelError("QuantidadeAtual", "Esta alteração faria com que o stock total do consumível ultrapassasse o seu limite máximo permitido.");
             }
             if (ModelState.IsValid)
             {
