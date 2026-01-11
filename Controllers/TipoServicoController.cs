@@ -149,23 +149,17 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-           
             var tipoServico = await _context.TipoServicos
                 .FirstOrDefaultAsync(m => m.TipoServicosId == id);
 
             if (tipoServico == null)
-            {
                 return NotFound();
-            }
 
             return View(tipoServico);
         }
 
-        // POST: TipoServico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -182,7 +176,6 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index), new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
         }
 
-        
         private bool TipoServicoExists(int id)
         {
             return _context.TipoServicos.Any(e => e.TipoServicosId == id);

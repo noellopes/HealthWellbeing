@@ -176,7 +176,6 @@ namespace HealthWellbeing.Controllers
             return View(servico);
         }
 
-        // POST: Servico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

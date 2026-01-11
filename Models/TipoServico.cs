@@ -17,6 +17,4 @@ namespace HealthWellbeing.Models
         [RegularExpression(@"^[^0-9]+$", ErrorMessage = "A descrição não pode conter números.")]
         public string? Descricao { get; set; }// Detalhes do tipo de serviço
 
-        
-    }
 }
