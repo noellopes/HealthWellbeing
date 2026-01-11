@@ -391,15 +391,31 @@ namespace HealthWellbeing.Controllers
                 // Se passou nas validações manuais acima
                 if (ModelState.IsValid)
                 {
-                    // Executa a Movimentação
+                    // 1. Executa a Movimentação Física
                     zonaOrigem.QuantidadeAtual -= model.QuantidadeATransferir;
                     zonaDestino.QuantidadeAtual += model.QuantidadeATransferir;
 
                     _context.Update(zonaOrigem);
                     _context.Update(zonaDestino);
+
+                    // 2. NOVO: Cria o Registo no Histórico de Transferências
+                    var log = new HistoricoTransferencia
+                    {
+                        DataTransferencia = DateTime.Now,
+                        Utilizador = User.Identity?.Name ?? "Desconhecido", // Capta quem fez a ação
+                        ConsumivelId = zonaOrigem.ConsumivelId,
+                        Quantidade = model.QuantidadeATransferir,
+                        ZonaOrigemId = zonaOrigem.ZonaId,
+                        ZonaDestinoId = zonaDestino.ZonaId
+                    };
+
+                    // Adiciona o log à base de dados
+                    _context.Add(log);
+
+                    // 3. Grava TUDO (Zonas + Histórico) ao mesmo tempo
                     await _context.SaveChangesAsync();
 
-                    TempData["SuccessMessage"] = $"✅ Transferência de {model.QuantidadeATransferir} unidades realizada com sucesso!";
+                    TempData["SuccessMessage"] = $"✅ Transferência de {model.QuantidadeATransferir} unidades realizada e registada!";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -424,6 +440,22 @@ namespace HealthWellbeing.Controllers
             }
 
             return View(model);
+        }
+
+        // -----------------------------
+        // GET: ZonaArmazenamento/Historico
+        // -----------------------------
+        public async Task<IActionResult> Historico()
+        {
+            // Vai buscar os dados à tabela nova
+            var historico = await _context.HistoricoTransferencias
+                .Include(h => h.Consumivel)
+                .Include(h => h.ZonaOrigem)
+                .Include(h => h.ZonaDestino)
+                .OrderByDescending(h => h.DataTransferencia) // Mais recentes primeiro
+                .ToListAsync();
+
+            return View(historico);
         }
 
 

@@ -74,6 +74,21 @@ namespace HealthWellbeing.Data
             .HasForeignKey(s => s.ZonaID)
             .OnDelete(DeleteBehavior.Cascade);
 
+            // ========================
+            // CONFIGURAÇÃO HISTÓRICO TRANSFERÊNCIAS (Evitar Ciclos)
+            // ========================
+            modelBuilder.Entity<HistoricoTransferencia>()
+                .HasOne(h => h.ZonaOrigem)
+                .WithMany()
+                .HasForeignKey(h => h.ZonaOrigemId)
+                .OnDelete(DeleteBehavior.Restrict); // ⚠️ Importante: Restrict em vez de Cascade
+
+            modelBuilder.Entity<HistoricoTransferencia>()
+                .HasOne(h => h.ZonaDestino)
+                .WithMany()
+                .HasForeignKey(h => h.ZonaDestinoId)
+                .OnDelete(DeleteBehavior.Restrict); // ⚠️ Importante: Restrict em vez de Cascade
+
         }
 
         // ========================
@@ -91,6 +106,7 @@ namespace HealthWellbeing.Data
         // CONSUMÍVEIS / STOCK
         // ========================
         public DbSet<ZonaArmazenamento> ZonaArmazenamento { get; set; } = default!;
+
         public DbSet<CategoriaConsumivel> CategoriaConsumivel { get; set; } = default!;
         public DbSet<Fornecedor> Fornecedor { get; set; } = default!;
         public DbSet<Consumivel> Consumivel { get; set; } = default!;
@@ -100,6 +116,7 @@ namespace HealthWellbeing.Data
         public DbSet<UsoConsumivel> UsoConsumivel { get; set; } = default!;
         public DbSet<LocalizacaoZonaArmazenamento> LocalizacaoZonaArmazenamento { get; set; } = default!;
         public DbSet<Fornecedor_Consumivel> Fornecedor_Consumivel { get; set; } = default!;
+        public DbSet<HistoricoTransferencia> HistoricoTransferencias { get; set; } = default!;
 
         // ========================
         // EQUIPAMENTOS / SALAS
