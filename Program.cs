@@ -54,20 +54,28 @@ app.MapRazorPages();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    // --- BLOCO 1: IDENTITY (LOGINS) ---
     try
     {
-        // 1. Criar Roles e Admin (Usa o SeedDataAccount.cs)
-        // Nota: O método tem de ser aguardado (.Wait() ou await num contexto async, aqui usamos .Wait() para garantir)
+        var identityContext = services.GetRequiredService<ApplicationDbContext>();
+        identityContext.Database.Migrate();
         HealthWellbeing.Data.SeedData.SeedRolesAndAdminAsync(services).Wait();
-
-        // 2. Criar Planos e Clientes (Usa o SeedDataGinasio.cs)
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("AVISO: Falha no Seed do Identity: " + ex.Message);
+        // Não fazemos throw aqui para ele tentar o próximo bloco
+    }
+    try
+    {
         var context = services.GetRequiredService<HealthWellbeingDbContext>();
+        context.Database.Migrate(); // Garante que as tuas tabelas existem
         SeedDataGinasio.Populate(context);
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "ERRO CRÍTICO: Falha ao criar dados iniciais (Seed).");
+        // Se este falhar, queremos saber porquê!
+        throw new Exception("ERRO NO SEED DO GINÁSIO: " + ex.Message);
     }
 }
 // =========================================================
