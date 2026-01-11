@@ -1,0 +1,76 @@
+﻿@model HealthWellbeing.Models.PhysicalAssessment
+
+@{
+    ViewData["Title"] = "New Physical Assessment";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 p-4">
+                <h2 class="h4 text-primary mb-3">Register Assessment</h2>
+                <hr />
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MemberId" class="form-label fw-bold">Member</label>
+                            <select asp-for="MemberId" class="form-select" asp-items="ViewBag.MemberId">
+                                <option value="">-- Select Member --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="TrainerId" class="form-label fw-bold">Trainer</label>
+                            <select asp-for="TrainerId" class="form-select" asp-items="ViewBag.TrainerId">
+                                <option value="">-- Select Trainer --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="AssessmentDate" class="form-label fw-bold"></label>
+                            <input asp-for="AssessmentDate" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Weight" class="form-label fw-bold">Weight (kg)</label>
+                            <input asp-for="Weight" class="form-control" placeholder="00.00" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Height" class="form-label fw-bold">Height (m)</label>
+                            <input asp-for="Height" class="form-control" placeholder="1.75" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="BodyFatPercentage" class="form-label fw-bold">Body Fat %</label>
+                            <input asp-for="BodyFatPercentage" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MuscleMass" class="form-label fw-bold">Muscle Mass (kg)</label>
+                            <input asp-for="MuscleMass" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label fw-bold">Observations</label>
+                        <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Additional notes..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Save Assessment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

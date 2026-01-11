@@ -21,6 +21,7 @@ internal class SeedDataGinasio
         var trainings = PopulateTraining(dbContext, trainers);
         PopulateMemberPlan(dbContext, members, plans);
         PopulateTrainingPlan(dbContext, plans, trainings);
+        PopulatePhysicalAssessment(dbContext, members, trainers);
     }
 
     private static List<Client> PopulateClients(HealthWellbeingDbContext dbContext)
@@ -570,6 +571,66 @@ internal class SeedDataGinasio
         trainingPlans.Add(new TrainingPlan { PlanId = GetPlanId("Corporate"), TrainingId = GetTrainingId("Sunday Morning"), DaysPerWeek = 1 });
 
         dbContext.TrainingPlan.AddRange(trainingPlans);
+        dbContext.SaveChanges();
+    }
+
+    private static void PopulatePhysicalAssessment(HealthWellbeingDbContext dbContext, List<Member> members, List<Trainer> trainers)
+    {
+        // 1. Verifica se já existem dados para não duplicar
+        if (dbContext.PhysicalAssessment.Any()) return;
+
+        // 2. Garante que temos membros e treinadores para fazer as ligações
+        if (!members.Any() || !trainers.Any()) return;
+
+        var assessments = new List<PhysicalAssessment>
+    {
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddMonths(-2),
+            Weight = 85.5m,
+            Height = 1.80m,
+            BodyFatPercentage = 22.5m,
+            MuscleMass = 38.0m,
+            Notes = "Initial assessment. Goal: Weight loss and muscle gain.",
+            MemberId = members[0].MemberId,
+            TrainerId = trainers[0].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddMonths(-1),
+            Weight = 83.2m,
+            Height = 1.80m,
+            BodyFatPercentage = 21.0m,
+            MuscleMass = 38.5m,
+            Notes = "Great progress in the first month. Better endurance.",
+            MemberId = members[0].MemberId,
+            TrainerId = trainers[0].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddMonths(-3),
+            Weight = 65.0m,
+            Height = 1.65m,
+            BodyFatPercentage = 28.0m,
+            MuscleMass = 25.0m,
+            Notes = "Member returning from injury. Focus on mobility.",
+            MemberId = members[1].MemberId,
+            TrainerId = trainers[1].TrainerId
+        },
+        new PhysicalAssessment
+        {
+            AssessmentDate = DateTime.Now.AddDays(-15),
+            Weight = 78.0m,
+            Height = 1.75m,
+            BodyFatPercentage = 18.5m,
+            MuscleMass = 40.0m,
+            Notes = "Athlete level assessment. Increasing intensity.",
+            MemberId = members[2].MemberId,
+            TrainerId = trainers[2].TrainerId
+        }
+    };
+
+        dbContext.PhysicalAssessment.AddRange(assessments);
         dbContext.SaveChanges();
     }
 }

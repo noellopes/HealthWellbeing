@@ -1,0 +1,51 @@
+﻿@model HealthWellbeing.Models.PhysicalAssessment
+
+@{
+    ViewData["Title"] = "Delete Assessment";
+}
+
+<div class="container py-4">
+    <h1 class="display-4 text-danger mb-3">Delete Assessment</h1>
+
+    <div class="alert alert-danger d-flex align-items-center p-4 border border-danger rounded shadow-sm" role="alert">
+        <i class="bi bi-exclamation-octagon-fill flex-shrink-0" style="font-size: 2.5rem;"></i>
+        <div class="ps-4">
+            <h4 class="alert-heading mb-1">Critical Action!</h4>
+            <p class="mb-0">Are you sure you want to permanently remove this physical assessment for <strong>@Model.Member?.Client?.Name</strong>?</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header bg-dark text-white p-3">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-x me-2"></i>Assessment Summary</h5>
+        </div>
+        <div class="card-body p-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 fw-bold text-muted">Member Name</dt>
+                <dd class="col-sm-8">@Model.Member?.Client?.Name</dd>
+
+                <dt class="col-sm-4 fw-bold text-muted">Trainer In Charge</dt>
+                <dd class="col-sm-8">@Model.Trainer?.Name</dd>
+
+                <dt class="col-sm-4 fw-bold text-muted">Assessment Date</dt>
+                <dd class="col-sm-8">@Model.AssessmentDate.ToString("dd/MM/yyyy")</dd>
+
+                <dt class="col-sm-4 fw-bold text-muted">Recorded Weight</dt>
+                <dd class="col-sm-8">@Model.Weight kg</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="PhysicalAssessmentId" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                <i class="bi bi-trash"></i> Confirm Delete
+            </button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>

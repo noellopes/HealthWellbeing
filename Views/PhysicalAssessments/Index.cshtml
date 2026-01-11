@@ -1,0 +1,50 @@
+﻿@model IEnumerable<HealthWellbeing.Models.PhysicalAssessment>
+
+@{
+    ViewData["Title"] = "Physical Assessments";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-primary">@ViewData["Title"]</h1>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> New Assessment
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted">
+                    <tr>
+                        <th class="ps-4">Date</th>
+                        <th>Member</th>
+                        <th>Trainer</th>
+                        <th>Weight (kg)</th>
+                        <th>BMI</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">@item.AssessmentDate.ToString("dd/MM/yyyy")</td>
+                            <td class="fw-bold">@item.Member?.Client?.Name</td>
+                            <td>@item.Trainer?.Name</td>
+                            <td>@item.Weight</td>
+                            <td><span class="badge bg-info text-dark">@item.BMI.ToString("F2")</span></td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-info" title="Details"><i class="bi bi-info-circle"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
