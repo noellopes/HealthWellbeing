@@ -16,12 +16,13 @@
                 <th>Consumível</th>
                 <th>Quantidade</th>
                 <th>Data</th>
+                <th>Zona</th>
             </tr>
         </thead>
         <tbody id="rows">
             <tr>
                 <td>
-                    <select name="ConsumivelID" class="form-control">
+                    <select name="ConsumivelID" class="form-control consumivel-select" onchange="updateZona(this)">
                         @foreach (var item in (SelectList)ViewData["ConsumivelID"])
                         {
                             <option value="@item.Value">@item.Text</option>
@@ -34,18 +35,66 @@
                 <td>
                     <input name="DataConsumo" type="date" class="form-control" />
                 </td>
+                <td>
+                    <select name="ZonaArmazenamentoID" class="form-control zona-select"></select>
+                </td>
             </tr>
         </tbody>
     </table>
 
     <button type="button" class="btn btn-secondary" onclick="addRow()">+ Adicionar Linha</button>
-
     <button type="submit" class="btn btn-success">Guardar</button>
 </form>
 
 <script>
-    function addRow() {
-        const row = document.querySelector("#rows tr").cloneNode(true);
-        document.querySelector("#rows").appendChild(row);
+    // Pega as zonas do ViewBag
+    const zonas = @Html.Raw(ViewBag.Zonas);
+
+    // Atualiza o dropdown de zona de armazenamento quando o consumível muda
+    function updateZona(selectElement) {
+        const row = selectElement.closest("tr");
+        const zonaSelect = row.querySelector(".zona-select");
+        const consumivelId = parseInt(selectElement.value);
+
+        // Limpa as opções existentes
+        zonaSelect.innerHTML = "";
+
+        // Filtra zonas ativas do consumível
+        const zonasFiltradas = zonas.filter(z => z.ConsumivelId === consumivelId);
+
+        // Adiciona opções
+        zonasFiltradas.forEach(z => {
+            const opt = document.createElement("option");
+            opt.value = z.ZonaId;
+            opt.text = z.NomeZona;
+            zonaSelect.appendChild(opt);
+        });
+
+        // Seleciona a primeira zona automaticamente
+        if (zonasFiltradas.length > 0) zonaSelect.value = zonasFiltradas[0].ZonaId;
     }
-</script> 
+
+    // Adiciona nova linha à tabela
+    function addRow() {
+        const template = document.querySelector("#rows tr");
+        const newRow = template.cloneNode(true);
+
+        // Reseta inputs da nova linha
+        newRow.querySelector(".consumivel-select").selectedIndex = 0;
+        newRow.querySelector(".zona-select").innerHTML = "";
+        newRow.querySelector("input[name='QuantidadeUsada']").value = "";
+        newRow.querySelector("input[name='DataConsumo']").value = "";
+
+        // Adiciona a linha
+        document.querySelector("#rows").appendChild(newRow);
+
+        // Atualiza zona da nova linha
+        updateZona(newRow.querySelector(".consumivel-select"));
+    }
+
+    // Inicializa a primeira linha ao carregar a página
+    document.addEventListener("DOMContentLoaded", () => {
+        const firstSelect = document.querySelector(".consumivel-select");
+        if (firstSelect) updateZona(firstSelect);
+    });
+</script>
