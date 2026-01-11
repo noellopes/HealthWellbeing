@@ -4,9 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HealthWellbeing</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthWellbeing.styles.css" asp-append-version="true" />
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
@@ -16,10 +18,12 @@
                 <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
                     <i class="bi bi-heart-pulse-fill me-1"></i>HealthWellbeing
                 </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
                     <ul class="navbar-nav flex-grow-1">
@@ -31,24 +35,32 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Plan" asp-action="PublicIndex">Plans & Pricing</a>
                         </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Gym Management
-                            </a>
-                            <ul class="dropdown-menu shadow-sm border-0">
-                                <li><a class="dropdown-item" asp-controller="Client" asp-action="Index"><i class="bi bi-people me-2"></i>Clients</a></li>
-                                <li><a class="dropdown-item" asp-controller="Member" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Members</a></li>
-                                <li><a class="dropdown-item" asp-controller="Plan" asp-action="Index"><i class="bi bi-tag me-2"></i>Plans (Admin)</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-controller="Trainer" asp-action="Index">Trainers</a></li>
-                            </ul>
-                        </li>
+                        @if (User.IsInRole("Administrator") || User.IsInRole("Trainer"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Gym Management
+                                </a>
+                                <ul class="dropdown-menu shadow-sm border-0">
+                                    <li><a class="dropdown-item" asp-controller="Client" asp-action="Index"><i class="bi bi-people me-2"></i>Clients</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Member" asp-action="Index"><i class="bi bi-card-checklist me-2"></i>Members</a></li>
+
+                                    @if (User.IsInRole("Administrator"))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li class="dropdown-header text-uppercase small text-muted">Admin Only</li>
+                                        <li><a class="dropdown-item" asp-controller="Plan" asp-action="Index"><i class="bi bi-tag me-2"></i>Plans Management</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Trainer" asp-action="Index"><i class="bi bi-person-badge me-2"></i>Trainers</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
                     </ul>
 
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            // Se o utilizador estiver logado
+                            // UTILIZADOR LOGADO
                             <li class="nav-item">
                                 <a class="nav-link text-dark fw-bold" href="#">
                                     <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
@@ -64,7 +76,7 @@
                         }
                         else
                         {
-                            // Se o utilizador NÃO estiver logado
+                            // UTILIZADOR NÃO LOGADO (Visitante)
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">
                                     <i class="bi bi-pencil-square me-1"></i>Register
@@ -82,6 +94,7 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -93,6 +106,7 @@
             &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
