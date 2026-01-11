@@ -35,6 +35,9 @@ namespace HealthWellbeing.Models
     public int TipoServicosId { get; set; }
 
     [ForeignKey("TipoServicosId")]
-    public  TipoServicos? TipoServico { get; set; } 
-}
+    public  TipoServicos? TipoServico { get; set; }
+        public ICollection<AgendamentoBalneario> Agendamentos { get; set; }
+        = new List<AgendamentoBalneario>();
+
+    }
     }

@@ -2,19 +2,28 @@
 
 @{
     ViewData["Title"] = "Serviços";
-    string? successMessage = TempData["SuccessMessage"] as string;
-}
-
-@if (!string.IsNullOrEmpty(successMessage))
-{
-    <div class="container py-4">
-        <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>@successMessage
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container py-4">
+            <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         </div>
-    </div>
-}
+    }
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="container py-4">
+            <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
 <!-- BOTÕES -->

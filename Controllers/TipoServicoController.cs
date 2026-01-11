@@ -148,32 +148,46 @@ namespace HealthWellbeing.Controllers
         // GET: TipoServico/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var tipoServico = await _context.TipoServicos
-                .FirstOrDefaultAsync(m => m.TipoServicosId == id);
+                .FirstOrDefaultAsync(t => t.TipoServicosId == id);
 
-            if (tipoServico == null)
-                return NotFound();
+            if (tipoServico == null) return NotFound();
 
             return View(tipoServico);
         }
 
+
+        // POST: TipoServico/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tipoServico = await _context.TipoServicos.FindAsync(id);
+            var tipoServico = await _context.TipoServicos
+                .Include(t => t.Servicos)
+                    .ThenInclude(s => s.Agendamentos)
+                .FirstOrDefaultAsync(t => t.TipoServicosId == id);
 
-            if (tipoServico != null)
-            {
-                _context.TipoServicos.Remove(tipoServico);
-                await _context.SaveChangesAsync();
-            }
+            if (tipoServico == null)
+                return NotFound();
 
             
-            return RedirectToAction(nameof(Index), new { successMessage = "Tipo de Serviço eliminado com sucesso!" });
+            if (tipoServico.Servicos.Any())
+            {
+                TempData["ErrorMessage"] =
+                    "Não é possível eliminar este Tipo de Serviço porque existem serviços associados.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.TipoServicos.Remove(tipoServico);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] =
+                "Tipo de Serviço eliminado com sucesso!";
+
+            return RedirectToAction(nameof(Index));
         }
 
         private bool TipoServicoExists(int id)

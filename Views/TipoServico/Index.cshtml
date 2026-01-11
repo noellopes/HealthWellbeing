@@ -4,21 +4,27 @@
     ViewData["Title"] = "Tipo de Serviços";
 }
 
-@if (!string.IsNullOrEmpty(successMessage))
-
+@if (TempData["ErrorMessage"] != null)
 {
-    <div class="container py-4">
-        <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm" role="alert">
-
-            <i class="bi bi-check-circle-fill me-2"></i>@successMessage
-
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show mb-4 shadow-sm">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+
 <h1 class="mb-4">@ViewData["Title"]</h1>
+
 
 <div class="d-flex align-items-center mb-3">
     <a asp-action="Create" class="btn btn-success me-2">
