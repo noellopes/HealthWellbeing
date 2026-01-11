@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260108183708_jan08")]
-    partial class jan08
+    [Migration("20260111192753_jan11")]
+    partial class jan11
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,13 +160,18 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainerId"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -180,13 +185,8 @@ namespace HealthWellbeing.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("Speciality")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("TrainerId");
 
@@ -201,12 +201,12 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TrainingId"));
 
-                    b.Property<string>("DayOfWeek")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
@@ -304,7 +304,7 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.MemberPlan", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Member", "Member")
-                        .WithMany()
+                        .WithMany("MemberPlans")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -361,6 +361,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Client", b =>
                 {
                     b.Navigation("Membership");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.Member", b =>
+                {
+                    b.Navigation("MemberPlans");
                 });
 #pragma warning restore 612, 618
         }

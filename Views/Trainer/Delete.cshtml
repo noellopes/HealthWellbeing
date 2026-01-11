@@ -1,61 +1,25 @@
 ﻿@model HealthWellbeing.Models.Trainer
 
 @{
-    ViewData["Title"] = "Delete Trainer";
+    ViewData["Title"] = "Delete Confirmation";
 }
 
-<h1 class="display-4 text-danger mb-3">Delete Trainer</h1>
-
-<h3 class="alert alert-warning border-0 shadow-sm p-3" role="alert">
-    ⚠️ Are you sure you want to delete the trainer: <strong class="text-danger">@Model.Name</strong>?
-</h3>
-<hr class="mb-4" />
-
-<div class="card shadow-lg mb-4">
-    <div class="card-header bg-dark text-white">
-        <h5 class="mb-0">Trainer Information to be Deleted</h5>
+<div class="container py-4">
+    <div class="alert alert-danger shadow-sm border-0" role="alert">
+        <h4 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Delete Trainer</h4>
+        <p>Are you sure you want to remove <strong>@Model.Name</strong> from the system? This action cannot be undone.</p>
     </div>
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
 
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Speciality)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Speciality)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Email)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Email)
-            </dd>
-
-            <dt class="col-sm-3 fw-bold">
-                @Html.DisplayNameFor(model => model.Phone)
-            </dt>
-            <dd class="col-sm-9">
-                @Html.DisplayFor(model => model.Phone)
-            </dd>
-        </dl>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <p class="mb-1 text-muted">Email: @Model.Email</p>
+            <p class="mb-0 text-muted">Phone: @Model.Phone</p>
+        </div>
     </div>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="TrainerId" />
+        <button type="submit" class="btn btn-danger px-4">Confirm Delete</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
 </div>
-
-<form asp-action="Delete" class="d-flex align-items-center mt-4">
-    <input type="hidden" asp-for="TrainerId" />
-
-    <button type="submit" class="btn btn-danger btn-lg shadow-sm me-3">
-        <i class="bi bi-trash"></i> Confirm Delete
-    </button>
-
-    <a asp-action="Index" class="btn btn-secondary btn-lg">
-        <i class="bi bi-x-circle"></i> Cancel
-    </a>
-</form>
