@@ -1,45 +1,40 @@
 ﻿@model HealthWellbeing.Models.PhysicalAssessment
 
-@{
-    ViewData["Title"] = "Assessment Details";
-}
-
 <div class="container py-4">
-    <div class="card shadow border-0">
-        <div class="card-header bg-primary text-white p-3">
-            <h2 class="h5 mb-0"><i class="bi bi-clipboard2-pulse me-2"></i>Assessment Results</h2>
-        </div>
-        <div class="card-body p-4">
-            <div class="row mb-4">
-                <div class="col-md-6 border-end">
-                    <h5 class="text-muted mb-3">Information</h5>
-                    <p><strong>Member:</strong> @Model.Member?.Client?.Name</p>
-                    <p><strong>Trainer:</strong> @Model.Trainer?.Name</p>
-                    <p><strong>Date:</strong> @Model.AssessmentDate.ToString("D")</p>
+    <h1 class="text-primary fw-bold mb-4">Assessment Report</h1>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">Physical Metrics</h5>
                 </div>
-                <div class="col-md-6 ps-md-4">
-                    <h5 class="text-muted mb-3">Metrics</h5>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Weight:</span> <span class="fw-bold">@Model.Weight kg</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Height:</span> <span class="fw-bold">@Model.Height m</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>BMI:</span> <span class="badge bg-primary">@Model.BMI.ToString("F2")</span>
+                <div class="card-body p-4">
+                    <p><strong>Member:</strong> @Model.Member?.Client?.Name</p>
+                    <hr />
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="small text-muted">Weight</div>
+                            <h4 class="fw-bold">@Model.Weight kg</h4>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="small text-muted">Height</div>
+                            <h4 class="fw-bold">@Model.Height m</h4>
+                        </div>
                     </div>
                 </div>
             </div>
-            @if (!string.IsNullOrEmpty(Model.Notes))
-            {
-                <div class="bg-light p-3 rounded">
-                    <strong>Notes:</strong> <p class="mb-0 italic">@Model.Notes</p>
-                </div>
-            }
         </div>
-        <div class="card-footer bg-light d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.PhysicalAssessmentId" class="btn btn-warning">Edit</a>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">BMI Status</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <h1 class="display-4 fw-bold text-primary">@Model.BMI.ToString("F1")</h1>
+                    <p class="badge bg-success rounded-pill px-3 py-2">Healthy Range</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

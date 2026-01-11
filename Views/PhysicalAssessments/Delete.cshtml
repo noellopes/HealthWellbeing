@@ -1,51 +1,25 @@
 ﻿@model HealthWellbeing.Models.PhysicalAssessment
 
-@{
-    ViewData["Title"] = "Delete Assessment";
-}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="alert alert-danger border-0 shadow-sm p-4 text-center mb-4" style="background-color: #f8d7da; color: #842029;">
+                <h2 class="fw-bold mb-2">Delete Record?</h2>
+                <p class="mb-0">You are about to remove the assessment for <strong>@Model.Member?.Client?.Name</strong>.</p>
+            </div>
 
-<div class="container py-4">
-    <h1 class="display-4 text-danger mb-3">Delete Assessment</h1>
+            <div class="card shadow-sm border-0 mb-4 p-4 text-center">
+                <p class="text-muted mb-1">Assessment Date:</p>
+                <h5 class="fw-bold">@Model.AssessmentDate.ToShortDateString()</h5>
+            </div>
 
-    <div class="alert alert-danger d-flex align-items-center p-4 border border-danger rounded shadow-sm" role="alert">
-        <i class="bi bi-exclamation-octagon-fill flex-shrink-0" style="font-size: 2.5rem;"></i>
-        <div class="ps-4">
-            <h4 class="alert-heading mb-1">Critical Action!</h4>
-            <p class="mb-0">Are you sure you want to permanently remove this physical assessment for <strong>@Model.Member?.Client?.Name</strong>?</p>
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="PhysicalAssessmentId" />
+                <div class="d-flex justify-content-center gap-3">
+                    <button type="submit" class="btn btn-danger px-5 fw-bold">Delete Forever</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary px-5 bg-white">Cancel</a>
+                </div>
+            </form>
         </div>
     </div>
-
-    <div class="card shadow-sm mb-4 border-0">
-        <div class="card-header bg-dark text-white p-3">
-            <h5 class="mb-0"><i class="bi bi-file-earmark-x me-2"></i>Assessment Summary</h5>
-        </div>
-        <div class="card-body p-4">
-            <dl class="row mb-0">
-                <dt class="col-sm-4 fw-bold text-muted">Member Name</dt>
-                <dd class="col-sm-8">@Model.Member?.Client?.Name</dd>
-
-                <dt class="col-sm-4 fw-bold text-muted">Trainer In Charge</dt>
-                <dd class="col-sm-8">@Model.Trainer?.Name</dd>
-
-                <dt class="col-sm-4 fw-bold text-muted">Assessment Date</dt>
-                <dd class="col-sm-8">@Model.AssessmentDate.ToString("dd/MM/yyyy")</dd>
-
-                <dt class="col-sm-4 fw-bold text-muted">Recorded Weight</dt>
-                <dd class="col-sm-8">@Model.Weight kg</dd>
-            </dl>
-        </div>
-    </div>
-
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="PhysicalAssessmentId" />
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
-                <i class="bi bi-trash"></i> Confirm Delete
-            </button>
-            <a asp-action="Index" class="btn btn-secondary btn-lg">
-                <i class="bi bi-x-circle"></i> Cancel
-            </a>
-        </div>
-    </form>
 </div>

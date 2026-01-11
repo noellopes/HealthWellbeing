@@ -1,50 +1,48 @@
 ﻿@model IEnumerable<HealthWellbeing.Models.PhysicalAssessment>
 
-@{
-    ViewData["Title"] = "Physical Assessments";
-}
-
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-primary">@ViewData["Title"]</h1>
-        <a asp-action="Create" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> New Assessment
-        </a>
-    </div>
+    <h1 class="text-primary fw-bold mb-4">Physical Assessments</h1>
 
     <div class="card shadow-sm border-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-muted">
-                    <tr>
-                        <th class="ps-4">Date</th>
-                        <th>Member</th>
-                        <th>Trainer</th>
-                        <th>Weight (kg)</th>
-                        <th>BMI</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">Assessment Directory</h5>
+            <a asp-action="Create" class="btn btn-success px-4">New Assessment</a>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <td class="ps-4">@item.AssessmentDate.ToString("dd/MM/yyyy")</td>
-                            <td class="fw-bold">@item.Member?.Client?.Name</td>
-                            <td>@item.Trainer?.Name</td>
-                            <td>@item.Weight</td>
-                            <td><span class="badge bg-info text-dark">@item.BMI.ToString("F2")</span></td>
-                            <td class="text-end pe-4">
-                                <div class="btn-group shadow-sm">
-                                    <a asp-action="Edit" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>
-                                    <a asp-action="Details" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-info" title="Details"><i class="bi bi-info-circle"></i></a>
-                                    <a asp-action="Delete" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
-                                </div>
-                            </td>
+                            <th>Date</th>
+                            <th>Member</th>
+                            <th>Trainer</th>
+                            <th>Weight (kg)</th>
+                            <th>BMI</th>
+                            <th class="text-center">Actions</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold">@item.AssessmentDate.ToString("dd/MM/yyyy")</td>
+                                <td>@item.Member?.Client?.Name</td>
+                                <td><span class="text-muted small">@item.Trainer?.Name</span></td>
+                                <td>@item.Weight</td>
+                                <td><span class="badge rounded-pill bg-info text-dark">@item.BMI.ToString("F2")</span></td>
+                                <td class="text-center">
+                                    <div class="btn-group gap-1">
+                                        <a asp-action="Edit" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-warning btn-sm">Edit</a>
+                                        <a asp-action="Details" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-info btn-sm text-white">Details</a>
+                                        <a asp-action="Delete" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-danger btn-sm">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
