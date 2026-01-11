@@ -305,6 +305,127 @@ namespace HealthWellbeing.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // -----------------------------
+        // GET: ZonaArmazenamento/Transferir/5
+        // -----------------------------
+        public async Task<IActionResult> Transferir(int? id)
+        {
+            if (id == null) return NotFound();
+
+            // Vai buscar a zona de origem e o nome do produto
+            var zonaOrigem = await _context.ZonaArmazenamento
+                .Include(z => z.Consumivel)
+                .FirstOrDefaultAsync(z => z.ZonaId == id);
+
+            if (zonaOrigem == null) return NotFound();
+
+            // Prepara o Modelo para o formulário
+            var model = new TransferenciaStock
+            {
+                ZonaOrigemId = zonaOrigem.ZonaId,
+                ZonaOrigemNome = zonaOrigem.NomeZona,
+                ConsumivelNome = zonaOrigem.Consumivel?.Nome,
+                QuantidadeAtualOrigem = zonaOrigem.QuantidadeAtual,
+                QuantidadeATransferir = 0
+            };
+
+            // Carregar APENAS zonas de destino válidas:
+            // 1. Mesmo Consumível
+            // 2. Zona diferente da origem
+            // 3. Zona Ativa
+            var zonasDestino = await _context.ZonaArmazenamento
+                .Where(z => z.ConsumivelId == zonaOrigem.ConsumivelId
+                            && z.ZonaId != zonaOrigem.ZonaId
+                            && z.Ativa == true)
+                .Select(z => new
+                {
+                    z.ZonaId,
+                    Display = $"{z.NomeZona} (Livre: {z.CapacidadeMaxima - z.QuantidadeAtual})"
+                })
+                .ToListAsync();
+
+            if (!zonasDestino.Any())
+            {
+                TempData["ErrorMessage"] = "⚠️ Não existem outras zonas ativas para este produto para onde possa transferir stock.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.ZonasDestino = new SelectList(zonasDestino, "ZonaId", "Display");
+
+            return View(model);
+        }
+
+        // -----------------------------
+        // POST: ZonaArmazenamento/Transferir
+        // -----------------------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Transferir(TransferenciaStock model)
+        {
+            if (ModelState.IsValid)
+            {
+                var zonaOrigem = await _context.ZonaArmazenamento.FindAsync(model.ZonaOrigemId);
+                var zonaDestino = await _context.ZonaArmazenamento.FindAsync(model.ZonaDestinoId);
+
+                if (zonaOrigem == null || zonaDestino == null)
+                {
+                    TempData["ErrorMessage"] = "❌ Erro: Zona de origem ou destino não encontrada.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // --- VALIDAÇÕES LÓGICAS ---
+
+                // 1. Tem stock suficiente na origem?
+                if (zonaOrigem.QuantidadeAtual < model.QuantidadeATransferir)
+                {
+                    ModelState.AddModelError("QuantidadeATransferir", "Não tem stock suficiente na origem.");
+                }
+
+                // 2. Tem espaço suficiente no destino?
+                int espacoLivreDestino = zonaDestino.CapacidadeMaxima - zonaDestino.QuantidadeAtual;
+                if (espacoLivreDestino < model.QuantidadeATransferir)
+                {
+                    ModelState.AddModelError("QuantidadeATransferir", $"O destino só tem espaço para {espacoLivreDestino} unidades.");
+                }
+
+                // Se passou nas validações manuais acima
+                if (ModelState.IsValid)
+                {
+                    // Executa a Movimentação
+                    zonaOrigem.QuantidadeAtual -= model.QuantidadeATransferir;
+                    zonaDestino.QuantidadeAtual += model.QuantidadeATransferir;
+
+                    _context.Update(zonaOrigem);
+                    _context.Update(zonaDestino);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = $"✅ Transferência de {model.QuantidadeATransferir} unidades realizada com sucesso!";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
+            // --- CASO DE ERRO (Recarregar a View) ---
+            var zonaOrigemDb = await _context.ZonaArmazenamento.FindAsync(model.ZonaOrigemId);
+
+            if (zonaOrigemDb != null)
+            {
+                var zonasDestino = await _context.ZonaArmazenamento
+               .Where(z => z.ConsumivelId == zonaOrigemDb.ConsumivelId
+                           && z.ZonaId != model.ZonaOrigemId
+                           && z.Ativa == true)
+               .Select(z => new
+               {
+                   z.ZonaId,
+                   Display = $"{z.NomeZona} (Livre: {z.CapacidadeMaxima - z.QuantidadeAtual})"
+               })
+               .ToListAsync();
+
+                ViewBag.ZonasDestino = new SelectList(zonasDestino, "ZonaId", "Display", model.ZonaDestinoId);
+            }
+
+            return View(model);
+        }
+
 
 
         private async Task AtualizarQuantidadeAtualConsumivel(int consumivelId)
