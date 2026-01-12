@@ -1,48 +1,77 @@
-﻿@model IEnumerable<HealthWellbeing.Models.PhysicalAssessment>
+﻿@model HealthWellbeing.ViewModels.PaginationInfo<HealthWellbeing.Models.PhysicalAssessment>
 
 <div class="container py-4">
     <h1 class="text-primary fw-bold mb-4">Physical Assessments</h1>
-
     <div class="card shadow-sm border-0">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
             <h5 class="mb-0">Assessment Directory</h5>
             <a asp-action="Create" class="btn btn-success px-4">New Assessment</a>
         </div>
-
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
+            @* Barra de Pesquisa *@
+            <form method="get" asp-action="Index">
+                <div class="row g-2 mb-4">
+                    <div class="col-md-5">
+                        <input type="text" name="searchMember" class="form-control" placeholder="Search by member name..." value="@ViewBag.SearchMember">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="searchTrainer" class="form-control" placeholder="Search by trainer..." value="@ViewBag.SearchTrainer">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Search</button>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Member</th>
+                        <th>Trainer</th>
+                        <th>Weight</th>
+                        <th>BMI</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
                         <tr>
-                            <th>Date</th>
-                            <th>Member</th>
-                            <th>Trainer</th>
-                            <th>Weight (kg)</th>
-                            <th>BMI</th>
-                            <th class="text-center">Actions</th>
+                            <td class="fw-bold">@item.AssessmentDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Member?.Client?.Name</td>
+                            <td><span class="text-muted small">@item.Trainer?.Name</span></td>
+                            <td>@item.Weight kg</td>
+                            <td><span class="badge rounded-pill bg-info text-dark">@item.BMI.ToString("F2")</span></td>
+                            <td class="text-center">
+                                <div class="btn-group gap-1">
+                                    <a asp-action="Edit" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-warning btn-sm">Edit</a>
+                                    <a asp-action="Details" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-info btn-sm text-white">Details</a>
+                                    <a asp-action="Delete" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-danger btn-sm">Delete</a>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td class="fw-bold">@item.AssessmentDate.ToString("dd/MM/yyyy")</td>
-                                <td>@item.Member?.Client?.Name</td>
-                                <td><span class="text-muted small">@item.Trainer?.Name</span></td>
-                                <td>@item.Weight</td>
-                                <td><span class="badge rounded-pill bg-info text-dark">@item.BMI.ToString("F2")</span></td>
-                                <td class="text-center">
-                                    <div class="btn-group gap-1">
-                                        <a asp-action="Edit" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-warning btn-sm">Edit</a>
-                                        <a asp-action="Details" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-info btn-sm text-white">Details</a>
-                                        <a asp-action="Delete" asp-route-id="@item.PhysicalAssessmentId" class="btn btn-danger btn-sm">Delete</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
+
+            @* Paginação *@
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="1" asp-route-searchMember="@ViewBag.SearchMember" asp-route-searchTrainer="@ViewBag.SearchTrainer">First</a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                            <a class="page-link" asp-route-page="@i" asp-route-searchMember="@ViewBag.SearchMember" asp-route-searchTrainer="@ViewBag.SearchTrainer">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-searchMember="@ViewBag.SearchMember" asp-route-searchTrainer="@ViewBag.SearchTrainer">Last</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>

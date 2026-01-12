@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,14 +23,32 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: PhysicalAssessments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string searchMember = "", string searchTrainer = "")
         {
-            // Adicionamos o Include(p => p.Member.Client) para conseguir mostrar o Nome do Cliente na lista
-            var assessments = _context.PhysicalAssessment
-                .Include(p => p.Member)
-                    .ThenInclude(m => m.Client)
-                .Include(p => p.Trainer);
-            return View(await assessments.ToListAsync());
+            var query = _context.PhysicalAssessment
+                .Include(p => p.Member).ThenInclude(m => m.Client)
+                .Include(p => p.Trainer)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchMember))
+                query = query.Where(p => p.Member.Client.Name.Contains(searchMember));
+
+            if (!string.IsNullOrEmpty(searchTrainer))
+                query = query.Where(p => p.Trainer.Name.Contains(searchTrainer));
+
+            int totalItems = await query.CountAsync();
+            var pagination = new PaginationInfo<PhysicalAssessment>(page, totalItems, 10);
+
+            pagination.Items = await query
+                .OrderByDescending(p => p.AssessmentDate)
+                .Skip(pagination.ItemsToSkip)
+                .Take(pagination.ItemsPerPage)
+                .ToListAsync();
+
+            ViewBag.SearchMember = searchMember;
+            ViewBag.SearchTrainer = searchTrainer;
+
+            return View(pagination);
         }
 
         // GET: PhysicalAssessments/Details/5
