@@ -2,57 +2,111 @@
 
 @{
     ViewData["Title"] = "Training Sessions";
+    // Verifica se é Staff para mostrar/esconder botões adequados
+    bool isStaff = User.IsInRole("Administrator") || User.IsInRole("Trainer");
+    bool isClient = User.IsInRole("Client");
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary fw-bold">Training Sessions</h2>
-        <a asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-lg"></i> New Training
-        </a>
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+        <h1 class="text-primary fw-bold">
+            <i class="bi bi-calendar3 me-2"></i>Training Sessions
+        </h1>
+
+        @if (isStaff)
+        {
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Training
+            </a>
+        }
     </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">Name</th>
-                        <th>Type</th>
-                        <th>Trainer</th>
-                        <th>Schedule</th>
-                        <th class="text-center">Manage</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <td class="ps-4 fw-bold">@item.Name</td>
-                            <td><span class="badge bg-info text-dark">@item.TrainingType.Name</span></td>
-                            <td>@item.Trainer.Name</td>
-                            <td>
-                                <div>@item.DayOfWeek</div>
-                                <small class="text-muted">@item.StartTime.ToString(@"hh\:mm") (@item.Duration min)</small>
-                            </td>
-
-                            <td class="text-center">
-                                <a asp-controller="TrainingExercise" asp-action="Index" asp-route-trainingId="@item.TrainingId"
-                                   class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-list-check me-1"></i> Exercises
-                                </a>
-                            </td>
-
-                            <td class="text-end pe-4">
-                                <a asp-action="Edit" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-secondary"><i class="bi bi-pencil"></i></a>
-                                <a asp-action="Details" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-info"><i class="bi bi-info-circle"></i></a>
-                                <a asp-action="Delete" asp-route-id="@item.TrainingId" class="btn btn-sm btn-link text-danger"><i class="bi bi-trash"></i></a>
-                            </td>
+                            <th class="ps-4">Name</th>
+                            <th>Type</th>
+                            <th>Trainer</th>
+                            <th>Schedule</th>
+                            <th class="text-end pe-4">@(isStaff ? "Manage" : "Action")</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">@Html.DisplayFor(modelItem => item.Name)</td>
+
+                                <td>
+                                    <span class="badge bg-info text-dark shadow-sm">
+                                        @Html.DisplayFor(modelItem => item.TrainingType.Name)
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (item.Trainer != null)
+                                    {
+                                        <span>@item.Trainer.Name</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">TBA</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">@item.DayOfWeek</span>
+                                        <small class="text-muted">
+                                            @item.StartTime.ToString(@"hh\:mm") (@item.Duration min)
+                                        </small>
+                                    </div>
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    @if (isClient)
+                                    {
+                                        <a asp-controller="Session" asp-action="Create" asp-route-trainingId="@item.TrainingId"
+                                           class="btn btn-sm btn-success fw-bold px-3 shadow-sm">
+                                            <i class="bi bi-calendar-plus-fill me-1"></i> Book Class
+                                        </a>
+                                    }
+
+                                    @if (isStaff)
+                                    {
+                                        <div class="btn-group shadow-sm">
+                                            <a asp-controller="TrainingExercise" asp-action="Index" asp-route-trainingId="@item.TrainingId"
+                                               class="btn btn-sm btn-outline-primary" title="Manage Exercises">
+                                                <i class="bi bi-list-check"></i> Exercises
+                                            </a>
+
+                                            <a asp-action="Edit" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a asp-action="Details" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-info" title="Details">
+                                                <i class="bi bi-info-circle"></i>
+                                            </a>
+
+                                            <a asp-action="Delete" asp-route-id="@item.TrainingId" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    }
+
+                                    @if (!isClient && !isStaff && User.Identity.IsAuthenticated)
+                                    {
+                                        <span class="text-muted small">No actions available</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
