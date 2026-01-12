@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,88 +20,76 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Client" asp-action="Index">Clientes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Utentes" asp-action="Index">Utentes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Servico" asp-action="Index">Serviços</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="TipoServico" asp-action="Index">Tipo de Serviços</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="AgendamentoBalneario" asp-action="Index">Agendamentos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Terapeuta" asp-action="Index">Terapeutas</a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-
-                      
-
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Client" asp-action="Index">Client</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Member" asp-action="Index">Member</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Plan" asp-action="Index">Plan</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="MemberPlan" asp-action="Index">MemberPlan</a></li>
-
-                                <li><hr class="dropdown-divider"></li>
-
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Trainer" asp-action="Index">Trainer</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Training" asp-action="Index">Training</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingPlan" asp-action="Index">TrainingPlan</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TrainingType" asp-action="Index">TrainingType</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Client" asp-action="Index">Clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Utentes" asp-action="Index">Utentes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Servico" asp-action="Index">Serviços</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="TipoServico" asp-action="Index">Tipo de Seviços</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="AgendamentoBalneario" asp-action="Index">Agendamentos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Consultas" asp-action="Index">Marcar Consulta</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Specialities" asp-action="Index">Especialidades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Doctor" asp-action="Index">Médicos</a>
-                        </li>                      
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Terapeuta" asp-action="Index">Terapeutas</a>
-                        </li>
-                        <li class="nav-item dropdown">
-
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Gestão de Ginásio
-                            </a>
-
+                            @* --- MENU DE GESTÃO (Dropdown para não ocupar a barra toda) --- *@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Gestão de Ginásio
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Specialities" asp-action="Index">Especialidades</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Doctor" asp-action="Index">Médicos</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Trainer" asp-action="Index">Treinadores</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Training" asp-action="Index">Treinos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TrainingPlan" asp-action="Index">Planos de Treino</a></li>
+                                    <li><a class="dropdown-item" asp-controller="TrainingType" asp-action="Index">Tipos de Treino</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Member" asp-action="Index">Membros</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Plan" asp-action="Index">Planos</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
 
+                    @* --- COMPONENTE DE LOGIN (Login/Logout) --- *@
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
 
-        <div class="container mt-4">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
+    <div class="container mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container">
+            &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
+    </footer>
 
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2025 - HealthWellbeing - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
-
-
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-        @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

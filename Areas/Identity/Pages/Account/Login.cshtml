@@ -1,0 +1,96 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Entrar";
+}
+
+<style>
+    /* Estilo do Cartão ajustado à cor da barra */
+    .custom-card {
+        background-color: #1a75ff; /* Azul vibrante igual à barra de navegação */
+        border-radius: 80px 20px 20px 20px; /* Canto arredondado característico */
+        padding: 60px 40px;
+        width: 100%;
+        max-width: 450px;
+        color: white;
+        border: none;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        margin: 50px auto; /* Centraliza horizontalmente */
+    }
+
+    /* Título minimalista */
+    .login-title {
+        font-size: 3.5rem;
+        font-weight: 300;
+        text-align: center;
+        margin-bottom: 40px;
+        letter-spacing: -1px;
+    }
+
+    /* Inputs arredondados com contorno branco */
+    .custom-input {
+        background: transparent !important;
+        border: 2px solid white !important;
+        border-radius: 30px !important;
+        color: white !important;
+        padding: 12px 25px !important;
+        margin-bottom: 20px !important;
+    }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+    /* Botão LOGIN escuro para contraste */
+    .btn-login {
+        background-color: #1a1a1a !important;
+        color: #1a75ff !important; /* Texto na mesma cor do azul do cartão */
+        border-radius: 40px !important;
+        padding: 12px !important;
+        font-weight: bold !important;
+        font-size: 1.5rem !important;
+        border: none !important;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .link-light {
+        color: white;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container">
+    <div class="custom-card shadow-lg">
+        <h1 class="login-title">Entrar</h1>
+
+        <form id="account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small" role="alert"></div>
+
+            <input asp-for="Input.Email" class="form-control custom-input" placeholder="Utilizador" />
+            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+
+            <input asp-for="Input.Password" class="form-control custom-input" type="password" placeholder="Palavra-passe" />
+            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+
+            <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                <label class="link-light">
+                    <input class="form-check-input me-1" asp-for="Input.RememberMe" /> Lembrar-me
+                </label>
+                <a id="forgot-password" asp-page="./ForgotPassword" class="link-light">Esqueceu a senha?</a>
+            </div>
+
+            <button id="login-submit" type="submit" class="btn-login">LOGIN</button>
+
+            <div class="text-center mt-4">
+                <p class="small mb-0">Não tem conta? <a asp-page="./Register" class="fw-bold link-light">Registe-se aqui</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
