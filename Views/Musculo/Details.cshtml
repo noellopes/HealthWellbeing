@@ -4,44 +4,45 @@
     ViewData["Title"] = "Detalhes do Músculo";
 }
 
-<div class="container mt-4">
+<div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">@ViewData["Title"]</h1>
-        <div>
-            <a asp-action="Index" class="btn btn-secondary me-2">
-                Voltar à Lista
+        <h1 class="h3 mb-0 text-primary">
+            <i class="bi bi-dumbbell me-2"></i>Detalhes
+        </h1>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model?.MusculoId" class="btn btn-warning shadow-sm text-dark">
+                <i class="bi bi-pencil me-1"></i> Editar
             </a>
-            <a asp-action="Edit" asp-route-id="@Model.MusculoId" class="btn btn-warning me-2">
-                Editar
+            <a asp-action="Delete" asp-route-id="@Model?.MusculoId" class="btn btn-danger shadow-sm text-white">
+                <i class="bi bi-trash me-1"></i> Apagar
             </a>
-            <a asp-action="Delete" asp-route-id="@Model.MusculoId" class="btn btn-danger"
-               >
-                Apagar
+            <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
             </a>
         </div>
     </div>
 
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">@Model.Nome_Musculo</h3>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+            <h5 class="mb-0 fw-bold text-dark">Informação do Músculo</h5>
         </div>
+        <div class="card-body p-4">
+            <div class="row mb-3 border-bottom pb-3">
+                <div class="col-md-3 text-muted fw-bold">Nome do Músculo</div>
+                <div class="col-md-9 text-dark">@Model.Nome_Musculo</div>
+            </div>
 
-        <div class="card-body">
             <div class="row">
-
-                <!-- Informações do Músculo -->
-                <div class="col-md-6 mb-3">
-                    <h5 class="fw-bold">Informações do Músculo</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <th class="text-secondary">Nome do Músculo:</th>
-                            <td>@Model.Nome_Musculo</td>
-                        </tr>
-                        <tr>
-                            <th class="text-secondary">Grupo Muscular:</th>
-                            <td>@Model.GrupoMuscular?.GrupoMuscularNome</td>
-                        </tr>
-                    </table>
+                <div class="col-md-3 text-muted fw-bold">Grupo Muscular</div>
+                <div class="col-md-9 text-dark">
+                    @if (Model.GrupoMuscular != null)
+                    {
+                        @Model.GrupoMuscular.GrupoMuscularNome
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">Não atribuído</span>
+                    }
                 </div>
             </div>
         </div>

@@ -5,17 +5,34 @@
 }
 
 <div class="container mt-4">
-    <h2 class="mb-3 text-primary"><i class="fas fa-users-cog"></i> Gestão de Utilizadores</h2>
+
+    <h2 class="mb-3 text-primary">
+        <i class="fas fa-users-cog"></i> Gestão de Utilizadores
+    </h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
     <div class="card card-body bg-light mb-4 shadow-sm">
         <form asp-action="Index" method="get" class="row g-2 align-items-end">
             <div class="col-md-9">
-                <label for="searchEmail" class="form-label fw-bold">Pesquisar por Email</label>
-                <input id="searchEmail" name="searchEmail" value="@ViewBag.SearchEmail" class="form-control" placeholder="exemplo@email.com" />
+                <label class="form-label fw-bold">Pesquisar por Email</label>
+                <input name="searchEmail"
+                       value="@ViewBag.SearchEmail"
+                       class="form-control"
+                       placeholder="exemplo@email.com" />
             </div>
             <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filtrar</button>
-                <a asp-action="Index" class="btn btn-secondary w-100">Limpar</a>
+                <button class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary w-100">
+                    Limpar
+                </a>
             </div>
         </form>
     </div>
@@ -32,31 +49,46 @@
             <tbody>
                 @foreach (var user in Model.Items)
                 {
+                    bool isAdmin = user.Roles.Contains("Administrador");
+                    bool isLastAdmin = isAdmin && Model.Items.Count(u => u.Roles.Contains("Administrador")) == 1;
+
                     <tr>
                         <td class="fw-bold">@user.Email</td>
                         <td>
                             @foreach (var role in user.Roles)
                             {
-                                var cor = role == "Administrador" ? "danger" : role == "ProfissionalSaude" ? "success" : "info";
+                                var cor = role == "Administrador" ? "danger"
+                                : role == "ProfissionalSaude" ? "success"
+                                : "info";
 
-                                <span class="badge bg-@cor me-1">
-                                    @role
-                                </span>
+                                <span class="badge bg-@cor me-1">@role</span>
                             }
                         </td>
                         <td class="text-center">
+
                             <form asp-action="ChangeToAdmin" method="post" class="d-inline">
                                 <input type="hidden" name="userId" value="@user.UserId" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Admin</button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    Admin
+                                </button>
                             </form>
+
                             <form asp-action="ChangeToProfissional" method="post" class="d-inline">
                                 <input type="hidden" name="userId" value="@user.UserId" />
-                                <button type="submit" class="btn btn-sm btn-outline-success">Profissional</button>
+                                <button class="btn btn-sm btn-outline-success"
+                                        @(isLastAdmin ? "disabled" : "")>
+                                    Profissional
+                                </button>
                             </form>
+
                             <form asp-action="ChangeToClient" method="post" class="d-inline">
                                 <input type="hidden" name="userId" value="@user.UserId" />
-                                <button type="submit" class="btn btn-sm btn-outline-primary">Utente</button>
+                                <button class="btn btn-sm btn-outline-primary"
+                                        @(isLastAdmin ? "disabled" : "")>
+                                    Utente
+                                </button>
                             </form>
+
                         </td>
                     </tr>
                 }
@@ -66,20 +98,35 @@
 
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
+
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" asp-route-page="1" asp-route-searchEmail="@ViewBag.SearchEmail">Início</a>
+                <a class="page-link"
+                   asp-route-page="1"
+                   asp-route-searchEmail="@ViewBag.SearchEmail">
+                    Início
+                </a>
             </li>
 
             @for (int p = Model.FirstPageShow; p <= Model.LastPageShow; p++)
             {
                 <li class="page-item @(p == Model.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-route-page="@p" asp-route-searchEmail="@ViewBag.SearchEmail">@p</a>
+                    <a class="page-link"
+                       asp-route-page="@p"
+                       asp-route-searchEmail="@ViewBag.SearchEmail">
+                        @p
+                    </a>
                 </li>
             }
 
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-route-page="@Model.TotalPages" asp-route-searchEmail="@ViewBag.SearchEmail">Fim</a>
+                <a class="page-link"
+                   asp-route-page="@Model.TotalPages"
+                   asp-route-searchEmail="@ViewBag.SearchEmail">
+                    Fim
+                </a>
             </li>
+
         </ul>
     </nav>
+
 </div>

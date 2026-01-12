@@ -4,41 +4,76 @@
     ViewData["Title"] = "Editar Músculo";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-warning">@ViewData["Title"]</h2>
-
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="MusculoId" />
-
-        <div asp-validation-summary="All" class="text-danger small"></div>
-
-        <!-- Nome do Músculo -->
-        <div class="mb-3">
-            <label asp-for="Nome_Musculo" class="form-label">Nome do Músculo *</label>
-            <input asp-for="Nome_Musculo" class="form-control" />
-            <span asp-validation-for="Nome_Musculo" class="text-danger small"></span>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-warning text-dark">
+                <i class="bi bi-pencil-square me-2"></i>Editar Músculo
+            </h1>
         </div>
-
-        <!-- Grupo Muscular -->
-        <div class="mb-4">
-            <label asp-for="GrupoMuscularId" class="form-label">Grupo Muscular *</label>
-            <select asp-for="GrupoMuscularId" class="form-select" asp-items="ViewBag.GrupoMuscularId">
-                <option value="">-- Selecionar Grupo Muscular --</option>
-            </select>
-            <span asp-validation-for="GrupoMuscularId" class="text-danger small"></span>
-        </div>
-
-        <!-- Botões -->
-        <div class="mt-4">
-            <button type="submit" class="btn btn-warning">
-                <i class="fas fa-save"></i> Guardar Alterações
-            </button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">
-                <i class="fas fa-arrow-left"></i> Cancelar
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary shadow-sm">
+                <i class="bi bi-arrow-left"></i> Voltar
             </a>
         </div>
-    </form>
+    </div>
+
+    @if (ViewBag.MensagemErro != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            @ViewBag.MensagemErro
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="text-warning fw-bold mb-0">Detalhes do Músculo</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="MusculoId" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                        <!-- Nome do Músculo -->
+                        <div class="mb-3">
+                            <label asp-for="Nome_Musculo"
+                                   class="form-label fw-bold text-muted small text-uppercase">
+                                Nome do Músculo
+                            </label>
+                            <input asp-for="Nome_Musculo" class="form-control" />
+                            <span asp-validation-for="Nome_Musculo" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Grupo Muscular -->
+                        <div class="mb-4">
+                            <label asp-for="GrupoMuscularId"
+                                   class="form-label fw-bold text-muted small text-uppercase">
+                                Grupo Muscular
+                            </label>
+                            <select asp-for="GrupoMuscularId"
+                                    class="form-select"
+                                    asp-items="ViewBag.GrupoMuscularId">
+                                <option value="">-- Selecionar Grupo Muscular --</option>
+                            </select>
+                            <span asp-validation-for="GrupoMuscularId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning px-5 shadow-sm text-dark">
+                                <i class="bi bi-save me-2"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

@@ -1,0 +1,76 @@
+﻿@{
+    ViewData["Title"] = "Progresso Físico";
+
+    var datas = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Datas);
+    var pesos = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Pesos);
+    var massaMuscular = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.MassaMuscular);
+    var gordura = Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Gordura);
+}
+
+<h2 class="mb-4">
+    📊 Progresso Físico<br />
+    <small class="text-muted">@ViewBag.NomeUtente</small>
+</h2>
+
+<div class="mb-5">
+    <h4>Evolução do Peso</h4>
+    <canvas id="pesoChart"></canvas>
+</div>
+
+<div class="mb-5">
+    <h4>Evolução da Massa Muscular</h4>
+    <canvas id="massaChart"></canvas>
+</div>
+
+<div class="mb-5">
+    <h4>Evolução da Gordura Corporal</h4>
+    <canvas id="gorduraChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @Html.Raw(datas);
+
+    // PESO
+    new Chart(document.getElementById('pesoChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Peso (kg)',
+                data: @Html.Raw(pesos),
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
+
+    // MASSA MUSCULAR
+    new Chart(document.getElementById('massaChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Massa Muscular (%)',
+                data: @Html.Raw(massaMuscular),
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
+
+    // GORDURA CORPORAL
+    new Chart(document.getElementById('gorduraChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Gordura Corporal (%)',
+                data: @Html.Raw(gordura),
+                borderWidth: 2,
+                tension: 0.3
+            }]
+        }
+    });
+</script>

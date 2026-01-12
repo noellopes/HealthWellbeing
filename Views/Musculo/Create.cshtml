@@ -4,47 +4,75 @@
     ViewData["Title"] = "Criar Músculo";
 }
 
-<div class="container mt-4">
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-success">
+                <i class="bi bi-plus-circle me-2"></i>Criar Músculo
+            </h1>
+        </div>
+        <div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
 
     @if (ViewBag.MensagemErro != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
             @ViewBag.MensagemErro
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
         </div>
     }
 
-    <h2 class="mb-4 text-success"><i class="fas fa-plus-circle"></i> @ViewData["Title"]</h2>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 ps-4">
+                    <h5 class="text-success fw-bold mb-0">Detalhes do Músculo</h5>
+                </div>
 
-    <form asp-action="Create" method="post">
-        @Html.AntiForgeryToken()
-        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
 
-        <!-- Nome do Músculo -->
-        <div class="mb-3">
-            <label asp-for="Nome_Musculo" class="form-label">Nome do Músculo *</label>
-            <input asp-for="Nome_Musculo" class="form-control" />
-            <span asp-validation-for="Nome_Musculo" class="text-danger small"></span>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+                        <!-- Nome do Músculo -->
+                        <div class="mb-3">
+                            <label asp-for="Nome_Musculo"
+                                   class="form-label fw-bold text-muted small text-uppercase">
+                                Nome do Músculo
+                            </label>
+                            <input asp-for="Nome_Musculo" class="form-control" />
+                            <span asp-validation-for="Nome_Musculo" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Grupo Muscular -->
+                        <div class="mb-4">
+                            <label asp-for="GrupoMuscularId"
+                                   class="form-label fw-bold text-muted small text-uppercase">
+                                Grupo Muscular
+                            </label>
+                            <select asp-for="GrupoMuscularId"
+                                    class="form-select"
+                                    asp-items="ViewBag.GrupoMuscularId">
+                                <option value="">-- Selecionar Grupo Muscular --</option>
+                            </select>
+                            <span asp-validation-for="GrupoMuscularId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success px-5 shadow-sm">
+                                <i class="bi bi-check-lg me-2"></i>Criar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <!-- Grupo Muscular -->
-        <div class="mb-3">
-            <label asp-for="GrupoMuscularId" class="form-label">Grupo Muscular *</label>
-            <select asp-for="GrupoMuscularId" class="form-select" asp-items="ViewBag.GrupoMuscularId">
-                <option value="">-- Selecionar Grupo Muscular --</option>
-            </select>
-            <span asp-validation-for="GrupoMuscularId" class="text-danger small"></span>
-        </div>
-
-        <!-- Botões -->
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success">
-                <i class="fas fa-save"></i> Criar Músculo
-            </button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">
-                <i class="fas fa-arrow-left"></i> Voltar à Lista
-            </a>
-        </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

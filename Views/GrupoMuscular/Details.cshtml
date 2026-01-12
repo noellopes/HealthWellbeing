@@ -4,30 +4,50 @@
     ViewData["Title"] = "Detalhes do Grupo Muscular";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-primary"><i class="fas fa-dumbbell"></i> @ViewData["Title"]</h2>
-
-    <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white fw-bold">
-            @Model.GrupoMuscularNome
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-primary">
+                <i class="bi bi-dumbbell me-2"></i>Detalhes
+            </h1>
         </div>
-        <div class="card-body">
-            <dl class="row mb-0">
-                <dt class="col-sm-3">Nome do Grupo</dt>
-                <dd class="col-sm-9">@Model.GrupoMuscularNome</dd>
-
-                <dt class="col-sm-3">Localização Corporal</dt>
-                <dd class="col-sm-9">@Model.LocalizacaoCorporal</dd>
-            </dl>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit"
+               asp-route-id="@Model?.GrupoMuscularId"
+               class="btn btn-warning shadow-sm text-dark">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
         </div>
     </div>
 
-    <div class="d-flex">
-        <a asp-action="Edit" asp-route-id="@Model.GrupoMuscularId" class="btn btn-warning me-2">
-            <i class="fas fa-edit"></i> Editar
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Voltar à Lista
-        </a>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom pt-4 ps-4 pb-3">
+            <h5 class="mb-0 fw-bold text-dark">
+                Informação do Grupo Muscular
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row mb-3 border-bottom pb-3">
+                <div class="col-md-3 text-muted fw-bold">
+                    @Html.DisplayNameFor(model => model.GrupoMuscularNome)
+                </div>
+                <div class="col-md-9 text-dark">
+                    @Html.DisplayFor(model => model.GrupoMuscularNome)
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 text-muted fw-bold">
+                    @Html.DisplayNameFor(model => model.LocalizacaoCorporal)
+                </div>
+                <div class="col-md-9 text-dark">
+                    @Html.DisplayFor(model => model.LocalizacaoCorporal)
+                </div>
+            </div>
+        </div>
     </div>
 </div>
