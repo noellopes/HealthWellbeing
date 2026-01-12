@@ -225,7 +225,10 @@ namespace HealthWellbeing.Controllers
                 TempData["SuccessMessage"] = "Consumos registados com sucesso!";
             }
 
-            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "TreatmentRecords", new { id = treatmentRecordId });
+
+
         }
 
         // ==========================================
