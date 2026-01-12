@@ -23,6 +23,15 @@ namespace HealthWellbeing.Services
                 .ToList();
         }
 
+        public List<UtenteBalneario> GetRecentes(int quantidade)
+        {
+            return _context.Utentes
+                .OrderByDescending(u => u.DataInscricao)
+                .Take(quantidade)
+                .ToList();
+        }
+
+
         public UtenteBalneario? GetById(int id)
         {
             return _context.Utentes

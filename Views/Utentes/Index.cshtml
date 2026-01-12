@@ -77,13 +77,16 @@
                     <a asp-action="Edit" asp-route-id="@item.UtenteBalnearioId"
                        class="btn btn-warning btn-sm">Editar</a>
 
-                    @if (User.IsInRole("Admin"))
+                    @if (User.Identity.IsAuthenticated)
                     {
-                        <a asp-action="Delete" asp-route-id="@item.UtenteBalnearioId"
-                           class="btn btn-danger btn-sm">
+                        <a asp-action="Delete"
+                           asp-route-id="@item.UtenteBalnearioId"
+                           class="btn btn-danger"
+                           onclick="return confirm('Tem a certeza que deseja apagar?');">
                             Apagar
                         </a>
                     }
+
                 </td>
             </tr>
         }

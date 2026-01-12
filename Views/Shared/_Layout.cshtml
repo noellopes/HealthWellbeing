@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -31,60 +35,94 @@
                     <ul class="navbar-nav flex-grow-1">
 
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-controller="Home" asp-action="Index">
+                            <a class="nav-link text-white"
+                               asp-controller="Home"
+                               asp-action="Index">
                                 Home
                             </a>
                         </li>
 
                         @if (User.Identity?.IsAuthenticated ?? false)
                         {
+                            <!-- DASHBOARD PRINCIPAL (UTENTES) -->
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Dashboard" asp-action="Index">
+                                <a class="nav-link text-white @(controller == "Utentes" ? "active" : "")"
+                                   asp-controller="Utentes"
+                                   asp-action="Dashboard">
                                     Dashboard
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Servico" asp-action="Index">
+                                <a class="nav-link text-white"
+                                   asp-controller="Servico"
+                                   asp-action="Index">
                                     Serviços
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="TipoServico" asp-action="Index">
+                                <a class="nav-link text-white"
+                                   asp-controller="TipoServico"
+                                   asp-action="Index">
                                     Tipo de Serviços
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Agendamento" asp-action="Index">
+                                <a class="nav-link text-white"
+                                   asp-controller="Agendamento"
+                                   asp-action="Index">
                                     Agendamentos
                                 </a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Terapeuta" asp-action="Index">
+                                <a class="nav-link text-white"
+                                   asp-controller="Terapeuta"
+                                   asp-action="Index">
                                     Terapeutas
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="Utentes" asp-action="Index">
+                            <!-- UTENTES -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white @(controller == "Utentes" ? "active" : "")"
+                                   data-bs-toggle="dropdown">
                                     Utentes
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Utentes"
+                                           asp-action="Dashboard">
+                                            Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Utentes"
+                                           asp-action="Index">
+                                            Lista de Utentes
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-controller="ClienteBalneario" asp-action="Index">
+                                <a class="nav-link text-white"
+                                   asp-controller="ClienteBalneario"
+                                   asp-action="Index">
                                     Cliente Balneário
                                 </a>
                             </li>
 
-                            @* LINKS APENAS PARA ADMIN *@
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-warning" asp-controller="Admin" asp-action="Index">
+                                    <a class="nav-link text-warning"
+                                       asp-controller="Admin"
+                                       asp-action="Index">
                                         Administração
                                     </a>
                                 </li>

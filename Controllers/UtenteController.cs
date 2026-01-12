@@ -17,7 +17,6 @@ public class UtentesController : Controller
     public IActionResult Index(int page = 1, string? search = null, bool? ativo = null)
     {
         int pageSize = 10;
-
         int total = _utenteService.Count(search, ativo);
 
         var vm = new Paginacao<UtenteBalneario>(page, total)
@@ -31,13 +30,33 @@ public class UtentesController : Controller
         return View(vm);
     }
 
+    // ✅ DASHBOARD NO SÍTIO CERTO (UTENTES)
+    public IActionResult Dashboard()
+    {
+        var vm = new UtentesDashboardViewModel
+        {
+            TotalUtentes = _utenteService.Count(null, null),
+            UtentesAtivos = _utenteService.Count(null, true),
+            UtentesInativos = _utenteService.Count(null, false),
 
+            //
+            /*
+            TotalTerapeutas = _utenteService.TotalTerapeutas(),
+            TotalServicos = _utenteService.TotalServicos(),
+            TotalAgendamentos = _utenteService.TotalAgendamentos(),
+            */
+
+            // Últimos utentes ()
+            Utentes = _utenteService.GetRecentes(5)
+        };
+
+        return View(vm);
+    }
 
     public IActionResult Create()
     {
         return View(new UtenteBalneario());
     }
-
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -65,11 +84,8 @@ public class UtentesController : Controller
         _utenteService.Add(utente);
 
         TempData["Success"] = "Cliente criado com sucesso.";
-
         return RedirectToAction(nameof(Index));
     }
-
-
 
     public IActionResult Edit(int id)
     {
@@ -91,7 +107,6 @@ public class UtentesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-
     public IActionResult Details(int id)
     {
         var utente = _utenteService.GetById(id);
@@ -101,8 +116,6 @@ public class UtentesController : Controller
         return View(utente);
     }
 
-
-    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         var utente = _utenteService.GetById(id);
@@ -113,16 +126,12 @@ public class UtentesController : Controller
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     [ActionName("Delete")]
-    public IActionResult DeleteConfirmed(int utenteBalnearioId)
+    public IActionResult DeleteConfirmed(int id)
     {
-        _utenteService.Delete(utenteBalnearioId);
+        _utenteService.Delete(id);
         TempData["Success"] = "Cliente eliminado com sucesso.";
         return RedirectToAction(nameof(Index));
     }
-
-
-
 }
