@@ -69,8 +69,12 @@ namespace HealthWellbeing.Controllers
         // GET: Servico/Create
         public IActionResult Create()
         {
-            // Alterado para TipoServicoId (singular) para bater com a View
-            ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome");
+            // Buscamos os tipos de serviço do banco e ordenamos pelo nome de A-Z
+            var tiposOrdenados = _context.TipoServicos.OrderBy(t => t.Nome).ToList();
+
+            // Passamos a lista já ordenada para a SelectList
+            ViewBag.TipoServicosId = new SelectList(tiposOrdenados, "TipoServicosId", "Nome");
+
             return View();
         }
 
@@ -181,15 +185,27 @@ namespace HealthWellbeing.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var servico = await _context.Servicos.FindAsync(id);
-            if (servico != null)
-            {
-                _context.Servicos.Remove(servico);
-                await _context.SaveChangesAsync();
+            bool temAgendamentos = await _context.Agendamentos
+                .AnyAsync(a => a.ServicoId == id);
 
-                TempData["SuccessMessage"] = "Serviço eliminado com sucesso!";
+            if (temAgendamentos)
+            {
+                TempData["ErrorMessage"] =
+                    "Não é possível eliminar este serviço porque existem agendamentos associados.";
+                return RedirectToAction(nameof(Index));
             }
 
+            var servico = await _context.Servicos.FindAsync(id);
+
+            if (servico == null)
+            {
+                return NotFound();
+            }
+
+            _context.Servicos.Remove(servico);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Serviço eliminado com sucesso!";
             return RedirectToAction(nameof(Index));
         }
 

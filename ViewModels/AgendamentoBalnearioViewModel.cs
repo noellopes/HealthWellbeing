@@ -8,5 +8,6 @@ namespace HealthWellbeing.ViewModel
         public IEnumerable<AgendamentoBalneario> ListaAgendamentos { get; set; }
         public Paginacao paginacao { get; set; }
         public string PesquisarNomeUtente { get; set; }
+        
     }
 }

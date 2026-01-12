@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260111040025_AddUtenteBalneario")]
-    partial class AddUtenteBalneario
+    [Migration("20260112044121_AdicionarEspecialidadesETerapeutasAtivos")]
+    partial class AdicionarEspecialidadesETerapeutasAtivos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -131,18 +131,23 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ServicoId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("TerapeutaId")
                         .HasColumnType("int");
 
                     b.Property<int>("TipoServicosId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UtenteBalnearioId")
+                    b.Property<int?>("UtenteBalnearioId")
                         .HasColumnType("int");
 
                     b.HasKey("AgendamentoId");
 
                     b.HasIndex("ServicoId");
+
+                    b.HasIndex("ServicoId1");
 
                     b.HasIndex("TerapeutaId");
 
@@ -970,7 +975,12 @@ namespace HealthWellbeing.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int?>("TerapeutaId")
+                        .HasColumnType("int");
+
                     b.HasKey("TipoServicosId");
+
+                    b.HasIndex("TerapeutaId");
 
                     b.ToTable("TipoServicos");
                 });
@@ -1139,7 +1149,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("SeguroSaudeId");
 
-                    b.ToTable("UtenteBalnearios");
+                    b.ToTable("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
@@ -1267,6 +1277,10 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeing.Models.Servico", null)
+                        .WithMany("Agendamentos")
+                        .HasForeignKey("ServicoId1");
+
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
                         .HasForeignKey("TerapeutaId")
@@ -1279,11 +1293,9 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
+                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "Utentes")
                         .WithMany()
-                        .HasForeignKey("UtenteBalnearioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UtenteBalnearioId");
 
                     b.Navigation("Servico");
 
@@ -1291,7 +1303,7 @@ namespace HealthWellbeing.Migrations
 
                     b.Navigation("TipoServico");
 
-                    b.Navigation("UtenteBalneario");
+                    b.Navigation("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
@@ -1369,12 +1381,19 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
-                        .WithMany()
+                        .WithMany("Servicos")
                         .HasForeignKey("TipoServicosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("TipoServico");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServicos", b =>
+                {
+                    b.HasOne("HealthWellbeing.Models.Terapeuta", null)
+                        .WithMany("Especialidades")
+                        .HasForeignKey("TerapeutaId");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Training", b =>
@@ -1450,6 +1469,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Musculos");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
+                {
+                    b.Navigation("Agendamentos");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
                 {
                     b.Navigation("Consultas");
@@ -1458,6 +1482,13 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Terapeuta", b =>
                 {
                     b.Navigation("Agendamentos");
+
+                    b.Navigation("Especialidades");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServicos", b =>
+                {
+                    b.Navigation("Servicos");
                 });
 #pragma warning restore 612, 618
         }

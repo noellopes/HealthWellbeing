@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260107055547_UpdateServicoTipoServicosFK")]
-    partial class UpdateServicoTipoServicosFK
+    [Migration("20260112124402_SincronizacaoHealthWellbeing")]
+    partial class SincronizacaoHealthWellbeing
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,7 +113,6 @@ namespace HealthWellbeing.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AgendamentoId"));
 
                     b.Property<string>("Descricao")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -132,10 +131,13 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("ServicoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TerapeutaId")
+                    b.Property<int?>("ServicoId1")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoServicoId")
+                    b.Property<int>("TerapeutaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TipoServicosId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UtenteBalnearioId")
@@ -145,13 +147,15 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("ServicoId");
 
+                    b.HasIndex("ServicoId1");
+
                     b.HasIndex("TerapeutaId");
 
-                    b.HasIndex("TipoServicoId");
+                    b.HasIndex("TipoServicosId");
 
                     b.HasIndex("UtenteBalnearioId");
 
-                    b.ToTable("Agendamento");
+                    b.ToTable("Agendamentos");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
@@ -856,10 +860,7 @@ namespace HealthWellbeing.Migrations
                     b.Property<decimal>("Preco")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("TipoServicoId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TipoServicosId")
+                    b.Property<int>("TipoServicosId")
                         .HasColumnType("int");
 
                     b.HasKey("ServicoId");
@@ -1143,7 +1144,7 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("SeguroSaudeId");
 
-                    b.ToTable("UtenteBalneario");
+                    b.ToTable("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.UtenteSaude", b =>
@@ -1271,17 +1272,23 @@ namespace HealthWellbeing.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("HealthWellbeing.Models.Servico", null)
+                        .WithMany("Agendamentos")
+                        .HasForeignKey("ServicoId1");
+
                     b.HasOne("HealthWellbeing.Models.Terapeuta", "Terapeuta")
                         .WithMany("Agendamentos")
-                        .HasForeignKey("TerapeutaId");
+                        .HasForeignKey("TerapeutaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
                         .WithMany()
-                        .HasForeignKey("TipoServicoId")
+                        .HasForeignKey("TipoServicosId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "UtenteBalneario")
+                    b.HasOne("HealthWellbeing.Models.UtenteBalneario", "Utentes")
                         .WithMany()
                         .HasForeignKey("UtenteBalnearioId");
 
@@ -1291,7 +1298,7 @@ namespace HealthWellbeing.Migrations
 
                     b.Navigation("TipoServico");
 
-                    b.Navigation("UtenteBalneario");
+                    b.Navigation("Utentes");
                 });
 
             modelBuilder.Entity("HealthWellbeing.Models.Alergia", b =>
@@ -1369,8 +1376,10 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.TipoServicos", "TipoServico")
-                        .WithMany()
-                        .HasForeignKey("TipoServicosId");
+                        .WithMany("Servicos")
+                        .HasForeignKey("TipoServicosId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TipoServico");
                 });
@@ -1448,6 +1457,11 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Musculos");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.Models.Servico", b =>
+                {
+                    b.Navigation("Agendamentos");
+                });
+
             modelBuilder.Entity("HealthWellbeing.Models.Specialities", b =>
                 {
                     b.Navigation("Consultas");
@@ -1456,6 +1470,11 @@ namespace HealthWellbeing.Migrations
             modelBuilder.Entity("HealthWellbeing.Models.Terapeuta", b =>
                 {
                     b.Navigation("Agendamentos");
+                });
+
+            modelBuilder.Entity("HealthWellbeing.Models.TipoServicos", b =>
+                {
+                    b.Navigation("Servicos");
                 });
 #pragma warning restore 612, 618
         }
