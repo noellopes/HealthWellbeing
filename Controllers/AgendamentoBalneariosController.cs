@@ -93,11 +93,7 @@ namespace HealthWellbeing.Controllers
             ViewBag.TerapeutaId =
                 new SelectList(_context.Terapeuta, "TerapeutaId", "Email");
 
-            ViewBag.ServicoId =
-                new SelectList(_context.Servicos, "ServicoId", "Nome");
-
             ViewBag.TipoServicosId = new SelectList(_context.TipoServicos, "TipoServicosId", "Nome", null);
-
             return View();
         }
 

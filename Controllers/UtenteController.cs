@@ -37,8 +37,6 @@ namespace HealthWellbeing.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-
         public IActionResult Edit(int id)
         {
             var utente = UtenteService.GetById(id);
