@@ -115,7 +115,7 @@ namespace HealthWellbeing.Controllers
         // GERIR UTENTES (DiretorClinico)
         // ================================
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         /*  public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "")
           {
               if (page < 1) page = 1;
@@ -182,7 +182,7 @@ namespace HealthWellbeing.Controllers
             return View(info);
         }*/
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Index(int page = 1, string searchNome = "", string searchNif = "", bool onlyUtentes = false)
         {
             if (page < 1) page = 1;
@@ -226,7 +226,7 @@ namespace HealthWellbeing.Controllers
         // Se for Rececionista, guarda o utente selecionado em Session
         // ================================
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico,Rececionista")]
+        [Authorize(Roles = "DiretorClinico,Rececionista,Medico")]
         public async Task<IActionResult> Details(int id)
         {
             var u = await _db.UtenteSaude
@@ -257,7 +257,7 @@ namespace HealthWellbeing.Controllers
         // CREATE (DiretorClinico)
         // ================================
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         /*
         public IActionResult Create()
         {
@@ -271,7 +271,7 @@ namespace HealthWellbeing.Controllers
             return View(vm);
         }*/
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Create(int? clientId)
         {
             LoadClientsJsonAvailable();
@@ -309,7 +309,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Create(UtenteSaudeFormVM vm)
         {
             vm.IsEdit = false;
@@ -402,7 +402,7 @@ namespace HealthWellbeing.Controllers
         // EDIT (DiretorClinico)
         // ================================
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Edit(int id)
         {
             var u = await _db.UtenteSaude
@@ -433,7 +433,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Edit(int id, UtenteSaudeFormVM vm)
         {
             vm.IsEdit = true;
@@ -484,7 +484,7 @@ namespace HealthWellbeing.Controllers
         // ================================
       
         [HttpGet]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> Delete(int id)
         {
             var u = await _db.UtenteSaude
@@ -503,7 +503,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "DiretorClinico")]
+        [Authorize(Roles = "DiretorClinico,Medico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var u = await _db.UtenteSaude
@@ -543,7 +543,7 @@ namespace HealthWellbeing.Controllers
             if (User.IsInRole("Administrador"))
                 return RedirectToAction("Index", "Admin");
 
-            if (User.IsInRole("DiretorClinico"))
+            if (User.IsInRole("DiretorClinico,Medico"))
                 return RedirectToAction(nameof(Index), "UtenteSaude");
 
             if (User.IsInRole("Rececionista"))
