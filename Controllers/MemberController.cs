@@ -89,7 +89,7 @@ namespace HealthWellbeing.Controllers
         [Authorize(Roles = "Administrator,Trainer")]
         public IActionResult Create(int? clientId)
         {
-            var clients = _context.Client.Where(c => c.Membership == null).OrderBy(c => c.Name).ToList();
+            var clients = _context.Client.Where(c => c.Member == null).OrderBy(c => c.Name).ToList();
             var plans = _context.Plan.OrderBy(p => p.Price).ToList();
 
             ViewData["ClientId"] = new SelectList(clients, "ClientId", "Name", clientId);
@@ -136,7 +136,7 @@ namespace HealthWellbeing.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewData["ClientId"] = new SelectList(_context.Client.Where(c => c.Membership == null), "ClientId", "Name", ClientId);
+            ViewData["ClientId"] = new SelectList(_context.Client.Where(c => c.Member == null), "ClientId", "Name", ClientId);
             ViewData["PlanId"] = new SelectList(_context.Plan, "PlanId", "Name", PlanId);
             return View();
         }

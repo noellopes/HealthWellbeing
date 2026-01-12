@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace HealthWellbeing.Migrations.ApplicationDb
+namespace HealthWellbeing.Migrations
 {
     /// <inheritdoc />
-    public partial class migAp12jan : Migration
+    public partial class corretions : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -42,8 +42,8 @@ namespace HealthWellbeing.Models
         [DataType(DataType.Date)]
         [Display(Name = "Registration Date")]
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
+        public virtual Member? Member { get; set; }
 
-        public Member? Membership { get; set; }
         public string? IdentityUserId { get; set; }
     }
 }

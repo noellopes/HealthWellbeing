@@ -1,0 +1,78 @@
+﻿@model HealthWellbeing.Models.Client
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-badge me-2"></i>My Personal Profile</h5>
+                    @if (Model.Member != null)
+                    {
+                        <span class="badge bg-light text-primary fw-bold">ACTIVE MEMBER</span>
+                    }
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+                        <div class="display-1 text-primary"><i class="bi bi-person-circle"></i></div>
+                        <h2 class="fw-bold">@Model.Name</h2>
+                        <p class="text-muted">Registered since @Model.RegistrationDate.ToString("MMMM yyyy")</p>
+                    </div>
+
+                    <hr />
+
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Email Address</label>
+                            <p class="fs-5">@Model.Email</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Phone Number</label>
+                            <p class="fs-5">@Model.Phone</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Birth Date</label>
+                            <p class="fs-5">@Model.BirthDate.ToShortDateString()</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Gender</label>
+                            <p class="fs-5">@Model.Gender</p>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-muted small text-uppercase fw-bold">Address</label>
+                            <p class="fs-5">@Model.Address</p>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.Member != null)
+            {
+                <div class="card shadow border-0 mt-4 border-start border-success border-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 text-success fs-1 me-3">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="fw-bold mb-1">Gym Access Is Active</h5>
+                                <p class="text-muted mb-0">You have full access to training sessions and physical assessments.</p>
+                            </div>
+                            <a asp-controller="PhysicalAssessment" asp-action="MyEvolution" class="btn btn-success">
+                                View Progress
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

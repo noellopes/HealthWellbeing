@@ -23,13 +23,11 @@ namespace HealthWellbeing.Controllers
             _userManager = userManager;
         }
 
-        // =============================================================
-        // GET: Sessions (A Minha Agenda)
-        // =============================================================
+        // GET: Sessions (Minha Agenda)
         public async Task<IActionResult> Index()
         {
             var member = await GetCurrentMemberAsync();
-            if (member == null) return RedirectToAction("Register", "Account");
+            if (member == null) return RedirectToAction("Index", "Home");
 
             var sessions = _context.Session
                 .Include(s => s.Training)
@@ -39,10 +37,7 @@ namespace HealthWellbeing.Controllers
             return View(await sessions.ToListAsync());
         }
 
-        // =============================================================
-        // PASSO 1 & 2: Confirmar Agendamento
-        // GET: Sessions/Create?trainingId=5
-        // =============================================================
+        // GET: Sessions/Book/5 (ID do Treino)
         public async Task<IActionResult> Create(int? trainingId)
         {
             if (trainingId == null) return NotFound();
@@ -54,8 +49,11 @@ namespace HealthWellbeing.Controllers
 
             if (training == null) return NotFound();
 
-            // Sugere a próxima data válida para este treino
-            DateTime nextDate = GetNextWeekday(DateTime.Today, training.DayOfWeek);
+            // CORREÇÃO 1: Conversão do Enum WeekDay para System.DayOfWeek
+            DayOfWeek targetDay = (DayOfWeek)training.DayOfWeek;
+
+            // Calcula a próxima data válida
+            DateTime nextDate = GetNextWeekday(DateTime.Today, targetDay);
 
             ViewBag.SuggestedDate = nextDate.ToString("yyyy-MM-dd");
             ViewBag.DayName = training.DayOfWeek.ToString();
@@ -63,10 +61,7 @@ namespace HealthWellbeing.Controllers
             return View(training);
         }
 
-        // =============================================================
-        // PASSO 3, 4 & 5: Verificar e Gravar
         // POST: Sessions/Create
-        // =============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int TrainingId, DateTime SessionDate)
@@ -74,73 +69,50 @@ namespace HealthWellbeing.Controllers
             var member = await GetCurrentMemberAsync();
             if (member == null) return Forbid();
 
+            // Precisamos do TrainingType para ver o MaxParticipants
             var training = await _context.Training
                 .Include(t => t.TrainingType)
                 .FirstOrDefaultAsync(t => t.TrainingId == TrainingId);
 
             if (training == null) return NotFound();
 
-            // 1. Verificação de Ocupação (Lotação)
-            int currentParticipants = await _context.Session
-                .CountAsync(s => s.TrainingId == TrainingId && s.SessionDate.Date == SessionDate.Date);
-
-            // 2. Verifica se já está inscrito
+            // 1. VERIFICAR SE JÁ ESTÁ INSCRITO
             bool alreadyBooked = await _context.Session
                 .AnyAsync(s => s.TrainingId == TrainingId && s.SessionDate.Date == SessionDate.Date && s.MemberId == member.MemberId);
 
             if (alreadyBooked)
             {
-                TempData["Error"] = "Já está inscrito nesta sessão.";
+                TempData["Error"] = "You are already booked for this session.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // 3. Decisão: Lotação Esgotada
+            // 2. VERIFICAR CAPACIDADE (CORREÇÃO AQUI)
+            // Conta quantas pessoas vão a esta aula neste dia
+            int currentParticipants = await _context.Session
+                .CountAsync(s => s.TrainingId == TrainingId && s.SessionDate.Date == SessionDate.Date);
+
+            // CORREÇÃO: Acessa MaxParticipants através de TrainingType
             if (currentParticipants >= training.TrainingType.MaxParticipants)
             {
-                // Procura alternativas do mesmo tipo
-                var alternatives = await _context.Training
-                    .Where(t => t.TrainingTypeId == training.TrainingTypeId && t.TrainingId != training.TrainingId)
-                    .ToListAsync();
-
-                ViewBag.ErrorMessage = "Lotação Esgotada!";
-                ViewBag.Alternatives = alternatives;
-
-                return View("FullCapacity", training);
+                TempData["Error"] = $"Class is full! Max capacity is {training.TrainingType.MaxParticipants}.";
+                return RedirectToAction("Index", "Training");
             }
 
-            // 4. Decisão: Disponível (Gravar)
+            // 3. CRIAR AGENDAMENTO
             var session = new Session
             {
                 TrainingId = TrainingId,
                 MemberId = member.MemberId,
-                SessionDate = SessionDate.Date + training.StartTime, // Junta Data e Hora
+                SessionDate = SessionDate,
                 Rating = null
             };
 
             _context.Add(session);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Sessão agendada com sucesso!";
+            TempData["Success"] = "Session booked successfully!";
             return RedirectToAction(nameof(Index));
         }
-
-        // =============================================================
-        // CANCELAR SESSÃO
-        // =============================================================
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var session = await _context.Session.FindAsync(id);
-            if (session != null)
-            {
-                _context.Session.Remove(session);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        // --- Helpers ---
 
         private async Task<Member?> GetCurrentMemberAsync()
         {

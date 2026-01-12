@@ -9,22 +9,22 @@ namespace HealthWellbeing.Models
         [Key]
         public int SessionId { get; set; }
 
-        // RELAÇÃO COM O TREINO (Qual é a aula?)
-        [ForeignKey("Training")]
-        public int TrainingId { get; set; }
-        public Training Training { get; set; }
-
-        // RELAÇÃO COM O MEMBRO (Quem vai?)
         [ForeignKey("Member")]
         public int MemberId { get; set; }
         public Member Member { get; set; }
 
-        // DADOS DO AGENDAMENTO
+        [ForeignKey("Training")]
+        public int TrainingId { get; set; }
+        public Training Training { get; set; }
+
         [Required]
         [Display(Name = "Session Date")]
         public DateTime SessionDate { get; set; }
 
-        // RATING (Avaliação posterior, opcional para já)
+        // Adicionado para bater certo com o Diagrama de Classes e as Views
+        [Display(Name = "Feedback")]
+        public string? MemberFeedback { get; set; }
+
         [Range(1, 5)]
         public int? Rating { get; set; }
     }

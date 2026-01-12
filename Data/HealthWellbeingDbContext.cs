@@ -26,11 +26,11 @@ namespace HealthWellbeing.Data
         public DbSet<Exercise> Exercise { get; set; } = default!;
         public DbSet<TrainingExercise> TrainingExercise { get; set; } = default!;
         public DbSet<PhysicalAssessment> PhysicalAssessment { get; set; } = default!;
+        public DbSet<Session> Session { get; set; } = default!;
 
         // Tabelas Intermédias e Auxiliares
         public DbSet<MemberPlan> MemberPlan { get; set; } = default!;
         public DbSet<TrainingPlan> TrainingPlan { get; set; } = default!;
-        public DbSet<Session> Session { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
