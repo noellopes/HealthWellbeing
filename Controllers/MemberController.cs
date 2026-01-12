@@ -69,6 +69,7 @@ namespace HealthWellbeing.Controllers
                 .Include(m => m.Client)
                 .Include(m => m.MemberPlans)
                     .ThenInclude(mp => mp.Plan)
+                .Include(m => m.PhysicalAssessments.OrderByDescending(a => a.AssessmentDate))
                 .FirstOrDefaultAsync(m => m.MemberId == id);
 
             if (member == null) return NotFound();

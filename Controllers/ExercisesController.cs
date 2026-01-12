@@ -24,11 +24,12 @@ namespace HealthWellbeing.Controllers
         // GET: Exercises/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var exercise = await _context.Exercise.FirstOrDefaultAsync(m => m.ExerciseId == id);
-            if (exercise == null) return NotFound();
-
             return View(exercise);
         }
 
@@ -38,6 +39,9 @@ namespace HealthWellbeing.Controllers
             return View();
         }
 
+        // POST: Exercises/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ExerciseId,Name,Description,MuscleGroup,Equipment")] Exercise exercise)
@@ -60,11 +64,17 @@ namespace HealthWellbeing.Controllers
             return View(exercise);
         }
 
+        // POST: Exercises/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ExerciseId,Name,Description,MuscleGroup,Equipment")] Exercise exercise)
         {
-            if (id != exercise.ExerciseId) return NotFound();
+            if (id != exercise.ExerciseId)
+            {
+                return NotFound();
+            }
 
             if (ModelState.IsValid)
             {
@@ -92,6 +102,7 @@ namespace HealthWellbeing.Controllers
             return View(exercise);
         }
 
+        // POST: Exercises/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

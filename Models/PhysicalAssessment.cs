@@ -46,6 +46,16 @@ namespace HealthWellbeing.Models
 
         // Campo calculado para o IMC
         [Display(Name = "BMI")]
-        public decimal BMI => (Height > 0) ? Weight / (Height * Height) : 0;
+        public decimal BMI
+        {
+            get
+            {
+                if (Height > 0)
+                {
+                    return Weight / (Height * Height);
+                }
+                return 0;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HealthWellbeing.Data;
 using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -109,6 +110,7 @@ namespace HealthWellbeing.Controllers
                 TempData["Success"] = "Assessment created successfully!";
                 return RedirectToAction(nameof(Index));
             }
+            // Repreenche as listas se houver erro
             ViewData["MemberId"] = new SelectList(_context.Member.Include(m => m.Client), "MemberId", "Client.Name", physicalAssessment.MemberId);
             ViewData["TrainerId"] = new SelectList(_context.Trainer, "TrainerId", "Name", physicalAssessment.TrainerId);
             return View(physicalAssessment);
