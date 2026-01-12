@@ -1,0 +1,130 @@
+﻿@model IEnumerable<HealthWellbeing.ViewModels.RegistoMateriais>
+
+@{
+    ViewData["Title"] = "Consumo de Materiais";
+    int currentPage = ViewBag.CurrentPage;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-secondary"><i class="bi bi-box-seam me-2"></i>Registo de Materiais</h1>
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Novo Registo
+        </a>
+    </div>
+
+    @* --- BARRA DE PESQUISA --- *@
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="searchString" class="form-control border-start-0 ps-0"
+                           placeholder="Pesquisar por nome do material..." value="@ViewBag.CurrentFilter" />
+                    <button type="submit" class="btn btn-primary">Pesquisar</button>
+                    @if (!string.IsNullOrEmpty(ViewBag.CurrentFilter))
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">Limpar</a>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Material</th>
+                        <th>Tamanho</th>
+                        <th class="text-center">Qtd</th>
+                        <th>Estado Material</th>
+                        <th>Data do Exame</th>
+                        <th class="text-end pe-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                <i class="bi bi-info-circle me-2"></i>Nenhum registo encontrado.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold">@item.Nome</td>
+                            <td>@(item.Tamanho ?? "N/A")</td>
+                            <td class="text-center"><span class="badge bg-secondary">@item.Quantidade</span></td>
+                            <td>
+                                @{
+                                    var matBadge = item.MaterialStatusId switch
+                                    {
+                                        9 => "badge bg-primary",
+                                        13 => "badge bg-success",
+                                        14 => "badge bg-danger",
+                                        _ => "badge bg-secondary"
+                                    };
+                                }
+                                <span class="@matBadge">@item.Estado?.Nome</span>
+                            </td>
+                            <td>
+                                <div class="small fw-bold text-dark">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    @item.Exame?.DataHoraMarcacao.ToString("dd/MM/yyyy")
+                                </div>
+                                <div class="extra-small text-muted">
+                                    @item.Exame?.DataHoraMarcacao.ToString("HH:mm")
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning" title="Editar">Editar<i class="bi bi-pencil"></i></a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info" title="Detalhes">Detalhes<i class="bi bi-eye"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger" title="Eliminar">Apagar<i class="bi bi-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @* --- PAGINAÇÃO NO RODAPÉ DA CARD --- *@
+        @if (totalPages > 1)
+        {
+            <div class="card-footer bg-white border-top-0 py-3">
+                <nav aria-label="Navegação de páginas">
+                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                        <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(currentPage - 1)"
+                               asp-route-searchString="@ViewBag.CurrentFilter">Anterior</a>
+                        </li>
+
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link" asp-action="Index"
+                                   asp-route-page="@i"
+                                   asp-route-searchString="@ViewBag.CurrentFilter">@i</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Index"
+                               asp-route-page="@(currentPage + 1)"
+                               asp-route-searchString="@ViewBag.CurrentFilter">Próximo</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

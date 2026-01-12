@@ -13,11 +13,11 @@ namespace HealthWellbeing.Models
         public string NomeEquipamento { get; set; } = string.Empty;
 
 
-        [Required(ErrorMessage = "A quantidade em stock é obrigatória.")]
+        [Required(ErrorMessage = "O tamannho é obrigatória.")]
         [StringLength(20)]
         public string? Tamanho { get; set; }
 
-        [Required(ErrorMessage = "A quantidade em stock é obrigatória.")]
+        [Required(ErrorMessage = "A quantidade é obrigatória.")]
         [Range(0, int.MaxValue)]
         public int Quantidade { get; set; }
 

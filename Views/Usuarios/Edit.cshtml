@@ -1,0 +1,76 @@
+﻿@model HealthWellbeing.ViewModels.CriarUsuario
+
+@{
+    ViewData["Title"] = "Editar Utilizador";
+}
+
+<div class="container mt-4">
+    @* --- Cabeçalho --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-secondary">
+            <i class="bi bi-person-gear me-2"></i>Editar Perfil
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            @* --- Cartão do Formulário --- *@
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-warning py-3">
+                    <h5 class="card-title mb-0 text-dark fw-bold">
+                        <i class="bi bi-pencil-square me-2"></i>Atualizar Conta
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @* ID oculto - agora acessível via CriarUsuario *@
+                        <input type="hidden" asp-for="Id" />
+
+                        @* Email (Bloqueado ou Editável conforme a regra de negócio) *@
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold small text-muted text-uppercase">Endereço de Email</label>
+                            <input asp-for="Email" class="form-control shadow-sm" type="email" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        @* Dropdown de Papéis (Roles) *@
+                        <div class="mb-4">
+                            <label asp-for="Role" class="form-label fw-bold small text-muted text-uppercase">Papel da Conta</label>
+                            <select asp-for="Role" class="form-select shadow-sm border-primary" asp-items="ViewBag.Roles">
+                                <option value="">-- Selecionar Novo Papel --</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                <i class="bi bi-save me-2"></i>Guardar Alterações
+                            </button>
+                            <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* --- Informação Extra --- *@
+            <div class="mt-3 p-3 bg-light rounded-3 border small text-muted">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+                <strong>Atenção:</strong> Ao alterar o papel, as permissões do utilizador serão atualizadas no próximo login.
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

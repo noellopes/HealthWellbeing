@@ -274,8 +274,7 @@ namespace HealthWellbeing.Data
                                 SalaDeExameId = sala.SalaId,
 
                                 ExameTipoId = tipo.ExameTipoId,
-                                ProfissionalExecutanteId = prof.ProfissionalExecutanteId,
-                                MaterialEquipamentoAssociadoId = mat.MaterialEquipamentoAssociadoId
+                                ProfissionalExecutanteId = prof.ProfissionalExecutanteId
                             });
                         }
                     }

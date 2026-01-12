@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin, Gestor")]
+    [Authorize(Roles = "Admin, Medico, Supervisor Tecnico")]
     public class MaterialEquipamentoAssociadoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

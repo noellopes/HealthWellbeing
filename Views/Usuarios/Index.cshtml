@@ -1,0 +1,86 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using HealthWellbeing.ViewModels
+@model IEnumerable<CriarUsuario>
+
+@{
+    ViewData["Title"] = "Gestão de Contas";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-secondary mb-0">
+            <i class="bi bi-people-fill me-2"></i>Contas de Utilizador
+        </h1>
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-person-plus-fill me-1"></i>Novo Utilizador
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Email</th>
+                            <th>Papel da Conta</th>
+                            <th class="text-center">Estado Email</th>
+                            <th class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">@item.Email</td>
+                                <td>
+                                    @{
+                                        var badgeClass = item.Role switch
+                                        {
+                                            "Admin" => "bg-danger",
+                                            "Medico" => "bg-primary",
+                                            "Rececionista" => "bg-info text-dark",
+                                            "Utente" => "bg-success",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @badgeClass">@item.Role</span>
+                                </td>
+
+                                @* --- COLUNA ESTADO EMAIL --- *@
+                                <td class="text-center">
+                                    @if (item.EmailConfirmed)
+                                    {
+                                        <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Confirmado
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning px-3">
+                                            <i class="bi bi-clock-history me-1"></i> Pendente
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info btn-sm">Detalhes
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm">Editar
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm">Apagar
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

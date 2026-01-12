@@ -1,0 +1,111 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityUser
+
+@{
+    ViewData["Title"] = "Detalhes do Utilizador";
+}
+
+<div class="container mt-4">
+    @* --- Cabeçalho --- *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-secondary">
+            <i class="bi bi-person-vcard me-2"></i>Perfil da Conta
+        </h1>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                <i class="bi bi-pencil me-1"></i>Editar Dados
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        @* --- Coluna: Informação Principal --- *@
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Informações Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted small text-uppercase">Email / Login</dt>
+                        <dd class="col-sm-8 fw-bold">@Model.Email</dd>
+
+                        @* --- CAMPO ADICIONADO: PAPEL DA CONTA --- *@
+                        <dt class="col-sm-4 text-muted small text-uppercase">Papel / Cargo</dt>
+                        <dd class="col-sm-8">
+                            @{
+                                var role = ViewBag.Role as string ?? "Sem Papel";
+                                var badgeClass = role switch
+                                {
+                                    "Admin" => "bg-danger",
+                                    "Medico" => "bg-primary",
+                                    "Rececionista" => "bg-info text-dark",
+                                    "Utente" => "bg-success",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">@role</span>
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted small text-uppercase">ID do Utilizador</dt>
+                        <dd class="col-sm-8"><code class="small text-muted">@Model.Id</code></dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        @* --- Coluna: Segurança e Status --- *@
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="card-title mb-0"><i class="bi bi-shield-lock me-2"></i>Segurança</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Email Confirmado
+                            @if (Model.EmailConfirmed)
+                            {
+                                <span class="badge rounded-pill bg-success-subtle text-success border border-success px-3">Sim</span>
+                            }
+                            else
+                            {
+                                <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger px-3">Não</span>
+                            }
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Autenticação em 2 Passos (2FA)
+                            <span class="badge bg-light text-dark border rounded-pill px-3">
+                                @(Model.TwoFactorEnabled ? "Ativo" : "Desativado")
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Bloqueio de Conta
+                            @if (Model.LockoutEnabled)
+                            {
+                                <span class="text-success small fw-bold"><i class="bi bi-check-circle-fill"></i> Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Inativo</span>
+                            }
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Falhas de Login
+                            <span class="badge bg-secondary rounded-pill">@Model.AccessFailedCount</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --- Alerta de Segurança --- *@
+    <div class="alert alert-light border shadow-sm small mt-2">
+        <i class="bi bi-shield-shaded me-2 text-primary"></i>
+        Esta conta é gerida pelo <strong>ASP.NET Core Identity</strong>. Algumas propriedades sensíveis não são editáveis diretamente por segurança.
+    </div>
+</div>

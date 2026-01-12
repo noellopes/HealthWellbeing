@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityUser
+
+@{
+    ViewData["Title"] = "Eliminar Utilizador";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            @* --- Alerta de Perigo --- *@
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white py-3 text-center">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Eliminação</h5>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <p class="lead">Tem a certeza que deseja eliminar permanentemente esta conta?</p>
+
+                    <div class="bg-light p-3 rounded border mb-4 text-start">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4 text-muted small text-uppercase">Email</dt>
+                            <dd class="col-sm-8 fw-bold">@Model.Email</dd>
+
+                            <dt class="col-sm-4 text-muted small text-uppercase">ID Sistema</dt>
+                            <dd class="col-sm-8"><code class="small text-muted">@Model.Id</code></dd>
+                        </dl>
+                    </div>
+
+                    <div class="alert alert-warning small border-0 shadow-sm">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Esta ação é <strong>irreversível</strong>. O utilizador perderá imediatamente o acesso a todas as áreas do Health Wellbeing.
+                    </div>
+
+                    @* --- Formulário de Confirmação --- *@
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                                <i class="bi bi-trash me-2"></i>Sim, Eliminar Conta
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Cancelar e Voltar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -132,12 +132,12 @@ else
                                 </a>
 
                                 @* SÓ MOSTRA EDITAR E ELIMINAR SE FOR ADMIN *@
-                                @if (isAdmin)
+                                @if (User.IsInRole("Admin") || User.IsInRole("Supervisor Tecnico"))
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-warning mx-1">
+                                    <a asp-action="Edit" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-warning mx-1">Editar
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-danger">
+                                    <a asp-action="Delete" asp-route-id="@item.ProfissionalExecutanteId" class="btn btn-sm btn-danger">Apagar
                                         <i class="bi bi-trash"></i>
                                     </a>
                                 }

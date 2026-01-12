@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace HealthWellbeing.Controllers
 {
-    [Authorize(Roles = "Admin, Gestor")]
+    [Authorize(Roles = "Admin, Supervisor Tecnico")]
     public class ExameTipoController : Controller
     {
         private readonly HealthWellbeingDbContext _context;

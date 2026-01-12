@@ -164,8 +164,6 @@ namespace HealthWellbeing.Migrations
 
                     b.HasIndex("ExameTipoId");
 
-                    b.HasIndex("MaterialEquipamentoAssociadoId");
-
                     b.HasIndex("MedicoSolicitanteId");
 
                     b.HasIndex("ProfissionalExecutanteId");
@@ -908,17 +906,44 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("SalaDeExame");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.ViewModels.RegistoMateriais", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tamanho")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExameId");
+
+                    b.HasIndex("MaterialStatusId");
+
+                    b.ToTable("RegistoMateriais");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ExameTipo", "ExameTipo")
                         .WithMany()
                         .HasForeignKey("ExameTipoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.MaterialEquipamentoAssociado", "MaterialEquipamentoAssociado")
-                        .WithMany()
-                        .HasForeignKey("MaterialEquipamentoAssociadoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -947,8 +972,6 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("ExameTipo");
-
-                    b.Navigation("MaterialEquipamentoAssociado");
 
                     b.Navigation("MedicoSolicitante");
 
@@ -1004,9 +1027,33 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Funcao");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.ViewModels.RegistoMateriais", b =>
+                {
+                    b.HasOne("HealthWellBeing.Models.Exame", "Exame")
+                        .WithMany("RegistoMateriais")
+                        .HasForeignKey("ExameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.EstadoMaterial", "Estado")
+                        .WithMany()
+                        .HasForeignKey("MaterialStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Estado");
+
+                    b.Navigation("Exame");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Especialidade", b =>
                 {
                     b.Navigation("TiposExame");
+                });
+
+            modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
+                {
+                    b.Navigation("RegistoMateriais");
                 });
 
             modelBuilder.Entity("HealthWellBeing.Models.Utente", b =>

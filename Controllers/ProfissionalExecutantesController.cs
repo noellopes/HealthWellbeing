@@ -56,6 +56,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ProfissionalExecutantes/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -74,7 +75,7 @@ namespace HealthWellbeing.Controllers
         // ============================================================
 
         // GET: ProfissionalExecutantes/Create
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public IActionResult Create()
         {
             ViewData["FuncaoId"] = new SelectList(_context.Funcoes, "FuncaoId", "NomeFuncao");
@@ -83,7 +84,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public async Task<IActionResult> Create([Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
         {
             if (ModelState.IsValid)
@@ -99,7 +100,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ProfissionalExecutantes/Edit/5
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -116,7 +117,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public async Task<IActionResult> Edit(int id, [Bind("ProfissionalExecutanteId,Nome,Telefone,Email,FuncaoId")] ProfissionalExecutante profissionalExecutante)
         {
             if (id != profissionalExecutante.ProfissionalExecutanteId)
@@ -145,7 +146,7 @@ namespace HealthWellbeing.Controllers
         }
 
         // GET: ProfissionalExecutantes/Delete/5
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -161,7 +162,7 @@ namespace HealthWellbeing.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, Gestor")]
+        [Authorize(Roles = "Admin, Supervisor Tecnico")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var profissional = await _context.ProfissionalExecutante.FindAsync(id);

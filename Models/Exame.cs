@@ -1,4 +1,5 @@
 ﻿using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -47,8 +48,9 @@ namespace HealthWellBeing.Models
         public SalaDeExames? SalaDeExame { get; set; }
 
         [Required(ErrorMessage = "O Equipamento é obrigatório.")]
+
         public int MaterialEquipamentoAssociadoId { get; set; }
-        public MaterialEquipamentoAssociado? MaterialEquipamentoAssociado { get; set; }
+        public virtual ICollection<RegistoMateriais> RegistoMateriais { get; set; } = new List<RegistoMateriais>();
 
         // --- OPÇÕES FIXAS ---
         public static readonly IReadOnlyList<string> OpcoesEstado = new List<string>

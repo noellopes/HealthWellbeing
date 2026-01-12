@@ -1,4 +1,5 @@
 ﻿using HealthWellbeing.Models;
+using HealthWellbeing.ViewModels;
 using HealthWellBeing.Models;
 using Microsoft.EntityFrameworkCore;
 using NuGet.ContentModel;
@@ -29,6 +30,8 @@ namespace HealthWellbeing.Data
 
         public DbSet<Funcao> Funcoes { get; set; }
         public DbSet<EstadoMaterial> EstadosMaterial{ get; set; }
+
+        public DbSet<RegistoMateriais> RegistoMateriais { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

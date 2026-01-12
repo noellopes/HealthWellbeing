@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthWellbeing.Migrations
 {
     [DbContext(typeof(HealthWellbeingDbContext))]
-    [Migration("20260108132759_InitialCreate")]
+    [Migration("20260112010815_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -166,8 +166,6 @@ namespace HealthWellbeing.Migrations
                     b.HasKey("ExameId");
 
                     b.HasIndex("ExameTipoId");
-
-                    b.HasIndex("MaterialEquipamentoAssociadoId");
 
                     b.HasIndex("MedicoSolicitanteId");
 
@@ -612,12 +610,6 @@ namespace HealthWellbeing.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaterialEquipamentoAssociadoId"));
 
-                    b.Property<int?>("EstadoMaterialMaterialStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MaterialStatusId")
-                        .HasColumnType("int");
-
                     b.Property<string>("NomeEquipamento")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -626,9 +618,12 @@ namespace HealthWellbeing.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
-                    b.HasKey("MaterialEquipamentoAssociadoId");
+                    b.Property<string>("Tamanho")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
-                    b.HasIndex("EstadoMaterialMaterialStatusId");
+                    b.HasKey("MaterialEquipamentoAssociadoId");
 
                     b.ToTable("MaterialEquipamentoAssociado");
 
@@ -636,184 +631,142 @@ namespace HealthWellbeing.Migrations
                         new
                         {
                             MaterialEquipamentoAssociadoId = 1,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Seringa Descartável 5ml",
-                            Quantidade = 500
+                            NomeEquipamento = "Luvas de Látex",
+                            Quantidade = 2,
+                            Tamanho = "S"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 2,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Compressa de Gaze Esterilizada",
-                            Quantidade = 1200
+                            NomeEquipamento = "Luvas de Látex",
+                            Quantidade = 3,
+                            Tamanho = "M"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 3,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Monitor de Sinais Vitais",
-                            Quantidade = 15
+                            NomeEquipamento = "Luvas de Látex",
+                            Quantidade = 1,
+                            Tamanho = "L"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 4,
-                            MaterialStatusId = 4,
-                            NomeEquipamento = "Eletrocardiógrafo Portátil",
-                            Quantidade = 5
+                            NomeEquipamento = "Máscara Cirúrgica Descartável",
+                            Quantidade = 2,
+                            Tamanho = "Único"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 5,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Luvas de Nitrilo (Caixa)",
-                            Quantidade = 80
+                            NomeEquipamento = "Bata Cirúrgica Estéril",
+                            Quantidade = 1,
+                            Tamanho = "L"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 6,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Cadeira de Rodas Standard",
-                            Quantidade = 25
+                            NomeEquipamento = "Seringa",
+                            Quantidade = 2,
+                            Tamanho = "5ml"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 7,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Bomba de Infusão Volumétrica",
-                            Quantidade = 40
+                            NomeEquipamento = "Seringa",
+                            Quantidade = 1,
+                            Tamanho = "10ml"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 8,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Termómetro Digital de Testa",
-                            Quantidade = 95
+                            NomeEquipamento = "Agulha Hipodérmica",
+                            Quantidade = 2,
+                            Tamanho = "21G"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 9,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Aspirador Cirúrgico",
-                            Quantidade = 8
+                            NomeEquipamento = "Agulha Hipodérmica",
+                            Quantidade = 2,
+                            Tamanho = "23G"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 10,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Mesa de Cirurgia Multiusos",
-                            Quantidade = 3
+                            NomeEquipamento = "Algodão Hidrófilo (Pacote)",
+                            Quantidade = 1,
+                            Tamanho = "500g"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 11,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Kit de Sutura Estéril",
-                            Quantidade = 300
+                            NomeEquipamento = "Compressas de Gaze Estéril",
+                            Quantidade = 2,
+                            Tamanho = "10x10cm"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 12,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Bisturi Descartável (Unidade)",
-                            Quantidade = 1500
+                            NomeEquipamento = "Ligadura Elástica",
+                            Quantidade = 1,
+                            Tamanho = "5cm"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 13,
-                            MaterialStatusId = 4,
-                            NomeEquipamento = "Ventilador Pulmonar",
-                            Quantidade = 12
+                            NomeEquipamento = "Ligadura Elástica",
+                            Quantidade = 2,
+                            Tamanho = "10cm"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 14,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Carro de Emergência (Completo)",
-                            Quantidade = 6
+                            NomeEquipamento = "Adesivo Micropore",
+                            Quantidade = 2,
+                            Tamanho = "2.5cm"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 15,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Agulha Hipodérmica 21G",
-                            Quantidade = 2000
+                            NomeEquipamento = "Solução Betadine (Frasco)",
+                            Quantidade = 1,
+                            Tamanho = "100ml"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 16,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Otoscópio/Oftalmoscópio",
-                            Quantidade = 18
+                            NomeEquipamento = "Espátula de Madeira (Abaixa-língua)",
+                            Quantidade = 2,
+                            Tamanho = "Único"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 17,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Tala Imobilizadora (Vários Tamanhos)",
-                            Quantidade = 75
+                            NomeEquipamento = "Copo de Recolha de Urina",
+                            Quantidade = 3,
+                            Tamanho = "100ml"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 18,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Esfigmomanómetro Digital",
-                            Quantidade = 35
+                            NomeEquipamento = "Gel para Ecografia (Frasco)",
+                            Quantidade = 2,
+                            Tamanho = "250ml"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 19,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Mascára Cirúrgica N95",
-                            Quantidade = 1000
+                            NomeEquipamento = "Papel para marquesa (Rolo)",
+                            Quantidade = 2,
+                            Tamanho = "Standard"
                         },
                         new
                         {
                             MaterialEquipamentoAssociadoId = 20,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Laringoscópio Completo",
-                            Quantidade = 7
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 21,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Fato de Proteção Biológica",
-                            Quantidade = 150
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 22,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Desfibrilhador Externo Automático (DEA)",
-                            Quantidade = 10
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 23,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Pilha Alcalina AA (Pack de 10)",
-                            Quantidade = 20
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 24,
-                            MaterialStatusId = 2,
-                            NomeEquipamento = "Estetoscópio Littmann",
-                            Quantidade = 55
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 25,
-                            MaterialStatusId = 4,
-                            NomeEquipamento = "Balança Hospitalar Digital",
-                            Quantidade = 4
-                        },
-                        new
-                        {
-                            MaterialEquipamentoAssociadoId = 26,
-                            MaterialStatusId = 1,
-                            NomeEquipamento = "Gesso Ortopédico (Rolo)",
-                            Quantidade = 90
+                            NomeEquipamento = "Cateter Intravenoso",
+                            Quantidade = 4,
+                            Tamanho = "20G"
                         });
                 });
 
@@ -956,17 +909,44 @@ namespace HealthWellbeing.Migrations
                     b.ToTable("SalaDeExame");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.ViewModels.RegistoMateriais", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tamanho")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExameId");
+
+                    b.HasIndex("MaterialStatusId");
+
+                    b.ToTable("RegistoMateriais");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.ExameTipo", "ExameTipo")
                         .WithMany()
                         .HasForeignKey("ExameTipoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthWellbeing.Models.MaterialEquipamentoAssociado", "MaterialEquipamentoAssociado")
-                        .WithMany()
-                        .HasForeignKey("MaterialEquipamentoAssociadoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -995,8 +975,6 @@ namespace HealthWellbeing.Migrations
                         .IsRequired();
 
                     b.Navigation("ExameTipo");
-
-                    b.Navigation("MaterialEquipamentoAssociado");
 
                     b.Navigation("MedicoSolicitante");
 
@@ -1037,15 +1015,6 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Recurso");
                 });
 
-            modelBuilder.Entity("HealthWellbeing.Models.MaterialEquipamentoAssociado", b =>
-                {
-                    b.HasOne("HealthWellbeing.Models.EstadoMaterial", "EstadoMaterial")
-                        .WithMany()
-                        .HasForeignKey("EstadoMaterialMaterialStatusId");
-
-                    b.Navigation("EstadoMaterial");
-                });
-
             modelBuilder.Entity("HealthWellbeing.Models.ProfissionalExecutante", b =>
                 {
                     b.HasOne("HealthWellbeing.Models.Funcao", "Funcao")
@@ -1061,9 +1030,33 @@ namespace HealthWellbeing.Migrations
                     b.Navigation("Funcao");
                 });
 
+            modelBuilder.Entity("HealthWellbeing.ViewModels.RegistoMateriais", b =>
+                {
+                    b.HasOne("HealthWellBeing.Models.Exame", "Exame")
+                        .WithMany("RegistoMateriais")
+                        .HasForeignKey("ExameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthWellbeing.Models.EstadoMaterial", "Estado")
+                        .WithMany()
+                        .HasForeignKey("MaterialStatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Estado");
+
+                    b.Navigation("Exame");
+                });
+
             modelBuilder.Entity("HealthWellBeing.Models.Especialidade", b =>
                 {
                     b.Navigation("TiposExame");
+                });
+
+            modelBuilder.Entity("HealthWellBeing.Models.Exame", b =>
+                {
+                    b.Navigation("RegistoMateriais");
                 });
 
             modelBuilder.Entity("HealthWellBeing.Models.Utente", b =>

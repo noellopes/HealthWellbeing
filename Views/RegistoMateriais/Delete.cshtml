@@ -1,0 +1,74 @@
+﻿@model HealthWellbeing.ViewModels.RegistoMateriais
+
+@{
+    ViewData["Title"] = "Eliminar Registo de Material";
+}
+
+<div class="container mt-4">
+    @* --- Cabeçalho --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-secondary">
+            <i class="bi bi-trash me-2"></i>Eliminar Consumo
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            @* --- Cartão de Confirmação --- *@
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-header bg-danger py-3">
+                    <h5 class="card-title mb-0 text-white fw-bold">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4 text-center">Tem a certeza de que deseja eliminar este registo de material? Esta ação não pode ser desfeita.</p>
+
+                    <div class="bg-light p-3 rounded-3 border mb-4">
+                        <dl class="row mb-0 small">
+                            <dt class="col-sm-4 text-muted text-uppercase small fw-bold">Material:</dt>
+                            <dd class="col-sm-8 fw-bold">@Model.Nome</dd>
+
+                            <dt class="col-sm-4 text-muted text-uppercase small fw-bold">Tamanho:</dt>
+                            <dd class="col-sm-8">@(Model.Tamanho ?? "N/A")</dd>
+
+                            <dt class="col-sm-4 text-muted text-uppercase small fw-bold">Quantidade:</dt>
+                            <dd class="col-sm-8"><span class="badge bg-dark">@Model.Quantidade</span></dd>
+
+                            <dt class="col-sm-4 text-muted text-uppercase small fw-bold">Estado:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-info text-dark">@Model.Estado?.Nome</span>
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted text-uppercase small fw-bold">Data do Exame:</dt>
+                            <dd class="col-sm-8 text-primary">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                @Model.Exame?.DataHoraMarcacao.ToString("dd/MM/yyyy HH:mm")
+                            </dd>
+                        </dl>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg shadow-sm">
+                                <i class="bi bi-trash-fill me-2"></i>Eliminar Permanentemente
+                            </button>
+                            <a asp-action="Index" class="btn btn-light border">Cancelar e Voltar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* --- Nota de Rodapé --- *@
+            <div class="mt-3 p-3 bg-light rounded-3 border small text-muted text-center">
+                <i class="bi bi-info-circle me-1"></i> A remoção deste item irá atualizar automaticamente o inventário associado ao exame.
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,87 @@
+﻿@model HealthWellbeing.ViewModels.CriarUsuario
+
+@{
+    ViewData["Title"] = "Novo Utilizador";
+}
+
+<div class="container mt-4">
+    @* --- Cabeçalho --- *@
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 text-secondary">
+            <i class="bi bi-person-plus me-2"></i>Registar Novo Utilizador
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            @* --- Cartão do Formulário --- *@
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-success py-3">
+                    <h5 class="card-title mb-0 text-white fw-bold">
+                        <i class="bi bi-shield-lock me-2"></i>Credenciais da Conta
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @* Email *@
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold small text-muted text-uppercase">Email Institucional</label>
+                            <input asp-for="Email" class="form-control shadow-sm" type="email" placeholder="nome@healthwellbeing.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        @* Papel / Role *@
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label fw-bold small text-muted text-uppercase">Papel da Conta</label>
+                            <select asp-for="Role" class="form-select shadow-sm border-success" asp-items="ViewBag.Roles">
+                                <option value="">-- Selecionar Papel (Admin, Medico...) --</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        @* Bloco de Passwords *@
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label fw-bold small text-muted text-uppercase">Password</label>
+                                <input asp-for="Password" class="form-control shadow-sm" type="password" />
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label fw-bold small text-muted text-uppercase">Confirmar</label>
+                                <input asp-for="ConfirmPassword" class="form-control shadow-sm" type="password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                <i class="bi bi-check-circle me-2"></i>Criar Utilizador
+                            </button>
+                            <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* --- Dica de Segurança --- *@
+            <div class="mt-3 p-3 bg-light rounded-3 border small text-muted">
+                <i class="bi bi-info-circle-fill text-primary me-1"></i>
+                <strong>Importante:</strong> Ao selecionar um papel, o utilizador terá acesso imediato às áreas correspondentes (Ex: Administração, Exames, etc.).
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
