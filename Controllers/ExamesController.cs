@@ -186,7 +186,19 @@ namespace HealthWellbeing.Controllers
                 .Include(e => e.RegistoMateriais)
                 .FirstOrDefaultAsync(m => m.ExameId == id);
 
-            if (exame == null) return NotFound();
+            if (exame == null)
+            {
+                TempData["ErrorMessage"] = "Este exame já não existe ou já foi eliminado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // NOVA VALIDAÇÃO: Bloquear acesso à página de confirmação se já estiver realizado
+            if (exame.Estado == "Realizado")
+            {
+                TempData["ErrorMessage"] = "Não é possível eliminar um exame que já foi marcado como 'Realizado'.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(exame);
         }
 
@@ -195,13 +207,35 @@ namespace HealthWellbeing.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var exame = await _context.Exames.FindAsync(id);
-            if (exame != null)
+
+            if (exame == null)
+            {
+                TempData["ErrorMessage"] = "Erro: O exame que tenta eliminar já não existe no sistema.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // NOVA VALIDAÇÃO DE SEGURANÇA NO POST: Impede a eliminação via requisição direta se realizado
+            if (exame.Estado == "Realizado")
+            {
+                TempData["ErrorMessage"] = "Operação negada: Exames com estado 'Realizado' não podem ser removidos.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 var materiais = _context.RegistoMateriais.Where(rm => rm.ExameId == id);
                 _context.RegistoMateriais.RemoveRange(materiais);
+
                 _context.Exames.Remove(exame);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Exame eliminado com sucesso.";
             }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocorreu um erro ao tentar eliminar o exame.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
